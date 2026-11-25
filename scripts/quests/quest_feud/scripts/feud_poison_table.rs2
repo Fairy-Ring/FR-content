@@ -1,19 +1,20 @@
-// The Feud — Use Hag's poison on the beer table (dump §16.2). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Using the Hag's poison
-// on the table, dump §16.2 — one mes: "You poison the drink."). Loc
-// feud_poison_beer_table 6246 @ 3356,2957 L0 (m52_46; op1=Take-beer is
-// LATER, not this hop). [oplocu] fires when a held item is used on the
-// table; only poison_from_hag 4604 proceeds. Success: mes "You poison
-// the drink." + inv_del poison_from_hag 4604 ×1 + %feud_var_drink_found
-// = 1 (CANDIDATE leftover name — drink poisoned). Already poisoned
-// (drink_found >= 1): silent return (dump §16.2 has no second-use line).
-// Stage/count stay. No 28. No dest / p_tele. Operator "Is the deed
-// done?" §17.2 is LATER. Fossil Island barman line is SUBTRACT.
-// No && / ||.
-// Cite feud-first-slice-377.md.
+// The Feud — poison Hag's drink at the beer table.
+// CANDIDATE current OSRS Transcript:The Feud; period RuneHQ places the
+// Barman report before table use. Gate: stage 22, source-named drink_found
+// varbit 321, and one poison_from_hag item.
+// Success consumes one vial, sets boss_vis varbit 335, and advances to 23.
+// Further item use at stage 23 repeats the sourced player line; no second vial
+// is consumed. Barman wording remains in the town script.
 
 [oplocu,feud_poison_beer_table]
-if (%feud_var_drink_found >= 1) {
+if (%feud_var >= ^feud_poisoned_drink) {
+    ~chatplayer("<p,neutral>I've poisoned the drink. I'd better leave it alone now in case someone notices.");
+    return;
+}
+if (%feud_var ! ^feud_poison_obtained) {
+    return;
+}
+if (%feud_var_drink_found < 1) {
     return;
 }
 def_obj $used = last_useitem;
@@ -22,5 +23,6 @@ if ($used ! poison_from_hag) {
 }
 mes("You poison the drink.");
 inv_del(inv, poison_from_hag, 1);
-%feud_var_drink_found = 1; // CANDIDATE leftover name — drink poisoned
+%feud_boss_vis = 1;
+%feud_var = ^feud_poisoned_drink;
 return;

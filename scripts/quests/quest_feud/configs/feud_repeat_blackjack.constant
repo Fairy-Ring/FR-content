@@ -1,0 +1,14 @@
+// VERIFIED period level gate for Menaphite Thugs: Tip.It, 27 April 2006.
+^feud_repeat_thug_thieving_level = 65
+
+// VERIFIED period bonuses, in the engine's tenths-of-XP units.
+^feud_repeat_bandit_ko_xp = 100
+^feud_repeat_thug_ko_xp = 200
+
+// VERIFIED period witnessed Bandit KO damage; Thugs share the reported failure result.
+^feud_repeat_witness_damage = 4
+// UNKNOWN engineering duration: the source says "a few seconds" but gives no ticks.
+^feud_repeat_witness_stun_ticks = 8
+
+// VERIFIED period willow sale price: Tip.It, 27 April 2006.
+^feud_repeat_willow_price = 600

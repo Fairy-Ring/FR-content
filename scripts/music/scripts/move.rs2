@@ -24,7 +24,6 @@
 [mapzone,0_36_51] @music_playbyregion(coord);
 [mapzone,0_36_52] @music_playbyregion(coord);
 [mapzone,0_36_53] @music_playbyregion(coord);
-[mapzone,0_36_54] @music_playbyregion(coord);
 [mapzone,0_37_47] @music_playbyregion(coord);
 [mapzone,0_37_48] 
 ~castlewars_mapzone;
@@ -34,7 +33,6 @@
 [mapzone,0_37_52] @music_playbyregion(coord);
 [mapzone,0_37_53] @music_playbyregion(coord);
 [mapzone,0_37_54] @music_playbyregion(coord);
-[mapzone,0_37_55] @music_playbyregion(coord);
 [mapzone,0_37_56] @music_playbyregion(coord);
 [mapzone,0_37_57] @music_playbyregion(coord);
 [mapzone,0_38_46] @music_playbyregion(coord);
@@ -231,16 +229,24 @@
 [mapzone,0_53_49] @music_playbyregion(coord);
 [mapzone,0_53_50] @music_playbyregion(coord);
 [mapzone,0_53_51] @music_playbyregion(coord);
-[mapzone,0_53_52] @music_playbyregion(coord);
-[mapzone,0_53_53] @music_playbyregion(coord);
+[mapzone,0_53_52]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
+[mapzone,0_53_53]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
 [mapzone,0_53_54] @music_playbyregion(coord);
 [mapzone,0_53_55] @music_playbyregion(coord);
 [mapzone,0_54_48] @music_playbyregion(coord);
 [mapzone,0_54_49] @music_playbyregion(coord);
 [mapzone,0_54_50] @music_playbyregion(coord);
 [mapzone,0_54_51] @music_playbyregion(coord);
-[mapzone,0_54_52] @music_playbyregion(coord);
-[mapzone,0_54_53] @music_playbyregion(coord);
+[mapzone,0_54_52]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
+[mapzone,0_54_53]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
 [mapzone,0_54_54]
 ~wanted_canifis_entry;
 @music_playbyregion(coord);
@@ -401,7 +407,6 @@
 [mapzone,0_34_78] @music_playbyregion(coord);
 [mapzone,0_35_73] @music_playbyregion(coord);
 [mapzone,0_35_78] @music_playbyregion(coord);
-[mapzone,0_36_55] @music_playbyregion(coord);
 [mapzone,0_36_56] @music_playbyregion(coord);
 [mapzone,0_36_57] @music_playbyregion(coord);
 [mapzone,0_36_77] @music_playbyregion(coord);

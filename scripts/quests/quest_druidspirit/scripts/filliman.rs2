@@ -115,6 +115,7 @@ switch_int(%druidspirit) {
 }
 
 [label,filliman_ns_dialogue]
+if (%druidspirit = ^druidspirit_complete & %fairy_farmers_quest = ^ft1_components) @ft1_nature_bless;
 if(%druidspirit < ^druidspirit_full_transform) {
     mes("This spirit seems to be occupied with other-worldly matters.");
     return;

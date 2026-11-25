@@ -1,0 +1,9 @@
+// Original 377 ids 533/534; original client fields retained.
+// UNKNOWN: save favour without time decay; no retained source specifies decay.
+// Old saves omitted these temporary varps and therefore load both as zero.
+[tai_bwo_cleanup]
+scope=perm
+
+[tai_bwo_villagerchat]
+transmit=yes
+scope=perm

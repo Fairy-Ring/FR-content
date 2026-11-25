@@ -1,0 +1,784 @@
+[
+  {
+    "name": "blackjack_oak",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 2,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "blackjack_willow",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 8,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_assault_oak",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 4,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 4,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_defend_oak",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 4,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 4,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_assault_willow",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 8,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 8,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_defend_willow",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 8,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 8,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_maple",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 20,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_assault_maple",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 24,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 20,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "roguetrader_bj_defend_maple",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 24,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 20,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_blunt",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_blunt_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_blunt_pound",
+        "sound": "blackjack_crush"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "mud_battlestaff",
+    "bonuses": {
+      "stabattack": 7,
+      "slashattack": -1,
+      "crushattack": 28,
+      "magicattack": 10,
+      "rangeattack": 0,
+      "stabdefence": 2,
+      "slashdefence": 3,
+      "crushdefence": 1,
+      "magicdefence": 10,
+      "rangedefence": 0,
+      "strengthbonus": 35,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_staff",
+    "attackrate": 5,
+    "attackrange": 0,
+    "defend_anim": "human_stafforb_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_stafforb_pummel",
+        "sound": "staff_hit"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_stafforb_pummel",
+        "sound": "staff_hit"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_stafforb_pummel",
+        "sound": "staff_hit"
+      }
+    ],
+    "requirements": {
+      "attack": 30,
+      "magic": 30
+    },
+    "quests": {}
+  },
+  {
+    "name": "mystic_mud_staff",
+    "bonuses": {
+      "stabattack": 10,
+      "slashattack": -1,
+      "crushattack": 40,
+      "magicattack": 10,
+      "rangeattack": 0,
+      "stabdefence": 2,
+      "slashdefence": 3,
+      "crushdefence": 1,
+      "magicdefence": 10,
+      "rangedefence": 0,
+      "strengthbonus": 50,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_staff",
+    "attackrate": 5,
+    "attackrange": 0,
+    "defend_anim": "human_stafforb_block",
+    "styles": [
+      {
+        "type": 2,
+        "stance": 0,
+        "animation": "human_stafforb_pummel",
+        "sound": "staff_hit"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_stafforb_pummel",
+        "sound": "staff_hit"
+      },
+      {
+        "type": 2,
+        "stance": 2,
+        "animation": "human_stafforb_pummel",
+        "sound": "staff_hit"
+      }
+    ],
+    "requirements": {
+      "attack": 40,
+      "magic": 40
+    },
+    "quests": {}
+  },
+  {
+    "name": "machette_opal",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 8,
+      "crushattack": -2,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 4,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_slash",
+    "attackrate": 5,
+    "attackrange": 0,
+    "defend_anim": "human_sword_def",
+    "styles": [
+      {
+        "type": 1,
+        "stance": 0,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      },
+      {
+        "type": 1,
+        "stance": 1,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      },
+      {
+        "type": 0,
+        "stance": 3,
+        "animation": "human_sword_stab",
+        "sound": "hacksword_stab"
+      },
+      {
+        "type": 1,
+        "stance": 2,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "machette_jade",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 11,
+      "crushattack": -2,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 6,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_slash",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_sword_def",
+    "styles": [
+      {
+        "type": 1,
+        "stance": 0,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      },
+      {
+        "type": 1,
+        "stance": 1,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      },
+      {
+        "type": 0,
+        "stance": 3,
+        "animation": "human_sword_stab",
+        "sound": "hacksword_stab"
+      },
+      {
+        "type": 1,
+        "stance": 2,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "machette_redtopaz",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 16,
+      "crushattack": -2,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 1,
+      "strengthbonus": 10,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_slash",
+    "attackrate": 4,
+    "attackrange": 0,
+    "defend_anim": "human_sword_def",
+    "styles": [
+      {
+        "type": 1,
+        "stance": 0,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      },
+      {
+        "type": 1,
+        "stance": 1,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      },
+      {
+        "type": 0,
+        "stance": 3,
+        "animation": "human_sword_stab",
+        "sound": "hacksword_stab"
+      },
+      {
+        "type": 1,
+        "stance": 2,
+        "animation": "human_sword_slash",
+        "sound": "hacksword_slash"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "tzhaar_throwingring",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 69,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0,
+      "rangebonus": 49
+    },
+    "category": "weapon_thrown",
+    "attackrate": 4,
+    "attackrange": 7,
+    "defend_anim": "human_unarmedblock",
+    "styles": [
+      {
+        "type": 3,
+        "stance": 4,
+        "animation": "thzarr_ring_chuck",
+        "sound": "tzhaar_xil_attack_ring"
+      },
+      {
+        "type": 3,
+        "stance": 5,
+        "animation": "thzarr_ring_chuck",
+        "sound": "tzhaar_xil_attack_ring"
+      },
+      {
+        "type": 3,
+        "stance": 6,
+        "animation": "thzarr_ring_chuck",
+        "sound": "tzhaar_xil_attack_ring"
+      }
+    ],
+    "requirements": {},
+    "quests": {}
+  },
+  {
+    "name": "daganoth_cave_magic_shortbow",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 69,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_bow",
+    "attackrate": 5,
+    "attackrange": 8,
+    "defend_anim": "human_unarmedblock",
+    "styles": [
+      {
+        "type": 3,
+        "stance": 4,
+        "animation": "human_bow",
+        "sound": "arrowlaunch2"
+      },
+      {
+        "type": 3,
+        "stance": 5,
+        "animation": "human_bow",
+        "sound": "arrowlaunch2"
+      },
+      {
+        "type": 3,
+        "stance": 6,
+        "animation": "human_bow",
+        "sound": "arrowlaunch2"
+      }
+    ],
+    "requirements": {
+      "ranged": 60
+    },
+    "quests": {},
+    "wearpos2": "lefthand"
+  },
+  {
+    "name": "dragon_2h_sword",
+    "bonuses": {
+      "stabattack": -4,
+      "slashattack": 92,
+      "crushattack": 80,
+      "magicattack": -4,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": -1,
+      "strengthbonus": 93,
+      "prayerbonus": 0,
+      "rangebonus": 0
+    },
+    "category": "weapon_2h_sword",
+    "attackrate": 7,
+    "attackrange": 0,
+    "defend_anim": "human_sword_def",
+    "styles": [
+      {
+        "type": 1,
+        "stance": 0,
+        "animation": "human_dhsword_slash",
+        "sound": "2H_slash"
+      },
+      {
+        "type": 1,
+        "stance": 1,
+        "animation": "human_dhsword_slash",
+        "sound": "2H_slash"
+      },
+      {
+        "type": 2,
+        "stance": 1,
+        "animation": "human_dhsword_chop",
+        "sound": "2H_crush"
+      },
+      {
+        "type": 1,
+        "stance": 2,
+        "animation": "human_dhsword_slash",
+        "sound": "2H_slash"
+      }
+    ],
+    "requirements": {},
+    "quests": {},
+    "wearpos2": "lefthand"
+  }
+]

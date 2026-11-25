@@ -1,0 +1,44 @@
+[tzhaar_throwingring]
+name=Toktz-xil-ul
+desc=A razor sharp ring of obsidian.
+members=yes
+stackable=yes
+iop2=Wield
+model=obj_tzhaar_throwingring
+2dxof=3
+2dyof=-4
+2dzoom=890
+2dyan=28
+2dxan=408
+contrast=35
+ambient=15
+manwear=obj_tzhaar_throwingring_manwear,0
+womanwear=obj_tzhaar_throwingring_manwear,6
+cost=250
+wearpos=righthand
+weight=12oz
+// VERIFIED: Sal Ranging, 27 April 2006: Obsidian Ring, attack 69, defence 0.
+param=rangeattack,69
+param=rangedefence,0
+// CANDIDATE: own item page 11143, first populated vector revision 123665.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+// CANDIDATE: first populated ranged-strength field, revision 255780, 10 December 2014.
+param=rangebonus,49
+category=weapon_thrown
+// CANDIDATE: own item page speed and range; thrown-knife/dart parameter form.
+param=attackrate,4
+param=attackrange,7
+// CANDIDATE: named 377 ring throw, flight and sound assets.
+param=rangeattack_anim,thzarr_ring_chuck
+param=rangeattack_sound,tzhaar_xil_attack_ring
+param=proj_travel,tzhaar_ring_throw_attack
+param=defend_anim,human_unarmedblock

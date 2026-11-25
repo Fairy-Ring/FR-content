@@ -134,8 +134,8 @@
 133=itexam_bits
 134=last_logout
 135=itdigsitemulti
-136=varp136_unused
-137=varp137_unused
+136=makinghistory_key_distance
+137=fairy_gardeners_visited
 138=thieving_stall_timer
 139=legendsquest
 140=legends_bits
@@ -187,14 +187,14 @@
 186=dragon_shield
 187=dragon_goblin
 188=heroquest
-189=varp189_unused
-190=varp190_unused
-191=varp191_unused
+189=enchanted_key_hunt
+190=soulbane_instance
+191=ordinary_dialogue_bits
 192=murderquest
 193=murder_poisonproof_progress
 194=murder_evidence
 195=murdersus
-196=varp196_unused
+196=feud_trial_villager
 197=desertrescue
 198=desertrescue_map_mechanisms
 199=varp199_unused
@@ -498,7 +498,7 @@
 497=rd_rooms_tempvar
 498=rd_rooms_tempvar2
 499=magic_carpet_var
-500=varp500_unused
+500=farming_growth_minute
 501=varp501_bits
 502=farming_tree_varp
 503=farming_fruit_tree_varp
@@ -517,7 +517,7 @@
 516=varp516_bits
 517=mourning_quest
 518=mourning_quest_bits
-519=varp519_unused
+519=farming_protection
 520=dagganoth_area_project
 521=forget_main_var
 522=varp522_unused
@@ -536,7 +536,7 @@
 535=tbw_cleanup_temp
 536=bankpin
 537=varp537_bits
-538=varp538_unused
+538=farming_soil_lives
 539=varp539_unused
 540=roguetrader_var
 541=rogue_suduku1

@@ -5,8 +5,8 @@
 // when >= 42 + inv 4445. Consume 4445. 42→43.
 // Key ring award leftover (Research: subject one-small-favour): inv_add 4446 once
 // on the same rant. 43→44.
-// Lamps leftover (Research: subject one-small-favour): inv_add 4447 twice (to 2).
-// 44→45. No dest / leftover 12346 / Check-keys / Rub / shop rewrite.
+// Lamps and completion: two 4447, then the registered terminal and reward scroll.
+// Rub remains in osf_reward_lamp.rs2. Research subject: one-small-favour.
 
 [opnpc1,shiloantiques]
 ~chatplayer("<p,neutral>Hello there!");
@@ -106,8 +106,8 @@ if ($mh = 1) {
 @yanni_items_for_sale;
 
 [label,yanni_osf_mahogany_return]
-// CANDIDATE Returning to Yanni with the red mahogany minus Quest complete /
-// toolbelt / topic / 2022 overlay. Grant 4446 once. Grant two 4447. No Rub.
+// CANDIDATE Returning to Yanni with the red mahogany minus toolbelt / topic /
+// 2022 overlay. VERIFIED rewards: period guides and kbase (subject one-small-favour).
 ~chatplayer("<p,happy>Here's the red mahogany you asked for.");
 ~chatnpc("<p,happy>Well, that's absolutely wonderful my friend! Many thanks!");
 ~chatplayer("<p,quiz>What, that's it?");
@@ -142,7 +142,9 @@ if ($lamps < 2) {
     inv_add(inv, thosf_reward_lamp, sub(2, $lamps));
 }
 if (%onesmallfavour = 44) {
-    %onesmallfavour = 45;
+    %onesmallfavour = ^onesmallfavour_complete;
+    // UNKNOWN scroll wording: functional title; reward lines use the period kbase list.
+    ~send_quest_complete(questlist:onesmallfavour, favour_key_ring, 200, ^onesmallfavour_questpoints, "You have completed One Small Favour!", "2 x 10000 experience|Steel Keyring|Ability to fly to the Feldip Hills");
 }
 return;
 

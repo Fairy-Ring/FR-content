@@ -1,0 +1,8 @@
+// CANDIDATE: the current sign transcript has no retained pre-cutoff revision.
+[oploc1,mudskipper_sign]
+~mesbox("Mudskipper Point.|WARNING!|BEWARE OF THE MUDSKIPPERS!");
+
+// CANDIDATE: the current Zanaris cow transcript has no retained pre-cutoff revision.
+[oploc1,fairy_fat_cow]
+~chatnpc_specific("Cow", cow, "<p,neutral>Hmm, interesting, there appears to be a human trying to talk to me. Is it aware that cows can't talk I wonder? Maybe if I just ignore it, it might go away.");
+mes("The cow is studiously ignoring you.");

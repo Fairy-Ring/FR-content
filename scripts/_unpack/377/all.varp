@@ -242,10 +242,6 @@ scope=perm
 
 [itdigsitemulti]
 
-[varp136_unused]
-
-[varp137_unused]
-
 [thieving_stall_timer]
 scope=perm
 
@@ -289,13 +285,6 @@ clientcode=7
 scope=perm
 transmit=yes
 
-[varp189_unused]
-
-[varp190_unused]
-
-[varp191_unused]
-
-[varp196_unused]
 
 [varp199_unused]
 
@@ -809,9 +798,6 @@ scope=perm
 
 [varp434_unused]
 
-[feud_var_multi]
-scope=perm
-
 [varp438_unused]
 // PRODUCT: S0 selects permanent save scope; this is not a recovered 377 fact.
 [alternate_spells]
@@ -960,8 +946,6 @@ transmit=yes
 [magic_carpet_var]
 transmit=yes
 
-[varp500_unused]
-
 [varp501_bits]
 transmit=yes
 
@@ -973,23 +957,7 @@ scope=perm
 transmit=yes
 scope=perm
 
-[farming_allotment_varp_1]
-transmit=yes
-scope=perm
-
-[farming_allotment_varp_2]
-transmit=yes
-scope=perm
-
-[farming_hops_varp]
-transmit=yes
-scope=perm
-
 [farming_special_tree_varp]
-transmit=yes
-scope=perm
-
-[farming_flower_varp]
 transmit=yes
 scope=perm
 
@@ -999,10 +967,6 @@ scope=perm
 
 [farming_varp_9]
 transmit=yes
-
-[varp511_bits]
-transmit=yes
-scope=perm
 
 [cactus_compost_varbit_basevar]
 transmit=yes
@@ -1014,18 +978,12 @@ scope=perm
 [spirit_tree_sarim_compost_varbit_basevar]
 scope=perm
 
-[varp515_bits]
-transmit=yes
-scope=perm
-
 [varp516_bits]
 transmit=yes
 scope=perm
 
 [mourning_quest_bits]
 transmit=yes
-
-[varp519_unused]
 
 [dagganoth_area_project]
 scope=perm
@@ -1053,10 +1011,6 @@ transmit=yes
 
 [varp532_unused]
 
-[tai_bwo_cleanup]
-
-[tai_bwo_villagerchat]
-transmit=yes
 
 [tbw_cleanup_temp]
 transmit=yes
@@ -1066,8 +1020,6 @@ transmit=yes
 scope=perm
 
 [varp537_bits]
-
-[varp538_unused]
 
 [varp539_unused]
 
@@ -1203,8 +1155,6 @@ transmit=yes
 
 [varp596_unused]
 
-[rimmington_extras_var]
-transmit=yes
 
 [desert]
 transmit=yes
@@ -1460,13 +1410,7 @@ scope=perm
 
 [varp713_unused]
 
-[rag_quest]
-scope=perm
-
 [varp715_unused]
-
-[rag_bone_2]
-transmit=yes
 
 [varp717_unused]
 

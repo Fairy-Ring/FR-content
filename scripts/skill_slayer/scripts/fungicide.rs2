@@ -1,0 +1,19 @@
+// CANDIDATE: Old School fungicide-spray page. One refill restores a spray to ten charges.
+[opheldu,_slayer_fungicide_spray]
+if (last_useitem = slayer_fungicide) {
+    ~fungicide_refill(last_slot);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,slayer_fungicide]
+if (oc_category(last_useitem) = slayer_fungicide_spray) {
+    ~fungicide_refill(last_useslot);
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,fungicide_refill](int $spray_slot)
+if (inv_getobj(inv, $spray_slot) = slayer_spray_pump_10) return;
+inv_del(inv, slayer_fungicide, 1);
+inv_setslot(inv, $spray_slot, slayer_spray_pump_10, 1);

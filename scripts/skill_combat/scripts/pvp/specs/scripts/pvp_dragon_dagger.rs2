@@ -4,7 +4,7 @@
 spotanim_pl(sp_attack_puncture_spotanim, 96, 0);
 anim(puncture, 0);
 sound_synth(puncture, 1, 0);
-.anim(.%com_defendanim, 20);
+if (.%com_defendanim ! null) .anim(.%com_defendanim, 20);
 .sound_synth(puncture, 1, 0);
 
 ~pvp_dragon_dagger_spec_hit;

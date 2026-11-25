@@ -1,0 +1,46 @@
+// Per-villager transient-state values; these are engineering identifiers, not quest stages.
+^feud_villager_state_idle = 0
+^feud_villager_state_distracted = 1
+^feud_villager_state_following = 2
+^feud_villager_state_unconscious = 3
+
+// VERIFIED source: successful blackjack knock-out awards 8 XP; witnessed knock-out costs 5 HP.
+^feud_villager_ko_xp = 80
+^feud_villager_witness_damage = 5
+// VERIFIED source: a caught ordinary villager pickpocket costs 2 HP.
+^feud_villager_pickpocket_fail_damage = 2
+
+// UNKNOWN engineering choices. The period source establishes that a failed knock-out
+// happens, but supplies no success-rate formula. The ordinary-man theft precedent uses
+// stat_random(thieving, 180, 240); neither bound below is a CANDIDATE historical KO rate.
+^feud_villager_ko_success_low = 180
+^feud_villager_ko_success_high = 240
+
+// UNKNOWN FEUD-KNOCKOUT-WINDOW-01: the ordinary-man player stun supplies an
+// eight-tick engineering precedent, not an authenticated Feud NPC wake duration.
+^feud_villager_knockout_ticks = 8
+
+// UNKNOWN FEUD-DISTRACTION-WINDOW-01: the theft window is a separate engineering
+// choice, not an authenticated duration or the rule for an unconscious NPC.
+^feud_villager_distraction_ticks = 12
+
+// UNKNOWN FEUD-TIMEOUT-REARM-01: native same-pass-safe queue delay, not a game duration.
+// Main approved remaining=1 using this minimum, making cleanup at most one tick late.
+^feud_repeat_timeout_min_delay = 2
+
+// UNKNOWN engineering choice: the closest local witness precedent uses radius 5 plus
+// line-of-sight for a stall theft; it is not a sourced Feud visibility radius.
+^feud_villager_witness_radius = 5
+
+// UNKNOWN engineering choice: Fenk's unrelated follower uses 1000 ticks; no Feud lure
+// timeout is sourced, and this value is not a historical Feud follow duration.
+^feud_villager_follow_timeout = 1000
+
+// The period transcript gives 10 coins for the distraction and 20 after refusing payment.
+^feud_urchin_payment_coins = 10
+^feud_urchin_double_payment_coins = 20
+
+// UNKNOWN engineering choice: nearest ordinary-man pickpocket precedent is 3 coins and
+// 8 XP. The Feud source gives neither an exact coin quantity nor pickpocket XP.
+^feud_villager_pickpocket_coins = 3
+^feud_villager_pickpocket_xp = 80

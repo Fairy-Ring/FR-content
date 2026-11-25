@@ -1,0 +1,19 @@
+// Candidate proximity hatch uses the native hunt -> queue4 dispatch.
+[ai_queue4,dungeon_dagganoth_egg1]
+npc_changetype(dungeon_dagganoth_egg2, ^max_32bit_int);
+npc_anim(dagganoth_egg_open, 0);
+npc_queue(1, 0, add(^waterbirth_egg_hatch_display_ticks, 1));
+
+// The display queue expires into the opened shell and one bounded native Spawn.
+[ai_queue1,dungeon_dagganoth_egg2]
+npc_changetype(dungeon_dagganoth_egg3, ^waterbirth_egg_reset_ticks);
+// npc_add's new NPC can receive its first World turn in this same tick. The extra countdown
+// unit keeps its 500 future-turn lifetime aligned with the shell's native type-revert boundary.
+npc_add(npc_coord, dagganoth_critter, add(^waterbirth_egg_reset_ticks, 1));
+
+// CANDIDATE Bones, Always: Dagannoth spawn, all retained 2014-2026 revisions.
+// The later ribs/elemental-weakness changes do not establish a 377 loot table.
+[ai_queue3,dagganoth_critter]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, bones, 1, ^lootdrop_duration);

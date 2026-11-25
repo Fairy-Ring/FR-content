@@ -1,0 +1,101 @@
+// VERIFIED steaming/dig/unlock beat: Tip.It, 2 May 2006.
+// CANDIDATE other messages and 50/100/150/200 distance bands: OSRS transcript 15263331.
+// CANDIDATE exact tile: OSRS Making History map (2442,3139); the period image
+// shows the same east-bank site north of the bridge. Travel from north/east.
+[opheld1,makinghistory_key]
+if (%makinghistory_prog >= ^makinghistory_complete) {
+    ~ek_feel;
+    return;
+}
+if (%makinghistory_trader_prog >= 4) {
+    mes("You've already delivered the journal");
+    return;
+}
+if (inv_total(inv, makinghistory_chest) > 0) {
+    mes("You already have the chest");
+    return;
+}
+if (inv_total(inv, makinghistory_journal) > 0) {
+    mes("You already have the journal");
+    return;
+}
+def_int $distance = distance(coord, ^mh_chest_coord);
+if ($distance = 0) {
+    mes("The key is steaming. It must be right below your feet.");
+    %makinghistory_key_distance = 1;
+    return;
+}
+~mh_key_reading($distance, false);
+
+// Share the existing comparison state and wording with the postquest hunt.
+// CANDIDATE hunt bands: OSRS Enchanted key revision 152529 and hunt revision 15336907.
+[proc,mh_key_reading](int $distance, boolean $hunt)
+def_string $temperature;
+if ($hunt = true) {
+    if ($distance <= 4) {
+        $temperature = "The key is steaming";
+    } else if ($distance <= 30) {
+        $temperature = "Ouch! It's burning hot";
+    } else if ($distance <= 60) {
+        $temperature = "It's very hot";
+    } else if ($distance <= 100) {
+        $temperature = "It's hot";
+    } else if ($distance <= 400) {
+        $temperature = "It's warm";
+    } else if ($distance <= 700) {
+        $temperature = "It's cold";
+    } else if ($distance <= 1000) {
+        $temperature = "It's very cold";
+    } else {
+        $temperature = "It's freezing";
+    }
+} else {
+    if ($distance <= 50) {
+        $temperature = "Ouch! It's burning hot";
+    } else if ($distance <= 100) {
+        $temperature = "It's hot";
+    } else if ($distance <= 150) {
+        $temperature = "It's warm";
+    } else if ($distance <= 200) {
+        $temperature = "It's cold";
+    } else {
+        $temperature = "It's freezing";
+    }
+}
+if (%makinghistory_key_distance > 0) {
+    if ($distance < sub(%makinghistory_key_distance, 1)) {
+        $temperature = "<($temperature)> and warmer than last time";
+    } else if ($distance > sub(%makinghistory_key_distance, 1)) {
+        $temperature = "<($temperature)> but colder than last time";
+    } else if ($hunt = true) {
+        $temperature = "<($temperature)> and the same temperature as last time";
+    }
+}
+%makinghistory_key_distance = add($distance, 1);
+mes($temperature);
+
+[proc,mh_dig]()(boolean)
+if (%makinghistory_prog ! 1 | %makinghistory_trader_prog < 1 | %makinghistory_trader_prog >= 4 | coord ! ^mh_chest_coord | inv_total(inv, makinghistory_key) = 0) {
+    return (false);
+}
+if (inv_total(inv, makinghistory_chest) > 0 | inv_total(inv, makinghistory_journal) > 0) {
+    return (false);
+}
+~mh_give(makinghistory_chest, 1);
+%makinghistory_trader_prog = 2;
+mes("You use the spade and find a chest. Wonder what's inside?");
+return (true);
+
+[opheldu,makinghistory_chest]
+if (last_useitem ! makinghistory_key | %makinghistory_prog ! 1 | %makinghistory_trader_prog < 1 | %makinghistory_trader_prog >= 4) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, makinghistory_chest, 1);
+inv_add(inv, makinghistory_journal, 1);
+%makinghistory_trader_prog = 3;
+mes("You look in the chest and find a journal, and then you throw away the chest.");
+
+[opheld1,makinghistory_scroll1]
+// CANDIDATE text: OSRS Scroll (Making History), revision 15342900.
+~mesbox("Timeline of the Ardougne Outpost|Start of Fifth age: Outpost built|+ 65 Years: 'The Dreaded Years of Tragedy'|+ 68 Years: 'The Great Battle'|+ 71 Years: Survivors of battle start a new line of kings of Ardougne and the Equal Trade Market.");

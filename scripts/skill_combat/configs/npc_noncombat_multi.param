@@ -1,0 +1,4 @@
+// Engineering compatibility flag on the shared base, not its player-visible form.
+[npc_noncombat_multi]
+type=boolean
+default=no

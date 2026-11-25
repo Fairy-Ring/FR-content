@@ -1,0 +1,75 @@
+// CANDIDATE: Current OSRS merchant mapping and dialogue; no period source found for the seller-to-cape assignments or transcript.
+// CANDIDATE: shop_buy=600 (shop pays 30 gp), shop_sell=1000 (shop charges 50 gp), delta=10 (1% per unit over the 1000 scale); existing inventories supply 100 stock and restocking.
+[proc,wilderness_capeseller_open](inv $stock, string $title)
+~openshop($stock, 600, 1000, 10, $title);
+
+[proc,wilderness_capeseller_talk](inv $stock, string $title)
+def_int $choice = 0;
+~chatnpc("<p,neutral>Hello there, are you interested in buying one of my special capes?");
+$choice = ~p_choice3("What's so special about your capes?", 1, "Yes please!", 2, "No thanks.", 3);
+while ($choice = 1) {
+    ~chatplayer("<p,neutral>What's so special about your capes?");
+    ~chatnpc("<p,neutral>Ahh well they make it less likely that you'll accidently attack anyone wearing the same cape as you and easier to attack everyone else. They also make it easier to distinguish people who're wearing the same cape as you");
+    ~chatnpc("<p,neutral>from everyone else. They're very useful when out in the wilderness with friends or anyone else you don't want to harm.");
+    ~chatnpc("<p,neutral>So would you like to buy one?");
+    $choice = ~p_choice3("What's so special about your capes?", 1, "Yes please!", 2, "No thanks.", 3);
+}
+if ($choice = 2) {
+    ~wilderness_capeseller_open($stock, $title);
+} else if ($choice = 3) {
+    ~chatplayer("<p,neutral>No thanks.");
+}
+
+[opnpc1,wilderness_capeseller_1]
+~wilderness_capeseller_talk(wildernesscapeshop1, "William's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_1]
+~wilderness_capeseller_open(wildernesscapeshop1, "William's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_3]
+~wilderness_capeseller_talk(wildernesscapeshop3, "Larry's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_3]
+~wilderness_capeseller_open(wildernesscapeshop3, "Larry's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_4]
+~wilderness_capeseller_talk(wildernesscapeshop4, "Darren's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_4]
+~wilderness_capeseller_open(wildernesscapeshop4, "Darren's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_5]
+~wilderness_capeseller_talk(wildernesscapeshop5, "Edward's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_5]
+~wilderness_capeseller_open(wildernesscapeshop5, "Edward's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_6]
+~wilderness_capeseller_talk(wildernesscapeshop6, "Richard's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_6]
+~wilderness_capeseller_open(wildernesscapeshop6, "Richard's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_7]
+~wilderness_capeseller_talk(wildernesscapeshop7, "Neil's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_7]
+~wilderness_capeseller_open(wildernesscapeshop7, "Neil's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_8]
+~wilderness_capeseller_talk(wildernesscapeshop8, "Edmond's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_8]
+~wilderness_capeseller_open(wildernesscapeshop8, "Edmond's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_9]
+~wilderness_capeseller_talk(wildernesscapeshop9, "Simon's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_9]
+~wilderness_capeseller_open(wildernesscapeshop9, "Simon's Wilderness Cape Shop.");
+
+[opnpc1,wilderness_capeseller_10]
+~wilderness_capeseller_talk(wildernesscapeshop10, "Sam's Wilderness Cape Shop.");
+
+[opnpc3,wilderness_capeseller_10]
+~wilderness_capeseller_open(wildernesscapeshop10, "Sam's Wilderness Cape Shop.");

@@ -1,0 +1,64 @@
+[pickpocket_master_farmer]
+table=pickpocket
+data=npc,master_farmer_1
+data=npc,master_farmer_2
+data=npc,martin_the_master_farmer
+// VERIFIED: Tip.It Thieving (27 April 2006), Farming (28 April 2006).
+data=level,38
+data=experience,430
+data=stun_damage,3
+// UNKNOWN: reuse the existing eight-tick pickpocket stun convention.
+data=stun_ticks,8
+// CANDIDATE: OSRS Master Farmer success endpoints, no later diary/equipment bonuses.
+data=success_chance,90,240
+// CANDIDATE: pre-change OSRS revision 3490983 (28 February 2017).
+// https://oldschool.runescape.wiki/w/Master_Farmer?oldid=3490983
+// Keep the published formula's category x row weights, including its rounding.
+// Later Snape grass, Potato cactus, Seaweed spore and Rocky are excluded.
+// No 2021 Farming-level scaling or later tripled hops quantities.
+// UNKNOWN normalization: the rounded source weights sum to 1000241, not 1000000.
+data=loot_total,1000241
+data=loot,potato_seed,1,4,178480
+data=loot,onion_seed,1,3,133860
+data=loot,cabbage_seed,1,3,69840
+data=loot,tomato_seed,1,2,64020
+data=loot,sweetcorn_seed,1,2,22310
+data=loot,strawberry_seed,1,1,12125
+data=loot,watermelon_seed,1,1,5335
+data=loot,barley_seed,1,4,55647
+data=loot,hammerstone_hop_seed,1,3,55404
+data=loot,asgarnian_hop_seed,1,2,41796
+data=loot,jute_seed,1,3,41553
+data=loot,yanillian_hop_seed,1,2,27702
+data=loot,krandorian_hop_seed,1,1,13122
+data=loot,wildblood_hop_seed,1,1,7047
+data=loot,marigold_seed,1,1,45872
+data=loot,nasturtium_seed,1,1,30378
+data=loot,rosemary_seed,1,1,19642
+data=loot,woad_seed,1,1,14518
+data=loot,limpwurt_seed,1,1,11590
+data=loot,redberry_bush_seed,1,1,38800
+data=loot,cadavaberry_bush_seed,1,1,27160
+data=loot,dwellberry_bush_seed,1,1,19400
+data=loot,jangerberry_bush_seed,1,1,7760
+data=loot,whiteberry_bush_seed,1,1,2813
+data=loot,poisonivy_bush_seed,1,1,1067
+data=loot,guam_seed,1,1,15360
+data=loot,marrentill_seed,1,1,10464
+data=loot,tarromin_seed,1,1,7152
+data=loot,harralander_seed,1,1,4848
+data=loot,ranarr_seed,1,1,3312
+data=loot,toadflax_seed,1,1,2256
+data=loot,irit_seed,1,1,1536
+data=loot,avantoe_seed,1,1,1056
+data=loot,kwuarm_seed,1,1,720
+data=loot,snapdragon_seed,1,1,480
+data=loot,cadantine_seed,1,1,336
+data=loot,lantadyme_seed,1,1,240
+data=loot,dwarf_weed_seed,1,1,144
+data=loot,torstol_seed,1,1,96
+data=loot,mushroom_seed,1,1,2500
+data=loot,belladonna_seed,1,1,1500
+data=loot,cactus_seed,1,1,1000
+// Reuse the existing farmer pocket wording, not a newly recovered transcript.
+data=pocket,farmer's pocket

@@ -105,7 +105,7 @@ jobs:
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
       # tests/skill-menus/: CI — packed trigger, menu packet, reset and button tests; no world server.
       # tests/silver-casting/: CI — compiled furnace handler fills each Silver Casting slot; no engine is started.
-      # tests/leather-batch/: CI — published Make1 baseline plus packed Make5/10 handlers and weak-queue processing; no server.
+      # tests/leather-batch/: CI — authored Make1 outcomes plus packed Make5/10 handlers and weak-queue processing; no server.
       # tests/teleother/: CI — compiled Player triggers and button handlers cover all three offers, settlement and recipient lifecycle; no server is started.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
       # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
@@ -119,7 +119,7 @@ jobs:
       # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
-      # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published comparisons by product; no server.
+      # tests/tan-snake/: CI — packed eight-tile tanning, authored product settlement and wrong-hide self-checks; no server.
       # tests/random-events-u00/: CI — real packed staff caller, genuine targets, refusal snapshots and two scratch mutants; no server.
       - name: Run offline content tests
         id: content_tests
@@ -150,13 +150,44 @@ jobs:
           run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
           run_test tests/varp-scope/test_varp_scope.mjs node --import tsx ../content/tests/varp-scope/test_varp_scope.mjs
+          run_test tests/instance-collision/test_instance_collision.mjs node --import tsx ../content/tests/instance-collision/test_instance_collision.mjs
           run_test 'tests/varp-morph-transmit/test_varp_morph_transmit.mjs + tests/varp-morph-transmit/test_ernest_scene.mjs' node --import tsx --test ../content/tests/varp-morph-transmit/test_varp_morph_transmit.mjs ../content/tests/varp-morph-transmit/test_ernest_scene.mjs
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
+          run_test tests/mountain-daughter/test_mountain_daughter.mjs node --import tsx ../content/tests/mountain-daughter/test_mountain_daughter.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
+          run_test tests/armourrows/test_armourrows.mjs node --import tsx ../content/tests/armourrows/test_armourrows.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
+          run_test tests/ancients1/test_ancients1.mjs node --import tsx ../content/tests/ancients1/test_ancients1.mjs
+          run_test tests/ancients2/test_ancients2.mjs node --import tsx ../content/tests/ancients2/test_ancients2.mjs
+          run_test tests/ancients3/test_ancients3.mjs node --import tsx ../content/tests/ancients3/test_ancients3.mjs
+          run_test tests/farming/test_farming.mjs node --import tsx ../content/tests/farming/test_farming.mjs
+          run_test tests/farming/test_disease_timing.mjs node --import tsx ../content/tests/farming/test_disease_timing.mjs
+          run_test tests/farming/test_allotments.mjs node --import tsx ../content/tests/farming/test_allotments.mjs
+          run_test tests/farming/test_herbs.mjs node --import tsx ../content/tests/farming/test_herbs.mjs
+          run_test tests/farming/test_tool_actions.mjs node --import tsx ../content/tests/farming/test_tool_actions.mjs
+          run_test tests/farming/test_flowers.mjs node --import tsx ../content/tests/farming/test_flowers.mjs
+          run_test tests/farming/test_hops.mjs node --import tsx ../content/tests/farming/test_hops.mjs
+          run_test tests/farming/test_compost.mjs node --import tsx ../content/tests/farming/test_compost.mjs
+          run_test tests/farming/test_compost_bins.mjs node --import tsx ../content/tests/farming/test_compost_bins.mjs
+          run_test tests/farming/test_gardeners.mjs node --import tsx ../content/tests/farming/test_gardeners.mjs
+          run_test tests/farming/test_suspension.mjs node --import tsx ../content/tests/farming/test_suspension.mjs
+          run_test tests/farming/test_clock_m.mjs node --import tsx ../content/tests/farming/test_clock_m.mjs
+          run_test tests/farming/test_seed_stall.mjs node --import tsx ../content/tests/farming/test_seed_stall.mjs
+          run_test tests/farming/test_seed_sources.mjs node --import tsx ../content/tests/farming/test_seed_sources.mjs
+          run_test 'tests/farming/test_master_farmer.mjs + tests/farming/test_general_seed_table.mjs' node --import tsx --test ../content/tests/farming/test_master_farmer.mjs ../content/tests/farming/test_general_seed_table.mjs
+          run_test tests/farming/test_tools.mjs node --import tsx ../content/tests/farming/test_tools.mjs
+          run_test tests/farming/test_inspect.mjs node --import tsx ../content/tests/farming/test_inspect.mjs
+          run_test tests/pickpocketing/test_pickpocketing.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/pickpocketing/test_pickpocketing.mjs
+          run_test tests/thieving-stalls/test_stalls.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --random-seed=377 --import tsx ../content/tests/thieving-stalls/test_stalls.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
           run_test tests/npc-poison/test_poison.mjs node --import tsx ../content/tests/npc-poison/test_poison.mjs
+          run_test tests/slayer-selector/test_proportional.mjs node --import tsx ../content/tests/slayer-selector/test_proportional.mjs --artifact-dir "$RUNNER_TEMP/slayer-proportional"
+          run_test tests/login/test_follower_login.mjs node --import tsx ../content/tests/login/test_follower_login.mjs
+          run_test tests/login/test_settings_login.mjs node --import tsx ../content/tests/login/test_settings_login.mjs
+          run_test tests/skippy/test_skippy.mjs node --import tsx ../content/tests/skippy/test_skippy.mjs
+          run_test tests/mogre/test_mogre.mjs node --import tsx ../content/tests/mogre/test_mogre.mjs
+          run_test tests/empty-lord/test_empty_lord.mjs node --import tsx ../content/tests/empty-lord/test_empty_lord.mjs
           run_test tests/barrows/test_config.mjs node ../content/tests/barrows/test_config.mjs --content-root ../content
           run_test tests/barrows/test_combat_config.mjs node --import tsx ../content/tests/barrows/test_combat_config.mjs --content-root ../content
           run_test tests/barrows/test_combat_tunnels.mjs node --import tsx ../content/tests/barrows/test_combat_tunnels.mjs
@@ -182,19 +213,47 @@ jobs:
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
           run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
           run_test tests/npc-death/test_npc_death.mjs node --import tsx ../content/tests/npc-death/test_npc_death.mjs
+          run_test tests/rag-and-bone-man/test_rag_and_bone.mjs node --import tsx ../content/tests/rag-and-bone-man/test_rag_and_bone.mjs
           run_test tests/elf-viking-drops/test_elf_viking_drops.mjs node --import tsx ../content/tests/elf-viking-drops/test_elf_viking_drops.mjs
           run_test tests/mortmyre-creatures/test_mortmyre_creatures.mjs node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
+          run_test tests/swamp-decay/test_swamp_decay.mjs node --import tsx ../content/tests/swamp-decay/test_swamp_decay.mjs
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
           # Built combat vectors and checker self-tests use the native pack; no server or vault.
           run_test tests/npc-combat/test_npc_combat.mjs node --import tsx ../content/tests/npc-combat/test_npc_combat.mjs
           run_test tests/npc-combat/test_outcomes.mjs node --import tsx ../content/tests/npc-combat/test_outcomes.mjs
+          run_test tests/npc-combat/test_nonattack_multi.mjs node --import tsx ../content/tests/npc-combat/test_nonattack_multi.mjs
+          run_test tests/weapon-sounds/test_weapon_sounds.mjs node --import tsx ../content/tests/weapon-sounds/test_weapon_sounds.mjs
+          run_test tests/weapon-rows/test_weapon_rows.mjs node --import tsx ../content/tests/weapon-rows/test_weapon_rows.mjs
+          run_test tests/halberd-special/test_halberd_special.mjs node --import tsx ../content/tests/halberd-special/test_halberd_special.mjs
+          run_test tests/special-routes/test_special_routes.mjs node --import tsx ../content/tests/special-routes/test_special_routes.mjs
+          run_test tests/weapon-gates/test_weapon_gates.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/weapon-gates/test_weapon_gates.mjs
+          run_test tests/mage-arena-levers/test_mage_arena_levers.mjs node --import tsx ../content/tests/mage-arena-levers/test_mage_arena_levers.mjs
+          run_test tests/weapon-reach/test_weapon_reach.mjs node --import tsx ../content/tests/weapon-reach/test_weapon_reach.mjs
+          run_test tests/mortton-builder-pointer/test_mortton_builder_pointer.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/mortton-builder-pointer/test_mortton_builder_pointer.mjs
+          run_test tests/champions-challenge/test_champions_challenge.mjs node --import tsx ../content/tests/champions-challenge/test_champions_challenge.mjs
           run_test tests/poison-rule/test_poison_rule.mjs node --import tsx ../content/tests/poison-rule/test_poison_rule.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
+          run_test tests/feud/test_feud_start.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_start.mjs
+          run_test tests/feud/test_feud_junk_sale.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_junk_sale.mjs
+          run_test tests/feud/test_feud_trials.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_trials.mjs
+          run_test tests/feud/test_feud_burglary.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_burglary.mjs
+          run_test tests/feud/test_feud_travel.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_travel.mjs
+          run_test tests/feud/test_feud_poison.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_poison.mjs
+          run_test tests/feud/test_feud_dung.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_dung.mjs
+          run_test tests/feud/test_feud_finale.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_finale.mjs
+          run_test tests/feud/test_feud_repeat_blackjack.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_repeat_blackjack.mjs
+          run_test tests/feud/test_feud_trial_logout.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_trial_logout.mjs
+          run_test tests/feud/test_feud_dyer.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_dyer.mjs
           run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
+          run_test tests/waterbirth-monsters/test_waterbirth_monsters.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_monsters.mjs
+          run_test tests/waterbirth-monsters/test_waterbirth_eggs.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_eggs.mjs
+          run_test tests/waterbirth-monsters/test_waterbirth_crabs.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_crabs.mjs
+          run_test tests/waterbirth-monsters/test_waterbirth_other_monsters.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_other_monsters.mjs
+          run_test tests/waterbirth-kings/test_waterbirth_kings.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-kings/test_waterbirth_kings.mjs
           run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
           run_test tests/fenkenstrain-completion/test_fenk_head_gate.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_head_gate.mjs
           run_test tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
@@ -208,11 +267,13 @@ jobs:
           run_test tests/smelt-batch/test_smelt_batch.mjs node --import tsx ../content/tests/smelt-batch/test_smelt_batch.mjs
           run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
           run_test tests/tan-snake/test_tan_snake.mjs node --import tsx ../content/tests/tan-snake/test_tan_snake.mjs
+          run_test tests/desert-treasure/test_s0_contract.py python3 ../content/tests/desert-treasure/test_s0_contract.py
           run_test tests/desert-treasure/test_s3_contract.py python3 ../content/tests/desert-treasure/test_s3_contract.py
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
           run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
           run_test tests/desert-treasure/s5_death_runtime.mts bash ../content/tests/desert-treasure/s5_death_runtime.sh "$PWD"
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
+          run_test tests/desert-treasure/test_s7_effects.mjs bash -c 'node --import tsx ../content/tests/desert-treasure/test_s7_effects.mjs && node --import tsx ../content/tests/desert-treasure/test_s7_topology.mjs'
           run_test tests/desert-treasure/test_s4_contract.py python3 ../content/tests/desert-treasure/test_s4_contract.py
           run_test tests/desert-treasure/test_s4_effects.mjs node --import tsx ../content/tests/desert-treasure/test_s4_effects.mjs
           run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
@@ -221,12 +282,27 @@ jobs:
           run_test tests/teleother/test_teleother.mjs node --import tsx ../content/tests/teleother/test_teleother.mjs
           run_test tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs node --import tsx ../content/tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs
           run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
+          run_test tests/canoes/test_canoes.mjs node --import tsx ../content/tests/canoes/test_canoes.mjs
           run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
+          run_test tests/wilderness-shops/test_wilderness_shops.mjs node --import tsx ../content/tests/wilderness-shops/test_wilderness_shops.mjs
+          run_test tests/beta-bankers/test_bankers.mjs node --import tsx ../content/tests/beta-bankers/test_bankers.mjs
+          run_test tests/bank-booths/test_bank_booths.mjs node --import tsx ../content/tests/bank-booths/test_bank_booths.mjs
+          run_test 'tests/tai-bwo-cleanup/test_cleanup.mjs + tests/tai-bwo-cleanup/test_fence.mjs' node --import tsx --test --test-concurrency=1 ../content/tests/tai-bwo-cleanup/test_cleanup.mjs ../content/tests/tai-bwo-cleanup/test_fence.mjs
           run_test tests/regicide-travel/test_regicide_travel.mjs node --import tsx ../content/tests/regicide-travel/test_regicide_travel.mjs
+          run_test tests/dwarven-transport/test_dwarven_transport.mjs node --import tsx ../content/tests/dwarven-transport/test_dwarven_transport.mjs
+          run_test tests/keldagrim-shops/test_keldagrim_shops.mjs node --import tsx ../content/tests/keldagrim-shops/test_keldagrim_shops.mjs
+          run_test tests/waterbirth/test_waterbirth.mjs node --import tsx ../content/tests/waterbirth/test_waterbirth.mjs
           run_test tests/slimy-eel/test_slimy_eel.mjs node --import tsx ../content/tests/slimy-eel/test_slimy_eel.mjs
+          run_test tests/fishing-spots/test_fishing_spots.mjs node --import tsx ../content/tests/fishing-spots/test_fishing_spots.mjs
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
+          run_test tests/magic-carpets/test_magic_carpets.mjs node --import tsx ../content/tests/magic-carpets/test_magic_carpets.mjs
           run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
           run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
+          run_test tests/ordinary-traversal/test_doors.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 bash -c 'node --import tsx ../content/tests/ordinary-traversal/test_doors.mjs && node --import tsx ../content/tests/ordinary-traversal/test_vertical.mjs && node --import tsx ../content/tests/ordinary-traversal/test_picklock_rate.mjs'
+          run_test tests/ordinary-search/test_ordinary_search.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ordinary-search/test_ordinary_search.mjs
+          run_test tests/ordinary-scenery/test_ordinary_scenery.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ordinary-scenery/test_ordinary_scenery.mjs
+          run_test tests/ordinary-proposals/test_ordinary_proposals.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ordinary-proposals/test_ordinary_proposals.mjs
+          run_test tests/abyss/test_rift_exits.mjs node --import tsx ../content/tests/abyss/test_rift_exits.mjs
           run_test tests/swamp-caves/test_sc01_lights.mjs node --import tsx ../content/tests/swamp-caves/test_sc01_lights.mjs
           run_test tests/swamp-caves/test_sc02_seller.mjs node --import tsx ../content/tests/swamp-caves/test_sc02_seller.mjs
           run_test tests/swamp-caves/test_sc02l_manufacture.mjs node --import tsx ../content/tests/swamp-caves/test_sc02l_manufacture.mjs
@@ -234,13 +310,32 @@ jobs:
           run_test tests/swamp-caves/test_sc04_gas.mjs node --import tsx ../content/tests/swamp-caves/test_sc04_gas.mjs
           run_test tests/swamp-caves/test_sc05_wall_beast.mjs node --import tsx ../content/tests/swamp-caves/test_sc05_wall_beast.mjs
           run_test tests/swamp-caves/test_sc06_stones.mjs node --import tsx ../content/tests/swamp-caves/test_sc06_stones.mjs
+          run_test tests/swamp-caves/test_sc06f_fishing.mjs node --import tsx ../content/tests/swamp-caves/test_sc06f_fishing.mjs
+          run_test tests/swamp-caves/test_sc07_entrance.mjs node --import tsx ../content/tests/swamp-caves/test_sc07_entrance.mjs
+          run_test tests/swamp-caves/test_sc10_tears_traversal.mjs node --import tsx ../content/tests/swamp-caves/test_sc10_tears_traversal.mjs
+          run_test tests/music/test_m01_swamp_caves.mjs node --import tsx ../content/tests/music/test_m01_swamp_caves.mjs
+          run_test tests/music/test_mg_gnomeball.mjs node --import tsx ../content/tests/music/test_mg_gnomeball.mjs
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
+          run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
+          run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
+          run_test tests/making-history/test_making_history.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/making-history/test_making_history.mjs
+          run_test tests/enchanted-key/test_enchanted_key.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/enchanted-key/test_enchanted_key.mjs
+          run_test tests/fairytale-1/test_fairytale1.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/fairytale-1/test_fairytale1.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
+          run_test tests/lumbridge-advisers/test_advisers.mjs node --import tsx ../content/tests/lumbridge-advisers/test_advisers.mjs
+          run_test tests/n619-old-towns/test_old_towns.mjs node --import tsx ../content/tests/n619-old-towns/test_old_towns.mjs
+          run_test tests/npc-talk-audit/runtime.mts bash ../content/tests/npc-talk-audit/runtime.sh "$PWD"
+          run_test tests/npc-other-options/test_npc_other_options.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/npc-other-options/test_npc_other_options.mjs
+          run_test tests/tindel-appraisal/test_tindel_appraisal.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/tindel-appraisal/test_tindel_appraisal.mjs
+          run_test tests/loc-option-audit/runtime.mts bash ../content/tests/loc-option-audit/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"
+          run_test tests/skill-guides/test_skill_guides.mjs node --import tsx ../content/tests/skill-guides/test_skill_guides.mjs
           run_test tests/content-gaps/packed.mts bash ../content/tests/content-gaps/packed.sh "$PWD"
+          run_test tests/mining-rocks/test_mining_rocks.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/mining-rocks/test_mining_rocks.mjs
+          run_test tests/quarry/test_quarry.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/quarry/test_quarry.mjs
           run_test tests/ape-agility/test_ape_atoll.mjs node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
           run_test tests/brim-dungeon/test_brim_dungeon.mjs node --import tsx ../content/tests/brim-dungeon/test_brim_dungeon.mjs
           run_test tests/splitbark-service/test_splitbark_service.mjs node --import tsx ../content/tests/splitbark-service/test_splitbark_service.mjs
@@ -255,7 +350,16 @@ jobs:
           run_test tests/multiform-guards/test_multiform_guards.mjs node --import tsx ../content/tests/multiform-guards/test_multiform_guards.mjs
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           run_test tests/monster-s01/test_monster_s01.mjs node --import tsx ../content/tests/monster-s01/test_monster_s01.mjs
+          run_test tests/cannon-gates/test_cannon_gates.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/cannon-gates/test_cannon_gates.mjs
+          run_test tests/cannon-areas/test_cannon_areas.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/cannon-areas/test_cannon_areas.mjs
           run_test tests/monster-s02/test_monster_s02.mjs node --import tsx ../content/tests/monster-s02/test_monster_s02.mjs
+          run_test tests/monster-a7/test_monster_a7.mjs node --import tsx ../content/tests/monster-a7/test_monster_a7.mjs
+          run_test tests/zygomite/test_zygomite.mjs node --import tsx ../content/tests/zygomite/test_zygomite.mjs
+          run_test tests/wyvern/test_wyvern.mjs node --import tsx ../content/tests/wyvern/test_wyvern.mjs
+          run_test tests/wyvern/test_wyvern_traversal.mjs node --import tsx ../content/tests/wyvern/test_wyvern_traversal.mjs
+          run_test tests/giant-mole/test_giant_mole.mjs node --import tsx ../content/tests/giant-mole/test_giant_mole.mjs
+          run_test tests/soulbane/test_soulbane.mjs node --import tsx ../content/tests/soulbane/test_soulbane.mjs
+          run_test tests/keldagrim-townsfolk/test_keldagrim_townsfolk.mjs node --import tsx ../content/tests/keldagrim-townsfolk/test_keldagrim_townsfolk.mjs
           exit "$failed"
 
       - name: Write job summary

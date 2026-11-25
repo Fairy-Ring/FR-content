@@ -1,0 +1,95 @@
+// CANDIDATE ordinary service: retained Old School transcript 14342931/14342948
+// and pre-rename RuneScape transcript 27918989. Complete histories and dated
+// name changes are recorded in the-feud.dlg.dyer-service. No Rogue Trader state.
+[opnpc1,feud_dye_lady]
+~chatplayer("<p,neutral>Wow! look at this place, it's so colourful.");
+~chatnpc("<p,neutral>Why thank you. Can I help you with anything?");
+~chatplayer("<p,quiz>I take it by the clothes you are wearing and this room that you are in the dye trade?");
+~chatnpc("<p,neutral>How observant of you.");
+if (~p_choice2("Could you make some dye for me please?", 1, "How did you get into the colour business?", 2) = 1) @feud_dyer_dyes;
+~chatplayer("<p,quiz>How did you get into the colour business?");
+~chatnpc("<p,neutral>Well, it's quite simple really my mother was a drysalter and I learnt the trade from her.");
+~chatplayer("<p,quiz>Umm, what's a drysalter, it isn't a medical condition is it?");
+~chatnpc("<p,neutral>No silly, it's someone who deals with preservatives and dyes. I didn't really enjoy the preservative side of things so I've chosen to deal solely in dyeing.");
+~chatplayer("<p,quiz>So how's business then?");
+~chatnpc("<p,neutral>It's a dyeing trade! Oh gosh, I'm sorry, that was a truly dreadful joke.");
+~chatplayer("<p,neutral>Hmm yes, about the worst I've heard today at least.");
+~chatnpc("<p,neutral>Thanks. But really, it's not the best around here, nearly everyone in this town wears only white, which means I don't exactly do a roaring trade. Now is there anything I can get you?");
+if (~p_choice2("Could you make some dye for me please?", 1, "No thanks, I'm just having a look around.", 2) = 1) @feud_dyer_dyes;
+~chatplayer("<p,neutral>No thanks, I'm just having a look around.");
+return;
+
+[label,feud_dyer_dyes]
+~chatplayer("<p,neutral>Can you make dyes for me please?");
+~chatnpc("<p,neutral>What colour dye do you want? I can make you blue, red or yellow dyes for you. If you bring me the correct raw materials.");
+def_int $colour = ~p_choice4("What do you need to make red dye?", 1, "What do you need to make yellow dye?", 2, "What do you need to make blue dye?", 3, "On second thoughts I don't really need any dye.", 4);
+if ($colour = 1) @feud_dyer_red;
+if ($colour = 2) @feud_dyer_yellow;
+if ($colour = 3) @feud_dyer_blue;
+~chatplayer("<p,neutral>On second thoughts, I don't think that I need some dye right now.");
+return;
+
+[label,feud_dyer_red]
+~chatplayer("<p,quiz>What do you need to make red dye?");
+~chatnpc("<p,neutral>Hmm.... 3 lots of redberries should do the trick and 25 coins should cover any other costs.");
+def_int $choice = ~p_choice4("Okay, make me some red dye please.", 1, "I don't think I have all the ingredients yet.", 2, "I can do without dye at that price.", 3, "Where would I find a redberry bush?", 4);
+if ($choice = 1) @feud_dyer_make(redberries, ^feud_dyer_redberries, reddye, "You don't have enough berries to make the red dye.", "Ok make me some red dye please.");
+if ($choice = 2) @feud_dyer_ingredients;
+if ($choice = 3) @feud_dyer_without_dye;
+~chatplayer("<p,quiz>Where would I find a redberry bush?");
+~chatnpc("<p,neutral>Well you could try growing them. They shouldn't be too hard to grow.");
+~chatplayer("<p,quiz>If I didn't care to grow my own, where else could I get some?");
+~chatnpc("<p,neutral>Well I know for sure that the desert climate wouldn't suit them. I have mine picked for me in the woods south of Varrock.");
+return;
+
+[label,feud_dyer_yellow]
+~chatplayer("<p,quiz>What do you need to make yellow dye?");
+~chatnpc("<p,neutral>Yellow is an awkward colour to recreate, I guess if you got me 2 onions I could use their skins to make a warm yellow dye for you. Oh yes and lest I forget I'll need 25 coins to cover the cost of the glass ware and");
+~chatnpc("<p,neutral>my wages.");
+def_int $choice = ~p_choice4("Okay, make me some yellow dye please.", 1, "I don't think I have all the ingredients yet.", 2, "I can do without dye at that price.", 3, "Where could I find some onions?", 4);
+if ($choice = 1) @feud_dyer_make(onion, ^feud_dyer_onions, yellowdye, "You don't have enough onions to make the yellow dye.", "Ok make me some yellow dye please.");
+if ($choice = 2) @feud_dyer_ingredients;
+if ($choice = 3) @feud_dyer_without_dye;
+~chatplayer("<p,quiz>Where could I find some onions?");
+~chatnpc("<p,neutral>Generally you would find onions in vegetable gardens, silly.");
+~chatplayer("<p,quiz>Ok you have me there but is there anywhere around here where I could get my hands on some onions?");
+~chatnpc("<p,neutral>I really don't know. A friend of mine grows hers on a farms near Draynor village. But that's a little far from here to be useful.");
+return;
+
+[label,feud_dyer_blue]
+~chatplayer("<p,quiz>What do you need to make blue dye?");
+~chatnpc("<p,neutral>To make a bottle of blue dye I'll need 2 woad leaves and 25 coins from you.");
+def_int $choice = ~p_choice4("Okay, make me some blue dye please.", 1, "I don't think I have all the ingredients yet.", 2, "I can do without dye at that price.", 3, "Where can I get some woad leaves?", 4);
+if ($choice = 1) @feud_dyer_make(woadleaf, ^feud_dyer_woad_leaves, bluedye, "You don't have enough woad leaves to make the blue dye.", "Ok make me some blue dye please.");
+if ($choice = 2) @feud_dyer_ingredients;
+if ($choice = 3) @feud_dyer_without_dye;
+~chatplayer("<p,quiz>Where can I get some woad leaves?");
+~chatnpc("<p,neutral>Woad leaves are fairly rare. My other customers tell me there's a gardener in Falador who grows them.");
+return;
+
+[label,feud_dyer_ingredients]
+~chatplayer("<p,neutral>I don't think I have all the ingredients yet.");
+~chatnpc("<p,neutral>You know what you need to get, now come back when you have them. Goodbye for now.");
+return;
+
+[label,feud_dyer_without_dye]
+~chatplayer("<p,neutral>I can do without dye at that price.");
+~chatnpc("<p,neutral>Fair enough, I still think that the price is fairly reasonable considering that I'm the only source of dye this side of the Shantay pass.");
+return;
+
+[label,feud_dyer_make](obj $ingredient, int $needed, namedobj $dye, string $missing, string $request)
+if (inv_total(inv, $ingredient) < $needed) {
+    ~mesbox($missing);
+    return;
+}
+if (inv_total(inv, coins) < ^feud_dyer_price) {
+    ~mesbox("You don't have enough coins to pay for the dye.");
+    return;
+}
+~chatplayer("<p,neutral><$request>");
+// Published Aggie exchange order; INV_ADD puts any overflow at the player's feet.
+// No suspend separates the deductions and grant. No post-2022 Rana narration.
+inv_del(inv, coins, ^feud_dyer_price);
+inv_del(inv, $ingredient, $needed);
+inv_add(inv, $dye, 1);
+return;

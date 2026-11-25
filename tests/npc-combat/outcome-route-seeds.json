@@ -332,6 +332,15 @@
       }
     },
     {
+      "script": "[ai_opplayer2,fairy_tanglefoot]",
+      "npc": "fairy_tanglefoot",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
       "script": "[ai_opplayer2,ikov_firewarrior]",
       "npc": "ikov_firewarrior",
       "seeds": {
@@ -975,7 +984,7 @@
       "npc": "slayer_basilisk",
       "seeds": {
         "miss": 2654435769,
-        "hit": 1013904242,
+        "hit": 3668340011,
         "zero": 1309757500
       },
       "equipment": "slayer_mirror_shield"
@@ -1229,6 +1238,481 @@
         "miss": 2654435769,
         "hit": 1013904242,
         "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_zygomite]",
+      "npc": "slayer_mutated_zygomite_adolescent",
+      "seeds": {
+        "miss": 1,
+        "hit": 9,
+        "zero": 17
+      }
+    },
+    {
+      "script": "[ai_applayer2,_slayer_zygomite]",
+      "npc": "slayer_mutated_zygomite_adolescent",
+      "seeds": {
+        "miss": 1,
+        "hit": 9,
+        "zero": 17
+      }
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_wyvern]",
+      "npc": "skeletal_wyvern1",
+      "seeds": {
+        "hit": 5376,
+        "zero": 8,
+        "miss": 11
+      }
+    },
+    {
+      "script": "[ai_applayer2,_slayer_wyvern]",
+      "npc": "skeletal_wyvern1",
+      "seeds": {
+        "hit": 5376,
+        "zero": 8,
+        "miss": 11
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_bear]",
+      "npc": "soulbane_anger_bear",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_goblin]",
+      "npc": "soulbane_anger_goblin",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_rat]",
+      "npc": "soulbane_anger_rat",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_unicorn]",
+      "npc": "soulbane_anger_unicorn",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_lighter]",
+      "npc": "dungeon_dagganoth_lighter",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_lighter_deeper]",
+      "npc": "dungeon_dagganoth_lighter_deeper",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_magic_monster]",
+      "npc": "dungeon_dagganoth_magic_monster",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]",
+      "npc": "dungeon_dagganoth_magic_monster_deeper",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_fear_reaper]",
+      "npc": "soulbane_fear_reaper",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 4 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "spawn": "[proc,soulbane_fear_spawn]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,dagannoth_water_creature_1x1_invisible]",
+      "npc": "dagannoth_water_creature_1x1_invisible",
+      "seeds": {
+        "hit": 3668340011,
+        "miss": 2654435769,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,dagannoth_water_creature_1x1_invisible2]",
+      "npc": "dagannoth_water_creature_1x1_invisible2",
+      "seeds": {
+        "hit": 3668340011,
+        "miss": 2654435769,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,dagannoth_water_creature_1x1_invisible3]",
+      "npc": "dagannoth_water_creature_1x1_invisible3",
+      "seeds": {
+        "hit": 3668340011,
+        "miss": 2654435769,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagannoth_water_creature_1x1]",
+      "npc": "dagannoth_water_creature_1x1",
+      "seeds": {
+        "hit": 1013904242,
+        "miss": 4055616968,
+        "zero": 2654435769
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagannoth_water_creature_1x12]",
+      "npc": "dagannoth_water_creature_1x12",
+      "seeds": {
+        "hit": 1013904242,
+        "miss": 4055616968,
+        "zero": 2654435769
+      }
+    },
+    {
+      "script": "[ai_opplayer2,feud_bandit_toughguy]",
+      "npc": "feud_bandit_toughguy",
+      "playerVars": {
+        "feud_var": 25
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target",
+        "npc_int": 1
+      },
+      "seeds": {
+        "hit": 3224,
+        "miss": 33828,
+        "zero": 3482
+      }
+    },
+    {
+      "script": "[ai_opplayer2,feud_menap_toughguy]",
+      "npc": "feud_menap_toughguy",
+      "playerVars": {
+        "feud_var": 24
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target",
+        "npc_int": 1
+      },
+      "seeds": {
+        "hit": 3224,
+        "miss": 33828,
+        "zero": 3482
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagannoth_water_creature_1x13]",
+      "npc": "dagannoth_water_creature_1x13",
+      "seeds": {
+        "hit": 1013904242,
+        "miss": 4055616968,
+        "zero": 2654435769
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagcave_ranged_boss]",
+      "npc": "dagcave_ranged_boss",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagcave_magic_boss]",
+      "npc": "dagcave_magic_boss",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_confu_creeper]",
+      "npc": "soulbane_confu_creeper",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 6 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_confu_creeper_fake1]",
+      "npc": "soulbane_confu_creeper_fake1",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 6 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_confu_creeper_fake2]",
+      "npc": "soulbane_confu_creeper_fake2",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 6 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_confu_creeper_fake3]",
+      "npc": "soulbane_confu_creeper_fake3",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 6 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_confu_creeper_fake4]",
+      "npc": "soulbane_confu_creeper_fake4",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 6 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_hope_monst3]",
+      "npc": "soulbane_hope_monst3",
+      "seeds": { "zero": 2654435769 },
+      "unsupportedBranches": {
+        "hit": "The first-life Hope ranged path delivers fixed zero damage without an accuracy roll.",
+        "miss": "The first-life Hope ranged path delivers fixed zero damage without an accuracy roll."
+      },
+      "playerVars": { "soulbane_prog": 8 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_hope_monst3]",
+      "npc": "soulbane_hope_monst3",
+      "seeds": { "zero": 2654435769 },
+      "unsupportedBranches": {
+        "hit": "The first-life Hope ranged path delivers fixed zero damage without an accuracy roll.",
+        "miss": "The first-life Hope ranged path delivers fixed zero damage without an accuracy roll."
+      },
+      "playerVars": { "soulbane_prog": 8 },
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_hope_monst2]",
+      "npc": "soulbane_hope_monst2",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 8 },
+      "prelude": "soulbane-hope-lives",
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_hope_monst2]",
+      "npc": "soulbane_hope_monst2",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 8 },
+      "prelude": "soulbane-hope-lives",
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_hope_monst1]",
+      "npc": "soulbane_hope_monst1",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 8 },
+      "prelude": "soulbane-hope-lives",
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_hope_monst1]",
+      "npc": "soulbane_hope_monst1",
+      "seeds": { "miss": 2654435769, "hit": 1013904242, "zero": 1309757500 },
+      "playerVars": { "soulbane_prog": 8 },
+      "prelude": "soulbane-hope-lives",
+      "privateRegion": {
+        "maps": ["47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_final_tolna1]",
+      "npc": "soulbane_final_tolna1",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_south",
+      "style": "melee",
+      "stand": "melee",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_final_tolna1]",
+      "npc": "soulbane_final_tolna1",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_south",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_final_tolna2]",
+      "npc": "soulbane_final_tolna2",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_east",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_final_tolna2]",
+      "npc": "soulbane_final_tolna2",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_east",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_final_tolna3]",
+      "npc": "soulbane_final_tolna3",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_north",
+      "style": "melee",
+      "stand": "melee",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_final_tolna3]",
+      "npc": "soulbane_final_tolna3",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_north",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
       }
     },
     {

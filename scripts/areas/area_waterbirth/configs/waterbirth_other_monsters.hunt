@@ -1,0 +1,13 @@
+// Hidden Spinolyps retain native adjacent melee without proximity emergence.
+[waterbirth_other_approach]
+type=player
+check_vis=lineofsight
+find_keephunting=off
+find_newmode=opplayer2
+
+// A hidden Rock wakes by proximity, including corners without melee contact.
+[waterbirth_other_rock_approach]
+type=player
+check_vis=lineofsight
+find_keephunting=off
+find_newmode=queue4

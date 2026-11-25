@@ -1,0 +1,52 @@
+// VERIFIED: the 377 support NPCs have the cached Destroy operation.
+// CANDIDATE directional support attacks and one prop per path:
+// Tip.It 10 May 2006 and Old School Waterbirth Island Dungeon / Door-support.
+[proc,waterbirth_is_support]()(boolean)
+if (npc_type = dagannoth_weak_door_south | npc_type = dagannoth_weak_door_west | npc_type = dagannoth_weak_door_north) return(true);
+return(false);
+
+[proc,waterbirth_support_side]()(boolean)
+if (~waterbirth_is_support = false) return(true);
+if ((npc_type = dagannoth_weak_door_south & coordz(coord) < coordz(npc_coord)) |
+    (npc_type = dagannoth_weak_door_west & coordx(coord) < coordx(npc_coord)) |
+    (npc_type = dagannoth_weak_door_north & coordz(coord) > coordz(npc_coord))) {
+    mes("This door does not seem to be openable from this side..."); // CANDIDATE Old School wording.
+    return(false);
+}
+return(true);
+
+// These props never retaliate or walk. Pending attacks on a fallen form do not
+// damage it again or schedule the ordinary creature-death/drop path.
+[ai_queue1,dagannoth_weak_door_south] return;
+[ai_queue1,dagannoth_weak_door_west] return;
+[ai_queue1,dagannoth_weak_door_north] return;
+[ai_queue1,dagannoth_weak_door_falling_south] return;
+[ai_queue1,dagannoth_weak_door_falling_west] return;
+[ai_queue1,dagannoth_weak_door_falling_north] return;
+[ai_queue1,dagannoth_weak_door_fallen_south] return;
+[ai_queue1,dagannoth_weak_door_fallen_west] return;
+[ai_queue1,dagannoth_weak_door_fallen_north] return;
+[ai_opplayer2,dagannoth_weak_door_south] return;
+[ai_opplayer2,dagannoth_weak_door_west] return;
+[ai_opplayer2,dagannoth_weak_door_north] return;
+[ai_queue2,dagannoth_weak_door_falling_south] return;
+[ai_queue2,dagannoth_weak_door_falling_west] return;
+[ai_queue2,dagannoth_weak_door_falling_north] return;
+[ai_queue2,dagannoth_weak_door_fallen_south] return;
+[ai_queue2,dagannoth_weak_door_fallen_west] return;
+[ai_queue2,dagannoth_weak_door_fallen_north] return;
+
+[ai_queue3,dagannoth_weak_door_south] ~waterbirth_support_fall(dagannoth_weak_door_fallen_south, weak_door_fall);
+[ai_queue3,dagannoth_weak_door_west] ~waterbirth_support_fall(dagannoth_weak_door_fallen_west, weak_door_fall_west);
+[ai_queue3,dagannoth_weak_door_north] ~waterbirth_support_fall(dagannoth_weak_door_fallen_north, weak_door_fall_north);
+
+[proc,waterbirth_support_fall](npc $fallen, seq $anim)
+npc_setmode(none);
+// Destruction ends native poison state before the scenery form is healed.
+~npc_poison_clear;
+if (npc_type = dagannoth_weak_door_west) npc_settimer(^waterbirth_pressure_poll);
+// Each support opens only its own original invisible blocking loc.
+if (loc_find(npc_coord, dagcave_invisibleblocking) = true) loc_change(trollrescue_blankmodel_8968, ^waterbirth_support_reset);
+npc_statheal(hitpoints, 0, 100);
+npc_changetype_keepall($fallen, ^waterbirth_support_reset);
+npc_anim($anim, 0);

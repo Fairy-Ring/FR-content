@@ -1,0 +1,185 @@
+// VERIFIED cache aliases and placements are unchanged; only their player traversal is supplied here.
+// The route pairings are CANDIDATE topology from the retained island map and paired cache ladders.
+
+[oploc1,dagannoth_caveentrance_rock]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_rocky_steps, false);
+
+[oploc1,dagannoth_rocky_steps]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_rock_entrance, true);
+
+[oploc1,dagannoth_caveentrance_ice]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_central_ladder, false);
+
+[oploc1,dagannoth_ladder_base_ext2]
+p_arrivedelay;
+@waterbirth_traversal_ladder_options(^waterbirth_traversal_ice_entrance, ^waterbirth_traversal_deep_entrance);
+
+[oploc2,dagannoth_ladder_base_ext2]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_ice_entrance, true);
+
+[oploc3,dagannoth_ladder_base_ext2]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_deep_entrance, false);
+
+[oploc1,dagexp_entrance_ladder]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_central_ladder, true);
+
+[oploc1,dagexp_ladder1]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder2, false);
+
+[oploc1,dagexp_ladder2]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder1, true);
+
+[oploc1,dagexp_ladder3]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder4, false);
+
+[oploc1,dagexp_ladder4]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder3, true);
+
+[oploc1,dagexp_ladder5]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder6, false);
+
+[oploc1,dagexp_ladder6]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder5, true);
+
+[oploc1,dagexp_ladder7]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder8, false);
+
+[oploc1,dagexp_ladder8]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder7, true);
+
+[oploc1,dagexp_ladder9]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder10, true);
+
+[oploc1,dagexp_ladder10]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder9, false);
+
+[oploc1,dagexp_ladder11]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder12, false);
+
+[oploc1,dagexp_ladder12]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder11, true);
+
+[oploc1,dagexp_ladder13]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder14, true);
+
+[oploc1,dagexp_ladder14]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder13, false);
+
+[oploc1,dagexp_ladder15]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder16, false);
+
+[oploc1,dagexp_ladder16]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder15, true);
+
+[oploc1,dagexp_ladder17]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder18, true);
+
+[oploc1,dagexp_ladder18]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder17, false);
+
+[oploc1,dagexp_ladder19]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder20, false);
+
+[oploc1,dagexp_ladder20]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder19, true);
+
+[oploc1,dagexp_ladder21]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder22, false);
+
+[oploc1,dagexp_ladder22]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder21, true);
+
+[oploc1,dagexp_ladder23]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder24, true);
+
+[oploc1,dagexp_ladder24]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder23, false);
+
+[oploc1,dagexp_ladder25]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder26, true);
+
+[oploc1,dagexp_ladder26]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder25, false);
+
+[oploc1,dagexp_ladder27]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder28, false);
+
+[oploc1,dagexp_ladder28]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder27, true);
+
+[oploc1,dagexp_ladder29]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder30, false);
+
+[oploc1,dagexp_ladder30]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder29, true);
+
+[oploc1,dagexp_ladder31]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder32, false);
+
+[oploc1,dagexp_ladder32]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder31, true);
+
+[oploc1,dagexp_ladder33]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder34, false);
+
+[oploc1,dagexp_ladder34]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_dagexp_ladder33, true);
+
+[oploc1,dagexp_bossroomladder_down]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_kings_ladder_up, false);
+
+[oploc1,dagexp_bossroomladder_up]
+p_arrivedelay;
+~climb_ladder(^waterbirth_traversal_kings_ladder_down, true);
+
+[label,waterbirth_traversal_ladder_options](coord $up, coord $down)
+def_int $option = ~p_choice2_header("Climb Up.", 1, "Climb Down.", 2, "Climb up or down the ladder?");
+if_close;
+anim(human_reachforladder, 0);
+p_delay(1);
+if ($option = 1) {
+    p_telejump($up);
+} else if ($option = 2) {
+    p_telejump($down);
+}

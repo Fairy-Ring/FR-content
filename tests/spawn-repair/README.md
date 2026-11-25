@@ -30,8 +30,38 @@ All repairs are **CANDIDATE**, not verified period history:
   The production map loader and routefinder show the destination is standable
   inside the same enclosed pen as 2318 and 2319; no fence or terrain is changed.
 
-The test checks all 23 audited entities (24 target positions with the relocation), the three genuine Nardah citizens, every ground
-quantity, exact totals, surviving home-region copies and packed identities.
-It also compares every source spawn with the runtime map archive. A hash freezes
-all non-target spawn rows, including the audit's 1,721 questionable records.
-Future authorized map changes must update that conservation baseline and totals.
+The main test also retains the Mountain Daughter cavern removal of noted object
+5685 at `m43_157`, level 0, local tile 32,30. It checks the repaired targets,
+the three genuine Nardah citizens, ground quantities, surviving home-region
+copies and packed identities. It compares every source spawn with the runtime
+map archive. It does not freeze whole-corpus hashes or totals.
+
+## Individual audit rows
+
+`audited-spawns.txt` retains the 1,721 occurrences classified as `questionable`
+in `U-SPAWNAUDIT-1113/suspect_npc_spawns.csv` and `suspect_obj_spawns.csv`.
+The audit used content `588e7132f24ce5cf0ed1cae7d1a3378cd8540cd2`.
+The list was checked against published content
+`6fcfc51dab81e1b2b566f65cfda4422fea76d7d3`. The cavern note entry requires
+its continued absence, rather than undoing the later repair. Piglet relocation
+remains unchanged in the main test.
+
+`test_audited_spawns.mjs` checks each listed map, section, level, tile, type
+and quantity. It names missing or changed rows. Duplicate audit occurrences
+require the same minimum multiplicity. Additions are allowed, including at
+audited tiles. Rows outside this list are not frozen by this guard.
+
+The main test always runs this guard. To test only source preservation, without
+a pack or a server, run:
+
+```sh
+node ../content/tests/spawn-repair/test_audited_spawns.mjs
+```
+
+The full test still requires a pack built from the current sources. A source
+mutation without repacking must use the source-only command to isolate this
+guard from the separate source/pack equality check.
+
+For a deliberate later repair, change that entry only and give the reason and
+repair commit or source in its comment. Prefix a deliberately removed row with
+`-`. The file header records this format. Do not regenerate unrelated entries.

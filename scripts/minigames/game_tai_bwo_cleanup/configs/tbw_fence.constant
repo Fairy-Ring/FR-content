@@ -1,0 +1,12 @@
+// CANDIDATE: Old School RuneScape Wiki, Tai Bwo Wannai Cleanup, "Repairing village fence" (history-checked).
+// Favour values are tenths of one percent for ~tbw_add_favour(int); XP is in tenths.
+^tbw_fence_favour_light = 1
+^tbw_fence_favour_med = 3
+^tbw_fence_favour_dense = 5
+^tbw_fence_xp_light = 281
+^tbw_fence_xp_med = 421
+^tbw_fence_xp_dense = 651
+// UNKNOWN: neither retained page states cost per Repair/Reinforce; use one spar per action.
+^tbw_fence_spar_cost = 1
+// UNKNOWN: local progress marker coordinated with introduction=1 and first sticks=3.
+^tbw_fence_progress_repaired = 2

@@ -1,0 +1,83 @@
+// Direct row selection never replaces farming_reconcile's script-wide
+// db_findnext cursor. New families must also avoid database searches there.
+[proc,farming_allotment_crop](int $stage)(dbrow)
+def_int $base = modulo($stage, ^farming_watered_offset);
+if ($base >= 6 & $base <= 12) return(farming_allotment_potato);
+if ($base >= 13 & $base <= 19) return(farming_allotment_onion);
+if ($base >= 20 & $base <= 26) return(farming_allotment_cabbage);
+if ($base >= 27 & $base <= 33) return(farming_allotment_tomato);
+if ($base >= 34 & $base <= 42) return(farming_allotment_sweetcorn);
+if ($base >= 43 & $base <= 51) return(farming_allotment_strawberry);
+if ($base >= 52 & $base <= 62) return(farming_allotment_watermelon);
+return(null);
+
+// CANDIDATE Old School: seed/mature immunity, disease consumes a cycle,
+// water expires after one cycle. UNKNOWN death timing is in farming_growth.
+[proc,farming_allotment_advance](int $stage, int $steps, dbrow $crop, int $treatment, int $window)(int)
+if ($crop = null) return($stage);
+def_int $first = db_getfield($crop, farming_allotment:first, 0);
+def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
+return(~farming_crop_advance($stage, $steps, $first, $mature, true, $treatment, farming_growth_potato, $window));
+
+[proc,farming_allotment_seed](obj $seed)(dbrow)
+switch_obj ($seed) {
+    case potato_seed, potato_seed_2, potato_seed_3, potato_seed_4, potato_seed_5 : return(farming_allotment_potato);
+    case onion_seed, onion_seed_2, onion_seed_3, onion_seed_4, onion_seed_5 : return(farming_allotment_onion);
+    case cabbage_seed, cabbage_seed_2, cabbage_seed_3, cabbage_seed_4, cabbage_seed_5 : return(farming_allotment_cabbage);
+    case tomato_seed, tomato_seed_2, tomato_seed_3, tomato_seed_4, tomato_seed_5 : return(farming_allotment_tomato);
+    case sweetcorn_seed, sweetcorn_seed_2, sweetcorn_seed_3, sweetcorn_seed_4, sweetcorn_seed_5 : return(farming_allotment_sweetcorn);
+    case strawberry_seed, strawberry_seed_2, strawberry_seed_3, strawberry_seed_4, strawberry_seed_5 : return(farming_allotment_strawberry);
+    case watermelon_seed, watermelon_seed_2, watermelon_seed_3, watermelon_seed_4, watermelon_seed_5 : return(farming_allotment_watermelon);
+    case default : return(null);
+}
+
+[proc,farming_allotment_life_loss]()(int)
+return(~farming_crop_life_loss(^farming_allotment_save_low, ^farming_allotment_save_high));
+
+[label,farming_allotment_harvest](boolean $automatic)
+if (~farming_veg_is_parent = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_veg_stage;
+def_dbrow $crop = ~farming_allotment_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
+def_int $last = db_getfield($crop, farming_allotment:last, 0);
+if ($stage < $mature | $stage > $last) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+if (inv_total(inv, spade) < 1) {
+    ~displaymessage(^dm_farming_spade);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+if (~farming_harvest_ready($automatic) = false) return;
+// CANDIDATE: herb picking sequence chosen by its low-picking motion.
+// UNKNOWN allotment binding: human_dig is the open spade-animation alternative.
+anim(picking_low, 0);
+inv_add(inv, db_getfield($crop, farming_allotment:produce, 0), 1);
+// VERIFIED period Tip.It per-item harvest XP.
+stat_advance(farming, db_getfield($crop, farming_allotment:harvest_xp, 0));
+if (random(^farming_harvest_denominator) < ~farming_allotment_life_loss) {
+    if (~farming_soil_consume(~farming_soil_index) = false) {
+        if ($stage < $last) {
+            $stage = add($stage, 1);
+        } else {
+            $stage = ^farming_veg_weeded;
+        }
+        ~farming_veg_set_stage($stage);
+    }
+}
+%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
+if ($stage >= $mature) p_oploc(3);
+// UNKNOWN functional wording, no retained period message transcript.
+def_string $plants = db_getfield($crop, farming_allotment:plural, 0);
+mes("You harvest some <$plants> from the allotment.");

@@ -1,0 +1,19 @@
+[cannon_restricted_zones]
+table=coord_pair_table
+// VERIFIED statement (Tip.It Slayer guide, 27 April 2006; also 5 November 2005 and 6 May 2006) that a cannon cannot be set up in the Slayer Dungeon; the extent is UNKNOWN.
+// UNKNOWN CANNON-AREA-FREMENNIK-01: engineering envelope of the cave's m42_156 and m43_156 maps, plane 0.
+data=coord_pair,0_42_156_0_0,0_43_156_63_63
+// VERIFIED statement: the same guide names the Slayer Tower; the extent is UNKNOWN.
+// UNKNOWN CANNON-AREA-TOWER-01: engineering envelope of m53_55's tower walls on the three accessible floors.
+data=coord_pair,0_53_55_12_10,2_53_55_61_60
+// CANDIDATE bans: RuneScape wiki Dwarf multicannon, 22 December 2007, names Zogre burial grounds and Shade tombs.
+// UNKNOWN CANNON-AREA-ZOGRE-01: surface engineering envelope of Jiggig's barricade-enclosed rock-ring floor component.
+data=coord_pair,0_38_47_24_29,0_38_47_59_47
+// UNKNOWN CANNON-AREA-SHADE-TOMBS-01: engineering map envelope containing the existing Mort'ton tomb entrance destination.
+data=coord_pair,0_54_151_0_0,0_54_151_63_63
+// CANDIDATE ban: the same 22 December 2007 list names Mort Myre Swamp.
+// UNKNOWN CANNON-AREA-MORT-MYRE-01: four-box engineering union covering the swamp-snail placements; it excludes the western far-bank strip, Mort'ton map m54_51 and the Dessous graveyard.
+data=coord_pair,0_53_51_6_0,0_53_53_63_63
+data=coord_pair,0_54_52_0_0,0_54_53_63_63
+data=coord_pair,0_55_53_0_0,0_55_53_35_63
+data=coord_pair,0_55_53_36_22,0_55_53_63_63

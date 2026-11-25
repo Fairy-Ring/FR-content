@@ -1,0 +1,4 @@
+// Fee data only: no bush, wood-tree or fruit-tree care service is enabled.
+[farming_protection_future]
+column=payment,obj,REQUIRED
+column=quantity,int,REQUIRED

@@ -1,0 +1,154 @@
+// Original 377 pairs; UNKNOWN engineering landings at their native walkable approaches.
+// CANDIDATE movement mechanism: the published climb_ladder procedure. No client fields change.
+[oploc1,elid_ladder_up]
+@ordinary_ladder_up;
+
+[oploc1,elid_laddertop]
+@ordinary_ladder_down;
+
+[oploc1,fairy_ladder_wind_down]
+@ordinary_ladder_down;
+
+[oploc1,fairy_ladder_wind_up]
+@ordinary_ladder_up;
+
+[oploc1,ladder_11739]
+@ordinary_ladder_up;
+
+[oploc1,ladder_11740]
+@ordinary_ladder_up;
+
+[oploc1,ladder_11741]
+@ordinary_ladder_down;
+
+[oploc1,ladder_11742]
+@ordinary_ladder_down;
+
+[oploc1,prison_ladder_up]
+@ordinary_ladder_up;
+
+[oploc1,prison_laddertop]
+@ordinary_ladder_down;
+
+[oploc1,prison_trapdoor]
+@ordinary_ladder_down;
+
+[oploc1,ship_ladder_no_approach]
+@ordinary_ladder_up;
+
+[oploc1,ship_laddertop_no_approach]
+@ordinary_ladder_down;
+
+[oploc1,vampire_ladder]
+@ordinary_ladder_up;
+
+[oploc1,wild_ladder]
+@ordinary_ladder_up;
+
+[oploc1,wild_ladder_middle]
+@ordinary_wild_ladder_choice;
+
+[oploc2,wild_ladder_middle]
+@ordinary_ladder_up;
+
+[oploc3,wild_ladder_middle]
+@ordinary_ladder_down;
+
+[oploc1,wild_laddertop]
+@ordinary_ladder_down;
+
+[oploc1,wild_laddertop_dungeon]
+@ordinary_ladder_down;
+
+[label,ordinary_ladder_up]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_37_69_35_42 : ~climb_ladder(1_37_69_35_41, true);
+    case 0_41_51_58_3 : ~climb_ladder(1_41_51_57_3, true);
+    case 0_43_50_24_34 : ~climb_ladder(1_43_50_23_34, true);
+    case 0_45_51_35_59 : ~climb_ladder(1_45_51_36_59, true);
+    case 0_46_50_4_13 : ~climb_ladder(1_46_50_5_13, true);
+    case 0_46_52_10_61 : ~climb_ladder(1_46_52_10_60, true);
+    case 0_46_52_2_50 : ~climb_ladder(1_46_52_2_49, true);
+    case 0_47_49_2_48 : ~climb_ladder(1_47_49_3_48, true);
+    case 0_47_52_19_25 : ~climb_ladder(1_47_52_19_24, true);
+    case 0_47_52_27_16 : ~climb_ladder(1_47_52_27_17, true);
+    case 0_47_56_14_41 : ~climb_ladder(1_47_56_14_42, true);
+    case 0_47_56_28_41 : ~climb_ladder(1_47_56_28_42, true);
+    case 0_47_56_28_54 : ~climb_ladder(1_47_56_28_53, true);
+    case 0_48_150_46_43 : ~climb_ladder(0_48_50_45_44, true);
+    case 0_53_45_11_47 : ~climb_ladder(1_53_45_11_46, true);
+    case 0_53_45_17_53 : ~climb_ladder(1_53_45_17_52, true);
+    case 0_53_45_24_25 : ~climb_ladder(1_53_45_25_25, true);
+    case 0_53_45_33_21 : ~climb_ladder(1_53_45_34_21, true);
+    case 0_53_45_37_26 : ~climb_ladder(1_53_45_37_25, true);
+    case 0_53_45_48_12 : ~climb_ladder(1_53_45_47_12, true);
+    case 0_53_45_57_19 : ~climb_ladder(1_53_45_57_18, true);
+    case 1_46_52_10_62 : ~climb_ladder(2_46_52_9_62, true);
+    case 1_47_49_5_43 : ~climb_ladder(2_47_49_6_43, true);
+    case 1_47_52_42_27 : ~climb_ladder(2_47_52_42_26, true);
+    case 1_47_56_14_41 : ~climb_ladder(2_47_56_14_42, true);
+    case 1_47_56_14_54 : ~climb_ladder(2_47_56_14_53, true);
+    case 1_47_56_28_41 : ~climb_ladder(2_47_56_28_42, true);
+    case 1_47_56_28_54 : ~climb_ladder(2_47_56_28_53, true);
+    case 2_46_52_10_61 : ~climb_ladder(3_46_52_10_62, true);
+    case 2_47_56_14_41 : ~climb_ladder(3_47_56_14_42, true);
+    case 2_47_56_14_54 : ~climb_ladder(3_47_56_14_53, true);
+    case 2_47_56_28_41 : ~climb_ladder(3_47_56_28_42, true);
+    case 2_47_56_28_54 : ~climb_ladder(3_47_56_28_53, true);
+}
+
+[label,ordinary_ladder_down]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_46_61_61_59 : ~climb_ladder(0_46_161_60_59, false);
+    case 0_48_50_46_44 : ~climb_ladder(0_48_150_45_43, false);
+    case 0_48_51_12_8 : ~climb_ladder(0_48_151_11_8, false);
+    case 1_37_69_35_42 : ~climb_ladder(0_37_69_35_41, false);
+    case 1_41_51_58_3 : ~climb_ladder(0_41_51_57_3, false);
+    case 1_43_50_24_34 : ~climb_ladder(0_43_50_24_35, false);
+    case 1_45_51_35_59 : ~climb_ladder(0_45_51_36_59, false);
+    case 1_46_50_4_13 : ~climb_ladder(0_46_50_5_13, false);
+    case 1_46_52_10_61 : ~climb_ladder(0_46_52_10_62, false);
+    case 1_46_52_2_50 : ~climb_ladder(0_46_52_2_51, false);
+    case 1_47_49_2_48 : ~climb_ladder(0_47_49_3_48, false);
+    case 1_47_52_19_25 : ~climb_ladder(0_47_52_19_26, false);
+    case 1_47_52_27_16 : ~climb_ladder(0_47_52_27_17, false);
+    case 1_47_56_14_41 : ~climb_ladder(0_47_56_14_42, false);
+    case 1_47_56_14_54 : ~climb_ladder(^ordinary_wild_northwest_ground, false);
+    case 1_47_56_28_41 : ~climb_ladder(0_47_56_28_42, false);
+    case 1_47_56_28_54 : ~climb_ladder(0_47_56_28_53, false);
+    case 1_53_45_11_47 : ~climb_ladder(0_53_45_11_46, false);
+    case 1_53_45_17_53 : ~climb_ladder(0_53_45_17_52, false);
+    case 1_53_45_24_25 : ~climb_ladder(0_53_45_25_25, false);
+    case 1_53_45_33_21 : ~climb_ladder(0_53_45_34_21, false);
+    case 1_53_45_37_26 : ~climb_ladder(0_53_45_37_25, false);
+    case 1_53_45_48_12 : ~climb_ladder(0_53_45_47_12, false);
+    case 1_53_45_57_19 : ~climb_ladder(0_53_45_57_18, false);
+    case 2_46_52_10_62 : ~climb_ladder(1_46_52_11_62, false);
+    case 2_47_49_5_43 : ~climb_ladder(1_47_49_6_43, false);
+    case 2_47_52_42_27 : ~climb_ladder(1_47_52_42_28, false);
+    case 2_47_56_14_41 : ~climb_ladder(1_47_56_14_42, false);
+    case 2_47_56_14_54 : ~climb_ladder(1_47_56_14_53, false);
+    case 2_47_56_28_41 : ~climb_ladder(1_47_56_28_42, false);
+    case 2_47_56_28_54 : ~climb_ladder(1_47_56_28_53, false);
+    case 3_46_52_10_61 : ~climb_ladder(2_46_52_10_60, false);
+    case 3_47_56_14_41 : ~climb_ladder(2_47_56_14_42, false);
+    case 3_47_56_14_54 : ~climb_ladder(2_47_56_14_53, false);
+    case 3_47_56_28_41 : ~climb_ladder(2_47_56_28_42, false);
+    case 3_47_56_28_54 : ~climb_ladder(2_47_56_28_53, false);
+}
+
+[label,ordinary_wild_ladder_choice]
+def_int $option = ~p_choice2_header("Climb Up.", 1, "Climb Down.", 2, "Climb up or down the ladder?");
+if_close;
+if ($option = 1) @ordinary_ladder_up;
+@ordinary_ladder_down;
+
+[oploc1,vampire_trap1]
+sound_synth(door_open, 1, 0);
+loc_change(vampire_trap2, 500);
+
+[oploc1,vampire_trap2]
+@ordinary_ladder_down;
+

@@ -1,64 +1,23 @@
-// The Feud — Menaphite Leader first talk, chat only. New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud §18.2 Talking to the
-// Menaphite Leader, minus the 27 Apr 2022 Beneath Cursed Sands lore pass:
-// Osmumten / Mehhar / Devourer branch is SUBTRACT). NPC feud_menap_boss
-// 1899 @ 3334,2956 L0; vis face feud_menap_boss_vis 1901 "Menaphite
-// Leader" while %feud_boss_vis 1 (OpNpcHandler resolves the multi vis —
-// bind the vis name, not the multi base). Gate: %feud_var_drink_found >= 1
-// (deed reported to Ali the Operator, §17.2 PASS feudosy2dkie) else return.
-// Tree verbatim: "Ali the Operator said you wanted to see me." ->
-// "That's right. I have kept a close eye on your progress. I'm impressed."
-// -> plans for the bandits -> "World domination! First Pollnivneach, then
-// Al Kharid, then the whole of the desert!" -> "What?" -> "You do
-// understand who we are, don't you?" -> "Actually I thought you were a
-// ragtag band of good-for- nothing thieves..." -> "Silence! We are the
-// descendants of assassins..." -> "For centuries we have wandered the
-// desert, rebuilding the empire we were promised!" -> "Will you join us in
-// our quest to defeat the thralls of Tumeken and reclaim our birthright?"
-// -> "Sorry, I have this irrational hatred for megalomaniac, despotic
-// zealots! Prepare to meet your maker, you big jerk!" -> "Fool! You'll
-// never get to me. Guards protect me." then spawn the Tough Guy fight:
-// npc_add(npc_coord, feud_menap_toughguy 1906, 500 CANDIDATE duration) +
-// npc_setmode(opplayer2). No stage write — no 28. Death [ai_queue3,feud_menap_toughguy]
-// then 100% drops CANDIDATE 2007-base (OSRS Tough Guy #Drops / The Feud
-// rewards / leftover blackjack_willow 4600): bones + willow blackjack.
-// Then dumps §18.5 verbatim (Leader threat + Ali's-nephew retort + villagers-reward hope)
-// then %feud_boss_vis = 0 (Leader gone — dump teleport, not dest / p_tele) and
-// %feud_var_menaboss = 1 (CANDIDATE leftover flag).
-// Cite copy-agent-opener-377.md · feud-config-unit-first-377.md ·
-// feud-varbit-map-377.md.
-
+// CANDIDATE: pre-2022 RuneScape transcript 18411641, lines 363–378.
+// Repeat summon and original varbit transitions: Old School transcript 15325427.
 [opnpc1,feud_menap_boss_vis]
-if (%feud_var_drink_found < 1) { return; }
-~chatplayer("<p,neutral>Ali the Operator said you wanted to see me.");
-~chatnpc("<p,neutral>That's right. I have kept a close eye on your progress. I'm impressed.");
-~chatplayer("<p,neutral>So what are your plans for the bandits?");
-~chatnpc("<p,neutral>The bandits? A mere nuisance, insignificant to my overall goal.");
-~chatplayer("<p,neutral>Wait, if you're not warring with the bandits, what are you planning?");
-~chatnpc("<p,happy>World domination! First Pollnivneach, then Al Kharid, then the whole of the desert!");
+if (%feud_var ! ^feud_leader_summons) return;
+if (%feud_var_menaboss = 1) {
+    npc_say("Guards!");
+    ~feud_champion_spawn(feud_menap_toughguy);
+    return;
+}
+~chatplayer("<p,neutral>Ali the operator told me that you wanted to see me.");
+~chatnpc("<p,neutral>That's right, I have been keeping track of your progress. It was impressive.");
+~chatplayer("<p,neutral>So what plans for the bandits?");
+~chatnpc("<p,neutral>The bandits? A mere nuisance, insignificant in my overall plans.");
+~chatplayer("<p,neutral>So if you're not warring with the bandits what then are you planning for?");
+~chatnpc("<p,happy>World domination, first Pollnivneach, then Al Kharid then the whole of Runescape!");
 ~chatplayer("<p,shock>What?");
-~chatnpc("<p,quiz>You do understand who we are, don't you?");
-~chatplayer("<p,neutral>Actually I thought you were a ragtag band of good-for- nothing thieves sucking the life out of this innocent town.");
-~chatnpc("<p,angry>Silence! We are the descendants of assassins, the heirs of the revolutionaries who defeated the corrupt pharaoh and his brood!");
-~chatnpc("<p,neutral>For centuries we have wandered the desert, rebuilding the empire we were promised!");
-~chatnpc("<p,quiz>Will you join us in our quest to defeat the thralls of Tumeken and reclaim our birthright?");
-~chatplayer("<p,angry>Sorry, I have this irrational hatred for megalomaniac, despotic zealots! Prepare to meet your maker, you big jerk!");
-~chatnpc("<p,angry>Fool! You'll never get to me. Guards protect me.");
-npc_add(npc_coord, feud_menap_toughguy, 500); // CANDIDATE duration — arena uses 500
-npc_setmode(opplayer2);
-return;
-
-[ai_queue3,feud_menap_toughguy]
-gosub(npc_death);
-if (npc_findhero = ^true) {
-    obj_add(npc_coord, bones, 1, ^lootdrop_duration);
-    obj_add(npc_coord, blackjack_willow, 1, ^lootdrop_duration);
-}
-if (p_finduid(%npc_aggressive_player) = true) {
-    ~chatnpc_specific("Menaphite Leader", feud_menap_boss_vis, "<p,angry>You haven't seen the last of me!");
-    ~chatplayer("<p,neutral>No doubt I haven't seen the last of you... but what about Ali's nephew?");
-    ~chatplayer("<p,neutral>Maybe the villagers will feel more talkative now that I've rid them of these evil Menaphites. Who knows, they might even give me a reward!");
-    %feud_boss_vis = 0; // CANDIDATE — Leader gone (dump teleport). Not dest.
-    %feud_var_menaboss = 1; // CANDIDATE leftover flag
-}
-return;
+~chatnpc("<p,quiz>You do understand who 'We' are?");
+~chatplayer("<p,neutral>Actually I thought you were a ragtag band of good for nothing thieves sucking the life out of this backwater excuse for a town.");
+~chatnpc("<p,angry>Silence! We are the chosen, exiled from Menaphos for trying to overthrow the Pharaoh. Loyal servants of Amascut the Devourer, God of Destruction. We are regrouping to launch another offensive against the thrall of Tumeken, using Pollnivneach as a spawning ground for revolution!");
+~chatplayer("<p,angry>That's it, I've had it! I'm just going to have to rid the world of you and your mob - I have this irrational hatred for megalomaniacal, despotic, religious zealots! Prepare to meet Icthy-aly-rin or whoever!");
+%feud_var_menaboss = 1;
+~chatnpc("<p,angry>Fool! You'll never get to me. Guards protect me. Guards!");
+~feud_champion_spawn(feud_menap_toughguy);

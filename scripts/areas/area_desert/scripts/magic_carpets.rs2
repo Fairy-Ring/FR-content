@@ -1,0 +1,113 @@
+// CANDIDATE service dialogue: Transcript:Rug_Merchant r15315417 (before spelling edits).
+// The 377 cache has no Travel operation; that shortcut dates to January 2007.
+// Bind to the visible NPCs, including the quest-controlled Uzer and Menaphite forms.
+[opnpc1,magic_carpet_seller1] @magic_carpet_talk(magic_carpet_seller1);
+[opnpc1,magic_carpet_seller2] @magic_carpet_talk(magic_carpet_seller2);
+[opnpc1,magic_carpet_seller3] @magic_carpet_talk(magic_carpet_seller3);
+[opnpc1,magic_carpet_seller4] @magic_carpet_talk(magic_carpet_seller4);
+[opnpc1,magic_carpet_seller5] @magic_carpet_talk(magic_carpet_seller5);
+[opnpc1,magic_carpet_seller6] @magic_carpet_talk(magic_carpet_seller6);
+[opnpc1,magic_carpet_seller7] @magic_carpet_talk(magic_carpet_seller7);
+[opnpc1,magic_carpet_seller8] @magic_carpet_talk(magic_carpet_seller8);
+
+[label,magic_carpet_talk](npc $station)
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>Greetings, desert traveller. Do you require the services of Ali Morrisane's flying carpet fleet?");
+if (~p_choice2("Yes please.", 1, "No thanks.", 2) = 2) {
+    ~chatnpc("<p,neutral>Come back anytime.");
+    return;
+}
+~chatplayer("<p,neutral>Yes please.");
+switch_npc ($station) {
+    case magic_carpet_seller1 :
+        ~chatnpc("<p,neutral>From here you can travel to Uzer, to the Bedabin camp or to the North of Pollnivneach.");
+        ~chatnpc("<p,neutral>The second major carpet hub station, to the south of Pollnivneach is in easy walking distance from there.");
+        switch_int (~p_choice4("I want to travel to Uzer.", 1, "I want to travel to the Bedabin camp.", 2, "I want to travel to Pollnivneach.", 3, "I don't want to travel to any of those places.", 4)) {
+            case 1 : ~magic_carpet_board(magic_carpet_seller5, ^magic_carpet_uzer);
+            case 2 : ~magic_carpet_board(magic_carpet_seller2, ^magic_carpet_bedabin);
+            case 3 : ~magic_carpet_board(magic_carpet_seller4, ^magic_carpet_poll_north);
+            case 4 : @magic_carpet_cancel;
+        }
+    case magic_carpet_seller2 :
+        ~chatnpc("<p,neutral>From here you can travel to the Shantay Pass.");
+        if (~p_choice2("Take me there.", 1, "I don't want to travel there.", 2) = 1) {
+            ~magic_carpet_board(magic_carpet_seller1, ^magic_carpet_shantay);
+        } else { @magic_carpet_cancel; }
+    case magic_carpet_seller3 :
+        ~chatnpc("<p,neutral>From here you can travel to Nardah and the Menaphite cities of Sophanem and Menaphos.");
+        switch_int (~p_choice4("I want to travel to Nardah.", 1, "I want to travel to Menaphos.", 2, "I want to travel to Sophanem.", 3, "I don't want to travel to any of those places.", 4)) {
+            case 1 : ~magic_carpet_board(magic_carpet_seller8, ^magic_carpet_nardah);
+            case 2 : ~magic_carpet_board(magic_carpet_seller7, ^magic_carpet_menaphos);
+            case 3 : ~magic_carpet_board(magic_carpet_seller6, ^magic_carpet_sophanem);
+            case 4 : @magic_carpet_cancel;
+        }
+    case magic_carpet_seller4 :
+        ~chatnpc("<p,neutral>From here you can travel to the Shantay Pass - the Southern gate of Al Kharid.");
+        if (~p_choice2("Take me to the Pass then.", 1, "I don't want to travel there.", 2) = 1) {
+            ~magic_carpet_board(magic_carpet_seller1, ^magic_carpet_shantay);
+        } else { @magic_carpet_cancel; }
+    case magic_carpet_seller5 :
+        ~chatnpc("<p,neutral>You can travel from here back to the Shantay Pass.");
+        if (~p_choice2("That sounds good, take me there.", 1, "I don't want to travel there.", 2) = 1) {
+            ~magic_carpet_board(magic_carpet_seller1, ^magic_carpet_shantay);
+        } else { @magic_carpet_cancel; }
+    case magic_carpet_seller6 :
+        ~chatnpc("<p,neutral>The carpets here will take you to the south of Pollnivneach. Do you want to take a lift?");
+        if (~p_choice2("Pollnivneach will do.", 1, "I don't want to travel there.", 2) = 1) {
+            ~magic_carpet_board(magic_carpet_seller3, ^magic_carpet_poll_south);
+        } else { @magic_carpet_cancel; }
+    case magic_carpet_seller7, magic_carpet_seller8 :
+        ~chatnpc("<p,neutral>The carpets here will take you to the south of Pollnivneach.");
+        if (~p_choice2("Let's go then.", 1, "I don't want to travel there.", 2) = 1) {
+            ~magic_carpet_board(magic_carpet_seller3, ^magic_carpet_poll_south);
+        } else { @magic_carpet_cancel; }
+}
+
+[label,magic_carpet_cancel]
+~chatnpc("<p,neutral>Fair enough, magic carpet travel isn't for everyone. Enjoy the walk.");
+
+[proc,magic_carpet_fare]()(int)
+// CANDIDATE: Rogue Trader's explicit cheap-flights reward, not merely starting The Feud.
+if (%roguetrader_cheapflights = 1) {
+    if (inv_total(worn, ring_of_charos_unlocked) > 0) { return(^magic_carpet_combined_fare); }
+    return(^magic_carpet_discount_fare);
+}
+if (inv_total(worn, ring_of_charos_unlocked) > 0) { return(^magic_carpet_discount_fare); }
+return(^magic_carpet_fare);
+
+[proc,magic_carpet_board](npc $destination, coord $arrival)
+// CANDIDATE quest locks from Magic carpet, corroborated by 377 merchant morphs.
+// UNKNOWN functional refusal/confirmation wording: the transcript omits paid travel.
+if ($destination = magic_carpet_seller5 & %golem_a < ^golem_complete) {
+    ~chatnpc("<p,neutral>You must complete The Golem before travelling to Uzer.");
+    return;
+}
+if ($destination = magic_carpet_seller6 | $destination = magic_carpet_seller7) {
+    if (%ics_little_var < ^ics_little_complete) {
+        ~chatnpc("<p,neutral>You must complete Icthlarin's Little Helper before travelling there.");
+        return;
+    }
+}
+// CANDIDATE pre-May-2013 restriction: the right hand must be empty.
+if (inv_getobj(worn, ^wearpos_rhand) ! null) {
+    ~chatnpc("<p,neutral>Please remove your weapon before travelling.");
+    return;
+}
+def_int $fare = ~magic_carpet_fare;
+~chatnpc("<p,neutral>The fare is <tostring($fare)> coins.");
+if (~p_choice2("Yes please.", 1, "No thanks.", 2) = 2) { return; }
+if (inv_total(inv, coins) < $fare) {
+    ~chatnpc("<p,neutral>You don't have enough coins.");
+    return;
+}
+inv_del(inv, coins, $fare);
+if_close;
+// LEFT SIMPLE / UNKNOWN flight: original 377 raise/land animations, plain teleport.
+// The retained 377 config/maps give stations and animation frames, not route waypoints.
+// Delay rounds the cache animation's 20ms frames up to server ticks, not a period flight time.
+anim(carpet_raise, 0);
+p_delay(calc((seqlength(carpet_raise) + 29) / 30));
+p_telejump($arrival);
+anim(carpet_land, 0);
+p_delay(calc((seqlength(carpet_land) + 29) / 30));
+anim(null, 0);

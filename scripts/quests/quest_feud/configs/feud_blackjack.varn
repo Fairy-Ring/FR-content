@@ -1,0 +1,16 @@
+[feud_villager_state]
+type=int
+
+[feud_villager_owner]
+type=player_uid
+
+[feud_villager_deadline]
+type=int
+
+// A nonzero deadline also owns the one pending callback for that condition kind.
+// Reset leaves it owned until that callback runs; a new action only moves its deadline.
+[feud_repeat_follow_deadline]
+type=int
+
+[feud_repeat_ko_deadline]
+type=int

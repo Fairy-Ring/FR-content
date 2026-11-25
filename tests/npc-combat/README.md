@@ -181,7 +181,21 @@ routing = {
 
 The entry must name one endpoint. The selector must select the other declared form. `stats`, `params`, and `hasop` assert what native opcodes read from a fresh spawned parent. `resolvedOptions` asserts the selected form's complete options separately. These expectations use the same exact values and reference syntax as fields.
 
-At the pinned engine, `Npc.ts:76-93` initializes levels from the spawned type. `NpcOps.ts:281-285` reads those levels for `NPC_STAT`. `NpcOps.ts:178-187` reads params from `activeNpc.type`. `NpcOps.ts:579-591` reads that type's options for `NPC_HASOP`. `resolveNpcType.ts:4-17` selects a visual form, and `OpNpcHandler.ts:40-45` checks its options. The checker executes the real resolver and three opcode handlers offline. It changes no routing. Explicit `changeType` can change the runtime type and levels (`Npc.ts:444-461`). This check does not prove a quest's natural transformation or access route.
+`Npc.ts:76-93` initializes levels from the spawned type. `NpcOps.ts:281-285` reads those levels for `NPC_STAT`. `NpcOps.ts:178-187` reads params from `activeNpc.type`. `NPC_HASOP` reads the player's visible form when a player is active, and the base type otherwise. This checker deliberately supplies no player for its `hasop` assertions. `resolveNpcType.ts:4-17` selects a visual form, and `OpNpcHandler.ts:40-45` checks its options. The checker executes the real resolver and three opcode handlers offline. It changes no routing. Explicit `changeType` can change the runtime type and levels (`Npc.ts:444-461`). This check does not prove a quest's natural transformation or access route.
+
+### Nonattack multi-NPC guards
+
+After building the pack, run:
+
+```sh
+node --import tsx ../content/tests/npc-combat/test_nonattack_multi.mjs
+```
+
+The real-VM test reads every packed selector for the 12 named bases. It checks both attack guards, generic attacks, poison, recoil, salve, and Crumble Undead.
+It also dispatches the original Desert Treasure Smash-ice and Elid Shoot handlers. The Feud controls follow the observed native `NPC_HASOP` result.
+An engine that reads only the Feud base must reject its op-less base. An engine that resolves its selected Attack form must accept it.
+
+This test does not prove map placement, natural quest progression, live packet delivery, or the quest-gated DT smash success branch.
 
 ## Proof limits
 
@@ -239,6 +253,8 @@ strict null ranged presentation for guard2, a missing native magic row for
 Nezikchened's AP route, non-damaging Bind/Confuse for chaos druid's AP route,
 and no accuracy roll for the troll thrower and snail routes. These native
 limitations are preserved, not repaired by the seam.
+
+The suite tries the stored seed first. If it reaches another branch, it tries at most 32 unsigned candidates `Math.imul(n, 0x9e3779b9) >>> 0` for `n=1..32`, skipping a duplicate of the stored seed. This caps an unreachable branch at 33 native fixture executions including the preferred seed. The mirror-shield trace found its replacement at candidate 3; the cap leaves headroom while bounding the cost of rebuilding native routes, especially Tolna's private-region fixture. Failed probes are not differentials or report cases/costs; each accepted branch prints and records its selected seed and total attempts. A branch mismatch with a script error fails immediately rather than entering the search. Existing named no-accuracy limitations above retain their previous behavior.
 
 The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
 `-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,

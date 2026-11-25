@@ -1,0 +1,12 @@
+// CANDIDATE exact Old School Waterbirth ranged and Wallasalki forms.
+^wbmon_ranged_maxhit = 20
+^wbmon_magic_maxhit = 30
+// UNKNOWN Waterbirth geometry: borrowed unchanged from horror_dagannoth.rs2:98-99.
+// That donor cites its Horror quest capture, not an original Waterbirth projectile.
+^wbmon_spines_start_height = 52
+^wbmon_spines_end_height = 28
+^wbmon_spines_delay = 10
+^wbmon_spines_angle = 25
+^wbmon_spines_flight_length = 36
+^wbmon_spines_offset = 50
+^wbmon_spines_distance_step = 5

@@ -1,0 +1,71 @@
+// CANDIDATE: ordinary quest-form Fear combat, without the Rage XP suppression.
+[ai_spawn,soulbane_fear_reaper]
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+
+[opnpc2,soulbane_fear_reaper]
+if (~soulbane_fear_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,soulbane_fear_reaper]
+if (~soulbane_fear_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,soulbane_fear_reaper]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_fear_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate;
+
+[ai_opplayer2,soulbane_fear_reaper]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_setmode(none);
+    return;
+}
+if (~soulbane_fear_attackable = false) {
+    npc_setmode(none);
+    return;
+}
+%npc_aggressive_player = uid;
+~npc_default_attack;
+
+[ai_queue4,soulbane_fear_reaper]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_fear_attackable = false | npc_stat(hitpoints) <= 0) return;
+npc_anim(null, 0);
+%npc_aggressive_player = uid;
+npc_setmode(opplayer2);
+
+[ai_queue2,soulbane_fear_reaper]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_fear_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_damage(last_int);
+
+[ai_queue3,soulbane_fear_reaper]
+if (finduid(%npc_attacking_uid) = true) {
+    if (~soulbane_fear_attackable = true & npc_stat(hitpoints) = 0) {
+        // Consume this NPC's owner marker before its delayed death animation.
+        // A repeated death dispatch cannot enqueue a second room credit.
+        %npc_int = 0;
+        queue*(soulbane_fear_credit, 0)(%soulbane_instance, add(%soulbane_fear_killedtally, 1));
+    }
+}
+~npc_death;
+
+[queue,soulbane_fear_credit](int $instance, int $ordinal)
+if (~soulbane_owned = false | %soulbane_instance ! $instance | %soulbane_prog ! 4) return;
+if (%soulbane_fear_monspres ! 1 | $ordinal ! add(%soulbane_fear_killedtally, 1) | $ordinal > 5) return;
+%soulbane_fear_monspres = 0;
+%soulbane_fear_killedtally = $ordinal;
+%soulbane_fear_enemydoor_old = %soulbane_fear_enemydoor;
+if ($ordinal = 5) {
+    %soulbane_fear_enemydoor = 0;
+    queue(soulbane_fear_complete, 0, 0);
+    return;
+}
+~soulbane_fear_choose;
+switch_int ($ordinal) {
+    case 1 : say("I don't like looking in these holes but I must!");
+    case 2 : say("I don't feel quite so afraid now.");
+    case 3 : say("These holes aren't that spooky.");
+    case 4 : say("This isn't so scary after all!");
+}

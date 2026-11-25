@@ -2416,6 +2416,3184 @@
           "value": 10
         }
       }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin",
+        "id": 1822
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-monster-r4221589",
+            "sha256": "e432045871052b49494f98afbd77188a7cf212104cd3b0b00ca4084c6e6f3140"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 1
+        },
+        "strength": {
+          "value": 1
+        },
+        "defence": {
+          "value": 1
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-rhq-460-20060108231728",
+                "sha256": "05c48aec86441a387683e37c19946cc9f06617b208426ff480c850af71092225"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m459-20051105222039",
+                "sha256": "5edd400805b2d27e3cbde474053946dd28059f9fe6fdf8e2cd3487241ed00a23"
+              },
+              {
+                "id": "src.monster-s01-operator-m1-20261114",
+                "sha256": "8b3e51e66d1d506e2336327132c3b5b7ede05290f9f5b4acf1f6b2a22ea5fceb"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin2",
+        "id": 1823
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-monster-r4221589",
+            "sha256": "e432045871052b49494f98afbd77188a7cf212104cd3b0b00ca4084c6e6f3140"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 1
+        },
+        "strength": {
+          "value": 1
+        },
+        "defence": {
+          "value": 1
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-rhq-460-20060108231728",
+                "sha256": "05c48aec86441a387683e37c19946cc9f06617b208426ff480c850af71092225"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m459-20051105222039",
+                "sha256": "5edd400805b2d27e3cbde474053946dd28059f9fe6fdf8e2cd3487241ed00a23"
+              },
+              {
+                "id": "src.monster-s01-operator-m1-20261114",
+                "sha256": "8b3e51e66d1d506e2336327132c3b5b7ede05290f9f5b4acf1f6b2a22ea5fceb"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin3",
+        "id": 1824
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-monster-r4221589",
+            "sha256": "e432045871052b49494f98afbd77188a7cf212104cd3b0b00ca4084c6e6f3140"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 1
+        },
+        "strength": {
+          "value": 1
+        },
+        "defence": {
+          "value": 1
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-rhq-460-20060108231728",
+                "sha256": "05c48aec86441a387683e37c19946cc9f06617b208426ff480c850af71092225"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m459-20051105222039",
+                "sha256": "5edd400805b2d27e3cbde474053946dd28059f9fe6fdf8e2cd3487241ed00a23"
+              },
+              {
+                "id": "src.monster-s01-operator-m1-20261114",
+                "sha256": "8b3e51e66d1d506e2336327132c3b5b7ede05290f9f5b4acf1f6b2a22ea5fceb"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin4",
+        "id": 1825
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-monster-r4221589",
+            "sha256": "e432045871052b49494f98afbd77188a7cf212104cd3b0b00ca4084c6e6f3140"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 1
+        },
+        "strength": {
+          "value": 1
+        },
+        "defence": {
+          "value": 1
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-rhq-460-20060108231728",
+                "sha256": "05c48aec86441a387683e37c19946cc9f06617b208426ff480c850af71092225"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m459-20051105222039",
+                "sha256": "5edd400805b2d27e3cbde474053946dd28059f9fe6fdf8e2cd3487241ed00a23"
+              },
+              {
+                "id": "src.monster-s01-operator-m1-20261114",
+                "sha256": "8b3e51e66d1d506e2336327132c3b5b7ede05290f9f5b4acf1f6b2a22ea5fceb"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-cave-goblins"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_guard1",
+        "id": 2073
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-guard-level-26-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-guard-r13331665",
+            "sha256": "f70bf958fac2ddbfae7e1202552f8f8b4774822c59634834b8277af68242ca22"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 25
+        },
+        "strength": {
+          "value": 18
+        },
+        "defence": {
+          "value": 25
+        },
+        "hitpoints": {
+          "value": 26,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-guard-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m516-20051105223316",
+                "sha256": "c5a0cdc8195f4cc88895ca7a66b8c5985f66a29fbd556db49f9a3ede14fce179"
+              },
+              {
+                "id": "src.monster-a7-tipit-m515-20051111050739",
+                "sha256": "83103605e03d55bab30c633275cd4a7e370bec6cbdfed6d5bc6200c0666cc075"
+              },
+              {
+                "id": "src.monster-a7-rhq-599-20060921181222",
+                "sha256": "b84cf0518845b1caa19d17019676211a2c93db4b2396d61b1ab88591b4b72ee6"
+              },
+              {
+                "id": "src.monster-a7-main-rulings",
+                "sha256": "da740aa9682e246735145b3fd4a9e1bcb76a481e64e8a87c773af1d724766f6f"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_bone_spear_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-spear-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_bone_spear_block"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-spear-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-spear-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-spear-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-spear-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-spear-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_guard2",
+        "id": 2074
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-guard-level-24-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-guard-r8018904",
+            "sha256": "4b2c73b524a782d9dccb12f1c6e09392af653b9840701323747752bae527ce20"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 22
+        },
+        "strength": {
+          "value": 16
+        },
+        "defence": {
+          "value": 22
+        },
+        "hitpoints": {
+          "value": 26,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-guard-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m515-20051111050739",
+                "sha256": "83103605e03d55bab30c633275cd4a7e370bec6cbdfed6d5bc6200c0666cc075"
+              },
+              {
+                "id": "src.monster-a7-tipit-m516-20051105223316",
+                "sha256": "c5a0cdc8195f4cc88895ca7a66b8c5985f66a29fbd556db49f9a3ede14fce179"
+              },
+              {
+                "id": "src.monster-a7-rhq-599-20060921181222",
+                "sha256": "b84cf0518845b1caa19d17019676211a2c93db4b2396d61b1ab88591b4b72ee6"
+              },
+              {
+                "id": "src.monster-a7-main-rulings",
+                "sha256": "da740aa9682e246735145b3fd4a9e1bcb76a481e64e8a87c773af1d724766f6f"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_bone_club_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-club-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_bone_spear_block"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-club-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-club-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-club-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-club-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-club-guard"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner",
+        "id": 2069
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-miner-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-miner-r4221728",
+            "sha256": "78f1e10f54128576a571a82c0aee2827f158a9033b8cf9706a6c39ec9c6b000c"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 10
+        },
+        "strength": {
+          "value": 12
+        },
+        "defence": {
+          "value": 7
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-miner-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m514-20051111050710",
+                "sha256": "325cb27cdb38d9b84912e5013421147b60773a492e84538c4b523fd1e94b82e2"
+              },
+              {
+                "id": "src.monster-a7-rhq-600-20060917124527",
+                "sha256": "2c03221a651713ab0a4ce8dc0af27aa6382c9a987e3bb9eb9171398aff9a0b29"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner2",
+        "id": 2070
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-miner-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-miner-r4221728",
+            "sha256": "78f1e10f54128576a571a82c0aee2827f158a9033b8cf9706a6c39ec9c6b000c"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 10
+        },
+        "strength": {
+          "value": 12
+        },
+        "defence": {
+          "value": 7
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-miner-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m514-20051111050710",
+                "sha256": "325cb27cdb38d9b84912e5013421147b60773a492e84538c4b523fd1e94b82e2"
+              },
+              {
+                "id": "src.monster-a7-rhq-600-20060917124527",
+                "sha256": "2c03221a651713ab0a4ce8dc0af27aa6382c9a987e3bb9eb9171398aff9a0b29"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner2_mining",
+        "id": 2076
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-miner-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-miner-r4221728",
+            "sha256": "78f1e10f54128576a571a82c0aee2827f158a9033b8cf9706a6c39ec9c6b000c"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 10
+        },
+        "strength": {
+          "value": 12
+        },
+        "defence": {
+          "value": 7
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-miner-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m514-20051111050710",
+                "sha256": "325cb27cdb38d9b84912e5013421147b60773a492e84538c4b523fd1e94b82e2"
+              },
+              {
+                "id": "src.monster-a7-rhq-600-20060917124527",
+                "sha256": "2c03221a651713ab0a4ce8dc0af27aa6382c9a987e3bb9eb9171398aff9a0b29"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner3",
+        "id": 2071
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-miner-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-miner-r4221728",
+            "sha256": "78f1e10f54128576a571a82c0aee2827f158a9033b8cf9706a6c39ec9c6b000c"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 10
+        },
+        "strength": {
+          "value": 12
+        },
+        "defence": {
+          "value": 7
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-miner-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m514-20051111050710",
+                "sha256": "325cb27cdb38d9b84912e5013421147b60773a492e84538c4b523fd1e94b82e2"
+              },
+              {
+                "id": "src.monster-a7-rhq-600-20060917124527",
+                "sha256": "2c03221a651713ab0a4ce8dc0af27aa6382c9a987e3bb9eb9171398aff9a0b29"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner4",
+        "id": 2072
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-miner-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-miner-r4221728",
+            "sha256": "78f1e10f54128576a571a82c0aee2827f158a9033b8cf9706a6c39ec9c6b000c"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 10
+        },
+        "strength": {
+          "value": 12
+        },
+        "defence": {
+          "value": 7
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-miner-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m514-20051111050710",
+                "sha256": "325cb27cdb38d9b84912e5013421147b60773a492e84538c4b523fd1e94b82e2"
+              },
+              {
+                "id": "src.monster-a7-rhq-600-20060917124527",
+                "sha256": "2c03221a651713ab0a4ce8dc0af27aa6382c9a987e3bb9eb9171398aff9a0b29"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner4_mining",
+        "id": 2078
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-cave-goblin-miner-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-cave-goblin-miner-r4221728",
+            "sha256": "78f1e10f54128576a571a82c0aee2827f158a9033b8cf9706a6c39ec9c6b000c"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 10
+        },
+        "strength": {
+          "value": 12
+        },
+        "defence": {
+          "value": 7
+        },
+        "hitpoints": {
+          "value": 10,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-cave-goblin-miner-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m514-20051111050710",
+                "sha256": "325cb27cdb38d9b84912e5013421147b60773a492e84538c4b523fd1e94b82e2"
+              },
+              {
+                "id": "src.monster-a7-rhq-600-20060917124527",
+                "sha256": "2c03221a651713ab0a4ce8dc0af27aa6382c9a987e3bb9eb9171398aff9a0b29"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_defend"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "cave_goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-own-family-miners"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "829f07344e4f42ad0adacfab24dee5a6e6e55b43",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-own-family-rule",
+                "sha256": "6f66fda5fe90f35f28368f2dd25ae4f1d366f08feb9b6901b9761377d82faa9e"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "goblin_green_soldier_1",
+        "id": 445
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-goblin-soldier-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-goblin-level-5-r14258042",
+            "sha256": "510bf42f49a5a4925fbfe2dd4032c33bcfba2ee11c3b8edae7fa01a212433d64"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          },
+          {
+            "id": "src.monster-a7-published-goblin-config",
+            "sha256": "670fba88f33e0d6e6ca4a8fbce44d909db85265739dceb2ca0e1a617214c9949"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 3
+        },
+        "strength": {
+          "value": 1
+        },
+        "defence": {
+          "value": 4
+        },
+        "hitpoints": {
+          "value": 12,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-goblin-soldier-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m57-20051111024837",
+                "sha256": "909fe69fc60cc0cebe706ead94a635796dd8ddc357e7db45ff657f7526a3f395"
+              },
+              {
+                "id": "src.monster-a7-rhq-13-20060108212153",
+                "sha256": "88fd20daac552e81700aa936fee4d65273a783710af5b4e8dbe7d87b8e0fd74c"
+              },
+              {
+                "id": "src.monster-a7-osrs-goblin-level-5-r212498",
+                "sha256": "589d46c6596059aaa46ff4b095611754e41ab708c605f99f2e0ec71c9df425ab"
+              },
+              {
+                "id": "src.monster-a7-main-rulings",
+                "sha256": "da740aa9682e246735145b3fd4a9e1bcb76a481e64e8a87c773af1d724766f6f"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "goblin_attack_armed"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "goblin_block"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "goblin_red_soldier_1",
+        "id": 444
+      },
+      "unit": "A7",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.a7-goblin-soldier-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+        "sources": [
+          {
+            "id": "src.monster-a7-osrs-goblin-level-5-r14258042",
+            "sha256": "510bf42f49a5a4925fbfe2dd4032c33bcfba2ee11c3b8edae7fa01a212433d64"
+          },
+          {
+            "id": "src.monster-a7-history",
+            "sha256": "2aea61058f537178ae3047f4e0fc121831f636194e185d767657c7610ee9af9e"
+          },
+          {
+            "id": "src.monster-a7-published-goblin-config",
+            "sha256": "670fba88f33e0d6e6ca4a8fbce44d909db85265739dceb2ca0e1a617214c9949"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 3
+        },
+        "strength": {
+          "value": 1
+        },
+        "defence": {
+          "value": 4
+        },
+        "hitpoints": {
+          "value": 12,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7-goblin-soldier-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "69cb139b60a7d2fadf608346e2ac33a83ca32b49",
+            "sources": [
+              {
+                "id": "src.monster-a7-tipit-m57-20051111024837",
+                "sha256": "909fe69fc60cc0cebe706ead94a635796dd8ddc357e7db45ff657f7526a3f395"
+              },
+              {
+                "id": "src.monster-a7-rhq-13-20060108212153",
+                "sha256": "88fd20daac552e81700aa936fee4d65273a783710af5b4e8dbe7d87b8e0fd74c"
+              },
+              {
+                "id": "src.monster-a7-osrs-goblin-level-5-r212498",
+                "sha256": "589d46c6596059aaa46ff4b095611754e41ab708c605f99f2e0ec71c9df425ab"
+              },
+              {
+                "id": "src.monster-a7-main-rulings",
+                "sha256": "da740aa9682e246735145b3fd4a9e1bcb76a481e64e8a87c773af1d724766f6f"
+              }
+            ]
+          }
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "goblin_attack_armed"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "goblin_block"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "goblin_attack"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "goblin_hit"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": {
+            "ref": "synth",
+            "name": "goblin_death"
+          },
+          "unit": "A7-ANIM",
+          "evidence": {
+            "facts": [
+              "monster-combat-data.a7anim-soldier-presentation"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "b4826aaa3e4411c04a6a0fa4d4a64df6e4c6ce8b",
+            "sources": [
+              {
+                "id": "src.monster-a7anim-operator-rule",
+                "sha256": "85e151918cc96cda1592ef5d6af06396dbfeab40c03178fc816024bad0ec0b0d"
+              },
+              {
+                "id": "src.monster-a7anim-published-donors",
+                "sha256": "a81446f9a17dc166c682390eb4854dd5165efc2f34114fbe95320a81b428a80c"
+              },
+              {
+                "id": "src.monster-a7anim-compatibility",
+                "sha256": "64f1ce5bb3542a0c520574f3588836c5d48ad418c9aaafb6e2c00e4e30383cae"
+              }
+            ]
+          }
+        }
+      }
     }
   ]
 }

@@ -1,7 +1,6 @@
 // Spirits of the Elid — Ghaslor the Elder (Nardah) Talk-to after Mayor start.
 // CANDIDATE lines (OSRS Transcript:Spirits of the Elid minus overlay).
-// Gate %elidquest >= 1. Curse path gives the Ballad of Jareesh (elid_ballad).
-// Chat + inv_add only — do not retouch elid_ballad.rs2, no fountain dest.
+// The Ballad identifies the waterfall route. Intermediate stage numbers are UNKNOWN.
 // Cite crawl/elid-changes-377.md.
 
 [opnpc1,elid_ghaslor]
@@ -20,6 +19,9 @@ if ($go = 2) {
 ~chatnpc("<p,neutral>Oh that's something which no one but the gods and the river spirits seem to know.");
 ~chatnpc("<p,neutral>Here I have something around here somewhere which may be of interest to you.");
 ~chatnpc("<p,neutral>Aha yes here it is, the ballad of Jareesh. This tells of a previous quest to try and find the spirits.");
+if (%elidquest < ^elid_ballad_received) {
+    %elidquest = ^elid_ballad_received;
+}
 if (inv_total(inv, elid_ballad) >= 1) {
     ~chatplayer("<p,neutral>Thank you very much for your help.");
     return;

@@ -1,0 +1,9 @@
+// UNKNOWN engineering destinations on the original 377 lair map.
+[giant_mole_burrow_coords]
+inputtype=int
+outputtype=coord
+default=null
+val=0,0_27_81_31_5
+val=1,0_27_81_10_25
+val=2,0_27_81_49_53
+val=3,0_27_80_32_31

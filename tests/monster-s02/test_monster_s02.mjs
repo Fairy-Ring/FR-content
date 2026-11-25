@@ -12,9 +12,6 @@ const content = path.resolve(here, '../..');
 const cannonComplete = /^\^mcannon_complete\s*=\s*(\d+)\s*$/m.exec(
   readFileSync(path.join(content, 'scripts/general/configs/quest.constant'), 'utf8'));
 assert(cannonComplete, 'checked-out Dwarf Cannon completion constant');
-const slayerRefusal = /if \(stat\(slayer\)[^\n]+\) \{[\s\S]*?\bmes\("([^"]+)"\);/.exec(
-  readFileSync(path.join(content, 'scripts/skill_combat/scripts/player/player_combat.rs2'), 'utf8'));
-assert(slayerRefusal, 'checked-out Slayer admission refusal');
 const load = async relative => import(pathToFileURL(path.join(engine, relative)).href);
 const World = (await load('src/engine/World.ts')).default;
 const mapGeometry = await load('src/engine/GameMap.ts');
@@ -39,6 +36,9 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType'
 }
 (await load('src/cache/config/DbTableIndex.ts')).default.init();
 assert(ScriptProvider.load(pack) > 0, 'load a real compiled pack');
+const slayerRefusal = 'You need a higher Slayer level to know how to wound this monster.';
+const packedSlayerAdmission = ScriptProvider.getByName('[proc,player_in_combat_check]');
+assert(packedSlayerAdmission?.stringOperands.includes(slayerRefusal), 'packed Slayer admission refusal');
 World.gameMap.init();
 assert(World.gameMap.getTotalLocs() > 0, 'load the real static map and teleport allocations');
 World.npcs.reset();
@@ -173,7 +173,7 @@ for (const name of ['slayer_killerwatt_ball', 'slayer_killerwatt']) {
   }
   player.levels[PlayerStat.SLAYER] = 36;
   check(`${name} below Slayer 37 refused by published admission`, run('[proc,player_in_combat_check]', player, npc), [0]);
-  check('published Slayer refusal from the checked-out tree', player.testMessages.filter(p => p.text).at(-1)?.text, slayerRefusal[1]);
+  check('published Slayer refusal from the packed result', player.testMessages.filter(p => p.text).at(-1)?.text, slayerRefusal);
   player.levels[PlayerStat.SLAYER] = 37;
   check(`${name} Slayer 37 admitted`, run('[proc,player_in_combat_check]', player, npc), [1]);
 }

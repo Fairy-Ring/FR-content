@@ -25,8 +25,15 @@ if ($random < 32) {       // The least common music that plays when completing a
 // Send Quest Scroll. CANDIDATE: Fluffs uses the generic reward scroll below;
 // its inherited custom interface id 2302 is the Rogues' Den puzzle in 377.
 switch_component ($component) {
-    case questlist:itgronigen ://Obveratory: Updates QP before quest scroll is queued & uses custom quest scroll
-        if_openmain(questscroll_itgronigen);
+    case questlist:itgronigen : // Observatory already awards its quest points.
+        // CANDIDATE: 289 Observatory scroll text/model, on the 377 generic scroll.
+        // origin/289 scripts/quests/interfaces/questscroll_itgronigen.if:36-56,105-126.
+        if_settext(questscroll:com_3, $questmessage);
+        if_settext(questscroll:com_9, tostring($questpoints));
+        if_settext(questscroll:com_10, "Quest points.");
+        // 377 telescope_8 = 1174, the 289 furniture_telescope model.
+        if_setmodel(questscroll:com_4, 1174);
+        if_openmain(questscroll);
     case questlist:tbwt : // Tai Bwo Wannai Trio (custom scroll) — port 289
         if_settext(questscroll_tbwt:com_3, $questmessage);
         if_settext(questscroll_tbwt:com_8, tostring($questpoints));
@@ -316,7 +323,7 @@ if (%elidquest >= ^elid_complete) {
 if (%enakh_quest >= ^enakh_complete) {
     $questpoints = add($questpoints, ^enakh_questpoints);
 }
-if (%fairy_farmers_quest = ^fairy_farmers_complete) {
+if (%fairy_farmers_quest >= ^fairy_farmers_complete) {
     $questpoints = add($questpoints, ^fairy_farmers_questpoints);
 }
 if (%feud_var >= ^feud_complete) {
@@ -373,6 +380,9 @@ if (%zogre >= ^zogre_complete) {
 // Wanted! registry only; the completion writer belongs to its quest unit.
 if (%wanted_main = ^wanted_complete) {
     $questpoints = add($questpoints, ^wanted_questpoints);
+}
+if (~rag_stage >= ^rag_complete) {
+    $questpoints = add($questpoints, ^rag_questpoints);
 }
 return ($questpoints);
 
@@ -464,6 +474,13 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:wanted, %wanted_main, ^wanted_complete);
 // Desert Treasure: without this line a relog leaves the started quest's row at its default colour.
 ~send_quest_progress_colour(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+~send_quest_progress_colour(questlist:onesmallfavour, %onesmallfavour, ^onesmallfavour_complete);
+~send_quest_progress_colour(questlist:elid, %elidquest, ^elid_complete);
+~send_quest_progress_colour(questlist:makinghistory, %makinghistory_prog, ^makinghistory_complete);
+~send_quest_progress_colour(questlist:rag, ~rag_stage, ^rag_complete);
+~send_quest_progress_colour(questlist:mdaughter, %mdaughter_quest_var, ^mdaughter_complete);
+~send_quest_progress_colour(questlist:fairy_farmers, %fairy_farmers_quest, ^fairy_farmers_complete);
+~send_quest_progress_colour(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

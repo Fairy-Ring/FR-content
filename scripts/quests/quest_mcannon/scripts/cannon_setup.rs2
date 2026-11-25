@@ -76,7 +76,9 @@ if (inzone(2_41_81_0_0, 2_41_81_63_63, coord) = true) {
     mes("The electricity is too powerful for you to set up a cannon here.");
     return;
 }
-if (~inzone_coord_pair_table(bank_zones, coord) = true | ~in_duel_arena(coord) = true | ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) { // guessing they dont let u set up at duel arena at all, esp with nomovement duels
+// Area rules and UNKNOWN map-derived bounds: cannon_restricted_zones.dbrow.
+// UNKNOWN engineering: a cannon cannot fire in the Mage Arena (see cannon_fire), so refuse setup.
+if (~inzone_coord_pair_table(cannon_restricted_zones, coord) = true | ~inzone_coord_pair_table(bank_zones, coord) = true | ~in_duel_arena(coord) = true | ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true | ~inzone_coord_pair_table(mage_arena, coord) = true) { // guessing they dont let u set up at duel arena at all, esp with nomovement duels
     mes("You can't set up a cannon here."); // osrs
     return;
 }

@@ -1,0 +1,214 @@
+// CANDIDATE kinds: period town rows and matching 377 goods models.
+// Level, XP and loot identities: Tip.It, 27 April 2006. Weights/timers reuse the published kind.
+[stealing_viking_fur_stall]
+table=stealing
+data=loc,viking_fur_market
+data=owner,viking_fur_monger
+data=guard,viking_guard
+data=level,35
+data=experience,360
+data=respawn_ticks,32
+data=loot,grey_wolf_fur,1,1,128,a piece of fur
+data=loot_total,128
+data=stall,fur stall
+data=stall,some fur
+data=empty,viking_market
+
+[stealing_dwarf_gem_stall]
+table=stealing
+data=loc,dwarf_market_gems
+data=owner,dwarf_city_shop_gems
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,75
+// VERIFIED: 16 XP in both April 2006 guides; the tenfold increase is dated 29 May 2014.
+data=experience,160
+data=respawn_ticks,600
+data=loot,uncut_sapphire,1,1,105,an uncut sapphire
+data=loot,uncut_emerald,1,1,17,an uncut emerald
+data=loot,uncut_ruby,1,1,5,an uncut ruby
+data=loot,uncut_diamond,1,1,1,an uncut diamond
+data=loot_total,128
+data=stall,gem stall
+data=stall,a gem
+data=empty,dwarf_market_empty_stall
+
+[stealing_dwarf_silver_stall]
+table=stealing
+data=loc,dwarf_market_silver
+data=owner,dwarf_city_shop_silver
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,50
+data=experience,540
+data=respawn_ticks,100
+data=loot,silver_ore,1,1,128,some silver
+data=loot_total,128
+data=stall,silver stall
+data=stall,some silver
+data=empty,dwarf_market_empty_stall
+
+// VERIFIED identities, level and XP: Tip.It, 27 April 2006.
+// CANDIDATE quantities/weights: finished Lost City 274 and checked OSRS history.
+[stealing_viking_fish_stall]
+table=stealing
+data=loc,viking_fish_market
+data=owner,viking_fish_monger
+data=guard,viking_guard
+data=level,42
+data=experience,420
+// CANDIDATE respawn: Lost City 274 at 65b754f768b79b941b21b2a1eb3b0d1ecae3cdfe,
+// stealing.dbrow:129-136, recorded as src.stalls-lc274-tables.
+data=respawn_ticks,32
+data=loot,raw_salmon,1,1,14,a salmon
+data=loot,raw_tuna,1,1,5,a tuna
+data=loot,raw_lobster,1,1,1,a lobster
+data=loot_total,20
+data=stall,fish stall
+data=stall,some fish
+data=empty,viking_market
+
+// CANDIDATE: same three-item bakery table as the published stall and period Sal's.
+// Tip.It additionally names meat pie; that conflicting fourth item is not added.
+[stealing_dwarf_bakery_stall]
+table=stealing
+data=loc,dwarf_market_bakery
+data=owner,dwarf_city_shop_bakery
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_dwarf_bakery_respawn_ticks
+data=loot,cake,1,1,13,a cake
+data=loot,bread,1,1,5,some bread
+data=loot,chocolate_slice,1,1,2,a chocolate slice
+data=loot_total,20
+data=stall,baker's stall
+data=empty,dwarf_market_empty_stall
+
+// VERIFIED level, XP and identities: period guides. CANDIDATE qty/odds: pre-2024 OSRS.
+[stealing_dwarf_crafting_stall]
+table=stealing
+data=loc,dwarf_market_crafting
+// CANDIDATE: operator, 19 November 2026: all except Ape Atoll should have owners.
+// Period Tip.It names only "Monkey Archers, Black Guards"; the owner is not VERIFIED.
+data=owner,dwarf_city_shop_craft
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_crafting_respawn_ticks
+data=loot,chisel,1,1,1,a chisel
+data=loot,necklace_mould,1,1,1,a necklace mould
+data=loot,ring_mould,1,1,1,a ring mould
+data=loot_total,3
+data=stall,crafting stall
+data=empty,dwarf_market_empty_stall
+
+// VERIFIED catcher kinds: period Tip.It's per-stall "NPCs to elude" column.
+// Ape Crafting/General/Magic/Scimitar name Monkey Archers; Food names None.
+// Keldagrim's candidate owner is retained separately above by operator decision.
+// CANDIDATE quantities/odds and bamboo-desk empty form: checked OSRS history.
+[stealing_monkey_crafting_stall]
+table=stealing
+data=loc,mm_stall_crafting
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_crafting_respawn_ticks
+data=loot,chisel,1,1,1,a chisel
+data=loot,necklace_mould,1,1,1,a necklace mould
+data=loot,ring_mould,1,1,1,a ring mould
+data=loot_total,3
+data=stall,crafting stall
+data=empty,mm_desk
+
+[stealing_monkey_food_stall]
+table=stealing
+data=loc,mm_stall_food
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_food_respawn_ticks
+data=loot,banana,1,1,1,a banana
+data=loot_total,1
+data=stall,food stall
+data=empty,mm_desk
+
+[stealing_monkey_general_stall]
+table=stealing
+data=loc,mm_stall_general
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_general_respawn_ticks
+data=loot,hammer,1,1,1,a hammer
+data=loot,pot_empty,1,1,1,a pot
+data=loot,tinderbox,1,1,1,a tinderbox
+data=loot_total,3
+data=stall,general stall
+data=empty,mm_desk
+
+// VERIFIED period listing: Sal's 5 April 2006 guide names elemental and law runes.
+// CANDIDATE: implement one rune per alternative, including one law rune.
+// UNKNOWN odds APE-MAGIC-RUNE-01: equal weights are an engineering default, not a sourced probability.
+[stealing_monkey_magic_stall]
+table=stealing
+data=loc,mm_stall_magic
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,65
+data=experience,1000
+data=respawn_ticks,^regional_magic_respawn_ticks
+data=loot,earthrune,1,1,1,an earth rune
+data=loot,firerune,1,1,1,a fire rune
+data=loot,waterrune,1,1,1,a water rune
+data=loot,lawrune,1,1,1,a law rune
+data=loot_total,4
+data=stall,magic stall
+data=empty,mm_desk
+
+[stealing_monkey_scimitar_stall]
+table=stealing
+data=loc,mm_stall_scimitar
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,65
+data=experience,1600
+data=respawn_ticks,^regional_scimitar_respawn_ticks
+data=loot,iron_scimitar,1,1,1,an iron scimitar
+data=loot_total,1
+data=stall,scimitar stall
+data=empty,mm_desk
+
+// CANDIDATE level, XP, quantities and odds: checked Wine stall OSRS history.
+// All five objects and both stall forms exist in the unchanged 377 cache.
+[stealing_wine_stall]
+table=stealing
+data=loc,rag_market_stall
+data=owner,rag_wine_merchant
+data=guard,farming_market_guard
+data=level,22
+data=experience,270
+data=respawn_ticks,^regional_wine_respawn_ticks
+data=loot,rag_bottle_wine,1,1,11,a bottle of wine
+data=loot,grapes,1,1,17,some grapes
+data=loot,jug_empty,1,1,39,a jug
+data=loot,jug_water,1,1,20,a jug of water
+data=loot,jug_wine,1,1,13,a jug of wine
+data=loot_total,100
+data=stall,wine stall
+data=empty,rag_market_stall_empty

@@ -14,9 +14,13 @@
       "[ai_opplayer2,chaosmonk1]",
       "[ai_opplayer2,chaosmonk2]",
       "[ai_opplayer2,chaosmonk3]",
+      "[ai_opplayer2,dagannoth_water_creature_1x1_invisible2]",
+      "[ai_opplayer2,dagannoth_water_creature_1x1_invisible3]",
+      "[ai_opplayer2,dagannoth_water_creature_1x1_invisible]",
       "[ai_opplayer2,druid]",
       "[ai_opplayer2,elvarg]",
       "[ai_opplayer2,entrana_monk]",
+      "[ai_opplayer2,fairy_tanglefoot]",
       "[ai_opplayer2,firediamond_firewarrior]",
       "[ai_opplayer2,irvig_senay]",
       "[ai_opplayer2,melzar_the_mad]",
@@ -27,14 +31,20 @@
       "[ai_opplayer2,slayer_banshee_1]",
       "[ai_opplayer2,slayer_cockatrice]",
       "[ai_opplayer2,slayer_dustdevil]",
+      "[ai_opplayer2,soulbane_fear_reaper]",
       "[ai_opplayer2,wizard_grayzag]",
       "[label,barbarian_default_attack]",
       "[proc,dt_damis_hit]",
       "[proc,dt_dessous_attack]",
       "[proc,dt_kamil_attack]",
+      "[proc,feud_champion_attack]",
       "[proc,invrigar_attack]",
       "[proc,necro_attack]",
       "[proc,sarawiz_melee_attack]",
+      "[proc,soulbane_confusion_npc_attack]",
+      "[proc,soulbane_hope_npc_attack]",
+      "[proc,soulbane_rage_npc_attack]",
+      "[proc,soulbane_tolna_npc_attack]",
       "[proc,vampire_attack]"
     ],
     "npc_meleeattack": [
@@ -98,6 +108,8 @@
     ],
     "npc_cast_spell_with_forced_max_hit": [
       "[ai_applayer2,_slayer_infernalmage]",
+      "[ai_applayer2,dungeon_dagganoth_magic_monster]",
+      "[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]",
       "[ai_applayer2,ikov_firewarrior]",
       "[ai_applayer2,wizard]",
       "[ai_opplayer2,_slayer_infernalmage]",
@@ -110,11 +122,17 @@
     ],
     "playerhit_n_melee": [
       "[ai_opplayer2,slayer_dustdevil]",
-      "[proc,killerwatt_attack]"
+      "[proc,killerwatt_attack]",
+      "[proc,wyvern_melee]",
+      "[proc,zygomite_attack]"
     ],
     "playerhit_n_ranged": [
       "[ai_applayer2,_snail]",
-      "[ai_applayer2,_troll_thrower]"
+      "[ai_applayer2,_troll_thrower]",
+      "[proc,soulbane_hope_ranged]",
+      "[proc,wyvern_breath]",
+      "[proc,wyvern_ranged]",
+      "[proc,zygomite_attack]"
     ],
     "npc_player_hit_roll": [
       "[proc,aberrant_attack]",
@@ -123,18 +141,22 @@
       "[proc,dt_kamil_attack]",
       "[proc,killerwatt_attack]",
       "[proc,npc_druid_entangle]",
-      "[proc,npc_zap_attack]"
+      "[proc,npc_zap_attack]",
+      "[proc,waterbirth_prime_attack]"
     ],
     "npc_spell_cast": [
       "[proc,chaos_druid_spell]",
       "[proc,dt_fareed_cast]",
-      "[proc,npc_druid_entangle]"
+      "[proc,npc_druid_entangle]",
+      "[proc,waterbirth_other_spinolyp_magic_attack]"
     ],
     "npc_combat_spell_checks": [
       "[ai_applayer2,druid]",
       "[ai_applayer2,wizard]",
       "[ai_opplayer2,druid]",
-      "[proc,dt_fareed_cast]"
+      "[proc,dt_fareed_cast]",
+      "[proc,waterbirth_other_spinolyp_magic_attack]",
+      "[proc,waterbirth_prime_attack]"
     ],
     "npc_debuff_allowed": [
       "[proc,chaos_druid_spell]"
@@ -142,7 +164,9 @@
     "npc_spell_fail": [
       "[proc,chaos_druid_spell]",
       "[proc,dt_fareed_cast]",
-      "[proc,npc_druid_entangle]"
+      "[proc,npc_druid_entangle]",
+      "[proc,waterbirth_other_spinolyp_magic_attack]",
+      "[proc,waterbirth_prime_attack]"
     ],
     "npc_stat_change_effect": [
       "[proc,chaos_druid_spell]"

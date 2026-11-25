@@ -46,12 +46,18 @@ if (%npc_owned_timer_interval > 0) {
 
 
 [proc,npc_poison_start](int $severity)
+if (npc_type = mudskipper_ogre) return; // CANDIDATE: Old School Mogre poison immunity.
 if (~npc_is_attackable() = false) {
     return;
 }
 if (map_members = ^false) {
     return;
 }
+~npc_poison_apply($severity);
+
+// The damaging cast already checked attackability. Its queued impact has no player pointer.
+[proc,npc_poison_apply](int $severity)
+if (map_members = ^false) return;
 
 if ($severity > %npc_poison) {
     if (%npc_owned_timer_interval > 0) {

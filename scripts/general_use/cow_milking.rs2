@@ -32,6 +32,13 @@ if(inv_total(inv, bucket_empty) = 0) {
 }
 weakqueue(milk_cow, 2, 0);
 
+[oploc2,fairy_fat_cow]
+if(inv_total(inv, bucket_empty) = 0) {
+    mes("You'll need an empty bucket to collect the milk.");
+    return;
+}
+weakqueue(milk_cow, 2, 0);
+
 [oplocu,fat_cow]
 if(last_useitem = bucket_empty) {
     p_oploc(1);

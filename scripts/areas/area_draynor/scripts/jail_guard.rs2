@@ -1,4 +1,17 @@
 [opnpc1,jailguard]
+@n619_jailguard;
+
+[opnpc1,jailguard_two_patrol]
+@n619_jailguard;
+
+[opnpc1,jailguard_three_patrol]
+@n619_jailguard;
+
+[opnpc1,jailguard_four_patrol]
+@n619_jailguard;
+
+// CANDIDATE: retained historical Jail guard transcript, unchanged ordinary text.
+[label,n619_jailguard]
 ~chatplayer("<p,quiz>Hi, who are you guarding here?");
 ~chatnpc("<p,shifty>Can't say, all very secret. You should get out of here. I am not supposed to talk while I guard.");
 @multi2("Hey, chill out, I won't cause you trouble.", jailguard_chill, "I had better leave, I don't want trouble.", joe_leave);

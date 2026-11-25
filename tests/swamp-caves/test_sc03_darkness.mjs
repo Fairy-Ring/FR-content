@@ -6,7 +6,8 @@ import {
   World, PlayerLoading, Packet, ScriptProvider, ScriptState, ServerTriggerType,
   PlayerStat, PlayerTimerType, types, map, CollisionType, engineModule, contentRoot,
   id, obj, inv, worn, player, seed, inventory, count, slotOf, use, held, remove,
-  execute, tile, environmentTick, button, invButton, startDialogue, resumeDialogue, dialoguePage
+  execute, tile, environmentTick, button, invButton, startDialogue, resumeDialogue, dialoguePage,
+  resetWallBeasts, passWallBeast
 } from './runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
@@ -55,7 +56,28 @@ function fixture(items = [], position = [0, 3168, 9572]) {
 }
 function start(p) { execute('[proc,swamp_cave_start]', p); ownership(p); return p; }
 function release(p) { execute('[proc,swamp_cave_release]', p); ownership(p, false); }
-function ticks(p, n, others = []) { for (let i = 0; i < n; i++) environmentTick(p, ...others); }
+let earlierPassers = null;
+function routeFrame(...players) {
+  const actors = [...new Set([...players, ...earlierPassers])];
+  const holes = [...World.npcs].filter(n => n.baseType === id('NpcType', 'swamp_wallbeast'));
+  for (const actor of actors) actor.resetEntity(false);
+  for (const n of holes) n.resetEntity(false);
+  World.currentTick++;
+  for (const n of holes) n.turn();
+  for (const actor of actors) {
+    if (actor.delayed && World.currentTick >= actor.delayedUntil) actor.delayed = false;
+    if (!actor.delayed && actor.activeScript?.execution === ScriptState.SUSPENDED) actor.executeScript(actor.activeScript, true, true);
+    actor.processQueues();
+    if (!actor.loggingOut) { actor.processTimers(PlayerTimerType.NORMAL); actor.processTimers(PlayerTimerType.SOFT); }
+    actor.processEngineQueue(); actor.processInteraction();
+  }
+}
+function ticks(p, n, others = []) {
+  for (let i = 0; i < n; i++) {
+    if (earlierPassers) routeFrame(p, ...others);
+    else environmentTick(p, ...others);
+  }
+}
 function elapsed(p, value) { ownership(p); assert.equal(timer(p).args[0], value, 'elapsed darkness is a timer argument'); }
 function pending(p, darkTicks = 29) {
   const t = timer(p);
@@ -315,7 +337,20 @@ function realGasPending() {
   return q;
 }
 for (const crossing of ['several zones', 'map square']) test(`engine entry and real walk across ${crossing} preserve clocks, pending identity and one root`, () => {
-  traceScripts(names => {
+  resetWallBeasts(); earlierPassers = [];
+  try {
+    // Keep real earlier wearers beside their holes, within native target range.
+    // Both setup and the subject turn NPCs; no exposed type/target is written.
+    for (const n of World.npcs) {
+      if (n.baseType !== id('NpcType', 'swamp_wallbeast')) continue;
+      const q = passWallBeast([n.x, n.z - 1], actor => routeFrame(actor));
+      earlierPassers.push(q);
+      const dx = map.canTravel(0, q.x, q.z, 1, 0, 1, 0, CollisionType.NORMAL) ? 1 : -1;
+      q.queueWaypoint(q.x + dx, q.z);
+      routeFrame();
+      assert.deepEqual(tile(q), [0, n.x + dx, n.z - 1]);
+    }
+    traceScripts(names => {
     const q = realGasPending();
     q.z = 9583; ticks(q, 1);
     assert.deepEqual(timer(q).args.slice(2), [-1, -1, 0], 'leaving gas cancels the real exposure');
@@ -356,7 +391,14 @@ for (const crossing of ['several zones', 'map square']) test(`engine entry and r
       assert(names.includes('[mapzone,0_50_149]'), 'real hinted map-square crossing');
     }
     release(p);
-  });
+    });
+  } finally {
+    for (const q of earlierPassers) {
+      release(q); q.clearInteraction(); q.isActive = false;
+      World.players[q.pid] = null; q.unlink();
+    }
+    earlierPassers = null; resetWallBeasts();
+  }
 });
 for (const [kind, from, to, expected] of [
   ['same map square', [0, 3168, 9572], [0, 3168, 9538], '[zoneexit,0_49_149_32_32]'],
@@ -859,12 +901,72 @@ test('published Tears down retains one controller; up synchronously releases bef
   ticks(p, 35); assert(hp(p) < before, 'the retained dark clock still bites at its ordinary threshold');
   assert.equal(rootPackets(p).length, 1);
 });
+// SC-07 rope cases are unchanged; SC-10 ruling 1 migrates only the two slopes.
+const sc07RopeCases = {
+  goblin_cave_entrance: 'SC-07 goblin_cave_entrance has real Climb-down and rope-use dispatch, no other option, and no travel, state or text for a fresh account',
+  swamp_cave_climbing_rope: 'SC-07 swamp_cave_climbing_rope has real Climb dispatch that releases before its surface landing, and no other option'
+};
 for (const name of ['goblin_cave_entrance', 'swamp_cave_climbing_rope', 'tog_climbing_rocks_up', 'tog_climbing_rocks_down']) {
-  test(`future travel ${name} has no published approach or operation dispatch`, () => {
+  test(sc07RopeCases[name] ?? `SC-10 ${name} has real slope dispatch and correct cave-root handoff`, () => {
     const type = types.LocType.get(id('LocType', name));
-    for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.OPLOC1]) {
-      assert.equal(ScriptProvider.getByTrigger(trigger, type.id, type.category), undefined);
+    if (!sc07RopeCases[name]) {
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.APLOC1, type.id, type.category)?.name, `[aploc1,${name}]`);
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category), undefined);
+      const ledge = name === 'tog_climbing_rocks_down';
+      const from = ledge ? [2, 3238, 9498] : [2, 3239, 9524];
+      const to = ledge ? [2, 3240, 9498] : [2, 3241, 9524];
+      const p = wireFixture([], from);
+      if (ledge) execute('[proc,tog_hud_enter]', p);
+      else { start(p); pending(p); }
+      const hud = id('Component', 'water_collected'), before = hp(p);
+      const teleport = p.teleport;
+      p.teleport = function (x, z, level) {
+        ownership(p, false);
+        assert.equal(p.overlay, ledge ? hud : -1, 'release precedes the actual crossing; the ledge never owns a root');
+        return teleport.call(this, x, z, level);
+      };
+      travel(p, name, ledge ? 3239 : 3240, ledge ? 9498 : 9524, to);
+      p.teleport = teleport;
+      ticks(p, 4); ownership(p, false); assert.equal(hp(p), before);
+      execute('[proc,tog_hud_enter]', p); assert.equal(p.overlay, hud);
+      if (ledge) {
+        const vars = [...p.vars], packets = rootPackets(p).length;
+        travel(p, name, 3239, 9498, to);
+        ticks(p, 35); assert.deepEqual(tile(p), to); assert.deepEqual([...p.vars], vars);
+        ownership(p, false); assert.equal(p.overlay, hud); assert.equal(rootPackets(p).length, packets);
+        assert.deepEqual(p.messages, []);
+      } else {
+        ticks(p, 35); ownership(p, false); assert.equal(p.overlay, hud); assert.equal(hp(p), before);
+        travel(p, name, 3240, 9524, from); ownership(p);
+        assert.equal(p.overlay, roots[0]); assert.equal(timer(p).args[0], 0, 'dark return starts fresh');
+        ticks(p, 4); ownership(p); release(p);
+      }
+      return;
     }
+    const dispatch = trigger => ScriptProvider.getByTrigger(trigger, type.id, type.category)?.name;
+    assert.equal(dispatch(ServerTriggerType.OPLOC1), `[oploc1,${name}]`, 'the real SC-07 operation');
+    assert.equal(dispatch(ServerTriggerType.OPLOCU), name === 'goblin_cave_entrance' ? '[oplocu,goblin_cave_entrance]' : undefined);
+    for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.APLOCU]) assert.equal(dispatch(trigger), undefined);
+    assert.deepEqual(type.op.slice(1), [null, null, null, null], 'no other visible option');
+    for (let option = 1; option < 5; option++) {
+      assert.equal(dispatch(ServerTriggerType.APLOC1 + option), undefined);
+      assert.equal(dispatch(ServerTriggerType.OPLOC1 + option), undefined);
+    }
+    if (name === 'goblin_cave_entrance') {
+      const p = wireFixture([], [0, 3168, 3172]);
+      const before = [...p.vars];
+      travel(p, name, 3169, 3172, [0, 3168, 3172]);
+      ticks(p, 3); p.encodeOut();
+      assert.deepEqual(tile(p), [0, 3168, 3172], 'no travel');
+      assert.deepEqual([...p.vars], before, 'no state written');
+      assert.deepEqual(p.messages, [], 'the presentation table gives no text');
+      ownership(p, false);
+      return;
+    }
+    const p = start(wireFixture([], [0, 3168, 9572])); pending(p);
+    travel(p, name, 3169, 9572, [0, 3168, 3172]);
+    ownership(p, false); assert.equal(p.overlay, -1); assert.equal(p.getVarBit(gas), 0);
+    const before = hp(p); ticks(p, 35); assert.equal(hp(p), before, 'no cave hit after the real exit'); ownership(p, false);
   });
 }
 for (const lit of [false, true]) test(`protected SC-07 rope contract ${lit ? 'lit' : 'unlit'}: release before exit, restart fresh on entry`, () => {

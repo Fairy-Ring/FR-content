@@ -1,0 +1,15 @@
+// UNKNOWN engineering stage ladder. Values select existing 377 fountain/plinth faces.
+// The period walkthrough supplies the sequence, not these intermediate numbers.
+^elid_started = 10
+^elid_ballad_received = 20
+^elid_spirits_explained = 25
+^elid_crevice_known = 30
+^elid_sole_requested = 40
+^elid_statuette_recovered = 50
+^elid_reward_model_scale = 200 // UNKNOWN engineering scroll model scale.
+// VERIFIED rewards: Tip.It capture 20060502085633, Spirits of the Elid.
+^elid_prayer_xp = 80000
+^elid_thieving_xp = 10000
+^elid_magic_xp = 10000
+// CANDIDATE: OSRS Elidinis Statuette, excluding 2015 run/2016 poison/spec additions.
+^elid_shrine_hitpoints_boost = 7

@@ -1,0 +1,5 @@
+// VERIFIED: 377 skippy_state morph slots; CANDIDATE meanings from the OSRS walkthrough.
+^skippy_drunk = 0
+^skippy_damp = 1
+^skippy_hungover = 2
+^skippy_complete = 3

@@ -1,0 +1,3425 @@
+{
+  "slice": "inns",
+  "scenarios": [
+    {
+      "npc": "dwarf_city_inn_keeper_rich",
+      "state": "giantdwarf-1",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the King's Axe inn! What can I help you with?",
+          "Go to the bar downstairs. I only deal with residents.",
+          "No, just guests that stay the night."
+        ],
+        "player": [
+          "Can I have some beer please?",
+          "Residents? People live here?"
+        ],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Welcome to the King's Axe inn! What can I help you with?",
+            "Go to the bar downstairs. I only deal with residents.",
+            "No, just guests that stay the night."
+          ],
+          "player": [
+            "Can I have some beer please?",
+            "Residents? People live here?"
+          ],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-inn-keeper"
+      ]
+    },
+    {
+      "npc": "dwarf_city_inn_keeper_rich",
+      "state": "giantdwarf-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the King's Axe inn! What can I help you with?",
+          "Go to the bar downstairs. I only deal with residents.",
+          "No, just guests that stay the night."
+        ],
+        "player": [
+          "Can I have some beer please?",
+          "Residents? People live here?"
+        ],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Welcome to the King's Axe inn! What can I help you with?",
+            "Go to the bar downstairs. I only deal with residents.",
+            "No, just guests that stay the night."
+          ],
+          "player": [
+            "Can I have some beer please?",
+            "Residents? People live here?"
+          ],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-inn-keeper"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-1-coins-0-gender-0",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "gender": 0,
+      "items": {},
+      "allowed": {
+        "npc": [
+          "Yes? Can I help you with something?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, sir has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope sir will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-1-gender-0",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 0,
+      "items": {
+        "coins": 1
+      },
+      "allowed": {
+        "npc": [
+          "Yes? Can I help you with something?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, sir has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope sir will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-2-gender-1",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 1,
+      "items": {
+        "coins": 2
+      },
+      "allowed": {
+        "npc": [
+          "Yes? Can I help you with something?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope madam will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!",
+            "One dwarven stout, best in all of Keldagrim!"
+          ],
+          "player": [
+            "A dwarven stout please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "dwarven_stout": 1
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-9-gender-0",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 0,
+      "items": {
+        "coins": 9
+      },
+      "allowed": {
+        "npc": [
+          "Yes? Can I help you with something?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, sir has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope sir will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 8,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 9,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!",
+            "One dwarven stout, best in all of Keldagrim!"
+          ],
+          "player": [
+            "A dwarven stout please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 7,
+            "dwarven_stout": 1
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 9,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "I'm sorry, I seem to have run out of money."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 9,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 9,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 9
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-10-gender-1",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 1,
+      "items": {
+        "coins": 10
+      },
+      "allowed": {
+        "npc": [
+          "Yes? Can I help you with something?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope madam will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 9,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 10,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!",
+            "One dwarven stout, best in all of Keldagrim!"
+          ],
+          "player": [
+            "A dwarven stout please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 8,
+            "dwarven_stout": 1
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 10,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+            "I hope madam will enjoy it!"
+          ],
+          "player": [
+            "A fine wine please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "jug_wine": 1
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 10,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 10
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-2000-gender-1",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 1,
+      "items": {
+        "coins": 2000
+      },
+      "allowed": {
+        "npc": [
+          "Yes? Can I help you with something?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope madam will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1999,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2000,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!",
+            "One dwarven stout, best in all of Keldagrim!"
+          ],
+          "player": [
+            "A dwarven stout please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1998,
+            "dwarven_stout": 1
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2000,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+            "I hope madam will enjoy it!"
+          ],
+          "player": [
+            "A fine wine please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1990,
+            "jug_wine": 1
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2000,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "Yes? Can I help you with something?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2000
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-2001-gender-0",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 0,
+      "items": {
+        "coins": 2001
+      },
+      "allowed": {
+        "npc": [
+          "And what will it be for you, fine sir?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, sir has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope sir will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2000,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?",
+            "It'll be yours for just 2 gold coins!",
+            "One dwarven stout, best in all of Keldagrim!"
+          ],
+          "player": [
+            "A dwarven stout please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1999,
+            "dwarven_stout": 1
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins.",
+            "I hope sir will enjoy it!"
+          ],
+          "player": [
+            "A fine wine please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1991,
+            "jug_wine": 1
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?",
+            "Ah, sir has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "And what will it be for you, fine sir?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barman_rich",
+      "state": "giantdwarf-2-coins-2001-gender-1",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "gender": 1,
+      "items": {
+        "coins": 2001
+      },
+      "allowed": {
+        "npc": [
+          "And what will it be for you, fine madam?",
+          "That'll be 1 gold coin please.",
+          "It'll be yours for just 2 gold coins!",
+          "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+          "Here you go. One delicious pint of beer.",
+          "One dwarven stout, best in all of Keldagrim!",
+          "I hope madam will enjoy it!"
+        ],
+        "player": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "I'm sorry, I seem to have run out of money.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "A beer please.",
+          "A dwarven stout please.",
+          "A fine wine please.",
+          "Nothing, thanks.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "A beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?",
+            "That'll be 1 gold coin please.",
+            "Here you go. One delicious pint of beer."
+          ],
+          "player": [
+            "A beer please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2000,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "A beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?",
+            "That'll be 1 gold coin please."
+          ],
+          "player": [
+            "A beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?",
+            "It'll be yours for just 2 gold coins!",
+            "One dwarven stout, best in all of Keldagrim!"
+          ],
+          "player": [
+            "A dwarven stout please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1999,
+            "dwarven_stout": 1
+          }
+        },
+        {
+          "choices": [
+            "A dwarven stout please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?",
+            "It'll be yours for just 2 gold coins!"
+          ],
+          "player": [
+            "A dwarven stout please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001,
+            "dwarven_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins.",
+            "I hope madam will enjoy it!"
+          ],
+          "player": [
+            "A fine wine please."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1991,
+            "jug_wine": 1
+          }
+        },
+        {
+          "choices": [
+            "A fine wine please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?",
+            "Ah, madam has taste! A jug of wine will cost you 10 gold coins."
+          ],
+          "player": [
+            "A fine wine please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001,
+            "jug_wine": 0
+          }
+        },
+        {
+          "choices": [
+            "Nothing, thanks."
+          ],
+          "npc": [
+            "And what will it be for you, fine madam?"
+          ],
+          "player": [
+            "Nothing, thanks."
+          ],
+          "menus": [
+            [
+              "A beer please.",
+              "A dwarven stout please.",
+              "A fine wine please.",
+              "Nothing, thanks."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2001
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barman-2022"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barmaid_poor",
+      "state": "giantdwarf-1-coins-0",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "items": {},
+      "allowed": {
+        "npc": [
+          "Welcome to the Laughing Miner pub, human traveller.",
+          "What man?",
+          "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+          "Well, he's drunk isn't he?",
+          "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+          "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+          "The Red Axe will fire you for just about anything if they want to.",
+          "That'll be 2 gold coins.",
+          "I can make you a stew for 20 gold coins.",
+          "Thanks for your custom."
+        ],
+        "player": [
+          "Who is that man walking around outside?",
+          "I mean the dwarf, the one with the sign.",
+          "But what's wrong with him?",
+          "How did that happen?",
+          "They fired him for that??",
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Sorry, I don't have 2 coins on me.",
+          "Sorry, I don't have 20 coins on me.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "Who is that man walking around outside?"
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "What man?",
+            "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+            "Well, he's drunk isn't he?",
+            "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+            "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+            "The Red Axe will fire you for just about anything if they want to."
+          ],
+          "player": [
+            "Who is that man walking around outside?",
+            "I mean the dwarf, the one with the sign.",
+            "But what's wrong with him?",
+            "How did that happen?",
+            "They fired him for that??"
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I don't have 2 coins on me."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I don't have 20 coins on me."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I have to go."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller."
+          ],
+          "player": [
+            "I have to go."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barmaid"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barmaid_poor",
+      "state": "giantdwarf-2-coins-1",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "items": {
+        "coins": 1
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the Laughing Miner pub, human traveller.",
+          "What man?",
+          "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+          "Well, he's drunk isn't he?",
+          "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+          "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+          "The Red Axe will fire you for just about anything if they want to.",
+          "That'll be 2 gold coins.",
+          "I can make you a stew for 20 gold coins.",
+          "Thanks for your custom."
+        ],
+        "player": [
+          "Who is that man walking around outside?",
+          "I mean the dwarf, the one with the sign.",
+          "But what's wrong with him?",
+          "How did that happen?",
+          "They fired him for that??",
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Sorry, I don't have 2 coins on me.",
+          "Sorry, I don't have 20 coins on me.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "Who is that man walking around outside?"
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "What man?",
+            "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+            "Well, he's drunk isn't he?",
+            "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+            "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+            "The Red Axe will fire you for just about anything if they want to."
+          ],
+          "player": [
+            "Who is that man walking around outside?",
+            "I mean the dwarf, the one with the sign.",
+            "But what's wrong with him?",
+            "How did that happen?",
+            "They fired him for that??"
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I don't have 2 coins on me."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I don't have 20 coins on me."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I have to go."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller."
+          ],
+          "player": [
+            "I have to go."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 1
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barmaid"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barmaid_poor",
+      "state": "giantdwarf-2-coins-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "items": {
+        "coins": 2
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the Laughing Miner pub, human traveller.",
+          "What man?",
+          "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+          "Well, he's drunk isn't he?",
+          "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+          "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+          "The Red Axe will fire you for just about anything if they want to.",
+          "That'll be 2 gold coins.",
+          "I can make you a stew for 20 gold coins.",
+          "Thanks for your custom."
+        ],
+        "player": [
+          "Who is that man walking around outside?",
+          "I mean the dwarf, the one with the sign.",
+          "But what's wrong with him?",
+          "How did that happen?",
+          "They fired him for that??",
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Sorry, I don't have 2 coins on me.",
+          "Sorry, I don't have 20 coins on me.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "Who is that man walking around outside?"
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "What man?",
+            "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+            "Well, he's drunk isn't he?",
+            "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+            "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+            "The Red Axe will fire you for just about anything if they want to."
+          ],
+          "player": [
+            "Who is that man walking around outside?",
+            "I mean the dwarf, the one with the sign.",
+            "But what's wrong with him?",
+            "How did that happen?",
+            "They fired him for that??"
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins.",
+            "Thanks for your custom."
+          ],
+          "player": [
+            "I'd like a beer please."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I don't have 20 coins on me."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I have to go."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller."
+          ],
+          "player": [
+            "I have to go."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 2
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barmaid"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barmaid_poor",
+      "state": "giantdwarf-2-coins-19",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "items": {
+        "coins": 19
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the Laughing Miner pub, human traveller.",
+          "What man?",
+          "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+          "Well, he's drunk isn't he?",
+          "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+          "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+          "The Red Axe will fire you for just about anything if they want to.",
+          "That'll be 2 gold coins.",
+          "I can make you a stew for 20 gold coins.",
+          "Thanks for your custom."
+        ],
+        "player": [
+          "Who is that man walking around outside?",
+          "I mean the dwarf, the one with the sign.",
+          "But what's wrong with him?",
+          "How did that happen?",
+          "They fired him for that??",
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Sorry, I don't have 2 coins on me.",
+          "Sorry, I don't have 20 coins on me.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "Who is that man walking around outside?"
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "What man?",
+            "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+            "Well, he's drunk isn't he?",
+            "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+            "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+            "The Red Axe will fire you for just about anything if they want to."
+          ],
+          "player": [
+            "Who is that man walking around outside?",
+            "I mean the dwarf, the one with the sign.",
+            "But what's wrong with him?",
+            "How did that happen?",
+            "They fired him for that??"
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 19
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins.",
+            "Thanks for your custom."
+          ],
+          "player": [
+            "I'd like a beer please."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 17,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 19,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I don't have 20 coins on me."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 19,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 19,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I have to go."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller."
+          ],
+          "player": [
+            "I have to go."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 19
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barmaid"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barmaid_poor",
+      "state": "giantdwarf-2-coins-20",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "items": {
+        "coins": 20
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the Laughing Miner pub, human traveller.",
+          "What man?",
+          "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+          "Well, he's drunk isn't he?",
+          "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+          "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+          "The Red Axe will fire you for just about anything if they want to.",
+          "That'll be 2 gold coins.",
+          "I can make you a stew for 20 gold coins.",
+          "Thanks for your custom."
+        ],
+        "player": [
+          "Who is that man walking around outside?",
+          "I mean the dwarf, the one with the sign.",
+          "But what's wrong with him?",
+          "How did that happen?",
+          "They fired him for that??",
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Sorry, I don't have 2 coins on me.",
+          "Sorry, I don't have 20 coins on me.",
+          "Sorry, I changed my mind."
+        ],
+        "options": [
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "Who is that man walking around outside?"
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "What man?",
+            "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+            "Well, he's drunk isn't he?",
+            "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+            "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+            "The Red Axe will fire you for just about anything if they want to."
+          ],
+          "player": [
+            "Who is that man walking around outside?",
+            "I mean the dwarf, the one with the sign.",
+            "But what's wrong with him?",
+            "How did that happen?",
+            "They fired him for that??"
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins.",
+            "Thanks for your custom."
+          ],
+          "player": [
+            "I'd like a beer please."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 18,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins.",
+            "Thanks for your custom."
+          ],
+          "player": [
+            "I'd like some food please."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "stew": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I have to go."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller."
+          ],
+          "player": [
+            "I have to go."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barmaid"
+      ]
+    },
+    {
+      "npc": "dwarf_city_barmaid_poor",
+      "state": "giantdwarf-2-coins-20-forget-1",
+      "vars": {
+        "giantdwarf_quest": 2,
+        "forget_quest": 1
+      },
+      "items": {
+        "coins": 20
+      },
+      "allowed": {
+        "npc": [
+          "Welcome to the Laughing Miner pub, human traveller.",
+          "What man?",
+          "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+          "Well, he's drunk isn't he?",
+          "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+          "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+          "The Red Axe will fire you for just about anything if they want to.",
+          "That'll be 2 gold coins.",
+          "I can make you a stew for 20 gold coins.",
+          "Thanks for your custom.",
+          "Sorry, we've stopped serving those. The seeds were too hard to get."
+        ],
+        "player": [
+          "Who is that man walking around outside?",
+          "I mean the dwarf, the one with the sign.",
+          "But what's wrong with him?",
+          "How did that happen?",
+          "They fired him for that??",
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I have to go.",
+          "Sorry, I don't have 2 coins on me.",
+          "Sorry, I don't have 20 coins on me.",
+          "Sorry, I changed my mind.",
+          "I'd like a Kelda stout please.",
+          "Yeah, tell me about it."
+        ],
+        "options": [
+          "Who is that man walking around outside?",
+          "I'd like a beer please.",
+          "I'd like some food please.",
+          "I'd like a Kelda stout please.",
+          "I have to go.",
+          "Pay.",
+          "Don't pay."
+        ]
+      },
+      "branches": [
+        {
+          "choices": [
+            "Who is that man walking around outside?"
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "What man?",
+            "Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.",
+            "Well, he's drunk isn't he?",
+            "I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.",
+            "I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.",
+            "The Red Axe will fire you for just about anything if they want to."
+          ],
+          "player": [
+            "Who is that man walking around outside?",
+            "I mean the dwarf, the one with the sign.",
+            "But what's wrong with him?",
+            "How did that happen?",
+            "They fired him for that??"
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins.",
+            "Thanks for your custom."
+          ],
+          "player": [
+            "I'd like a beer please."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 18,
+            "beer": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like a beer please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "That'll be 2 gold coins."
+          ],
+          "player": [
+            "I'd like a beer please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20,
+            "beer": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins.",
+            "Thanks for your custom."
+          ],
+          "player": [
+            "I'd like some food please."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 0,
+            "stew": 1
+          }
+        },
+        {
+          "choices": [
+            "I'd like some food please.",
+            "Don't pay."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "I can make you a stew for 20 gold coins."
+          ],
+          "player": [
+            "I'd like some food please.",
+            "Sorry, I changed my mind."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ],
+            [
+              "Pay.",
+              "Don't pay."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20,
+            "stew": 0
+          }
+        },
+        {
+          "choices": [
+            "I'd like a Kelda stout please."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller.",
+            "Sorry, we've stopped serving those. The seeds were too hard to get."
+          ],
+          "player": [
+            "I'd like a Kelda stout please.",
+            "Yeah, tell me about it."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20,
+            "beer": 0,
+            "stew": 0,
+            "kelda_stout": 0
+          }
+        },
+        {
+          "choices": [
+            "I have to go."
+          ],
+          "npc": [
+            "Welcome to the Laughing Miner pub, human traveller."
+          ],
+          "player": [
+            "I have to go."
+          ],
+          "menus": [
+            [
+              "Who is that man walking around outside?",
+              "I'd like a beer please.",
+              "I'd like some food please.",
+              "I'd like a Kelda stout please.",
+              "I have to go."
+            ]
+          ],
+          "afterItems": {
+            "coins": 20
+          }
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-inns-barmaid"
+      ]
+    }
+  ],
+  "deferred": []
+}

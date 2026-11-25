@@ -1,0 +1,28 @@
+[mdaughter_bear_helmet]
+name=Bearhead
+desc=Quite ferocious looking.
+recol1s=15855
+recol1d=6346
+model=obj_mdaughter_bear_helmet
+cost=0
+2dxof=4
+2dzoom=690
+2dyan=1996
+2dxan=64
+iop2=Wear
+manwear=obj_mdaughter_bear_helmet_manwear,0
+womanwear=obj_mdaughter_bear_helmet_womanwear,0
+manhead=obj_mdaughter_bear_helmet_manhead
+womanhead=obj_mdaughter_bear_helmet_womanhead
+members=yes
+wearpos=hat
+wearpos2=head
+weight=1lb
+// CANDIDATE: Old School Bearhead revision 123931 (2013-03-09), before later rebalances.
+param=magicattack,-3
+param=rangeattack,-3
+param=stabdefence,12
+param=slashdefence,14
+param=crushdefence,10
+param=magicdefence,7
+param=rangedefence,9

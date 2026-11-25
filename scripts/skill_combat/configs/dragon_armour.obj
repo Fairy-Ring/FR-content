@@ -1,0 +1,23 @@
+[dragon_plateskirt]
+name=Dragon plateskirt
+desc=This looks pretty heavy.
+model=obj_dragon_plateskirt
+2dxof=4
+2dyof=15
+2dzoom=1230
+2dxan=584
+cost=270000
+iop2=Wear
+manwear=obj_dragon_plateskirt_manwear,0
+womanwear=obj_dragon_plateskirt_womanwear,0
+members=yes
+wearpos=legs
+weight=20lb
+// VERIFIED: Tip.It Combat, captured 1 May 2006.
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,68
+param=slashdefence,66
+param=crushdefence,63
+param=magicdefence,-4
+param=rangedefence,65

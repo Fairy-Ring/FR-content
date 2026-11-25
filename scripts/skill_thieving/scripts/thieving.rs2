@@ -12,6 +12,9 @@ if(npc_stat(hitpoints) = 0) {
 if (~check_if_success_pick_pocket($data) = false) {
     def_int $stun_ticks = db_getfield($data, pickpocket:stun_ticks, 0);
     def_int $stun_damage = db_getfield($data, pickpocket:stun_damage, 0);
+    if (db_getfieldcount($data, pickpocket:stun_damage_max) > 0) {
+        $stun_damage = ~random_range($stun_damage, db_getfield($data, pickpocket:stun_damage_max, 0));
+    }
     ~fail_pick_pocket($stun_damage, $stun_ticks, $pocket);
     return;
 }
@@ -89,8 +92,13 @@ switch_loc (loc_type) {
 }
 ~stealing_check_for_reward($data);
 stat_advance(thieving, $experience);
+~regional_stall_stolen;
 // Temp note: dur does not need updated
-loc_change(market, $respawn_ticks);
+def_loc $empty = db_getfield($data, stealing:empty, 0);
+if ($empty = null) {
+    $empty = market;
+}
+loc_change($empty, $respawn_ticks);
 
 [label,activate_trapped_chest]
 p_arrivedelay;
@@ -138,6 +146,10 @@ loc_change(chest_2572, $respawn_ticks); //looted chest
 [proc,pick_pocket_check_for_reward](dbrow $data)
 def_int $count = calc(db_getfieldcount($data, pickpocket:loot) - 1);
 def_int $reward_rarity_denominator = 128;
+def_int $loot_total = db_getfield($data, pickpocket:loot_total, 0);
+if ($loot_total > 0) {
+    $reward_rarity_denominator = $loot_total;
+}
 while ($count >= 0) {
     def_namedobj $reward;
     def_int $reward_quantity_min;
@@ -149,8 +161,18 @@ while ($count >= 0) {
     $reward_rarity_denominator = sub($reward_rarity_denominator, $reward_rarity_numerator);
     if ($roll >= $reward_rarity_denominator) {
         def_int $quantity_roll = ~random_range($reward_quantity_min, $reward_quantity_max);
-        // Pickpocketing can reward more than 1.
-        inv_add(inv, $reward, $quantity_roll);
+        if ($reward = trail_clue_easy_map001) {
+            // The representative row uses the existing random clue and one-clue rule.
+            if (~trail_geteasyclue = true) {
+                return;
+            }
+        } else {
+            // Pickpocketing can reward more than 1.
+            inv_add(inv, $reward, $quantity_roll);
+        }
+        if ($loot_total > 0) {
+            return;
+        }
     }
 
     $count = calc($count - 1);

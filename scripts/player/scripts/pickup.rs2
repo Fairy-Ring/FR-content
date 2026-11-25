@@ -40,6 +40,7 @@ inv_add(inv, $replacement, 1);
 wealth_event(^wealth_pickup, oc_debugname($replacement), 1, oc_cost($replacement));
 
 [proc,pickup_obj_check_for_space](obj $obj, int $amount)(boolean)
+if (~champions_inventory_check = false) return(false);
 if (inv_itemspace(inv, $obj, $amount, inv_size(inv)) = false) {
     mes("You don't have enough inventory space to hold that item.");
     return(false);

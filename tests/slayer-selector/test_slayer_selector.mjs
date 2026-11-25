@@ -6,9 +6,9 @@
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode full
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-discriminator --base-pack <S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --base-pack <S1 full pack>
- *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-pack <pre-S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode table-old-discriminator --base-pack <published S2 pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode replacement [--base-pack <published full pack>]
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode priestperil [--base-pack <published full pack>]
  * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else RUNNER_TEMP or the system temporary directory.
  *
  * No server or live client is started. The adversarial DBRows are compiled in
@@ -89,8 +89,8 @@ const SOURCED_SLAYER_THRESHOLDS = [
     ['slayer_abyssaldemon', 85],
     ['slayer_darkbeast', 90]
 ];
-// Accepted plan's fixed row census, independently transcribed from its labelled report.
-// Historical membership labels vary by row; every stored number/order keeps Lost City values.
+// Fixed row census includes D1 bears and the four B-SLAYERROLL memberships.
+// New pair numbers are UNKNOWN engineering rows borrowed from named same-creature rows.
 const MASTER_TABLES_FILE = path.join(TEST_DIR, 'master_tables.json');
 const MASTER_TABLES = JSON.parse(fs.readFileSync(MASTER_TABLES_FILE, 'utf8'));
 const FAMILY_B = 3800;
@@ -102,13 +102,20 @@ const OUT_OF_S1 = [
 const OWNER_PREDICATES = [
     {
         proc: 'slayer_priestperil_unlocked',
-        categories: ['slayer_crawlinghand', 'slayer_banshee', 'slayer_infernalmage', 'slayer_bloodveld', 'slayer_aberrantspecter', 'slayer_gargoyle', 'slayer_nechryael', 'slayer_abyssaldemon', 'slayer_ghoul', 'slayer_werewolf', 'slayer_vampire']
+        categories: ['slayer_crawlinghand', 'slayer_banshee', 'slayer_infernalmage', 'slayer_bloodveld', 'slayer_aberrantspecter', 'slayer_gargoyle', 'slayer_nechryael', 'slayer_abyssaldemon', 'slayer_ghoul', 'slayer_werewolf', 'slayer_vampire'],
+        // CANDIDATE assignment reconstruction: Drezel grants Morytania access at 61, after completion at 60.
+        gate: { variable: 'priestperil', threshold: 61 }
     },
     { proc: 'slayer_horror_unlocked', categories: ['slayer_dagannoth'] },
     { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'] },
     { proc: 'slayer_deserttreasure_unlocked', categories: ['slayer_dustdevil'] },
     { proc: 'slayer_mourning2_unlocked', categories: ['slayer_darkbeast'] },
-    { proc: 'slayer_skippy_unlocked', categories: ['slayer_mogre'] }
+    {
+        proc: 'slayer_skippy_unlocked',
+        categories: ['slayer_mogre'],
+        // VERIFIED 377: skippy_state is bits 0-2 of this varp; CANDIDATE completion is 3.
+        gate: { variable: 'rimmington_extras_var', threshold: 3 }
+    }
 ];
 
 function parseArgs(argv) {
@@ -120,8 +127,8 @@ function parseArgs(argv) {
         else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement'].includes(result.mode), `unsupported --mode ${result.mode}`);
-    if (['old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
+    assert(['full', 'ci', 'proportional', 'adversarial', 'old-discriminator', 'table-old-discriminator', 'replacement', 'priestperil'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    if (['old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
 
@@ -352,7 +359,10 @@ function loadOracle() {
     const taskSource = fs.readFileSync(SOURCES.taskScript, 'utf8');
     const masterSource = fs.readFileSync(SOURCES.masterScript, 'utf8');
     const recommendationSource = fs.readFileSync(SOURCES.recommendationScript, 'utf8');
-    const questNames = [...new Set([...extractValidatorBody(taskSource).matchAll(/%([A-Za-z0-9_]+)\s*</g)].map(match => match[1]))];
+    const questNames = [...new Set([
+        ...[...extractValidatorBody(taskSource).matchAll(/%([A-Za-z0-9_]+)\s*</g)].map(match => match[1]),
+        ...OWNER_PREDICATES.filter(owner => owner.gate).map(owner => owner.gate.variable)
+    ])];
     const questValues = Object.fromEntries(questNames.map(name => [name, 0]));
     const validatorRoutes = parseValidatorRoutes(taskSource, constants);
     const reverseConstants = new Map();
@@ -433,10 +443,14 @@ function expectedValidator(target, fixture) {
     const combatRequirement = ORACLE.combatReq.get(target) ?? 0;
     const questGate = ORACLE.questGates.get(target);
     const questValue = questGate ? (fixture.questValues?.[questGate.variable] ?? ORACLE.questValues[questGate.variable] ?? 0) : 0;
+    const ownerProc = ORACLE.ownerProcByTarget.get(target);
+    const owner = OWNER_PREDICATES.find(entry => entry.proc === ownerProc);
+    const ownerAccepts = !ownerProc || (owner?.gate
+        && (fixture.questValues?.[owner.gate.variable] ?? 0) >= owner.gate.threshold);
     return fixture.baseSlayer >= slayerRequirement
         && fixture.combat >= combatRequirement
         && !ORACLE.alwaysBlockedTargets.has(target)
-        && !ORACLE.ownerProcByTarget.has(target)
+        && Boolean(ownerAccepts)
         && (!questGate || questValue >= questGate.threshold);
 }
 
@@ -601,7 +615,7 @@ function compileFixturePack(fixtureMode = 'standard') {
     return result;
 }
 
-const FIXTURE_PACK_RESULT = OPTIONS.mode === 'replacement' ? null : compileFixturePack();
+const FIXTURE_PACK_RESULT = ['replacement', 'priestperil', 'proportional'].includes(OPTIONS.mode) ? null : compileFixturePack();
 const FIXTURE_PACK_DIR = FIXTURE_PACK_RESULT?.directory ?? null;
 
 async function importEngine(relative) {
@@ -758,6 +772,9 @@ function completedQuestValues() {
     const values = { ...ORACLE.questValues };
     for (const gate of ORACLE.questGates.values()) {
         values[gate.variable] = Math.max(values[gate.variable] ?? 0, gate.threshold);
+    }
+    for (const owner of OWNER_PREDICATES) {
+        if (owner.gate) values[owner.gate.variable] = owner.gate.threshold;
     }
     return values;
 }
@@ -979,7 +996,7 @@ function testTuraelPredicate() {
     const player = makePlayer();
     applyFixture(player, FIXTURES.get('turael:high'));
     const categories = new Set(MASTER_TABLES.turael.map(([, category]) => Number(ORACLE.constants.get(`slayer_${category}`))));
-    assert.equal(categories.has(Number(ORACLE.constants.get('slayer_bear'))), false, 'S3 disclosed keep-off bear membership');
+    assert.equal(categories.has(Number(ORACLE.constants.get('slayer_bear'))), true, 'D1 must activate bears in Turael membership');
     const results = [];
     for (const target of [-1, ...Array.from({ length: 77 }, (_, i) => i)]) {
         const prior = sentinelTask(player, target, 41);
@@ -987,7 +1004,7 @@ function testTuraelPredicate() {
         let actual;
         try { actual = runInt(player, '[proc,has_turael_task]').value; }
         finally { trace.restore(); }
-        assert.equal(actual, categories.has(target) ? 1 : 0, `S3 has_turael_task must equal remaining Turael list: category ${target}`);
+        assert.equal(actual, categories.has(target) ? 1 : 0, `has_turael_task must equal Turael's active list: category ${target}`);
         assert.deepEqual(trace.events, [], 'membership predicate must not write task state');
         assert.equal(player.getVar(IDS.target), prior.target);
         assert.equal(player.getVar(IDS.count), prior.count);
@@ -1012,7 +1029,8 @@ function drawLiveRowEndpoints(masterKey, suffix, fixture) {
         const trace = traceWrites(player);
         let random;
         try {
-            const stream = [...Array(index).fill(1 - Number.EPSILON), 0, side === 'min' ? 0 : 1 - Number.EPSILON];
+            const stream = forcedStreamForRow(master, fixture, `${masterKey}_${suffix}`).values;
+            stream[1] = side === 'min' ? 0 : 1 - Number.EPSILON;
             random = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
         } finally { trace.restore(); }
         const count = side === 'min' ? min : max;
@@ -1023,6 +1041,36 @@ function drawLiveRowEndpoints(masterKey, suffix, fixture) {
         assert.equal(gemCount(player), 0, 'direct generator must not grant introductory gem');
         return { master: masterKey, row: suffix, target, weight, endpoint: side, count, fixture: recordFixture(fixture), prior, randomValues: random.observed, opcount: random.result.opcount };
     });
+}
+
+function testD1Bears() {
+    const master = ORACLE.masters.find(entry => entry.key === 'turael');
+    const bear = Number(ORACLE.constants.get('slayer_bear'));
+    const bearIndex = master.rows.findIndex(row => row.sourceName === 'turael_bears');
+    const goblinIndex = master.rows.findIndex(row => row.sourceName === 'turael_goblins');
+    assert(bearIndex >= 0 && goblinIndex > bearIndex, 'D1 bear must retain its authored position after bats');
+    const npc = makeNpc(IDS.masters.turael);
+    const boundaries = [];
+    for (const [level, combat] of [[10, 12], [11, 13]]) {
+        const fixture = { ...FIXTURES.get('turael:minimum'), key: `d1_bear_cb${combat}`, level, combat, baseSlayer: 1, currentSlayer: 1 };
+        const player = makePlayer();
+        applyFixture(player, fixture);
+        assert.equal(combatLevel(player), combat, 'D1 exact bear combat boundary');
+        assert.equal(validatorAccepts(player, npc, bear), combat >= 13, 'D1 bear keeps the published combat-13 gate with no extra Slayer/quest gate');
+        const selectedIndex = combat >= 13 ? bearIndex : goblinIndex;
+        const stream = forcedStreamForRow(master, fixture, master.rows[selectedIndex].sourceName).values;
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let result;
+        try { result = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id])); }
+        finally { trace.restore(); }
+        assert.equal(result.result.value, 1, 'D1 real Turael list must assign');
+        assert.equal(player.getVar(IDS.target), master.rows[selectedIndex].target, 'D1 bear combat gate must affect actual selection');
+        assert.equal(player.getVar(IDS.count), combat >= 13 ? 10 : 15, 'D1 amount keeps the published lower endpoint');
+        assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], 'D1 protected assignment write order');
+        boundaries.push({ fixture: recordFixture(fixture), prior, after: taskSnapshot(player), randomValues: result.observed });
+    }
+    return { boundaries, endpoints: drawLiveRowEndpoints('turael', 'bears', FIXTURES.get('turael:high')) };
 }
 
 function testErnestGate(masterKey) {
@@ -1109,8 +1157,8 @@ function testDuradelTables() {
         return { axis: fixture.axis, fixture: recordFixture(fixture), accepted, recommended };
     });
     const dragonEndpoints = MASTER_TABLES.duradel.filter(([, category]) => category.endsWith('dragon')).flatMap(([suffix]) => drawLiveRowEndpoints('duradel', suffix, FIXTURES.get('duradel:high')));
-    assert.equal(dragonEndpoints.length, 8, 'four retained Duradel dragon rows, both inclusive endpoints');
-    return { historicalNumbers: 'UNKNOWN: keeps the Lost City value; no inferred minimum130', boundaries, dragonEndpoints };
+    assert.equal(dragonEndpoints.length, 10, 'five Duradel dragon rows, both inclusive endpoints');
+    return { historicalNumbers: 'UNKNOWN: retained Lost City rows and disclosed borrowed bronze row; no inferred minimum130', boundaries, dragonEndpoints };
 }
 
 
@@ -1265,7 +1313,7 @@ function testThresholds() {
                 assert.equal(traced.result, expected, `${fixture.key}: packed validator must use base Slayer threshold ${requirement}`);
                 if (ownerProc) {
                     const expectedCalls = baseSlayer >= requirement ? [`[proc,${ownerProc}]`] : [];
-                    assert.deepEqual(traced.calls, expectedCalls, `${fixture.key}: packed threshold must run before its unfinished owner gate`);
+                    assert.deepEqual(traced.calls, expectedCalls, `${fixture.key}: packed threshold must run before its owner gate`);
                 }
                 targets.push(target);
                 observations.push({
@@ -1358,10 +1406,12 @@ function testOwnerPredicateDispatch() {
             assert(!expectedRoutes.has(target), `category ^${category} has multiple owner predicates`);
             expectedRoutes.set(target, owner.proc);
         }
-        const body = extractProcSource(ORACLE.taskSource, owner.proc).replace(/\/\/[^\n]*/g, '').replace(/\s+/g, '');
-        assert.equal(body, `[proc,${owner.proc}]()(boolean)return(false);`, `${owner.proc} must remain an unfinished false body`);
+        if (!owner.gate) {
+            const body = extractProcSource(ORACLE.taskSource, owner.proc).replace(/\/\/[^\n]*/g, '').replace(/\s+/g, '');
+            assert.equal(body, `[proc,${owner.proc}]()(boolean)return(false);`, `${owner.proc} must remain an unfinished false body`);
+        }
     }
-    assert.equal(ORACLE.ownerProcByTarget.size, expectedRoutes.size, 'validator source must route exactly the six planned unfinished owner contracts');
+    assert.equal(ORACLE.ownerProcByTarget.size, expectedRoutes.size, 'validator source must route exactly the six planned owner contracts');
     for (const [target, proc] of expectedRoutes) {
         assert.equal(ORACLE.ownerProcByTarget.get(target), proc, `${ORACLE.reverseConstants.get(target)} must route to ${proc}`);
     }
@@ -1373,16 +1423,118 @@ function testOwnerPredicateDispatch() {
     const results = [];
     for (const owner of OWNER_PREDICATES) {
         const direct = runInt(player, `[proc,${owner.proc}]`, npc);
-        assert.equal(direct.value, 0, `${owner.proc}: compiled unfinished predicate must return false`);
+        assert.equal(direct.value, owner.gate ? 1 : 0, `${owner.proc}: compiled predicate must match its completed-state contract`);
         for (const category of owner.categories) {
             const target = Number(ORACLE.constants.get(category));
             const traced = tracePackedCalls([owner.proc], () => validatorAccepts(player, npc, target));
-            assert.equal(traced.result, false, `${category}: unfinished owner gate must exclude the target`);
+            assert.equal(traced.result, Boolean(owner.gate), `${category}: owner gate must match its completed-state contract`);
             assert.deepEqual(traced.calls, [`[proc,${owner.proc}]`], `${category}: packed validator did not dispatch to ${owner.proc}`);
             results.push({ category, target, ownerProc: owner.proc, predicateResult: direct.value, validatorResult: traced.result, packedCalls: traced.calls });
         }
     }
     return { fixture, routes: results };
+}
+
+function testPriestperilAccess() {
+    const owner = OWNER_PREDICATES.find(entry => entry.proc === 'slayer_priestperil_unlocked');
+    assert.equal(Number(ORACLE.constants.get('priestperil_complete')), 60, 'quest completion is not the Morytania access grant');
+    assert.equal(owner.categories.length, 11, 'Priest in Peril must retain all eleven routed categories');
+    const targets = new Set(owner.categories.map(category => Number(ORACLE.constants.get(category))));
+    const player = makePlayer();
+    const validatorNpc = makeNpc(IDS.masters.turael);
+    const stages = [];
+    // Every pre-access stage rejects every category, including completed-but-not-admitted stage 60.
+    for (let stage = 0; stage <= 61; stage++) {
+        const fixture = {
+            key: `priestperil_${stage}`, combat: 126, level: 99, baseSlayer: 99, currentSlayer: 99,
+            questValues: { ...completedQuestValues(), priestperil: stage }
+        };
+        applyFixture(player, fixture);
+        const expected = stage === 61;
+        assert.equal(runInt(player, `[proc,${owner.proc}]`, validatorNpc).value, Number(expected), `Priest in Peril stage ${stage}: access predicate`);
+        const categories = owner.categories.map(category => {
+            const target = Number(ORACLE.constants.get(category));
+            assert.equal(validatorAccepts(player, validatorNpc, target), expected, `${category}: stage ${stage} must ${expected ? 'admit' : 'reject'} the category`);
+            return { category, target, accepted: expected };
+        });
+        assert.equal(player.getVar(QUEST_VAR_IDS.priestperil), stage, 'eligibility must not change quest state');
+        stages.push({ stage, accepted: expected, categories });
+    }
+
+    const assignments = [];
+    for (const target of targets) {
+        const master = ORACLE.masters.find(entry => entry.rows.some(row => row.target === target));
+        assert(master, `Priest in Peril target ${target} needs a real master row`);
+        const index = master.rows.findIndex(row => row.target === target);
+        const npc = makeNpc(IDS.masters[master.key]);
+        for (const stage of [60, 61]) {
+            const fixture = {
+                key: `${master.key}_priestperil_${stage}`, combat: 126, level: 99, baseSlayer: 99, currentSlayer: 99,
+                questValues: { ...completedQuestValues(), priestperil: stage }
+            };
+            applyFixture(player, fixture);
+            assert.equal(combatLevel(player), 126, 'Priest in Peril assignment fixture combat');
+            const fallback = master.rows.findIndex(row => !targets.has(row.target) && expectedRowEligibility(row, fixture));
+            assert(fallback >= 0, `${master.key}: below-gate control needs an eligible non-Priest-in-Peril row`);
+            const selected = stage === 61 ? index : fallback;
+            const stream = forcedStreamForRow(master, fixture, master.rows[selected].sourceName).values;
+            const trace = traceWrites(player);
+            let draw;
+            try {
+                draw = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
+            } finally {
+                trace.restore();
+            }
+            assert.equal(draw.result.value, 1, `${master.key}: real table must assign at stage ${stage}`);
+            assert.equal(player.getVar(IDS.target), master.rows[selected].target, `${master.key}: Priest in Peril gate must affect the real draw`);
+            assert.equal(player.getVar(IDS.count), master.rows[selected].min, 'real assignment must retain its amount bound');
+            assert.deepEqual(trace.events, [{ kind: 'target', value: master.rows[selected].target }, { kind: 'count', value: master.rows[selected].min }], 'only the permitted task may be written');
+            assert.equal(player.getVar(QUEST_VAR_IDS.priestperil), stage, 'assignment must not change quest state');
+            assignments.push({ target, master: master.key, stage, after: taskSnapshot(player), randomValues: draw.observed });
+        }
+    }
+    return { stageVariable: 'priestperil', completion: 60, access: 61, stages, assignments };
+}
+
+function testSkippyAccess() {
+    const owner = OWNER_PREDICATES.find(entry => entry.proc === 'slayer_skippy_unlocked');
+    const target = Number(ORACLE.constants.get('slayer_mogre'));
+    const masters = ORACLE.masters.filter(master => master.rows.some(row => row.target === target));
+    assert(masters.length > 0, 'mogres need a real master row');
+    const player = makePlayer();
+    const assignments = [];
+    for (let stage = 0; stage <= owner.gate.threshold; stage++) {
+        const expected = stage === owner.gate.threshold;
+        for (const master of masters) {
+            const fixture = {
+                key: `${master.key}_skippy_${stage}`, combat: 126, level: 99, baseSlayer: 99, currentSlayer: 99,
+                questValues: { ...completedQuestValues(), [owner.gate.variable]: stage }
+            };
+            applyFixture(player, fixture);
+            const npc = makeNpc(IDS.masters[master.key]);
+            assert.equal(runInt(player, `[proc,${owner.proc}]`, npc).value, Number(expected), `Skippy stage ${stage}: access predicate`);
+            assert.equal(validatorAccepts(player, npc, target), expected, `Skippy stage ${stage}: mogre category access`);
+            const index = master.rows.findIndex(row => row.target === target);
+            const fallback = master.rows.findIndex(row => row.target !== target && expectedRowEligibility(row, fixture));
+            assert(fallback >= 0, `${master.key}: below-gate control needs an eligible non-mogre row`);
+            const selected = expected ? index : fallback;
+            const stream = forcedStreamForRow(master, fixture, master.rows[selected].sourceName).values;
+            const trace = traceWrites(player);
+            let draw;
+            try {
+                draw = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
+            } finally {
+                trace.restore();
+            }
+            assert.equal(draw.result.value, 1, `${master.key}: real table must assign at Skippy stage ${stage}`);
+            assert.equal(player.getVar(IDS.target), master.rows[selected].target, `${master.key}: Skippy gate must affect the real draw`);
+            assert.equal(player.getVar(IDS.count), master.rows[selected].min, 'real assignment must retain its amount bound');
+            assert.deepEqual(trace.events, [{ kind: 'target', value: master.rows[selected].target }, { kind: 'count', value: master.rows[selected].min }], 'only the permitted task may be written');
+            assert.equal(player.getVar(QUEST_VAR_IDS[owner.gate.variable]), stage, 'assignment must not change Skippy state');
+            assignments.push({ master: master.key, stage, mogresAccepted: expected, after: taskSnapshot(player), randomValues: draw.observed });
+        }
+    }
+    return { stageVariable: owner.gate.variable, completion: owner.gate.threshold, assignments };
 }
 
 function testDispatchAndOneShotOrder(packedRows) {
@@ -1535,7 +1687,7 @@ function testCurrentTeachingSuccess() {
     assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: teaching fixture combat mismatch`);
     const npc = makeNpc(IDS.masters.turael);
     assert.equal(eligibleMaster(player, npc, IDS.masters.turael), true, 'Turael should admit first teaching fixture');
-    const forced = streamForFirstEligible(master, fixture);
+    const forced = forcedStreamForRow(master, fixture);
     const acceptance = buildActualValidatorCache(player, npc, fixture, [forced.row.target], `${fixture.key}:teaching`);
     sentinelTask(player, 0, 0);
     const trace = traceWrites(player);
@@ -1575,17 +1727,15 @@ function testS8ProtectedReaders() {
     return { baselineCommit: S8_PROTECTED_BASELINE.commit, fingerprints };
 }
 
-function forcedStreamForRow(master, fixture, sourceName) {
+function forcedStreamForRow(master, fixture, sourceName = eligibleRows(master, fixture)[0]?.sourceName) {
     const index = master.rows.findIndex(row => row.sourceName === sourceName);
     assert(index >= 0, `${master.key}: missing selected source row ${sourceName}`);
     const row = master.rows[index];
     assert.equal(expectedRowEligibility(row, fixture), true, `${sourceName}: selected S8 row must pass the source oracle`);
-    const values = [];
-    for (const preceding of master.rows.slice(0, index)) {
-        assert(preceding.weight > 0, `${preceding.sourceName}: cannot force through a nonpositive row`);
-        values.push(1 - Number.EPSILON);
-    }
-    values.push(0, 0);
+    const eligible = eligibleRows(master, fixture);
+    const total = eligible.reduce((sum, entry) => sum + entry.weight, 0);
+    const before = eligible.slice(0, eligible.indexOf(row)).reduce((sum, entry) => sum + entry.weight, 0);
+    const values = [(before + row.weight / 2) / total, 0];
     return { row, index, values };
 }
 
@@ -1671,7 +1821,7 @@ function runS8CountZeroAssignment(masterKey, fixture, {
     } else {
         selected = sourceName
             ? forcedStreamForRow(master, fixture, sourceName)
-            : streamForFirstEligible(master, fixture);
+            : forcedStreamForRow(master, fixture);
         randomValues = selected.values;
         if (warningExpected) choices.push(1);
         choices.push(2);
@@ -1724,7 +1874,7 @@ function testS8ReplacementFailure(scriptPack, configs = scriptPack) {
     const player = makePlayer();
     applyFixture(player, fixture);
     const npc = makeNpc(IDS.masters.turael);
-    const bearTarget = Number(ORACLE.constants.get('slayer_bear'));
+    const nonmemberTarget = Number(ORACLE.constants.get('slayer_earthwarrior'));
     const tableId = rowForPacked('turael_task_table').id;
     const tableReferences = packedValues(rowForPacked('turael_task_table').row, 'task').map(Number);
     const childNames = ['s1_selector_dagannoth', 's1_selector_elf'];
@@ -1737,8 +1887,8 @@ function testS8ReplacementFailure(scriptPack, configs = scriptPack) {
         assert.equal(accepted, false, `${name}: replacement row must be rejected by the real packed validator`);
         return { name, rowId: childIds[index], target, targetName: ORACLE.taskNamesById.get(target) ?? null, realValidatorAccepted: accepted };
     });
-    sentinelTask(player, bearTarget, 27);
-    assert.equal(runInt(player, '[proc,has_turael_task]').value, 0, 'bear prior task must take the real Turael reassignment consent path');
+    sentinelTask(player, nonmemberTarget, 27);
+    assert.equal(runInt(player, '[proc,has_turael_task]').value, 0, 'earth warrior prior task must take the real Turael reassignment consent path');
     seedExistingGem(player);
     const prior = taskSnapshot(player);
 
@@ -1753,7 +1903,7 @@ function testS8ReplacementFailure(scriptPack, configs = scriptPack) {
     assert.deepEqual(directTrace.events, [], 'replacement selector failure wrote target/count/gem');
     assert.deepEqual(directTrace.inventoryWrites, [], 'replacement selector failure wrote inventory');
     assert.deepEqual(direct.observed, [], 'replacement selector preflight consumed RNG');
-    assert.deepEqual(taskSnapshot(player), prior, 'replacement selector failure changed prior bear/count/gem');
+    assert.deepEqual(taskSnapshot(player), prior, 'replacement selector failure changed prior task/count/gem');
 
     const tracedDialogue = tracePackedReturns(['generate_slayer_task'], () => runTrackedDialogue(
         player,
@@ -1770,15 +1920,15 @@ function testS8ReplacementFailure(scriptPack, configs = scriptPack) {
     assert.deepEqual(dialogue.taskWrites, [], 'consented replacement dialogue failure wrote target/count/gem');
     assert.deepEqual(dialogue.inventoryWrites, [], 'consented replacement dialogue failure wrote inventory');
     assert.deepEqual(dialogue.forcedRandomValues, [], 'consented replacement dialogue failure consumed RNG');
-    assert.deepEqual(taskSnapshot(player), prior, 'consented replacement dialogue did not preserve prior bear/count/gem');
+    assert.deepEqual(taskSnapshot(player), prior, 'consented replacement dialogue did not preserve prior task/count/gem');
     assert.match(dialogue.pages.join(' '), /yes, please/i, 'replacement failure did not execute the consent choice');
     assertNoS8AssignmentSuccess(dialogue.pages, 'consented replacement dialogue');
 
     const countZeroPlayer = makePlayer();
     applyFixture(countZeroPlayer, fixture);
     assert.equal(eligibleMaster(countZeroPlayer, npc, IDS.masters.turael), true, 'count-zero failed insist must pass real Turael admission');
-    sentinelTask(countZeroPlayer, bearTarget, 0);
-    assert.equal(runInt(countZeroPlayer, '[proc,has_turael_task]').value, 0, 'count-zero bear must take the real new-task path');
+    sentinelTask(countZeroPlayer, nonmemberTarget, 0);
+    assert.equal(runInt(countZeroPlayer, '[proc,has_turael_task]').value, 0, 'count-zero nonmember must take the real new-task path');
     seedExistingGem(countZeroPlayer);
     const countZeroPrior = taskSnapshot(countZeroPlayer);
     const tracedCountZero = tracePackedReturns(['generate_slayer_task'], () => runTrackedDialogue(
@@ -1795,7 +1945,7 @@ function testS8ReplacementFailure(scriptPack, configs = scriptPack) {
     assert.deepEqual(countZeroDialogue.taskWrites, [], 'count-zero failed insist wrote target/count/gem');
     assert.deepEqual(countZeroDialogue.inventoryWrites, [], 'count-zero failed insist wrote inventory');
     assert.deepEqual(countZeroDialogue.forcedRandomValues, [], 'count-zero failed insist consumed RNG');
-    assert.deepEqual(taskSnapshot(countZeroPlayer), countZeroPrior, 'count-zero failed insist changed prior bear/count/gem');
+    assert.deepEqual(taskSnapshot(countZeroPlayer), countZeroPrior, 'count-zero failed insist changed prior task/count/gem');
     assert.match(countZeroDialogue.pages.join(' '), /actually very strong|sure you don.t want/i, 'count-zero failed insist warning page missing');
     assertNoS8AssignmentSuccess(countZeroDialogue.pages, 'count-zero failed insist');
 
@@ -1854,33 +2004,43 @@ function testS8DialogueCases(scriptPack, configs = scriptPack) {
     const turael = ORACLE.masters.find(master => master.key === 'turael');
     const turaelHigh = FIXTURES.get('turael:high');
 
-    const bearConsentPlayer = makePlayer();
-    applyFixture(bearConsentPlayer, turaelHigh);
     const turaelNpc = makeNpc(IDS.masters.turael);
-    sentinelTask(bearConsentPlayer, bearTarget, 31);
-    assert.equal(runInt(bearConsentPlayer, '[proc,has_turael_task]').value, 0, 'bear must remain outside the packed Turael category predicate');
-    seedExistingGem(bearConsentPlayer);
-    const bearConsentPrior = taskSnapshot(bearConsentPlayer);
-    const bearForced = streamForFirstEligible(turael, turaelHigh);
-    const bearConsent = runTrackedDialogue(bearConsentPlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 1, 2], bearForced.values, taskProcedures);
-    assertS8SuccessfulAssignment(bearConsentPlayer, turaelNpc, turaelHigh, bearForced.row, bearConsentPrior, bearConsent, 'positive-count bear consent through Turael');
-    assert.match(bearConsent.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count bear consent prompt missing');
-    const bearConsentRecord = recordS8Conversation('turael-positive-bear-consent', turaelHigh, bearConsentPrior, bearConsentPlayer, bearConsent, {
-        priorTaskName: 'bear',
-        selectedSourceRow: bearForced.row.sourceName,
+    const ownBear = runS8CountZeroAssignment('turael', turaelHigh, { sourceName: 'turael_bears' });
+    assert.equal(ownBear.player.getVar(IDS.target), bearTarget, 'D1 real dialogue must assign bears');
+    assert.equal(runInt(ownBear.player, '[proc,has_turael_task]').value, 1, 'D1 bears must be a Turael category');
+    const ownBearPrior = taskSnapshot(ownBear.player);
+    const ownBearRefusal = runTrackedDialogue(ownBear.player, turaelNpc, '[opnpc1,_slayer_master]', [1], [], taskProcedures);
+    assertS8NoMutation(ownBear.player, ownBearPrior, ownBearRefusal, 'D1 positive-count bear refusal');
+    assert.match(ownBearRefusal.pages.join(' '), /still hunting something; come back when you.ve finished your task/i, 'D1 bear refusal page missing');
+    const bearRefusalRecord = recordS8Conversation('turael-positive-bear-refusal', turaelHigh, ownBearPrior, ownBear.player, ownBearRefusal);
+
+    const nonmemberTarget = Number(ORACLE.constants.get('slayer_earthwarrior'));
+    const nonmemberConsentPlayer = makePlayer();
+    applyFixture(nonmemberConsentPlayer, turaelHigh);
+    sentinelTask(nonmemberConsentPlayer, nonmemberTarget, 31);
+    assert.equal(runInt(nonmemberConsentPlayer, '[proc,has_turael_task]').value, 0, 'earth warriors remain outside Turael categories');
+    seedExistingGem(nonmemberConsentPlayer);
+    const nonmemberConsentPrior = taskSnapshot(nonmemberConsentPlayer);
+    const nonmemberForced = forcedStreamForRow(turael, turaelHigh);
+    const nonmemberConsent = runTrackedDialogue(nonmemberConsentPlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 1, 2], nonmemberForced.values, taskProcedures);
+    assertS8SuccessfulAssignment(nonmemberConsentPlayer, turaelNpc, turaelHigh, nonmemberForced.row, nonmemberConsentPrior, nonmemberConsent, 'positive-count nonmember consent through Turael');
+    assert.match(nonmemberConsent.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count consent prompt missing');
+    const nonmemberConsentRecord = recordS8Conversation('turael-positive-earthwarrior-consent', turaelHigh, nonmemberConsentPrior, nonmemberConsentPlayer, nonmemberConsent, {
+        priorTaskName: 'earthwarrior',
+        selectedSourceRow: nonmemberForced.row.sourceName,
         assignedBy: 'turael',
         taskProvenanceStored: false
     });
 
-    const bearDeclinePlayer = makePlayer();
-    applyFixture(bearDeclinePlayer, turaelHigh);
-    sentinelTask(bearDeclinePlayer, bearTarget, 31);
-    seedExistingGem(bearDeclinePlayer);
-    const bearDeclinePrior = taskSnapshot(bearDeclinePlayer);
-    const bearDecline = runTrackedDialogue(bearDeclinePlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 2], [], taskProcedures);
-    assertS8NoMutation(bearDeclinePlayer, bearDeclinePrior, bearDecline, 'positive-count bear decline through Turael');
-    assert.match(bearDecline.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count decline prompt missing');
-    const bearDeclineRecord = recordS8Conversation('turael-positive-bear-decline', turaelHigh, bearDeclinePrior, bearDeclinePlayer, bearDecline, { priorTaskName: 'bear' });
+    const nonmemberDeclinePlayer = makePlayer();
+    applyFixture(nonmemberDeclinePlayer, turaelHigh);
+    sentinelTask(nonmemberDeclinePlayer, nonmemberTarget, 31);
+    seedExistingGem(nonmemberDeclinePlayer);
+    const nonmemberDeclinePrior = taskSnapshot(nonmemberDeclinePlayer);
+    const nonmemberDecline = runTrackedDialogue(nonmemberDeclinePlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 2], [], taskProcedures);
+    assertS8NoMutation(nonmemberDeclinePlayer, nonmemberDeclinePrior, nonmemberDecline, 'positive-count nonmember decline through Turael');
+    assert.match(nonmemberDecline.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count decline prompt missing');
+    const nonmemberDeclineRecord = recordS8Conversation('turael-positive-earthwarrior-decline', turaelHigh, nonmemberDeclinePrior, nonmemberDeclinePlayer, nonmemberDecline, { priorTaskName: 'earthwarrior' });
 
     const highFixture = FIXTURES.get('turael:high');
     const crossRow = findCrossMasterEligibleRow('mazchna', 'turael', highFixture);
@@ -1981,8 +2141,10 @@ function testS8DialogueCases(scriptPack, configs = scriptPack) {
     return {
         protectedReaders,
         positiveCount: {
-            bearConsent: bearConsentRecord,
-            bearDecline: bearDeclineRecord,
+            bearAssignment: ownBear.record,
+            bearRefusal: bearRefusalRecord,
+            nonmemberConsent: nonmemberConsentRecord,
+            nonmemberDecline: nonmemberDeclineRecord,
             turaelCategoryRefusalFromAnotherMaster: categoryRefusalRecord,
             otherMasterRefusals
         },
@@ -1999,24 +2161,132 @@ function testS8DialogueCases(scriptPack, configs = scriptPack) {
 }
 
 function buildDistribution(master, fixture, rows) {
-    let survival = 1;
-    const occurrenceWeights = [];
-    let passSuccess = 0;
-    for (const row of rows) {
-        const probability = expectedRowEligibility(row, fixture) ? 1 / row.weight : 0;
-        const perPass = probability * survival;
-        occurrenceWeights.push({ row, probability, perPass });
-        passSuccess += perPass;
-        survival *= 1 - probability;
-    }
-    assert(passSuccess > 0, `${master.key}/${fixture.key}: no eligible ordered-pass probability`);
+    const eligible = rows.filter(row => expectedRowEligibility(row, fixture));
+    const totalWeight = eligible.reduce((sum, row) => sum + row.weight, 0);
+    assert(totalWeight > 0, `${master.key}/${fixture.key}: no eligible proportional weight`);
     const categoryProbability = new Map();
-    for (const occurrence of occurrenceWeights) {
-        if (occurrence.perPass === 0) continue;
-        const probability = occurrence.perPass / passSuccess;
-        categoryProbability.set(occurrence.row.target, (categoryProbability.get(occurrence.row.target) ?? 0) + probability);
+    for (const row of eligible) {
+        categoryProbability.set(row.target, (categoryProbability.get(row.target) ?? 0) + row.weight / totalWeight);
     }
-    return { occurrenceWeights, categoryProbability, passSuccess };
+    return { categoryProbability, totalWeight };
+}
+
+function enumerateProportionalRoll(master, fixture, table = null) {
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: enumeration combat`);
+    const npc = makeNpc(IDS.masters[master.key]);
+    const select = () => table === null
+        ? runInt(player, '[proc,slayer_new_target]', npc)
+        : runInt(player, '[proc,generate_slayer_task]', npc, [table]);
+    const eligible = eligibleRows(master, fixture);
+    const total = eligible.reduce((sum, row) => sum + row.weight, 0);
+    const counts = new Map(master.rows.map(row => [row.sourceName, 0]));
+    let expectedIndex = 0;
+    let boundary = eligible[0]?.weight ?? 0;
+    for (let roll = 0; roll < total; roll++) {
+        while (roll >= boundary) boundary += eligible[++expectedIndex].weight;
+        const expected = eligible[expectedIndex];
+        sentinelTask(player);
+        const trace = traceWrites(player);
+        let draw;
+        try {
+            draw = withRandomStream([(roll + 0.5) / total, 0], select);
+        } finally {
+            trace.restore();
+        }
+        assert.equal(draw.result.value, 1, `${fixture.key}/roll${roll}: nonempty eligible set`);
+        assert.equal(player.getVar(IDS.target), expected.target, `${fixture.key}/roll${roll}: exact eligible weighted bucket`);
+        assert.equal(player.getVar(IDS.count), expected.min, `${fixture.key}/roll${roll}: unchanged amount lower endpoint`);
+        assert.deepEqual(trace.events, [{ kind: 'target', value: expected.target }, { kind: 'count', value: expected.min }], `${fixture.key}/roll${roll}: atomic assignment order`);
+        assert.equal(gemCount(player), 0, 'selector must not grant a gem');
+        counts.set(expected.sourceName, counts.get(expected.sourceName) + 1);
+    }
+    if (total === 0) {
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let draw;
+        try {
+            draw = withRandomStream([], select);
+        } finally {
+            trace.restore();
+        }
+        assert.deepEqual(trace.events, [], 'empty set must not write task state');
+        assert.equal(gemCount(player), 0, 'empty set must not grant a gem');
+        assert.equal(draw.result.value, 0, `${fixture.key}: empty eligible set`);
+        assert.equal(player.getVar(IDS.target), prior.target, 'empty set must preserve the prior target');
+        assert.equal(player.getVar(IDS.count), prior.count, 'empty set must preserve the prior count');
+    }
+    for (const row of master.rows) {
+        assert.equal(counts.get(row.sourceName), expectedRowEligibility(row, fixture) ? row.weight : 0, `${fixture.key}/${row.sourceName}: exact eligible mass`);
+    }
+    return { master: master.key, fixture: recordFixture(fixture), totalWeight: total, counts: Object.fromEntries(counts) };
+}
+
+function exactCombatFixture(fixture, combat) {
+    // Fixture only: find ordinary equal combat stats plus Prayer for the exact boundary.
+    for (let level = 1; level <= 99; level++) {
+        for (let prayer = 1; prayer <= 99; prayer++) {
+            const base = 10 * (2 * level + Math.floor(prayer / 2));
+            const actual = Math.floor((base + Math.max(26 * level, 13 * Math.floor(3 * level / 2))) / 40);
+            if (actual === combat) return { ...fixture, combat, level, baseCombatSkills: { [PlayerStat.PRAYER]: prayer } };
+        }
+    }
+    throw new Error(`unreachable combat fixture ${combat}`);
+}
+
+function testProportionalRoll(packedRows) {
+    const distributions = [];
+    for (const master of ORACLE.masters) {
+        const packed = packedRows.get(master.key);
+        for (const kind of ['minimum', 'high']) distributions.push(enumerateProportionalRoll(packed, FIXTURES.get(`${master.key}:${kind}`)));
+    }
+    const turael = distributions.find(row => row.master === 'turael' && row.fixture.baseSlayer === 99);
+    const oracleMaster = ORACLE.masters.find(master => master.key === 'turael');
+    const oracleRows = eligibleRows(oracleMaster, FIXTURES.get('turael:high'));
+    const expectedTotal = oracleRows.reduce((sum, row) => sum + row.weight, 0);
+    assert.equal(turael.totalWeight, expectedTotal, 'high Turael total matches the independent table and eligibility oracle');
+    const percentages = {};
+    for (const name of ['rats', 'bears']) {
+        const row = oracleRows.find(row => row.sourceName === `turael_${name}`);
+        assert(row, `${name}: eligible oracle row required`);
+        const count = turael.counts[row.sourceName];
+        assert.equal(count, row.weight, `${name}: exact bucket mass matches the table`);
+        percentages[name] = (100 * count / turael.totalWeight).toFixed(2);
+        assert.equal(percentages[name], (100 * row.weight / expectedTotal).toFixed(2), `${name}: proportional probability matches the table`);
+    }
+    const additions = [];
+    for (const [masterKey, suffix, donorKey, donorSuffix] of [
+        ['mazchna', 'mossgiants', 'vannaka', 'mossgiants'],
+        ['chaeldar', 'crawlinghands', 'vannaka', 'crawlinghands'],
+        ['duradel', 'bronzedragons', 'chaeldar', 'bronzedragons'],
+        ['duradel', 'turoths', 'chaeldar', 'turoths']
+    ]) {
+        const master = packedRows.get(masterKey);
+        const row = master.rows.find(entry => entry.sourceName === `${masterKey}_${suffix}`);
+        const donor = packedRows.get(donorKey).rows.find(entry => entry.sourceName === `${donorKey}_${donorSuffix}`);
+        assert(row && donor, `${masterKey}_${suffix}: real membership and donor required`);
+        assert.deepEqual([row.target, row.weight, row.min, row.max], [donor.target, donor.weight, donor.min, donor.max], 'UNKNOWN engineering row must retain the disclosed donor values');
+        const high = { ...FIXTURES.get(`${masterKey}:high`), questValues: completedQuestValues() };
+        const cases = [{ ...high, key: `${row.sourceName}_eligible` }];
+        const slayer = ORACLE.slayerReq.get(row.target) ?? 0;
+        if (slayer > 1) {
+            for (const baseSlayer of [slayer - 1, slayer]) cases.push({ ...high, key: `${row.sourceName}_slayer${baseSlayer}`, baseSlayer, currentSlayer: 1 });
+        }
+        const combat = ORACLE.combatReq.get(row.target) ?? 0;
+        if (combat > 3) {
+            for (const level of [combat - 1, combat]) cases.push({ ...exactCombatFixture(high, level), key: `${row.sourceName}_cb${level}` });
+        }
+        if (suffix === 'crawlinghands') {
+            for (const priestperil of [60, 61]) cases.push({ ...high, key: `${row.sourceName}_priestperil${priestperil}`, questValues: { ...high.questValues, priestperil } });
+        }
+        const outcomes = cases.map(fixture => enumerateProportionalRoll(master, fixture));
+        assert(outcomes.some(outcome => outcome.counts[row.sourceName] === row.weight), 'new row needs a real eligible assignment');
+        if (slayer > 1 || combat > 3 || suffix === 'crawlinghands') assert(outcomes.some(outcome => outcome.counts[row.sourceName] === 0), 'gated row needs a real excluded case');
+        additions.push({ row: row.sourceName, donor: donor.sourceName, engineeringLabel: 'UNKNOWN', outcomes });
+    }
+    console.log(`PASS proportional exact enumeration: rats=${percentages.rats}%, bears=${percentages.bears}%; four borrowed rows retain eligibility`);
+    return { distributions, additions, sheetFixture: { totalWeight: turael.totalWeight, ...percentages } };
 }
 
 class GzipJsonlWriter {
@@ -2063,22 +2333,11 @@ function makeCountMap() {
 }
 
 function locateOccurrence(master, fixture, target, count, randomCalls, acceptance) {
-    const positive = master.rows.filter(row => row.weight > 0);
-    const weightCount = positive.length;
-    assert(weightCount > 0, `${master.key}: no positive weights`);
-    const amountCalls = 1;
-    for (let index = 0; index < positive.length; index++) {
-        const row = positive[index];
-        if (row.target !== target || !expectedRowEligibility(row, fixture)) continue;
-        const rowPosition = index + 1;
-        const remainder = randomCalls - amountCalls - rowPosition;
-        if (remainder < 0 || remainder % weightCount !== 0) continue;
-        const retries = remainder / weightCount;
-        assert.equal(acceptance.get(target), true, `${master.key}/${fixture.key}: selected target lacks actual validator acceptance`);
-        assert(count >= row.min && count <= row.max, `${master.key}/${fixture.key}: count ${count} outside selected occurrence ${row.sourceName} [${row.min},${row.max}]`);
-        return { row, retries, rowPosition, weightCount };
-    }
-    throw new Error(`${master.key}/${fixture.key}: cannot reconcile ${randomCalls} RNG calls with selected target ${target}; positiveRows=${weightCount}`);
+    assert.equal(randomCalls, 2, `${master.key}/${fixture.key}: one category draw and one unchanged amount draw required`);
+    const row = master.rows.find(entry => entry.target === target && expectedRowEligibility(entry, fixture) && count >= entry.min && count <= entry.max);
+    assert(row, `${master.key}/${fixture.key}: selected target/count lacks an eligible occurrence`);
+    assert.equal(acceptance.get(target), true, `${master.key}/${fixture.key}: selected target lacks actual validator acceptance`);
+    return { row, retries: 0 };
 }
 
 async function runDistribution(master, fixture, packedRows, acceptance, drawsPerSeed = DRAWS_PER_SEED) {
@@ -2181,8 +2440,8 @@ async function runDistribution(master, fixture, packedRows, acceptance, drawsPer
         outputPath,
         outputSha256: digestFile(outputPath),
         categoryCount: 76,
-        passSuccessProbability: model.passSuccess,
-        positiveRowsPerPass: positiveWeights,
+        eligibleWeight: model.totalWeight,
+        positiveRows: positiveWeights,
         fixture: recordFixture(fixture)
     };
 }
@@ -2192,6 +2451,7 @@ function testCurrentSuite() {
     const packedRows = assertPackedLiveRows();
     const masterSnapshots = testMasterSnapshots();
     const turaelPredicate = testTuraelPredicate();
+    const d1Bears = testD1Bears();
     assert.deepEqual(Object.keys(MASTER_TABLES), MASTER_DEFS.map(master => master.key), 'all five fixed labelled master snapshots are required');
     const ernest = ['mazchna', 'vannaka'].map(testErnestGate);
     const chaeldarRetargets = testChaeldarRetargets();
@@ -2201,6 +2461,8 @@ function testCurrentSuite() {
     const thresholds = testThresholds();
     const currentStatSource = testCurrentSlayerDoesNotGateAssignment();
     const ownerPredicateDispatch = testOwnerPredicateDispatch();
+    const priestperilAccess = testPriestperilAccess();
+    const skippyAccess = testSkippyAccess();
     const fixtureValidatorCaches = new Map();
     const emptyMinimumFailures = [];
     for (const master of ORACLE.masters) {
@@ -2242,7 +2504,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, masterSnapshots, turaelPredicate, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, d1Bears, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, priestperilAccess, skippyAccess, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -2336,10 +2598,25 @@ function testAdversarialFixtures() {
             results.push({ fixture: masterName, child: childName, actualValidatorAcceptance: actual });
         }
         results.push({ fixture: masterName, selector: false, writes: trace.events, prior, opcount: random.result.opcount, randomValues: random.observed });
+        if (masterName === 's1_selector_fixture_all_ineligible') {
+            // Exercise the enumeration's zero-total branch with the same real compiled table.
+            const emptyRows = rows.map(sourceName => {
+                const child = rowForPacked(sourceName).row;
+                return {
+                    sourceName,
+                    target: Number(packedValues(child, 'task')[0]),
+                    weight: Number(packedValues(child, 'weight')[0]),
+                    min: Number(packedValues(child, 'min_amount')[0]),
+                    max: Number(packedValues(child, 'max_amount')[0])
+                };
+            });
+            const enumeration = enumerateProportionalRoll({ ...master, rows: emptyRows }, fixture, masterId);
+            assert.equal(enumeration.totalWeight, 0, 'registered all-ineligible fixture reaches the zero-total enumeration branch');
+            results.push({ fixture: masterName, enumeration });
+        }
     }
 
-    // A test-only two-row compiled table proves that validator rejection consumes
-    // its weight roll and continues through the same pass to the valid row.
+    // A test-only two-row compiled table proves that rejected rows have no bucket.
     const mixedId = rowForPacked('s1_selector_fixture_rejected_then_valid').id;
     const mixed = rowForPacked('s1_selector_fixture_rejected_then_valid');
     const mixedChildIds = packedValues(mixed.row, 'task');
@@ -2351,12 +2628,12 @@ function testAdversarialFixtures() {
     sentinelTask(player, 23, 45);
     const trace = traceWrites(player);
     JavaRandom.setSeed(1);
-    const mixedRun = withRandomStream([0, 0, 0], () => runInt(player, selector, npc, [mixedId]));
+    const mixedRun = withRandomStream([0, 0], () => runInt(player, selector, npc, [mixedId]));
     trace.restore();
-    assert.equal(mixedRun.result.value, 1, 'mixed selector must succeed after a rejected row');
-    assert.equal(player.getVar(IDS.target), acceptedTarget, 'mixed selector must continue within the same pass');
+    assert.equal(mixedRun.result.value, 1, 'mixed selector must succeed with its sole eligible bucket');
+    assert.equal(player.getVar(IDS.target), acceptedTarget, 'mixed selector must exclude the rejected bucket');
     assert.equal(player.getVar(IDS.count), 1, 'mixed fixture inclusive amount lower endpoint mismatch');
-    assert.deepEqual(mixedRun.observed, [0, 0, 0], 'rejected and accepted rows plus amount must use exactly three random opcode calls');
+    assert.deepEqual(mixedRun.observed, [0, 0], 'eligible category and amount must use exactly two random opcode calls');
     assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], 'mixed selector must write target then count');
     assert.equal(gemCount(player), 0, 'selector-only mixed fixture must not grant gem');
     results.push({ fixture: 's1_selector_fixture_rejected_then_valid', rejectedTarget, acceptedTarget, success: true, randomValues: mixedRun.observed, writes: trace.events, opcount: mixedRun.result.opcount });
@@ -2427,75 +2704,6 @@ function findBasePackDirectory(basePack) {
     return basePack;
 }
 
-function testLegacyEmptyRecursion(basePack) {
-    loadRuntime({ scripts: basePack, rows: FIXTURE_PACK_DIR, configs: basePack });
-    const player = makePlayer();
-    const fixture = FIXTURES.get('turael:high');
-    applyFixture(player, fixture);
-    const prior = sentinelTask(player, 321, 654);
-    const npc = makeNpc(IDS.masters.turael);
-    const emptyId = rowForPacked('s1_selector_fixture_all_ineligible').id;
-    const trace = traceWrites(player);
-    JavaRandom.setSeed(1);
-    const state = ScriptRunner.init(getScript('[proc,generate_slayer_task]'), player, npc, [emptyId]);
-    let exec;
-    let thrown = null;
-    try {
-        exec = player.runScript(state, true, true);
-    } catch (error) {
-        thrown = String(error?.stack ?? error);
-    }
-    trace.restore();
-    assert(thrown !== null || exec !== ScriptState.FINISHED, `old empty table unexpectedly finished (ops=${state.opcount})`);
-    assert(state.fp >= 50 || state.opcount >= 500000 || thrown !== null, `old eligible-set recursion did not reach its interpreter failure boundary (fp=${state.fp}, ops=${state.opcount}, error=${thrown})`);
-    assert.deepEqual(trace.events, [], 'old empty recursion wrote task target/count');
-    assert.equal(player.getVar(IDS.target), prior.target);
-    assert.equal(player.getVar(IDS.count), prior.count);
-    assert.equal(gemCount(player), 0);
-    assert.doesNotMatch(dialogueText(player), /we.ll start you off hunting|your new task is to kill/i);
-    return { fixture: 's1_selector_fixture_all_ineligible', exec: exec ?? null, stateExecution: state.execution, framePointer: state.fp, opcount: state.opcount, thrown, prior, writes: trace.events };
-}
-
-function streamForFirstEligible(master, fixture) {
-    const first = master.rows.findIndex(row => expectedRowEligibility(row, fixture));
-    assert(first >= 0, `${master.key}: no independently eligible row for legacy admission proof`);
-    const values = [];
-    for (let index = 0; index < first; index++) {
-        const row = master.rows[index];
-        assert(row.weight > 0, `${row.sourceName}: old packed code cannot safely roll nonpositive table weight`);
-        values.push(1 - Number.EPSILON);
-    }
-    values.push(0, 0);
-    return { first, row: master.rows[first], values };
-}
-
-function testLegacyFirstTeachingAdmission(basePack) {
-    loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
-    const packedRows = assertPackedLiveRows();
-    const master = packedRows.get('chaeldar');
-    const { player, fixture } = underqualifiedChaeldarFixture();
-    const npc = makeNpc(IDS.masters.chaeldar);
-    const forced = streamForFirstEligible(master, fixture);
-    const actualAcceptance = buildActualValidatorCache(player, npc, fixture, [forced.row.target], fixture.key);
-    assert.equal(actualAcceptance.get(forced.row.target), true, 'legacy first-row proof target is not accepted by actual base-code validator');
-    const prior = sentinelTask(player, 0, 0);
-    const trace = traceWrites(player);
-    JavaRandom.setSeed(1);
-    const stream = withRandomStream(forced.values, () => {
-        const dialog = startDialogue(player, npc, '[opnpc1,_slayer_master]');
-        return driveDialogue(player, dialog, [1, 2, 1, 2]);
-    });
-    trace.restore();
-    assert.equal(player.getVar(IDS.target), forced.row.target, 'old first teaching did not assign the first actually eligible low-level row');
-    assert(player.getVar(IDS.count) >= forced.row.min && player.getVar(IDS.count) <= forced.row.max, 'old first teaching count is outside selected row range');
-    assert.equal(gemCount(player), 1, 'old first teaching must grant the gem before its failed admission');
-    assert.match(dialogueText(player), /we.ll start you off hunting/i, 'old first teaching assignment success line missing');
-    assert.deepEqual(trace.events.map(event => event.kind), ['gem', 'target', 'count'], 'legacy first teaching did not expose old gem-before-task order');
-    assert.equal(eligibleMaster(player, npc, IDS.masters.chaeldar), false, 'legacy target must remain under current Chaeldar admission threshold');
-    assert.equal(actualAcceptance.get(player.getVar(IDS.target)), true, 'legacy target not accepted by the actual validator');
-    assert.notEqual(player.getVar(IDS.target), prior.target, 'legacy proof did not replace the initial empty target');
-    return { fixture: recordFixture(fixture), selectedSourceRow: forced.row.sourceName, target: player.getVar(IDS.target), count: player.getVar(IDS.count), forcedRandomValues: stream.observed, writes: trace.events, gemCount: gemCount(player), messages: player.messages };
-}
 function testOldHarpieDiscriminator(basePack) {
     loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
     const target = Number(ORACLE.constants.get('slayer_harpiebugswarm'));
@@ -2603,6 +2811,7 @@ try {
             packedRows: Object.fromEntries([...current.packedRows].map(([name, master]) => [name, { memberOccurrences: master.rows.length }])),
             masterSnapshots: current.masterSnapshots,
             turaelPredicate: current.turaelPredicate,
+            d1Bears: current.d1Bears,
             ernest: current.ernest,
             chaeldarRetargets: current.chaeldarRetargets,
             duradelTables: current.duradelTables,
@@ -2611,6 +2820,8 @@ try {
             thresholds: current.thresholds,
             currentStatSource: current.currentStatSource,
             ownerPredicateDispatch: current.ownerPredicateDispatch,
+            priestperilAccess: current.priestperilAccess,
+            skippyAccess: current.skippyAccess,
             dispatch: current.dispatch,
             emptyMinimumFailures: current.emptyMinimumFailures,
             teaching: current.teaching
@@ -2644,6 +2855,11 @@ try {
         }, null, 2)}\n`);
         metadata.checks.distributions = distributions;
         metadata.checks.binFile = { path: binPath, sha256: digestFile(binPath), binCount: allBins.length };
+    } else if (OPTIONS.mode === 'proportional') {
+        loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
+        const packedRows = assertPackedLiveRows();
+        testMasterSnapshots();
+        metadata.checks.proportional = testProportionalRoll(packedRows);
     } else if (OPTIONS.mode === 'adversarial') {
         loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
         metadata.checks.adversarial = testAdversarialFixtures();
@@ -2656,11 +2872,10 @@ try {
     } else if (OPTIONS.mode === 'replacement') {
         const basePack = OPTIONS.basePack ? findBasePackDirectory(OPTIONS.basePack) : findBasePackDirectory(ACTIVE_PACK_DIR);
         metadata.checks.s8 = testS8DialogueCases(basePack, basePack);
-    } else {
-        const basePack = findBasePackDirectory(OPTIONS.basePack);
-        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(basePack);
-        metadata.checks.oldEmptyRecursion = testLegacyEmptyRecursion(basePack);
-        metadata.checks.oldFirstTeachingAdmission = testLegacyFirstTeachingAdmission(basePack);
+    } else if (OPTIONS.mode === 'priestperil') {
+        loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
+        assertPackedLiveRows();
+        metadata.checks.priestperilAccess = testPriestperilAccess();
     }
     metadata.status = 'PASS';
     metadata.completedAt = new Date().toISOString();

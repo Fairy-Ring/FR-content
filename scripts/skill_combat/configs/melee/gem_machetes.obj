@@ -1,0 +1,131 @@
+[machette_opal]
+name=Opal machete
+desc=A jungle specific slashing device.
+recol1s=23254
+recol1d=29587
+recol2s=17969
+recol2d=12684
+cost=500
+model=obj_machette
+2dxof=-2
+2dyof=-12
+2dzoom=770
+2dyan=88
+2dxan=200
+iop2=Wield
+manwear=obj_machette_manwear,0
+womanwear=obj_machette_manwear,6
+members=yes
+wearpos=righthand
+weight=3lb
+// CANDIDATE: own Old School item page, revision 278950; equipment-data records conflicts.
+param=stabattack,0
+param=slashattack,8
+param=crushattack,-2
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,4
+param=prayerbonus,0
+category=weapon_slash
+// CANDIDATE: same raw item-page speed as the published plain machete (5 ticks).
+param=attackrate,5
+// CANDIDATE: published plain machete and scimitar combat route.
+// human_machette_chop is used for jungle chopping; combat follows the published family.
+param=slashattack_anim,human_sword_slash
+param=stabattack_anim,human_sword_stab
+param=defend_anim,human_sword_def
+param=slash_sound,hacksword_slash
+param=stab_sound,hacksword_stab
+
+[machette_jade]
+name=Jade machete
+desc=A jungle specific slashing device.
+recol1s=23254
+recol1d=22512
+recol2s=17969
+recol2d=12684
+cost=1000
+model=obj_machette
+2dxof=-2
+2dyof=-12
+2dzoom=770
+2dyan=88
+2dxan=200
+iop2=Wield
+manwear=obj_machette_manwear,0
+womanwear=obj_machette_manwear,6
+members=yes
+wearpos=righthand
+weight=3lb
+// CANDIDATE: own Old School item page, revision 5914131; equipment-data records conflicts.
+param=stabattack,0
+param=slashattack,11
+param=crushattack,-2
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,6
+param=prayerbonus,0
+category=weapon_slash
+// CANDIDATE: corrected jade raw speed 6 matches dagger/scimitar (4 ticks); equipment-data records the seven-minute 5.
+param=attackrate,4
+// CANDIDATE: published plain machete and scimitar combat route.
+// human_machette_chop is used for jungle chopping; combat follows the published family.
+param=slashattack_anim,human_sword_slash
+param=stabattack_anim,human_sword_stab
+param=defend_anim,human_sword_def
+param=slash_sound,hacksword_slash
+param=stab_sound,hacksword_stab
+
+[machette_redtopaz]
+name=Red topaz machete
+desc=A jungle specific slashing device.
+recol1s=23254
+recol1d=30765
+recol2s=17969
+recol2d=12684
+cost=2000
+model=obj_machette
+2dxof=-2
+2dyof=-12
+2dzoom=770
+2dyan=88
+2dxan=200
+iop2=Wield
+manwear=obj_machette_manwear,0
+womanwear=obj_machette_manwear,6
+members=yes
+wearpos=righthand
+weight=3lb
+// CANDIDATE: own Old School item page, revision 125785; equipment-data records conflicts.
+param=stabattack,0
+param=slashattack,16
+param=crushattack,-2
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
+param=magicdefence,0
+param=rangedefence,1
+param=strengthbonus,10
+param=prayerbonus,0
+category=weapon_slash
+// CANDIDATE: raw speed matches published rune dagger and scimitar (4 ticks).
+param=attackrate,4
+// CANDIDATE: published plain machete and scimitar combat route.
+// human_machette_chop is used for jungle chopping; combat follows the published family.
+param=slashattack_anim,human_sword_slash
+param=stabattack_anim,human_sword_stab
+param=defend_anim,human_sword_def
+param=slash_sound,hacksword_slash
+param=stab_sound,hacksword_stab

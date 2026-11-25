@@ -1,6 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
 // Triage, not historical verification. Never turn these family inferences into gates.
 function expectation(name) {
   if (/^cert_|^mm_helper$|^newbieshrimp$|^crystalshard_dagger$/.test(name)) {
@@ -48,23 +45,18 @@ function expectation(name) {
   return ['UNKNOWN', 'No gated sibling establishes a requirement in this bounded triage; item-specific research is still needed.'];
 }
 
-export function ungatedWearReport(contentRoot, ObjType, ScriptProvider, ServerTriggerType) {
-  const raw = fs.readFileSync(path.join(contentRoot, 'scripts/_unpack/377/all.obj'), 'utf8');
+export function ungatedWearReport(ObjType, ScriptProvider, ServerTriggerType) {
   const rows = [];
-  // The current category handlers are mm_greegree (location) and runecraft_tiaras
-  // (no-talisman state). Neither imposes a level or quest equipment requirement.
-  for (const match of raw.matchAll(/^\[([^\]]+)\]\n([\s\S]*?)(?=^\[|$\s*(?![\s\S]))/gm)) {
-    const [, name, body] = match;
-    if (!/^iop\d+=(Wear|Wield)$/mi.test(body)) continue;
-    const type = ObjType.getByName(name);
-    if (!type) {
-      rows.push({ name, id: null, displayName: body.match(/^name=(.*)$/m)?.[1] ?? null, expectation: 'UNKNOWN', basis: 'Raw 377 option exists but this debug name has no packed object identity.' });
-      continue;
-    }
+  // Read resolved pack options, not the source file an item happened to occupy.
+  // Category handlers impose location/state conditions, not equipment requirements.
+  for (let id = 0; id < ObjType.count; id++) {
+    const type = ObjType.get(id);
+    if (!type.iop.some(option => /^(Wear|Wield)$/i.test(option ?? ''))) continue;
+    const name = type.debugname;
     if (ScriptProvider.getByTriggerSpecific(ServerTriggerType.OPHELD2, type.id, -1)) continue;
     const categoryHandler = ScriptProvider.getByTriggerSpecific(ServerTriggerType.OPHELD2, -1, type.category);
     const [expected, basis] = expectation(name);
     rows.push({ name, id: type.id, displayName: type.name, expectation: expected, basis, categoryHandler: categoryHandler?.name ?? null });
   }
-  return { kind: 'REPORT_ONLY', scope: 'Every raw revision-377 Wear/Wield option without a packed item-specific opheld2; no current category handler applies a level/quest requirement.', count: rows.length, rows };
+  return { kind: 'REPORT_ONLY', scope: 'Every packed Wear/Wield option without a packed item-specific opheld2; no current category handler applies a level/quest requirement.', count: rows.length, rows };
 }

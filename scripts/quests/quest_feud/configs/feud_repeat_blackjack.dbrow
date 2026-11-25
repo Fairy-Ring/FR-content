@@ -1,0 +1,42 @@
+// VERIFIED period levels, XP, coins and Bandit normal-catch damage: Tip.It Thieving, 27 April 2006.
+// Experience uses tenths of an XP. The Thug's 5-HP normal-pick failure is in the table.
+// KO failure is handled separately; this column is not evidence for KO damage.
+// UNKNOWN success curve and stun duration: retain the existing Guard 50/240, 8-tick convention.
+[pickpocket_feud_bandit56]
+table=pickpocket
+data=npc,feud_arabian_guard1_1
+data=npc,feud_arabian_guard1_2
+data=level,52
+data=experience,840
+data=stun_ticks,8
+data=stun_damage,5
+data=success_chance,50,240
+data=loot,coins,50,50,128
+data=pocket,bandit's pocket
+data=loot_total,128
+
+[pickpocket_feud_bandit41]
+table=pickpocket
+data=npc,feud_arabian_guard2_1
+data=npc,feud_arabian_guard2_2
+data=level,45
+data=experience,650
+data=stun_ticks,8
+data=stun_damage,5
+data=success_chance,50,240
+data=loot,coins,40,40,128
+data=pocket,bandit's pocket
+data=loot_total,128
+
+[pickpocket_feud_menaphite_thug]
+table=pickpocket
+data=npc,feud_egyptian_doorman_1
+data=npc,feud_egyptian_doorman_2
+data=level,65
+data=experience,1375
+data=stun_ticks,8
+data=stun_damage,5
+data=success_chance,50,240
+data=loot,coins,50,50,128
+data=pocket,thug's pocket
+data=loot_total,128

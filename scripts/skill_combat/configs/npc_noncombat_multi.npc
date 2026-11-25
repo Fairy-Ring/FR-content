@@ -1,0 +1,132 @@
+// Engineering compatibility list. Preserve these bases' published combat refusals.
+// Owner: Desert Treasure. Base: troll_block_1.
+[troll_block_1]
+turnspeed=0
+size=2
+turnspeed=0
+vislevel=34
+multivar=fd_icewarrior_dadfree
+multinpc=0,fd_trollblock1
+multinpc=1,fd_troll_dad
+
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
+param=npc_noncombat_multi,yes
+
+// Owner: Desert Treasure. Base: troll_block_2.
+[troll_block_2]
+turnspeed=0
+size=2
+turnspeed=0
+vislevel=34
+multivar=fd_icewarrior_mumfree
+multinpc=0,fd_trollblock2
+multinpc=1,fd_troll_mum
+
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
+param=npc_noncombat_multi,yes
+
+// Owner: party room. Base: vc_partyrat_multi1.
+[vc_partyrat_multi1]
+readyanim=mouse_ready
+walkanim=mouse_walk
+vislevel=1
+multivar=vc_raton_off1
+multinpc=0,vc_party_rat
+param=npc_noncombat_multi,yes
+
+// Owner: party room. Base: vc_partyrat_multi2.
+[vc_partyrat_multi2]
+readyanim=mouse_ready
+walkanim=mouse_walk
+vislevel=1
+multivar=vc_raton_off2
+multinpc=0,vc_party_rat
+param=npc_noncombat_multi,yes
+
+// Owner: party room. Base: vc_partyrat_multi3.
+[vc_partyrat_multi3]
+readyanim=mouse_ready
+walkanim=mouse_walk
+vislevel=1
+multivar=vc_raton_off3
+multinpc=0,vc_party_rat
+param=npc_noncombat_multi,yes
+
+// Owner: party room. Base: vc_partyrat_multi4.
+[vc_partyrat_multi4]
+readyanim=mouse_ready
+walkanim=mouse_walk
+vislevel=1
+multivar=vc_raton_off4
+multinpc=0,vc_party_rat
+param=npc_noncombat_multi,yes
+
+// Owner: party room. Base: vc_partyrat_multi5.
+[vc_partyrat_multi5]
+readyanim=mouse_ready
+walkanim=mouse_walk
+vislevel=1
+multivar=vc_raton_off5
+multinpc=0,vc_party_rat
+param=npc_noncombat_multi,yes
+
+// Owner: party room. Base: vc_partyrat_multi6.
+[vc_partyrat_multi6]
+readyanim=mouse_ready
+walkanim=mouse_walk
+vislevel=1
+multivar=vc_raton_off6
+multinpc=0,vc_party_rat
+param=npc_noncombat_multi,yes
+
+// Owner: Spirits of the Elid. Base: elid_ranging_target_multinpc.
+[elid_ranging_target_multinpc]
+turnspeed=0
+vislevel=1
+multivar=elid_rangingchannel
+multinpc=0,elid_ranging_target
+multinpc=1,elid_ranging_target_done
+param=npc_noncombat_multi,yes
+
+// Owner: Enakhra's Lament. Base: enakh_boneguard_multinpc.
+[enakh_boneguard_multinpc]
+turnspeed=0
+readyanim=enakh_boneguard_ready
+vislevel=13
+multivar=enakh_quest
+multinpc=0,enakh_boneguard
+multinpc=10,enakh_boneguard
+multinpc=20,enakh_boneguard
+multinpc=30,enakh_boneguard
+multinpc=40,enakh_boneguard
+multinpc=50,enakh_bone_pile
+multinpc=60,enakh_bone_pile
+multinpc=65,enakh_bone_pile
+multinpc=70,enakh_bone_pile
+param=npc_noncombat_multi,yes
+
+// Owner: Enakhra's Lament. Base: enakh_dummy_fountain_multinpc.
+[enakh_dummy_fountain_multinpc]
+vislevel=hide
+size=2
+minimap=no
+turnspeed=0
+multivar=enakh_ice_room
+multinpc=0,enakh_dummy_fountain
+param=npc_noncombat_multi,yes
+
+// Owner: Enakhra's Lament. Base: enakh_dummy_furnace_multinpc.
+[enakh_dummy_furnace_multinpc]
+vislevel=hide
+size=2
+minimap=no
+turnspeed=0
+multivar=enakh_smoke_room
+multinpc=0,enakh_dummy_furnace
+param=npc_noncombat_multi,yes

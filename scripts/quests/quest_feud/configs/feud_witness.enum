@@ -1,0 +1,45 @@
+// UNKNOWN FEUD-WITNESS-PERSON-01: visible original Feud/Pollnivneach people.
+// Tip.It (27 April 2006) says "other NPC's" and "fellow citizens"; it does not
+// settle animals or hidden server objects. Excluding both is an engineering
+// choice, not a recovered original rule. NPC_TYPE resolves visible morphs;
+// model-less multi bases and animal forms deliberately retain the default.
+[feud_witness_people]
+inputtype=npc
+outputtype=int
+default=0
+val=enakh_aristarchus,1
+val=feud_ali_m,1
+val=feud_drunken_ali,1
+val=feud_ali_the_barman,1
+val=feud_kebabman,1
+val=feud_marketseller,1
+val=feud_ali_the_discount_camel_seller,1
+val=feud_street_urchin,1
+val=feud_mayor_geom,1
+val=feud_hag,1
+val=feud_snakecharmer,1
+val=feud_bandit_boss_vis,1
+val=feud_arabian_guard1_1,1
+val=feud_arabian_guard1_2,1
+val=feud_arabian_guard2_1,1
+val=feud_arabian_guard2_2,1
+val=feud_bandit_toughguy,1
+val=feud_arabian_guard_coward,1
+val=feud_villager_1_1,1
+val=feud_villager_1_2,1
+val=feud_villager_1_3,1
+val=feud_villager_2_1,1
+val=feud_villager_2_2,1
+val=feud_villager_2_3,1
+val=feud_villager_3_1,1
+val=feud_villager_3_2,1
+val=feud_villager_3_3,1
+val=feud_menap_boss_vis,1
+val=feud_egyptian_minder,1
+val=feud_egyptian_doorman_1,1
+val=feud_egyptian_doorman_2,1
+val=feud_menap_toughguy,1
+val=feud_bjseller,1
+val=feud_dye_lady,1
+val=magic_carpet_seller3,1
+val=magic_carpet_seller4,1

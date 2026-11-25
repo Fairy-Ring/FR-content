@@ -91,10 +91,19 @@ return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
 // "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
 // magic callers (pass spell id or 0). Quest-local ai_queue2 remains secondary.
 [proc,npc_max_dealt](int $maxhit, int $spell)(int)
+if (npc_type = fairy_tanglefoot) return(~ft1_tanglefoot_max_dealt($maxhit, $spell));
+if (~soulbane_rage_npc = true) return(~soulbane_rage_max(min($maxhit, npc_param(max_dealt)), $spell));
+if (npc_type = soulbane_fear_reaper & ~soulbane_fear_attackable = false) return(0);
+if (~soulbane_confusion_npc = true) return(~soulbane_confusion_max(min($maxhit, npc_param(max_dealt))));
+if (~soulbane_hope_npc = true) {
+    if (~soulbane_hope_attackable = false) return(0);
+    return(min($maxhit, npc_param(max_dealt)));
+}
+if (~soulbane_tolna_npc = true & ~soulbane_tolna_attackable = false) return(0);
 if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
     return(0);
 }
-// CANDIDATE slayer.s01-harpie-unlit-damage-cap.
+// CANDIDATE slayer.harpie-shared-damage-cap.
 // Keep the equipment rule local to this NPC type, before damage XP.
 if (npc_type = slayer_harpiebugswarm & inv_total(worn, slayer_buglan_on) = 0) {
     return(0);
@@ -139,8 +148,22 @@ if (randominc($attack_roll) > randominc($defence_roll)) {
 }
 return(false);
 
-// allows any npc with op2 defined to be attacked
+// Preserve the published noncombat multi-base exclusions before visible op2 lookup.
+// NPC_PARAM reads the shared base, unlike player-resolved NPC_TYPE.
+[proc,npc_combat_hasop]()(boolean)
+if (npc_param(npc_noncombat_multi) = ^true) {
+    return(false);
+}
+return(npc_hasop(2));
+
+// Existing op2 truthiness policy, except for the named noncombat multi bases.
 [proc,npc_is_attackable]()(boolean)
+if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
+if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
+if (~soulbane_confusion_npc = true) return(~soulbane_confusion_attackable);
+if (~soulbane_hope_npc = true) return(~soulbane_hope_attackable);
+if (~soulbane_tolna_npc = true) return(~soulbane_tolna_attackable);
+if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
 if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
 // TODO 377: re-enable these!!
@@ -247,13 +270,19 @@ if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded
 
 if (~dt_dessous_attackable = false) return(false);
 if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);
-if (npc_hasop(2) = true) {
+if (~npc_combat_hasop = true) {
     return (true);
 }
 return (false);
 
 // this proc is used for magic (TODO 377: re-enable later!!)
 [proc,npc_is_attackable_opt]()(boolean)
+if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
+if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
+if (~soulbane_confusion_npc = true) return(~soulbane_confusion_attackable);
+if (~soulbane_hope_npc = true) return(~soulbane_hope_attackable);
+if (~soulbane_tolna_npc = true) return(~soulbane_tolna_attackable);
+if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
 if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
 if (npc_type = wormbrain & (~quest_dragon_getting_map_parts = false | inv_total(inv, mappart2) > 0 | %dragon_goblin ! ^quest_dragon_knows_about_goblin)) {
@@ -285,7 +314,7 @@ if(npc_type = gorad & (~obj_gettotal(ogretooth) > 0 | getbit_range(%itwatchtower
 if(npc_type = desertminingcaptain) {
     return (~mercenary_capt_attack(true));
 } 
-if(npc_type = ikov_firewarrior) { // can't attack with magic
+if (~npc_is_attackable_opt_ikov_firewarrior = true) { // can't attack with magic
     ~chatnpc("<p,angry>Your puny weapons do nothing against me human! Come back when you can give me a real fight!");
     return (false);
 }
@@ -341,12 +370,29 @@ if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded
 
 if (~dt_dessous_attackable = false) return(false);
 if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);
-if (npc_hasop(2) = true) {
+if (~npc_combat_hasop = true) {
     return (true);
 }
 mes("You can't attack this npc.");
 return (false);
 
+// Area scans call this only after multiway admits the secondary NPC tile.
+// Dialogue-specific refusal branches are absent because their maps are single-combat.
+[proc,npc_is_attackable_opt_quiet]()(boolean)
+if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
+if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
+if (~soulbane_confusion_npc = true) return(~soulbane_confusion_attackable);
+if (~soulbane_hope_npc = true) return(~soulbane_hope_attackable);
+if (~soulbane_tolna_npc = true) return(~soulbane_tolna_attackable);
+if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
+if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
+if (~npc_is_attackable_opt_ikov_firewarrior = true) return(false);
+if (~npc_combat_hasop = true) return(true);
+return(false);
+
+[proc,npc_is_attackable_opt_ikov_firewarrior]()(boolean)
+if (npc_type = ikov_firewarrior) return(true);
+return(false);
 
 [proc,npc_retal_ready]()(boolean)
 if ((add(%npc_action_delay, 8) < map_clock) | (npc_getmode ! applayer2 & npc_getmode ! opplayer2 & npc_getmode ! playerescape)) {
@@ -387,7 +433,7 @@ error("style of <tostring($style)> not defined in switch for npc_combat_defenceb
 
 //  this should be strong queued. Some damage is queued, some isnt
 [queue,combat_damage_player](int $damage)
-if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc_finduid(%aggressive_npc) = true & npc_hasop(2) = true & %npc_attacking_uid = uid & $damage > 0 & stat(hitpoints) > 0) {
+if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc_finduid(%aggressive_npc) = true & ~npc_combat_hasop = true & %npc_attacking_uid = uid & $damage > 0 & stat(hitpoints) > 0) {
     // https://oldschool.runescape.wiki/w/Update:Clue_Scroll_Step_Counter
     // - "Recoil damage will now always target the entity that caused the initial damage, rather than the most recent entity to deal damage."
     def_int $recoil_damage = add(scale(10, 100, $damage), 1);

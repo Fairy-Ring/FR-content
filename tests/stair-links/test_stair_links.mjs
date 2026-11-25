@@ -28,7 +28,30 @@ for (const file of ['stairs.rs2', 'ladders.rs2']) {
     }
   }
 }
+const sharedHandlerCount = handlers.length;
+const feudStairNames = new Set([
+  'feud_outsidestairs_base', 'feud_outsidestairs_top',
+  'feud_insidestairs_base', 'feud_insidestairs_top'
+]);
+const feudTravel = readFileSync(path.join(content, 'scripts/quests/quest_feud/scripts/feud_travel.rs2'), 'utf8');
+const feudHeaders = [...feudTravel.matchAll(/^\[(oploc[1-5]),([^\]]+)\].*$/gm)];
+for (const [index, header] of feudHeaders.entries()) {
+  const block = feudTravel.slice(header.index + header[0].length, feudHeaders[index + 1]?.index ?? feudTravel.length);
+  if (feudStairNames.has(header[2]) && block.includes('switch_coord') && block.includes('@unhandled_stairs')) {
+    handlers.push({ name: header[2], trigger: header[1] });
+  }
+}
+assert.equal(handlers.length - sharedHandlerCount, feudStairNames.size, 'all four newly covered Feud stairs have quest travel handlers');
+assert.deepEqual(handlers.slice(sharedHandlerCount).map(handler => handler.name).sort(), [...feudStairNames].sort(),
+  'each newly covered Feud stair handler is accounted exactly once');
 assert.equal(handlers.length, 134, 'every coordinate-dispatched fallback handler is inventoried');
+// The four Feud fallbacks did not move players in the starting build. Their new
+// map-paired routes are not inherited gameplay; all unrelated parity stays below.
+assert.equal(sharedHandlerCount, handlers.length - feudStairNames.size, 'the unrelated shared handlers remain separately accounted');
+assert.deepEqual(manifest.filter(entry => feudStairNames.has(entry.name)).map(entry => entry.name).sort(),
+  [...feudStairNames].sort(), 'the four newly covered Feud placements are each enumerated once');
+assert.ok(manifest.filter(entry => feudStairNames.has(entry.name)).every(entry => entry.status === 'new'),
+  'new Feud routes cannot be classified as inherited parity');
 const native = [];
 const floors = new Set();
 const locs = [];

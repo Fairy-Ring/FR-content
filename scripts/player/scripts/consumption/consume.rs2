@@ -119,6 +119,7 @@ switch_obj(last_item) {
 
 // all normal foods use %eat_delay
 [label,player_consume_item](label $consume_effect, int $eat_delay, int $skill_delay)
+if (~champions_inventory_check = false) return;
 def_obj $obj = inv_getobj(inv, last_slot);
 
 if (~duel_arena_consume_check($obj) = false) {
@@ -136,6 +137,7 @@ if ($skill_delay ! null) {
     %action_delay = calc(%action_delay + $skill_delay);
 }
 
+~soulbane_hope_food($obj);
 // consume effect
 jump($consume_effect);
 

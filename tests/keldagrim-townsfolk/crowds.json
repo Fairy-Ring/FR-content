@@ -1,0 +1,624 @@
+{
+  "slice": "crowds",
+  "scenarios": [
+    {
+      "npc": "dwarf_city_black_guard1",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard2",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard3",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard4",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_berserker1",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-berserker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_berserker2",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-berserker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_berserker3",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-berserker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_gnome_emissary",
+      "placedNpc": "dwarf_city_gnome_emissary_multi",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Don't bother us, can't you see we're busy here?"],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Don't bother us, can't you see we're busy here?"], "player": [], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-gnome-emissary-transcript"]
+    },
+    {
+      "npc": "dwarf_city_gnome_male_emissary",
+      "placedNpc": "dwarf_city_gnome_male_emissary_multi",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Why do you want to know?", "It's not a human city either, but you're here all the same.", "Anyway, we're here to do some business with one of the companies of the Consortium. Getting supplies for our people back at, er, the Grand Tree.", "Oh, nothing special, nothing special I assure you... it's just that the dwarves have everything in large supplies."],
+        "player": ["Hello there! What're you doing in the city?", "I was just wondering, I thought this was a dwarven city, not a gnome city.", "Fair point.", "What kind of special supplies do the dwarves have that you need then?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Why do you want to know?", "It's not a human city either, but you're here all the same.", "Anyway, we're here to do some business with one of the companies of the Consortium. Getting supplies for our people back at, er, the Grand Tree.", "Oh, nothing special, nothing special I assure you... it's just that the dwarves have everything in large supplies."], "player": ["Hello there! What're you doing in the city?", "I was just wondering, I thought this was a dwarven city, not a gnome city.", "Fair point.", "What kind of special supplies do the dwarves have that you need then?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-gnome-traveller-transcript"]
+    },
+    {
+      "npc": "dwarf_city_gnome_female_emissary",
+      "placedNpc": "dwarf_city_gnome_female_emissary_multi",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Miss gnome to you, thank you.", "Fair? Hardly...", "We are the companions of the leader of our expedition. We have come here to bargain for much needed supplies for our people.", "Ehm... from Tree Gnome Village.", "The Grand Tree!", "Oh yes, sorry, that's what I meant to say."],
+        "player": ["Hello there mister gnome!", "Oh, sorry about that... So what are you doing in fair Keldagrim?", "Oh yes, where are you from?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Miss gnome to you, thank you.", "Fair? Hardly...", "We are the companions of the leader of our expedition. We have come here to bargain for much needed supplies for our people.", "Ehm... from Tree Gnome Village.", "The Grand Tree!", "Oh yes, sorry, that's what I meant to say."], "player": ["Hello there mister gnome!", "Oh, sorry about that... So what are you doing in fair Keldagrim?", "Oh yes, where are you from?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-gnome-traveller-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_guard",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Don't bother me, can't you see I'm busy?", "You can go in. The Consortium, in their infinite wisdom, has decided to open up the factory to all and sundry.", "We've built a new blast furnace and always have a shortage of people to work on it.", "Just don't go causing any trouble, I still run this factory!"],
+        "player": ["No, I can't... can I go into the factory?", "How come?", "I'll have a look, thanks."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Don't bother me, can't you see I'm busy?", "You can go in. The Consortium, in their infinite wisdom, has decided to open up the factory to all and sundry.", "We've built a new blast furnace and always have a shortage of people to work on it.", "Just don't go causing any trouble, I still run this factory!"], "player": ["No, I can't... can I go into the factory?", "How come?", "I'll have a look, thanks."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-manager-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker1",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Do I look like a guide to you?", "Alright, just head down the stairs, it's easy to find."],
+        "player": ["I'm sorry, I'm looking for the blast furnace?", "No, you look like a hard-working dwarf, but can you please tell me where the blast furnace is?", "Thanks."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Do I look like a guide to you?", "Alright, just head down the stairs, it's easy to find."], "player": ["I'm sorry, I'm looking for the blast furnace?", "No, you look like a hard-working dwarf, but can you please tell me where the blast furnace is?", "Thanks."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker2",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Don't I look okay?", "Very funny, human."],
+        "player": ["Are you okay?", "If you were any shorter you wouldn't exist."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Don't I look okay?", "Very funny, human."], "player": ["Are you okay?", "If you were any shorter you wouldn't exist."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker3",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Working of course, can't you see that?", "Refining the ore that is being brought into the factory, of course.", "It means you should stop asking so many questions and get back to work!"],
+        "player": ["What are you dwarves doing in this factory?", "But working on what?", "And what does that mean?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Working of course, can't you see that?", "Refining the ore that is being brought into the factory, of course.", "It means you should stop asking so many questions and get back to work!"], "player": ["What are you dwarves doing in this factory?", "But working on what?", "And what does that mean?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker4",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["The Consortium does and that's all you need to know.", "Oh yes, all the major companies own this plant. It's too vital to be in the hands of one company alone.", "I tire of these questions. Let me get back to work!"],
+        "player": ["Who owns this factory?", "But what company? I thought there were all these different companies?", "And what exactly are you doing here?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["The Consortium does and that's all you need to know.", "Oh yes, all the major companies own this plant. It's too vital to be in the hands of one company alone.", "I tire of these questions. Let me get back to work!"], "player": ["Who owns this factory?", "But what company? I thought there were all these different companies?", "And what exactly are you doing here?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_assistant",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["And where do you come from, traveller?", "That I could have guessed.", "We've been having more human visitors in the city recently, there is another one over there. Perhaps you'll want to talk to her.", "Ssshhhh...", "There is a lot of knowledge stored in this library, you know.", "What can I help you with?", "Looking for a book? A manuscript? Knowledge?", "I'll leave you to your browsing, then."],
+        "player": ["From... out of town.", "Oh, I'm sure.", "Help? What kind of help do you mean?", "Oh, nothing in specific really."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["And where do you come from, traveller?", "That I could have guessed.", "We've been having more human visitors in the city recently, there is another one over there. Perhaps you'll want to talk to her."], "player": ["From... out of town."], "menus": [], "random": [0.1]},
+        {"choices": [], "npc": ["Ssshhhh..."], "player": [], "menus": [], "random": [0.35]},
+        {"choices": [], "npc": ["There is a lot of knowledge stored in this library, you know."], "player": ["Oh, I'm sure."], "menus": [], "random": [0.6]},
+        {"choices": [], "npc": ["What can I help you with?", "Looking for a book? A manuscript? Knowledge?", "I'll leave you to your browsing, then."], "player": ["Help? What kind of help do you mean?", "Oh, nothing in specific really."], "menus": [], "random": [0.85]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-assistant-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_customer",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {
+        "npc": ["Ssshhh, don't talk...", "Ssshhhh! Can't you read the sign?", "Don't be a cheeky human!"],
+        "player": ["Hello, can you help me?", "But I just want to ask you something.", "What sign??", "Ssshhhh."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Ssshhh, don't talk...", "Ssshhhh! Can't you read the sign?", "Don't be a cheeky human!"], "player": ["Hello, can you help me?", "But I just want to ask you something.", "What sign??", "Ssshhhh."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-customer-dwarf-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_customer_human",
+      "state": "giantdwarf-1-male",
+      "vars": {"giantdwarf_quest": 1},
+      "gender": 0,
+      "allowed": {
+        "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each his own, I suppose."],
+        "player": ["Indeed!", "I think it's mostly fame and riches I'm after."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each his own, I suppose."], "player": ["Indeed!", "I think it's mostly fame and riches I'm after."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-customer-human-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_customer_human",
+      "state": "giantdwarf-1-female",
+      "vars": {"giantdwarf_quest": 1},
+      "gender": 1,
+      "allowed": {
+        "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each her own, I suppose."],
+        "player": ["Indeed!", "I think it's mostly fame and riches I'm after."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each her own, I suppose."], "player": ["Indeed!", "I think it's mostly fame and riches I'm after."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-customer-human-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_customer_human",
+      "state": "giantdwarf-2-male",
+      "vars": {"giantdwarf_quest": 2},
+      "gender": 0,
+      "allowed": {
+        "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each his own, I suppose."],
+        "player": ["Indeed!", "I think it's mostly fame and riches I'm after."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each his own, I suppose."], "player": ["Indeed!", "I think it's mostly fame and riches I'm after."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-customer-human-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_customer_human",
+      "state": "giantdwarf-2-female",
+      "vars": {"giantdwarf_quest": 2},
+      "gender": 1,
+      "allowed": {
+        "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each her own, I suppose."],
+        "player": ["Indeed!", "I think it's mostly fame and riches I'm after."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Oh, that's nice, another human visitor to Keldagrim!", "And what brings you to this city? Come to seek knowledge as well?", "To each her own, I suppose."], "player": ["Indeed!", "I think it's mostly fame and riches I'm after."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-customer-human-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard1",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard2",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard3",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_black_guard4",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-black-guard-transcript"]
+    },
+    {
+      "npc": "dwarf_city_berserker1",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-berserker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_berserker2",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-berserker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_berserker3",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Obey the law!", "Stay out of trouble!", "Out of the way, human!", "I'm keeping an eye on you!"],
+        "player": [],
+        "options": [],
+        "game": ["The guard ignores you."]
+      },
+      "branches": [
+        {"choices": [], "npc": ["Obey the law!"], "player": [], "menus": [], "random": [0.05]},
+        {"choices": [], "npc": ["Stay out of trouble!"], "player": [], "menus": [], "random": [0.25]},
+        {"choices": [], "npc": ["Out of the way, human!"], "player": [], "menus": [], "random": [0.45]},
+        {"choices": [], "npc": ["I'm keeping an eye on you!"], "player": [], "menus": [], "random": [0.65]},
+        {"choices": [], "npc": [], "player": [], "menus": [], "random": [0.85], "game": ["The guard ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-berserker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_gnome_emissary",
+      "placedNpc": "dwarf_city_gnome_emissary_multi",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Don't bother us, can't you see we're busy here?"],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Don't bother us, can't you see we're busy here?"], "player": [], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-gnome-emissary-transcript"]
+    },
+    {
+      "npc": "dwarf_city_gnome_male_emissary",
+      "placedNpc": "dwarf_city_gnome_male_emissary_multi",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Why do you want to know?", "It's not a human city either, but you're here all the same.", "Anyway, we're here to do some business with one of the companies of the Consortium. Getting supplies for our people back at, er, the Grand Tree.", "Oh, nothing special, nothing special I assure you... it's just that the dwarves have everything in large supplies."],
+        "player": ["Hello there! What're you doing in the city?", "I was just wondering, I thought this was a dwarven city, not a gnome city.", "Fair point.", "What kind of special supplies do the dwarves have that you need then?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Why do you want to know?", "It's not a human city either, but you're here all the same.", "Anyway, we're here to do some business with one of the companies of the Consortium. Getting supplies for our people back at, er, the Grand Tree.", "Oh, nothing special, nothing special I assure you... it's just that the dwarves have everything in large supplies."], "player": ["Hello there! What're you doing in the city?", "I was just wondering, I thought this was a dwarven city, not a gnome city.", "Fair point.", "What kind of special supplies do the dwarves have that you need then?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-gnome-traveller-transcript"]
+    },
+    {
+      "npc": "dwarf_city_gnome_female_emissary",
+      "placedNpc": "dwarf_city_gnome_female_emissary_multi",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Miss gnome to you, thank you.", "Fair? Hardly...", "We are the companions of the leader of our expedition. We have come here to bargain for much needed supplies for our people.", "Ehm... from Tree Gnome Village.", "The Grand Tree!", "Oh yes, sorry, that's what I meant to say."],
+        "player": ["Hello there mister gnome!", "Oh, sorry about that... So what are you doing in fair Keldagrim?", "Oh yes, where are you from?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Miss gnome to you, thank you.", "Fair? Hardly...", "We are the companions of the leader of our expedition. We have come here to bargain for much needed supplies for our people.", "Ehm... from Tree Gnome Village.", "The Grand Tree!", "Oh yes, sorry, that's what I meant to say."], "player": ["Hello there mister gnome!", "Oh, sorry about that... So what are you doing in fair Keldagrim?", "Oh yes, where are you from?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-gnome-traveller-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_guard",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Don't bother me, can't you see I'm busy?", "You can go in. The Consortium, in their infinite wisdom, has decided to open up the factory to all and sundry.", "We've built a new blast furnace and always have a shortage of people to work on it.", "Just don't go causing any trouble, I still run this factory!"],
+        "player": ["No, I can't... can I go into the factory?", "How come?", "I'll have a look, thanks."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Don't bother me, can't you see I'm busy?", "You can go in. The Consortium, in their infinite wisdom, has decided to open up the factory to all and sundry.", "We've built a new blast furnace and always have a shortage of people to work on it.", "Just don't go causing any trouble, I still run this factory!"], "player": ["No, I can't... can I go into the factory?", "How come?", "I'll have a look, thanks."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-manager-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker1",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Do I look like a guide to you?", "Alright, just head down the stairs, it's easy to find."],
+        "player": ["I'm sorry, I'm looking for the blast furnace?", "No, you look like a hard-working dwarf, but can you please tell me where the blast furnace is?", "Thanks."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Do I look like a guide to you?", "Alright, just head down the stairs, it's easy to find."], "player": ["I'm sorry, I'm looking for the blast furnace?", "No, you look like a hard-working dwarf, but can you please tell me where the blast furnace is?", "Thanks."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker2",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Don't I look okay?", "Very funny, human."],
+        "player": ["Are you okay?", "If you were any shorter you wouldn't exist."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Don't I look okay?", "Very funny, human."], "player": ["Are you okay?", "If you were any shorter you wouldn't exist."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker3",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Working of course, can't you see that?", "Refining the ore that is being brought into the factory, of course.", "It means you should stop asking so many questions and get back to work!"],
+        "player": ["What are you dwarves doing in this factory?", "But working on what?", "And what does that mean?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Working of course, can't you see that?", "Refining the ore that is being brought into the factory, of course.", "It means you should stop asking so many questions and get back to work!"], "player": ["What are you dwarves doing in this factory?", "But working on what?", "And what does that mean?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_factory_worker4",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["The Consortium does and that's all you need to know.", "Oh yes, all the major companies own this plant. It's too vital to be in the hands of one company alone.", "I tire of these questions. Let me get back to work!"],
+        "player": ["Who owns this factory?", "But what company? I thought there were all these different companies?", "And what exactly are you doing here?"],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["The Consortium does and that's all you need to know.", "Oh yes, all the major companies own this plant. It's too vital to be in the hands of one company alone.", "I tire of these questions. Let me get back to work!"], "player": ["Who owns this factory?", "But what company? I thought there were all these different companies?", "And what exactly are you doing here?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-factory-worker-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_assistant",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["And where do you come from, traveller?", "That I could have guessed.", "We've been having more human visitors in the city recently, there is another one over there. Perhaps you'll want to talk to her.", "Ssshhhh...", "There is a lot of knowledge stored in this library, you know.", "What can I help you with?", "Looking for a book? A manuscript? Knowledge?", "I'll leave you to your browsing, then."],
+        "player": ["From... out of town.", "Oh, I'm sure.", "Help? What kind of help do you mean?", "Oh, nothing in specific really."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["And where do you come from, traveller?", "That I could have guessed.", "We've been having more human visitors in the city recently, there is another one over there. Perhaps you'll want to talk to her."], "player": ["From... out of town."], "menus": [], "random": [0.1]},
+        {"choices": [], "npc": ["Ssshhhh..."], "player": [], "menus": [], "random": [0.35]},
+        {"choices": [], "npc": ["There is a lot of knowledge stored in this library, you know."], "player": ["Oh, I'm sure."], "menus": [], "random": [0.6]},
+        {"choices": [], "npc": ["What can I help you with?", "Looking for a book? A manuscript? Knowledge?", "I'll leave you to your browsing, then."], "player": ["Help? What kind of help do you mean?", "Oh, nothing in specific really."], "menus": [], "random": [0.85]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-assistant-transcript"]
+    },
+    {
+      "npc": "dwarf_city_library_customer",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {
+        "npc": ["Ssshhh, don't talk...", "Ssshhhh! Can't you read the sign?", "Don't be a cheeky human!"],
+        "player": ["Hello, can you help me?", "But I just want to ask you something.", "What sign??", "Ssshhhh."],
+        "options": []
+      },
+      "branches": [
+        {"choices": [], "npc": ["Ssshhh, don't talk...", "Ssshhhh! Can't you read the sign?", "Don't be a cheeky human!"], "player": ["Hello, can you help me?", "But I just want to ask you something.", "What sign??", "Ssshhhh."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-crowds-customer-dwarf-transcript"]
+    }
+  ],
+  "deferred": []
+}

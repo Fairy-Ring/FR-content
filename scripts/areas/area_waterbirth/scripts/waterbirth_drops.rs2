@@ -1,0 +1,173 @@
+// CANDIDATE Old School Waterbirth tables. Period Sal's corroborates armour materials.
+// Later ensouled heads, brimstone keys, potato-cactus/snape-grass seeds excluded.
+// Pure essence was released before 377; use its original certificate for the noted drop.
+[ai_queue3,dungeon_dagganoth_mainroom] @wbmon_melee_death;
+[ai_queue3,dungeon_dagganoth_mainroom_deeper] @wbmon_melee_death;
+[ai_queue3,dungeon_dagganoth_lighter] @wbmon_ranged_death;
+[ai_queue3,dungeon_dagganoth_lighter_deeper] @wbmon_ranged_death;
+[ai_queue3,dungeon_dagganoth_magic_monster] @wbmon_magic_death;
+[ai_queue3,dungeon_dagganoth_magic_monster_deeper] @wbmon_magic_death;
+
+[label,wbmon_melee_death]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+~trail_mediumcluedrop(128, npc_coord);
+def_namedobj $item;
+def_int $count;
+$item, $count = ~wbmon_melee_loot;
+if ($item ! null) obj_add(npc_coord, $item, $count, ^lootdrop_duration);
+
+[label,wbmon_ranged_death]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+~trail_mediumcluedrop(128, npc_coord);
+def_namedobj $item;
+def_int $count;
+$item, $count = ~wbmon_ranged_loot;
+if ($item ! null) obj_add(npc_coord, $item, $count, ^lootdrop_duration);
+
+[label,wbmon_magic_death]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+~trail_mediumcluedrop(128, npc_coord);
+def_namedobj $item;
+def_int $count;
+$item, $count = ~wbmon_magic_loot;
+if ($item ! null) obj_add(npc_coord, $item, $count, ^lootdrop_duration);
+
+[proc,wbmon_melee_loot]()(namedobj, int)
+def_int $roll = random(128);
+if ($roll < 2) return(vikinggloves, 1);
+else if ($roll < 4) return(viking_top_darkbrown, 1);
+else if ($roll < 7) return(viking_cloak_brown, 1);
+else if ($roll < 17) return(steel_axe, 1);
+else if ($roll < 27) return(mithril_javelin, 3);
+else if ($roll < 32) return(steel_arrow, 15);
+else if ($roll < 35) return(viking_shield, 1);
+else if ($roll < 38) return(viking_helmet, 1);
+else if ($roll < 40) return(viking_sword, 1);
+else if ($roll < 50) return(waterrune, 10);
+else if ($roll < 60) return(naturerune, add(random(10), 1));
+else if ($roll < 62) return(bloodrune, add(random(10), 1));
+else if ($roll < 72) return(lawrune, add(random(10), 1));
+else if ($roll < 76) return(~randomherb);
+else if ($roll < 77) return(~wbmon_rare_seed);
+else if ($roll < 81) return(~wbmon_talisman);
+else if ($roll < 91) return(dagganoth_hide, 1);
+else if ($roll < 101) return(tinderbox, 1);
+else if ($roll < 106) return(raw_lobster, 1);
+else if ($roll < 113) return(smalloysterpearls, 1);
+else if ($roll < 115) return(coins, 3);
+else if ($roll < 117) return(coins, 26);
+else if ($roll < 119) return(coins, 38);
+else if ($roll < 121) return(coins, 47);
+else if ($roll < 123) return(coins, 81);
+else if ($roll < 125) return(keg_of_beer, 1);
+else if ($roll < 126) return(~wbmon_gem);
+// Two slots, each helm 1/32: 1/2048 per helm, remaining outcomes empty.
+return(~wbmon_rare_helm(32));
+
+[proc,wbmon_ranged_loot]()(namedobj, int)
+def_int $roll = random(128);
+if ($roll < 2) return(vikinggloves, 1);
+else if ($roll < 4) return(viking_top_darkbrown, 1);
+else if ($roll < 6) return(viking_cloak_brown, 1);
+else if ($roll < 8) return(mithril_javelin, add(random(3), 1));
+else if ($roll < 18) return(steel_arrow, add(random(30), 1));
+else if ($roll < 20) return(dagganoth_range_feet, 1);
+else if ($roll < 22) return(dagganoth_range_gloves, 1);
+else if ($roll < 25) return(viking_shield, 1);
+else if ($roll < 28) return(viking_helmet, 1);
+else if ($roll < 31) return(viking_sword, 1);
+else if ($roll < 39) return(~randomherb);
+else if ($roll < 40) return(~wbmon_rare_seed);
+else if ($roll < 45) return(~wbmon_talisman);
+else if ($roll < 50) return(casket, 1);
+else if ($roll < 55) return(bigoysterpearls, 1);
+else if ($roll < 65) return(opal_bolttips, add(random(20), 1));
+else if ($roll < 95) return(seaweed, add(random(10), 1));
+else if ($roll < 103) return(edible_seaweed, add(random(5), 1));
+else if ($roll < 108) return(raw_bass, 1);
+else if ($roll < 118) return(coins, add(random(140), 1));
+else if ($roll < 120) return(dagganoth_range_head_part, 1);
+else if ($roll < 122) return(dagganoth_range_body_part, 1);
+else if ($roll < 124) return(dagganoth_range_leg_part, 1);
+else if ($roll < 126) return(keg_of_beer, 1);
+else if ($roll < 127) return(~wbmon_gem);
+// One slot, each helm 1/16: 1/2048 per helm.
+return(~wbmon_rare_helm(16));
+
+[proc,wbmon_magic_loot]()(namedobj, int)
+def_int $roll = random(128);
+if ($roll < 2) return(dagganoth_mage_gloves, 1);
+else if ($roll < 4) return(dagganoth_mage_feet, 1);
+else if ($roll < 14) return(airrune, add(random(10), 1));
+else if ($roll < 24) return(mindrune, add(random(10), 1));
+else if ($roll < 34) return(waterrune, add(random(10), 1));
+else if ($roll < 44) return(earthrune, add(random(10), 1));
+else if ($roll < 54) return(chaosrune, add(random(10), 1));
+else if ($roll < 64) return(deathrune, add(random(10), 1));
+else if ($roll < 74) return(bloodrune, add(random(5), 1));
+else if ($roll < 84) return(steel_arrow, add(random(10), 1));
+else if ($roll < 94) return(~randomherb);
+else if ($roll < 95) return(~wbmon_rare_seed);
+else if ($roll < 103) return(~wbmon_talisman);
+else if ($roll < 113) return(cert_blankrune_high, 9);
+else if ($roll < 115) return(dagganoth_mage_leg_part, 1);
+else if ($roll < 117) return(dagganoth_mage_body_part, 1);
+else if ($roll < 119) return(dagganoth_mage_head_part, 1);
+else if ($roll < 121) return(raw_herring, add(random(2), 1));
+else if ($roll < 124) return(raw_mackerel, add(random(2), 1));
+else if ($roll < 126) return(raw_tuna, add(random(2), 1));
+else if ($roll < 127) return(~wbmon_gem);
+return(null, 0);
+
+[proc,wbmon_rare_helm](int $size)(namedobj, int)
+switch_int (random($size)) {
+    case 0 : return(viking_helmet_crush, 1);
+    case 1 : return(viking_helmet_range, 1);
+    case 2 : return(viking_helmet_magic, 1);
+    case 3 : return(viking_helmet_slash, 1);
+}
+return(null, 0);
+
+// CANDIDATE modern rare-seed weights after removing the two later seeds (90/1090).
+// All twelve surviving seeds exist in the 377 cache; normalize the surviving 1000.
+[proc,wbmon_rare_seed]()(namedobj, int)
+def_int $roll = random(1000);
+if ($roll < 216) return(toadflax_seed, 1);
+else if ($roll < 364) return(irit_seed, 1);
+else if ($roll < 507) return(belladonna_seed, 1);
+else if ($roll < 610) return(poisonivy_bush_seed, 1);
+else if ($roll < 711) return(avantoe_seed, 1);
+else if ($roll < 807) return(cactus_seed, 1);
+else if ($roll < 876) return(kwuarm_seed, 1);
+else if ($roll < 922) return(snapdragon_seed, 1);
+else if ($roll < 954) return(cadantine_seed, 1);
+else if ($roll < 977) return(lantadyme_seed, 1);
+else if ($roll < 991) return(dwarf_weed_seed, 1);
+return(torstol_seed, 1);
+
+// CANDIDATE modern talisman subtable (all nine items exist in 377).
+[proc,wbmon_talisman]()(namedobj, int)
+def_int $roll = random(70);
+if ($roll < 10) return(air_talisman, 1);
+else if ($roll < 20) return(body_talisman, 1);
+else if ($roll < 30) return(earth_talisman, 1);
+else if ($roll < 40) return(fire_talisman, 1);
+else if ($roll < 50) return(mind_talisman, 1);
+else if ($roll < 60) return(water_talisman, 1);
+else if ($roll < 64) return(cosmic_talisman, 1);
+else if ($roll < 67) return(chaos_talisman, 1);
+return(nature_talisman, 1);
+
+// Reuse native gem/wealth/quest handling, with the cited Waterbirth nature variant.
+[proc,wbmon_gem]()(namedobj, int)
+def_namedobj $item;
+def_int $count;
+$item, $count = ~randomjewel;
+if ($item = chaos_talisman) $item = nature_talisman;
+return($item, $count);

@@ -73,16 +73,20 @@ async function run() {
 
   for (const [kind, names] of Object.entries({
     npc: ['regicide_darkelf', 'regicide_darkelf2', 'viking_guard', 'viking_guard2',
-      'farming_market_guard', 'mourning_guard_range'],
+      'farming_market_guard', 'mourning_guard_melee', 'mourning_guard_melee2',
+      'mourning_guard_range', 'mourning_guard_range2'],
     obj: ['bones', 'coins', 'dragonhide_body', 'dragonhide_chaps', 'mithril_spear',
       'mithril_kiteshield', 'adamant_full_helm', 'rune_dagger', 'waterrune', 'naturerune',
       'lawrune', 'firerune', 'unidentified_guam', 'bass', 'shark', 'adamantite_ore',
       'uncut_sapphire', 'trail_clue_hard_map001', 'trail_clue_medium_map001',
+      'elf_crystal_tiny', 'mourning_teleport_crystal_1', 'lobster', 'ring_of_wealth',
+      'irit_seed', 'kwuarm_seed', 'avantoe_seed', 'toadflax_seed', 'cadantine_seed', 'dwarf_weed_seed', 'snapdragon_seed',
+      'rune_spear', 'dragon_spear', 'dragonshield_a', 'rune_javelin',
       'iron_warhammer', 'bronze_warhammer', 'steel_warhammer', 'black_warhammer',
       'viking_sword', 'viking_shield', 'viking_helmet', 'keg_of_beer', 'cake', 'iron_ore',
       'copper_ore', 'bucket_water', 'fur', 'tin_ore', 'raw_sardine', 'beer', 'ring_mould'],
     category: ['elf_warrior'],
-    varp: ['viking'],
+    varp: ['viking', 'legendsquest'],
     varn: ['npc_aggressive_player'],
     seq: ['human_bow', 'human_spear_spike'],
     spotanim: ['sp_attack_glow_arrow_launch', 'sp_attack_glow_arrow_travel'],
@@ -97,6 +101,11 @@ async function run() {
     return value;
   };
   const invId = configs.InvType.getId('inv');
+  const wornId = configs.InvType.getId('worn');
+  const legendsVarp = id('varp', 'legendsquest');
+  const legendsComplete = readConstant('scripts/general/configs/quest.constant', 'legends_complete');
+  assert.equal(readConstant('scripts/quests/quest_regicide/configs/quest_regicide.constant',
+    'regicide_lletya_crystal_denominator'), 5, 'recorded-only LLETYA-CRYSTAL-01');
   const vikingVarp = id('varp', 'viking');
   const aggressiveVar = id('varn', 'npc_aggressive_player');
   const elfCategory = id('category', 'elf_warrior');
@@ -163,11 +172,15 @@ async function run() {
     checkedTriggerKeys.add(`${ServerTriggerType.AI_QUEUE3}:${npcId}`);
   }
 
-  for (const npcName of ['farming_market_guard', 'mourning_guard_range']) {
+  for (const npcName of ['farming_market_guard', 'mourning_guard_melee', 'mourning_guard_melee2',
+    'mourning_guard_range', 'mourning_guard_range2']) {
     const npcId = id('npc', npcName);
     const type = configs.NpcType.getByName(npcName);
     assert(type && type.id === npcId, `packed NPC lookup mismatch for ${npcName}`);
     assert.equal(type.category, -1, `${npcName} must retain its non-category default`);
+    if (npcName.startsWith('mourning_guard_')) {
+      assert.equal(type.op[1], 'Attack', `${npcName} is natively attackable, but has no dedicated combat/drop unit`);
+    }
     for (const trigger of triggerNames) {
       assert.equal(ScriptProvider.getByTriggerSpecific(trigger, npcId), undefined,
         `${npcName} unexpectedly has a dedicated ${triggerName.get(trigger)} trigger`);
@@ -220,19 +233,30 @@ async function run() {
       ]
     }
   ];
-  // Original published bands remain the oracle for every previously occupied slot.
+  // Published bands remain the oracle except the selected pikeman coin amount.
   const publishedTables = tables.map(table => ({ ...table, rows: [...table.rows] }));
   const additions = [
-    { key: 'archer', names: ['regicide_darkelf'], emptyFrom: 108, emptyTail: 20,
-      rows: [[102, 103, 'dragon_vambraces', 1], [103, 105, 'airrune', 10],
-        [105, 106, 'poisonivy_bush_seed', 1], [106, 107, 'cactus_seed', 1], [107, 108, 'belladonna_seed', 1]] },
-    { key: 'pikeman', names: ['regicide_darkelf2'], emptyFrom: 106, emptyTail: 22,
-      rows: [[102, 103, 'rune_med_helm', 1], [103, 104, 'poisonivy_bush_seed', 1],
-        [104, 105, 'cactus_seed', 1], [105, 106, 'belladonna_seed', 1]] }
+    { key: 'archer', names: ['regicide_darkelf'], emptyFrom: 111, emptyTail: 17, highCoinAward: 180,
+      rows: [
+        [102, 103, 'dragon_vambraces', 1], [103, 105, 'airrune', 10],
+        [105, 106, 'poisonivy_bush_seed', 1], [106, 107, 'cactus_seed', 1], [107, 108, 'belladonna_seed', 1],
+        [108, 109, 'elf_crystal_tiny', 1], [109, 110, 'lobster', 1], [110, 111, 'herbseed', 1]
+      ] },
+    { key: 'pikeman', names: ['regicide_darkelf2'], emptyFrom: 110, emptyTail: 18, highCoinAward: 220,
+      rows: [
+        [102, 103, 'rune_med_helm', 1], [103, 104, 'poisonivy_bush_seed', 1],
+        [104, 105, 'cactus_seed', 1], [105, 106, 'belladonna_seed', 1],
+        [106, 107, 'elf_crystal_tiny', 1], [107, 108, 'mourning_teleport_crystal_1', 1],
+        [108, 109, 'lobster', 1], [109, 110, 'herbseed', 1]
+      ] }
   ];
   const elfTable = tables.shift();
-  tables.unshift(...additions.map(addition => ({ ...elfTable, ...addition,
-    rows: [...elfTable.rows, ...addition.rows] })));
+  tables.unshift(...additions.map(({ highCoinAward, ...addition }) => {
+    const inheritedRows = elfTable.rows.map(row => row[2] === 'coins' && row[3] === 180
+      ? [row[0], row[1], row[2], highCoinAward]
+      : row);
+    return { ...elfTable, ...addition, rows: [...inheritedRows, ...addition.rows] };
+  }));
   tables[2] = { ...tables[2], emptyFrom: 96, emptyTail: 32,
     rows: [...tables[2].rows, [95, 96, 'steel_bar', 1]] };
   for (const table of tables) {
@@ -245,6 +269,7 @@ async function run() {
     for (const row of table.rows) {
       if (row[2] === 'herb') id('obj', 'unidentified_guam');
       else if (row[2] === 'jewel') id('obj', 'uncut_sapphire');
+      else if (row[2] === 'herbseed') id('obj', 'irit_seed');
       else id('obj', row[2]);
     }
   }
@@ -288,7 +313,9 @@ async function run() {
 
   function addNpc(name, x, z, lifecycle = EntityLifeCycle.RESPAWN) {
     const type = configs.NpcType.getByName(name);
-    const npc = new Npc(0, x, z, type.size, type.size, lifecycle, ++serial, type.id, type.blockwalk);
+    // Cases clean up sequentially. Reuse one valid NPC slot instead of exhausting the 14-bit list.
+    assert.equal(World.npcs.get(1), undefined, 'previous fixture NPC slot was not released');
+    const npc = new Npc(0, x, z, type.size, type.size, lifecycle, 1, type.id, type.blockwalk);
     World.addNpc(npc, -1);
     World.processNpcEventQueue();
     assert.strictEqual(World.npcs.get(npc.nid), npc, `${name} was not registered by World.addNpc`);
@@ -339,7 +366,37 @@ async function run() {
     return table.rows.find(([start, end]) => roll >= start && roll < end) ?? null;
   }
 
-  function deathDrawValues(table, roll, { clue = 'miss', helper = 0, heldClue = false } = {}) {
+  const seedTickets = ['irit_seed', 'irit_seed', 'kwuarm_seed', 'kwuarm_seed',
+    'avantoe_seed', 'avantoe_seed', 'toadflax_seed', 'toadflax_seed',
+    'cadantine_seed', 'cadantine_seed', 'dwarf_weed_seed', 'dwarf_weed_seed', 'snapdragon_seed'];
+  const herbTickets = [
+    [32, 'unidentified_guam'], [56, 'unidentified_marentill'], [74, 'unidentified_tarromin'],
+    [88, 'unidentified_harralander'], [99, 'unidentified_ranarr'], [107, 'unidentified_irit'],
+    [113, 'unidentified_avantoe'], [118, 'unidentified_kwuarm'], [122, 'unidentified_cadantine'],
+    [125, 'unidentified_lantadyme'], [128, 'unidentified_dwarf_weed']
+  ];
+  const rareTickets = { rune_spear: 8, dragonshield_a: 4, dragon_spear: 3 };
+  function expectedJewel(helper, rare, legends) {
+    if (helper < 32) return [{ name: 'uncut_sapphire', count: 1 }];
+    if (helper < 48) return [{ name: 'uncut_emerald', count: 1 }];
+    if (helper < 56) return [{ name: 'uncut_ruby', count: 1 }];
+    if (helper < 58) return [{ name: 'uncut_diamond', count: 1 }];
+    if (helper === 58) return [{ name: 'rune_javelin', count: 5 }];
+    if (helper === 59) return [{ name: 'keyhalf1', count: 1 }];
+    if (helper === 60) return [{ name: 'keyhalf2', count: 1 }];
+    if (helper === 61 && legends) {
+      if (rare < 8) return [{ name: 'rune_spear', count: 1 }];
+      if (rare < 12) return [{ name: 'dragonshield_a', count: 1 }];
+      if (rare < 15) return [{ name: 'dragon_spear', count: 1 }];
+      return [];
+    }
+    if (helper < 65) return [{ name: 'nature_talisman', count: 1 }];
+    return [];
+  }
+
+  function deathDrawValues(table, roll, {
+    clue = 'miss', helper = 0, heldClue = false, rare = 0, legends = false, wealth = false
+  } = {}) {
     const values = [];
     if (!heldClue) {
       if (clue === 'hit') values.push(0, 0);
@@ -348,18 +405,24 @@ async function run() {
       else assert.fail(`unknown clue mode ${clue}`);
     }
     values.push(roll);
-    if (rowAt(table, roll)?.[2] === 'herb' || rowAt(table, roll)?.[2] === 'jewel') values.push(helper);
+    const item = rowAt(table, roll)?.[2];
+    if (item === 'herb') values.push(helper);
+    if (item === 'herbseed') values.push((helper + 0.5) * 128 / 13);
+    if (item === 'jewel') {
+      values.push((helper + 0.5) * 128 / (wealth ? 65 : 128));
+      if (helper === 61 && legends) values.push(rare);
+    }
     return values;
   }
 
-  function expectedRegular(table, roll, vikingState, helper) {
+  function expectedRegular(table, roll, vikingState, { helper = 0, rare = 0, legends = false } = {}) {
     const row = rowAt(table, roll);
     if (!row || (row[4] && vikingState !== vikingComplete)) return [];
-    if (row[2] === 'herb') return [{ name: 'unidentified_guam', count: 1 }];
-    if (row[2] === 'jewel') return helper === 127 ? [] : [{ name: 'uncut_sapphire', count: 1 }];
+    if (row[2] === 'herb') return [{ name: herbTickets.find(([end]) => helper < end)[1], count: 1 }];
+    if (row[2] === 'herbseed') return [{ name: seedTickets[helper], count: 1 }];
+    if (row[2] === 'jewel') return expectedJewel(helper, rare, legends);
     return [{ name: row[2], count: row[3] }];
   }
-
   function assertDrops(label, records, actor, regular, clueName = null, noHero = false) {
     if (noHero) {
       assert.deepEqual(records, [], `${label}: no-hero drops`);
@@ -388,7 +451,7 @@ async function run() {
 
   function runDeathCase(table, npcName, roll, {
     vikingState = vikingNotStarted, clue = 'miss', helper = 0, heldClue = false,
-    noHero = false, expectedClue = null, suffix = ''
+    noHero = false, expectedClue = null, suffix = '', rare = 0, legends = false, wealth = false
   } = {}) {
     const label = `${table.key}:${npcName}:roll${roll}${suffix}`;
     const x = 3200;
@@ -401,6 +464,8 @@ async function run() {
       npc = addNpc(npcName, x, z);
       if (actor) {
         npc.setVar(aggressiveVar, actor.uid);
+        actor.setVar(legendsVarp, legends ? legendsComplete : 0);
+        if (wealth) actor.getInventory(wornId).set(0, { id: id('obj', 'ring_of_wealth'), count: 1 });
         npc.heroPoints.addHero(actor.hash64, npc.levels[NpcStat.HITPOINTS]);
         if (heldClue) actor.getInventory(invId).set(0, { id: id('obj', table.clueItem), count: 1 });
       }
@@ -409,7 +474,7 @@ async function run() {
       assert(trigger, `${label}: selected death trigger missing`);
       const state = ScriptRunner.init(trigger, npc);
       assert.equal(state._activeNpc2, null, `${label}: unexpected secondary NPC`);
-      const draws = noHero ? [] : deathDrawValues(table, roll, { clue, helper, heldClue });
+      const draws = noHero ? [] : deathDrawValues(table, roll, { clue, helper, heldClue, rare, legends, wealth });
       const tracker = { label, values: draws, index: 0 };
       npc.applyDamage(npc.levels[NpcStat.HITPOINTS], 1);
       objectCapture = records;
@@ -424,7 +489,7 @@ async function run() {
       assert.equal(state.execution, ScriptState.FINISHED, `${label}: death script did not finish`);
       assert(!npc.isActive && npc.lifecycleTick > 0, `${label}: NPC did not enter respawn state`);
       assert.equal(tracker.index, draws.length, `${label}: exact scheduled random draw count`);
-      const expected = noHero ? [] : expectedRegular(table, roll, vikingState, helper);
+      const expected = noHero ? [] : expectedRegular(table, roll, vikingState, { helper, rare, legends });
       assertDrops(label, records, actor, expected, expectedClue, noHero);
       return records.map(record => ({ name: byId.obj.get(record.id), count: record.count }));
     } finally {
@@ -535,7 +600,12 @@ async function run() {
           const oldTable = publishedTables.find(row => row.names.includes(npcName));
           if (published.size) {
             const old = published.get(`${npcName}:${roll}`);
-            if (roll < oldTable.emptyFrom || roll >= table.emptyFrom) {
+            if (npcName === 'regicide_darkelf2' && roll >= 75 && roll < 85) {
+              assert.deepEqual(old.filter(item => item.name !== 'bones'), [{ name: 'coins', count: 180 }],
+                `${npcName}:${roll}: published high-coin award`);
+              assert.deepEqual(actual.filter(item => item.name !== 'bones'), [{ name: 'coins', count: 220 }],
+                `${npcName}:${roll}: selected high-coin award`);
+            } else if (roll < oldTable.emptyFrom || roll >= table.emptyFrom) {
               assert.deepEqual(actual, old, `${npcName}:${roll}: differs from published pack`);
             } else {
               assert.deepEqual(old, [{ name: 'bones', count: 1 }],
@@ -551,9 +621,11 @@ async function run() {
           rollChecks++;
         }
         const expectedTotals = table.key === 'archer'
-          ? { dragon_vambraces: 1, airrune: 20, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1 }
+          ? { dragon_vambraces: 1, airrune: 20, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1,
+            elf_crystal_tiny: 1, lobster: 1, irit_seed: 1 }
           : table.key === 'pikeman'
-            ? { rune_med_helm: 1, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1 }
+            ? { rune_med_helm: 1, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1,
+              elf_crystal_tiny: 1, mourning_teleport_crystal_1: 1, lobster: 1, irit_seed: 1 }
             : { steel_bar: 1 };
         assert.deepEqual(Object.fromEntries(totals), expectedTotals, `${npcName}: added item totals`);
         console.log(`PASS ${npcName}: ${table.emptyFrom} allocated/${table.emptyTail} empty; additions ${JSON.stringify(expectedTotals)}`);
@@ -567,7 +639,7 @@ async function run() {
       }
     }
     assert.equal(rollChecks, 4 * 128, 'every roll for both target types in both tables');
-    assert.equal(emptyTailHits, 20 + 22 + 2 * 32, 'exact remaining empty allocations');
+    assert.equal(emptyTailHits, 17 + 18 + 2 * 32, 'exact remaining empty allocations');
 
     for (const npcName of guardNpcNames) {
       for (const state of [vikingNotStarted, vikingStarted]) {
@@ -580,6 +652,81 @@ async function run() {
       }
       runDeathCase(tables[2], npcName, 94, { helper: 127, suffix: ':null-jewel' });
     }
+
+    // Every herb and seed helper ticket is checked against a literal, independent oracle.
+    // The main table above checks all 128 slots, including each newly consumed empty slot.
+    for (const table of tables) {
+      for (const npcName of table.names) {
+        const herbRoll = table.rows.find(row => row[2] === 'herb')[0];
+        for (let helper = 0; helper < 128; helper++) {
+          runDeathCase(table, npcName, herbRoll, { helper, heldClue: true, suffix: `:herb-${helper}` });
+        }
+        const seedRow = table.rows.find(row => row[2] === 'herbseed');
+        if (!seedRow) continue;
+        const counts = new Map();
+        for (let helper = 0; helper < 13; helper++) {
+          const result = runDeathCase(table, npcName, seedRow[0], {
+            helper, heldClue: true, suffix: `:seed-ticket-${helper}`
+          }).filter(item => item.name !== 'bones');
+          assert.equal(result.length, 1, 'one seed per herb-seed award');
+          counts.set(result[0].name, (counts.get(result[0].name) ?? 0) + 1);
+        }
+        assert.deepEqual(Object.fromEntries(counts), {
+          irit_seed: 2, kwuarm_seed: 2, avantoe_seed: 2, toadflax_seed: 2,
+          cadantine_seed: 2, dwarf_weed_seed: 2, snapdragon_seed: 1
+        }, `${npcName}: exact ELF-HERB-MIX-01 distribution`);
+        console.log(`PASS ${npcName}: herb seeds 1/128; six species 2/1664 each, snapdragon 1/1664`);
+      }
+    }
+
+    // Enumerate every joint branch of the existing shared route. Non-rare branches
+    // represent all 128 unused rare tickets, so integer masses share one denominator.
+    let sharedChecks = 0;
+    for (const table of tables) {
+      const jewelRow = table.rows.find(row => row[2] === 'jewel');
+      const mainTickets = jewelRow[1] - jewelRow[0];
+      assert.equal(mainTickets, table.key === 'viking' ? 1 : 5, 'unchanged shared entry width');
+      for (const npcName of table.names) {
+        for (const legends of [false, true]) {
+          for (const wealth of [false, true]) {
+            const jewelTickets = wealth ? 65 : 128;
+            const denominator = 128 * jewelTickets * 128;
+            const totals = { rune_spear: 0, dragonshield_a: 0, dragon_spear: 0 };
+            let totalMass = 0;
+            let javelinMass = 0;
+            for (let roll = jewelRow[0]; roll < jewelRow[1]; roll++) {
+              for (let helper = 0; helper < jewelTickets; helper++) {
+                const rareBranch = legends && helper === 61;
+                for (let rare = 0; rare < (rareBranch ? 128 : 1); rare++) {
+                  const mass = rareBranch ? 1 : 128;
+                  const result = runDeathCase(table, npcName, roll, {
+                    helper, rare, legends, wealth, heldClue: true,
+                    suffix: `:shared-L${Number(legends)}-W${Number(wealth)}-${helper}-${rare}`
+                  });
+                  for (const item of result) {
+                    if (Object.hasOwn(totals, item.name)) totals[item.name] += mass;
+                    if (item.name === 'rune_javelin') {
+                      assert.equal(item.count, 5, 'existing shared javelin quantity');
+                      javelinMass += mass;
+                    }
+                  }
+                  totalMass += mass;
+                  sharedChecks++;
+                }
+              }
+            }
+            assert.equal(totalMass, mainTickets * jewelTickets * 128, 'complete joint shared support');
+            assert.equal(javelinMass, mainTickets * 128, 'unchanged shared javelin probability');
+            for (const [name, tickets] of Object.entries(rareTickets)) {
+              const expectedNumerator = legends ? mainTickets * tickets : 0;
+              assert.equal(totals[name], expectedNumerator, `${npcName}: exact ${name} numerator`);
+              console.log(`PASS ${npcName}: Legends=${legends}, Wealth=${wealth}, ${name}=${totals[name]}/${denominator}`);
+            }
+          }
+        }
+      }
+    }
+    assert.equal(sharedChecks, 7680, 'every joint shared-table branch for all four NPC types');
 
     console.log(`PASS elf-viking-drops: ${rollChecks} exhaustive roll cases; 9 trigger selections; two real combat types`);
   } finally {

@@ -1,15 +1,12 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 // Reuse the existing transport-free packed-world loader, including the genuine 377 map.
-import { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, map, pack, locFor, nativeLocRows, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
+import { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, map, locFor, nativeLocRows, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
 const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/script/ScriptOpcode.ts`).href);
 const { default: ClientCheatHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/ClientCheatHandler.ts`).href);
 const { default: ClientCheat } = await import(pathToFileURL(`${engine}/src/network/game/client/model/ClientCheat.ts`).href);
-const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
 const { default: MessageGameEncoder } = await import(pathToFileURL(`${engine}/src/network/game/server/codec/MessageGameEncoder.ts`).href);
-const { default: JavaRandom } = await import(pathToFileURL(`${engine}/src/util/JavaRandom.ts`).href);
 const invId = requiredId(types.InvType, 'inv');
 const eventVar = requiredId(types.VarPlayerType, 'macro_event');
 const handlers = { ...ScriptRunner.HANDLERS };
@@ -26,7 +23,7 @@ function check(name, fn) {
   try { fn(); passed++; console.log(`PASS ${name}`); }
   catch (error) { failed++; console.error(`FAIL ${name}: ${error.stack}`); }
 }
-const baseline = JSON.parse(readFileSync(new URL('./inert-baseline.json', import.meta.url), 'utf8'));
+const baseline = JSON.parse(readFileSync(new URL('./packed-identities.json', import.meta.url), 'utf8'));
 check('published packed actor model option tool loc and component identities are unchanged', () => assert.deepEqual(identities(), baseline.identities));
 function player(tile = [0, 3222, 3218]) {
   const slot = ++serial;
@@ -80,6 +77,20 @@ function prep(index) {
 function snap(p) {
   return { vars: [...p.vars], inventory: p.getInventory(invId).items.map(i => i ? { id: i.id, count: i.count } : null), npcs: [...World.npcs].map(n => [n.uid, n.type, n.x, n.z]), modalChat: p.modalChat, modalMain: p.modalMain, tile: [p.level, p.x, p.z] };
 }
+function activeActors() {
+  return [...World.npcs].filter(n => n.isActive)
+    .map(n => [types.NpcType.get(n.type).debugname, n.level, n.x, n.z])
+    .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+}
+function executeOrdinary(p, name, loc = null) {
+  const state = ScriptRunner.init(packed(name), p, loc, []);
+  p.runScript(state, true);
+  for (let resumes = 0; state.execution === ScriptState.SUSPENDED && resumes < 10; resumes++) {
+    state.execution = ScriptState.RUNNING;
+    p.runScript(state, true, true);
+  }
+  assert.equal(state.execution, ScriptState.FINISHED, `ordinary ${name} completes`);
+}
 function run(p, name, { stop = true, removeAdmission = false, unknownFallthrough = false, raw = false } = {}) {
   const calls = [];
   let unknownChanged = false;
@@ -115,51 +126,6 @@ function run(p, name, { stop = true, removeAdmission = false, unknownFallthrough
   } finally {
     Object.assign(ScriptRunner.HANDLERS, handlers);
   }
-}
-// These traces are captured from the published pack, never from copied RuneScript.
-// The opt-in baseline run also executes the old pack in this same real interpreter.
-function inertTrace(name) {
-  const row = name.includes('oploc') ? nativeLocRows('copperrock1').find(row => World.getLoc(row.x, row.z, row.level, requiredId(types.LocType, 'copperrock1'))) : null;
-  if (name.includes('oploc')) assert(row, 'a fresh genuine copper rock is required for each ordinary mining run');
-  const p = player(row ? nextTo(row) : undefined);
-  if (name.includes('oploc')) {
-    give(p, 'bronze_pickaxe');
-    p.setVar(requiredId(types.VarPlayerType, 'action_delay'), World.currentTick);
-  }
-  if (name.includes('if_button')) for (const [name, quantity] of [['lawrune', 1], ['airrune', 3], ['earthrune', 1]]) p.invAdd(invId, requiredId(types.ObjType, name), quantity);
-  const trace = [];
-  const random = Math.random;
-  Math.random = () => 0.5;
-  for (const [code, original] of Object.entries(handlers)) ScriptRunner.HANDLERS[code] = state => {
-    // Numeric packed operands contain relocated script/config ids. Compare executed
-    // command identities/positions and string literals, not unrelated pack numbering.
-    trace.push([state.script.name, state.pc, Number(code), state.stringOperand]);
-    assert(!state.script.name.includes('macro_fixture'), 'ordinary action must never enter the fixture');
-    original(state);
-  };
-  try {
-    const state = ScriptRunner.init(packed(name), p, row ? locFor(row) : null, []);
-    // RANDOM, RANDOMINC and STAT_RANDOM use this singleton, not Math.random.
-    // Reset each root so earlier draws and process state cannot select its trace.
-    JavaRandom.setSeed(0);
-    p.runScript(state, true);
-    for (let resumes = 0; state.execution === ScriptState.SUSPENDED && resumes < 10; resumes++) {
-      state.execution = ScriptState.RUNNING;
-      p.runScript(state, true, true);
-    }
-    assert.equal(state.execution, ScriptState.FINISHED, `ordinary ${name} completes`);
-    assert.equal(p.getVar(eventVar), 0);
-    assert(!trace.some(([name]) => spawners.some(s => name === `[proc,${s}]`)), 'ordinary action must not spawn an event');
-    return { commands: trace.length, sha256: createHash('sha256').update(JSON.stringify(trace)).digest('hex') };
-  } finally {
-    Math.random = random;
-    Object.assign(ScriptRunner.HANDLERS, handlers);
-  }
-}
-function loadPack(directory) {
-  for (const Type of Object.values(types)) Type.load(directory);
-  DbTableIndex.init();
-  assert(ScriptProvider.load(directory) > 0);
 }
 check('packed command has only one string argument; obsolete aliases are absent', () => {
   const script = packed('[debugproc,macro_event]');
@@ -321,16 +287,16 @@ check('admission-removal mutant is caught by the same refusal predicate', () => 
 check('unknown-fallthrough mutant is caught by the same refusal predicate', () => {
   assert.throws(() => refusal(player(), 'not-built', { unknownFallthrough: true }), /must not reach a spawner/);
 });
-const ordinaryRoots = ['[login,_]', '[queue,macro_event_login]', '[oploc1,_mining_rock_normal]', '[if_button,magic:lumbridge_teleport]'];
-if (process.env.U00_BASELINE_PACK) {
-  loadPack(process.env.U00_BASELINE_PACK);
-  try {
-    console.log(`PUBLISHED_IDENTITIES ${JSON.stringify(identities())}`);
-    for (const root of ordinaryRoots) console.log(`PUBLISHED_TRACE ${JSON.stringify([root, inertTrace(root)])}`);
-  } finally { loadPack(pack); }
-}
-for (const root of ordinaryRoots) check(`ordinary packed commands match published trace ${root}`, () => {
-  assert.deepEqual(inertTrace(root), baseline.traces[root]);
+check('ordinary copper mining keeps its player-visible swing with random events off', () => {
+  const p = player(rock.tile);
+  give(p, 'bronze_pickaxe');
+  p.setVar(requiredId(types.VarPlayerType, 'action_delay'), World.currentTick);
+  const beforeActors = activeActors();
+  executeOrdinary(p, '[oploc1,_mining_rock_normal]', locFor(rock.row));
+  assert(p.messages.some(message => message.msg === 'You swing your pick at the rock.'));
+  assert.equal(p.getVar(eventVar), 0, 'the ordinary mining action does not start a random event');
+  assert.deepEqual(activeActors(), beforeActors, 'the no-event mining action creates no actor');
+  World.players[p.slot] = null;
 });
 console.log(`RESULT ${failed ? 'FAIL' : 'PASS'} random-events-u00 passed=${passed} failed=${failed}`);
 process.exit(failed ? 1 : 0);

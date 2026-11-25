@@ -25,7 +25,7 @@ if ($end_coord ! .coord) {
 }
 
 .spotanim_pl(stunned_shove, 96, 0);
-.anim(%com_defendanim, 0);
+if (.%com_defendanim ! null) .anim(.%com_defendanim, 0);
 .queue*(pvp_retaliate, 0)(uid);
 .p_delay(4);
 
@@ -36,7 +36,7 @@ if ($end_coord ! coord) {
     p_teleport($end_coord);
 }
 spotanim_pl(stunned_shove, 96, 0);
-anim(%com_defendanim, 0);
+if (%com_defendanim ! null) anim(%com_defendanim, 0);
 queue*(pvp_retaliate, 0)(%pk_predator1);
 p_delay(4);
 
@@ -47,7 +47,7 @@ if ($end_coord ! coord) {
     p_teleport($end_coord);
 }
 spotanim_pl(stunned_shove, 96, 0);
-anim(%com_defendanim, 0);
+if (%com_defendanim ! null) anim(%com_defendanim, 0);
 queue*(pvp_retaliate, 0)(%pk_predator1);
 p_delay(4);
 
@@ -58,7 +58,7 @@ if ($end_coord ! coord) {
     p_teleport($end_coord);
 }
 spotanim_pl(stunned_shove, 96, 0);
-anim(%com_defendanim, 0);
+if (%com_defendanim ! null) anim(%com_defendanim, 0);
 queue*(pvp_retaliate, 0)(%pk_predator1);
 p_delay(4);
 
@@ -69,6 +69,6 @@ if ($end_coord ! coord) {
     p_teleport($end_coord);
 }
 spotanim_pl(stunned_shove, 96, 0);
-anim(%com_defendanim, 0);
+if (%com_defendanim ! null) anim(%com_defendanim, 0);
 queue*(pvp_retaliate, 0)(%pk_predator1);
 p_delay(4);

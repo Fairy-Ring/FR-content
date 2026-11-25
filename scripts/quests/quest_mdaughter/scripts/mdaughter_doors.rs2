@@ -1,0 +1,13 @@
+// VERIFIED cache operations and paired forms: Open/Close and Go-through.
+// UNKNOWN: persistent-flap lifetime uses the quest's engineering loc lifetime.
+[oploc1,mdaughter_tent_door] loc_change(mdaughter_tent_door_open, ^mdaughter_travel_loc_lifetime);
+[oploc1,mdaughter_tent_door_open] loc_change(mdaughter_tent_door, ^mdaughter_travel_loc_lifetime);
+[oploc1,mdaughter_tent_doorl] loc_change(mdaughter_tent_door_openl, ^mdaughter_travel_loc_lifetime);
+[oploc1,mdaughter_tent_door_openl] loc_change(mdaughter_tent_doorl, ^mdaughter_travel_loc_lifetime);
+
+// Reuse the normal one-operation door transit from the player's actual side.
+[oploc1,mdaughter_rocktent_door]
+~open_and_close_door(mdaughter_rocktent_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+
+[oploc1,mdaughter_rocktent_doorl]
+~open_and_close_door(mdaughter_rocktent_door_openl, ~check_axis(coord, loc_coord, loc_angle), false);

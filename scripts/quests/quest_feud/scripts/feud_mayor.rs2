@@ -1,32 +1,36 @@
-// The Feud — Ali the Mayor after the Menaphite Leader is gone (§19.3). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud §19.3 Talking to Ali the Mayor,
-// minus the 27 Apr 2022 lore pass). World NPC multi feud_mayor 1869 @
-// 3360,2970 L0 (m52_46 0 32 26); vis face feud_mayor_geom 1870 "Ali the
-// Mayor" op1=Talk-to while %feud_mayor_invis 0 (multinpc=0,feud_mayor_geom —
-// bind the vis name, not the multi base). Stand 3361,2970 E. Not on the NPC.
-// Gate: %feud_var_menaboss >= 1 (Tough Guy killed, §18.5 PASS feudtsy35b22 —
-// Leader gone, menaboss flag) else return. §19.3 verbatim, chat only. No
-// stage write / no 28 / no dest / p_tele. No && / ||. The early
-// welcome-to-Pollnivneach tree (§2.2) is NOT written.
-// §21.5 Finishing up (Bandit champion dead, §20.4 PASS d478d3333):
-// %feud_var_banditboss >= 1 dispatches @feud_mayor_nephew BEFORE the
-// celebrate — "My thanks, adventurer. Your methods and motives may be
-// questionable, but none can argue that you have delivered our little town
-// from the wicked gangs who plagued it. I think things will change around
-// here, now" / "that our problems are at a manageable size." / the nephew
-// story ("greatest salesman", "a little too good", "angered the Menaphites
-// and the bandits") / "smuggled him out" / "treasure trove" /
-// "wholeheartedly apologise" / player "I think I may be able to help with
-// one other thing... Ali the Operator." / "Now, how would a passing
-// adventurer know where to find my missing jewels?" / "Er, let's just put
-// it down to adventurer's intuition." Chat only, then return. No var writes.
-// Cite copy-agent-opener-377.md · anchors-pollniv.md · feud-config-unit-first-377.md.
-
+// CANDIDATE: pre-2022 RuneScape transcript 18411641, lines 419–422.
+// Ordinary greeting: Old School NPC transcript 11364029 (2020).
+// Missing quest branches and transitions: Old School quest transcript 15325427.
+// The post-2022 Hakeem form and its new-citizen conversation are not used.
 [opnpc1,feud_mayor_geom]
-if (%feud_var_banditboss >= 1) {
-    @feud_mayor_nephew;
+if (%feud_var = ^feud_mayor_reveal) {
+    ~chatnpc("<p,neutral>Thank you once again. Have you spoken to Ali Morrisane yet?");
+    ~chatplayer("<p,neutral>No not yet.");
+    ~chatnpc("<p,neutral>Perhaps you should! I'm sure he's keen to hear word of his nephew.");
+    return;
 }
-if (%feud_var_menaboss < 1) { return; }
+if (%feud_var = ^feud_bandits_defeated) @feud_mayor_nephew;
+if (%feud_var = ^feud_menaphites_defeated) @feud_mayor_consequences;
+if (%feud_var >= ^feud_jewels_taken & %feud_var < ^feud_menaphites_defeated) {
+    ~chatnpc("<p,neutral>I really can't chat for very long, the recent escalation in crime has me run off my feet. Just a short while ago even my own house was robbed. This cannot continue.");
+    return;
+}
+if (%feud_var >= ^feud_camels_delivered & %feud_var < ^feud_jewels_taken) {
+    ~chatnpc("<p,neutral>I really can't chat for very long, the recent escalation in crime has me run off my feet. There are muggings and burglaries happening in broad daylight! It's really not on.");
+    return;
+}
+~chatnpc("<p,neutral>Welcome adventurer to the town of Pollnivneach, the gateway to Menaphos and Al-Kharid. My name is Ali and I'm the mayor of this town. I hope you enjoy your stay here.");
+~chatplayer("<p,neutral>Thank you. That is the warmest welcome I've had anywhere for a while at least. People generally treat travelling adventurers with suspicion.");
+~chatnpc("<p,neutral>All are welcome here, such is the way of things in border regions. Now more than ever I suppose.");
+~chatplayer("<p,neutral>What do you mean by that?");
+~chatnpc("<p,neutral>There's trouble in town, and a lot of villagers have left as a result.");
+~chatplayer("<p,neutral>I'm looking for someone called Ali.");
+~chatnpc("<p,neutral>I doubt that's easy in Pollnivneach.");
+~chatplayer("<p,neutral>Well can you help me?");
+~chatnpc("<p,neutral>I'm more than a little busy at the moment, I'm sure there are plenty of people in town who could help you.");
+return;
+
+[label,feud_mayor_consequences]
 ~chatnpc("<p,neutral>I don't know what we did to deserve your presence here, but I for one am filled with regret.");
 ~chatplayer("<p,angry>Well that's some show of gratitude! Can't I even get a 'thank you' for ridding your town of one of the gangs?");
 ~chatnpc("<p,quiz>Do you understand the concept of consequences?");
@@ -38,17 +42,17 @@ if (%feud_var_menaboss < 1) { return; }
 return;
 
 [label,feud_mayor_nephew]
-~chatnpc("<p,neutral>My thanks, adventurer. Your methods and motives may be questionable, but none can argue that you have delivered our little town from the wicked gangs who plagued it. I think things will change around here, now");
-~chatnpc("<p,neutral>that our problems are at a manageable size.");
-~chatnpc("<p,neutral>The least that I can do for you is answer your questions about the whereabouts of Ali Morrisane's nephew. He always was a mischievous young man, full of harebrained schemes.");
-~chatnpc("<p,neutral>He dreamed of being the greatest salesman in all of Gielinor! Unfortunately, he was a little too good.");
-~chatnpc("<p,neutral>He angered a number of people by coercing them into buying things they didn't really want. Completely within the law, of course, but the law could only protect young Ali for so long.");
-~chatnpc("<p,neutral>Once he angered the Menaphites and the bandits, I knew I could no longer protect him.");
-~chatnpc("<p,neutral>Under cover of darkness I smuggled him out of the town, and he's been gone ever since.");
-~chatnpc("<p,neutral>I can assure you, however, that he is safe and well - and now that you have effectively ended the threat posed by the gangs, he can continue his business elsewhere. Last I heard he planned to open some kind");
-~chatnpc("<p,neutral>of trade network with forty of his friends. A 'treasure trove', he claims. I'll believe it when I see it.");
-~chatnpc("<p,neutral>I hope that helps you in your quest. If you speak to Ali Morrisane, do tell him that I wholeheartedly apologise for the way he - er, his family - has been treated.");
-~chatplayer("<p,neutral>I think I may be able to help with one other thing. I heard that your house was burgled recently. If you're interested in recovering the goods, you ought to have a word with Ali the Operator.");
-~chatnpc("<p,quiz>Now, how would a passing adventurer know where to find my missing jewels?");
-~chatplayer("<p,neutral>Er, let's just put it down to adventurer's intuition.");
-return;
+~chatnpc("<p,neutral>My thanks, your methods and motives may be questionable but nonetheless thank you for delivering this town from those wicked individuals.");
+~chatnpc("<p,neutral>I think now that our problems are at a manageable size, mistakes made in the past will not be repeated.");
+~chatnpc("<p,neutral>The least that I can do for you is answer your questions about the whereabouts of Ali Morrisane's nephew.");
+~chatnpc("<p,neutral>He was asked to leave the town as much for concerns for his health and, as sad as it is to admit, the anger of our towns people.");
+~chatnpc("<p,neutral>He is a good lad but is too good a salesman for his health. He angered a number of people by coercing them into buying things they really didn't want.");
+~chatnpc("<p,neutral>He acted completely within the letter of the law... but that could only protect him so long. Once he angered the Menaphites and the Bandits I could no longer protect him and he had to go.");
+~chatnpc("<p,neutral>I can assure you that he is safe and well and now that the threats to his life no longer hold any water he plans to open some kind of superstore with forty of his disreputable friends.");
+~chatnpc("<p,neutral>A 'treasure trove' he claims. I will believe it when I see it though. He will probably remain hidden for some time.");
+~chatnpc("<p,neutral>I hope that helps you in your quest. Will you give my apologies to Ali Morrisane for treating his family so.");
+%feud_var = ^feud_mayor_reveal;
+%feud_bandit_boss_vis = 0;
+~chatplayer("<p,neutral>I think I may be able to put one more thing to right. I heard that your house was burgled recently. I think you should ask Ali 'The operator' about that, it may prove beneficial.");
+~chatnpc("<p,quiz>How do you know this?");
+~chatplayer("<p,neutral>Let's just put it down to adventurer's intuition.");

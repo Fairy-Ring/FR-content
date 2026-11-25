@@ -1,19 +1,120 @@
-// Soul's Bane — Enter the roped rift -> rage room 3013,5243 L0, overlay
-// rage_level 15100 ("Rage level." + ten dummy pips). Chrome-only: no Launa
-// start-talk, no rack Take-from, no Angry-* combat, no XP, no journal 15098.
-// Rope-on (soulbane_riftrope_pres) is a harness toy; the empty rift 13967 is
-// not bound (2007-base "You can't just jump down there").
-// Cite residual-if-15100-room-dest-377.md + residual-if-rage-level-377.md.
-
+// VERIFIED period rule: spear/bear, sword/unicorn, mace/rat, axe/goblin.
+// CANDIDATE damage/menus/wording: retained Old School pages and transcript.
 [oploc1,soulbane_falloff2_rope] @soulbane_rage_enter;
 [oploc1,soulbane_falloff2_rope_multi] @soulbane_rage_enter;
-
 [label,soulbane_rage_enter]
-// Preserve the unroped form's published refusal when parent fallback selects us.
-if (%soulbane_riftrope_pres ! 1) {
+// The separately scoped postquest dungeon is not a recycled quest room.
+if (%soulbane_prog = ^soulbane_complete) return;
+if (%soulbane_riftrope_pres ! 1 | %soulbane_prog < 1) {
     ~displaymessage(^dm_default);
     return;
 }
 p_arrivedelay;
-p_teleport(0_47_81_5_59); // 3013,5243 L0 — collision walkable E of rack 3012,5243
+~soulbane_enter;
+
+// VERIFIED period order: completed Rage leads into the room of Fear.
+[oploc1,soul_bane_awall_void_exit]
+if (~soulbane_owned = false | %soulbane_prog ! 3) return;
+~soulbane_fear_enter;
+
+[oploc1,soulbane_rack_multi] @soulbane_rage_rack;
+[oploc1,soulbane_rack_all] @soulbane_rage_rack;
+[oploc1,soulbane_rack_no_sword] @soulbane_rage_rack;
+[oploc1,soulbane_rack_no_spear] @soulbane_rage_rack;
+[oploc1,soulbane_rack_no_mace] @soulbane_rage_rack;
+[oploc1,soulbane_rack_no_axe] @soulbane_rage_rack;
+[label,soulbane_rage_rack]
+if (~soulbane_owned = false | %soulbane_anger_donespecial ! 0) return;
+def_int $choice = ~p_choice5_header("The Sword", 1, "The Spear", 2, "The Mace", 3, "The Battleaxe", 4, "Nothing", 5, "Which weapon would you like to take?");
+def_namedobj $weapon = null;
+switch_int ($choice) {
+    case 1 : $weapon = soulbane_anger_swordq;
+    case 2 : $weapon = soulbane_anger_spearq;
+    case 3 : $weapon = soulbane_anger_maceq;
+    case 4 : $weapon = soulbane_anger_axeq;
+}
+if ($weapon ! null) {
+    if (inv_total(inv, $weapon) > 0 | inv_total(worn, $weapon) > 0) return;
+    if (inv_freespace(inv) = 0 & inv_total(inv, soulbane_anger_swordq) = 0 & inv_total(inv, soulbane_anger_spearq) = 0 & inv_total(inv, soulbane_anger_maceq) = 0 & inv_total(inv, soulbane_anger_axeq) = 0) {
+        // CANDIDATE inherited equip refusal; preserve the equipped weapon.
+        mes("You don't have enough free space to do that.");
+        return;
+    }
+}
+~soulbane_clear_weapons;
+%soulbane_anger_weaponmulti = 0;
+if ($weapon ! null) {
+    inv_add(inv, $weapon, 1);
+    %soulbane_anger_weaponmulti = $choice;
+}
+
+// UNKNOWN inventory reconstruction: Drop returns an anger weapon to its rack,
+// rather than allowing stockpiled floor weapons to defeat the one-weapon rule.
+[opheld5,soulbane_anger_swordq] ~soulbane_rage_return;
+[opheld5,soulbane_anger_spearq] ~soulbane_rage_return;
+[opheld5,soulbane_anger_maceq] ~soulbane_rage_return;
+[opheld5,soulbane_anger_axeq] ~soulbane_rage_return;
+[proc,soulbane_rage_return]
+inv_del(inv, last_item, 1);
+%soulbane_anger_weaponmulti = 0;
+
+[proc,soulbane_rage_spawn]
+~soulbane_rage_add(soulbane_anger_bear, ^soulbane_rage_bear1);
+~soulbane_rage_add(soulbane_anger_bear, ^soulbane_rage_bear2);
+~soulbane_rage_add(soulbane_anger_unicorn, ^soulbane_rage_unicorn1);
+~soulbane_rage_add(soulbane_anger_unicorn, ^soulbane_rage_unicorn2);
+~soulbane_rage_add(soulbane_anger_rat, ^soulbane_rage_rat1);
+~soulbane_rage_add(soulbane_anger_rat, ^soulbane_rage_rat2);
+~soulbane_rage_add(soulbane_anger_goblin, ^soulbane_rage_goblin1);
+~soulbane_rage_add(soulbane_anger_goblin, ^soulbane_rage_goblin2);
+
+[proc,soulbane_rage_add](npc $type, coord $template)
+npc_add(~soulbane_room_coord($template), $type, ^soulbane_npc_lifetime);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = null;
+%npc_int = %soulbane_instance;
+
+[proc,soulbane_rage_npc]()(boolean)
+if (npc_type = soulbane_anger_bear | npc_type = soulbane_anger_unicorn | npc_type = soulbane_anger_rat | npc_type = soulbane_anger_goblin) return(true);
+return(false);
+
+[proc,soulbane_rage_attackable]()(boolean)
+if (%soulbane_prog ! 2 | %soulbane_anger_donespecial ! 0) return(false);
+return(~soulbane_npc_owned);
+
+[proc,soulbane_rage_matching_weapon]()(boolean)
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+if (npc_type = soulbane_anger_bear & $weapon = soulbane_anger_spearq) return(true);
+if (npc_type = soulbane_anger_unicorn & $weapon = soulbane_anger_swordq) return(true);
+if (npc_type = soulbane_anger_rat & $weapon = soulbane_anger_maceq) return(true);
+if (npc_type = soulbane_anger_goblin & $weapon = soulbane_anger_axeq) return(true);
+return(false);
+
+// Runs before random damage, XP and heropoints for melee/ranged/spells/specs.
+[proc,soulbane_rage_max](int $maxhit, int $spell)(int)
+if ($spell ! 0 | ~soulbane_rage_attackable = false | ~soulbane_rage_matching_weapon = false) return(0);
+return($maxhit);
+
+// Multiply the ROLLED hit, not its maximum. Ordinary NPC hits are unchanged.
+[proc,soulbane_rage_hit](int $damage, boolean $spell)(int)
+if (~soulbane_rage_npc = false) return($damage);
+if ($spell = true | ~soulbane_rage_attackable = false | ~soulbane_rage_matching_weapon = false) return(0);
+return(multiply($damage, 10));
+
+[proc,soulbane_rage_meter]
 if_openoverlay(rage_level);
+def_int $pips = divide(multiply(%soulbane_anger_damagedealt, 10), ^soulbane_rage_target);
+~soulbane_rage_pip(rage_level:com_0, $pips, 1);
+~soulbane_rage_pip(rage_level:com_2, $pips, 2);
+~soulbane_rage_pip(rage_level:com_4, $pips, 3);
+~soulbane_rage_pip(rage_level:com_6, $pips, 4);
+~soulbane_rage_pip(rage_level:com_8, $pips, 5);
+~soulbane_rage_pip(rage_level:com_10, $pips, 6);
+~soulbane_rage_pip(rage_level:com_12, $pips, 7);
+~soulbane_rage_pip(rage_level:com_14, $pips, 8);
+~soulbane_rage_pip(rage_level:com_16, $pips, 9);
+~soulbane_rage_pip(rage_level:com_18, $pips, 10);
+
+[proc,soulbane_rage_pip](component $component, int $pips, int $ordinal)
+if ($pips < $ordinal) if_sethide($component, true);
+else if_sethide($component, false);

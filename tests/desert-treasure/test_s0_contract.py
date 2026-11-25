@@ -6,12 +6,14 @@ from __future__ import annotations
 from pathlib import Path
 import os
 import re
-import subprocess
+import tarfile
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROOT = Path(os.environ.get("DT_S0_CONTENT_ROOT", REPO_ROOT)).resolve()
-BASELINE_COMMIT = "208a5b7f734f8f2e2bd24fcde6a4abb237bb59a1"
+# Byte-exact source files from 208a5b7f734f8f2e2bd24fcde6a4abb237bb59a1.
+# Keep the baseline in the checkout so the same contract runs in shallow CI clones.
+BASELINE = Path(__file__).with_name("s0-baseline.tar.gz")
 UNPACK = ROOT / "scripts" / "_unpack" / "377"
 VARP = UNPACK / "all.varp"
 VARP_PACK = ROOT / "pack" / "varp.pack"
@@ -53,18 +55,16 @@ def baseline_text(relative_path: str) -> str:
             return ""
         return path.read_text(encoding="utf-8")
 
-    result = subprocess.run(
-        ["git", "show", f"{BASELINE_COMMIT}:{relative_path}"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        check=False,
-        text=True,
-        encoding="utf-8",
-    )
-    if result.returncode != 0:
-        require(False, f"cannot read baseline {BASELINE_COMMIT}:{relative_path}: {result.stderr.strip()}")
-        return ""
-    return result.stdout
+    with tarfile.open(BASELINE, "r:gz") as archive:
+        try:
+            source = archive.extractfile(relative_path)
+        except KeyError:
+            require(False, f"baseline file is missing: {relative_path}")
+            return ""
+        if source is None:
+            require(False, f"baseline file is missing: {relative_path}")
+            return ""
+        return source.read().decode("utf-8")
 
 
 def section_names(text: str) -> list[str]:
@@ -244,12 +244,18 @@ def check_original_entity_configs() -> None:
         require(not base_duplicates, f"duplicate baseline {filename} sections: {base_duplicates[:3]}")
         names = [name for name in section_names(base_text) if DT_ENTITY.fullmatch(name)]
         require(bool(names), f"{filename} must contain the original Desert Treasure family")
+        unmoved_names = [
+            name for name in names
+            if filename != "all.obj" or name != "staff_of_zaros"
+        ]
         require(
-            [name for name in section_names(text) if name in names] == names,
+            [name for name in section_names(text) if name in unmoved_names] == unmoved_names,
             f"{filename} must preserve Desert Treasure section identities/order",
         )
         if filename in ("all.loc", "all.obj"):
             for name in names:
+                if filename == "all.obj" and name == "staff_of_zaros":
+                    continue
                 require(sections.get(name) == base_sections[name],
                         f"[{name}] must preserve original definitions and operations")
         configs[filename] = sections
@@ -260,12 +266,84 @@ def check_original_entity_configs() -> None:
         def identities(text: str) -> dict[int, str]:
             return {int(slot): name for slot, name in re.findall(r"(?m)^(\d+)=([^\r\n]+)$", text)
                     if DT_ENTITY.fullmatch(name)}
+        current_identities = identities((ROOT / relative_path).read_text(encoding="utf-8"))
         require(
-            identities((ROOT / relative_path).read_text(encoding="utf-8")) == identities(baseline_text(relative_path)),
+            current_identities == identities(baseline_text(relative_path)),
             f"{pack_name} must preserve Desert Treasure numeric identities",
+        )
+        if pack_name == "obj.pack":
+            require(current_identities.get(4675) == "staff_of_zaros",
+                    "[staff_of_zaros] must retain its original built-pack identity 4675")
+
+    # B-ANCIENTS3 relocates only this original row. Its ordered cache fields stay
+    # frozen; only the explicit staff category and server fields below are added.
+    staff_definitions: list[dict[str, list[str]]] = []
+    for path in sorted((ROOT / "scripts").rglob("*.obj")):
+        text = path.read_text(encoding="utf-8")
+        count = section_names(text).count("staff_of_zaros")
+        if count:
+            sections, _ = parse_sections_text(text, str(path))
+            staff_definitions.extend([sections["staff_of_zaros"]] * count)
+    require(len(staff_definitions) == 1,
+            "[staff_of_zaros] must have exactly one definition across all .obj files")
+    original_staff = [
+        (key, value)
+        for key, values in base_configs["all.obj"]["staff_of_zaros"].items()
+        for value in values
+    ]
+    require(len(original_staff) == 15, "[staff_of_zaros] baseline must contain fifteen original fields")
+    # VERIFIED bonuses; CANDIDATE four-tick melee rate; UNKNOWN presentation row.
+    staff_additions = [
+        ("category", "weapon_staff"),
+        ("param", "stabattack,10"),
+        ("param", "slashattack,-1"),
+        ("param", "crushattack,40"),
+        ("param", "magicattack,15"),
+        ("param", "rangeattack,0"),
+        ("param", "stabdefence,2"),
+        ("param", "slashdefence,3"),
+        ("param", "crushdefence,1"),
+        ("param", "magicdefence,15"),
+        ("param", "rangedefence,0"),
+        ("param", "strengthbonus,50"),
+        ("param", "prayerbonus,-1"),
+        ("param", "attackrate,4"),
+        ("param", "ready_baseanim,human_staffready"),
+        ("param", "crushattack_anim,human_staff_pummel"),
+        ("param", "defend_anim,human_staff_block"),
+        ("param", "crush_sound,staff_hit"),
+        ("param", "walk_f_baseanim,human_halberdwalk_f"),
+        ("param", "walk_b_baseanim,human_halberdwalk_b"),
+        ("param", "walk_l_baseanim,human_halberdwalk_l"),
+        ("param", "walk_r_baseanim,human_halberdwalk_r"),
+        ("param", "running_baseanim,human_halberdrunning"),
+        ("param", "turnonspot_baseanim,human_halberdturnonspot"),
+    ]
+    if len(staff_definitions) == 1:
+        staff_fields = [
+            (key, value)
+            for key, values in staff_definitions[0].items()
+            for value in values
+        ]
+        require(
+            staff_fields == original_staff + staff_additions,
+            "[staff_of_zaros] must preserve the fifteen original fields in order and add only its approved server fields",
         )
 
     npcs = configs["all.npc"]
+    moved_bases = ("troll_block_1", "troll_block_2")
+    moved_counts = dict.fromkeys(moved_bases, 0)
+    for path in sorted((ROOT / "scripts").rglob("*.npc")):
+        text = path.read_text(encoding="utf-8")
+        names = section_names(text)
+        for name in moved_bases:
+            count = names.count(name)
+            if count:
+                moved_counts[name] += count
+                sections, _ = parse_sections_text(text, str(path))
+                npcs[name] = sections[name]
+    for name in moved_bases:
+        require(moved_counts[name] == 1, f"[{name}] must have exactly one NPC definition")
     base_npcs = base_configs["all.npc"]
     expected_npcs = {
         "icediamond_icewarrior": (130, 190, 80, 135, 4, "obj_khazard_helmet_manwear", "154"),
@@ -308,6 +386,8 @@ def check_original_entity_configs() -> None:
         }
     for name in ("troll_block_1", "fd_trollblock1", "troll_block_2", "fd_trollblock2"):
         s5_behaviour[name] = {"hitpoints": "10", "wanderrange": "0", "defaultmode": "none"}
+    for name in moved_bases:
+        s5_behaviour[name]["param"] = ("npc_noncombat_multi,yes",)
 
     def strip_s5_behaviour(name, values):
         result = {key: list(items) for key, items in values.items()}
@@ -455,6 +535,29 @@ def check_original_entity_configs() -> None:
         if name in expected_npcs or not (DT_ENTITY.fullmatch(name) or name in s5_behaviour):
             continue
         current_values = strip_s5_behaviour(name, npcs.get(name, {}))
+        if name in {f"deserttreasure_mummy_{n}" for n in range(2, 6)}:
+            # S7 arms the original mapped mummies. Values remain UNKNOWN;
+            # assert each addition, then retain the full inherited-data freeze.
+            for field, expected in {
+                "wanderrange": ["3"], "maxrange": ["8"], "attackrange": ["1"],
+                "huntmode": ["aggressive_melee"], "huntrange": ["5"],
+            }.items():
+                require(field not in base_values, f"[{name}] baseline has no S7 field {field}")
+                require(current_values.pop(field, None) == expected,
+                        f"[{name}] exact S7 field {field}={expected[0]}")
+            params = current_values.pop("param", [])
+            for expected in (
+                "attackrate,4", "damagetype,^crush_style",
+                "attack_anim,deserttreasure_mummy_attack",
+                "defend_anim,deserttreasure_mummy_block",
+                "death_anim,deserttreasure_mummy_death",
+            ):
+                require(params.count(expected) == 1, f"[{name}] exact S7 param {expected}")
+                require(expected not in base_values.get("param", []),
+                        f"[{name}] baseline has no S7 param {expected}")
+                params = [value for value in params if value != expected]
+            if params:
+                current_values["param"] = params
         if name.startswith("fourdiamonds_sword_bandit_sit"):
             # Published S1 fixes the four seated, non-wandering bandits.
             for field, expected in seated_fields.items():

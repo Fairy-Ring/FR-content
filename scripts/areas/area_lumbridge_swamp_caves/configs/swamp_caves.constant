@@ -39,6 +39,7 @@
 ^swamp_wallbeast_6 = 0_50_149_15_23
 ^swamp_wallbeast_7 = 0_50_149_16_51
 // UNKNOWN original durations: engineering hold, cooldown, leash and reset.
+// SC-05H: the same UNKNOWN engineering hold also stalls a repelled lunge.
 ^swamp_wallbeast_hold_ticks = 6
 ^swamp_wallbeast_hit_tick = 5
 ^swamp_wallbeast_cooldown_ticks = 10
@@ -59,3 +60,23 @@
 ^swamp_stone_high = 252
 ^swamp_stone_success_xp = 30
 ^swamp_stone_failure_xp = 10
+
+// CANDIDATE destinations from original maps; UNKNOWN original arrival/motion.
+^swamp_cave_rope_bottom = 0_49_149_32_36
+^swamp_cave_rope_top = 0_49_49_32_36
+
+// SC-10 UNKNOWN original arrivals/motion: collision-checked engineering ends.
+^tog_approach_dark = 2_50_148_39_52
+^tog_approach_juna = 2_50_148_41_52
+^tog_ledge = 2_50_148_38_26
+^tog_ledge_juna = 2_50_148_40_26
+^tog_slope_half_ticks = 2
+
+// TOG-FERRY-PRESENTATION-01: UNKNOWN engineering use of VERIFIED NPC 2022.
+// Keep the published three-tick halves and ledge destination. Centre the size-3
+// carrier under the size-1 rider. Its seven-tick lifetime also cleans up an
+// abandoned script, after the six-tick transfer's final player phase.
+^tog_ferry_half_ticks = 3
+^tog_ferry_carrier_ticks = 7
+^tog_ferry_centre_offset = -1
+^tog_ferry_anim_delay = 0

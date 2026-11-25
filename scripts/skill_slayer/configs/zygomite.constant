@@ -1,0 +1,16 @@
+// CANDIDATE: Old School fungicide-spray page, eight or fewer hitpoints.
+^zygomite_finish_hitpoints = 8
+// CANDIDATE: current Old School Zygomite combat data.
+^zygomite_young_melee_maxhit = 7
+^zygomite_adult_melee_maxhit = 8
+^zygomite_young_ranged_maxhit = 6
+^zygomite_adult_ranged_maxhit = 10
+// UNKNOWN engineering: occasional spores are reconstructed as one attack in four nearby.
+^zygomite_spore_roll = 4
+// UNKNOWN engine encoding: retain the revealed form until death, like killerwatt.
+^zygomite_form_lifetime = 1000000000
+// UNKNOWN engineering: native pick/leap presentation takes two ticks.
+^zygomite_pick_delay = 2
+// UNKNOWN engineering: effect height and travel duration (client cycles) are not recovered.
+^zygomite_spore_height = 92
+^zygomite_spore_duration = 32

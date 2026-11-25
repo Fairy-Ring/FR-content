@@ -1,0 +1,411 @@
+{
+  "schema": 1,
+  "description": "Independent occurrence-level O/J oracle from the frozen pre-2022 comparison, not derived from production RuneScript at test time.",
+  "removedEntries": [
+    "[label,feud_camel_disposed]",
+    "[label,feud_camel_thanks]",
+    "[label,feud_bandit_celebrate]",
+    "[label,feud_coward_celebrate]",
+    "[label,feud_urchin_celebrate]"
+  ],
+  "requiredScripts": [
+    "[opnpc1,feud_ali_m]",
+    "[label,feud_ali_m_refuse]",
+    "[opnpc1,feud_bandit_boss_vis]",
+    "[oploc1,feud_cactus_row]",
+    "[opnpc1,feud_ali_the_discount_camel_seller]",
+    "[label,feud_camel_menu]",
+    "[label,feud_camel_store]",
+    "[label,feud_camel_town]",
+    "[label,feud_camel_lovely]",
+    "[label,feud_camel_buy]",
+    "[label,feud_camel_price_menu]",
+    "[label,feud_camel_ali]",
+    "[label,feud_camel_receipts]",
+    "[queue,feud_champion_defeated]",
+    "[opnpc1,feud_drunken_ali]",
+    "[opnpcu,feud_drunken_ali]",
+    "[label,feud_dyer_make]",
+    "[label,feud_bandit_after]",
+    "[label,feud_bandit_recruited]",
+    "[label,feud_coward_recruited]",
+    "[label,feud_thug_after]",
+    "[label,feud_thug_recruited]",
+    "[label,feud_thug_traitor]",
+    "[label,feud_thug_avenge]",
+    "[label,feud_hag_no_snake]",
+    "[label,feud_hag_no_dung]",
+    "[label,feud_hag_poison_recovery]",
+    "[opnpc1,feud_mayor_geom]",
+    "[label,feud_mayor_consequences]",
+    "[oploc1,feud_mayors_bed]",
+    "[oploc1,feud_mayors_desk]",
+    "[label,feud_mayor_door]",
+    "[if_button,inter_265:com_13]",
+    "[label,feud_safe_digit]",
+    "[label,feud_operator_progress]",
+    "[label,feud_operator_notyet]",
+    "[label,feud_operator_flavour]",
+    "[label,feud_operator_report]",
+    "[label,feud_operator_stakeout]",
+    "[label,feud_operator_breakin]",
+    "[label,feud_operator_jewels]",
+    "[label,feud_operator_traitor]",
+    "[label,feud_operator_search]",
+    "[label,feud_operator_oak]",
+    "[label,feud_operator_deed]",
+    "[label,feud_operator_deed_wait]",
+    "[label,feud_operator_ruin]",
+    "[proc,feud_villager_pickpocket_fail]",
+    "[oplocu,feud_poison_beer_table]",
+    "[label,feud_capture_snake]",
+    "[label,feud_barman_menu]",
+    "[label,feud_barman_followup]",
+    "[label,feud_kebab_standard]",
+    "[label,feud_kebab_hot]",
+    "[label,feud_urchin_start]",
+    "[proc,feud_urchin_do_distract]",
+    "[proc,feud_urchin_no_villager]",
+    "[label,feud_urchin_payment]",
+    "[label,feud_urchin_double_payment]",
+    "[label,feud_urchin_repeat_distraction]",
+    "[label,feud_urchin_repeat_target]",
+    "[label,feud_urchin_information]",
+    "[label,feud_urchin_info_menu]",
+    "[label,feud_urchin_info_choices]",
+    "[label,feud_urchin_info_end]",
+    "[label,feud_villager_celebrate]",
+    "[oplocu,feud_money_bowl]"
+  ],
+  "removed": [
+    {
+      "occurrence": "feud_camel_man.rs2:9",
+      "class": "O",
+      "script": "[opnpc1,feud_ali_the_discount_camel_seller]",
+      "text": "Hello! Welcome back to my discount camel store. How are those camels getting along?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:18",
+      "class": "O",
+      "script": "[label,feud_camel_menu]",
+      "text": "I decided to get rid of the camels.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:21",
+      "class": "O",
+      "script": "[label,feud_camel_menu]",
+      "text": "I decided to get rid of the camels.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:46",
+      "class": "O",
+      "script": "[label,feud_camel_store]",
+      "text": "Perhaps you'd like a camel of your own? You're in the right place, if so...",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:66",
+      "class": "O",
+      "script": "[label,feud_camel_store]",
+      "text": "If only I could figure out how to get people to return the camels...",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:106",
+      "class": "O",
+      "script": "[label,feud_camel_town]",
+      "text": "What, you want me to put a little note in your quest journal?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:117",
+      "class": "O",
+      "script": "[label,feud_camel_lovely]",
+      "text": "Oh. Anyway...",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:137",
+      "class": "J",
+      "script": "[label,feud_camel_buy]",
+      "text": "Well Sandy, the female camel, is a placid beast. At 20 years of age she comes from a prestigious line of camels - her mother was part of the Emir's baggage train!",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:138",
+      "class": "O",
+      "script": "[label,feud_camel_buy]",
+      "text": "Lumps, on the other hand, is a 15 year old male. He's a bit surly and prone to bouts of stubbornness. However, he more than makes up for this failing with his immense strength and stamina.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:139",
+      "class": "O",
+      "script": "[label,feud_camel_buy]",
+      "text": "Both of them are of the 'Camelus Horribleus' family, a rare breed only found in this area of Gielinor. It is...",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:140",
+      "class": "O",
+      "script": "[label,feud_camel_buy]",
+      "text": "Ok, ok, that's enough! They're camels, I get it.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:207",
+      "class": "O",
+      "script": "[label,feud_camel_ali]",
+      "text": "Have you considered hiring a camel? Or perhaps purchasing one of your own? I can get you a discount.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:228",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "Why? did they not please you?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:229",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "No, they didn't. I sold them as Kebab meat!",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:229",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "I'm not really a camel person, so I gave them to a better owner.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:229",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "I decided to try and use them to end the hostilities between the two gangs.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:231",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "No, they didn't. I sold them as Kebab meat!",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:232",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "Nooooo! Not Sandy and Lumps! You beast! Get out of my shop this instant!",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:236",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "I'm not really a camel person, so I gave them to a better owner.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:237",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "That's very responsible of you. Too many people let their camels run feral through the desert, instead of sending them to happy homes.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:238",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "You want to watch out for those feral camels, you know.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:240",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "I decided to try and use them to end the hostilities between the two gangs.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:241",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "A noble purpose for two noble beasts! Did you succeed?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:242",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "Still working on that, I'm afraid.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:243",
+      "class": "O",
+      "script": "[label,feud_camel_disposed]",
+      "text": "Well, I wish you the best of luck.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:249",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Hello! Welcome back to my discount camel store. How are those camels getting along?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:250",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Hey Ali!",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:251",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Hello adventurer.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:252",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Any news?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:253",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Not much really, I just want to thank you for what you have done for this town. I might even stick around now that business is better!",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:254",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Any grand plans?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:255",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Well I've been debating whether I should diversify into camel rental, too. Although I do have all these cages lying around... do you think there's a market for discount jackals?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:256",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Maybe! Best of luck, in any case.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_camel_man.rs2:257",
+      "class": "O",
+      "script": "[label,feud_camel_thanks]",
+      "text": "Thank you.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:124",
+      "class": "O",
+      "script": "[label,feud_bandit_celebrate]",
+      "text": "Welcome! Your actions surprise me.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:125",
+      "class": "O",
+      "script": "[label,feud_bandit_celebrate]",
+      "text": "What do you mean?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:126",
+      "class": "O",
+      "script": "[label,feud_bandit_celebrate]",
+      "text": "It was brilliant the way you got rid of the Menaphite leader.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:127",
+      "class": "O",
+      "script": "[label,feud_bandit_celebrate]",
+      "text": "Er... yes. Thank you.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:128",
+      "class": "O",
+      "script": "[label,feud_bandit_celebrate]",
+      "text": "So will you run the rest of them out of town now?",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:129",
+      "class": "O",
+      "script": "[label,feud_bandit_celebrate]",
+      "text": "I don't know.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_gangs.rs2:201",
+      "class": "O",
+      "script": "[label,feud_coward_celebrate]",
+      "text": "Welcome. Our leader would be pleased to congratulate you on your disposal of the Menaphites who plagued this town.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_urchin.rs2:190",
+      "class": "O",
+      "script": "[label,feud_urchin_info_choices]",
+      "text": "The town",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_urchin.rs2:213",
+      "class": "O",
+      "script": "[label,feud_urchin_info_choices]",
+      "text": "Tell me about the town.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_urchin.rs2:214",
+      "class": "O",
+      "script": "[label,feud_urchin_info_choices]",
+      "text": "It's boring! We're not as big as Menaphos or as powerful as Al Kharid, and we've got a really nasty crime problem. It's no wonder so many grown-ups have left.",
+      "sharedWithRetainedOccurrence": false
+    },
+    {
+      "occurrence": "feud_urchin.rs2:226",
+      "class": "O",
+      "script": "[label,feud_urchin_celebrate]",
+      "text": "I think I need to try a different tactic. Sorry, kid!",
+      "sharedWithRetainedOccurrence": true
+    },
+    {
+      "occurrence": "feud_urchin.rs2:227",
+      "class": "O",
+      "script": "[label,feud_urchin_celebrate]",
+      "text": "Well do you need any information then?",
+      "sharedWithRetainedOccurrence": true
+    },
+    {
+      "occurrence": "feud_urchin.rs2:228",
+      "class": "O",
+      "script": "[label,feud_urchin_celebrate]",
+      "text": "No thanks, I think I have a fair idea of what is going on in the town now.",
+      "sharedWithRetainedOccurrence": false
+    }
+  ]
+}

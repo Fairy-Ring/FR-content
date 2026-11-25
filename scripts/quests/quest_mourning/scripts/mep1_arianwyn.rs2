@@ -11,7 +11,7 @@ if (%mourning_quest < 1) {
 if (%mourning_quest >= 9) {
     // MEP1 complete = varp 517 = OSRS MOURNING'S_END_PART_I_PROGRESS,
     // terminal stage 9 (Chisel 8->9). 377 unpack places mourning_quest at
-    // varp 517 (between varp516_bits / varp519_unused). Cite mep2-start-complete-gate-377.md.
+    // varp 517. Cite mep2-start-complete-gate-377.md.
     @mourning2_arianwyn_start;
     return;
 }

@@ -1,0 +1,33 @@
+// CANDIDATE: Old School stats and shield cap, not recovered 377 server values.
+^wyvern_melee_maxhit = 13
+^wyvern_ranged_maxhit = 13
+^wyvern_breath_maxhit = 50
+^wyvern_shield_maxhit = 10
+^wyvern_magic_prayer_maxhit = 20
+^wyvern_granite_roll = 512
+// UNKNOWN engineering: eleven ticks; no registered source states a duration.
+^wyvern_freeze_ticks = 11
+// UNKNOWN engineering: original attack mix, freeze chance and stat-loss amounts.
+^wyvern_melee_style = 0
+^wyvern_ranged_style = 1
+^wyvern_breath_style = 2
+^wyvern_close_styles = 3
+^wyvern_distant_styles = 2
+^wyvern_freeze_roll = 6
+^wyvern_stat_drain_percent = 10
+// UNKNOWN engineering: presentation geometry, in client cycles/model units.
+^wyvern_projectile_height = 40
+^wyvern_projectile_endheight = 36
+^wyvern_projectile_delay = 32
+^wyvern_projectile_angle = 15
+^wyvern_projectile_offset = 11
+^wyvern_projectile_step = 5
+// UNKNOWN engineering: common-table weights. Membership and quantities use the
+// pre-18-June-2007 wiki list, before both documented drop-value boosts.
+^wyvern_drop_slots = 128
+// UNKNOWN engineering: centre tile south of the mapped exit's 3x2 footprint
+// (3055,9556, angle 0), facing that mouth; original server landing is unrecovered.
+^wyvern_entry_landing = 0_47_149_48_19
+// UNKNOWN engineering: centre tile north of the mapped entrance's 3x2 footprint
+// (3055,9560, angle 2), facing that mouth; z9561 is inside its blocked footprint.
+^wyvern_exit_landing = 0_47_149_48_26

@@ -1,0 +1,101 @@
+// CANDIDATE wording: fairytale-1.dlg.malignius-mortifer.
+[opnpc1,elemental_wizard_boss]
+if (%fairy_farmers_quest < ^ft1_zandar) return;
+if (%fairy_farmers_quest >= ^ft1_enchanted) {
+    if (~obj_gettotal(fairy_enchanted_secateurs) = 0 & %farming_tools_fairysecateurs = 0) {
+        // VERIFIED period replacement price; UNKNOWN plain functional menu wording.
+        def_int $replace = ~p_choice2("Buy replacement magic secateurs for 40,000 coins.", 1, "No thanks.", 2);
+        if ($replace = 2) return;
+        if (inv_total(inv, coins) < 40000) {
+            mes("You need 40,000 coins.");
+            return;
+        }
+        if (inv_freespace(inv) = 0 & inv_total(inv, coins) > 40000) {
+            mes("Your inventory is too full to take that.");
+            return;
+        }
+        inv_del(inv, coins, 40000);
+        inv_add(inv, fairy_enchanted_secateurs, 1);
+        return;
+    }
+    ~chatnpc("<p,neutral>I have already told you all I know about fighting a Tanglefoot. What more would you have of me?");
+    return;
+}
+if (%fairy_farmers_quest = ^ft1_components) {
+    ~chatplayer("<p,neutral>I was asking you about fighting a Tanglefoot...");
+    ~chatnpc("<p,neutral>I have already told you all I know about fighting a Tanglefoot. What more would you have of me?");
+    def_int $repeat = ~p_choice2("Could you tell me how to kill a Tanglefoot again, please?", 1, "What did I need to take to the Nature Spirit again?", 2);
+    if ($repeat = 1) {
+        ~chatplayer("<p,quiz>Could you tell me how to kill a Tanglefoot again, please?");
+        ~chatnpc("<p,neutral>I guess so. Forgot to take notes did you? Well, listen carefully this time. You will need to enchant a pair of secateurs. Only these can harm a Tanglefoot.");
+    } else {
+        ~chatplayer("<p,quiz>What did I need to take to the Nature Spirit again?");
+        ~ft1_components_reminder;
+    }
+    ~chatplayer("<p,neutral>Great, thanks very much.");
+    return;
+}
+if (%fairy_farmers_quest = ^ft1_zandar) {
+    ~chatplayer("<p,quiz>I need help with fighting a Tanglefoot. Can you help me?");
+    ~chatnpc("<p,neutral>Almost certainly, I am a great practitioner of the magic arts, after all.");
+    ~chatplayer("<p,neutral>Great, thanks. I was told by Zandar Horfyre that you fought one once.");
+    ~chatnpc("<p,neutral>That is true and an epic battle it was too.");
+    ~chatplayer("<p,quiz>That's great! I presume you won as you are here to tell me about it, could you tell me how to defeat one, please?");
+    ~chatnpc("<p,neutral>Of course I won! As I've already stated I am a master of the magic arts.");
+    ~chatnpc("<p,quiz>Why do you want to know how to kill a Tanglefoot?");
+    ~chatplayer("<p,neutral>There is a Tanglefoot in the lost city of Zanaris and I have been asked to kill it.");
+    ~chatnpc("<p,neutral>I see. Well I could tell you how to defeat your Tanglefoot, however I would need you to perform a little undertaking for me first.");
+    ~chatplayer("<p,quiz>What exactly did you have in mind?");
+    ~chatnpc("<p,neutral>To the north-east of here is a haunted manor. Bring me a skull from a grave you find there and you shall have your answer.");
+    %fairy_farmers_quest = ^ft1_skull;
+} else {
+    ~chatplayer("<p,neutral>I was asking you about fighting a Tanglefoot...");
+    ~chatnpc("<p,quiz>So, have you brought me the skull?");
+}
+if (inv_total(inv, fairy_skull) = 0) {
+    ~chatplayer("<p,neutral>No, not yet.");
+    ~chatnpc("<p,neutral>Well come and talk to me once you have it.");
+    return;
+}
+~chatplayer("<p,neutral>Actually I have it right here.");
+~chatnpc("<p,neutral>Excellent, hand it over then.");
+// CANDIDATE three random, distinct items per player; UNKNOWN uniform algorithm.
+// Choose and persist once at the skull hand-off, never reroll on a reminder/logout.
+inv_del(inv, fairy_skull, 1);
+def_int $first = add(random(^ft1_item_count), 1);
+def_int $second = add(random(sub(^ft1_item_count, 1)), 1);
+if ($second >= $first) $second = add($second, 1);
+def_int $third = add(random(sub(^ft1_item_count, 2)), 1);
+if ($third >= min($first, $second)) $third = add($third, 1);
+if ($third >= max($first, $second)) $third = add($third, 1);
+%fairy_nature_item1 = $first;
+%fairy_nature_item2 = $second;
+%fairy_nature_item3 = $third;
+%fairy_farmers_quest = ^ft1_components;
+~chatnpc("<p,neutral>Right then, to business. A Tanglefoot can not be harmed by might nor magic. The only weapon that can damage them are a pair of enchanted secateurs!");
+~chatplayer("<p,quiz>Where can I get a pair of these enchanted secateurs?");
+~chatnpc("<p,neutral>You will have to make them... listen carefully and I'll tell you how.");
+~chatnpc("<p,neutral>Obviously you will need a pair of secateurs, you will also need to gather <oc_name(enum(int, namedobj, ft1_nature_items, %fairy_nature_item1))>, <oc_name(enum(int, namedobj, ft1_nature_items, %fairy_nature_item2))> and <oc_name(enum(int, namedobj, ft1_nature_items, %fairy_nature_item3))>.");
+~chatnpc("<p,neutral>Take them to the Nature Spirit and ask him to perform the ceremony of Phasma Phasmatis Natura.");
+~chatplayer("<p,neutral>Phasma Phasmatis Natura. Got it! Is that all?");
+~chatnpc("<p,neutral>Yes, that's all. You'll be able to use those secateurs to kill the monster.");
+~chatplayer("<p,neutral>Great, thanks very much.");
+
+[proc,ft1_components_reminder]
+~chatnpc("<p,neutral>You will need a pair of secateurs. You will also need to gather <oc_name(enum(int, namedobj, ft1_nature_items, %fairy_nature_item1))>, <oc_name(enum(int, namedobj, ft1_nature_items, %fairy_nature_item2))> and <oc_name(enum(int, namedobj, ft1_nature_items, %fairy_nature_item3))>.");
+~chatnpc("<p,neutral>Take them to the Nature Spirit and ask him to perform the ceremony of Phasma Phasmatis Natura.");
+
+[proc,ft1_skull_dig]()(boolean)
+// VERIFIED grave location. UNKNOWN engineering reach: the gravestone blocks its
+// own tile, so a player digs from a reachable adjacent tile, not inside the loc.
+if (distance(coord, ^ft1_skull_grave) > ^ft1_skull_dig_range | %fairy_farmers_quest ! ^ft1_skull) return(false);
+if (~obj_gettotal(fairy_skull) > 0) return(true);
+if (inv_freespace(inv) = 0) {
+    mes("Your inventory is too full to take that.");
+    return(true);
+}
+anim(human_dig, 0);
+inv_add(inv, fairy_skull, 1);
+// UNKNOWN plain functional line, not recovered period wording.
+mes("You find a Draynor skull.");
+return(true);

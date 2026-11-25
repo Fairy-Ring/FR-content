@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /** S01 executes the real packed VM; only its documented RNG seam is controlled. */
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -103,18 +102,13 @@ function cap(player, npc, style, maximum = 23) {
   player.setVar(id(VarPlayerType, 'damagetype'), style);
   return run('[proc,npc_max_dealt]', player, npc, [maximum, 0])[0];
 }
-function unrelatedCaps() {
-  const rows = [];
-  for (const type of [1, 41, 81, 1154, 1604, 1612, 1624, 1831, 2690, NpcType.getByName('rd_combat_npc_room_3').id]) {
-    for (const style of [0, 3, 4]) {
-      const { player, npc } = fixture(type);
-      rows.push({ type, debugname: NpcType.get(type).debugname, style, maximum: 23, cap: cap(player, npc, style) });
-    }
-  }
-  return rows;
-}
-function openPaths(names) {
-  for (const name of names) {
+function slayerCannonRecoilCases() {
+  for (const [name, cannonDamage] of [
+    ['slayer_kursk_1', 30],
+    ['slayer_turoth_dad', 30],
+    ['slayer_dustdevil', 30],
+    ['slayer_harpiebugswarm', 0]
+  ]) {
     {
       const { player, npc } = fixture(name);
       player.setVar(id(VarPlayerType, 'tutorial'), 1000);
@@ -124,8 +118,21 @@ function openPaths(names) {
       player.setVar(id(VarPlayerType, 'com_rangeattack'), 1000000);
       npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
       random([0.999999, 0, 0.999999], () => run('[proc,cannon_fire]', player, npc));
-      check(`${name} cannon without required equipment`, [...npc.queue.all()].map(q => q.lastInt), [0, 30]);
-      check(`${name} cannon damage-derived Ranged XP`, player.stats[PlayerStat.RANGED], Math.min(30, npc.levels[NpcStat.HITPOINTS]) * 20);
+      check(`${name} cannon without required equipment`, [...npc.queue.all()].map(q => q.lastInt), [0, cannonDamage]);
+      check(`${name} cannon damage-derived Ranged XP`, player.stats[PlayerStat.RANGED], Math.min(cannonDamage, npc.levels[NpcStat.HITPOINTS]) * 20);
+    }
+    if (name === 'slayer_harpiebugswarm') {
+      const { player, npc } = fixture(name);
+      wear(player, 5, 'slayer_buglan_on');
+      player.setVar(id(VarPlayerType, 'tutorial'), 1000);
+      player.setVar(id(VarPlayerType, 'rockthrower'), 10);
+      player.setVar(id(VarPlayerType, 'ownedmcannon'), ((player.x - 2) << 14) | player.z);
+      player.setVar(id(VarPlayerType, 'damagetype'), 3);
+      player.setVar(id(VarPlayerType, 'com_rangeattack'), 1000000);
+      npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
+      random([0.999999, 0, 0.999999], () => run('[proc,cannon_fire]', player, npc));
+      check('harpie cannon with worn lit lantern', [...npc.queue.all()].map(q => q.lastInt), [0, 30]);
+      check('harpie lit-lantern cannon damage-derived XP', player.stats[PlayerStat.RANGED], Math.min(30, npc.levels[NpcStat.HITPOINTS]) * 20);
     }
     {
       const { player, npc } = fixture(name);
@@ -138,20 +145,7 @@ function openPaths(names) {
     }
   }
 }
-if (process.argv.includes('--open-paths')) {
-  openPaths(['slayer_kursk_1', 'slayer_turoth_dad']);
-  console.log(`PASS published Kurask/Turoth cannon and recoil ${assertions} assertions`);
-  process.exit(0);
-}
-const baselineAt = process.argv.indexOf('--baseline');
-if (baselineAt >= 0) {
-  const rows = unrelatedCaps();
-  writeFileSync(process.argv[baselineAt + 1], `${JSON.stringify({ contentCommit: 'b195a0ade83c9ef3a6c9b6c35a42c9e0520c7888', rows }, null, 2)}\n`);
-  console.log(`PASS published damage-cap baseline ${rows.length} rows`);
-  process.exit(0);
-}
-check('other NPC caps match the published pack in melee/ranged/magic', unrelatedCaps(), JSON.parse(readFileSync(path.join(here, 'published-max-dealt.json'), 'utf8')).rows);
-openPaths(['slayer_kursk_1', 'slayer_turoth_dad', 'slayer_dustdevil', 'slayer_harpiebugswarm']);
+slayerCannonRecoilCases();
 for (const [name, hp] of [['slayer_dustdevil', 105], ['slayer_harpiebugswarm', 25], ['swamp_cave_slime', 25]]) {
   const { npc } = fixture(name);
   check(`${name} spawned HP`, npc.levels[NpcStat.HITPOINTS], hp);

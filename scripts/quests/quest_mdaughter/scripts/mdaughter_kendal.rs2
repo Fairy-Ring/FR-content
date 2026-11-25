@@ -1,11 +1,185 @@
-// Mountain Daughter — The Kendal Talk-to (mdaughter_bearman 1812, child of
-// multi mdaughter_multi_bear 1811 @ 2786,10081). CANDIDATE last-resort
-// 2007-base: OSRS Transcript:Mountain Daughter "Talking to him" minus
-// Changes. Chat header The Kendal. Prefer 0 write: %mdaughter_quest_var
-// stays 1. No bear bits / dest / pool / kill / fake complete. Hunt 289? no.
-// Cite docs/research/md-kendal-377.md §4.5.
+// CANDIDATE wording: retained OSRS Transcript:Mountain Daughter, The Kendal.
+// VERIFIED fight/body/trophy chain: Tip.It guide, 27 April 2006.
+// NPC integer storage starts at zero; initialize the typed owner on each spawn.
+[ai_spawn,mdaughter_multi_bear] ~mdaughter_kendal_spawn;
+[ai_spawn,mdaughter_bearman] ~mdaughter_kendal_spawn;
+[ai_spawn,mdaughter_bearman_fighter] ~mdaughter_kendal_spawn;
+[proc,mdaughter_kendal_spawn]
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+%npc_attacking_uid = null;
+%npc_aggressive_player = null;
+%npc_int = 0;
+npc_settimer(0);
 
-[opnpc1,mdaughter_bearman]
-~chatplayer("<p,neutral>Errr... hello?");
-~chatnpc("<p,neutral>Who dares to disturb my slumber?");
-return;
+// CANDIDATE later transcript: one player owns the shared Kendal at a time.
+// UNKNOWN engineering release policy; npc_int is this encounter's absolute deadline.
+[ai_timer,mdaughter_multi_bear] ~mdaughter_kendal_release_stale;
+[ai_timer,mdaughter_bearman] ~mdaughter_kendal_release_stale;
+[ai_timer,mdaughter_bearman_fighter] ~mdaughter_kendal_release_stale;
+[proc,mdaughter_kendal_release_stale]
+if (%npc_attacking_uid = null | npc_stat(hitpoints) = 0) return;
+if (%npc_int > map_clock & .finduid(%npc_attacking_uid) = true) {
+    if (inzone(^mdaughter_cavern_sw, ^mdaughter_cavern_ne, .coord) = true & .stat(hitpoints) > 0) {
+        if ((npc_getmode = opplayer2 | npc_getmode = applayer2) & %npc_aggressive_player = %npc_attacking_uid) return;
+        if (npc_getmode = playerfaceclose & .busy = true) return;
+    }
+}
+%npc_attacking_uid = null;
+%npc_aggressive_player = null;
+%npc_lastcombat = 0;
+%npc_int = 0;
+npc_setmode(none);
+npc_settimer(0);
+
+[proc,mdaughter_kendal_claim]
+if (%npc_attacking_uid ! uid | %npc_int = 0) {
+    %npc_attacking_uid = uid;
+    %npc_int = add(map_clock, ^mdaughter_kendal_hold_ticks);
+    npc_settimer(1);
+}
+
+[opnpc1,mdaughter_bearman] @mdaughter_kendal_talk;
+[opnpc1,mdaughter_multi_bear] @mdaughter_kendal_talk;
+
+[label,mdaughter_kendal_talk]
+if (%mdaughter_quest_var < ^mdaughter_remains) {
+    ~chatplayer("<p,neutral>Errr... hello?");
+    ~chatnpc("<p,angry>Go now, mortal, but I'll be watching you!");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_kendal_dead) return;
+~mdaughter_kendal_release_stale;
+if (%npc_attacking_uid ! null & %npc_attacking_uid ! uid & .finduid(%npc_attacking_uid) = true) {
+    mes("This bear has no quarrel with you.");
+    return;
+}
+if (%mdaughter_bear_discovery = 0) {
+    ~chatplayer("<p,neutral>Errr... hello?");
+    ~chatnpc("<p,angry>Who dares to disturb my slumber?");
+    def_int $greet = ~p_choice3("It's just me, no one special.", 1, "It's me, of whom many legends are sung.", 2, "Slumber? You didn't seem to be sleeping.", 3);
+    if ($greet = 2) {
+        ~chatplayer("<p,neutral>It's <displayname>, of whom many legends are sung.");
+        ~chatnpc("<p,angry>You are brave, to come into my cave and say a thing like that!");
+        return;
+    }
+    if ($greet = 3) {
+        ~chatplayer("<p,quiz>Slumber? You didn't seem to be sleeping.");
+        ~chatnpc("<p,angry>Do not mock me, mortal!");
+        return;
+    }
+    ~chatplayer("<p,neutral>It's just me, <displayname>, no one special.");
+    ~chatnpc("<p,quiz>Have you come, then, to pay your respects?");
+    ~chatplayer("<p,quiz>How... exactly do I do that?");
+    ~chatnpc("<p,angry>With your blood, mortal!");
+    if (~p_choice2("Time to go!", 1, "You mean a sacrifice?", 2) = 1) {
+        ~chatplayer("<p,neutral>Time to go, see you later!");
+        ~chatnpc("<p,angry>Go now, mortal, but I'll be watching you!");
+        return;
+    }
+    ~chatplayer("<p,quiz>You mean a sacrifice? Are you some kind of god?");
+    ~chatnpc("<p,angry>I am the guardian of the mountain, the god of the northern lands. I move the earth and control the skies. I am the Kendal!");
+    def_int $god = ~p_choice3("I seek your advice, oh great one!", 1, "You look like you escaped from a fairground!", 2, "You look like a man in a bearsuit!", 3);
+    if ($god = 1) {
+        ~chatplayer("<p,neutral>I seek your advice, oh great one.");
+        ~chatplayer("<p,quiz>I seek the cowardly murderer of a young lady of a nearby clan of mountain people. Do you know where I can find this person?");
+        ~chatnpc("<p,angry>I am not here to answer questions of such trivial nature! Go now before doom befalls you, mortal!");
+        return;
+    }
+    if ($god = 2) {
+        ~chatplayer("<p,neutral>You look like you escaped from a fairground!");
+        ~chatnpc("<p,angry>I would not say such things if I were you, mortal!");
+        return;
+    }
+    ~chatplayer("<p,neutral>You look like a man in a bearsuit!");
+    ~chatnpc("<p,angry>What did you say, mortal?");
+    ~chatplayer("<p,neutral>I said, you look like a man wearing a bearsuit!");
+    ~chatnpc("<p,shock>How did you figure that out? How did you know?");
+    ~chatplayer("<p,neutral>I just said you looked like a man wearing a bearsuit, I didn't know you were!");
+    %mdaughter_bear_discovery = 1;
+}
+~chatplayer("<p,quiz>So what are you doing here, pretending to be a god?");
+~chatnpc("<p,neutral>Ah, the people that live in the mountains here, they are a superstitious lot. They fear few things, but magic and gods they're scared to death of.");
+~chatnpc("<p,neutral>So I took on the guise of one of their legends. It's a good way of being left alone.");
+~chatplayer("<p,quiz>And do you leave them alone as well?");
+~chatnpc("<p,neutral>Ah, you're referring to the skeletons you see here? Yes, I did. Most of the time, at least. When there was no troll to be ambushed, and I had to eat...");
+~chatplayer("<p,quiz>Did you kill a young lady, by the lake? Just recently?");
+~chatnpc("<p,neutral>Recently? Oh no, the entrance you came through has been blocked off for a good many years now. I've only seen trolls and the occasional stray dwarf since then, until you came along.");
+~chatnpc("<p,neutral>But yes, more than ten years ago, I did kill someone like that.");
+if (~p_choice2("Oh, never mind then, that can't be right.", 1, "Can I see that corpse?", 2) = 1) return;
+~chatplayer("<p,quiz>Can I see that corpse? I'd like to make sure of something.");
+~chatnpc("<p,neutral>She is just over there, in the centre, with the dress. I did not eat her after I killed her, she was too beautiful for that.");
+~chatnpc("<p,sad>I felt sorry for killing her, but by then it was already too late.");
+~chatplayer("<p,neutral>Yes, she does match the description I was given, it is her after all!");
+if (~p_choice2("Hand the body over to me!", 1, "I humbly request to be given the remains.", 2) = 1) {
+    ~chatplayer("<p,angry>I demand that you hand the body over to me! I must return them to her father!");
+    ~chatnpc("<p,angry>You demand nothing! You may have uncovered my disguise, but my claws can still tear you apart at will!");
+    ~chatnpc("<p,angry>I will not allow you to leave!");
+} else {
+    ~chatplayer("<p,neutral>I humbly request to be given the remains, so I can return them to her father.");
+    ~chatnpc("<p,neutral>I cannot do that. If they knew I wasn't a god, and if her father knew I killed his daughter, the whole tribe would come in here at once and I'd be finished.");
+    if (~p_choice2("I will kill you myself!", 1, "Never mind then, I'd better leave.", 2) = 1) {
+        ~chatplayer("<p,angry>I will kill you myself!");
+        ~chatnpc("<p,angry>Come and try!");
+    } else {
+        ~chatnpc("<p,angry>I'm afraid I can't allow you to leave either. You cannot tell anyone about me.");
+    }
+}
+%mdaughter_bear_mayattack = 1;
+~mdaughter_kendal_claim;
+%npc_aggressive_player = uid;
+npc_setmode(opplayer2);
+
+[opnpc2,mdaughter_bearman] @mdaughter_kendal_attack;
+[opnpc2,mdaughter_bearman_fighter] @mdaughter_kendal_attack;
+[opnpc2,mdaughter_multi_bear] @mdaughter_kendal_attack;
+[label,mdaughter_kendal_attack]
+if (~mdaughter_kendal_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,mdaughter_bearman] @mdaughter_kendal_attack_ap;
+[apnpc2,mdaughter_bearman_fighter] @mdaughter_kendal_attack_ap;
+[apnpc2,mdaughter_multi_bear] @mdaughter_kendal_attack_ap;
+[label,mdaughter_kendal_attack_ap]
+if (~mdaughter_kendal_attackable = false) return;
+@player_combat_start_ap;
+
+[proc,mdaughter_kendal_attackable]()(boolean)
+if (%mdaughter_quest_var ! ^mdaughter_remains | %mdaughter_bear_mayattack = 0) {
+    mes("Do not attack me, puny mortal <displayname>!");
+    return(false);
+}
+~mdaughter_kendal_release_stale;
+if (%npc_attacking_uid ! null & %npc_attacking_uid ! uid & .finduid(%npc_attacking_uid) = true) {
+    mes("This bear has no quarrel with you.");
+    return(false);
+}
+~mdaughter_kendal_claim;
+return(true);
+
+// Queue dispatch uses the placed root; visible forms also bind their own handlers.
+[ai_queue2,mdaughter_multi_bear] ~mdaughter_kendal_damage(last_int);
+[ai_queue2,mdaughter_bearman] ~mdaughter_kendal_damage(last_int);
+[ai_queue2,mdaughter_bearman_fighter] ~mdaughter_kendal_damage(last_int);
+[proc,mdaughter_kendal_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (%mdaughter_quest_var ! ^mdaughter_remains | %mdaughter_bear_mayattack = 0 | %npc_aggressive_player ! uid) return;
+~npc_default_damage($damage);
+
+[ai_queue3,mdaughter_multi_bear] ~mdaughter_kendal_death;
+[ai_queue3,mdaughter_bearman] ~mdaughter_kendal_death;
+[ai_queue3,mdaughter_bearman_fighter] ~mdaughter_kendal_death;
+[proc,mdaughter_kendal_death]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid & %mdaughter_quest_var = ^mdaughter_remains & %mdaughter_bear_mayattack = 1) {
+        queue(mdaughter_kendal_defeated, 0, 0);
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,mdaughter_kendal_defeated]
+if (%mdaughter_quest_var ! ^mdaughter_remains | %mdaughter_bear_mayattack = 0) return;
+%mdaughter_quest_var = ^mdaughter_kendal_dead;
+if (inv_freespace(inv) > 0) inv_add(inv, mdaughter_bear_helmet, 1);
+else obj_add(coord, mdaughter_bear_helmet, 1, ^lootdrop_duration);
+mes("You collect the helmet from the corpse of the 'bear' as a trophy.");

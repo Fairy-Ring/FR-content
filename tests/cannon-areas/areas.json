@@ -1,0 +1,53 @@
+[
+  {
+    "name": "Fremennik Slayer Dungeon",
+    "bound": "CANNON-AREA-FREMENNIK-01",
+    "boxes": [[0, 2688, 9984, 0, 2815, 10047]],
+    "witness": { "inside": [0, 2808, 10002], "outside": [0, 2794, 3612] }
+  },
+  {
+    "name": "Slayer Tower",
+    "bound": "CANNON-AREA-TOWER-01",
+    "boxes": [[0, 3404, 3530, 2, 3453, 3580]]
+  },
+  {
+    "name": "Zogre burial grounds",
+    "bound": "CANNON-AREA-ZOGRE-01",
+    "boxes": [[0, 2456, 3037, 0, 2491, 3055]],
+    "cases": [
+      { "name": "west barricade approach 2454 remains allowed", "tile": [0, 2454, 3048], "refused": false },
+      { "name": "west barricade approach 2455 remains allowed", "tile": [0, 2455, 3048], "refused": false },
+      { "name": "inside the outer barricade", "tile": [0, 2457, 3048], "refused": true },
+      { "name": "inside the inner barricade", "tile": [0, 2459, 3048], "refused": true },
+      { "name": "southern enclosed floor", "tile": [0, 2482, 3037], "refused": true },
+      { "name": "northern enclosed floor", "tile": [0, 2482, 3055], "refused": true },
+      { "name": "Uglug Nar camp remains allowed", "tile": [0, 2442, 3049], "refused": false },
+      { "name": "strip south of Castle Wars lobby remains allowed", "tile": [0, 2440, 3070], "refused": false },
+      { "name": "Feldip ravine remains allowed", "tile": [0, 2479, 3018], "refused": false }
+    ]
+  },
+  {
+    "name": "Shade tombs",
+    "bound": "CANNON-AREA-SHADE-TOMBS-01",
+    "boxes": [[0, 3456, 9664, 0, 3519, 9727]]
+  },
+  {
+    "name": "Mort Myre Swamp",
+    "bound": "CANNON-AREA-MORT-MYRE-01",
+    "boxes": [[0, 3398, 3264, 0, 3455, 3455], [0, 3456, 3328, 0, 3519, 3455], [0, 3520, 3392, 0, 3555, 3455], [0, 3556, 3414, 0, 3583, 3455]],
+    "cases": [{ "name": "Dessous graveyard remains allowed", "tile": [0, 3568, 3405], "refused": false }, { "name": "River Salve far bank remains allowed", "tile": [0, 3395, 3390], "refused": false }]
+  },
+  {
+    "name": "Barrows crypt and surface controls",
+    "boxes": [],
+    "cases": [
+      { "name": "Ahrim crypt remains allowed", "tile": [3, 3557, 9703], "refused": false },
+      { "name": "Dharok crypt remains allowed", "tile": [3, 3556, 9718], "refused": false },
+      { "name": "Guthan crypt remains allowed", "tile": [3, 3535, 9705], "refused": false },
+      { "name": "Karil crypt remains allowed", "tile": [3, 3547, 9685], "refused": false },
+      { "name": "Torag crypt remains allowed", "tile": [3, 3565, 9684], "refused": false },
+      { "name": "Verac crypt remains allowed", "tile": [3, 3577, 9703], "refused": false },
+      { "name": "Ahrim surface mound remains allowed", "tile": [0, 3565, 3289], "refused": false }
+    ]
+  }
+]

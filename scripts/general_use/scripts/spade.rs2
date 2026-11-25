@@ -1,4 +1,7 @@
 [opheld1,spade]
+if (~giant_mole_dig = true) return;
+if (~ek_dig() = true) return;
+if (~ft1_skull_dig = true) return;
 // Pirate's Treasure
 if (distance(coord, 0_46_52_55_55) <= 1) {
     @hunt_dig;
@@ -73,6 +76,7 @@ if(map_members = ^true & ~trail_hasclue_inv = true) {
 if (~barrows_dig() = true) {
     return;
 }
+if (~mh_dig() = true) return;
 ~displaymessage(^dm_default);
 
 

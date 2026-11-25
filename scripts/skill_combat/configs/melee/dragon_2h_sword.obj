@@ -1,0 +1,38 @@
+[dragon_2h_sword]
+name=Dragon 2h sword
+desc=A two-handed Dragon Sword.
+cost=220000
+model=obj_dragon_2h_sword
+iop2=Wield
+manwear=obj_dragon_2h_sword_manwear,0
+womanwear=obj_dragon_2h_sword_manwear,6
+members=yes
+2dyof=3
+2dzoom=2022
+2dyan=1065
+2dzan=124
+2dxan=636
+wearpos=righthand
+wearpos2=lefthand
+weight=8lb
+// VERIFIED: Tip.It Combat, captured 1 May 2006, Dragon 2hander row.
+param=stabattack,-4
+param=slashattack,92
+param=crushattack,80
+param=magicattack,-4
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,-1
+param=strengthbonus,93
+param=prayerbonus,0
+// CANDIDATE: published rune and steel two-handed sword combat route.
+category=weapon_2h_sword
+param=attackrate,7
+param=slashattack_anim,human_dhsword_slash
+param=crushattack_anim,human_dhsword_chop
+param=defend_anim,human_sword_def
+param=slash_sound,2H_slash
+param=crush_sound,2H_crush

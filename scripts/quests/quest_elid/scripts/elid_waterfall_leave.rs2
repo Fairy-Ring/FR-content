@@ -1,9 +1,8 @@
-// Spirits of the Elid — waterfall cave Leave dest (cave -> surface).
-// CANDIDATE dest-side (Research: subject spirits-of-the-elid): 3369,3131 L0
-// = 0_52_48_41_59, surface next-to root 6382. Packed op1=Leave on
-// elid_underground_exit 10417 (name Cave exit). No consume, no mes (dump
-// silent). Stay %elidquest. No dest onto root loc / wiki pin.
-// Research: subject spirits-of-the-elid · pack/loc.pack 10417.
+// Spirits of the Elid — leave the underground waterfall route.
+// Exit loc 10417 carries Leave; 3369,3131,0 is a map-derived CANDIDATE
+// destination back to the surface, next to root 6382.
+// No item is consumed and no elidquest stage is written.
+// Research: spirits-of-the-elid.waterfall-leave-destination.
 
 [oploc1,elid_underground_exit]
 p_telejump(0_52_48_41_59); // CANDIDATE dest-side 3369,3131 L0

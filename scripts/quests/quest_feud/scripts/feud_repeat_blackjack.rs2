@@ -1,0 +1,220 @@
+// Repeatable post-Feud blackjacking. Period rewards are in the sibling DB rows/constants.
+
+[opnpc3,feud_arabian_guard1_1]
+if (%feud_var ! ^feud_complete) { return; }
+@feud_repeat_pickpocket;
+
+[opnpc3,feud_arabian_guard1_2]
+if (%feud_var ! ^feud_complete) { return; }
+@feud_repeat_pickpocket;
+
+[opnpc3,feud_arabian_guard2_1]
+if (%feud_var ! ^feud_complete) { return; }
+@feud_repeat_pickpocket;
+
+[opnpc3,feud_arabian_guard2_2]
+if (%feud_var ! ^feud_complete) { return; }
+@feud_repeat_pickpocket;
+
+[opnpc3,feud_egyptian_doorman_2]
+if (%feud_var ! ^feud_complete) { return; }
+@feud_repeat_pickpocket;
+
+[opnpc4,feud_arabian_guard1_2]
+if (%feud_var ! ^feud_complete) { return; }
+~feud_repeat_start_lure;
+
+[opnpc4,feud_arabian_guard2_2]
+if (%feud_var ! ^feud_complete) { return; }
+~feud_repeat_start_lure;
+
+[opnpc4,feud_egyptian_doorman_2]
+if (%feud_var ! ^feud_complete) { return; }
+~feud_repeat_start_lure;
+
+[opnpc5,feud_arabian_guard1_2]
+if (%feud_var ! ^feud_complete) { return; }
+if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) { return; }
+~feud_repeat_blackjack_ko(^feud_repeat_bandit_ko_xp, false);
+
+[opnpc5,feud_arabian_guard2_2]
+if (%feud_var ! ^feud_complete) { return; }
+if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) { return; }
+~feud_repeat_blackjack_ko(^feud_repeat_bandit_ko_xp, false);
+
+[opnpc5,feud_egyptian_doorman_2]
+if (%feud_var ! ^feud_complete) { return; }
+if (stat(thieving) < ^feud_repeat_thug_thieving_level) { return; }
+if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) { return; }
+~feud_repeat_blackjack_ko(^feud_repeat_thug_ko_xp, false);
+
+[label,feud_repeat_pickpocket]
+~feud_villager_reconcile;
+if (%feud_villager_state ! ^feud_villager_state_idle) {
+    if (%feud_villager_owner ! uid) { return; }
+}
+@attempt_pick_pocket(npc_type);
+
+[proc,feud_repeat_villager_pickpocket]
+if (~feud_villager_reconcile = uid) {
+    ~npc_retaliate(0);
+    return;
+}
+if (%feud_villager_state ! ^feud_villager_state_unconscious) {
+    ~feud_villager_pickpocket_fail;
+    return;
+}
+if (%feud_villager_owner ! uid) { return; }
+// VERIFIED: villagers give a few coins, not Thieving XP, when picked after a KO.
+inv_add(inv, coins, ^feud_villager_pickpocket_coins);
+return;
+
+[proc,feud_repeat_start_lure]()(boolean)
+if (~feud_lure_available = false) { return(false); }
+%feud_villager_state = ^feud_villager_state_following;
+%feud_villager_owner = uid;
+%feud_villager_deadline = calc(map_clock + ^feud_villager_follow_timeout);
+%npc_attacking_uid = uid;
+npc_setmode(playerfollow);
+~feud_repeat_schedule_timeout(false);
+return(true);
+
+[proc,feud_repeat_villager_ko]
+if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) { return; }
+~feud_repeat_blackjack_ko(^feud_villager_ko_xp, true);
+return;
+
+[proc,feud_repeat_blackjack_ko](int $experience, boolean $villager)(boolean)
+~feud_villager_reconcile;
+if (%feud_villager_state ! ^feud_villager_state_following) { return(false); }
+if (%feud_villager_owner ! uid) { return(false); }
+def_coord $spot = npc_coord;
+def_npc_uid $target = npc_uid;
+if (~feud_villager_has_witness($spot, $target) = true) {
+    if ($villager = true) {
+        ~damage_self(^feud_villager_witness_damage);
+        return(false);
+    }
+    ~feud_repeat_witnessed_ko;
+    return(false);
+}
+if (npc_finduid($target) = false) { return(false); }
+if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_success_high) = false) {
+    // VERIFIED for villagers; CANDIDATE for Bandits/Thugs: failure starts ordinary combat.
+    // No unwitnessed Bandit/Thug damage or stun is supplied by the period source.
+    // UNKNOWN: failure ends this follow through the same release as every other exit.
+    ~feud_villager_reset;
+    ~npc_retaliate(0);
+    return(false);
+}
+%feud_villager_state = ^feud_villager_state_unconscious;
+%feud_villager_owner = uid;
+%feud_villager_deadline = calc(map_clock + ^feud_villager_knockout_ticks);
+%npc_attacking_uid = null;
+npc_walk(npc_coord);
+npc_setmode(none);
+npc_anim(human_unconscious, 0);
+~feud_repeat_schedule_timeout(true);
+stat_advance(thieving, $experience);
+return(true);
+
+[proc,feud_repeat_witnessed_ko]
+~feud_villager_reset;
+spotanim_pl(stunned_thieving, 124, 0);
+anim(%com_defendanim, 0);
+npc_anim(npc_param(attack_anim), 0);
+if (npc_param(attack_sound) ! null) {
+    sound_synth(npc_param(attack_sound), 0, 0);
+}
+sound_synth(stunned, 1, 0);
+~damage_self(^feud_repeat_witness_damage);
+def_int $stun_end = calc(map_clock + ^feud_repeat_witness_stun_ticks);
+%action_delay = $stun_end;
+%stunned = $stun_end;
+walktrigger(stunned);
+~npc_retaliate(0);
+return;
+
+// Preserve the published 30-tick poison timer on attackable Bandit/Thug forms.
+// A nonzero kind deadline owns exactly ONE pending callback; a new action moves
+// that deadline without adding a callback. There are at most two per NPC.
+// Villagers instead use the published wall-beast timer and never enter this queue.
+[proc,feud_repeat_schedule_timeout](boolean $knockout)
+if (~feud_villager_uses_timer = true) {
+    npc_settimer(1);
+    return;
+}
+def_int $pending;
+def_int $kind = 0;
+if ($knockout = true) {
+    $pending = %feud_repeat_ko_deadline;
+    %feud_repeat_ko_deadline = %feud_villager_deadline;
+    $kind = 1;
+} else {
+    $pending = %feud_repeat_follow_deadline;
+    %feud_repeat_follow_deadline = %feud_villager_deadline;
+}
+if ($pending ! 0) return;
+def_int $remaining = calc(%feud_villager_deadline - map_clock);
+if ($remaining < ^feud_repeat_timeout_min_delay) $remaining = ^feud_repeat_timeout_min_delay;
+npc_queue(19, $kind, $remaining);
+
+[proc,feud_repeat_timeout]
+~feud_villager_reconcile;
+def_int $kind = last_int;
+def_int $deadline;
+def_int $condition;
+if ($kind = 0) {
+    $deadline = %feud_repeat_follow_deadline;
+    %feud_repeat_follow_deadline = 0;
+    $condition = ^feud_villager_state_following;
+} else {
+    $deadline = %feud_repeat_ko_deadline;
+    %feud_repeat_ko_deadline = 0;
+    $condition = ^feud_villager_state_unconscious;
+}
+// An obsolete condition ends without requeueing or changing the newer condition.
+if (%feud_villager_state ! $condition) return;
+if (.finduid(%feud_villager_owner) = false | map_clock >= $deadline) {
+    ~feud_villager_reset;
+    return;
+}
+if ($kind = 0) {
+    %feud_repeat_follow_deadline = $deadline;
+} else {
+    %feud_repeat_ko_deadline = $deadline;
+}
+// Npc.processQueue predecrements a newly visited request once. Delay 2 cannot
+// execute in this same pass; delay 1 can. UNKNOWN FEUD-TIMEOUT-REARM-01:
+// remaining=1 uses 2, so cleanup can be at most one tick late, never early.
+def_int $remaining = calc($deadline - map_clock);
+if ($remaining < ^feud_repeat_timeout_min_delay) $remaining = ^feud_repeat_timeout_min_delay;
+npc_queue(19, $kind, $remaining);
+
+// Cover every original form, including an ordinary saved-stage morph change.
+[ai_queue19,feud_arabian_guard_multi]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_arabian_guard1_1]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_arabian_guard1_2]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_arabian_guard2_multi]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_arabian_guard2_1]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_arabian_guard2_2]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_egyptian_doorman_multi]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_egyptian_doorman_1]
+~feud_repeat_timeout;
+
+[ai_queue19,feud_egyptian_doorman_2]
+~feud_repeat_timeout;

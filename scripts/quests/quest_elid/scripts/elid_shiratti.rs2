@@ -12,6 +12,12 @@
 
 [opnpc1,elid_shiratti]
 if (%elidquest < 1) { return; }
+if (%elidquest >= ^elid_spirits_explained & %elidquest < ^elid_complete & inv_total(inv, elid_statuette) > 0) {
+    // CANDIDATE: OSRS transcript, Talking to Shiratti with the statuette.
+    ~chatplayer("<p,neutral>I have got the statuette.");
+    ~chatnpc("<p,neutral>That is great news! I could kiss you, but they don't allow shrine custodians to engage in that sort of behaviour. You should put the statuette back on its plinth.");
+    return;
+}
 def_int $s = ~p_choice4("I am trying to find out the cause of this town's curse.", 1, "Good day to you.", 2, "What is this building?", 3, "What is that key on display?", 4);
 if ($s = 1) {
     ~chatplayer("<p,neutral>I am trying to find out the cause of this town's curse.");

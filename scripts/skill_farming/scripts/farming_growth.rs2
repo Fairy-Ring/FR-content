@@ -1,0 +1,59 @@
+// CANDIDATE: the legacy Farming description's restarted 500-tick stream.
+// Preserved original fault: login, logout and world changes can lose growth ticks.
+// See docs/research/period-faults.md; no post-2018 offset or repair.
+
+[proc,farming_growth_steps](int $last, int $now, int $period, boolean $offline)(int)
+if ($last = 0 | $now <= $last) return(0);
+if ($offline = true) {
+    // UNKNOWN save arithmetic: infer ticks at L+5, L+10, ... strictly before N.
+    // Saved time is minute-resolved; the tie rule excludes the login minute.
+    // Retain the saved L mod 5 phase, with no multiplier or artificial bound.
+    return(max(0, sub(divide(sub(sub($now, 1), modulo($last, ^farming_growth_window_minutes)), $period), divide($last, $period))));
+}
+// Online timers do not replay missed windows or grant multiple stages.
+if (modulo($now, $period) < ^farming_growth_window_minutes
+    & divide($now, $period) > divide($last, $period)) return(1);
+return(0);
+
+[proc,farming_reconcile](boolean $offline)
+def_int $now = date_minutes;
+def_int $last = %farming_growth_minute;
+if ($now < $last) return;
+// Consume the shared range first so a script failure cannot replay writes.
+%farming_growth_minute = $now;
+db_listall(farming_growth);
+def_dbrow $row = db_findnext;
+while ($row ! null) {
+    def_int $period = db_getfield($row, farming_growth:period, 0);
+    def_int $steps = ~farming_growth_steps($last, $now, $period, $offline);
+    // Retain the actual first window, not just its count: disease must not
+    // borrow a slower window that preceded the step which caused disease.
+    def_int $window = multiply(divide($now, $period), $period);
+    if ($offline = true) $window = multiply(add(divide($last, $period), 1), $period);
+    ~farming_growth_dispatch(db_getfield($row, farming_growth:handler, 0), $steps, $window);
+    $row = db_findnext;
+}
+
+[proc,farming_growth_dispatch](int $handler, int $steps, int $window)
+if ($steps = 0) return;
+switch_int ($handler) {
+    case ^farming_handler_potato : ~farming_potato_advance_all($steps, $window);
+    case ^farming_handler_herb : ~farming_herb_advance_all($steps, $window);
+    case ^farming_handler_flower : ~farming_flower_advance_all($steps, $window);
+    case ^farming_handler_hops : ~farming_hops_advance_all($steps, $window);
+    case ^farming_handler_compost : ~farming_compost_growth($steps);
+}
+
+[proc,farming_login]
+~farming_reconcile(true);
+// Keep the player's phase even with no planted crop. Planting never resets it.
+// UNKNOWN favourable access policy: an open interface or delay does not stop growth.
+softtimer(farming_growth, ^farming_growth_poll_ticks);
+
+[proc,farming_logout]
+def_int $now = date_minutes;
+if ($now >= %farming_growth_minute) %farming_growth_minute = $now;
+clearsofttimer(farming_growth);
+
+[softtimer,farming_growth]
+~farming_reconcile(false);

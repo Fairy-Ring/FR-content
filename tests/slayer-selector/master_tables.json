@@ -11,6 +11,7 @@
         ["scorpions", "scorpion", 7, 15, 50],
         ["zombies", "zombie", 7, 15, 50],
         ["bats", "bat", 7, 15, 50],
+        ["bears", "bear", 7, 10, 50],
         ["ghosts", "ghost", 7, 15, 50],
         ["cavecrawlers", "cavecrawler", 8, 15, 50],
         ["icefiends", "icefiend", 8, 15, 20],
@@ -51,7 +52,8 @@
         ["crawlinghands", "crawlinghand", 8, 40, 70],
         ["banshees", "banshee", 8, 40, 70],
         ["ghouls", "ghoul", 7, 10, 20],
-        ["vampires", "vampire", 6, 10, 20]
+        ["vampires", "vampire", 6, 10, 20],
+        ["mossgiants", "mossgiant", 7, 60, 120]
     ],
     "vannaka": [
         ["aberrantspecters", "aberrantspecter", 8, 60, 120],
@@ -139,7 +141,8 @@
         ["banshees", "banshee", 5, 110, 170],
         ["cavecrawlers", "cavecrawler", 5, 110, 170],
         ["lizards", "lizard", 5, 110, 170],
-        ["rockslugs", "rockslug", 5, 110, 170]
+        ["rockslugs", "rockslug", 5, 110, 170],
+        ["crawlinghands", "crawlinghand", 6, 60, 120]
     ],
     "duradel": [
         ["abyssaldemons", "abyssaldemon", 12, 130, 200],
@@ -170,6 +173,8 @@
         ["trolls", "troll", 6, 130, 200],
         ["bluedragons", "bluedragon", 4, 110, 170],
         ["elves", "elf", 4, 100, 170],
-        ["mutatedzygomites", "mutatedzygomite", 2, 20, 30]
+        ["mutatedzygomites", "mutatedzygomite", 2, 20, 30],
+        ["bronzedragons", "bronzedragon", 11, 10, 20],
+        ["turoths", "turoth", 10, 110, 170]
     ]
 }

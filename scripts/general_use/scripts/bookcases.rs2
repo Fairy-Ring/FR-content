@@ -8,6 +8,11 @@ switch_coord (loc_coord) {
     case default : @search_bookcase;
 }
 
+[oploc2,mm_bookcase]
+// CANDIDATE: OSRS Bamboo Bookcase revision 15115816, marked mes; RS3 differs on "taste".
+p_arrivedelay;
+mes("You find nothing to suit your reading tastes here.");
+
 [label,search_bookcase]
 mes("You search the bookcase...");
 p_delay(1);

@@ -1,46 +1,90 @@
-// The Feud — Villager Knock-Out (op5, vis 2). New file.
-// CANDIDATE 2007-base (dump §9.3 lure-then-KO walk; the dump has NO KO
-// dialogue lines — CANDIDATE mes only, no invent dest). Gate: %feud_var >= 1
-// AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 AND
-// %feud_talk_villager >= 2 AND the oak blackjack (4599) in inv or worn AND
-// %feud_npc_multi >= 1 else return. op5=Knock-Out exists only on the
-// concrete vis _3 faces (feud_villager_1_3/2_3/3_3 — NOT the multi bases
-// 1887/1891/1895); the world NPC is the multi and the vis child is resolved
-// by %feud_npc_multi (0 -> _1, 1 -> _2, 2 -> _3). The flip 1->2 happens on
-// the pickpocket refuse at count >= 2 with the oak held (feud_pickpocket.rs2
-// — the engine rejects op5 while vis 1, same as Lure); this file writes it
-// idempotently too. Count stays 2. %feud_var stays 1. No 28. The
-// pick-after-KO (count 3) is the NEXT hop. No dest / p_tele. No && / ||.
-// Cite feud-operator-blackjack-377.md §7.5 · osrs-wiki-changes-crawl-377.md.
+// Feud villager knock-out; period source establishes failure/attack but not its rate formula.
 
 [opnpc5,feud_villager_1_3]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
-if (%feud_talk_villager < 2) { return; }
-if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
-if (%feud_npc_multi < 1) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_ko;
+    return;
+}
+if (%feud_var ! ^feud_villager_lured & %feud_var ! ^feud_villager_knocked_out) return;
+if (inv_total(worn, blackjack_oak) < 1) { return; }
 @feud_villager_ko;
 
 [opnpc5,feud_villager_2_3]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
-if (%feud_talk_villager < 2) { return; }
-if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
-if (%feud_npc_multi < 1) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_ko;
+    return;
+}
+if (%feud_var ! ^feud_villager_lured & %feud_var ! ^feud_villager_knocked_out) return;
+if (inv_total(worn, blackjack_oak) < 1) { return; }
 @feud_villager_ko;
 
 [opnpc5,feud_villager_3_3]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
-if (%feud_talk_villager < 2) { return; }
-if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
-if (%feud_npc_multi < 1) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_ko;
+    return;
+}
+if (%feud_var ! ^feud_villager_lured & %feud_var ! ^feud_villager_knocked_out) return;
+if (inv_total(worn, blackjack_oak) < 1) { return; }
 @feud_villager_ko;
 
 [label,feud_villager_ko]
-mes("You knock the villager out."); // CANDIDATE mes — dump is silent on KO lines
-%feud_npc_multi = 2;
+~feud_villager_reconcile;
+if (%feud_villager_state ! ^feud_villager_state_following) { return; }
+if (%feud_villager_owner ! uid) { return; }
+if (%feud_trial_villager ! npc_uid) return;
+def_coord $spot = npc_coord;
+def_npc_uid $target = npc_uid;
+if (~feud_villager_has_witness($spot, $target) = true) {
+    ~damage_self(^feud_villager_witness_damage);
+    return;
+}
+if (npc_finduid($target) = false) { return; }
+if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_success_high) = false) {
+    // UNKNOWN: failure ends this follow through the same release as every other exit.
+    ~feud_villager_reset;
+    ~npc_retaliate(0);
+    return;
+}
+%feud_villager_state = ^feud_villager_state_unconscious;
+%feud_villager_owner = uid;
+%feud_villager_deadline = calc(map_clock + ^feud_villager_knockout_ticks);
+%npc_attacking_uid = null;
+npc_walk(npc_coord);
+npc_setmode(none);
+npc_anim(human_unconscious, 0);
+npc_settimer(1);
+if (%feud_var = ^feud_villager_lured) {
+    %feud_var = ^feud_villager_knocked_out;
+    stat_advance(thieving, ^feud_villager_ko_xp);
+}
 return;
+
+[proc,feud_villager_has_witness](coord $spot, npc_uid $target)(boolean)
+// npc_huntall excludes non-attackable types, including the original citizens.
+// FEUD-WITNESS-PERSON-01 is the single data rule for visible-person eligibility.
+def_int $x = coordx($spot);
+def_int $z = coordz($spot);
+def_int $zone_x = calc(($x - ^feud_villager_witness_radius) / 8 * 8);
+def_int $first_zone_z = calc(($z - ^feud_villager_witness_radius) / 8 * 8);
+def_int $last_x = calc($x + ^feud_villager_witness_radius);
+def_int $last_z = calc($z + ^feud_villager_witness_radius);
+while ($zone_x <= $last_x) {
+    def_int $x_offset = calc($zone_x - $x);
+    def_int $zone_z = $first_zone_z;
+    while ($zone_z <= $last_z) {
+        npc_findallzone(movecoord($spot, $x_offset, 0, calc($zone_z - $z)));
+        while (npc_findnext = true) {
+            def_coord $candidate = npc_coord;
+            if (npc_uid ! $target & npc_getmode ! opplayer2 &
+                enum(npc, int, feud_witness_people, npc_type) = 1 &
+                distance($candidate, $spot) <= ^feud_villager_witness_radius &
+                lineofsight($candidate, $spot) = true) {
+                // The iterator made the witness active; consequences belong to the victim.
+                return(npc_finduid($target));
+            }
+        }
+        $zone_z = calc($zone_z + 8);
+    }
+    $zone_x = calc($zone_x + 8);
+}
+return(false);

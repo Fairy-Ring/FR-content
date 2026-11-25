@@ -1,0 +1,44 @@
+// VERIFIED styles: Sal's Dagannoth Hunting guide, 29 April 2006.
+// CANDIDATE max hits: exact Waterbirth Old School forms, later weakness omitted.
+// UNKNOWN original projectile bindings: retain borrowed horror_spines_travel
+// and Water Wave presentation; cache effects 473-477 have no clear NPC match.
+[ai_queue1,dungeon_dagganoth_lighter] ~npc_default_retaliate_ap;
+[ai_queue1,dungeon_dagganoth_lighter_deeper] ~npc_default_retaliate_ap;
+[ai_opplayer2,dungeon_dagganoth_lighter] npc_setmode(applayer2);
+[ai_opplayer2,dungeon_dagganoth_lighter_deeper] npc_setmode(applayer2);
+[ai_applayer2,dungeon_dagganoth_lighter] ~waterbirth_dagannoth_rangeattack;
+[ai_applayer2,dungeon_dagganoth_lighter_deeper] ~waterbirth_dagannoth_rangeattack;
+
+// Ordinary forms use native ranged accuracy, not the quest's unconditional roll.
+[proc,waterbirth_dagannoth_rangeattack]
+if (%npc_action_delay > map_clock) {
+    npc_setmode(applayer2);
+    return;
+}
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) {
+    return;
+}
+
+def_int $attack_roll = ~npc_ranged_attack_roll;
+def_int $defence_roll = ~player_defence_roll_specific(^ranged_style);
+npc_anim(horror_dagannoth_rangeattack, 0);
+~.sound_area(dagganoth_spines, 0, npc_coord, 10);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~player_projectile(npc_coord, coord, uid, horror_spines_travel,
+    ^wbmon_spines_start_height, ^wbmon_spines_end_height, ^wbmon_spines_delay,
+    ^wbmon_spines_angle, ^wbmon_spines_flight_length, ^wbmon_spines_offset, ^wbmon_spines_distance_step);
+~npc_rangeattack_resolve($attack_roll, $defence_roll, ^wbmon_ranged_maxhit, 0, $duration);
+anim(%com_defendanim, $duration);
+
+[ai_queue1,dungeon_dagganoth_magic_monster] ~npc_default_retaliate_ap;
+[ai_queue1,dungeon_dagganoth_magic_monster_deeper] ~npc_default_retaliate_ap;
+[ai_opplayer2,dungeon_dagganoth_magic_monster] npc_setmode(applayer2);
+[ai_opplayer2,dungeon_dagganoth_magic_monster_deeper] npc_setmode(applayer2);
+[ai_applayer2,dungeon_dagganoth_magic_monster]
+~npc_cast_spell_with_forced_max_hit(^water_wave, npc_param(attackrate), ^wbmon_magic_maxhit);
+[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]
+~npc_cast_spell_with_forced_max_hit(^water_wave, npc_param(attackrate), ^wbmon_magic_maxhit);

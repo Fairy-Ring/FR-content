@@ -1,106 +1,65 @@
-// The Feud — Ali the Operator Talk-to, chat only. Four trees:
-// (a) join a gang (shipped, PASS feudosxtiyip), (b) after the first
-// pickpocket, the progress advice tree (dump § Picking another pocket:
-// "How is the pickpocketing going? Need a hand?" -> "Yeah, I could do with a
-// bit of advice." -> distraction hint, then the help sub-menu; "Nah, no
-// problems here..." goes straight to the flavour menu — no extra Yes line),
-// (c) after the second pickpocket, the oak blackjack tree (dump §
-// Pickpocketing part three / Talking to Ali the Operator: "Having problems?"
-// -> "Yeah, I could do with a bit of advice." -> distraction failing ->
-// award blackjack_oak 4599; full-inv decline / already-has branches), and
-// (d) after the third pickpocket, the report tree (dump § Welcome to the
-// Menaphites: "Well done! You have finished your first trial." -> burglary
-// briefing -> award feud_mayors_house_keys 4589; full-inv branch), and
-// (e) after the mayor-villa jewels, the jewels handoff tree (dump § Now
-// you've stolen the jewels / Talking to Ali the Operator: "I've completed
-// your task." -> crack that safe / hints lying around -> "Now give me the
-// jewels." -> mes hand-over, inv_del 4590, %feud_given_jewels 1 CANDIDATE ->
-// traitor briefing through "Well then get to it."), and (f) after the thug
-// names Traitorous Ali, the traitor report tree (dump § Talking to Ali the
-// Operator again: "I have discovered the identity of the traitor. It was..."
-// / "Traitorous Ali!" -> sandpit and an umbrella -> "Find him and then kill
-// him" -> help menu; %feud_found_trait 1 CANDIDATE), and (g) after the
-// drink is poisoned, the deed report tree (dump §17.2 Reporting the deed /
-// Talking to Ali the Operator: "Is the deed done?" -> "Almost, his drink is
-// poisoned. As soon as he gets back, he'll be done for." -> "Excellent work!
-// Now, go speak with our boss." -> "He wants to discuss the future direction
-// of the gang."; gate %feud_var_drink_found 1 CANDIDATE), and (h) while
-// still working, the deed-wait tree (dump §15.1 Planning a murder / Talking
-// to Ali the Operator: "Is the deed done?" -> "I'm still working on it." ->
-// "Well don't waste time talking to me. Get on with it."; gate
-// %feud_found_trait 1 CANDIDATE), and (i) after the Menaphite Leader is
-// gone, the ruin tree (dump §19.6 Celebrating your victory / Talking to Ali
-// the Operator: "Why did you have to go and ruin everything? We had a
-// beautiful future ahead of us, the town would have been ours!" ->
-// ~p_choice3 -> "Maybe I wanted to make it MY town!" / "Evil megalomaniacs
-// set on destruction should be opposed." / "I'm sorry, I didn't mean to
-// upset you. Can we still be friends?" -> each close verbatim then return;
-// gate %feud_var_menaboss 1 CANDIDATE, dispatched FIRST after the gates,
-// before jewels/deed/traitor).
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
-// another pocket / Pickpocketing part three / Welcome to the Menaphites /
-// Now you've stolen the jewels / Talking to Ali the Operator again /
-// Celebrating your victory minus the 27 Apr 2022 lore pass). Gate:
-// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else
-// return. Ruin when %feud_var_menaboss >= 1 (dispatched first). Jewels tree
-// when the player holds feud_mayors_jewels; deed report when
-// %feud_var_drink_found >= 1; deed-wait when %feud_found_trait >= 1;
-// traitor report when %feud_given_jewels >= 1; report when
-// %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else the
-// join tree.
-// No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
-// keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
-// %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
-// willow. No dest / p_tele. No && / ||.
-// Cite feud-operator-blackjack-377.md §7.4 §7.5 §7.6 · osrs-wiki-changes-crawl-377.md.
+// Operator trial sequence: VERIFIED period quest guides.
+// Existing wording is CANDIDATE from transcript revision 18411641.
+// Stage-23 deed wording is CANDIDATE from retained transcript revision 9602124.
+// Existing stage-1 saves retain their receipt and trial progress.
 
 [opnpc1,feud_egyptian_minder]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
-if (%feud_var_menaboss >= 1) {
-    @feud_operator_ruin;
-}
-if (inv_total(inv, feud_mayors_jewels) >= 1) {
-    @feud_operator_jewels;
-}
-if (%feud_var_drink_found >= 1) {
-    @feud_operator_deed;
-}
-if (%feud_found_trait >= 1) {
-    @feud_operator_deed_wait;
-}
-if (%feud_given_jewels >= 1) {
-    @feud_operator_traitor;
-}
-if (%feud_talk_villager >= 3) {
-    @feud_operator_report;
-}
-if (%feud_talk_villager >= 2) {
-    @feud_operator_oak;
-}
-if (%feud_talk_villager >= 1) {
+if (%feud_var < ^feud_camels_delivered) { return; }
+if (%feud_var = ^feud_recruited | %feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) {
     @feud_operator_progress;
 }
-~chatnpc("<p,neutral>You seem to be a man of action. We could do with more people like you to sort those despicable bandits out.");
+if (%feud_var = ^feud_second_pick | %feud_var = ^feud_villager_lured | %feud_var = ^feud_villager_knocked_out) {
+    @feud_operator_oak;
+}
+if (%feud_var = ^feud_third_pick) {
+    @feud_operator_report;
+}
+if (%feud_var = ^feud_burglary) {
+    @feud_operator_stakeout;
+}
+if (%feud_var = ^feud_staked_out) {
+    @feud_operator_breakin;
+}
+if (%feud_var = ^feud_jewels_taken) {
+    @feud_operator_jewels;
+}
+if (%feud_var = ^feud_traitor_inquiry) {
+    if (%feud_found_trait >= 1) {
+        @feud_operator_traitor;
+    }
+    @feud_operator_search;
+}
+if (%feud_var >= ^feud_poison_task) {
+    if (%feud_var >= ^feud_menaphites_defeated) {
+        @feud_operator_ruin;
+    }
+    if (%feud_var = ^feud_poisoned_drink) {
+        @feud_operator_deed;
+    }
+    if (%feud_var = ^feud_leader_summons) { return; }
+    if (%feud_found_trait >= 1) {
+        @feud_operator_deed_wait;
+    }
+    @feud_operator_help;
+}
+
+~chatnpc("<p,neutral>You seem to be a <text_gender("man", "woman")> of action. We could do with more people like you to sort those despicable bandits out.");
 ~chatplayer("<p,neutral>Yeah, those pesky bandits!");
 ~chatnpc("<p,quiz>So will you join us in our fight to wipe them out?");
 def_int $join = ~p_choice2("Yes, of course, those bandits should be taught a lesson.", 1, "Perhaps later, I'm quite busy at the moment.", 2);
 if ($join = 2) {
     @feud_operator_notyet;
 }
-~chatplayer("<p,happy>Yes, of course, those pesky bandits should be taught a lesson.");
+~chatplayer("<p,happy>Yes, of course, those bandits should be taught a lesson.");
 ~chatnpc("<p,happy>Good choice my friend, together we will crush them.");
 ~chatplayer("<p,quiz>So when do we start?");
 ~chatnpc("<p,neutral>Slow down, slow down. First you must prove yourself capable and trustworthy.");
 ~chatplayer("<p,quiz>How will I manage that?");
-~chatnpc("<p,neutral>Don't worry about that, I'll just set you a few jobs to do.");
-~chatnpc("<p,neutral>As you might have gathered we have a less-than- sparkling reputation around here.");
-~chatnpc("<p,neutral>So I want you to foster this reputation and grow it.");
+~chatnpc("<p,neutral>Don't worry about that, I'll just set you a few jobs to do. As you might have gathered we have the reputation for being less than scrupulous, something with good foundation. So I want you to foster this reputation and grow it.");
 ~chatplayer("<p,quiz>What exactly does that mean?");
-~chatnpc("<p,neutral>It means that I want you to go out into the town and pickpocket three villagers, then report back to me.");
-~chatnpc("<p,neutral>If you have any problems don't be afraid to ask for some advice.");
+~chatnpc("<p,neutral>It means that I want you to go out into the town and pickpocket 3 villagers and then report back to me. IF you have any problems don't be afraid to ask for some advice.");
 ~chatplayer("<p,neutral>Oh right, thanks.");
+%feud_var = ^feud_recruited;
 @feud_operator_help;
 
 [label,feud_operator_progress]
@@ -140,26 +99,26 @@ if ($t = 1) {
 }
 if ($t = 2) {
     ~chatplayer("<p,neutral>Tell me about the other people in the town.");
-    ~chatnpc("<p,neutral>Sheep, ready for the slau... hang on. I shouldn't be telling you that. Just forget I said anything.");
+    ~chatnpc("<p,neutral>Sheep, ready for the slau... hang on I shouldn't be saying..., listen I don't want to talk about them.");
     @feud_operator_help;
 }
 ~chatplayer("<p,neutral>I'm looking for Ali.");
-~chatnpc("<p,quiz>Can you be a bit more specific? Everyone here is called Ali.");
-~chatplayer("<p,neutral>So I noticed. Well, he has an uncle called Ali Morrisane, a market vendor in Al Kharid. That's all I really know about him.");
-~chatnpc("<p,neutral>Say no more. I know just the Ali you mean - that little snake robbed me too! If we work together perhaps we can catch him and teach him a lesson.");
+~chatnpc("<p,quiz>You will have to be a lot more specific if you want help finding him. Everyone here is called Ali.");
+~chatplayer("<p,neutral>I've discovered that. Well he has an uncle called Ali Morrisane, a market vendor in Al Kharid and that's all I really know about him.");
+~chatnpc("<p,neutral>Say no more. I too am looking for him. The little tyke robbed me too, if we work together perhaps we can catch him and teach him a lesson.");
 @feud_operator_help;
 
 [label,feud_operator_report]
 ~chatnpc("<p,neutral>Well done! You have finished your first trial.");
 ~chatplayer("<p,quiz>First trial?");
-~chatnpc("<p,neutral>You didn't think we'd hire you off the back of a couple of pick-pocketings, did you?");
+~chatnpc("<p,neutral>You hardly think that a couple of pick-pocketings would do, did you?");
 ~chatplayer("<p,neutral>Ah, of course not.");
-~chatnpc("<p,neutral>Good! Now, the next thing you have to do is a spot of burglary.");
-~chatnpc("<p,neutral>The only place worth pilfering around here is the mayor's villa.");
-~chatnpc("<p,neutral>I want you to retrieve his wife's jewels.");
+~chatnpc("<p,neutral>Good, now the next thing you have to do is a spot of burglary.");
+~chatnpc("<p,neutral>The only place worth pilfering is the mayor's villa.");
+~chatnpc("<p,neutral>I want you to retrieve the mayor's wife's jewels.");
 ~chatplayer("<p,quiz>Got any advice?");
-~chatnpc("<p,neutral>Well I think that a disguise would be a good start. After that I would stake out the place to make sure he's not in.");
-~chatnpc("<p,neutral>You'll need a key to the front door, too.");
+~chatnpc("<p,neutral>Well I think that a disguise would be a good start. After that I would definitely stake out the place to make sure the mayor is not in.");
+~chatnpc("<p,neutral>You'll need a key to the front door too.");
 if (inv_freespace(inv) < 1) {
     ~chatplayer("<p,neutral>I can't carry anything else.");
     ~chatnpc("<p,neutral>Well then come back to me again when you are ready. Don't be too long.");
@@ -167,36 +126,92 @@ if (inv_freespace(inv) < 1) {
 }
 inv_add(inv, feud_mayors_house_keys, 1);
 mes("Ali the Operator hands you a set of keys.");
+%feud_var = ^feud_burglary;
 ~chatplayer("<p,quiz>Anything else?");
 ~chatnpc("<p,neutral>No! Now get going.");
 return;
 
+[label,feud_operator_stakeout]
+~chatnpc("<p,neutral>Haven't I helped you enough already?");
+~chatplayer("<p,neutral>Actually, I'm still having problems getting in.");
+if (inv_total(inv, feud_mayors_house_keys) < 1) {
+    ~chatnpc("<p,neutral>So you've lost your keys then. It's lucky I keep a spare pair.");
+    inv_add(inv, feud_mayors_house_keys, 1);
+    mes("Ali the Operator hands you a set of keys.");
+    return;
+}
+~chatnpc("<p,neutral>So what's the problem? Have you created a disguise yet?");
+def_int $d = ~p_choice2("Yes of course.", 1, "Now that you mention it, I'm having a few problems with that.", 2);
+if ($d = 1) {
+    ~chatplayer("<p,neutral>Yes of course.");
+    ~chatnpc("<p,neutral>Then make sure that you stake the place out to make sure neither the mayor or his family are inside.");
+    @feud_operator_help;
+}
+~chatplayer("<p,neutral>Now that you mention it, yes I am having problems with the disguise.");
+~chatnpc("<p,neutral>You'll have to create something that will hide your hair and obscure your facial features.");
+~chatnpc("<p,neutral>Make sure you're wearing a pair of gloves so that you don't leave any incriminating finger prints.");
+~chatnpc("<p,neutral>You should have all this equipped before you stake out the house.");
+@feud_operator_help;
+
+[label,feud_operator_breakin]
+~chatnpc("<p,quiz>What now?");
+if (inv_total(inv, feud_mayors_house_keys) < 1) {
+    ~chatplayer("<p,neutral>I've lost the keys you gave me.");
+    ~chatnpc("<p,neutral>It's lucky I keep a spare pair.");
+    if (inv_freespace(inv) < 1) {
+        obj_add(coord, feud_mayors_house_keys, 1, ^lootdrop_duration);
+    } else {
+        inv_add(inv, feud_mayors_house_keys, 1);
+    }
+    mes("Ali the Operator hands you a set of keys.");
+    return;
+}
+if (%feud_var_mayorsdoor >= 1) {
+    ~chatplayer("<p,neutral>I've managed to break in, but I'm unable to get the jewels.");
+    ~chatnpc("<p,neutral>Then search the house more thoroughly! Everything you need should be there.");
+} else {
+    ~chatplayer("<p,neutral>I've managed to stake the place out. What should I do now?");
+    ~chatnpc("<p,neutral>Try using those keys I gave you to open the door!");
+}
+@feud_operator_help;
+
 [label,feud_operator_jewels]
-~chatplayer("<p,neutral>I've completed your task.");
-~chatnpc("<p,neutral>Impressive, I didn't expect you to crack that safe so quickly. Did you have help?");
+~chatplayer("<p,neutral>I completed your task.");
+~chatnpc("<p,neutral>Impressive, I didn't expect you to succeed so soon with cracking that safe. Did you have help?");
 ~chatplayer("<p,neutral>Of course not, although the mayor did leave a number of hints lying around.");
-~chatnpc("<p,neutral>That man is a fool. Now give me the jewels.");
+~chatnpc("<p,neutral>That mayor is a fool. Now give me the jewels.");
+if (inv_total(inv, feud_mayors_jewels) < 1) {
+    ~chatplayer("<p,neutral>Actually I seem to have misplaced them.");
+    ~chatnpc("<p,neutral>You are trying my patience. Hurry back with the jewels. Don't disappoint me.");
+    return;
+}
 mes("You hand Ali the Operator the jewels.");
 inv_del(inv, feud_mayors_jewels, 1);
 %feud_given_jewels = 1; // CANDIDATE
-~chatnpc("<p,neutral>Now, your final task is one of the upmost importance. It has come to my attention that there is a traitor in our midst.");
+~chatnpc("<p,neutral>now your final task is one of the upmost importance. It has come to my attention that there is a traitor in our midst.");
 ~chatplayer("<p,quiz>Oh really?");
-~chatnpc("<p,neutral>Yes, and I want you to root them out.");
+~chatnpc("<p,neutral>Yes and I want you to root them out.");
 ~chatplayer("<p,quiz>Why me?");
-~chatnpc("<p,neutral>Because I feel like I can trust you. You don't have the emotional baggage that comes with playing the villain your entire life.");
-~chatplayer("<p,neutral>Aw! You can count on me to find the traitor.");
+~chatnpc("<p,neutral>Because I feel like I can trust you. You don't have all the baggage that comes with being a villain your entire life.");
+%feud_var = ^feud_traitor_inquiry;
+~chatplayer("<p,neutral>You can count on me to find out.");
 ~chatnpc("<p,neutral>Well then get to it.");
 return;
 
 [label,feud_operator_traitor]
-~chatplayer("<p,neutral>I have discovered the identity of the traitor. It was...");
-~chatplayer("<p,neutral>Traitorous Ali!");
-~chatnpc("<p,neutral>No! I would never have suspected Traitorous Ali.");
-~chatnpc("<p,neutral>Well, there was that time he sold out his entire family for a sandpit and an umbrella.");
-~chatnpc("<p,neutral>But I'm sure it took much more for him to betray us!");
+~chatplayer("<p,neutral>I have discovered the identity of the traitor, strangely enough it was traitorous Ali!");
+~chatnpc("<p,neutral>No! I would never have suspected that 'Traitorous Ali' would betray us.");
+~chatnpc("<p,neutral>Actually... what am I saying! Of course it would have been him.");
+~chatnpc("<p,neutral>He betrayed his family for a sandpit and an umbrella! I'm sure he sold us out for much more.");
 ~chatplayer("<p,neutral>Actually he sold you out for...");
-~chatnpc("<p,neutral>Stop, I don't want to know. It hurts too much already. Find him and then kill him, but do it quietly. I don't want a fuss.");
-%feud_found_trait = 1; // CANDIDATE
+%feud_var = ^feud_poison_task;
+~chatnpc("<p,neutral>Stop, I don't want to know. It hurts too much already. Find him and then kill him, but do it quietly, I don't want a fuss.");
+@feud_operator_help;
+
+[label,feud_operator_search]
+~chatnpc("<p,quiz>How is the search for the traitor going?");
+~chatplayer("<p,neutral>Still no breakthrough.");
+~chatnpc("<p,neutral>Make sure you interview our other members. They may know more than they let on.");
 @feud_operator_help;
 
 [label,feud_operator_oak]
@@ -205,7 +220,7 @@ def_int $o = ~p_choice2("Yeah, I could do with a bit of advice.", 1, "Nah, no pr
 if ($o = 1) {
     ~chatplayer("<p,neutral>Yeah, I could do with a bit of advice.");
     ~chatnpc("<p,neutral>The distraction tactic isn't working any more?");
-    ~chatplayer("<p,neutral>No, they seem to have figured that one out already.");
+    ~chatplayer("<p,neutral>No they seem to have figured that one out already.");
     ~chatnpc("<p,neutral>It is a small town, news spreads fast. Perhaps using a spot of cunning and a bit of brute force might work better.");
     if (inv_freespace(inv) < 1) {
         ~chatnpc("<p,neutral>Here, take this, it might help.");
@@ -218,17 +233,17 @@ if ($o = 1) {
         return;
     }
     inv_add(inv, blackjack_oak, 1);
-    mes("Ali The Operator hands you a Blackjack made out of oak.");
+    mes("Ali 'The Operator' hands you a Blackjack made out of oak.");
     return;
 }
-~chatplayer("<p,neutral>No problems here. I actually wanted to ask you about something else.");
+~chatplayer("<p,neutral>Nah, no problems here. I want to ask you about something else.");
 @feud_operator_help;
 
 [label,feud_operator_deed]
 ~chatnpc("<p,quiz>Is the deed done?");
-~chatplayer("<p,neutral>Almost, his drink is poisoned. As soon as he gets back, he'll be done for.");
-~chatnpc("<p,neutral>Excellent work! Now, go speak with our boss.");
-~chatnpc("<p,neutral>He wants to discuss the future direction of the gang.");
+~chatplayer("<p,neutral>Almost, his drink is poisoned, as soon as he gets back, he'll be done for.");
+~chatnpc("<p,neutral>You have proven yourself to be worthy of the bosses presence. He wants to see you know to discuss the future direction of the gang.");
+%feud_var = ^feud_leader_summons;
 return;
 
 [label,feud_operator_deed_wait]
@@ -237,19 +252,20 @@ return;
 ~chatnpc("<p,neutral>Well don't waste time talking to me. Get on with it.");
 return;
 
+
 [label,feud_operator_ruin]
-~chatnpc("<p,neutral>Why did you have to go and ruin everything? We had a beautiful future ahead of us, the town would have been ours!");
+~chatnpc("<p,neutral>Why did you have to go and ruin everything? We had a beautiful future ahead of us, the town would have been ours.");
 def_int $r = ~p_choice3("Maybe I wanted to make it MY town!", 1, "Evil megalomaniacs set on destruction should be opposed.", 2, "I'm sorry, I didn't mean to upset you. Can we still be friends?", 3);
 if ($r = 1) {
     ~chatplayer("<p,neutral>Maybe I wanted to make it MY town!");
-    ~chatnpc("<p,neutral>I see. I knew the hunger for power would get to you eventually.");
+    ~chatnpc("<p,neutral>I see. I knew the power hunger would get to you eventually.");
     return;
 }
 if ($r = 2) {
     ~chatplayer("<p,neutral>Evil megalomaniacs set on destruction should be opposed.");
     ~chatnpc("<p,neutral>Really? I thought you were meant to follow those types blindly, with unquestioning loyalty.");
-    ~chatplayer("<p,neutral>Look, Gielinor is full of power mad evil-doers. I'm sure another will come along soon enough.");
-    ~chatnpc("<p,neutral>No... it just wouldn't be the same. I think I'll just wallow in self pity for a while.");
+    ~chatplayer("<p,neutral>Look Runescape is full of power mad evil-doers. I'm sure another will come along soon enough.");
+    ~chatnpc("<p,neutral>No it just wouldn't be the same, I think I'll just wallow in self pity for a while.");
     return;
 }
 ~chatplayer("<p,neutral>I'm sorry, I didn't mean to upset you. Can we still be friends?");

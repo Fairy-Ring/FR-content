@@ -1,0 +1,84 @@
+// CANDIDATE Old School crop care. Families translate cache bytes at their
+// boundary; only this helper owns the disease/watering state walk.
+[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable, int $treatment, dbrow $growth, int $window)(int)
+// Healthy growth is finite. Disease resolves the remaining range in one check.
+def_int $period = db_getfield($growth, farming_growth:period, 0);
+def_int $diseaseperiod = db_getfield($growth, farming_growth:disease_period, 0);
+while ($steps > 0) {
+    if ($stage > add($first, ^farming_diseased_offset) & $stage < add($mature, ^farming_diseased_offset)) {
+        // UNKNOWN operator-adopted next tier. Never use a slower window from
+        // before disease began, even when several healthy steps were caught up.
+        def_int $until = modulo(sub($diseaseperiod, modulo($window, $diseaseperiod)), $diseaseperiod);
+        if ($steps > divide($until, $period)) return(add($stage, sub(^farming_dead_offset, ^farming_diseased_offset)));
+        return($stage);
+    }
+    def_int $chance = ^farming_allotment_disease_dry;
+    if ($waterable = true & $stage >= add($first, ^farming_watered_offset) & $stage < add($mature, ^farming_watered_offset)) {
+        $stage = sub($stage, ^farming_watered_offset);
+        $chance = ^farming_allotment_disease_watered;
+    }
+    if ($stage < $first | $stage >= $mature) return($stage);
+    if ($stage = $first) {
+        $stage = add($stage, 1);
+    } else {
+        if ($treatment ! 0) $chance = ~farming_soil_disease($chance, $treatment);
+        if (random(^farming_disease_denominator) < $chance) {
+            $stage = add($stage, ^farming_diseased_offset);
+        } else {
+            $stage = add($stage, 1);
+        }
+    }
+    $steps = sub($steps, 1);
+    $window = add($window, $period);
+}
+return($stage);
+
+// The caller writes the returned stage to its own original patch selector.
+[proc,farming_crop_care](int $stage, int $first, int $mature, string $plant, boolean $waterable)(int)
+if ($waterable = true & oc_category(last_useitem) = watering_can & last_useitem ! watering_can_0
+    & $stage >= $first & $stage < $mature) {
+    // CANDIDATE cache-tool attribution; repetition remains UNKNOWN and is not built.
+    anim(farming_watering, 0);
+    inv_setslot(inv, last_useslot, oc_param(last_useitem, next_obj_stage), 1);
+    // UNKNOWN functional wording: no retained period message transcript.
+    mes("You water the <$plant> plants.");
+    return(add($stage, ^farming_watered_offset));
+}
+if (last_useitem = plant_cure & $stage > add($first, ^farming_diseased_offset)
+    & $stage < add($mature, ^farming_diseased_offset)) {
+    anim(farming_plant_cure, 0);
+    inv_setslot(inv, last_useslot, vial_empty, 1);
+    // UNKNOWN functional wording: no retained period message transcript.
+    mes("You cure the <$plant> plants.");
+    return(sub($stage, ^farming_diseased_offset));
+}
+if (last_useitem = spade & $stage > add($first, ^farming_dead_offset)
+    & $stage < add($mature, ^farming_dead_offset)) {
+    anim(human_dig, 0);
+    // UNKNOWN functional wording: no retained period message transcript.
+    mes("You dig up the dead <$plant> plants.");
+    return(^farming_veg_weeded);
+}
+if (last_useitem = rake) {
+    ~displaymessage(^dm_farming_patch_planted);
+    return($stage);
+}
+~displaymessage(^dm_default);
+return($stage);
+
+// CANDIDATE OSRS level interpolation; callers supply labelled crop endpoints.
+[proc,farming_crop_life_loss](int $low, int $high)(int)
+def_int $level = min(99, stat(farming));
+def_int $save = calc(($low * (99 - $level) + $high * ($level - 1) + 49) / 98 + 1);
+return(sub(^farming_harvest_denominator, $save));
+
+// CANDIDATE OSRS history: automatic harvest takes three ticks, manual two.
+// A pending OpLoc is cancellable by the engine, unlike a suspended player script.
+[proc,farming_harvest_ready](boolean $automatic)(boolean)
+if ($automatic = true) {
+    if (%action_delay <= map_clock) return(true);
+} else if (%action_delay <= calc(map_clock + ^farming_harvest_auto_ticks - ^farming_harvest_manual_ticks)) {
+    return(true);
+}
+p_oploc(3);
+return(false);

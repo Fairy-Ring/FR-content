@@ -405,26 +405,28 @@
     },
     {
       "identity": {
-        "debugname": "barrows_bloodworm",
-        "id": 2031
+        "debugname": "cave_goblin",
+        "id": 1822
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 80,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 35,
-        "desc": "Think I should keep my distance...",
+        "defence": 1,
+        "desc": "A goblin with big bulging eyes.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 45,
+        "heads": [
+          5798
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
@@ -432,15 +434,18 @@
         "members": false,
         "minimap": true,
         "models": [
-          6632
+          5781,
+          5782,
+          5783,
+          5784
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Bloodworm",
+        "name": "Cave goblin",
         "op": [
-          null,
+          "Talk-to",
           "Attack",
           null,
           null,
@@ -451,21 +456,15 @@
         "ranged": 1,
         "readyanim": {
           "ref": "seq",
-          "name": "bloodworm_ready"
+          "name": "cave_goblin_ready"
         },
         "recol_d": [
-          9899,
-          8099,
-          7070,
-          5012,
-          22404
+          8976,
+          12942
         ],
         "recol_s": [
-          4940,
-          2756,
-          2749,
-          1837,
-          3980
+          10894,
+          14990
         ],
         "regenrate": 100,
         "resizeh": 128,
@@ -475,13 +474,13 @@
         "resizez": -1,
         "respawnrate": 100,
         "size": 1,
-        "strength": 20,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 52,
+        "vislevel": 3,
         "walkanim": {
           "ref": "seq",
-          "name": "bloodworm_walk"
+          "name": "cave_goblin_walk"
         },
         "walkanim_b": -1,
         "walkanim_l": -1,
@@ -491,62 +490,68 @@
     },
     {
       "identity": {
-        "debugname": "barrows_rat",
-        "id": 2032
+        "debugname": "cave_goblin2",
+        "id": 1823
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 70,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 20,
-        "desc": "A nasty little rodent.",
+        "defence": 1,
+        "desc": "A goblin with big bulging eyes.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 35,
+        "heads": [
+          5798
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
         "maxrange": 7,
         "members": false,
-        "minimap": false,
+        "minimap": true,
         "models": [
-          2927
+          5781,
+          5782,
+          5783,
+          5784
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Crypt rat",
+        "name": "Cave goblin",
         "op": [
-          null,
+          "Talk-to",
           "Attack",
           null,
           null,
           null
         ],
-        "param:slayer_category": 3,
         "patrolCoord": [],
         "patrolDelay": [],
         "ranged": 1,
         "readyanim": {
           "ref": "seq",
-          "name": "rat_ready"
+          "name": "cave_goblin_ready"
         },
         "recol_d": [
-          21679,
-          13501
+          8976,
+          12467,
+          12463
         ],
         "recol_s": [
-          61,
-          2512
+          10894,
+          14990,
+          12942
         ],
         "regenrate": 100,
         "resizeh": 128,
@@ -556,13 +561,13 @@
         "resizez": -1,
         "respawnrate": 100,
         "size": 1,
-        "strength": 20,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 43,
+        "vislevel": 3,
         "walkanim": {
           "ref": "seq",
-          "name": "rat_walk"
+          "name": "cave_goblin_walk"
         },
         "walkanim_b": -1,
         "walkanim_l": -1,
@@ -572,26 +577,28 @@
     },
     {
       "identity": {
-        "debugname": "barrows_giantrat",
-        "id": 2033
+        "debugname": "cave_goblin3",
+        "id": 1824
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 80,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 65,
-        "desc": "A nasty overgrown rodent.",
+        "defence": 1,
+        "desc": "A goblin with big bulging eyes.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 70,
+        "heads": [
+          5798
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
@@ -599,41 +606,41 @@
         "members": false,
         "minimap": true,
         "models": [
-          2959
+          5781,
+          5782,
+          5783,
+          5784
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Giant crypt rat",
+        "name": "Cave goblin",
         "op": [
-          null,
+          "Talk-to",
           "Attack",
           null,
           null,
           null
         ],
-        "param:slayer_category": 3,
         "patrolCoord": [],
         "patrolDelay": [],
         "ranged": 1,
         "readyanim": {
           "ref": "seq",
-          "name": "giantrat_ready"
+          "name": "cave_goblin_ready"
         },
         "recol_d": [
-          21652,
-          8367,
-          16673,
-          17180,
-          10413
+          12480,
+          12467,
+          12463,
+          12484
         ],
         "recol_s": [
-          43299,
-          187,
-          189,
-          935,
-          61
+          10894,
+          14990,
+          12942,
+          8976
         ],
         "regenrate": 100,
         "resizeh": 128,
@@ -642,14 +649,14 @@
         "resizey": -1,
         "resizez": -1,
         "respawnrate": 100,
-        "size": 2,
-        "strength": 50,
+        "size": 1,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 76,
+        "vislevel": 3,
         "walkanim": {
           "ref": "seq",
-          "name": "giantrat_walk"
+          "name": "cave_goblin_walk"
         },
         "walkanim_b": -1,
         "walkanim_l": -1,
@@ -659,26 +666,28 @@
     },
     {
       "identity": {
-        "debugname": "barrows_spider",
-        "id": 2034
+        "debugname": "cave_goblin4",
+        "id": 1825
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 45,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 45,
-        "desc": "Incey wincey.",
+        "defence": 1,
+        "desc": "A goblin with big bulging eyes.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 60,
+        "heads": [
+          5798
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
@@ -686,15 +695,18 @@
         "members": false,
         "minimap": true,
         "models": [
-          2996
+          5781,
+          5782,
+          5783,
+          5784
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Crypt spider",
+        "name": "Cave goblin",
         "op": [
-          null,
+          "Talk-to",
           "Attack",
           null,
           null,
@@ -703,12 +715,23 @@
         "patrolCoord": [],
         "patrolDelay": [],
         "ranged": 1,
-        "readyanim": -1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_ready"
+        },
         "recol_d": [
-          12574
+          12480,
+          12467,
+          12463,
+          12484,
+          12488
         ],
         "recol_s": [
-          7591
+          10894,
+          14990,
+          12942,
+          8976,
+          8609
         ],
         "regenrate": 100,
         "resizeh": 128,
@@ -718,13 +741,13 @@
         "resizez": -1,
         "respawnrate": 100,
         "size": 1,
-        "strength": 47,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 56,
+        "vislevel": 3,
         "walkanim": {
           "ref": "seq",
-          "name": "spider_walk"
+          "name": "cave_goblin_walk"
         },
         "walkanim_b": -1,
         "walkanim_l": -1,
@@ -734,26 +757,28 @@
     },
     {
       "identity": {
-        "debugname": "barrows_giantspider",
-        "id": 2035
+        "debugname": "cave_goblin_guard1",
+        "id": 2073
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 65,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 65,
-        "desc": "Not very incey wincey...",
+        "defence": 1,
+        "desc": "He protects the miners.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 80,
+        "heads": [
+          6955
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
@@ -761,15 +786,19 @@
         "members": false,
         "minimap": true,
         "models": [
-          2884
+          6934,
+          6937,
+          5783,
+          5784,
+          6943
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Giant crypt spider",
+        "name": "Cave goblin guard",
         "op": [
-          null,
+          "Talk-to",
           "Attack",
           null,
           null,
@@ -780,17 +809,15 @@
         "ranged": 1,
         "readyanim": {
           "ref": "seq",
-          "name": "giantspider_ready"
+          "name": "cave_goblin_bone_spear_ready"
         },
         "recol_d": [
-          17930,
-          13074,
-          16846
+          8976,
+          12942
         ],
         "recol_s": [
-          10258,
-          8128,
-          127
+          10894,
+          14990
         ],
         "regenrate": 100,
         "resizeh": 128,
@@ -800,13 +827,13 @@
         "resizez": -1,
         "respawnrate": 100,
         "size": 1,
-        "strength": 67,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 79,
+        "vislevel": 26,
         "walkanim": {
           "ref": "seq",
-          "name": "giantspider_walk"
+          "name": "cave_goblin_bone_spear_walk"
         },
         "walkanim_b": -1,
         "walkanim_l": -1,
@@ -816,26 +843,28 @@
     },
     {
       "identity": {
-        "debugname": "barrows_skeleton_unarmed",
-        "id": 2036
+        "debugname": "cave_goblin_guard2",
+        "id": 2074
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 72,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 72,
-        "desc": "Could do with gaining a few pounds.",
+        "defence": 1,
+        "desc": "He protects the miners.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 51,
+        "heads": [
+          6955
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
@@ -843,18 +872,19 @@
         "members": false,
         "minimap": true,
         "models": [
-          6744,
-          6647,
-          6680,
-          6650
+          6934,
+          6937,
+          5783,
+          5784,
+          6941
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Skeleton",
+        "name": "Cave goblin guard",
         "op": [
-          null,
+          "Talk-to",
           "Attack",
           null,
           null,
@@ -865,13 +895,15 @@
         "ranged": 1,
         "readyanim": {
           "ref": "seq",
-          "name": "human_ready"
+          "name": "cave_goblin_bone_spear_ready"
         },
         "recol_d": [
-          10423
+          8976,
+          12942
         ],
         "recol_s": [
-          5231
+          10894,
+          14990
         ],
         "regenrate": 100,
         "resizeh": 128,
@@ -881,51 +913,44 @@
         "resizez": -1,
         "respawnrate": 100,
         "size": 1,
-        "strength": 72,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 77,
+        "vislevel": 24,
         "walkanim": {
           "ref": "seq",
-          "name": "human_walk_f"
+          "name": "cave_goblin_bone_spear_walk"
         },
-        "walkanim_b": {
-          "ref": "seq",
-          "name": "human_walk_b"
-        },
-        "walkanim_l": {
-          "ref": "seq",
-          "name": "human_walk_r"
-        },
-        "walkanim_r": {
-          "ref": "seq",
-          "name": "human_walk_l"
-        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
         "wanderrange": 5
       }
     },
     {
       "identity": {
-        "debugname": "barrows_skeleton_armed",
-        "id": 2037
+        "debugname": "cave_goblin_miner",
+        "id": 2069
       },
-      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
       "fields": {
         "active": true,
         "alwaysontop": false,
         "ambient": 0,
-        "attack": 72,
+        "attack": 1,
         "attackrange": 0,
         "blockwalk": 1,
         "category": -1,
         "contrast": 0,
         "defaultmode": 1,
-        "defence": 72,
-        "desc": "Could do with gaining a few pounds.",
+        "defence": 1,
+        "desc": "This one is slacking off.",
         "givechase": true,
         "headicon": -1,
-        "heads": null,
-        "hitpoints": 51,
+        "heads": [
+          6957
+        ],
+        "hitpoints": 1,
         "huntmode": -1,
         "huntrange": 0,
         "magic": 1,
@@ -933,15 +958,552 @@
         "members": false,
         "minimap": true,
         "models": [
-          6744,
-          6648,
-          6680
+          6936,
+          5782,
+          5783,
+          5784,
+          6942
         ],
         "moverestrict": 0,
         "multinpc": [],
         "multivarbit": -1,
         "multivarp": -1,
-        "name": "Skeleton",
+        "name": "Cave goblin miner",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_ready"
+        },
+        "recol_d": [
+          8976,
+          12942
+        ],
+        "recol_s": [
+          10894,
+          14990
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 11,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_goblin_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner2",
+        "id": 2070
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "This one is slacking off.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": [
+          6957
+        ],
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6936,
+          5782,
+          5783,
+          5784,
+          6942
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Cave goblin miner",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_ready"
+        },
+        "recol_d": [
+          8976,
+          12467,
+          12463
+        ],
+        "recol_s": [
+          10894,
+          14990,
+          12942
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 11,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_goblin_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner2_mining",
+        "id": 2076
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "He's working away.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": [
+          6957
+        ],
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6936,
+          5782,
+          5783,
+          5784,
+          6942
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Cave goblin miner",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_mining"
+        },
+        "recol_d": [
+          8976,
+          12467,
+          12463
+        ],
+        "recol_s": [
+          10894,
+          14990,
+          12942
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 11,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_goblin_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner3",
+        "id": 2071
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "This one is slacking off.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": [
+          6957
+        ],
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6936,
+          5782,
+          5783,
+          5784,
+          6942
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Cave goblin miner",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_ready"
+        },
+        "recol_d": [
+          12480,
+          12467,
+          12463,
+          12484
+        ],
+        "recol_s": [
+          10894,
+          14990,
+          12942,
+          8976
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 11,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_goblin_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner4",
+        "id": 2072
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "This one is slacking off.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": [
+          6957
+        ],
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6936,
+          5782,
+          5783,
+          5784,
+          6942
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Cave goblin miner",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_ready"
+        },
+        "recol_d": [
+          12480,
+          12467,
+          12463,
+          12484,
+          12488
+        ],
+        "recol_s": [
+          10894,
+          14990,
+          12942,
+          8976,
+          8609
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 11,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_goblin_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "cave_goblin_miner4_mining",
+        "id": 2078
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "He's working away.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": [
+          6957
+        ],
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6936,
+          5782,
+          5783,
+          5784,
+          6942
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Cave goblin miner",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_goblin_mining"
+        },
+        "recol_d": [
+          12480,
+          12467,
+          12463,
+          12484,
+          12488
+        ],
+        "recol_s": [
+          10894,
+          14990,
+          12942,
+          8976,
+          8609
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 11,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_goblin_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "goblin_green_soldier_1",
+        "id": 445
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "An ugly green creature.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          5535,
+          5540,
+          5546,
+          5547,
+          5552,
+          2957
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Goblin",
         "op": [
           null,
           "Attack",
@@ -954,48 +1516,118 @@
         "ranged": 1,
         "readyanim": {
           "ref": "seq",
-          "name": "human_ready"
+          "name": "goblin_ready_spear"
         },
         "recol_d": [
-          12471,
-          11817,
-          10405,
-          10902
+          9891,
+          25121
         ],
         "recol_s": [
-          5231,
-          9152,
-          68,
-          7054
+          14238,
+          2974
         ],
         "regenrate": 100,
-        "resizeh": 128,
-        "resizev": 128,
+        "resizeh": 125,
+        "resizev": 125,
         "resizex": -1,
         "resizey": -1,
         "resizez": -1,
         "respawnrate": 100,
         "size": 1,
-        "strength": 72,
+        "strength": 1,
         "timer": -1,
         "turnspeed": 32,
-        "vislevel": 77,
+        "vislevel": 5,
         "walkanim": {
           "ref": "seq",
-          "name": "human_walk_f"
+          "name": "goblin_walk_spear"
         },
-        "walkanim_b": {
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "goblin_red_soldier_1",
+        "id": 444
+      },
+      "contentCommit": "c48aeee1ac3d5067b04b4bcc743fc9de7a88c2e5",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "An ugly green creature.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          5535,
+          5540,
+          5546,
+          5547,
+          5552,
+          5554
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Goblin",
+        "op": [
+          "Talk-to",
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
           "ref": "seq",
-          "name": "human_walk_b"
+          "name": "goblin_ready"
         },
-        "walkanim_l": {
+        "recol_d": [
+          9891
+        ],
+        "recol_s": [
+          14238
+        ],
+        "regenrate": 100,
+        "resizeh": 126,
+        "resizev": 126,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 5,
+        "walkanim": {
           "ref": "seq",
-          "name": "human_walk_r"
+          "name": "goblin_walk"
         },
-        "walkanim_r": {
-          "ref": "seq",
-          "name": "human_walk_l"
-        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
         "wanderrange": 5
       }
     }

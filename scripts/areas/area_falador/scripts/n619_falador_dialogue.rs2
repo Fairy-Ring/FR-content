@@ -1,0 +1,89 @@
+// CANDIDATE wording from the retained Old School transcript revisions cited in west-east-source.md.
+// Mining Guild: complete CANDIDATE Lost City 274 two-option conversation; later-recorded ore option deferred.
+// https://github.com/LostCityRS/Content/blob/65b754f768b79b941b21b2a1eb3b0d1ecae3cdfe/scripts/skill_mining/scripts/dwarf_mining_guild.rs2
+
+[opnpc1,mguild_guard1]
+@n619_mguild_guard;
+
+[opnpc1,mguild_guard2]
+@n619_mguild_guard;
+
+[label,n619_mguild_guard]
+~chatnpc("<p,happy>Welcome to the Mining Guild. Can I help you with anything?");
+@n619_mguild_menu;
+
+[label,n619_mguild_menu]
+def_int $option = ~p_choice2("What have you got in the guild?", 1, "No thanks, I'm fine.", 2);
+if ($option = 1) {
+    ~chatplayer("<p,quiz>What have you got in the guild?");
+    ~chatnpc("<p,happy>Ooh, it's WONDERFUL! There are lots of coal rocks, and even a few mithril rocks in the guild, all exclusively for people with atleast level 60 mining.");
+    ~chatnpc("<p,happy>There's no better mining site anywhere near here.");
+    if (stat(mining) >= 60) {
+        ~chatplayer("<p,happy>It's a good thing I have level <tostring(stat(mining))> Mining.");
+        ~chatnpc("<p,happy>Yes, that's amazing! Did you want anything else?");
+    } else {
+        ~chatplayer("<p,neutral>So you won't let me go in there?");
+        ~chatnpc("<p,neutral>Sorry, but rules are rules.|Go do some more training first.|Can I help you with anything else?");
+    }
+    @n619_mguild_menu;
+} else {
+    ~chatplayer("<p,bored>No thanks, I'm fine.");
+}
+
+[opnpc1,favour_gangster_dwarf]
+@n619_favour_gangster;
+
+[opnpc1,favour_gangster_dwarf_2]
+@n619_favour_gangster;
+
+[opnpc1,favour_gangster_dwarf_3]
+@n619_favour_gangster;
+
+[label,n619_favour_gangster]
+~chatnpc("<p,neutral>Yeah...whada you want?");
+@n619_favour_gangster_menu;
+
+[label,n619_favour_gangster_menu]
+def_int $option = ~p_choice4("Who are you?", 1, "What're you doing here?", 2, "Who do you work for?", 3, "Ok, thanks.", 4);
+if ($option = 1) {
+    ~chatplayer("<p,quiz>Who are you?");
+    ~chatnpc("<p,neutral>I'm nobody you need to worry about...who are you? Why are you asking so many questions? Are you with the Varrock guards?");
+    @n619_favour_gangster_menu;
+} else if ($option = 2) {
+    ~chatplayer("<p,quiz>What're you doing here?");
+    ~chatnpc("<p,neutral>Well, as if it's any of your business, I'm an associate of Hammerspike. He's a great dwarf you know. You could learn a lot from a dwarf like him.");
+    @n619_favour_gangster_menu;
+} else if ($option = 3) {
+    ~chatplayer("<p,quiz>Who do you work for?");
+    ~chatnpc("<p,neutral>I have an ongoing contract with Hammerspike, when he gives the word, the hammer starts flying.");
+    @n619_favour_gangster_menu;
+} else {
+    ~chatplayer("<p,bored>Okay, thanks.");
+}
+
+[opnpc1,master_crafter_2]
+~chatnpc("<p,happy>Hello, and welcome to the Crafting Guild. Accomplished crafters from all over the land come here to use our top notch workshops.");
+
+[opnpc1,master_crafter_3]
+~chatnpc("<p,confused>Yeah?");
+~chatplayer("<p,happy>Hello.");
+~chatnpc("<p,confused>Whassup?");
+~chatplayer("<p,quiz>So... are you here to give crafting tips?");
+~chatnpc("<p,confused>Dude, do I look like I wanna talk to you?");
+~chatplayer("<p,neutral>I suppose not.");
+~chatnpc("<p,happy>Right on!");
+
+[opnpc1,falador_gardener]
+~chatplayer("<p,happy>Hello.");
+~chatnpc("<p,angry>Oi'm busy. If tha' wants owt, tha' can go find Wyson. He's ta boss 'round here. And KEEP YER TRAMPIN' FEET ORFF MA' FLOWERS!");
+~chatplayer("<p,neutral>Right...");
+
+[opnpc1,salesman_ranging]
+~chatnpc("<p,quiz>Would you like to buy some archery equipment?");
+def_int $option = ~p_choice2("No thanks, I've got all the archery equipment I need.", 1, "Let's see what you've got, then.", 2);
+if ($option = 1) {
+    ~chatplayer("<p,bored>No thanks, I've got all the archery equipment I need.");
+    ~chatnpc("<p,happy>Okay. Fare well on your travels.");
+} else {
+    ~openshop_activenpc;
+}

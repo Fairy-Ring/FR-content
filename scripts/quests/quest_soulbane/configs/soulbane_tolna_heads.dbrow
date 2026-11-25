@@ -1,0 +1,22 @@
+// CANDIDATE r15392739 intervals, explicitly selected over conflicting period prose.
+// UNKNOWN stands: reachable original-map footprints, not recovered placements.
+[soulbane_tolna_south]
+table=soulbane_tolna_heads
+data=head,soulbane_final_tolna1
+data=stand,^soulbane_tolna_south
+data=melee_ticks,^soulbane_tolna_south_melee_ticks
+data=ranged_ticks,^soulbane_tolna_south_ranged_ticks
+
+[soulbane_tolna_east]
+table=soulbane_tolna_heads
+data=head,soulbane_final_tolna2
+data=stand,^soulbane_tolna_east
+data=melee_ticks,^soulbane_tolna_no_melee
+data=ranged_ticks,^soulbane_tolna_east_ranged_ticks
+
+[soulbane_tolna_north]
+table=soulbane_tolna_heads
+data=head,soulbane_final_tolna3
+data=stand,^soulbane_tolna_north
+data=melee_ticks,^soulbane_tolna_north_melee_ticks
+data=ranged_ticks,^soulbane_tolna_north_ranged_ticks

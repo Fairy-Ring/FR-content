@@ -1,0 +1,24 @@
+[dwarf_goldrock_helmet]
+name=Gold helmet
+desc=Made of gold and white gold.
+model=obj_dwarf_goldrock_helmet
+2dxof=1
+2dyof=-4
+2dzoom=590
+2dyan=104
+2dxan=80
+iop2=Wear
+manwear=obj_dwarf_goldrock_helmet_manwear,0
+womanwear=obj_dwarf_goldrock_helmet_womanwear,0
+manhead=obj_leather_cowl_manhead2
+manhead2=obj_dwarf_goldrock_helmet_manhead2
+womanhead=obj_leather_cowl_womanhead2
+womanhead2=obj_dwarf_goldrock_helmet_manhead2
+members=yes
+wearpos=hat
+wearpos2=head
+weight=70lb
+// CANDIDATE: Old School Gold helmet revision 166126 (2013-09-01), before later rebalances.
+param=slashdefence,10
+param=crushdefence,20
+param=rangedefence,10

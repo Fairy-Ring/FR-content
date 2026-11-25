@@ -1,0 +1,57 @@
+// VERIFIED: Tip.It Mountain Daughter, 27 April 2006, The burial and Rewards.
+// CANDIDATE wording: OSRS Transcript:Mountain Daughter, Laying Asleif to rest.
+[opobj3,mdaughter_daughter_corpse]
+if (%mdaughter_quest_var < ^mdaughter_kendal_dead) {
+    mes("I did not give you permission to touch that, mortal!");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_buried | ~obj_gettotal(mdaughter_daughter_corpse) > 0) {
+    mes("This must be someone else's corpse, you already have Asleif's corpse.");
+    return;
+}
+@pickup_obj;
+
+[opheld3,mdaughter_daughter_corpse]
+if (%mdaughter_quest_var < ^mdaughter_burial) {
+    mes("You'd better bring this back to the chieftain instead.");
+    return;
+}
+if (%mdaughter_quest_var ! ^mdaughter_burial) return;
+// UNKNOWN: functional wrong-location message, not retained historical wording.
+if (~mdaughter_at_center = false) {
+    mes("She must be buried on the island at the center of the pool.");
+    return;
+}
+if (inv_total(inv, mdaughter_necklace) = 0) {
+    mes("She needs to be buried with some of her possessions, like jewelry.");
+    return;
+}
+inv_del(inv, mdaughter_daughter_corpse, 1);
+inv_del(inv, mdaughter_necklace, 1);
+%mdaughter_burial_state = 1;
+%mdaughter_quest_var = ^mdaughter_buried;
+~mesbox("You dig a hole in the ground, then carefully lay down the skeleton of the chieftain's daughter, together with her necklace. You then close the hole, creating a small burial mound. Now all you need to do is build a cairn on top.");
+
+// The operation is dispatched on the visible mound, not its multi root.
+[oplocu,mdaughter_burialmound] ~mdaughter_build_cairn;
+[oplocu,mdaughter_multimound] ~mdaughter_build_cairn;
+[proc,mdaughter_build_cairn]
+if (last_useitem ! mdaughter_rock) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%mdaughter_quest_var ! ^mdaughter_buried | %mdaughter_burial_state ! 1 | ~mdaughter_at_center = false) return;
+def_int $rocks = inv_total(inv, mdaughter_rock);
+if ($rocks < ^mdaughter_cairn_rocks) {
+    mes("You don't have enough rocks to build a cairn. You need <tostring(sub(^mdaughter_cairn_rocks, $rocks))> more rock(s).");
+    return;
+}
+inv_del(inv, mdaughter_rock, ^mdaughter_cairn_rocks);
+%mdaughter_burial_state = 2;
+%mdaughter_quest_var = ^mdaughter_complete;
+stat_advance(attack, ^mdaughter_attack_xp);
+stat_advance(prayer, ^mdaughter_prayer_xp);
+mes("You think you can hear a soft 'thank you' as the singing quietens down.");
+session_log(^log_adventure, "Quest complete: Mountain Daughter");
+// UNKNOWN: reconstruction of generic scroll layout and title, not a retained period screenshot.
+~send_quest_complete(questlist:mdaughter, mdaughter_bear_helmet, 250, ^mdaughter_questpoints, "You have completed the\\nMountain Daughter quest!", "1000 Attack XP|2000 Prayer XP|Bearhead");

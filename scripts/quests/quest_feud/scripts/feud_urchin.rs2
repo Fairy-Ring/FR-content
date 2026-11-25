@@ -1,88 +1,130 @@
-// The Feud — Street urchin hire + distract (chat + flag). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Picking another pocket /
-// Talking to a Street urchin, minus the 27 Apr 2022 lore pass). Gate:
-// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 AND
-// %feud_talk_villager >= 1 (joined + first pick done) else return.
-// Hire chat is dump verbatim (Hey kid -> easy money -> 10 gold coins ->
-// That's it!). Then an any-villager-in-range check via npc_find on the
-// WORLD multi type (feud_villager_multi_2 then _3 then _1; the vis
-// feud_villager_*_* are client-only faces — NPC_FIND will not match them).
-// Range 10 CANDIDATE (period scripts use 10-15). Villager in range ->
-// "Okay, I see them. Here I go!" / "Hey you, camel features! Come here." /
-// Villager "Excuse me?" and write %feud_var_urchin = 1 + %feud_distracted =
-// 1 (CANDIDATE). No villager -> "Listen, you're crazy. I can't see anyone to
-// distract." and NO flag write. %feud_closest_villager (1-3 CANDIDATE, the
-// multi group found; order 2/3/1 mirrors proximity from the urchin's primary
-// face 3352,2958 — group 2 @ 3355,2957 ~4, group 3 @ 3349,2954 ~4.5, group
-// 1 @ 3355,2949 ~10).
-// npc_find switches the current-NPC context to the found villager, so the
-// urchin's uid is saved before the cascade (def_npc_uid) and restored in the
-// distract proc (npc_finduid) before the urchin ~chatnpc lines.
-// %feud_var stays 1. %feud_talk_villager stays 1. No 28. No dest /
-// p_tele. No pickpocket rewrite. No count 3. No blackjack. No && / ||.
-// Pay/deny after the distract (dump § Pickpocketing part three / Talking to
-// a Street urchin, first time after the distraction): "Did you see the way I
-// distracted that guy?..." -> "So where's my money?" -> pay 10 (inv_del coins
-// 10 + %feud_ali_money 1 CANDIDATE) or deny (no write, %feud_ali_money stays
-// 0). The pay branch's trailing "Well do you need any other information
-// then?" info menu is the generic urchin info tree (later hop). Deny-again /
-// second distract (%feud_urchin_again) is the NEXT hop — do not write it.
-// §19.2 celebrate (after Tough Guy kill): %feud_var_menaboss >= 1 dispatches
-// @feud_urchin_celebrate BEFORE hire/paydeny — urchin offers to rob more
-// people, player declines and refuses the info menu. Dump verbatim, chat
-// only. No 28 / dest / p_tele. No && / ||.
-// Cite feud-operator-blackjack-377.md §7.4 · anchors-pollniv.md · crawl first row.
+// Feud urchin trial and town-information dialogue.
+// Transcript dialogue is CANDIDATE; per-villager timing and theft amounts are named UNKNOWN choices.
 
 [opnpc1,feud_street_urchin]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
-if (%feud_talk_villager < 1) { return; }
-if (%feud_var_menaboss >= 1) {
-    @feud_urchin_celebrate;
-}
-if (%feud_var_urchin >= 1) {
-    ~feud_urchin_paydeny;
+if (%feud_var >= ^feud_menaphites_defeated) {
+    ~chatnpc("<p,quiz>What do you want?");
     return;
 }
+if (%feud_var < ^feud_first_pick) {
+    @feud_urchin_information;
+}
+if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) {
+    @feud_urchin_start;
+}
+if (%feud_var = ^feud_second_pick) {
+    if (%feud_var_urchin = 2) {
+        @feud_urchin_double_payment;
+    }
+    if (%feud_var_urchin = 1) {
+        @feud_urchin_repeat_distraction;
+    }
+    @feud_urchin_payment;
+}
+return;
+
+[label,feud_urchin_start]
+if (~feud_trial_target_ready = false) return;
 def_npc_uid $urchin = npc_uid;
+if (%feud_var = ^feud_first_pick) %feud_urchin_again = 1;
 ~chatplayer("<p,neutral>Hey kid, come here!");
 ~chatnpc("<p,quiz>What do you want?");
 ~chatplayer("<p,quiz>I need a little help, do you want to make some easy money?");
 ~chatnpc("<p,neutral>That depends.");
-~chatplayer("<p,neutral>Do you see that villager over there? If you could distract him for a bit I'll give you 10 gold coins.");
+~chatplayer("<p,neutral>Do you see that villager over there? Well if you could distract him for a bit I'll give you 10 gold coins.");
 ~chatnpc("<p,quiz>Is that it?");
-~chatplayer("<p,neutral>That's it!");
-if (npc_find(coord, feud_villager_multi_2, 10, 0) = true) {
-    %feud_closest_villager = 2;
-    ~feud_urchin_do_distract($urchin);
+~chatplayer("<p,neutral>Ya it's simple but just do it and do it right.");
+def_npc_uid $villager = ~feud_urchin_find_villager;
+if ($villager ! null) {
+    ~feud_urchin_do_distract($urchin, $villager);
     return;
 }
-if (npc_find(coord, feud_villager_multi_3, 10, 0) = true) {
-    %feud_closest_villager = 3;
-    ~feud_urchin_do_distract($urchin);
-    return;
-}
-if (npc_find(coord, feud_villager_multi_1, 10, 0) = true) {
-    %feud_closest_villager = 1;
-    ~feud_urchin_do_distract($urchin);
-    return;
-}
-~chatnpc("<p,neutral>Listen, you're crazy. I can't see anyone to distract.");
+~feud_urchin_no_villager($urchin);
 return;
 
-[proc,feud_urchin_do_distract](npc_uid $u)
-if (npc_finduid($u) = false) { return; }
-~chatnpc("<p,neutral>Okay, I see them. Here I go!");
-~chatnpc("<p,neutral>Hey you, camel features! Come here.");
-~chatnpc_specific("Villager", feud_villager_1_1, "<p,neutral>Excuse me?");
-%feud_var_urchin = 1;
-%feud_distracted = 1;
+// Keep npc_find's type priority, radius, squared-distance ordering and last-iterator tie.
+// Reconcile before excluding another player's active hold or follow.
+[proc,feud_urchin_find_villager]()(npc_uid)
+def_npc_uid $villager = ~feud_urchin_find_free(feud_villager_multi_2);
+if ($villager ! null) return($villager);
+$villager = ~feud_urchin_find_free(feud_villager_multi_3);
+if ($villager ! null) return($villager);
+return(~feud_urchin_find_free(feud_villager_multi_1));
 
-[proc,feud_urchin_paydeny]
+[proc,feud_urchin_find_free](npc $kind)(npc_uid)
+def_int $x = coordx(coord);
+def_int $z = coordz(coord);
+def_npc_uid $closest = null;
+def_int $distance = 0;
+npc_findall(coord, $kind, 10, 0);
+while (npc_findnext = true) {
+    ~feud_villager_reconcile;
+    if (%feud_villager_state = ^feud_villager_state_idle) {
+        def_int $dx = calc(coordx(npc_coord) - $x);
+        def_int $dz = calc(coordz(npc_coord) - $z);
+        def_int $square = calc($dx * $dx + $dz * $dz);
+        if ($closest = null | $square <= $distance) {
+            $closest = npc_uid;
+            $distance = $square;
+        }
+    }
+}
+return($closest);
+
+[proc,feud_urchin_do_distract](npc_uid $u, npc_uid $v)
+if (npc_finduid($v) = false) {
+    ~feud_urchin_no_villager($u);
+    return;
+}
+~feud_villager_reconcile;
+if (%feud_villager_state ! ^feud_villager_state_idle) {
+    ~feud_urchin_no_villager($u);
+    return;
+}
+%feud_trial_villager = $v;
+%feud_villager_state = ^feud_villager_state_distracted;
+%feud_villager_owner = uid;
+// UNKNOWN: reserve the target now, but start no theft window while its owner is paused.
+%feud_villager_deadline = 0;
+// UNKNOWN: no retained source says whether he stood or walked while distracted.
+// Main chose the favourable stationary policy, following this unit's knockout hold.
+npc_walk(npc_coord);
+npc_setmode(none);
+npc_settimer(1);
+if (npc_finduid($u) = false) {
+    if (npc_finduid($v) = true) {
+        ~feud_villager_reset;
+    }
+    return;
+}
+if (%feud_var = ^feud_first_pick) %feud_distracted = 1;
+~chatnpc("<p,neutral>Ya, I see them. Give me a sec.");
+if (%feud_var = ^feud_first_pick) %feud_var = ^feud_distraction_active;
+npc_say("Hey you, camel features! Come here.");
+if (npc_finduid($v) = true) {
+    %feud_villager_deadline = calc(map_clock + ^feud_villager_distraction_ticks);
+    // VERIFIED: RuneHQ's 24 April 2006 guide marks this villager with a flashing arrow.
+    hint_npc;
+    npc_say("What me?");
+}
+
+// The final short NPC page uses this existing root. Ordinary interruption closes it;
+// successful Continue has already armed a nonzero deadline before the chat closes.
+[if_close,npcchat1]
+if (%feud_trial_villager = null) return;
+if (npc_finduid(%feud_trial_villager) = false) return;
+~feud_villager_reconcile;
+if (%feud_villager_state ! ^feud_villager_state_distracted | %feud_villager_deadline ! 0) return;
+~feud_trial_release;
+
+[proc,feud_urchin_no_villager](npc_uid $u)
+if (npc_finduid($u) = false) { return; }
+~chatnpc("<p,neutral>Listen, you're crazy. I can't see anyone to distract.");
+
+[label,feud_urchin_payment]
 ~chatplayer("<p,neutral>Hey there!");
-~chatnpc("<p,happy>Did you see the way I distracted that guy? Man, I'm one smooth operator!");
-~chatplayer("<p,neutral>You did good, kid.");
+~chatnpc("<p,happy>Did you see the way I distracted that guy? Man I'm one smooth operator.");
+~chatplayer("<p,neutral>Ya you were good alright.");
 ~chatnpc("<p,quiz>So where's my money?");
 def_int $m = ~p_choice2("What money?", 1, "Here you go, thanks.", 2);
 if ($m = 1) {
@@ -93,20 +135,100 @@ if ($m = 1) {
     ~chatplayer("<p,neutral>How observant of you!");
     ~chatnpc("<p,angry>Give me my money!");
     ~chatplayer("<p,angry>Make me!");
+    %feud_var_urchin = 2;
     ~chatnpc("<p,angry>You'll be sorry!");
     return;
 }
+if (inv_total(inv, coins) < ^feud_urchin_payment_coins) { return; }
+inv_del(inv, coins, ^feud_urchin_payment_coins);
+%feud_var_urchin = 1;
 ~chatplayer("<p,neutral>Here you go, thanks.");
-inv_del(inv, coins, 10);
-%feud_ali_money = 1;
-~chatnpc("<p,neutral>Thanks sir, I didn't think you would hold up your side of the deal. There's not much honour amongst thieves, you know.");
+~chatnpc("<p,neutral>Thanks <text_gender("sir", "ma'am")>, I didn't think you would hold up your side of the deal. There's not much honour among thieves, you know.");
 ~chatnpc("<p,quiz>Well do you need any other information then?");
+@feud_urchin_info_choices;
+
+[label,feud_urchin_double_payment]
+~chatplayer("<p,neutral>Hey there!");
+~chatnpc("<p,angry>Thief! Thief!");
+~chatplayer("<p,neutral>Shut up! Don't cause any more trouble or you'll regret it.");
+~chatnpc("<p,angry>Give me double and I'll be quiet!");
+if (inv_total(inv, coins) < ^feud_urchin_double_payment_coins) { return; }
+inv_del(inv, coins, ^feud_urchin_double_payment_coins);
+~chatplayer("<p,neutral>Okay, here you go - you thief.");
+~chatnpc("<p,angry>Better a thief than a liar!");
+%feud_var_urchin = 1;
 return;
 
-[label,feud_urchin_celebrate]
+[label,feud_urchin_repeat_distraction]
+def_npc_uid $urchin = npc_uid;
 ~chatplayer("<p,neutral>Hey there!");
 ~chatnpc("<p,quiz>Hi! Do you want to go rob some more people? I could do with some more money.");
+~chatplayer("<p,neutral>Ok, let's do it again.");
+def_npc_uid $villager = ~feud_urchin_find_villager;
+if ($villager ! null) {
+    @feud_urchin_repeat_target($urchin, $villager);
+}
+if (npc_finduid($urchin) = true) {
+    ~chatnpc("<p,neutral>There doesn't seem to be anyone around to rob at the moment. Perhaps we can try again later.");
+}
+return;
+
+[label,feud_urchin_repeat_target](npc_uid $u, npc_uid $v)
+if (npc_finduid($u) = false) { return; }
+npc_say("Hey you, camel features! Come here.");
+if (npc_finduid($v) = false) { return; }
+npc_say("I know your game guttersnipe.");
+npc_say("You won't fool anyone with that trick again.");
+if (npc_finduid($u) = false) { return; }
 ~chatplayer("<p,neutral>I think I need to try a different tactic. Sorry, kid!");
 ~chatnpc("<p,quiz>Well do you need any information then?");
-~chatplayer("<p,neutral>No thanks, I think I have a fair idea of what is going on in the town now.");
+@feud_urchin_info_choices;
+
+[label,feud_urchin_information]
+~chatplayer("<p,neutral>Hello there!");
+~chatnpc("<p,quiz>What do you want? Information?");
+~chatplayer("<p,neutral>What would you know?");
+~chatnpc("<p,neutral>No one knows what's going on in the streets better than me. I live, sleep, eat and drink here. The fact that I'm so small means that people tend to ignore me which helps even more.");
+@feud_urchin_info_menu;
+
+[label,feud_urchin_info_menu]
+~chatnpc("<p,quiz>Do you need any other information?");
+@feud_urchin_info_choices;
+
+[label,feud_urchin_info_choices]
+def_int $info = ~p_choice2("Yes tell me about...", 1, "No thanks.", 2);
+if ($info = 2) {
+    @feud_urchin_info_end;
+}
+~chatplayer("<p,neutral>Yes tell me about...");
+def_int $topic = ~p_choice4("The Menaphites", 1, "The bandits", 2, "The Mayor", 3, "Ali Morrisane's nephew", 4);
+if ($topic = 1) {
+    ~chatplayer("<p,neutral>Tell me about the Menaphites.");
+    ~chatnpc("<p,neutral>They're a bad bunch, always starting fights down in the Asp and Snake. Word on the street is that they're led by some deranged priest. Nobody's ever seen them though - they do all their deals through Ali 'the Operator'. I reckon they're up to something, but they're such a close knit group that little ever slips out.");
+    @feud_urchin_info_menu;
+}
+if ($topic = 2) {
+    ~chatplayer("<p,neutral>Tell me about the bandits.");
+    ~chatnpc("<p,neutral>There's not much to say, really. They're just a group of local thugs led by the biggest and strongest amongst them. If they have any other plans, I don't know about it.");
+    @feud_urchin_info_menu;
+}
+if ($topic = 3) {
+    ~chatplayer("<p,neutral>Tell me about the Mayor.");
+    ~chatnpc("<p,neutral>The mayor is a spineless coward! He never stands up to anybody. That's why the Menaphites are so strong now! He let them stay, and then they started causing trouble.|When he realised his mistake, he hired a band of local thugs to drive them out, but they saw how weak he was and turned on us too. Now we've got bandits and Menaphites, and the mayor isn't doing anything!");
+    @feud_urchin_info_menu;
+}
+if ($topic = 4) {
+    ~chatplayer("<p,neutral>Tell me about Ali Morrisane's nephew.");
+    ~chatnpc("<p,neutral>I know him! He used to kick us when he caught any of us stealing from his stall.");
+    ~chatplayer("<p,neutral>Do you know where he is now then?");
+    ~chatnpc("<p,neutral>He disappeared a little while ago. All I know is it had something to do with the gangs. Probably he scammed them. You'd have to gain their trust to find out more, m'afraid - if I get too close, they might disappear me too!");
+    @feud_urchin_info_menu;
+}
 return;
+
+[label,feud_urchin_info_end]
+~chatplayer("<p,neutral>No thanks.");
+~chatnpc("<p,neutral>Come back if you need any info about anything in the town.");
+~chatplayer("<p,neutral>I will do thanks.");
+return;
+

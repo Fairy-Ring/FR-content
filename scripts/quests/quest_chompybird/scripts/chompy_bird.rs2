@@ -144,7 +144,7 @@ if (~player_npc_hit_roll(%damagetype) = true) {
 
 def_int $delay = add(~player_use_ogre_bow($ammo), 30); // osrs it seems to be delayed an extra tick
 anim(%com_attackanim, 0);
-sound_synth(%com_attacksound, 0, 0);
+if (%com_attacksound ! null) sound_synth(%com_attacksound, 0, 0);
 // Chompies don't fight back
 npc_queue(2, $damage, calc($delay / 30)); // ai_queue2 takes uncapped damage (avoids npcs from tick healing)
 if (npc_param(defend_sound) ! null) {

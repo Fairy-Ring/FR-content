@@ -1,0 +1,31 @@
+// Client fields moved unchanged from the original 377 unpack.
+// Resource assignment is CANDIDATE; exact-model empty pairing is UNKNOWN.
+[rocks_10946]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_4027
+recol1s=15854
+recol1d=18820
+recol2s=6342
+recol2d=16706
+op1=Mine
+op2=Prospect
+op3=hidden
+hillskew=yes
+category=mining_rock_fast
+param=next_loc_stage_mining,rocks_10944
+
+[rocks_10947]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_4028
+recol1s=9513
+recol1d=19912
+recol2s=6342
+recol2d=18821
+op1=Mine
+op2=Prospect
+op3=hidden
+hillskew=yes
+category=mining_rock_fast
+param=next_loc_stage_mining,rocks_10945

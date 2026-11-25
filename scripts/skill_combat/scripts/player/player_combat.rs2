@@ -2,6 +2,11 @@
 [apnpc2,_] @player_combat_start_ap;
 
 [label,player_combat_start_ap]
+// CANDIDATE: Lost City 289, uncited.
+if (~mm_wearing_greegree = true) { // checks before attackrange
+    ~mesbox("You cannot attack as a monkey.");
+    return;
+}
 def_int $attackrange = ~player_attackrange(inv_getobj(worn, ^wearpos_rhand));
 if (($attackrange <= 1 & ~player_in_combat_check = false) | npc_range(coord) > $attackrange) {
     p_aprange($attackrange);
@@ -68,6 +73,12 @@ switch_int ($damagetype) {
 }
 
 [proc,player_in_combat_check]()(boolean)
+// CANDIDATE: Lost City 289, uncited.
+if (~mm_wearing_greegree = true) {
+    ~mesbox("You cannot attack as a monkey.");
+    return(false);
+}
+if (~waterbirth_support_side = false) return(false);
 if (~swamp_cave_can_attack = false) return(false);
 // npc_forcemulti: treat as multi even outside multiway (274 player_combat; Draugen etc.)
 if (map_multiway(npc_coord) = false & nc_param(npc_type, npc_forcemulti) = ^false) {
@@ -90,11 +101,11 @@ if (map_multiway(npc_coord) = false & nc_param(npc_type, npc_forcemulti) = ^fals
         return(false);
     }
 }
-if (%npc_macro_event_target ! null & %npc_macro_event_target ! uid) {
+if (~player_in_combat_check_macro_refused = true) {
     mes("It's not after you."); // https://youtu.be/y58EFTJNIH8
     return(false);
 }
-if (stat(slayer) < enum(int, int, slayer_req, npc_param(slayer_category))) {
+if (~player_in_combat_check_slayer_refused = true) {
     // OSRS prevents attacking but this should actually just cap damage to 0 (early OSRS behaviour)
     // so move this to the damage cap procs that exist in 295 when converting
     mes("You need a higher Slayer level to know how to wound this monster.");
@@ -102,8 +113,24 @@ if (stat(slayer) < enum(int, int, slayer_req, npc_param(slayer_category))) {
 }
 return(true);
 
+// Area scans call this only after map_multiway admits the secondary target tile.
+[proc,player_in_combat_check_quiet]()(boolean)
+if (~swamp_cave_can_attack = false) return(false);
+if (~player_in_combat_check_macro_refused = true) return(false);
+if (~player_in_combat_check_slayer_refused = true) return(false);
+return(true);
+
+[proc,player_in_combat_check_macro_refused]()(boolean)
+if (%npc_macro_event_target ! null & %npc_macro_event_target ! uid) return(true);
+return(false);
+
+[proc,player_in_combat_check_slayer_refused]()(boolean)
+if (stat(slayer) < enum(int, int, slayer_req, npc_param(slayer_category))) return(true);
+return(false);
+
 // mage arena and crumble undead use this for no discenerable reason
 [proc,player_in_combat_check2]()(boolean)
+if (~waterbirth_support_side = false) return(false);
 if (~swamp_cave_can_attack = false) return(false);
 if (map_multiway(npc_coord) = false & nc_param(npc_type, npc_forcemulti) = ^false) {
     // "I'm already under attack" with no period:

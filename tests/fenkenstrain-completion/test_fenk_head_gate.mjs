@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /** Execute the packed grave handler and real gardener conversation. No server.
  * CANDIDATE started-step gate; the follower itself is not a Dig prerequisite.
- * Held/handed-in command lists were captured from published ffffb3b6fdd60632c032e185435e18444a85449e.
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -19,7 +18,6 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'NpcType', 'Loc
 const { default: ScriptProvider } = await eng('src/engine/script/ScriptProvider.ts');
 const { default: ScriptRunner } = await eng('src/engine/script/ScriptRunner.ts');
 const { default: ScriptState } = await eng('src/engine/script/ScriptState.ts');
-const { ScriptOpcode } = await eng('src/engine/script/ScriptOpcode.ts');
 const { default: Player } = await eng('src/engine/entity/Player.ts');
 const { default: Npc } = await eng('src/engine/entity/Npc.ts');
 const { default: Loc } = await eng('src/engine/entity/Loc.ts');
@@ -42,20 +40,10 @@ const lands = new Int8Array(4 * 64 * 64);
 map.loadGround(lands, new Packet(zip.m55_55), 3520, 3520);
 map.loadLocations(lands, new Packet(zip.l55_55), 3520, 3520);
 World.currentTick = 10;
-let commands = [];
-const originals = new Map();
-for (const [name, ints, strings] of [['P_ARRIVEDELAY', 0, 0], ['ANIM', 2, 0], ['P_DELAY', 1, 0], ['MES', 0, 1], ['INV_ADD', 3, 0]]) {
-    const opcode = ScriptOpcode[name], original = ScriptRunner.HANDLERS[opcode];
-    originals.set(opcode, original);
-    ScriptRunner.HANDLERS[opcode] = state => {
-        commands.push([name, ...state.intStack.slice(state.isp - ints, state.isp), ...state.stringStack.slice(state.ssp - strings, state.ssp)]);
-        original(state); // Observe only: execute the real production command unchanged.
-    };
-}
 function player() {
     const p = new Player('', 0n, 0n);
     p.uid = 1; p.pid = 1; p.isActive = true; p.x = 3551; p.z = 3560; p.level = 0; p.lastMovement = 0;
-    p.write = () => {}; p.messageGame = () => {}; p.wrappedMessageGame = () => {};
+    p.write = () => {}; p.messages = []; p.messageGame = text => p.messages.push(text); p.wrappedMessageGame = p.messageGame;
     p.getInventory(I.inv).add(I.spade, 1);
     return p;
 }
@@ -76,63 +64,70 @@ function run(p, name, target, choices = []) {
     assert.equal(result, ScriptState.FINISHED, `${name} must finish, never swallow an abort`);
     assert.equal(choices.length, 0);
 }
-function dig(p, x = 3608, z = 3491) {
-    commands = [];
+// Authored from the grave's eligibility, one-head reward and space rules.
+// Observe resulting state and player messages, never the engine command stream.
+function dig(p, outcome, x = 3608, z = 3491) {
+    const items = p.getInventory(I.inv);
+    const before = items.items.map(item => item && { ...item });
+    const heads = items.getItemCount(I.head), xp = [...p.stats], vars = [...p.vars];
+    const tick = World.currentTick;
+    p.messages = [];
+    p.animId = -1; // Each Dig case starts without a previous animation.
     const loc = new Loc(0, x, z, 1, 1, EntityLifeCycle.RESPAWN, I.grave, 10, 0);
     run(p, '[oploc2,fenk_grave_poor]', loc);
-    return structuredClone(commands);
-}
-const prefix = [['P_ARRIVEDELAY'], ['ANIM', I.dig, 0], ['P_DELAY', 1], ['MES', 'You start digging...']];
-const empty = [...prefix, ['MES', '...but the grave is empty.']];
-const found = [...prefix, ['INV_ADD', I.inv, I.head, 1], ['MES', '...and you find a decapitated head.']];
-const traces = {};
-try {
-    let p = player();
-    traces.notTalked = dig(p);
-    assert.deepEqual(traces.notTalked, [['P_ARRIVEDELAY'], ['MES', 'Nothing interesting happens.']]);
-    assert.equal(p.getInventory(I.inv).getItemCount(I.head), 0);
-    assert.deepEqual(dig(p, 3542, 3486), empty, 'wrong grave retains published Dig');
-    for (let slot = 1; slot < 28; slot++) p.getInventory(I.inv).set(slot, { id: I.spade, count: 1 });
-    traces.notTalkedFullInventory = dig(p);
-    assert.deepEqual(commands, traces.notTalked, 'full inventory must not disclose the head before talking');
-    for (const stage of [0, 1, 3, 8]) {
-        p = player(); p.setVar(I.stage, stage);
-        const got = dig(p);
-        assert.deepEqual(got, traces.notTalked, `quest stage ${stage} alone never replaces the talk`);
+    assert.equal(items.getItemCount(I.head), heads + Number(outcome === 'found'));
+    assert.deepEqual([...p.stats], xp, 'Dig awards no XP');
+    assert.deepEqual([...p.vars], vars, 'Dig changes no quest or remembered state');
+    if (outcome !== 'found') assert.deepEqual(items.items, before, 'refusal preserves every inventory slot');
+    else {
+        assert.equal(items.getItemCount(I.spade), 1, 'the reward does not consume the spade');
+        assert.equal(items.items.filter(Boolean).length, before.filter(Boolean).length + 1, 'exactly one head is added');
     }
-    for (const head of [I.head, I.full]) {
-        p = player(); p.getInventory(I.inv).add(head, 1);
-        traces[head === I.head ? 'held' : 'heldFull'] = dig(p);
-        assert.deepEqual(commands, empty, 'held head with spoken bit 0 retains published commands');
-        assert.equal(p.getInventory(I.inv).getItemCount(head), 1);
+    const result = { locked: 'Nothing interesting happens.', empty: '...but the grave is empty.',
+        found: '...and you find a decapitated head.', full: "You don't have enough inventory space." }[outcome];
+    assert(result, 'named authored outcome');
+    assert.deepEqual(p.messages, outcome === 'locked' ? [result] : ['You start digging...', result]);
+    if (outcome === 'locked') {
+        assert.equal(p.animId, -1, 'locked Dig plays no animation');
+        assert.equal(World.currentTick, tick, 'locked Dig does not delay');
+    } else {
+        assert.equal(p.animId, I.dig, 'eligible Dig plays the authored digging animation');
+        // P_DELAY resumes at the current tick + one scheduling tick + its argument.
+        assert.equal(World.currentTick - tick - 1, 1, 'eligible Dig delays exactly one tick');
     }
-    p = player(); p.setVarBit(I.handed, 1);
-    traces.handedIn = dig(p);
-    assert.deepEqual(commands, empty, 'handed-in head with spoken bit 0 retains published commands');
-    assert.equal(p.getInventory(I.inv).getItemCount(I.head), 0);
-    p = player(); p.setVar(I.stage, 1); p.getInventory(I.worn).add(I.amulet, 1);
-    const npc = new Npc(0, 3551, 3561, 1, 1, EntityLifeCycle.RESPAWN, 1, I.gardener, 0);
-    npc.isActive = true;
-    assert.equal(p.getVarBit(I.spoken), 0);
-    run(p, '[opnpc1,fenk_gardener]', npc, [1]);
-    assert.equal(p.getVarBit(I.spoken), 1, 'real completed head conversation writes the bit');
-    run(p, '[proc,fenk_clear_gardener_follow]');
-    assert.equal(p.getVar(I.follower), -1, 'positive Dig needs no active follower');
-    traces.talked = dig(p);
-    assert.deepEqual(commands, found);
-    assert.equal(p.getInventory(I.inv).getItemCount(I.head), 1);
-    p.getInventory(I.inv).remove(I.head, 1);
-    for (let slot = 1; slot < 28; slot++) p.getInventory(I.inv).set(slot, { id: I.spade, count: 1 });
-    traces.talkedFullInventory = dig(p);
-    assert.deepEqual(commands, [...prefix, ['MES', "You don't have enough inventory space."]], 'talked full-inventory commands remain published');
-    for (let slot = 1; slot < 28; slot++) p.getInventory(I.inv).set(slot, null);
-    assert.deepEqual(dig(p), found, 'free-space retry after talk succeeds');
-    assert.deepEqual(dig(p), empty, 'second head refused');
-    p.getInventory(I.inv).remove(I.head, 1);
-    assert.deepEqual(dig(p), found, 'lost pre-hand-in head remains recoverable after talk');
-    console.log(JSON.stringify(traces, null, 2));
-    console.log('PASS packed head gate command lists, quest stages, real conversation, no follower, duplicate and recovery controls');
-} finally {
-    for (const [opcode, original] of originals) ScriptRunner.HANDLERS[opcode] = original;
 }
+let p = player();
+dig(p, 'locked');
+dig(p, 'empty', 3542, 3486);
+for (let slot = 1; slot < 28; slot++) p.getInventory(I.inv).set(slot, { id: I.spade, count: 1 });
+dig(p, 'locked'); // A full bag must not disclose the head before the conversation.
+for (const stage of [0, 1, 3, 8]) {
+    p = player(); p.setVar(I.stage, stage);
+    dig(p, 'locked'); // Quest stage alone never substitutes for the conversation.
+}
+for (const head of [I.head, I.full]) {
+    p = player(); p.getInventory(I.inv).add(head, 1);
+    dig(p, 'empty');
+    assert.equal(p.getInventory(I.inv).getItemCount(head), 1);
+}
+p = player(); p.setVarBit(I.handed, 1);
+dig(p, 'empty');
+p = player(); p.setVar(I.stage, 1); p.getInventory(I.worn).add(I.amulet, 1);
+const npc = new Npc(0, 3551, 3561, 1, 1, EntityLifeCycle.RESPAWN, 1, I.gardener, 0);
+npc.isActive = true;
+assert.equal(p.getVarBit(I.spoken), 0);
+run(p, '[opnpc1,fenk_gardener]', npc, [1]);
+assert.equal(p.getVarBit(I.spoken), 1, 'real completed head conversation writes the bit');
+run(p, '[proc,fenk_clear_gardener_follow]');
+assert.equal(p.getVar(I.follower), -1, 'positive Dig needs no active follower');
+dig(p, 'found');
+p.getInventory(I.inv).remove(I.head, 1);
+for (let slot = 1; slot < 28; slot++) p.getInventory(I.inv).set(slot, { id: I.spade, count: 1 });
+dig(p, 'full');
+for (let slot = 1; slot < 28; slot++) p.getInventory(I.inv).set(slot, null);
+dig(p, 'found'); // Free-space retry after the conversation succeeds.
+dig(p, 'empty'); // A second head is refused.
+p.getInventory(I.inv).remove(I.head, 1);
+dig(p, 'found'); // A lost pre-hand-in head remains recoverable.
+console.log('PASS packed head eligibility, exact reward, refusals, presentation and retry outcomes');
 process.exit(0);

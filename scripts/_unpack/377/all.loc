@@ -31006,17 +31006,6 @@ recol1d=10535
 sharelight=yes
 active=no
 
-[slayertower_door]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-
 [slayertower_door_arch]
 model=loc_4488
 hillskew=yes
@@ -31037,41 +31026,6 @@ op1=Open
 blockwalk=no
 mirror=yes
 active=no
-
-[slayertower_door_mirror]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-mirror=yes
-op1=Open
-
-[slayertower_door_open]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
-
-[slayertower_door_open_mirror]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-mirror=yes
-op1=Close
 
 [slayer_dungeon_entrance]
 name=Cave Entrance
@@ -33457,300 +33411,6 @@ retex2s=elfwood
 retex2d=wood2
 op1=Search
 
-[mineral_vein]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=14596
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4977]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=14596
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4978]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=14596
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4979]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=13741
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4980]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=13741
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4981]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=13741
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4982]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=6242
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4983]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=6242
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4984]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=6242
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4985]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=0
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4986]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=0
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4987]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=0
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4988]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=6346
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4989]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=6346
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4990]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=6346
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4991]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=6438
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4992]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=6438
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4993]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=6438
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4994]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=18851
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4995]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=18851
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_4996]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=18851
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
 [track_points_a_mirrored]
 model=track_pointsa
 hillskew=yes
@@ -34982,17 +34642,6 @@ width=2
 blockrange=no
 blockwalk=no
 
-[door_5126]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-
 [danger_sign]
 name=Danger sign
 desc=Danger!
@@ -35004,17 +34653,6 @@ recol2d=20011
 recol3s=13571
 recol3d=11592
 op1=Read
-
-[door_5128]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
 
 [scenery_5129]
 model=loc_5129
@@ -36841,24 +36479,6 @@ recol3d=6340
 hillskew=yes
 active=no
 
-[ahoy_boxes_1]
-name=Boxes
-desc=A pile of boxes for storage.
-model=ahoy_boxes1
-recol1s=13639
-recol1d=5313
-recol2s=10468
-recol2d=8484
-recol3s=9411
-recol3d=7427
-recol4s=8354
-recol4d=6370
-recol5s=12582
-recol5d=4256
-recol6s=11525
-recol6d=4256
-blockrange=no
-op1=Search
 
 [ahoy_plant_1]
 name=Plant
@@ -43253,379 +42873,6 @@ blockrange=no
 sharelight=yes
 active=no
 
-[feud_money_bowl]
-name=Money Pot
-desc=I suppose he wants my money.
-model=feud_money_bowl
-
-[feud_table_bare]
-name=Table
-desc=A lovely table.
-model=feud_table_bare
-width=2
-
-[feud_fountain]
-name=Fountain
-desc=An expensive water feature.
-model=fountain
-recol1s=10535
-recol1d=22193
-recol2s=15855
-recol2d=24309
-recol3s=13706
-recol3d=23250
-recol4s=11592
-recol4d=23250
-recol5s=12649
-recol5d=24307
-recol6s=14763
-recol6d=25366
-width=2
-length=2
-mapscene=8
-blockrange=no
-
-[feud_awning]
-model=feud_awning
-active=no
-
-[feud_awning_r]
-model=feud_awningr
-active=no
-
-[feud_awning_l]
-model=feud_awning_l
-active=no
-
-[feud_stop_sign]
-name=Stop!
-desc=Stop for what, food?
-model=feud_stop_sign
-width=2
-
-[feud_potted_plant]
-name=Plant
-desc=Yellow blossom, lovely.
-model=feud_potted_plant
-
-[feud_closed_door_left]
-name=Door
-desc=Closed.
-model=feud_closed_door_left
-mirror=yes
-active=yes
-op1=Open
-
-[feud_open_door_left]
-name=Door
-desc=Open.
-model=feud_open_door_left
-mirror=yes
-active=yes
-
-[feud_closed_door_right]
-name=Door
-desc=Closed.
-model=feud_closed_door_left
-active=yes
-op1=Open
-
-[feud_open_door_right]
-name=Door
-desc=Open.
-model=feud_open_door_left
-active=yes
-
-[feud_poison_beer_table]
-name=Table
-desc=Has upon it a beer, which I will not take for moral reasons.
-model=feud_poison_beer_table
-anim=green_beer_ready
-op1=Take-beer
-
-[feud_desertwindow]
-model=feud_desertwindow
-ambient=10
-
-[feud_fencing]
-model=pier_rail
-recol1s=9409
-recol1d=10466
-recol2s=11523
-recol2d=8321
-recol3s=8353
-recol3d=6209
-sharelight=yes
-hillskew=yes
-blockrange=no
-active=no
-
-[feud_desert_well]
-name=Well
-desc=No this is not a mirage!
-model=desertwell
-recol1s=12682
-recol1d=25366
-recol2s=12683
-recol2d=5281
-recol3s=10368
-recol3d=7233
-blockrange=no
-
-[feud_poorbed]
-name=Bed
-desc=It's a goldfish! No, wait, it's just a bed.
-model=poorbed2
-recol1s=26389
-recol1d=26386
-recol2s=29596
-recol2d=26356
-recol3s=8321
-recol3d=11264
-width=2
-length=3
-blockrange=no
-
-[feud_rugcorner_red]
-model=rugcorner_verydark
-recol1s=15360
-recol1d=10240
-recol2s=28321
-recol2d=6273
-sharelight=yes
-
-[feud_rugside_red]
-model=rugside_verydark
-recol1s=15360
-recol1d=10240
-recol2s=28321
-recol2d=6273
-sharelight=yes
-
-[feud_rugmiddle_red]
-model=rugmiddle_verydark
-recol1s=15360
-recol1d=10240
-recol2s=28321
-recol2d=6273
-sharelight=yes
-
-[feud_flag]
-model=flag_entrance
-recol1s=26353
-recol1d=26423
-recol2s=24205
-recol2d=26423
-recol3s=9409
-recol3d=6241
-width=2
-ambient=60
-contrast=60
-active=no
-anim=flagblowing
-blockrange=no
-resizex=110
-resizey=110
-resizez=110
-offsetx=30
-offsety=0
-offsetz=0
-
-[feud_foodtrough]
-name=Trough
-desc=Animal feeder.
-model=ctfoodtrough
-width=2
-
-[feud_foodtrough2]
-name=Trough
-desc=Animal feeder.
-model=ctfoodtrough
-model2=foodtrough2
-width=2
-
-[feud_ugthanki_pooh]
-name=Dung
-desc=Lovely... Fresh.
-model=feud_ugthanki_pooh
-recol1s=15855
-recol1d=9411
-anim=camel_steam
-blockwalk=no
-op1=Pick-up
-
-[feud_ugthanki_pooh_old]
-name=Dung
-desc=Dry dung.
-model=feud_ugthanki_pooh_old
-recol1s=15855
-recol1d=11523
-blockwalk=no
-op1=Pick-up
-
-[feud_ugthanki_pooh_poisoned]
-name=Dung
-desc=Smelly.
-model=feud_ugthanki_pooh
-recol1s=15855
-recol1d=9571
-anim=camel_steam
-blockwalk=no
-op1=Pick-up
-
-[feud_laddertop_norim]
-name=Ladder
-desc=I can climb down this.
-model=loc_3205
-active=yes
-op1=Climb-down
-mapscene=7
-forceapproach=south
-
-[feud_ladder]
-name=Ladder
-desc=I can climb this.
-model=ladder
-active=yes
-op1=Climb-up
-mapscene=7
-forceapproach=south
-
-[feud_laddermiddle]
-name=Ladder
-desc=I can climb this.
-model=ladder
-active=yes
-op1=Climb
-op2=Climb-up
-op3=Climb-down
-mapscene=7
-
-[feud_wall_hutch]
-name=Hutch
-desc=Useful for pets.
-model=feud_wall_hutch
-width=2
-
-[feud_bird_cage_stand]
-name=Bird cage stand
-desc=Useful for keeping birds.
-model=dwarf_bird_cage_stand
-
-[feud_bird_cage_table]
-name=Cage
-desc=Bird cage.
-model=bigtable
-model2=feud_bird_cage_table
-retex1s=darkwood
-retex1d=wood2
-retex2s=elfwood
-retex2d=wood2
-width=2
-
-[feud_bird_cage]
-name=Cage
-desc=Bird cage.
-model=feud_bird_cage
-
-[feud_golden_bird_cage_stand]
-name=Golden cage
-desc=An empty cage, maybe the owner let the creature free... I do hope so.
-model=dwarf_bird_cage_stand
-recol1s=12682
-recol1d=29349
-recol2s=11627
-recol2d=27235
-
-[feud_pet_hutch]
-name=Hutch
-desc=Useful for pets.
-model=bigtable
-model2=feud_pet_hutch
-retex1s=darkwood
-retex1d=wood2
-retex2s=elfwood
-retex2d=wood2
-width=2
-
-[feud_pet_cages]
-name=Cages
-desc=Useful for pets.
-model=bigtable
-model2=feud_pet_cages
-retex1s=darkwood
-retex1d=wood2
-retex2s=elfwood
-retex2d=wood2
-width=2
-
-[feud_tentdoor]
-model=tentdoor2
-recol1s=5348
-recol1d=7183
-sharelight=yes
-blockwalk=no
-
-[feud_tentwall]
-model=tentwall2
-recol1s=9216
-recol1d=27299
-recol2s=26425
-recol2d=7183
-sharelight=yes
-occlude=yes
-
-[feud_tentroof]
-model=regicide_darkelf_tentroof
-recol1s=9216
-recol1d=27299
-recol2s=26425
-recol2d=7183
-sharelight=yes
-
-[feud_tentroofcentre]
-model=regicide_darkelf_tentroofcentre
-recol1s=9216
-recol1d=27299
-recol2s=26425
-recol2d=7183
-sharelight=yes
-
-[feud_mayors_bed]
-name=Bed
-desc=Lovely comfy looking big bed.
-model=bigbed
-width=2
-length=3
-op1=Search
-
-[feud_mayors_desk]
-name=Study desk
-desc=Laden with heaps of paper.
-model=studydesk
-width=2
-blockrange=no
-op1=Search
-
-[feud_mayors_picture]
-name=Landscape
-desc=I don't know much about art, but I like this.
-model=painting2_king
-retex1s=painting2
-retex1d=painting1
-ambient=20
-active=yes
-op1=Search
-
-[feud_cactus_row]
-name=Cactus
-desc=Look at the size of this cactus.
-model=cactus3
-width=2
-length=2
-mapscene=4
-op1=Hide-behind
-
 [ikov_trapdoor_down]
 name=Trapdoor
 desc=Don't you open that trapdoor!
@@ -49520,90 +48767,6 @@ sharelight=yes
 model=goblin_cavewall_hole1
 width=2
 active=no
-
-[rocks_6943]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=5284
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-
-[rocks_6944]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=5284
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-
-[rocks_6945]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=5284
-recol2s=6342
-recol2d=19026
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-
-[rocks_6946]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=5284
-recol2s=6342
-recol2d=19026
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-
-[rocks_6947]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=5284
-recol2s=6342
-recol2d=5284
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-
-[rocks_6948]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=5284
-recol2s=6342
-recol2d=5284
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
 
 [lost_tribe_collapsing_floor]
 model=lost_tribe_collapsing_floor
@@ -57188,19 +56351,6 @@ shadow=no
 active=yes
 ambient=35
 
-[feud_clothesequip_table]
-name=Table
-desc=Items for making clothes are kept on here.
-model=clothesequip_table
-retex1s=elfwood
-retex1d=wood2
-recol2s=19021
-recol2d=19588
-recol3s=32767
-recol3d=19098
-length=2
-blockrange=no
-
 [dye_pots]
 name=Dye Pots
 desc=Pots full of dye.
@@ -59453,48 +58603,6 @@ hillskew=yes
 active=yes
 op1=Squeeze-through
 
-[farming_scarecrow_weeds_1_mory]
-name=Scarecrow
-desc=Should scare off the birds...
-model=belladonna_patch_weeds1
-model2=farming_scarecrow
-model3=belladonna_patch_weededi2
-recol1s=10658
-recol1d=5346
-recol2s=8544
-recol2d=4289
-ambient=25
-op2=Inspect
-op4=Guide
-
-[farming_scarecrow_weeds_2_mory]
-name=Scarecrow
-desc=Should scare off the birds...
-model=belladonna_patch_weeds2
-model2=farming_scarecrow
-model3=belladonna_patch_weededi2
-recol1s=10658
-recol1d=5346
-recol2s=8544
-recol2d=4289
-ambient=25
-op2=Inspect
-op4=Guide
-
-[farming_scarecrow_weeds_3_mory]
-name=Scarecrow
-desc=Should scare off the birds...
-model=belladonna_patch_weeds3
-model2=farming_scarecrow
-model3=belladonna_patch_weededi2
-recol1s=10658
-recol1d=5346
-recol2s=8544
-recol2d=4289
-ambient=25
-op2=Inspect
-op4=Guide
-
 [scenery_9341]
 model=loc_9341
 recol1s=198
@@ -61387,12 +60495,6 @@ model=sarim_anchor
 blockrange=no
 ambient=25
 
-[sarim_bookcase2]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
 
 [sarim_ship_chain]
 name=Chain
@@ -62238,35 +61340,8 @@ resizex=64
 resizey=64
 resizez=64
 
-[sarim_bookcase2_offset]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
-offsetx=0
-offsety=0
-offsetz=-16
 
-[sarim_bookcase2_offset_northfacing]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
-offsetx=0
-offsety=0
-offsetz=16
 
-[sarim_bookcase2_offset_westfacing]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
-offsetx=-16
-offsety=0
-offsetz=0
 
 [rimmington_artist_easil]
 name=Easel
@@ -62274,13 +61349,6 @@ desc=An artist's easel.
 model=rimmington_artist_easil
 ambient=20
 
-[bookcase_polybooks]
-name=Bookcase
-desc=A good source of books!
-model=bookcase_polybooks
-length=2
-op1=Search
-forceapproach=east
 
 [rimmington_makeovermage_bed]
 name=Bed
@@ -66008,112 +65076,6 @@ recol4s=20969
 recol4d=10466
 blockrange=no
 
-[makinghistory_door]
-name=Door
-desc=The door is closed.
-model=door
-recol1s=14626
-recol1d=10466
-recol2s=13569
-recol2d=9409
-recol3s=12512
-recol3d=6240
-recol4s=11456
-recol4d=7296
-active=yes
-op1=Open
-raiseobject=no
-
-[makinghistory_door_open]
-name=Door
-desc=The door is open.
-model=door
-recol1s=14626
-recol1d=10466
-recol2s=13569
-recol2d=9409
-recol3s=12512
-recol3d=6240
-recol4s=11456
-recol4d=7296
-active=yes
-op1=Close
-raiseobject=no
-
-[makinghistory_doubledoorl]
-name=Door
-desc=The door is closed.
-model=lefayeunopenabledoorl
-recol1s=11458
-recol1d=6240
-recol2s=12515
-recol2d=7296
-recol3s=13569
-recol3d=9409
-recol4s=14626
-recol4d=10466
-recol5s=15717
-recol5d=11523
-active=yes
-op1=Open
-raiseobject=no
-
-[makinghistory_doubledoorl_open]
-name=Door
-desc=The door is open.
-model=lefayeunopenabledoorl
-recol1s=11458
-recol1d=6240
-recol2s=12515
-recol2d=7296
-recol3s=13569
-recol3d=9409
-recol4s=14626
-recol4d=10466
-recol5s=15717
-recol5d=11523
-active=yes
-op1=Close
-raiseobject=no
-
-[makinghistory_doubledoorr]
-name=Door
-desc=The door is closed.
-model=lefayeunopenabledoorl
-recol1s=11458
-recol1d=6240
-recol2s=12515
-recol2d=7296
-recol3s=13569
-recol3d=9409
-recol4s=14626
-recol4d=10466
-recol5s=15717
-recol5d=11523
-mirror=yes
-active=yes
-op1=Open
-raiseobject=no
-
-[makinghistory_doubledoorr_open]
-name=Door
-desc=The door is open.
-model=lefayeunopenabledoorl
-recol1s=11458
-recol1d=6240
-recol2s=12515
-recol2d=7296
-recol3s=13569
-recol3d=9409
-recol4s=14626
-recol4d=10466
-recol5s=15717
-recol5d=11523
-mirror=yes
-active=yes
-op1=Close
-raiseobject=no
-
 [makinghistory_shield_display_multiloc]
 active=yes
 multivar=makinghistory_objloc
@@ -67379,44 +66341,7 @@ length=2
 ambient=15
 forceapproach=west
 
-[elid_crate]
-name=Crate
-desc=Cheaper than using a chest for storage.
-model=rd_large_crate
-recol1s=14695
-recol1d=13605
-recol2s=12615
-recol2d=12548
-recol3s=12581
-recol3d=11491
-recol4s=11524
-recol4d=10434
-recol5s=10467
-recol5d=9377
-recol6s=9410
-recol6d=8320
-blockrange=no
-ambient=60
-op1=Search
 
-[elid_crates]
-name=Crates
-desc=Produced by the Karamja Box Company.
-model=rd_large_crates
-recol1s=14695
-recol1d=13605
-recol2s=12615
-recol2d=12548
-recol3s=12581
-recol3d=11491
-recol4s=11524
-recol4d=10434
-recol5s=10467
-recol5d=9377
-recol6s=9410
-recol6d=8320
-ambient=60
-op1=Search
 
 [elid_boxes]
 name=Boxes
@@ -68788,23 +67713,6 @@ recol2d=11556
 ambient=30
 length=2
 
-[elid_bankbooth]
-name=Bank booth
-desc=The bank teller will serve you from here.
-model=ahoy_bankbooth
-recol1s=10598
-recol1d=13605
-recol2s=8484
-recol2d=12548
-recol3s=6370
-recol3d=10434
-recol4s=3235
-recol4d=8320
-op1=Use
-op2=Use-quickly
-blockrange=no
-ambient=30
-
 [elid_bankboothclosed]
 name=Closed bank booth
 desc=This booth is closed.
@@ -68861,51 +67769,6 @@ hillskew=yes
 ambient=15
 mirror=yes
 
-[door_10527]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-
-[door_10528]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
-
-[door_10529]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-mirror=yes
-
-[door_10530]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
-mirror=yes
 
 [champions_wall]
 model=rd_falador_dungeon_wall
@@ -69478,70 +68341,6 @@ recol2d=17010
 recol3s=26390
 recol3d=26390
 
-[rocks_10583]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=24511
-recol2s=6342
-recol2d=382
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-ambient=20
-
-[rocks_10584]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=24511
-recol2s=6342
-recol2d=382
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-ambient=20
-
-[rocks_10585]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=24511
-recol2s=6342
-recol2d=24511
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-ambient=20
-
-[rocks_10586]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=24511
-recol2s=6342
-recol2d=24511
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-ambient=20
-
 [rocks_10587]
 name=Rocks
 desc=A rocky outcrop.
@@ -69662,24 +68461,6 @@ recol3s=13505
 recol3d=26623
 hillskew=yes
 active=no
-
-[wyvern_snow_cave_exit]
-name=Icy Cavern
-desc=Emergency exit.
-model=wyvern_snow_cave_exit
-width=3
-length=2
-sharelight=yes
-op1=Enter
-
-[wyvern_snow_cave_entrance]
-name=Icy Cavern
-desc=Enter if you dare...
-model=wyvern_snow_cave_exit
-width=3
-length=2
-sharelight=yes
-op1=Enter
 
 [wyvern_underground_top]
 model=cavewall_top
@@ -72905,92 +71686,6 @@ offsety=-512
 [scenery_10943]
 model=loc_10943
 
-[rocks_10944]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=17793
-recol2s=6342
-recol2d=17793
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-
-[rocks_10945]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=17793
-recol2s=6342
-recol2d=17793
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-
-[rocks_10946]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=18820
-recol2s=6342
-recol2d=16706
-op1=Mine
-op2=Prospect
-op3=hidden
-hillskew=yes
-
-[rocks_10947]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=19912
-recol2s=6342
-recol2d=18821
-op1=Mine
-op2=Prospect
-op3=hidden
-hillskew=yes
-
-[rocks_10948]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=17793
-recol2s=6342
-recol2d=4226
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-
-[rocks_10949]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=17793
-recol2s=6342
-recol2d=22025
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-
 [enakh_temple_sand_pile]
 name=Sand pile
 desc=Looks sturdy enough to climb!
@@ -75978,54 +74673,6 @@ ambient=10
 category=mining_rock_normal
 param=next_loc_stage_mining,rocks_11165
 
-[rocks_11189]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=12579
-recol2s=6342
-recol2d=22025
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9736
-
-[rocks_11190]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=12579
-recol2s=6342
-recol2d=22025
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9737
-
-[rocks_11191]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=12579
-recol2s=6342
-recol2d=22025
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_11165
-
 [rocks_11192]
 name=Rocks
 desc=A rocky outcrop.
@@ -78364,53 +77011,6 @@ blockrange=no
 ambient=10
 param=next_loc_stage_mining,rocks_9725
 
-[rocks_11555]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=7329
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11556]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=7329
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11557]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=7329
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
 
 [fai_barbarian_abode_wall]
 model=viking_abode_wall
@@ -79355,45 +77955,6 @@ recol4d=12547
 length=2
 blockrange=no
 
-[fai_barbarian_large_doubledoor_r]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Open
-mirror=yes
-raiseobject=no
-
-[fai_barbarian_large_doubledoor_l]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Open
-raiseobject=no
-
 [fai_barbarian_large_doubledoor_r_inactive]
 model=lefayeunopenabledoorl
 recol1s=15717
@@ -79428,45 +77989,6 @@ recol6s=11458
 recol6d=10433
 raiseobject=no
 active=no
-
-[fai_barbarian_open_large_doubledoor_r]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Close
-mirror=yes
-raiseobject=no
-
-[fai_barbarian_open_large_doubledoor_l]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Close
-raiseobject=no
 
 [fai_barbarian_counter]
 name=Counter
@@ -80375,92 +78897,6 @@ ambient=20
 category=double_door_open_and_close_left
 param=next_loc_stage,castle_door_11718
 
-[castle_door_11717]
-name=Castle door
-desc=A grand door.
-model=loc_11717
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Open
-raiseobject=no
-resizey=152
-ambient=20
-mirror=yes
-
-[castle_door_11718]
-name=Castle door
-desc=A grand door.
-model=loc_11718
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Close
-raiseobject=no
-resizey=152
-ambient=20
-mirror=yes
-
-[castle_door_11719]
-name=Castle door
-desc=A grand door.
-model=loc_11717
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Open
-raiseobject=no
-resizey=152
-ambient=20
-
-[castle_door_11720]
-name=Castle door
-desc=A grand door.
-model=loc_11718
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Close
-raiseobject=no
-resizey=152
-ambient=20
-
 [castle_door_11721]
 name=Castle door
 desc=A grand door.
@@ -80689,47 +79125,7 @@ blockrange=no
 width=2
 blockrange=no
 
-[boxes_11744]
-name=Boxes
-desc=Small wooden boxes.
-model=ahoy_boxes1
-recol1s=13639
-recol1d=17865
-recol2s=12582
-recol2d=16808
-recol3s=11525
-recol3d=15751
-recol4s=10468
-recol4d=14694
-recol5s=9411
-recol5d=13637
-recol6s=8354
-recol6d=12580
-ambient=10
-op1=Search
 
-[crates_11745]
-name=Crates
-desc=Wooden crates.
-model=rd_small_crates
-recol1s=14695
-recol1d=17865
-recol2s=12615
-recol2d=16808
-recol3s=12581
-recol3d=15751
-recol4s=11524
-recol4d=14694
-recol5s=10467
-recol5d=13637
-recol6s=9410
-recol6d=12580
-ambient=10
-blockrange=no
-offsetx=-30
-offsety=0
-offsetz=0
-op1=Search
 
 [stool_11746]
 name=Stool
@@ -80880,13 +79276,6 @@ recol4d=12548
 recol5s=4256
 recol5d=11523
 
-[bank_booth]
-name=Bank booth
-desc=The bank teller will serve you from here.
-model=fever_bankbooth
-op1=Use
-op2=Use-quickly
-blockrange=no
 
 [fountain_11759]
 name=Fountain
@@ -82927,246 +81316,6 @@ blockrange=no
 ambient=10
 param=next_loc_stage_mining,rocks_9723
 
-[rocks_11946]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=6346
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11947]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=6346
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
-
-[rocks_11948]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=21070
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11949]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=21070
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11950]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=21070
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
-
-[rocks_11951]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=23108
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11952]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=23108
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11953]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=23108
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
-
-[rocks_11954]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11955]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11956]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
-
-[rocks_11957]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=13741
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11958]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=13741
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11959]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=13741
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
-
-[rocks_11960]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=14596
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
 [rocks_11961]
 name=Rocks
 desc=A rocky outcrop.
@@ -83175,54 +81324,6 @@ recol1s=9513
 recol1d=7329
 recol2s=6342
 recol2d=14596
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11962]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=14596
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
-
-[rocks_11963]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=4226
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11964]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=4226
 op1=Mine
 op2=Prospect
 op3=hidden
@@ -84414,24 +82515,6 @@ model=fairy_range
 length=2
 forceapproach=east
 
-[fairy_crates_small]
-name=Crate
-desc=For storage.
-model=rd_small_crates
-recol1s=14695
-recol1d=6272
-recol2s=12615
-recol2d=7329
-recol3s=12581
-recol3d=8386
-recol4s=11524
-recol4d=9443
-recol5s=10467
-recol5d=10500
-recol6s=9410
-recol6d=11557
-op1=Search
-ambient=15
 
 [fairy_crate_2]
 name=Crates
@@ -84630,44 +82713,7 @@ hillskew=yes
 active=no
 blockwalk=no
 
-[fairy_chest_closed]
-name=Closed chest
-desc=I wonder what's inside.
-model=ahoy_chest_closed
-recol1s=14695
-recol1d=6272
-recol2s=12615
-recol2d=7329
-recol3s=6370
-recol3d=8386
-recol4s=6373
-recol4d=9443
-recol5s=8484
-recol5d=10500
-recol6s=9543
-recol6d=11557
-op1=Open
-forceapproach=north
 
-[fairy_chest_open]
-name=Open chest
-desc=Perhaps I should search it.
-model=ahoy_chest_open
-recol1s=14695
-recol1d=6272
-recol2s=4256
-recol2d=7329
-recol3s=6370
-recol3d=8386
-recol4s=6373
-recol4d=9443
-recol5s=8484
-recol5d=10500
-recol6s=9543
-recol6d=11557
-op2=Search
-op3=Shut
-forceapproach=north
 
 [fairy_trough]
 name=Water Trough
@@ -89844,48 +87890,6 @@ forcedecor=yes
 mirror=yes
 mapscene=46
 
-[mineral_vein_12941]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4976
-recol1s=992
-recol1d=22025
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_12942]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4977
-recol1s=992
-recol1d=22025
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
-[mineral_vein_12943]
-name=Mineral vein
-desc=A distinctive layer in the rock strata.
-model=loc_4978
-recol1s=992
-recol1d=22025
-active=yes
-contrast=100
-ambient=25
-hillskew=yes
-op1=Mine
-op2=Prospect
-op3=Hidden
-
 [sang_boat_broken_multiloc]
 name=Boat
 desc=It's not a schooner, it's a sailboat.
@@ -91203,46 +89207,6 @@ ambient=20
 op1=Use
 mapscene=7
 
-[soulbane_firewall_multi]
-active=yes
-anim=firewall
-blockwalk=no
-multivar=soulbane_anger_flamepres
-multiloc=0,soulbane_firewall
-
-[soulbane_firewall]
-name=Fire
-desc=Very hot!
-model=soulbane_firewall
-anim=firewall
-ambient=100
-contrast=100
-resizey=200
-mapscene=22
-blockwalk=no
-
-[soul_bane_awall_void_exit]
-name=Exit
-desc=To the next area!
-model=soul_bane_awall_void_exit
-recol1s=66
-recol1d=12288
-recol2s=4261
-recol2d=10240
-recol3s=3204
-recol3d=8192
-recol4s=2147
-recol4d=6144
-recol5s=1090
-recol5d=4096
-recol6s=33
-recol6d=2048
-sharelight=yes
-hillskew=yes
-length=2
-ambient=40
-op1=Enter
-
 [soul_bane_awall_top]
 model=soul_bane_awall_top
 sharelight=yes
@@ -92133,69 +90097,6 @@ hillskew=yes
 sharelight=yes
 blockwalk=no
 ambient=25
-
-[soulbane_rack_multi]
-length=2
-active=yes
-op1=Take-from
-multivar=soulbane_anger_weaponmulti
-multiloc=0,soulbane_rack_all
-multiloc=1,soulbane_rack_no_sword
-multiloc=2,soulbane_rack_no_spear
-multiloc=3,soulbane_rack_no_mace
-multiloc=4,soulbane_rack_no_axe
-
-[soulbane_rack_all]
-name=Weapon rack
-desc=Oooo, sharp, pointy things!
-model=soulbane_rack_all
-model2=soulbane_rack_alli2
-model3=soulbane_rack_alli3
-model4=soulbane_rack_alli4
-length=2
-offsetx=-40
-op1=Take-from
-
-[soulbane_rack_no_sword]
-name=Weapon rack
-desc=Oooo, sharp, pointy things!
-model=soulbane_rack_all
-model2=soulbane_rack_alli2
-model3=soulbane_rack_alli4
-length=2
-offsetx=-40
-op1=Take-from
-
-[soulbane_rack_no_spear]
-name=Weapon rack
-desc=Oooo, sharp, pointy things!
-model=soulbane_rack_all
-model2=soulbane_rack_alli3
-model3=soulbane_rack_alli4
-length=2
-offsetx=-40
-op1=Take-from
-
-[soulbane_rack_no_mace]
-name=Weapon rack
-desc=Oooo, sharp, pointy things!
-model=soulbane_rack_alli3
-model2=soulbane_rack_alli2
-model3=soulbane_rack_alli4
-length=2
-offsetx=-40
-op1=Take-from
-
-[soulbane_rack_no_axe]
-name=Weapon rack
-desc=Oooo, sharp, pointy things!
-model=soulbane_rack_all
-model2=soulbane_rack_alli3
-model3=soulbane_rack_alli2
-model4=soulbane_rack_no_axe
-length=2
-offsetx=-40
-op1=Take-from
 
 [soulbane_rope_up]
 name=Rope
@@ -94775,96 +92676,6 @@ mapscene=25
 blockrange=no
 ambient=10
 
-[rocks_14902]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=10570
-recol2s=6342
-recol2d=13741
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-
-[rocks_14903]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=10570
-recol2s=6342
-recol2d=13741
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-
-[rocks_14904]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=10570
-recol2s=6342
-recol2d=18854
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-
-[rocks_14905]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=10570
-recol2s=6342
-recol2d=18854
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-
-[rocks_14906]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=10570
-recol2s=6342
-recol2d=26981
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-
-[rocks_14907]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=10570
-recol2s=6342
-recol2d=26981
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-
 [wom_staffmulti]
 active=yes
 multivar=swansong
@@ -94907,66 +92718,6 @@ recol1d=8354
 blockwalk=no
 active=yes
 op1=Take
-
-[rocks_14913]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=10570
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-ambient=10
-
-[rocks_14914]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=10570
-recol2s=6342
-recol2d=6242
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-ambient=10
-
-[rocks_14915]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=10570
-recol2s=6342
-recol2d=10570
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-ambient=10
-
-[rocks_14916]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=10570
-recol2s=6342
-recol2d=10570
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=12
-blockrange=no
-ambient=10
 
 [sink_14917]
 name=Sink

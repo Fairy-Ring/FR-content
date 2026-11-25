@@ -1,29 +1,16 @@
-// The Feud — Snake-charmer kit (Talk-to + coins on pot). New file.
-// CANDIDATE 2007-base (OSRS Transcript:Ali the Snake Charmer). NPC
-// feud_snakecharmer 1872 @ 3354,2953 L0 (Ali the Snake Charmer) · loc
-// feud_money_bowl 6230 @ 3355,2953 (Money Pot) · snake_flute 4605 ·
-// basket_for_snake 4606.
-// Talk-to: player "Wow, a snake charmer! Can I have a go? Can I have a go?
-// Please?" + mes "The snake charmer is focusing intently on his music and
-// doesn't seem to notice you." (ignored until tipped).
-// Coins on the money bowl (last_useitem = coins; 1 is enough): mes "The
-// snake charmer snaps out of his trance and directs his full attention to
-// you." + choice. Can-I-have-a-go -> kit logic: full inv refuse; both held
-// -> "I'm not stopping you! You have your own snake charming flute."; flute
-// only -> "Ah, I see you've lost your basket..." + give basket; basket only
-// -> "...lost your snake charming flute..." + give flute; neither -> "If
-// you're that desperate to try, have my patented snake charming starter
-// kit..." + mes "The snake charmer gives you a snake charming flute and a
-// basket." + give both. The Ratcatchers "animal charming" option is a LATER
-// hop (silent return here). Objs only — no %feud_ali_money (dump writes
-// none). Stage/count stay. No 28. No dest / p_tele. No charm this hop.
-// No && / ||.
-// Cite feud-first-slice-377.md money pot tile · feud-config-unit-first-377.md
-// · osrs-wiki-changes-crawl-377.md.
+// The Feud — Snake-charmer kit from the money pot.
+// CANDIDATE: pre-November-2022 principal wording from transcript 11364035;
+// missing capacity/replacement branches are later candidates. Period guides
+// support coins on the pot; one coin follows the later transcript's heading.
+// feud_snakecharmer 1872 @ 3354,2953 L0; feud_money_bowl 6230 @ 3355,2953.
+// Talk-to is ignored until the pot is paid. The single sourced request is
+// “Can I have a go?”; the later Ratcatchers option is not part of this quest.
+// Existing kit objects only; no quest state. Missing one item needs one slot,
+// missing both needs two. No stage changes or later dialogue.
 
 [opnpc1,feud_snakecharmer]
-~chatplayer("<p,happy>Wow, a snake charmer! Can I have a go? Can I have a go? Please?");
-mes("The snake charmer is focusing intently on his music and doesn't seem to notice you.");
+~chatplayer("<p,happy>Wow a snake charmer. Can I have a go? Can I have a go? Please?");
+mes("The snake charmer fails to acknowledge you, he seems too deep into the music to notice you.");
 return;
 
 [oplocu,feud_money_bowl]
@@ -31,13 +18,20 @@ def_obj $used = last_useitem;
 if ($used ! coins) {
     return;
 }
-mes("The snake charmer snaps out of his trance and directs his full attention to you.");
-def_int $ask = ~p_choice2("Wow, a snake charmer! Can I have a go? Can I have a go? Please?", 1, "I want to talk to you about animal charming.", 2);
-if ($ask = 2) {
-    return; // Ratcatchers animal charming — LATER hop
+if (inv_total(inv, coins) < ^feud_charmer_coin_cost) {
+    return;
 }
-~chatplayer("<p,happy>Wow, a snake charmer! Can I have a go? Can I have a go? Please?");
-if (inv_freespace(inv) < 1) {
+inv_del(inv, coins, ^feud_charmer_coin_cost);
+mes("The snake charmer snaps out of his trance and directs his full attention to you.");
+~chatplayer("<p,happy>Wow a snake charmer. Can I have a go? Can I have a go? Please?");
+def_int $space = 0;
+if (inv_total(inv, snake_flute) < 1) {
+    $space = add($space, 1);
+}
+if (inv_total(inv, basket_for_snake) < 1) {
+    $space = add($space, 1);
+}
+if (inv_freespace(inv) < $space) {
     ~chatnpc_specific("Ali the Snake Charmer", feud_snakecharmer, "<p,neutral>If it means that you'll leave me alone, I will happily give you my snake charming super starter kit, complete with flute and basket. But you're clearly over burdened as it is.");
     return;
 }
@@ -55,8 +49,9 @@ if (inv_total(inv, basket_for_snake) >= 1) {
     inv_add(inv, snake_flute, 1);
     return;
 }
-~chatnpc_specific("Ali the Snake Charmer", feud_snakecharmer, "<p,neutral>If you're that desperate to try, have my patented snake charming starter kit. It comes with a special snake charming flute and a basket to keep your charmed snakes in. Now, leave me alone!");
+~chatnpc_specific("Ali the Snake Charmer", feud_snakecharmer, "<p,neutral>If it means that you'll leave me alone, I would give you my snake charming super starter kit complete with flute and basket.");
 mes("The snake charmer gives you a snake charming flute and a basket.");
 inv_add(inv, snake_flute, 1);
 inv_add(inv, basket_for_snake, 1);
 return;
+

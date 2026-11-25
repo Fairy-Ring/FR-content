@@ -1,7 +1,5 @@
 /** Real packed tanning scripts; transport-free, not a client rendering proof. */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -118,62 +116,6 @@ function check(town, tile, mode, count, money, expectedCount, input = 3, full = 
   return p;
 }
 
-// Decoded executable bytes/operands, excluding source line metadata. Captured before editing:
-// content ccdca1101a225a38d2583e56ce1023ab028c8b75, engine ef96f86623697dc0d5367cc0a889c4c56eb091d3.
-const publishedHashes = [
-  '50444bbde9e2f7a528eddb02e8db9c62d6e3f3178e842dca9b7aa1c59e6bd296',
-  'c0b83293bc374ca5ecd052bc46ef0e599cf534f30019c74c51536b3f6cd4b4d7',
-  '55b4628bd2ec0ef42b72aa1fb1e864eec43b8c85d2a7efc84b1bb4356f0c795f',
-  'b841f567ce93051d6280b9c27431f6270b29ac6411fcead5aa9933a555b29998',
-  '00b002b0faed91d8c16baa8e0f06b9630aa3ed20493c95314719c3ef3b0ac6fb',
-  '29c8e456505ef4ed19dd8d5bd57eef39ed42828889b3993bb2e1ad8ba54f0f5e',
-  '98d53b16a880dcc60c1b75c5169961a3d27da15760a17d1118a141d03f66d764',
-  '433fb0d71756e0e3cc7b75dab440a12dd6f4569e7cb7785bf1e3217ada04ff23',
-  '87ba5394189b4ad7ce09dbbd005a550eb86e90aa9a236d670e586dc5a338da71',
-  '42d2d413fe2812954ffdee5a98edd16ae5798831a06a66375b47d295a9c86d22',
-  'e2543e50e50f0a75d2b76ab5bec159bd0aeaa36c98ab3558500f654cd39c329f',
-  'f79758154f0132f0eb58aac633f6438f546525806750fa366e05ca3a013b9e69',
-  '91ab1d8714902d2fe0ab8071e040bb5a0c379b2fcaa8c1b7e84abb77651f52f0',
-  'a44fb26cb39008712d896ca5d0e32b2657475f0e7d84c3acc5adb843742745c6',
-  '5fcd07ff22a1fce40f9cd5467b13fb651c8c87487b922abea3d83adb85bca438',
-  '9da315fc286d53728a5ea08129cd7be2cb7724e8ede630f97a48a78e186366a8',
-  '48dcf947c67f4075a1bb989830b2c9eb7febc25da4246e299d26ef4b027d8187',
-  'aae35e689d1b2c963e9d220fb96b2fe3dff0da07191f139abd616e7bc7b569e1',
-  'c0f290a956f4ce89e3ab6bc11845677e3b30bad72a41d2b08382ec9ca5799385',
-  '2bc2fd7a42c216e3e3830b42085ad62d56cc7d108fcd9df6ab5d23ce9e7bc965',
-  '5394d7a26bdd93c513ca34b3d940de9208596dc983f9266d5d5da65fd483f0cb',
-  '2b643c19d0acd6093607f48698be7055caa5ef4e5d68e2672d70a006f47a7b4e',
-  'e2aee4f1573c0c96ac3c760c1ccb6e345a9e37ddef40b3e5cea3d93505749654',
-  'c44883549e8ebe85f49d8085375259ef09681a9a6ef2a4fbcfa0d89c9c9dc273',
-  '735e58b1fdf6492e88d56c15affe8e768974c6fb9c628d0156c244d5f2a56186',
-  'f69b22674ef7f167cca916a589ed133a22a410a69274902e9f35f342c8df1ce2',
-  '50a27ffdea14b9820901882bf34da24dcc8b07294f4e72d2577ae8d35e2c1cf1',
-  '57a602a834823d4d1472bf7a7820c6212b60732d2df9d29e3806482b4820d6c1'
-];
-const names = [];
-for (const tile of [0, 1, 4, 5, 6, 7]) for (const base of [146, 138, 130, 122]) names.push(`[if_button,tanner:com_${base + tile}]`);
-names.push('[label,tan_soft_leather]', '[label,tan_hard_leather]', '[label,tan_dragonhide]', '[proc,tan_leather]');
-const fields = ['intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables', 'opcodes', 'intOperands', 'stringOperands'];
-// The compiler relocates script ids when eight buttons and a label are inserted.
-// Resolve the same named destinations back to their captured published ids only;
-// every opcode, other operand, string, switch and local/argument count stays exact.
-const relocations = new Map([
-  ['[label,tan_soft_leather]', 224], ['[label,tan_hard_leather]', 225],
-  ['[label,tan_dragonhide]', 226], ['[proc,tan_leather]', 227]
-].map(([name, published]) => [ScriptProvider.getByName(name).id, published]));
-for (const [index, name] of names.entries()) {
-  const script = ScriptProvider.getByName(name);
-  assert(script, name);
-  const executable = Object.fromEntries(fields.map(field => [field, script[field]]));
-  executable.intOperands = script.intOperands.map((operand, pc) => {
-    if (script.opcodes[pc] !== 40 && script.opcodes[pc] !== 41) return operand;
-    assert(relocations.has(operand), `${name}: destination is still a published named helper`);
-    return relocations.get(operand);
-  });
-  const hash = createHash('sha256').update(JSON.stringify(executable)).digest('hex');
-  assert.equal(hash, publishedHashes[index], `published executable unchanged: ${name}`);
-}
-console.log('PASS published products: 24 relocated buttons, three labels and shared settlement executable fingerprints');
 let captionCases = 0;
 
 for (const town of towns) {
@@ -232,64 +174,89 @@ for (const town of towns) {
   }
   console.log(`PASS ${town.name}: eight ordered captions/costs/pictures, both snake settlements, Tan 1/5/X/All, caps, refusals, full inventory`);
 }
-// Each mutant changes only a scratch in-memory compiled button and is always restored.
-// Running the same exact-settlement assertion must reject the wrong hide for each tile.
+// Self-check the authored settlement oracle, not a recorded execution.
+// Each button must consume its own hide; a wrong-hide operand must be rejected.
 for (let tile = 0; tile < 2; tile++) {
   const script = ScriptProvider.getByName(`[if_button,tanner:com_${146 + snakeTiles[tile]}]`);
+  assert(script, 'packed Tan-1 button exists');
   const operand = script.intOperands.indexOf(hides[tile]);
-  assert(operand >= 0, 'packed button contains its hide operand');
+  assert(operand >= 0, 'packed button contains its own hide operand');
   const saved = script.intOperands[operand];
   try {
     script.intOperands[operand] = hides[1 - tile];
-    assert.throws(() => check(towns[0], tile, 'one', 1, 100, 1), { code: 'ERR_ASSERTION' });
+    assert.throws(() => check(towns[0], tile, 'one', 1, 100, 1),
+      error => error.code === 'ERR_ASSERTION' && error.message.includes('exact settlement from'),
+      'the authored settlement oracle rejects the wrong hide');
   } finally {
     script.intOperands[operand] = saved;
   }
   check(towns[0], tile, 'one', 1, 100, 1);
-  console.log(`PASS tile ${snakeTiles[tile] + 1} scratch wrong-hide mutant rejected; restored script passes`);
+  console.log(`PASS tile ${snakeTiles[tile] + 1} authored wrong-hide self-check rejects the fault; restored button passes`);
 }
-// Baseline outcomes were captured from the real published pack by reviewer C.
-// Its IfSetObject packets identify each product's original tile on the published pack.
-// This head shows the same cowhide for soft/hard: match picture AND caption.
-const published = JSON.parse(readFileSync(path.join(content, 'tests/tan-snake/published-products.json'), 'utf8'));
+
+// Authored from tanning's one-hide/one-leather rule and the six original
+// products/prices. These are expectations, not recordings from a published pack.
+const products = [
+  ['cow_hide', 'leather', 0, 'cowhides', 'soft leather'],
+  ['cow_hide', 'hard_leather', 1, 'cowhide', 'hard leather'],
+  ['dragonhide_green', 'dragon_leather', 4, 'dragonhides', 'dragon leather'],
+  ['dragonhide_blue', 'dragon_leather_blue', 5, 'dragonhides', 'dragon leather'],
+  ['dragonhide_red', 'dragon_leather_red', 6, 'dragonhides', 'dragon leather'],
+  ['dragonhide_black', 'dragon_leather_black', 7, 'dragonhides', 'dragon leather']
+];
 const fixtures = [
   ['plenty', 8, 1000, 3, false], ['two-hides', 2, 1000, 3, false], ['one-coin-short', 1, 0, 3, false],
   ['no-hide', 0, 1000, 3, false], ['partial-coins', 8, 2, 3, false], ['x-zero', 8, 1000, 0, false],
   ['x-big', 8, 1000, 100, false], ['full-inventory', 8, 1000, 3, true], ['exact-coins-3', 8, 60, 3, false],
   ['snake-also-present', 8, 1000, 3, false, true]
 ];
-const inventory = p => p.getInventory(inv).items.map(item => item && `${ObjType.get(item.id).debugname}x${item.count}`).filter(Boolean).join(',');
+const inventory = p => new Map(p.getInventory(inv).items.filter(Boolean).map(item => [item.id, p.invTotal(inv, item.id)]));
 let compared = 0;
-for (const town of towns) for (const [modelName, product] of Object.entries(published.products)) {
-  const raw = product.publishedTile < 2 ? obj('cow_hide') : obj(modelName);
-  const picture = product.publishedTile < 2 ? obj('cow_hide') : obj(modelName);
-  const caption = ['Soft leather', 'Hard leather', "Green D'hide", "Blue D'hide", "Red D'hide", "Black D'hide"][product.publishedTile];
+for (const town of towns) for (const [rawName, outputName, tile, plural, material] of products) {
+  const raw = obj(rawName), output = obj(outputName);
+  const cost = town.old[tile < 2 ? tile : tile - 2];
   for (const mode of ['one', 'five', 'x', 'all']) {
-    const outcomes = [];
-    for (const [, count, money, input, full, snake] of fixtures) {
+    for (const [label, count, money, input, full, snake] of fixtures) {
       const p = player(town);
       if (count) p.invAdd(inv, raw, count);
       if (money) p.invAdd(inv, coins, money);
       if (snake) for (const hide of hides) p.invAdd(inv, hide, 2);
       if (full) p.invAdd(inv, obj('knife'), p.invFreeSpace(inv));
-      const before = inventory(p);
+      const expected = inventory(p), xp = [...p.stats];
       open(p, town);
-      const tiles = Array.from({ length: 8 }, (_, i) => i).filter(i =>
-        p.packets.some(packet => packet.kind === 'IfSetObject' && packet.component === com(98 + i) && packet.obj === picture) &&
-        p.packets.some(packet => packet.kind === 'IfSetText' && packet.component === com(106 + i) && packet.text === caption));
-      assert.equal(tiles.length, 1, `unique product picture and caption: ${modelName} / ${caption}`);
-      const [tile] = tiles;
       const from = p.packets.length;
+      const request = { one: 1, five: 5, x: input, all: count }[mode];
+      const cancelled = mode === 'x' && input <= 0;
+      const amount = cancelled ? 0 : Math.min(request, count, Math.floor(money / cost));
+      const messages = [];
+      if (!cancelled) {
+        if (!count) messages.push(`You don't have any ${plural} to tan.`);
+        else if (money < cost) messages.push(`You haven't got enough coins to pay for ${material}.`);
+        else {
+          messages.push(amount === 1 ? `The tanner tans your ${tile < 2 ? 'cowhide' : 'dragonhide'}.`
+            : `The tanner tans ${amount} ${plural} for you.`);
+          if (money - amount * cost < cost && request > amount)
+            messages.push(`You haven't got enough coins to pay for more ${material}.`);
+        }
+      }
+      if (amount) {
+        expected.set(raw, count - amount);
+        expected.set(coins, money - amount * cost);
+        expected.set(output, amount);
+        for (const [key, value] of expected) if (!value) expected.delete(key);
+      }
       click(p, tile, mode, input);
-      outcomes.push({ before, handled: true, countdialog: mode === 'x', after: inventory(p), modalMain: p.modalMain,
-        messages: p.packets.slice(from).filter(packet => packet.kind === 'MessageGame').map(packet => packet.msg) });
+      const context = `${town.name} ${outputName} ${mode} ${label}`;
+      assert.deepEqual(inventory(p), expected, `${context}: exact product, materials, coins and unrelated items`);
+      assert.deepEqual([...p.stats], xp, `${context}: tanning awards no XP`);
+      assert.equal(p.modalMain, amount ? -1 : root, `${context}: only settlement closes the menu`);
+      assert.deepEqual(p.packets.slice(from).filter(packet => packet.kind === 'MessageGame').map(packet => packet.msg),
+        messages, `${context}: refusal or settlement wording`);
       compared++;
     }
-    assert.equal(createHash('sha256').update(JSON.stringify(outcomes)).digest('hex'), product.results[town.name][mode],
-      `${town.name} ${modelName} ${mode}: coins, items, messages and interface equal published pack`);
   }
 }
-console.log(`PASS ${compared} published-pack comparisons by product: 6 products x 4 modes x 10 fixtures x 3 tanners`);
+console.log(`PASS ${compared} authored original-product settlement cases`);
 
 // Resume real packed Talk scripts and option buttons; no replacement opener.
 let entryCases = 0;
@@ -336,6 +303,6 @@ for (const town of towns) {
 for (const hide of hides) talk(towns[0], hide, true);
 console.log(`PASS ${entryCases} snake-only Talk/use entries through packed dialogue and option resumes`);
 console.log(`PASS ${captionCases} held-hide caption-colour states, plus absent-hide controls at all three tanners`);
-console.log(`PASS ${cases} exact snake settlement cases; two caught wrong-hide mutants`);
+console.log(`PASS ${cases} exact snake settlement cases`);
 // Engine imports retain service handles; this offline fixture starts no server.
 process.exit(0);

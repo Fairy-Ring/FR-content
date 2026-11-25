@@ -1,0 +1,39 @@
+// Original 377 multiloc and varbit; period RuneHQ 24 April 2006 requires picklocking.
+// CANDIDATE rates, 4 XP and one-level failure drain: retained OSRS trapdoor revisions.
+// The older revision consistently says 4 XP; the latest prose still says 4, but its table says 3.8.
+// ordinary_ham_attempt_duration: UNKNOWN engineering, 0 ticks by transfer from
+// skill_thieving/scripts/doors/locked_door.rs2:118-175 (no attempt animation or delay).
+// Later OSRS "saving up to 5 ticks" is a lead that real attempts took time, not this value's source.
+[oploc5,osf_trapdoor_closed]
+p_arrivedelay;
+if (map_members = ^false) {
+    mes(^mes_members_thieving);
+    return;
+}
+def_boolean $success;
+if (inv_total(inv, lockpick) > 0) {
+    $success = stat_random(thieving, ^ordinary_ham_lockpick_low, ^ordinary_ham_lockpick_high);
+} else {
+    $success = stat_random(thieving, ^ordinary_ham_hand_low, ^ordinary_ham_hand_high);
+}
+if ($success = ^true) {
+    %ham_thief = 1;
+    stat_advance(thieving, 40);
+} else {
+    stat_sub(thieving, 1, 0);
+    if (random(^ordinary_ham_failure_xp_denominator) = 0) {
+        stat_advance(thieving, 10);
+    }
+}
+
+[oploc1,osf_trapdoor_open]
+p_arrivedelay;
+~climb_ladder(^ordinary_ham_hideout_arrival, false);
+
+[oploc2,osf_trapdoor_open]
+p_arrivedelay;
+%ham_thief = 0;
+
+[oploc1,osf_ham_ladder]
+p_arrivedelay;
+~climb_ladder(^ordinary_ham_surface_arrival, true);

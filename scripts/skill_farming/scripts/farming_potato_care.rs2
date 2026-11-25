@@ -1,0 +1,27 @@
+[oplocu,potato_seed_watered] @farming_potato_use;
+[oplocu,potato_1_watered] @farming_potato_use;
+[oplocu,potato_2_watered] @farming_potato_use;
+[oplocu,potato_3_watered] @farming_potato_use;
+[oplocu,potato_1_diseased] @farming_potato_use;
+[oplocu,potato_2_diseased] @farming_potato_use;
+[oplocu,potato_3_diseased] @farming_potato_use;
+[oplocu,potato_1_dead] @farming_potato_use;
+[oplocu,potato_2_dead] @farming_potato_use;
+[oplocu,potato_3_dead] @farming_potato_use;
+
+[label,farming_potato_use]
+if (~farming_veg_is_parent = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_veg_stage;
+def_dbrow $crop = ~farming_allotment_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $first = db_getfield($crop, farming_allotment:first, 0);
+def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
+def_string $plant = db_getfield($crop, farming_allotment:singular, 0);
+def_int $after = ~farming_crop_care($stage, $first, $mature, $plant, true);
+if ($after ! $stage) ~farming_veg_set_stage($after);

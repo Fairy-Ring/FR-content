@@ -1,0 +1,346 @@
+// CANDIDATE: explicit tradeability overrides follow exact-ID Old School item-page histories.
+[feud_mayors_house_keys]
+name=Keys
+desc=Keys to the Mayor's house.
+members=yes
+model=obj_ikov_shinykey
+2dxof=-3
+2dyof=5
+2dzoom=700
+2dyan=20
+2dxan=328
+weight=10g
+tradeable=no
+
+[feud_mayors_jewels]
+name=Jewels
+desc=The Mayor of Pollnivneach's wife's jewels.
+recol1s=31649
+recol1d=17441
+recol2s=32767
+recol2d=10240
+model=obj_amulet_of_accuracy
+2dyof=-28
+2dzoom=460
+2dxan=196
+members=yes
+weight=10g
+tradeable=no
+
+[feud_karidian_turban]
+name=Karidian headpiece
+desc=Wear it on your head.
+model=obj_feud_karidian_turban
+2dzoom=590
+2dyan=252
+2dzan=2036
+2dxan=2036
+members=yes
+weight=70g
+
+[cert_feud_karidian_turban]
+certlink=feud_karidian_turban
+certtemplate=template_for_cert
+
+[feud_karidian_fakebeard]
+name=Fake beard
+desc=Makes me itch.
+model=obj_feud_karidian_fakebeard
+2dzoom=470
+2dyan=1884
+2dzan=8
+2dxan=320
+members=yes
+weight=30g
+
+[cert_feud_karidian_fakebeard]
+certlink=feud_karidian_fakebeard
+certtemplate=template_for_cert
+
+[feud_karidian_fakebeard_and_hat]
+name=Karidian disguise
+desc=Makes my face itch.
+model=obj_feud_karidian_fakebeard_and_hat
+2dxof=-3
+2dyof=-14
+2dzoom=810
+2dyan=72
+2dxan=340
+members=yes
+weight=100g
+
+[cert_feud_karidian_fakebeard_and_hat]
+certlink=feud_karidian_fakebeard_and_hat
+certtemplate=template_for_cert
+
+[feud_fib_hint]
+name=Note
+desc=A note found in the Mayor's bedroom mentioning the word 'Fibonacci'.
+recol1s=29594
+recol1d=29398
+model=obj_nulodions_notes
+2dxof=1
+2dyof=7
+2dzoom=1040
+2dyan=120
+2dxan=380
+members=yes
+iop1=Read
+weight=20g
+tradeable=no
+
+[feud_nos_note]
+name=Note
+desc=A list of 5 numbers.
+recol1s=29594
+recol1d=29398
+model=obj_nulodions_notes
+2dxof=1
+2dyof=7
+2dzoom=1040
+2dyan=120
+2dxan=380
+iop1=Read
+members=yes
+weight=20g
+tradeable=no
+
+[blackjack_oak]
+name=Oak-blackjack
+desc=A handy little club made out of oak.
+model=obj_blackjack_oak
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+manwear=obj_blackjack_oak_manwear,0
+womanwear=obj_blackjack_oak_manwear,6
+members=yes
+weight=1kg
+wearpos=righthand
+weight=4lb
+tradeable=no
+// VERIFIED: Tip.It Thieving, captured 27 April 2006, prints +2 strength.
+param=strengthbonus,2
+// CANDIDATE: Oak blackjack item page 15534, revision 135426, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=prayerbonus,0
+category=weapon_blunt
+// CANDIDATE: the item's Old School speed and existing blunt-family route.
+param=attackrate,4
+// UNKNOWN engineering: the blunt family's named combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[blackjack_willow]
+name=Willow-blackjack
+desc=A handy little club made out of willow.
+recol1s=3137
+recol1d=20004
+model=obj_blackjack_oak
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+manwear=obj_blackjack_oak_manwear,0
+womanwear=obj_blackjack_oak_manwear,6
+cost=600
+weight=1kg
+wearpos=righthand
+weight=4lb
+// VERIFIED: Tip.It Thieving, captured 27 April 2006, prints +8 strength.
+param=strengthbonus,8
+// CANDIDATE: Willow blackjack item page 15539, revision 135434, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=prayerbonus,0
+category=weapon_blunt
+// CANDIDATE: the item's Old School speed and existing blunt-family route.
+param=attackrate,4
+// UNKNOWN engineering: the blunt family's named combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[feud_camel_pooh_bucket]
+name=Ugthanki dung
+desc=Dung of the Camelus Horribleus variety.
+recol1s=9571
+recol1d=6306
+model=obj_feud_camel_pooh_bucket
+members=yes
+2dyof=-18
+2dzoom=1020
+2dyan=1660
+2dxan=204
+iop4=Empty
+weight=400g
+tradeable=no
+
+[feud_camel_poison_pooh_bucket]
+name=Ugthanki dung
+desc=Poor Camel, what have I fed you?
+model=obj_feud_camel_pooh_bucket
+members=yes
+2dyof=-18
+2dzoom=1020
+2dyan=1660
+2dxan=204
+iop4=Empty
+weight=400g
+tradeable=no
+
+[feud_camel_receipt]
+name=Receipt
+desc=A receipt for one 'Camelus Horribleus'.
+recol1s=29594
+recol1d=29398
+model=obj_nulodions_notes
+2dxof=1
+2dyof=7
+2dzoom=1040
+2dyan=120
+2dxan=380
+members=yes
+weight=20g
+tradeable=no
+
+[poison_from_hag]
+name=Hag's poison
+desc=A red viscous liquid in a vial.
+recol1s=15855
+recol1d=15360
+model=obj_strength4
+2dyof=-1
+2dzoom=550
+2dyan=1996
+2dxan=84
+members=yes
+weight=200g
+tradeable=no
+
+[snake_flute]
+name=Snake charm
+desc=Makes a hissing sound.
+model=obj_snake_flute
+2dxof=-3
+2dzoom=1170
+2dyan=56
+2dxan=304
+iop1=Play
+manwear=obj_snake_flute_manwear,0
+womanwear=obj_snake_flute_womanwear,0
+members=yes
+wearpos=righthand
+wearpos2=lefthand
+weight=100g
+tradeable=no
+
+[basket_for_snake]
+name=Snake basket
+desc=This is used to hold snakes.
+model=obj_basket_for_snake
+members=yes
+2dzoom=1420
+2dxan=12
+weight=500g
+tradeable=no
+
+[basket_with_snake]
+name=Snake basket full
+desc=This basket contains a snake.
+model=obj_basket_with_snake
+members=yes
+2dxof=-5
+2dyof=-1
+2dzoom=1560
+2dyan=1964
+weight=1kg
+tradeable=no
+
+[super_kebab]
+name=Super kebab
+desc=A meaty and very hot kebab.
+recol1s=8384
+recol1d=26657
+cost=3
+iop1=Eat
+model=obj_ugthanki_kebab_bad
+2dxof=4
+2dyof=1
+2dzoom=700
+2dyan=1844
+2dzan=176
+2dxan=1876
+members=yes
+weight=250g
+
+[cert_super_kebab]
+certlink=super_kebab
+certtemplate=template_for_cert
+
+[superhot_kebab_sauce]
+name=Red hot sauce
+desc=The bottle feels warm.
+model=obj_superhot_kebab_sauce
+2dyof=-1
+2dzoom=540
+2dyan=1472
+2dxan=48
+members=yes
+weight=100g
+tradeable=no
+
+[feud_desert_disguise]
+name=Desert disguise
+desc=A disguise suitable for the desert.
+model=obj_feud_karidian_fakebeard_and_hat
+iop2=Wear
+members=yes
+2dyof=-32
+2dzoom=780
+2dyan=2044
+2dxan=296
+manwear=obj_feud_desert_disguise_manwear,0
+manwear2=obj_feud_desert_disguise_manwear2
+manwear3=obj_feud_desert_disguise_manwear3
+womanwear=obj_feud_desert_disguise_womanwear,0
+womanwear2=obj_feud_desert_disguise_womanwear2
+womanwear3=obj_feud_desert_disguise_womanwear3
+manhead=obj_feud_desert_disguise_manhead
+manhead2=obj_leather_cowl_manhead2
+womanhead=obj_feud_desert_disguise_manhead
+womanhead2=obj_leather_cowl_womanhead2
+wearpos=hat
+wearpos2=head
+wearpos3=jaw
+weight=40g
+tradeable=no
+
+[cert_blackjack_willow]
+certlink=blackjack_willow
+certtemplate=template_for_cert

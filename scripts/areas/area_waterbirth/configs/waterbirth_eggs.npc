@@ -1,0 +1,67 @@
+// Waterbirth egg forms and the original Dagannoth spawn.
+[dungeon_dagganoth_egg1]
+name=Egg
+desc=I bet it's not made of chocolate...
+model1=npc_2449
+resizeh=100
+resizev=100
+turnspeed=0
+vislevel=hide
+minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+// CANDIDATE later proximity behavior; the one-tile radius is UNKNOWN engineering.
+huntmode=waterbirth_egg_proximity
+huntrange=^waterbirth_egg_hunt_radius
+
+
+[dungeon_dagganoth_egg2]
+name=Egg
+desc=Moving eggs are worrying...
+model1=npc_2450
+walkanim=dagganoth_egg_open
+readyanim=dagganoth_egg_open
+resizeh=100
+resizev=100
+turnspeed=0
+vislevel=hide
+minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[dungeon_dagganoth_egg3]
+name=Egg
+desc=I wonder what was inside it?
+model1=npc_2451
+resizeh=100
+resizev=100
+turnspeed=0
+vislevel=hide
+minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+[dagganoth_critter]
+name=Dagannoth spawn
+desc=A teeny-tiny horror from the ocean depths...
+model1=npc_2454
+walkanim=dagganoth_walk_quickly
+readyanim=horror_dagannoth_ready
+resizeh=60
+resizev=60
+op2=Attack
+vislevel=42
+// CANDIDATE current exact-variant OSRS values; first revision conflicts on HP36/aggression No.
+// The 377 unpack fields were not treated as verified combat stats.
+hitpoints=35
+attack=50
+strength=35
+defence=25
+param=slayer_category,^slayer_dagannoth
+// CANDIDATE current exact-variant aggression and Stab attack use ordinary combat.
+huntmode=aggressive_melee
+huntrange=^waterbirth_spawn_hunt_radius
+param=damagetype,^stab_style
+param=attackrate,4

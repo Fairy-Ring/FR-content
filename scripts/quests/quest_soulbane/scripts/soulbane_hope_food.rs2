@@ -1,0 +1,20 @@
+// CANDIDATE later rule: eating restores 75% of the monster's current health.
+// UNKNOWN authorized reading: native current opponent only; additive, floor, cap.
+// Both retained Changes sections were checked; see hopeless-food-policy.md.
+[proc,soulbane_hope_food](obj $food)
+if (%soulbane_prog ! ^soulbane_hope_active) return;
+if (~soulbane_owned = false) return;
+if (~soulbane_hope_room(coord, false) = false) return;
+// Exclude every drink branch of the shared consumption dispatcher. Delay values
+// cannot identify food: karambwan and gnome foods deliberately have null delays.
+def_category $category = oc_category($food);
+if ($category = potion | $category = alcoholic_drinks | $category = gnome_cocktail | $category = gnome_unf_odd_cocktail) return;
+if ($food = cup_of_tea | $food = keg_of_beer) return;
+// Same opponent and expiry window as the inherited ordinary NPC combat checks.
+if (%aggressive_npc = null | add(%lastcombat, ^soulbane_hope_combat_ticks) <= map_clock) return;
+if (npc_finduid(%aggressive_npc) = false) return;
+if (~soulbane_hope_npc = false) return;
+if (~soulbane_hope_attackable = false) return;
+def_int $restore = divide(multiply(npc_stat(hitpoints), ^soulbane_hope_food_percent), 100);
+// A constant, not the native base-HP percentage argument; native heal caps at max.
+npc_statheal(hitpoints, $restore, 0);

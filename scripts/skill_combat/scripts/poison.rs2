@@ -4,6 +4,9 @@ if (npc_param(poison_severity) > 0) {
 }
 
 [queue,poison_player](int $severity)
+~poison_player_apply($severity);
+
+[proc,poison_player_apply](int $severity)
 if (map_members = ^false) {
     // nothing poisons in f2p
     return;

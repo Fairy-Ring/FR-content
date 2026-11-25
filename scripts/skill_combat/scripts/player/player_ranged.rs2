@@ -1,4 +1,5 @@
 [label,player_ranged_attack]
+if (~champions_combat_check(^ranged_style) = false) return;
 if (~npc_is_attackable = false) {
     return;
 }
@@ -70,7 +71,7 @@ p_opnpc(2);
 
 //mes("attackstyle: <tostring(%attackstyle)>, damagestyle: <tostring(%damagestyle)>, damage: <tostring($damage)>, damagetype: <tostring(%damagetype)>");
 anim(%com_attackanim, 0);
-sound_synth(%com_attacksound, 0, 0);
+if (%com_attacksound ! null) sound_synth(%com_attacksound, 0, 0);
 def_int $delay = add(~player_ranged_use_weapon($rhand, $ammo), 30); // osrs it seems to be delayed an extra tick
 ~npc_retaliate(calc($delay / 30));
 npc_queue(2, $damage, calc($delay / 30));

@@ -1,0 +1,32 @@
+// VERIFIED two-player stones: Sal's Dagannoth Hunting, 29 April 2006.
+// Each pair uses the cache's two distinct pad tiles, not a room player count.
+[ai_timer,dagannoth_weak_door_west] ~waterbirth_pressure_poll;
+[ai_timer,dagannoth_weak_door_falling_west] ~waterbirth_pressure_poll;
+[ai_timer,dagannoth_weak_door_fallen_west] ~waterbirth_pressure_poll;
+
+[proc,waterbirth_pressure_poll]
+~waterbirth_pressure_pair(0_38_158_59_18, dagannoth_pressure_door3, 0_38_158_58_18, 0_38_158_58_20);
+~waterbirth_pressure_pair(0_38_158_59_34, dagannoth_pressure_door2, 0_38_158_58_34, 0_38_158_58_36);
+~waterbirth_pressure_pair(0_38_158_59_50, dagannoth_pressure_door, 0_38_158_58_50, 0_38_158_58_52);
+
+[proc,waterbirth_pressure_pair](coord $door, loc $closed, coord $first, coord $second)
+if (map_playercount($first, $first) = 0 | map_playercount($second, $second) = 0) return;
+~waterbirth_pressure_open($door, $closed);
+
+[proc,waterbirth_pressure_open](coord $door, loc $closed)
+if (loc_find($door, $closed) = true) {
+    loc_change(dagannoth_pressure_open, ^waterbirth_pressure_grace);
+} else if (loc_find($door, dagannoth_pressure_open) = true) {
+    // The native mutable loc refreshes its own reset, without stacking locs.
+    loc_change(dagannoth_pressure_open, ^waterbirth_pressure_grace);
+}
+
+[oploc1,dagannoth_pressure_door] ~waterbirth_pressure_exit;
+[oploc1,dagannoth_pressure_door2] ~waterbirth_pressure_exit;
+[oploc1,dagannoth_pressure_door3] ~waterbirth_pressure_exit;
+
+[proc,waterbirth_pressure_exit]
+// UNKNOWN engineering exit-side release. It prevents a player being trapped
+// after the other player leaves. No Close operation can imprison another player.
+if (coordx(coord) > coordx(loc_coord)) loc_change(dagannoth_pressure_open, ^waterbirth_pressure_grace);
+else ~waterbirth_pressure_poll;

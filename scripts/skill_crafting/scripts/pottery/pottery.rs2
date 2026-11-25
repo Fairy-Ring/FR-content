@@ -15,11 +15,14 @@ switch_obj (last_useitem)
 [label,use_pottery_oven](obj $item)
 switch_obj ($item)
 {
-    case bowl_unfired, piedish_unfired, pot_unfired : @fire_pottery(last_useslot);
+    case bowl_unfired, piedish_unfired, pot_unfired :
+        ~fire_pottery(last_useslot);
+        return;
     case potlid_unfired :
         // OSF potlid craft after teach 35. Research: subject one-small-favour.
         if (%onesmallfavour >= 35) {
-            @fire_pottery(last_useslot);
+            ~fire_pottery(last_useslot);
+            return;
         }
         ~displaymessage(^dm_default);
     case default : ~displaymessage(^dm_default);
@@ -159,7 +162,7 @@ stat_advance(crafting, struct_param($struct, processexp));
 mes("You make the clay into a <substring($name, 8, string_length($name))>.");
 
 // No level req for some reason (does have a success chance though)
-[label,fire_pottery](int $last)
+[proc,fire_pottery](int $last)
 def_obj $last_obj = inv_getobj(inv, $last);
 def_struct $struct;
 if ($last_obj = potlid_unfired) {
@@ -167,16 +170,22 @@ if ($last_obj = potlid_unfired) {
 } else {
     $struct = oc_param($last_obj, crafting_pottery_struct);
 }
+~fire_pottery_start($struct);
+p_delay(2);
+~fire_pottery_harden($struct);
+p_delay(2);
+~fire_pottery_finish($last_obj, $struct);
+
+// Shared undelayed phases; item-use retains both original three-tick waits.
+[proc,fire_pottery_start](struct $struct)
 mes("You put the <oc_name(struct_param($struct, product))> in the oven.");
 sound_synth(furnace, 1, 0);
 anim(human_furnace, 0);
 
-p_delay(2);
-
+[proc,fire_pottery_harden](struct $struct)
 mes("The <oc_name(struct_param($struct, product))> hardens in the oven.");
 
-p_delay(2);
-
+[proc,fire_pottery_finish](obj $last_obj, struct $struct)
 def_namedobj $product = struct_param($struct, product);
 // delete unfired item
 inv_del(inv, $last_obj, 1);

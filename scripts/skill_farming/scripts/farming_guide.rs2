@@ -1,0 +1,5 @@
+// CANDIDATE: the 27 August 2025 Old School change implies Guide already opened this skill guide.
+// No older source recovered its section. Use the first page, not the later patch-specific routing.
+// See farming.patch-guide-default-opening; the option itself is VERIFIED original 377 cache data.
+[oploc4,_farming_patch_guide]
+@skill_guide(farming, 0);

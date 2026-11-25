@@ -1,0 +1,10 @@
+// N101: paired mouths in the ice dungeon, not on the surface (m47_149).
+// UNKNOWN engineering landings are named and derived in wyvern.constant.
+// No Slayer entry gate: the sourced requirement applies to harming the monster.
+[oploc1,wyvern_snow_cave_entrance]
+p_telejump(^wyvern_entry_landing);
+facesquare(movecoord(^wyvern_entry_landing, 0, 0, 1));
+
+[oploc1,wyvern_snow_cave_exit]
+p_telejump(^wyvern_exit_landing);
+facesquare(movecoord(^wyvern_exit_landing, 0, 0, -1));

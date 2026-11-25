@@ -63,6 +63,7 @@ queue(macro_event_login, 0, 0);
 ~gnomeball_login;
 // if player is on a trawler ship, they login at port sarim
 ~trawler_login;
+if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena = true) ~champions_login;
 // logging out when posioned would continue to poison you after logging back in in 2006
 // https://forum.tip.it/topic/76167-poison-effect-on-f2p/
 ~set_poison_login;
@@ -70,12 +71,15 @@ queue(macro_event_login, 0, 0);
 ~update_weight_equipment;
 ~ferment_wines_login;
 ~thieving_stall_timers_login;
+~farming_login;
+~rag_login;
 ~stat_boost_login; // f2p boost reset
 ~sa_login; // start timer if low sa energy
 
 // Active Recruitment Drive assessments do not survive logout. A completed
 // assessment (marker 2) remains available to Tiffy after relog.
 ~rd_lifecycle_login;
+if (%soulbane_prog >= 2 & %soulbane_prog <= ^soulbane_tolna_clear) ~soulbane_login;
 
 // A fresh login cannot retain the session timers for saved Smoke torch bits.
 if (%fd_torch_count1 ! 0 | %fd_torch_count2 ! 0 | %fd_torch_count3 ! 0 | %fd_torch_count4 ! 0) ~dt_smoke_logout;
@@ -106,6 +110,8 @@ if (inzone(2_42_42_59_53, 2_43_42_1_54, coord) = true | inzone(1_43_42_6_46, 1_4
 cam_reset;
 if (~swamp_cave_inside(coord) = true) ~swamp_cave_start;
 ~barrows_resume;
+~giant_mole_environment_start;
+~dt_pyramid_start;
 queue(follower_login, 0, 0);
 // CoF gardener: directions is packed perm; follower uid is temp. Restore courtyard multi.
 queue(fenk_on_login_cleanup, 0, 0);

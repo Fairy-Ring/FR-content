@@ -1,0 +1,100 @@
+// UNKNOWN engineering mapping: original fields, not reconstructed 377 ownership.
+// The enum is the single patch-to-field table. No new client varbit is needed.
+[proc,farming_soil_index]()(int)
+return(enum(loc, int, farming_soil_patch, loc_type));
+
+[proc,farming_soil_treatment](int $index)(int)
+def_int $bit = multiply($index, 2);
+if ($index < 16) return(getbit_range(%varp513_bits, $bit, add($bit, 1)));
+$bit = sub($bit, 8);
+return(getbit_range(%varp516_bits, $bit, add($bit, 1)));
+
+[proc,farming_soil_set_treatment](int $index, int $treatment)
+if (~farming_soil_treatment($index) = $treatment) return;
+def_int $bit = multiply($index, 2);
+if ($index < 16) {
+    %varp513_bits = setbit_range_toint(%varp513_bits, $treatment, $bit, add($bit, 1));
+} else {
+    $bit = sub($bit, 8);
+    %varp516_bits = setbit_range_toint(%varp516_bits, $treatment, $bit, add($bit, 1));
+}
+
+[proc,farming_soil_extra](int $index)(int)
+// Flowers have their existing fixed yield, not harvest lives.
+if ($index >= 12 & $index < 16) return(0);
+if ($index >= 16) $index = sub($index, 4);
+def_int $bit = multiply($index, 2);
+return(getbit_range(%farming_soil_lives, $bit, add($bit, 1)));
+
+[proc,farming_soil_set_extra](int $index, int $lives)
+if (~farming_soil_extra($index) = $lives) return;
+if ($index >= 16) $index = sub($index, 4);
+def_int $bit = multiply($index, 2);
+%farming_soil_lives = setbit_range_toint(%farming_soil_lives, $lives, $bit, add($bit, 1));
+
+// Direct rows preserve the shared growth loop's db_findnext cursor.
+[proc,farming_soil_row](int $treatment)(dbrow)
+switch_int ($treatment) {
+    case 1 : return(farming_soil_compost);
+    case 2 : return(farming_soil_supercompost);
+    case default : return(farming_soil_none);
+}
+
+[proc,farming_soil_disease](int $chance, int $treatment)(int)
+return(divide($chance, db_getfield(~farming_soil_row($treatment), farming_soil:disease_divisor, 0)));
+
+// Initialize once at the growing-to-harvestable boundary, including catch-up.
+[proc,farming_soil_mature](int $index, int $before, int $after, int $mature)
+if ($before = $after | $after ! $mature) return;
+def_int $treatment = ~farming_soil_treatment($index);
+if ($treatment = 0) return;
+~farming_soil_set_extra($index, db_getfield(~farming_soil_row($treatment), farming_soil:lives, 0));
+
+// UNKNOWN storage order: spend added lives before the cache's base lives.
+// The same life-loss roll is preserved; treatment identity remains until empty.
+[proc,farming_soil_consume](int $index)(boolean)
+def_int $extra = ~farming_soil_extra($index);
+if ($extra = 0) return(false);
+~farming_soil_set_extra($index, sub($extra, 1));
+return(true);
+
+[proc,farming_soil_clear](int $index)
+~farming_soil_set_treatment($index, 0);
+~farming_soil_set_extra($index, 0);
+
+// VERIFIED period order and XP; CANDIDATE pre-2016 empty, untreated gate.
+// Callers admit only the two original filled buckets on a known patch parent.
+[proc,farming_soil_apply](int $stage)
+if ($stage ! ^farming_veg_weeded) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $index = ~farming_soil_index;
+if (~farming_soil_treatment($index) ! 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $treatment = 1;
+if (last_useitem = bucket_supercompost) $treatment = 2;
+def_dbrow $row = ~farming_soil_row($treatment);
+// UNKNOWN exchange: replace the used container, including a full inventory.
+inv_setslot(inv, last_useslot, bucket_empty, ^farming_soil_returned_buckets);
+~farming_soil_set_treatment($index, $treatment);
+stat_advance(farming, db_getfield($row, farming_soil:experience, 0));
+mes(~farming_soil_application_message($index, $treatment));
+
+// UNKNOWN: farming.compost-application-operator-wording records the recollection.
+// Fill two names in the single authored database string; allotment has no "patch".
+[proc,farming_soil_application_message](int $index, int $treatment)(string)
+def_string $patch = "allotment";
+if ($index >= 16) $patch = "herb patch";
+else if ($index >= 12) $patch = "flower patch";
+else if ($index >= 8) $patch = "hops patch";
+def_string $compost = "compost";
+if ($treatment = 2) $compost = "supercompost";
+def_string $message = db_getfield(~farming_soil_row($treatment), farming_soil:application_message, 0);
+def_int $type_start = string_indexof_string("{type}", $message);
+def_int $type_end = add($type_start, string_length("{type}"));
+def_int $compost_start = string_indexof_string("{compost type}", $message);
+def_int $compost_end = add($compost_start, string_length("{compost type}"));
+return("<substring($message, 0, $type_start)><$patch><substring($message, $type_end, $compost_start)><$compost><substring($message, $compost_end, string_length($message))>");

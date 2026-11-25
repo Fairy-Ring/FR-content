@@ -1,0 +1,17 @@
+// CANDIDATE message: pre-2022 transcripts 9602124 and 18411641.
+// CANDIDATE eligibility and equal item mix: src.feud-morrisane-store-15355193.
+// UNKNOWN price: feud_junk.constant. An ineligible refusal simply ends, with no
+// source for an alternative reply; do not invent one.
+[proc,feud_morrisane_junk_sale]
+def_int $coins = inv_total(inv, coins);
+if ($coins < ^feud_junk_min_coins | inv_freespace(inv) = 0) return;
+if ($coins < ^feud_junk_price) return;
+def_int $roll = random(^feud_junk_choices);
+def_namedobj $junk = bronze_pickaxe;
+if ($roll = 1) $junk = bucket_empty;
+else if ($roll = 2) $junk = knife;
+else if ($roll = 3) $junk = raw_chicken;
+else if ($roll = 4) $junk = tinderbox;
+inv_del(inv, coins, ^feud_junk_price);
+inv_add(inv, $junk, 1);
+mes("Despite your best efforts Ali M still manages to sell you some junk.");

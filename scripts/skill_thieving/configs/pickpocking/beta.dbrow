@@ -1,0 +1,177 @@
+// VERIFIED level, XP, damage and coins: Tip.It Thieving Guide, 27 April 2006.
+// UNKNOWN exact stun duration: retain the published eight-tick convention.
+// UNKNOWN success curve: use the published Guard curve, not a historical rate claim.
+[pickpocket_fremennik]
+table=pickpocket
+data=npc,viking_man
+data=npc,viking_man2
+data=npc,viking_man3
+data=npc,viking_man4
+data=npc,viking_man5
+data=npc,viking_woman
+data=npc,viking_woman2
+data=npc,viking_woman3
+data=npc,viking_woman4
+data=npc,viking_woman_indoors
+data=level,45
+data=experience,650
+data=stun_ticks,8
+data=stun_damage,2
+data=success_chance,50,240
+data=loot,coins,40,40,128
+data=pocket,citizen's pocket
+data=loot_total,128
+
+// VERIFIED levels, XP, damage ranges and period loot categories: same Tip.It capture.
+// CANDIDATE weights: OSRS revision 14342251, scaled from 100 to 1100 for herbs.
+// CANDIDATE pre-pouch coins 1-21: revision 8336916 and 12 July 2018 update.
+// The ordinary clue roll is retained; the later pre-roll layout is not imported.
+[pickpocket_ham_female]
+table=pickpocket
+data=npc,favour_female_ham_civilian
+data=level,15
+data=experience,185
+data=stun_ticks,8
+data=stun_damage,1
+data=stun_damage_max,2
+data=success_chance,50,240
+data=loot,ham_shirt,1,1,11
+data=loot,ham_robe,1,1,11
+data=loot,ham_hood,1,1,11
+data=loot,ham_cloak,1,1,11
+data=loot,ham_badge,1,1,11
+data=loot,ham_gloves,1,1,11
+data=loot,ham_boots,1,1,11
+data=loot,bronze_arrow,1,13,33
+data=loot,bronze_axe,1,1,33
+data=loot,bronze_dagger,1,1,33
+data=loot,bronze_pickaxe,1,1,33
+data=loot,iron_axe,1,1,33
+data=loot,iron_dagger,1,1,33
+data=loot,iron_pickaxe,1,1,33
+data=loot,leather_armour,1,1,33
+data=loot,steel_arrow,1,13,22
+data=loot,steel_axe,1,1,22
+data=loot,steel_dagger,1,1,22
+data=loot,steel_pickaxe,1,1,22
+data=loot,digsitebuttons,1,1,44
+data=loot,digsitearmour1,1,1,44
+data=loot,digsitesword,1,1,44
+data=loot,feather,1,7,33
+data=loot,knife,1,1,22
+data=loot,needle,1,1,22
+data=loot,raw_anchovies,1,1,22
+data=loot,raw_chicken,1,1,22
+data=loot,tinderbox,1,1,22
+data=loot,uncut_opal,1,1,22
+data=loot,coal,1,1,22
+data=loot,iron_ore,1,1,22
+data=loot,uncut_jade,1,1,22
+data=loot,logs,1,1,33
+data=loot,cow_hide,1,1,33
+data=loot,thread,1,10,33
+data=loot,unidentified_guam,1,1,12
+data=loot,unidentified_marentill,1,1,6
+data=loot,unidentified_tarromin,1,1,4
+data=loot,coins,1,21,165
+data=loot,trail_clue_easy_map001,1,1,22
+data=pocket,woman's pocket
+data=loot_total,1100
+
+[pickpocket_ham_male]
+table=pickpocket
+data=npc,favour_male_ham_civilian
+data=level,20
+data=experience,225
+data=stun_ticks,8
+data=stun_damage,2
+data=stun_damage_max,3
+data=success_chance,50,240
+data=loot,ham_shirt,1,1,11
+data=loot,ham_robe,1,1,11
+data=loot,ham_hood,1,1,11
+data=loot,ham_cloak,1,1,11
+data=loot,ham_badge,1,1,11
+data=loot,ham_gloves,1,1,11
+data=loot,ham_boots,1,1,11
+data=loot,bronze_arrow,1,13,33
+data=loot,bronze_axe,1,1,33
+data=loot,bronze_dagger,1,1,33
+data=loot,bronze_pickaxe,1,1,33
+data=loot,iron_axe,1,1,33
+data=loot,iron_dagger,1,1,33
+data=loot,iron_pickaxe,1,1,33
+data=loot,leather_armour,1,1,33
+data=loot,steel_arrow,1,13,22
+data=loot,steel_axe,1,1,22
+data=loot,steel_dagger,1,1,22
+data=loot,steel_pickaxe,1,1,22
+data=loot,digsitebuttons,1,1,44
+data=loot,digsitearmour1,1,1,44
+data=loot,digsitesword,1,1,44
+data=loot,feather,1,7,33
+data=loot,knife,1,1,22
+data=loot,needle,1,1,22
+data=loot,raw_anchovies,1,1,22
+data=loot,raw_chicken,1,1,22
+data=loot,tinderbox,1,1,22
+data=loot,uncut_opal,1,1,22
+data=loot,coal,1,1,22
+data=loot,iron_ore,1,1,22
+data=loot,uncut_jade,1,1,22
+data=loot,logs,1,1,33
+data=loot,cow_hide,1,1,33
+data=loot,thread,1,10,33
+data=loot,unidentified_guam,1,1,12
+data=loot,unidentified_marentill,1,1,6
+data=loot,unidentified_tarromin,1,1,4
+data=loot,coins,1,21,165
+data=loot,trail_clue_easy_map001,1,1,22
+data=pocket,man's pocket
+data=loot_total,1100
+
+// VERIFIED period values and three outcomes; CANDIDATE weights: OSRS Bandit table.
+[pickpocket_desert_bandit]
+table=pickpocket
+data=npc,fourdiamonds_sword_bandit_1
+data=npc,fourdiamonds_sword_bandit_free
+data=level,53
+data=experience,790
+data=stun_ticks,8
+data=stun_damage,3
+data=success_chance,50,240
+data=loot,coins,30,30,5
+data=loot,1doseantipoison,1,1,1
+data=loot,lockpick,1,1,1
+data=pocket,bandit's pocket
+data=loot_total,7
+
+// VERIFIED period level, XP, damage, coin/rune ranges and nine loot categories.
+// CANDIDATE known weights: OSRS Lletya table, not Prifddinas-only loot.
+// UNKNOWN ELF_PERIOD_ONLY_WEIGHT = 1 each for unicorn horn and black robe.
+// UNKNOWN ELF_SINGLE_QUANTITY = 1 where the period guide names no quantity.
+// The two period-only weights extend the known total of 128 to 130.
+[pickpocket_lletya_elf]
+table=pickpocket
+data=npc,mourning_town_elf_1
+data=npc,mourning_town_elf_2
+data=npc,mourning_town_elf_3
+data=npc,mourning_town_elf_4
+data=npc,mourning_town_elf_5
+data=level,85
+data=experience,3530
+data=stun_ticks,8
+data=stun_damage,5
+data=success_chance,50,240
+data=loot,coins,250,350,105
+data=loot,deathrune,2,2,8
+data=loot,naturerune,3,3,5
+data=loot,jug_wine,1,1,6
+data=loot,diamond,1,1,1
+data=loot,fire_orb,1,1,2
+data=loot,gold_ore,1,1,1
+data=loot,unicorn_horn,1,1,1
+// CANDIDATE identity: the period guide's dark wizard robe maps to cache black_robe.
+data=loot,black_robe,1,1,1
+data=pocket,elf's pocket
+data=loot_total,130

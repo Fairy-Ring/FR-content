@@ -1,0 +1,38 @@
+// CANDIDATE wording: OSRS Making History transcript revision 15263331.
+// Erin is the existing Silver merchant, not a new cache NPC.
+[label,mh_erin]
+if (%makinghistory_trader_prog = 0) {
+    ~chatplayer("<p,quiz>Are you Erin?");
+    ~chatnpc("<p,neutral>That I am. What do you want? You realise I'm working here.");
+    ~chatplayer("<p,neutral>This shouldn't take too long. I just want to ask you a bit about your great Grandfather, the one who lived in the outpost?");
+    ~chatnpc("<p,quiz>What's it to you?");
+    ~chatplayer("<p,neutral>I'm doing some research for a man called Jorral. Apparently the King is going to make the outpost into his very own alchemists' lab.");
+    ~chatnpc("<p,neutral>That can only cause chaos! Well, my great Grandfather lived and died there according to my mother, but even she knows very little about him.");
+    ~chatplayer("<p,neutral>I see.");
+    ~chatnpc("<p,neutral>The only thing I have of his is a key. It's a strange key, it changes temperature by itself as you walk around. I'm afraid I don't know what it's for though.");
+    ~chatplayer("<p,quiz>No idea at all?");
+    ~chatnpc("<p,neutral>Well, I imagine it's to some sort of chest of his belongings as it's too small for a door. Perhaps if you find some of his belongings you will discover some clues amongst them.");
+    ~chatplayer("<p,quiz>It's better than nothing. Will you lend it to me then?");
+    ~chatnpc("<p,neutral>Why not. I can't use it anyway. Try feeling its change in temperature as you walk around.");
+    ~mh_give(makinghistory_key, 1);
+    %makinghistory_trader_prog = 1;
+    return;
+}
+if (inv_total(inv, makinghistory_journal) > 0) {
+    ~chatplayer("<p,quiz>Would you like to see the journal I have found?");
+    ~chatnpc("<p,neutral>Let's have a look.");
+    ~mesbox("Erin reads the Journal.");
+    ~chatnpc("<p,neutral>Very interesting. Best you show it to Jorral at the outpost.");
+    ~chatplayer("<p,quiz>I was just about to. Do you want the key back?");
+    ~chatnpc("<p,neutral>Keep it, it may come in handy.");
+    return;
+}
+if (inv_total(inv, makinghistory_key) = 0 & inv_total(bank, makinghistory_key) = 0) {
+    // UNKNOWN recovery rule; reuse the sourced lending line rather than invent speech.
+    ~chatnpc("<p,neutral>Why not. I can't use it anyway. Try feeling its change in temperature as you walk around.");
+    ~mh_give(makinghistory_key, 1);
+    return;
+}
+~chatplayer("<p,neutral>I haven't found anything yet.");
+~chatnpc("<p,neutral>Keep trying. Have you noticed that the key changes temperature as you walk around?");
+return;

@@ -1,0 +1,34 @@
+// CANDIDATE resource mapping, sandstone requirement, XP and respawn.
+// Granite 45 Mining has a retained launch-day period statement.
+[quarry_sandstone_rock]
+table=mining_table
+data=rock,rocks_10946
+data=ore_name,sandstone
+data=rock_level,35
+data=rock_respawnrate,9
+
+[quarry_granite_rock]
+table=mining_table
+data=rock,rocks_10947
+data=ore_name,granite
+data=rock_level,45
+data=rock_respawnrate,9
+
+// Largest-first conditional rolls. XP is stored in tenths, as in mining_table.
+// Low/high pairs are CANDIDATE from the checked later rock pages; the engine's
+// published older stat_random is retained, not the post-2023 chart formula.
+// Exact May 2006 size probabilities remain UNKNOWN.
+[quarry_sandstone_blocks]
+table=quarry_blocks
+data=stone,quarry_sandstone_rock
+data=block,enakh_sandstone_large,600,4,50
+data=block,enakh_sandstone_medium,500,8,75
+data=block,enakh_sandstone_small,400,16,100
+data=block,enakh_sandstone_tiny,300,25,200
+
+[quarry_granite_blocks]
+table=quarry_blocks
+data=stone,quarry_granite_rock
+data=block,enakh_granite_medium,750,6,64
+data=block,enakh_granite_small,600,8,75
+data=block,enakh_granite_tiny,500,16,100

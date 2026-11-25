@@ -1,0 +1,63 @@
+// CANDIDATE: earliest populated Old School numbers; period Slayer guide supplies requirements and uses, not bonuses.
+
+[slayer_mirror_shield]
+name=Mirror shield
+desc=I can just about see things in this shield's reflection.
+cost=1000
+model=obj_slayer_mirror_shield
+2dxof=1
+2dzoom=1910
+2dyan=400
+2dxan=480
+iop2=Wield
+wearpos=lefthand
+weight=5lb
+manwear=obj_slayer_mirror_shield_manwear,0
+womanwear=obj_slayer_mirror_shield_manwear,6
+members=yes
+cost=5000
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,10
+param=slashdefence,15
+param=crushdefence,5
+param=magicdefence,5
+param=rangedefence,10
+param=strengthbonus,0
+param=prayerbonus,0
+
+[wallbeast_spike_helmet]
+name=Spiny helmet
+desc=You don't want to wear it inside-out.
+cost=650
+manwear=obj_wallbeast_spike_helmet_manwear,0
+womanwear=obj_wallbeast_spike_helmet_womanwear,0
+manhead=obj_wallbeast_spike_helmet_manhead
+womanhead=obj_wallbeast_spike_helmet_womanhead
+model=obj_wallbeast_spike_helmet
+2dxof=5
+2dyof=-3
+2dzoom=660
+2dyan=440
+2dxan=444
+members=yes
+iop2=Wear
+wearpos=hat
+wearpos2=head
+wearpos3=jaw
+weight=5lb
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,-6
+param=rangeattack,-2
+param=stabdefence,9
+param=slashdefence,10
+param=crushdefence,7
+param=magicdefence,-1
+param=rangedefence,9
+param=strengthbonus,0
+param=prayerbonus,0

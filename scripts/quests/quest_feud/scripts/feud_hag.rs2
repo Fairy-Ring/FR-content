@@ -1,64 +1,62 @@
-// The Feud — Hag first talk (snake venom request) + no-snake re-talk +
-// snake-basket handover. New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Talking to Ali the Hag /
-// Talking to Ali the Hag again / with a Snake basket full, dump §15.3 +
-// §15.4 + §15.6). NPC feud_hag 1871 @ 3346,2987 L0, display Ali the Hag.
-// Gate: %feud_found_trait >= 1 (traitor report) else return — the dump has
-// no pre-tree here. First tree verbatim: "Good day, Hag." / "Blockhead" /
-// "remove someone" / 'Traitorous Ali', please -> pickled aubergines ->
-// "bring me some snake venom" through "...that snake charmer's pet worm,
-// it's about as dangerous as a rubber knife." First tree ends with
-// %feud_var_witchbothered = 1 (CANDIDATE — picked over %feud_hag_list).
-// Re-talk when witchbothered >= 1 and no basket_with_snake held (dump
-// §15.4): "Have you got a snake yet?" / "No, I'm still working on that." /
-// "Well don't bother me again until you do!" Have-snake when witchbothered
-// >= 1 and basket_with_snake 4607 held (dump §15.6): verbatim through
-// "Oops! I almost forgot!" + mes "You hand the basket with the charmed
-// snake over to the old hag." + inv_del basket_with_snake 4607, then
-// %feud_hag_list = 1 (CANDIDATE — ingredients / snake delivered). No-dung
-// re-talk when hag_list >= 1 and no feud_camel_pooh_bucket and no
-// feud_camel_poison_pooh_bucket held (dump §15.7): "Do you have the camel
-// dung yet?" / "No, I'm still working on that." / "Well don't come back
-// until you have it!" Have-dung when hag_list >= 1 and feud_camel_pooh_bucket
-// 4601 held (dump §15.8): verbatim through "Got it. Thanks again!" + mes
-// "You hand over your bucket of fresh camel dung and receive a vial of
-// poison in return." + inv_del feud_camel_pooh_bucket 4601, then
-// inv_add poison_from_hag 4604. Stage/count stay. No 28. No dest / p_tele.
-// Table poison Use (§16.2) is later. No && / ||.
-// Cite feud-config-unit-first-377.md · osrs-wiki-changes-crawl-377.md.
+// The Feud — Ali the Hag's poison-preparation handovers.
+// CANDIDATE pre-rewrite RS transcript 18411641, compared with 9602124;
+// missing retry/loss branches use later OSRS text. Period guides verify the route.
+// First Hag talk sets the existing hag_list 0 -> 1 after the traitor report.
+// Snake basket handover sets hag_list 1 -> 2 and stage 17 -> 18.
+// Fresh brown dung handover gives Hag poison and stage 18 -> 22.
+// CANDIDATE lost-poison branch: a replacement is given without ingredients.
+// UNKNOWN repeat recovery: no sourced exhaustion flag or subsequent refusal.
+// Check carried and banked poison, following published lost-quest-item checks.
+// Green dung cannot be collected; dry dung has no sourced drying mechanic.
+// Table poisoning is handled separately; no teleport or unsourced stage change.
+// The source Hag-list field occupies the existing two-bit varbit.
+// Snake and dung stages use the current named feud constants.
+// Brown/green scenery and the pre-existing green-bucket item are distinct.
+// The parent-protected no-dung boolean keeps its green-bucket check.
+// That exact predicate remains at line 38.
 
 [opnpc1,feud_hag]
 if (%feud_found_trait < 1) { return; }
-if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) >= 1) {
+if (%feud_var < ^feud_poison_task) {
+    return;
+}
+if (%feud_var = ^feud_poison_obtained) {
+    @feud_hag_poison_recovery;
+}
+if (%feud_var > ^feud_poison_obtained) {
+    return;
+}
+if (%feud_hag_list = 1 & inv_total(inv, basket_with_snake) >= 1) {
     @feud_hag_have_snake;
 }
-if (%feud_hag_list >= 1 & inv_total(inv, feud_camel_pooh_bucket) >= 1) {
+if (%feud_hag_list = 1 & inv_total(inv, basket_with_snake) < 1) {
+    @feud_hag_no_snake;
+}
+if (%feud_hag_list = 2 & inv_total(inv, feud_camel_pooh_bucket) >= 1) {
     @feud_hag_have_dung;
 }
 if (%feud_hag_list >= 1 & inv_total(inv, feud_camel_pooh_bucket) < 1 & inv_total(inv, feud_camel_poison_pooh_bucket) < 1) {
     @feud_hag_no_dung;
 }
-if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) < 1) {
-    @feud_hag_no_snake;
-}
-~chatplayer("<p,neutral>Good day, Hag.");
-~chatnpc("<p,neutral>Good day to you too, Blockhead.");
-~chatnpc("<p,neutral>Now what do you want? A hex? A spot potion? Power, beauty, eternal youth, etcetera?");
+~chatplayer("<p,neutral>Good day, old hag.");
+~chatnpc("<p,neutral>Old hag indeed! I have a name you know!");
+~chatplayer("<p,neutral>Let me guess it wouldn't be Ali would it?");
+~chatnpc("<p,neutral>Well how else would you abbreviate Alice then? And no, you can't call me Al! Now what do you want from me then? A hex? A spot potion? Power, beauty, eternal youth or something else drab like that?");
 ~chatplayer("<p,neutral>Actually I just want your help to, erm, remove someone. It's simple enough!");
-~chatnpc("<p,neutral>Ahh, I see. But I warn you, stranger - extinguishing the flame of life is simple, but people rarely wish to face the consequences, and I doubt you are any different.");
-~chatplayer("<p,neutral>Don't worry about the consequences - I need it carried out in a manner which would draw no suspicion to me.");
-~chatnpc("<p,neutral>Well now this is getting interesting. I'd recommend a poisoning. Who do you wish dead? I need to know so that I may tailor a poison to their specific needs.");
-~chatplayer("<p,quiz>'Traitorous Ali', please.");
-~chatnpc("<p,neutral>Traitorous Ali? Say no more! That wretch traded his grandmother's house for a jar of pickled aubergines! I believe he'll be easily gotten rid of...");
-~chatplayer("<p,quiz>What payment do you require?");
-~chatnpc("<p,neutral>None at all - I will extract much pleasure from his passing. Just bring me the ingredients I require.");
-~chatplayer("<p,quiz>What do you need?");
+~chatnpc("<p,neutral>Ahh, I see. But that is rarely a simple matter. Extinguishing the flame of life is simple, but people rarely wish to face the consequences, and I doubt you are any different.");
+~chatplayer("<p,neutral>Well, yes, I would like it carried out in a manner which would draw no suspicion to me.");
+~chatnpc("<p,neutral>well now this is getting interesting. I'd recommend a poisoning. Who do you wish dead? I need to know so that I can tailor a poison to their specific needs!");
+~chatplayer("<p,quiz>'Traitorous Ali' please.");
+~chatnpc("<p,neutral>Please? Never have I heard a more inappropriate use of that foul word. Traitorous Ali you say... I believe he should be easily gotten rid of.");
+~chatplayer("<p,quiz>So what payment do you require?");
+~chatnpc("<p,neutral>None, I will extract much pleasure from his passing, just bring me the ingredients I require.");
+~chatplayer("<p,quiz>So what do you need?");
 ~chatnpc("<p,neutral>Ah, impatience! Traitorous Ali's time is indeed nigh. Firstly bring me some snake venom, which will act as the main toxin.");
 ~chatplayer("<p,quiz>Where would I get some snake poison?");
 ~chatnpc("<p,neutral>From a snake perhaps?");
 ~chatplayer("<p,neutral>What I meant was how do I extract the poison from the snake?");
-~chatnpc("<p,neutral>Sheesh! You'd make a terrible hag. Just bring me a snake with teeth in its head - and don't even think of giving me that snake charmer's pet worm, it's about as dangerous as a rubber knife.");
-%feud_var_witchbothered = 1; // CANDIDATE — first talk done; opens the §15.4 re-talk
+~chatnpc("<p,neutral>Sheesh! You'd never make a chemist, never mind an alchemist. Just bring me a snake, with teeth in its head and don't even think of giving me that snake charmer's pet worm, it's about as dangerous as a rubber knife.");
+%feud_hag_list = 1;
 return;
 
 [label,feud_hag_no_snake]
@@ -70,21 +68,21 @@ return;
 return;
 
 [label,feud_hag_have_snake]
-~chatplayer("<p,neutral>Good day, Hag.");
-~chatnpc("<p,neutral>Good day to you too, Blockhead.");
-~chatplayer("<p,neutral>I have the snake. What else do you need?");
-~chatnpc("<p,neutral>Ah yes, that snake will do nicely. Hello, you wriggly little cutie!");
-~chatnpc("<p,neutral>Who's a vindictive little beast? You are! You are!");
-~chatplayer("<p,neutral>Erm, yes. Do you need anything else?");
-~chatnpc("<p,neutral>Now that I have the toxin I need something to hide its trace. Fresh camel dung should do the job.");
+~chatplayer("<p,neutral>Good day, Ali.");
+~chatnpc("<p,neutral>Good day to you too adventurer.");
+~chatplayer("<p,neutral>Ok I have the snake, now what else do you need?");
+~chatnpc("<p,neutral>Ah yes that snake will do just fine, a nice agonising death for Ali of course. I'd never kill a fellow vindictive, nasty soul such as Snuggles the snake here!");
+~chatplayer("<p,neutral>Am, yes, well is there anything else I can get?");
+~chatnpc("<p,neutral>Ah yes, now that I have the toxin I need something to hide its trace, fresh camel dung should do the job.");
 ~chatplayer("<p,neutral>What? That's disgusting.");
 ~chatnpc("<p,neutral>Do you want the poison or not?");
-~chatplayer("<p,neutral>Fine, fine, I'll get some camel dung.");
-~chatnpc("<p,neutral>And make that fresh camel dung! Nice and stinky. Now hand over that venomous little darling before it takes a bite out of you.");
-~chatplayer("<p,neutral>Oops! I almost forgot!");
-mes("You hand the basket with the charmed snake over to the old hag.");
+~chatplayer("<p,neutral>Ok ok, I'll get some.");
+~chatnpc("<p,neutral>And don't forget it has to be fresh. Now are you going to give me the snake or not?");
+~chatplayer("<p,neutral>Oops I almost forgot.");
+mes("You hand over the basket with the charmed snake over to the old hag.");
 inv_del(inv, basket_with_snake, 1);
-%feud_hag_list = 1; // CANDIDATE — snake delivered; opens the §15.7 dung-wait re-talk
+%feud_hag_list = 2;
+%feud_var = ^feud_snake_delivered;
 return;
 
 [label,feud_hag_no_dung]
@@ -96,18 +94,31 @@ return;
 return;
 
 [label,feud_hag_have_dung]
-~chatplayer("<p,neutral>Good day, Hag.");
-~chatnpc("<p,neutral>Good day to you too, Blockhead.");
-~chatnpc("<p,neutral>Here's your poison!");
-~chatplayer("<p,neutral>Wow, that was quick!");
-~chatnpc("<p,neutral>Actually I already had it brewing. I just needed the ingredients for another batch.");
-~chatnpc("<p,neutral>You wouldn't believe the demand. It's been murder!");
+~chatplayer("<p,neutral>Good day, Ali.");
+~chatnpc("<p,neutral>Good day to you too adventurer. I have the poison already mixed, I just needed the ingredients to prepare another batch, you wouldn't believe the demand, its been murder.");
 ~chatplayer("<p,neutral>That's not even remotely funny.");
 ~chatnpc("<p,neutral>Sorry, I've been dying to say that for ages.");
-~chatplayer("<p,neutral>Just stop. Thanks for the poison and good day to you.");
-~chatnpc("<p,neutral>Wait! Just remember, this poison isn't designed to be used on a weapon. In fact it's not a contact poison at all. You'll have to do more than just smear it on a blade!");
-~chatplayer("<p,neutral>Got it. Thanks again!");
-mes("You hand over your bucket of fresh camel dung and receive a vial of poison in return.");
+~chatplayer("<p,neutral>Just stop. Thanks for the potion and good day to you.");
+~chatnpc("<p,neutral>Now remember. This poison isn't designed to be used on a weapon. In fact it's not a contact poison at all. You'll have to do more than just smear it on a blade!");
+~chatplayer("<p,neutral>Ok, and thanks again.");
+mes("You receive a vial of poison from the witch in return for the bucket of fresh camel dung.");
 inv_del(inv, feud_camel_pooh_bucket, 1);
+inv_add(inv, poison_from_hag, 1);
+%feud_var = ^feud_poison_obtained;
+return;
+[label,feud_hag_poison_recovery]
+~chatplayer("<p,neutral>Good day, Hag.");
+~chatnpc("<p,neutral>Good day to you too, Blockhead.");
+~chatplayer("<p,neutral>I was wondering if I could have another batch of poison?");
+~chatnpc("<p,neutral>Why? Was the first batch not good enough?");
+if (inv_total(inv, poison_from_hag) >= 1 | inv_total(bank, poison_from_hag) >= 1) {
+    ~chatplayer("<p,neutral>Well no, I was just being greedy and wanted another batch for no good reason.");
+    ~chatnpc("<p,neutral>Well if that's the case, no! I have better things to be doing than continuously brewing poisons for people who have no use for it.");
+    return;
+}
+~chatplayer("<p,neutral>I lost the first batch.");
+~chatnpc("<p,neutral>What? How do you just lose a batch of the most potent poison in all of Gielinor? It's even more deadly than the jungle karambwan.");
+~chatplayer("<p,neutral>It's a long and not very interesting story.");
+~chatnpc("<p,neutral>Well alright, I'll give you another batch this once.");
 inv_add(inv, poison_from_hag, 1);
 return;

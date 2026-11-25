@@ -1,0 +1,57 @@
+[label,pvp_dragon_scimitar_sa]
+// VERIFIED: Sever costs 55% energy (2006 Special attacks, revision 3803).
+~set_sa_vars(oc_param(inv_getobj(worn, ^wearpos_rhand), sa_energy));
+~set_pk_vars;
+def_int $damage = 0;
+def_int $maxhit = %com_maxhit;
+// CANDIDATE: later developer statement gives 125% accuracy against slash defence.
+// UNKNOWN engineering: ordinary maximum damage, as no source gives a damage boost.
+def_int $attack_roll = scale(^dragon_scimitar_accuracy, 100, ~player_attack_roll_specific(%damagetype));
+def_int $defence_roll = ~.player_defence_roll_specific(^slash_style);
+if (randominc($attack_roll) > randominc($defence_roll)) {
+    if (~.check_protect_prayer(^melee_style) = true) {
+        $maxhit = scale(6, 10, $maxhit);
+    }
+    $damage = min(randominc($maxhit), .stat(hitpoints));
+    ~give_combat_experience_pvp(%damagestyle, $damage, ~pvp_xp_multiplier(~.player_combat_level));
+    both_heropoints($damage);
+    // CANDIDATE: a successful accuracy roll counts even with zero damage (29 May 2017 developer statement).
+    ~dragon_scimitar_sever;
+}
+// VERIFIED 377 resource identities; UNKNOWN original binding, height and delays.
+anim(sp_attack_dragon_scimitar, 0);
+sound_synth(sever, 1, 0);
+.sound_synth(sever, 1, 0);
+spotanim_pl(sp_attack_dragon_scimitar_trail_spotanim, 96, 0);
+if (.%com_defendanim ! null) .anim(.%com_defendanim, 20);
+.queue*(pvp_retaliate, 0)(uid);
+~.pvp_damage(0, $damage);
+
+[proc,dragon_scimitar_sever]
+def_player_uid $caster = uid;
+// Prayer variables are unprotected; reuse the existing deactivation on the victim.
+if (finduid(.uid) = true) {
+    // CANDIDATE: explicit active-prayer deactivation is described by the later Old School page.
+    ~prayer_deactivate_specific(^prayer_protectfrommagic);
+    ~prayer_deactivate_specific(^prayer_protectfrommissiles);
+    ~prayer_deactivate_specific(^prayer_protectfrommelee);
+    // Replacing this timer restarts the window on every successful special.
+    settimer(dragon_scimitar_prayer_lock, ^dragon_scimitar_prayer_ticks);
+}
+def_boolean $caster_restored = finduid($caster);
+
+[proc,dragon_scimitar_prayer_check](dbrow $data)(boolean)
+def_int $prayer = db_getfield($data, prayers:prayer, 0);
+if ($prayer = ^prayer_protectfrommagic | $prayer = ^prayer_protectfrommissiles | $prayer = ^prayer_protectfrommelee) {
+    def_int $start = gettimer(dragon_scimitar_prayer_lock);
+    // Age, not callback execution, ends the lock even when the victim is busy.
+    if ($start >= 0 & map_clock < add($start, ^dragon_scimitar_prayer_ticks)) {
+        // UNKNOWN engineering feedback: reuse the existing refusal sound, with no invented text.
+        sound_synth(prayer_off, 1, 0);
+        return(false);
+    }
+}
+return(true);
+
+[timer,dragon_scimitar_prayer_lock]
+cleartimer(dragon_scimitar_prayer_lock);

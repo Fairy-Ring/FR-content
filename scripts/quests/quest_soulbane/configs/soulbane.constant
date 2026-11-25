@@ -1,0 +1,161 @@
+// UNKNOWN engineering values: soulbane.rage-engineering in the research registry.
+// The period guides say 'full on anger' but give no numeric threshold or spawns.
+^soulbane_rage_target = 1500
+// Maximum duration admitted by this engine; region teardown owns entity cleanup.
+^soulbane_npc_lifetime = 2147483647
+// UNKNOWN engineering layout: separated memory patches, not period server tiles.
+// Zone and tile offsets correspond; registered native scene tests check both.
+^soulbane_region_zones = 16
+^soulbane_region_midpoint = 64
+^soulbane_memory_zones_east = 4
+^soulbane_memory_zones_north = 2
+^soulbane_memory_zone_east = 12
+^soulbane_memory_tile_east = 96
+^soulbane_memory_zone_north = 14
+^soulbane_memory_tile_north = 112
+^soulbane_scene_source = 0_51_53_0_32
+^soulbane_fear_scene_source = 0_51_53_32_56
+^soulbane_surface = 0_51_53_46_63
+// CANDIDATE existing descent endpoint, subject to registered packed path tests.
+^soulbane_rage_entry = 0_47_81_5_59
+// UNKNOWN observation stand, selected from the packed reachable eastern edge.
+^soulbane_rage_east_edge = 0_47_81_30_51
+^soulbane_rage_bear1 = 0_47_81_11_54
+^soulbane_rage_bear2 = 0_47_81_10_49
+^soulbane_rage_unicorn1 = 0_47_81_16_56
+^soulbane_rage_unicorn2 = 0_47_81_16_49
+^soulbane_rage_rat1 = 0_47_81_22_56
+^soulbane_rage_rat2 = 0_47_81_22_49
+^soulbane_rage_goblin1 = 0_47_81_28_55
+^soulbane_rage_goblin2 = 0_47_81_28_49
+// UNKNOWN reconstruction stands for the sourced Varrock family scene.
+^soulbane_scene_player = 0_51_53_7_40
+// UNKNOWN camera eye: it must stand on ground inside the copied memory strip.
+^soulbane_scene_camera = 0_51_53_6_38
+^soulbane_scene_launa = 0_51_53_7_42
+^soulbane_scene_tolna = 0_51_53_8_42
+// CANDIDATE Old School behaviour, first documented in wiki r3247935 (2017-01-20).
+// No dated game update introducing this was found; period guides are silent.
+^soulbane_rage_attack_xp = 40
+// UNKNOWN Fear staging/spawn/presentation values; original server tiles are lost.
+^soulbane_fear_entry = 0_47_81_50_48
+// UNKNOWN observation stand, selected from the packed reachable eastern edge.
+^soulbane_fear_east_edge = 0_47_81_61_47
+^soulbane_fear_reaper1 = 0_47_81_57_58
+^soulbane_fear_reaper2 = 0_47_81_57_43
+^soulbane_fear_reaper3 = 0_47_81_54_38
+^soulbane_fear_reaper4 = 0_47_81_44_38
+// UNKNOWN: nearest open 2-by-2 footprint to the old stand, one tile west.
+^soulbane_fear_reaper5 = 0_47_81_40_45
+^soulbane_fear_reaper6 = 0_47_81_41_55
+^soulbane_fear_scene_player = 0_51_53_45_63
+^soulbane_fear_scene_tolna = 0_51_53_46_63
+// fear_cut has 60 presentation cycles before its 20001-cycle final hold.
+^soulbane_fear_scare_ticks = 2
+
+// UNKNOWN server stage encodings within the original quest-progress field.
+^soulbane_confusion_active = 6
+^soulbane_confusion_clear = 7
+^soulbane_hope_active = 8
+^soulbane_hope_clear = 9
+^soulbane_tolna_intro = 10
+^soulbane_tolna_active = 11
+^soulbane_tolna_clear = 12
+// VERIFIED period counts: soulbane.period-confusion-rule and period-hopeless-rule.
+^soulbane_confusion_real_kills = 5
+^soulbane_confusion_zero_hits = 8
+^soulbane_hope_lives = 3
+// CANDIDATE later guide r15359515: five simultaneous beasts and five creatures.
+^soulbane_confusion_group_size = 5
+^soulbane_hope_creatures = 5
+// UNKNOWN engineering: the published npc_death final-hit removal delay.
+^soulbane_confusion_removal_ticks = 1
+
+// UNKNOWN stands: nearest open source footprint to disclosed reconstruction
+// seeds, Manhattan distance then x/z, with exact native paths from each entry.
+^soulbane_confusion_entry = 0_47_81_48_26
+^soulbane_confusion_spawn1 = 0_47_81_42_21
+^soulbane_confusion_spawn2 = 0_47_81_52_23
+^soulbane_confusion_spawn3 = 0_47_81_46_16
+^soulbane_confusion_spawn4 = 0_47_81_56_14
+^soulbane_confusion_spawn5 = 0_47_81_38_12
+^soulbane_confusion_scene_player = 0_47_81_48_24
+^soulbane_confusion_scene_tolna = 0_47_81_48_26
+^soulbane_confusion_scene_camera = 0_47_81_46_22
+^soulbane_hope_entry = 0_48_81_16_26
+^soulbane_hope_bridged_entry = 0_47_81_16_26
+^soulbane_hope_spawn1 = 0_48_81_4_20
+^soulbane_hope_spawn2 = 0_48_81_13_25
+^soulbane_hope_spawn3 = 0_48_81_20_23
+^soulbane_hope_spawn4 = 0_48_81_24_16
+^soulbane_hope_spawn5 = 0_48_81_8_14
+// One reachable common stand precedes the exact westward 64-tile transfer.
+^soulbane_hope_scene_before = 0_48_81_13_16
+^soulbane_hope_scene_after = 0_47_81_13_16
+// UNKNOWN readable hold duration for each sourced overhead speech.
+^soulbane_scene_overhead_ticks = 5
+// UNKNOWN roaming/range and poison-duration bindings; severity one delivers
+// the VERIFIED one-point poison hit through the published poison timer.
+^soulbane_encounter_wander = 0
+^soulbane_encounter_hunt = 4
+^soulbane_encounter_maxrange = 40
+^soulbane_hope_attackrange = 5
+^soulbane_confusion_poison_severity = 1
+
+// UNKNOWN private-copy layout and food/combat bindings; see the policy record.
+^soulbane_region_levels = 4
+^soulbane_room_zones = 4
+^soulbane_room_tiles = 32
+^soulbane_hope_source = 0_48_81_0_0
+^soulbane_hope_copy_offset = 64
+^soulbane_hope_melee_wait_ticks = 5
+^soulbane_hope_retreat_ticks = 2
+^soulbane_hope_combat_ticks = 8
+// CANDIDATE eating percentage; VERIFIED period blue-ball damage.
+^soulbane_hope_food_percent = 75
+^soulbane_hope_ranged_damage = 0
+// UNKNOWN original projectile presentation, using the cache's hope effects.
+^soulbane_hope_projectile_height = 61
+^soulbane_hope_projectile_endheight = 40
+^soulbane_hope_projectile_delay = 32
+^soulbane_hope_projectile_angle = 5
+^soulbane_hope_projectile_offset = 4
+^soulbane_hope_projectile_step = 10
+
+// UNKNOWN arena staging on original 377 ground, not recovered actor placements.
+// Registered tests require complete footprints and native paths from the entry.
+^soulbane_tolna_source = 1_46_81_0_0
+^soulbane_tolna_map_source = 0_46_81_0_0
+^soulbane_tolna_region_zones = 8
+^soulbane_tolna_region_midpoint = 32
+^soulbane_tolna_entry = 1_46_81_24_28
+^soulbane_tolna_player = 1_46_81_28_28
+^soulbane_tolna_camera = 1_46_81_25_26
+^soulbane_tolna_brana = 1_46_81_30_27
+^soulbane_tolna_human = 1_46_81_30_28
+^soulbane_tolna_south = 1_46_81_27_23
+^soulbane_tolna_east = 1_46_81_27_30
+^soulbane_tolna_north = 1_46_81_26_34
+// UNKNOWN native AP admission range; exact attack intervals live in the rows.
+^soulbane_tolna_attackrange = 10
+// CANDIDATE selected Old School Tolna r15392739 combat profile.
+^soulbane_tolna_maxhit = 5
+^soulbane_tolna_south_melee_ticks = 8
+^soulbane_tolna_south_ranged_ticks = 7
+^soulbane_tolna_east_ranged_ticks = 5
+^soulbane_tolna_north_melee_ticks = 3
+^soulbane_tolna_north_ranged_ticks = 20
+// UNKNOWN row sentinel: the eastern head has no melee attack.
+^soulbane_tolna_no_melee = 0
+// UNKNOWN native duration binding for the sourced one-point player poison.
+^soulbane_tolna_poison_severity = 1
+// UNKNOWN projectile bindings, using the published native ranged defaults.
+^soulbane_tolna_projectile_height = 40
+^soulbane_tolna_projectile_endheight = 36
+^soulbane_tolna_projectile_delay = 32
+^soulbane_tolna_projectile_angle = 15
+^soulbane_tolna_projectile_offset = 11
+^soulbane_tolna_projectile_step = 5
+// VERIFIED period rewards. Native experience helpers take tenths of XP.
+^soulbane_reward_xp_tenths = 5000
+^soulbane_reward_coins = 500

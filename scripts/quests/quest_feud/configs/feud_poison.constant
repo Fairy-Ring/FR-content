@@ -1,0 +1,23 @@
+// CANDIDATE: current Dung scenery history reports 2/25 green, exactly 8%.
+^feud_dung_green_chance = 8
+
+// CANDIDATE: current OSRS walkthrough says a coin; period guides say some coins.
+^feud_charmer_coin_cost = 1
+
+// UNKNOWN FEUD-TROUGH-CAMEL-SEARCH-01: identifies the reacting camel, not a nearness gate.
+// Original trough (3339,2962); original camels (3342,2962) and (3343,2964):
+// southwest-coordinate distances 3 and 4, plus published default wanderrange 5.
+// max(3 + 5, 4 + 5) = 9 covers both complete original wander rectangles.
+^feud_camel_trough_range = 9
+
+// UNKNOWN: adjacent range for using the flute on a desert snake.
+^feud_snake_use_range = 1
+
+// UNKNOWN: RuneHQ says dung appears a few seconds after the camel eats.
+^feud_dung_spawn_delay = 5
+
+// UNKNOWN: ordinary ground-drop precedent is 200 cycles.
+^feud_dung_lifetime = 200
+
+// UNKNOWN FEUD-DUNG-PLACEMENT-01: camel tile, N, NE, E, SE, S, SW, W, NW.
+^feud_dung_candidate_count = 9

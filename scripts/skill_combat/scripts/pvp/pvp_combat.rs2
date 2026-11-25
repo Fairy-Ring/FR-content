@@ -29,18 +29,27 @@ if (~player_autocast_enabled = true) {
 }
 @pvp_melee_attack;
 
-[proc,pvp_level_check]()(boolean)
+[proc,pvp_level_check_reason]()(int)
 // not high enough level
 def_int $combat_level_diff = abs(sub(~player_combat_level, ~.player_combat_level));
 def_int $wilderness_level = min(~wilderness_level(coord), ~wilderness_level(.coord));
-if ($wilderness_level < 1) {
-    mes("You can't attack players who aren't in the Wilderness.");
-    return(false);
-}
-if ($wilderness_level < $combat_level_diff) {
-    mes("Your level difference is too great!");
-    mes("You need to move deeper into the wilderness."); // wilderness is title'd in late 2005/2006 ish
-    return(false);
+if ($wilderness_level < 1) return(1);
+if ($wilderness_level < $combat_level_diff) return(2);
+return(0);
+
+[proc,pvp_level_check_quiet]()(boolean)
+if (~pvp_level_check_reason = 0) return(true);
+return(false);
+
+[proc,pvp_level_check]()(boolean)
+switch_int (~pvp_level_check_reason) {
+    case 1 :
+        mes("You can't attack players who aren't in the Wilderness.");
+        return(false);
+    case 2 :
+        mes("Your level difference is too great!");
+        mes("You need to move deeper into the wilderness."); // wilderness is title'd in late 2005/2006 ish
+        return(false);
 }
 // 2007: https://youtu.be/3apk-gE1zh8?t=544
 // "You can't fight someone who's right next to the Wilderness Ditch. Wait until he's further in."
@@ -71,6 +80,14 @@ if (~player_autocast_enabled = false & ~inzone_coord_pair_table(mage_arena, coor
     mes("Kolodion allows only magical combat within the arena."); // osrs
     return(false);
 }
+
+// Area scans call this only after map_multiway admits the secondary target tile.
+// Duel Arena regions have no multiway rows, so their published checks cannot run here.
+[proc,pvp_is_attackable_opt_quiet]()(boolean)
+if (~pvp_level_check_quiet = false) return(false);
+// The admitted candidate takes pvp_in_combat_check's early multiway return.
+if (~pvp_in_combat_check = false) return(false);
+return(true);
 
 // For magic
 [proc,pvp_is_attackable_opt]()(boolean)
@@ -122,6 +139,7 @@ if (map_multiway(.coord) = false) {
     }
 }
 return(true);
+
 
 [proc,pvp_hit_roll](int $damagetype)(boolean)
 def_int $attack_roll = ~player_attack_roll_specific($damagetype);

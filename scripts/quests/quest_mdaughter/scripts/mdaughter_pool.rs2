@@ -1,0 +1,96 @@
+// CANDIDATE wording: OSRS Transcript:Mountain Daughter, The Shining Pool.
+// VERIFIED story/task order: Tip.It guide, 27 April 2006.
+[oploc1,mdaughter_sulphar_gas] ~mdaughter_pool_listen;
+[oploc3,mdaughter_poolwater] ~mdaughter_pool_listen;
+
+[proc,mdaughter_at_center]()(boolean)
+// UNKNOWN: engineering region enclosing only the packed center island's dry tiles.
+// Water inside this rectangle is collision-blocked; the bound grants no crossing.
+if (coordy(coord) = 0 & coordx(coord) >= 2779 & coordx(coord) <= 2786 & coordz(coord) >= 3690 & coordz(coord) <= 3696) return(true);
+return(false);
+
+[proc,mdaughter_pool_listen]
+if (%mdaughter_quest_var >= ^mdaughter_complete) return;
+if (~mdaughter_at_center = false | %mdaughter_quest_var = 0) {
+    ~mesbox("You think you can hear soft singing! The sound seems to be coming from the center of the pool.");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_buried) {
+    ~chatplayer("<p,quiz>Uhm... Asleif? Hello?");
+    ~chatplayer("<p,quiz>Hello? Are you there?");
+    ~chatplayer("<p,neutral>Burying her must have really helped! I should get on with building the cairn on top.");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_burial) {
+    ~chatplayer("<p,neutral>I convinced your father about your death. He asked me to give you a proper burial, here on this island.");
+    ~mesbox("'Then my father made a wise decision. Please proceed.'");
+    ~chatplayer("<p,neutral>Well, it's kind of awkward... can you maybe be silent while I bury you?");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_kendal_dead) {
+    ~chatplayer("<p,neutral>I found him! I found your murderer! It was some bear-like man who called himself the Kendal.");
+    ~mesbox("'The Kendal is an ancient spirit of our people, but he is benevolent. Are you sure of this?'");
+    ~chatplayer("<p,neutral>Well, it was actually a guy in a bearsuit. But he's dead now.");
+    ~mesbox("'Go then, to my father, and show him what you've learned.'");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_remains) {
+    ~chatplayer("<p,quiz>What was the task you wanted me to do again?");
+    ~mesbox("'You must convince the tribe that I am dead and that they need to move on. Convince my father, and the rest will follow.'");
+    return;
+}
+if (%mdaughter_quest_var >= ^mdaughter_tasks) {
+    if (%mdaughter_hamal_relations_done = 0 | %mdaughter_food_var < 3) {
+        ~chatplayer("<p,quiz>I forgot what you wanted me to do.");
+        ~mesbox("'I ask you, <displayname>, to help bring these two people closer together again.'");
+        ~mesbox("'My father has not moved camp for far too long. There is very little food now for my people. You must find a new supply of food for them, for I fear the worst.'");
+        return;
+    }
+    ~chatplayer("<p,neutral>Hey, ehm... Asleif spirit thing? Hello?");
+    ~mesbox("'Yes, <displayname>?'");
+    ~chatplayer("<p,happy>I did what you asked me to! I improved the relations between Rellekka and the mountain camp, and I found a new supply of food!");
+    ~mesbox("'Yes, <displayname>, I can sense that this is so.'");
+    ~chatplayer("<p,quiz>So do you have any other quests for me, perhaps with some bigger rewards?");
+    ~mesbox("'I do not fully understand what you speak of, but I do have one more task I would like you to do.'");
+    ~mesbox("'My father does not believe that I am dead. In his heart, he knows it to be true, but he cannot accept it.'");
+    ~mesbox("'You must convince him, <displayname>. Once you have convinced my father, everyone else in the camp will follow him. Then, perhaps, they can move on again.'");
+    ~chatplayer("<p,quiz>How do I do that, exactly? I don't think I'll be able to get him down to this little island.");
+    ~mesbox("'I must leave that to you. All I know is that I was attacked by some creature or animal while I was sitting by the lake. It dragged me off and I remember nothing else.'");
+    ~mesbox("'Perhaps this will help you, I cannot provide further assistance.'");
+    %mdaughter_quest_var = ^mdaughter_remains;
+    return;
+}
+~mesbox("You can clearly hear the voice coming from the water now.");
+~mesbox("'<displayname>... <displayname>!'");
+~chatplayer("<p,neutral>Er... yes, hello?");
+~mesbox("'Listen to me, <displayname>, listen to what I will say.'");
+if (~p_choice2("I think I'm going mad.", 1, "Hello! Who are you?", 2) = 1) {
+    ~chatplayer("<p,neutral>I think I'm going mad, I'm starting to hear things.");
+    return;
+}
+~chatplayer("<p,quiz>Hello! Who are you? And where for that matter?");
+~mesbox("'I am all around you. I am the soft singing in the wind. I am the faint rippling of the water. I am the stone of the rocks around you.'");
+~chatplayer("<p,neutral>Well, I suppose that answered both questions then.");
+~mesbox("'I am the voice of Asleif, daughter of Hamal, son of Wulfgard.'");
+~chatplayer("<p,quiz>Wait, you're Asleif? I think I was looking for you! Where are you hiding?");
+~mesbox("'Asleif is no longer in your world, she dwells in the halls of her ancestors now.'");
+~chatplayer("<p,quiz>But I thought you said you were Asleif?");
+~mesbox("'I am but the voice of her, an echo of the past, reflected on the water. A tiny part of her spirit.'");
+if (~p_choice2("I think I'd better have a lie down.", 1, "So what exactly do you want from me?", 2) = 1) return;
+~chatplayer("<p,quiz>So what exactly do you want from me?");
+~mesbox("'I am greatly concerned for the people who were once my tribesmen. You must help me, <displayname>, for their current course will lead to their doom.'");
+~chatplayer("<p,neutral>Er, I don't think they like the idea of me helping them.");
+~mesbox("'Listen to me, and judge then if you think yourself capable or not.'");
+~mesbox("'My people have, as is their way, isolated themselves from the rest of the world. There is no one for them to turn to in times of need.'");
+~mesbox("'Our tribesmen are the children of the Fremennik of Rellekka. The parting was a bitter affair and the two groups never forgave each other.'");
+~mesbox("'I ask you, <displayname>, to help bring these two people closer together again.'");
+if (~p_choice2("That sounds like something I can do.", 1, "I'm not really a diplomat.", 2) = 2) return;
+~chatplayer("<p,neutral>All right, that sounds like something I can do.");
+~mesbox("'There is another thing, <displayname>, that I ask of you.'");
+~chatplayer("<p,quiz>Yes?");
+~mesbox("'My father has not moved camp for far too long. There is very little food now for my people. You must find a new supply of food for them, for I fear the worst.'");
+if (~p_choice2("I'll get right on it.", 1, "I'm not really a farmer.", 2) = 2) return;
+~chatplayer("<p,neutral>I'll get right on it.");
+~chatplayer("<p,neutral>So let's see, peace with Rellekka, and a new supply of food.");
+~mesbox("'Thank you, <displayname>, and may the gods bless you on your journey.'");
+%mdaughter_quest_var = ^mdaughter_tasks;

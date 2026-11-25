@@ -1,0 +1,202 @@
+// CANDIDATE: ordinary shopkeeper dialogue follows the OSRS Wiki transcripts.
+// Transcript histories begin in 2020-2023 and do not prove revision-377 wording.
+// Keldagrim task exchanges and named quest or non-NPC interactions are excluded.
+
+[opnpc1,smithing_guild_buyer]
+~chatnpc("<p,neutral>Do you want to trade?");
+def_int $choice = ~p_choice2("What are you selling?", 1, "No thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>What are you selling?");
+    ~chatnpc("<p,neutral>The finest smiths from all over Gielinor come here to work, and I buy the fruit of their craft. Armour made from the higher metals!");
+    def_int $nested_choice = ~p_choice2("Let's have a look then.", 1, "No thanks.", 2);
+    if ($nested_choice = 1) {
+        ~chatplayer("<p,neutral>Let's have a look then.");
+        ~openshop_activenpc;
+        return;
+    }
+}
+~chatplayer("<p,neutral>No thanks.");
+~chatnpc("<p,neutral>You just don't appreciate the beauty of fine metalwork.");
+
+[opnpc3,smithing_guild_buyer]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_warhammer]
+~chatnpc("<p,neutral>What do you want, human?");
+~chatplayer("<p,neutral>Ehm, anything on offer?");
+~chatnpc("<p,neutral>Can you wield a warhammer? If not, then go away.");
+def_int $choice = ~p_choice2("Of course I can.", 1, "I can, but I won't.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Of course I can.");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>I can, but I won't.");
+~chatnpc("<p,neutral>Yeah, right.");
+
+[opnpc3,dwarf_city_shop_warhammer]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_weapons]
+~chatnpc("<p,neutral>Welcome, human, to the Quality Weapons Shop! Can I interest you in a purchase?");
+def_int $choice = ~p_choice2("Yes, I'm looking for some weapons.", 1, "No thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Yes, I'm looking for some weapons.");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>No thanks.");
+
+[opnpc3,dwarf_city_shop_weapons]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_armour]
+~chatnpc("<p,neutral>Welcome to my store, human! Are you interested in buying anything?");
+def_int $choice = ~p_choice2("Yes, I'm looking for some armour.", 1, "No thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Yes, I'm looking for some armour.");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>No thanks.");
+
+[opnpc3,dwarf_city_shop_armour]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_general_store]
+~chatnpc("<p,neutral>What can I interest you in? We have something of everything here!");
+def_int $choice = ~p_choice2("Oh good!", 1, "Nothing, thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Oh good!");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>Nothing, thanks.");
+
+[opnpc3,dwarf_city_shop_general_store]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_bakery]
+~chatnpc("<p,neutral>Welcome to my stall! Come and buy some tasty bread, freshly baked just 2 months ago!");
+def_int $choice = ~p_choice2("Sounds delicious!", 1, "I think I'll pass.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Sounds delicious!");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>I think I'll pass.");
+
+[opnpc3,dwarf_city_shop_bakery]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_gems]
+~chatnpc("<p,neutral>Greetings, human... can I interest you in some fine gems?");
+def_int $choice = ~p_choice2("Show me the wares!", 1, "No thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Show me the wares!");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>No thanks.");
+
+[opnpc3,dwarf_city_shop_gems]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_craft]
+~chatnpc("<p,neutral>I have a wide variety of crafting tools on offer, care to take a look?");
+def_int $choice = ~p_choice2("Yes please!", 1, "No thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Yes please!");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>No thanks.");
+
+[opnpc3,dwarf_city_shop_craft]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_silver]
+~chatnpc("<p,neutral>Finest silver in all of Keldagrim, come and see!");
+def_int $choice = ~p_choice2("Right, what do you have?", 1, "Not interested, thanks.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Right, what do you have?");
+    ~chatnpc("<p,neutral>Silver, what else!");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>No thanks.");
+
+[opnpc3,dwarf_city_shop_silver]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_pickaxe]
+~chatnpc("<p,neutral>What'you want?");
+def_int $choice = ~p_choice3("Do you have any pickaxes?", 1, "Do you have any quests?", 2, "Nothing really.", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Do you-");
+    ~chatnpc("<p,neutral>What? Speak up, I can't hear you!");
+    ~chatplayer("<p,neutral>Uhm... I'm just looking for some pickaxes! Do you have any?");
+    ~chatnpc("<p,neutral>Do I have any pickaxes? Do I? Of course I do, this is a pickaxe shop, isn't it!");
+    ~openshop_activenpc;
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>Do you-");
+    ~chatnpc("<p,neutral>What? Stop mumbling!");
+    ~chatplayer("<p,neutral>I want a quest!");
+    ~chatnpc("<p,neutral>I don't have any lousy quests... I've got someone who's helping me already!");
+    ~chatnpc("<p,neutral>Well, I say helping... he takes his merry time to do his chores, my son does.");
+    ~chatplayer("<p,neutral>Then perhaps I can help in some way?");
+    ~chatnpc("<p,neutral>Pfft, I doubt it... maybe when my son fouls up again, but not now.");
+    return;
+}
+~chatplayer("<p,neutral>Nothing really.");
+~chatnpc("<p,neutral>Then clear off!");
+
+[opnpc3,dwarf_city_shop_pickaxe]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_cloth]
+~chatnpc("<p,neutral>Oh no, not another human... what do you want then?");
+~chatplayer("<p,neutral>Oh, do you get humans here often?");
+~chatnpc("<p,neutral>Not that often, no, but sometimes.");
+~chatnpc("<p,neutral>Of course, since you people are too big for dwarven clothes, they typically don't stay very long.");
+~chatplayer("<p,neutral>Why don't you make bigger clothes then?");
+~chatnpc("<p,neutral>What'd be the point? Besides, I don't make these clothes myself.");
+def_int $choice = ~p_choice3("Who makes these clothes then?", 1, "I still want to buy your clothes.", 2, "So do you have any quests for me?", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Who makes these clothes then?");
+    ~chatnpc("<p,neutral>Oh, my sister, she lives in Keldagrim-East. Has a little stall on the other side of the Kelda.");
+    ~chatnpc("<p,neutral>If she only worked a little harder, like me, she wouldn't have to live in the sewers of the city. Shame really.");
+    ~chatplayer("<p,neutral>The sewers? Your sister lives in the sewers?");
+    ~chatnpc("<p,neutral>Keldagrim-East, such a ghastly place. Not civil, polite and clean like we are in the West.");
+    ~chatplayer("<p,neutral>Uh-huh.");
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>I still want to buy your clothes.");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>So do you have any quests for me?");
+~chatnpc("<p,neutral>Quests? Why would I have any quests?");
+~chatplayer("<p,neutral>Oh, just anything to do would be fine.");
+~chatnpc("<p,neutral>No, not right now... maybe I'll have something for you to do later, but nothing at the moment.");
+
+[opnpc3,dwarf_city_shop_cloth]
+~openshop_activenpc;
+
+[opnpc1,dwarf_city_shop_cloth_poor]
+~chatnpc("<p,neutral>Welcome to my clothes stall, can I help you with anything?");
+def_int $choice = ~p_choice2("Yes, what clothes do you have in stock?", 1, "No, I'm just browsing.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Yes, what clothes do you have in stock?");
+    ~chatnpc("<p,neutral>Not a lot, I'm afraid, most of what I produce goes to my sister. Her shop is in Keldagrim-West.");
+    ~chatplayer("<p,neutral>Well, show me what you do have then.");
+    ~openshop_activenpc;
+    return;
+}
+~chatplayer("<p,neutral>No, I'm just browsing.");
+
+[opnpc3,dwarf_city_shop_cloth_poor]
+~openshop_activenpc;

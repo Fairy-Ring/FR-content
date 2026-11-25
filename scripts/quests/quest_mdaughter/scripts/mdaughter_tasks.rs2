@@ -1,0 +1,156 @@
+// VERIFIED task chain: Tip.It Mountain Daughter, 27 April 2006.
+// CANDIDATE wording: OSRS Transcript:Mountain Daughter and Transcript:Svidi.
+// UNKNOWN: subprogress integers are an engineering ladder, not historical values.
+[opnpc1,mdaughter_svidi]
+if (%mdaughter_relations_var = 0) {
+    ~chatplayer("<p,quiz>Hello. Where are you going?");
+    ~chatnpc("<p,angry>None of your business! Leave me alone!");
+    ~chatplayer("<p,neutral>It just seemed as if you were walking in circles.");
+    ~chatnpc("<p,angry>No I'm not! Now leave me alone!");
+    ~chatplayer("<p,neutral>Okay, okay.");
+    return;
+}
+if (%mdaughter_relations_var >= 5) {
+    ~chatplayer("<p,quiz>Why aren't you in Rellekka yet?");
+    ~chatnpc("<p,neutral>I'll go in there, don't worry. I'm just waiting for the right moment.");
+    ~chatnpc("<p,neutral>You can go back to Hamal to tell him I'm on my way.");
+    return;
+}
+if (%mdaughter_relations_var >= 4) {
+    ~chatplayer("<p,happy>Brundt gave me the guarantee of safe passage to give to you!");
+    ~chatnpc("<p,neutral>Let me see that, I want to be sure it's authentic.");
+    if (inv_total(inv, mdaughter_safety_guarantee) = 0) {
+        ~chatplayer("<p,neutral>Oh, I seem to have lost it somewhere.");
+        ~chatnpc("<p,neutral>That doesn't help me much, does it?");
+        return;
+    }
+    ~chatplayer("<p,neutral>Here you go.");
+    inv_del(inv, mdaughter_safety_guarantee, 1);
+    %mdaughter_relations_var = 5;
+    ~chatnpc("<p,neutral>Hmmm...");
+    ~chatnpc("<p,happy>Okay, this looks valid enough. I'll go and talk to Brundt.");
+    ~chatplayer("<p,happy>Great!");
+    return;
+}
+if (%mdaughter_relations_var >= 2) {
+    ~chatplayer("<p,quiz>Weren't you on your way to Rellekka?");
+    ~chatnpc("<p,quiz>Weren't you on your way to get me a guarantee of safe passage into Rellekka?");
+    ~chatplayer("<p,neutral>Oh yes, I almost forgot.");
+    return;
+}
+~chatplayer("<p,quiz>Are you, by any chance, Svidi? Sent by Hamal to talk to Brundt and the council of Rellekka?");
+~chatnpc("<p,quiz>Maybe... who is asking? You're an outerlander, aren't you?");
+~chatplayer("<p,neutral>Yes, but Hamal asked me to rescue you from a Rellekka prison. What are you doing here?");
+~chatnpc("<p,neutral>I haven't actually been in Rellekka yet...");
+~chatplayer("<p,quiz>Why, can't you find the way?");
+~chatnpc("<p,neutral>Well, I'm not actually sure if I should go in there, you see.");
+~chatplayer("<p,quiz>Why not?");
+~chatnpc("<p,neutral>I've always been told that the people of Rellekka are ignorants, almost as bad as other outerlanders. I think they might kill me if I go there.");
+~chatplayer("<p,neutral>Nonsense. I'm an outerlander and I haven't killed you either!");
+~chatnpc("<p,neutral>Yes, but you're on your own, they have a whole village.");
+~chatnpc("<p,neutral>So I don't want to go in there, but I don't want to go back to the camp and tell Hamal that I didn't dare to go to Rellekka either.");
+def_int $persuade = ~p_choice2("Aren't you supposed to be a ferocious warrior?", 1, "Can't I persuade you to go in there somehow?", 2);
+if ($persuade = 1) {
+    ~chatplayer("<p,quiz>Aren't you supposed to be a ferocious warrior?");
+    ~chatnpc("<p,neutral>Not all of us are warriors.");
+    ~chatnpc("<p,neutral>Some of us are schooled in the fine art of diplomacy.");
+    return;
+}
+~chatplayer("<p,quiz>Can't I persuade you to go in there somehow?");
+~chatnpc("<p,neutral>I won't go in there unless I know it's safe.");
+~chatplayer("<p,quiz>Do you want me to go with you as your bodyguard?");
+~chatnpc("<p,neutral>You? But you're an outerlander! You'd probably lead me to a cave to kill me yourself!");
+~chatplayer("<p,quiz>What if I get you some kind of guarantee of safe passage from the village? Will that do?");
+~chatnpc("<p,neutral>Hmmmm...");
+~chatnpc("<p,neutral>Yes, that will do.");
+%mdaughter_relations_var = 2;
+
+[proc,mdaughter_brundt]
+if (%mdaughter_relations_var >= 5) {
+    ~chatplayer("<p,quiz>Did you meet with the representative from the mountain camp yet?");
+    ~chatnpc("<p,neutral>No, we're still waiting for him, but I'm sure he'll be here in due time.");
+    ~chatnpc("<p,neutral>Perhaps you should go back to their chieftain to tell him about the meeting.");
+    return;
+}
+if (%mdaughter_relations_var >= 4) {
+    ~chatplayer("<p,quiz>Did you meet with the representative from the mountain camp yet?");
+    ~chatnpc("<p,neutral>No, we haven't seen him yet. Did you give him that safe passage guarantee yet?");
+    if (inv_total(inv, mdaughter_safety_guarantee) = 0) {
+        ~chatplayer("<p,neutral>I'm afraid to say that I lost it.");
+        ~chatnpc("<p,neutral>Okay, here's another, try not to lose it this time.");
+        // UNKNOWN: functional inventory-space message, absent from retained transcript.
+        if (inv_freespace(inv) = 0) {
+            mes("You need a free inventory space.");
+            return;
+        }
+        inv_add(inv, mdaughter_safety_guarantee, 1);
+    } else {
+        ~chatplayer("<p,neutral>No, I still need to give him that.");
+    }
+    return;
+}
+if (%mdaughter_relations_var = 3 & inv_total(inv, mdaughter_half_rock) > 0) {
+    ~chatplayer("<p,happy>I've brought you back your rock!");
+    ~chatnpc("<p,happy>Really? Let me see!");
+    ~chatnpc("<p,quiz>This rock seems a lot smaller than our bard made it out to be.");
+    ~chatplayer("<p,neutral>Well, it's not the whole rock, it's part of the rock...");
+    ~chatplayer("<p,neutral>I split it in two.");
+    ~chatnpc("<p,happy>You are unusually insightful for an outerlander!");
+    ~chatnpc("<p,neutral>Yes, we are satisfied with sharing the rock. I'll meet with this representative and will inform the council to join us here in the longhall.");
+    ~chatplayer("<p,quiz>Can I have that guarantee of safe passage, then, to give to the representative?");
+    ~chatnpc("<p,neutral>Oh yes, here it is.");
+    inv_del(inv, mdaughter_half_rock, 1);
+    inv_add(inv, mdaughter_safety_guarantee, 1);
+    %mdaughter_brundt_done = 1;
+    %mdaughter_relations_var = 4;
+    return;
+}
+if (%mdaughter_relations_var = 3) {
+    ~chatplayer("<p,quiz>Why won't you meet with the representative of the mountain camp?");
+    ~chatnpc("<p,neutral>Like I said, we don't want anything to do with them until they give back our ancient rock.");
+    return;
+}
+~chatplayer("<p,neutral>The chieftain from the mountain camp has sent a representative to Rellekka!");
+~chatnpc("<p,neutral>Very unusual, outerlander, but we have not seen him yet.");
+~chatplayer("<p,neutral>Well, that's the problem, he doesn't dare to come into Rellekka. He's afraid he's going to get hurt.");
+~chatnpc("<p,quiz>What? He's not much of a warrior, is he?");
+~chatplayer("<p,neutral>That's what I thought. He says he wants a guarantee of safety.");
+~chatnpc("<p,neutral>I will meet with this man on one condition, outerlander.");
+~chatnpc("<p,neutral>When their group split off from Rellekka, they stole one of the ancient relics of the Fremennik. Our ancient rock.");
+~chatplayer("<p,quiz>Ancient rock? What did it do?");
+~chatnpc("<p,quiz>Do?");
+~chatnpc("<p,neutral>The rock was just that, a rock. It had no special properties and was in essence no different from any other rock.");
+~chatplayer("<p,quiz>So what did it mean?");
+~chatnpc("<p,neutral>It symbolised our refusal to use the runestones for ourselves, instead relying on our own abilities.");
+~chatnpc("<p,neutral>The people you speak of took the stone with them when they left for the mountains. They claimed their way of living was more pure and closer to nature.");
+~chatnpc("<p,neutral>In any case, before the council and I meet with anyone from their camp, they will have to give our rock back.");
+%mdaughter_relations_var = 3;
+
+[opnpc1,mdaughter_jokul]
+if (%mdaughter_food_var = 0) {
+    ~chatplayer("<p,quiz>Do you have any idea where the chieftain's daughter is?");
+    ~chatnpc("<p,neutral>That's what we would all like to know.");
+    return;
+}
+if (%mdaughter_food_var >= 3) {
+    ~chatnpc("<p,happy>I must thank you for your generous gift, outerlander.");
+    ~chatplayer("<p,quiz>Gift?");
+    ~chatnpc("<p,neutral>Yes, the seed of the White Pearl. It grows remarkably well.");
+    ~chatplayer("<p,happy>Ah... well, glad to be of help.");
+    return;
+}
+~chatplayer("<p,quiz>How goes the goat herding?");
+~chatnpc("<p,neutral>It goes, outerlander...");
+~chatnpc("<p,sad>Times are hard here at the moment. We've been here for too long and there is not much food left, or places where I can take my goats.");
+~chatplayer("<p,quiz>Well, I'm trying to find a new supply of food for your people. Any ideas on where to start?");
+~chatnpc("<p,neutral>If only it were so easy!");
+~chatnpc("<p,neutral>That being said...");
+~chatplayer("<p,quiz>Yes..?");
+~chatnpc("<p,neutral>I have heard there is a certain kind of fruit... that will grow even here, in the mountains.");
+~chatplayer("<p,quiz>What's the name of the fruit?");
+~chatnpc("<p,neutral>It is called White Pearl, named after its white appearance.");
+~chatplayer("<p,quiz>Any ideas on where to find some?");
+~chatnpc("<p,neutral>I do not know. I believe it grows mainly in the mountains, and it can grow in even the most difficult circumstances.");
+~chatnpc("<p,neutral>We cannot move on until we find the chieftain's daughter, and we do not generally move far inland. But perhaps you can search for it.");
+~chatplayer("<p,neutral>I'll see what I can find.");
+%mdaughter_food_var = 2;

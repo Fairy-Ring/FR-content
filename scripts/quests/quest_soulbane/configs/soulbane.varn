@@ -1,0 +1,5 @@
+// UNKNOWN server bindings: per-illusion hits and the later-life melee deadline.
+// Server-only NPC state; no player varp, varbit or client-cache field is added.
+[soulbane_hope_melee_until]
+
+[soulbane_confusion_hits]

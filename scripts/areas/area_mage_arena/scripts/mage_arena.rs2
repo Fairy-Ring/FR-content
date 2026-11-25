@@ -21,6 +21,30 @@ mes("You pull the lever...");
 p_delay(0);
 ~player_teleport_normal(0_48_61_18_52);
 
+// UNKNOWN access: either lever works at every stage (favourable default).
+// UNKNOWN presentation: reuse the working cellar levers, including their message.
+[oploc1,magearena_lever_in]
+p_arrivedelay;
+anim(human_leverdown, 0);
+sound_synth(lever, 1, 0);
+loc_change(hauntedleverdown, 7);
+if_close;
+p_delay(1);
+mes("You pull the lever...");
+p_delay(0);
+~player_teleport_normal(^mage_arena_lever_in_coord);
+
+[oploc1,magearena_lever_out]
+p_arrivedelay;
+anim(human_leverdown, 0);
+sound_synth(lever, 1, 0);
+loc_change(hauntedleverdown, 7);
+if_close;
+p_delay(1);
+mes("You pull the lever...");
+p_delay(0);
+~player_teleport_normal(^mage_arena_lever_out_coord);
+
 [oploc1,magearena_waterportal1] @jump_in_sparkling_pool(^sparkling_pool_chamber_coord);
 [oploc1,magearena_waterportal2] @jump_in_sparkling_pool(^sparkling_pool_return_coord);
 
@@ -89,14 +113,11 @@ anim(null, 0);
 
 // need to find screenshots to confirm these
 [oploc1,magearena_scan]
+// VERIFIED src.got-update-20050830 (official news, 30 August 2005): armour and weapons are allowed in the arena; only magical combat is permitted.
 // if north of the loc
 if (coordz(coord) > coordz(loc_coord)) {
     if (%magearena < ^mage_arena_complete) {
         ~mesbox("You cannot enter without the permission of Kolodion."); // rsc, might be mes
-        return;
-    }
-    if (~can_enter_mage_arena = false) {
-        ~mesbox("You cannot enter the arena while carrying weapons or armour."); // rsc, might be mes
         return;
     }
     p_teleport(movecoord(coord, 0, 0, -1));
@@ -106,44 +127,6 @@ if (coordz(coord) > coordz(loc_coord)) {
 mes("You pass through the mystical barrier."); //rsc
 
 
-[proc,can_enter_mage_arena]()(boolean)
-if ((inv_totalcat(inv, armour_hands) > 0 | inv_totalcat(worn, armour_hands) > 0)
-    | (inv_totalcat(inv, armour_helmet) > 0 | inv_totalcat(worn, armour_helmet) > 0) 
-    | (inv_totalcat(inv, armour_body) > 0 | inv_totalcat(worn, armour_body) > 0) 
-    | (inv_totalcat(inv, armour_legs) > 0 | inv_totalcat(worn, armour_legs) > 0) 
-    | (inv_totalcat(inv, armour_shield) > 0 | inv_totalcat(worn, armour_shield) > 0) 
-    | (inv_totalcat(inv, weapon_slash) > 0 | inv_totalcat(worn, weapon_slash) > 0) 
-    | (inv_totalcat(inv, weapon_blunt) > 0 | inv_totalcat(worn, weapon_blunt) > 0) 
-    | (inv_totalcat(inv, weapon_stab) > 0 | inv_totalcat(worn, weapon_stab) > 0) 
-    | (inv_totalcat(inv, weapon_crossbow) > 0 | inv_totalcat(worn, weapon_crossbow) > 0) 
-    | (inv_totalcat(inv, weapon_axe) > 0 | inv_totalcat(worn, weapon_axe) > 0) 
-    | (inv_totalcat(inv, weapon_pickaxe) > 0 | inv_totalcat(worn, weapon_pickaxe) > 0) 
-    | (inv_totalcat(inv, weapon_javelin) > 0 | inv_totalcat(worn, weapon_javelin) > 0) 
-    | (inv_totalcat(inv, weapon_2h_sword) > 0 | inv_totalcat(worn, weapon_2h_sword) > 0) 
-    | (inv_totalcat(inv, weapon_spear) > 0 | inv_totalcat(worn, weapon_spear) > 0) 
-    | (inv_totalcat(inv, weapon_spiked) > 0 | inv_totalcat(worn, weapon_spiked) > 0) 
-    | (inv_totalcat(inv, weapon_thrown) > 0 | inv_totalcat(worn, weapon_thrown) > 0) 
-    | (inv_totalcat(inv, weapon_scythe) > 0 | inv_totalcat(worn, weapon_scythe) > 0) 
-    | (inv_totalcat(inv, weapon_bow) > 0 | inv_totalcat(worn, weapon_bow) > 0)
-    | (inv_totalcat(inv, weapon_claws) > 0 | inv_totalcat(worn, weapon_claws) > 0)
-    | (inv_totalcat(inv, arrows) > 0 | inv_totalcat(worn, arrows) > 0)
-    | (inv_totalcat(inv, unstrung_bow) > 0)
-    | (inv_total(inv, headless_arrow) > 0) // headless arrows
-    | (inv_total(inv, arrow_shaft) > 0) 
-    | (inv_total(inv, bow_string) > 0)
-    | (inv_totalcat(inv, category_22) > 0) // logs
-    | (inv_totalcat(inv, unstrung_bow) > 0)
-    // not sure if they would think of adding some of these checks but really no way to know :(
-    | (inv_totalcat(inv, trail_clue_easy) > 0)
-    | (inv_totalcat(inv, trail_clue_medium) > 0)
-    | (inv_totalcat(inv, trail_clue_hard) > 0)
-    | (inv_totalcat(inv, trail_casket_easy) > 0)
-    | (inv_totalcat(inv, trail_casket_medium) > 0)
-    | (inv_totalcat(inv, trail_casket_hard) > 0)
-    | (inv_totalcat(inv, cannon_parts) > 0)) {
-    return (false);
-}
-return (true);
 
 [proc,mage_arena_in_progress]()(boolean)
 if (%magearena < ^mage_arena_complete & %magearena > ^mage_arena_started) {

@@ -874,29 +874,6 @@ switch_coord (loc_coord) {
     case default : @unhandled_stairs(loc_coord);
 }
 
-[oploc1,feud_outsidestairs_base]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
-
-[oploc1,feud_outsidestairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
-
-[oploc1,feud_insidestairs_base]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
-
-[oploc1,feud_insidestairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
 
 [oploc1,golem_stairs_up]
 // arrive delay?

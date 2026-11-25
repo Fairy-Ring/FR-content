@@ -11,6 +11,7 @@ data=task,turael_cavebugs
 data=task,turael_scorpions
 data=task,turael_zombies
 data=task,turael_bats
+data=task,turael_bears
 data=task,turael_ghosts
 data=task,turael_cavecrawlers
 data=task,turael_icefiends
@@ -53,6 +54,7 @@ data=task,mazchna_crawlinghands
 data=task,mazchna_banshees
 data=task,mazchna_ghouls
 data=task,mazchna_vampires
+data=task,mazchna_mossgiants
 
 [vannaka_task_table]
 table=slayer_task_table
@@ -143,6 +145,7 @@ data=task,chaeldar_banshees
 data=task,chaeldar_cavecrawlers
 data=task,chaeldar_lizards
 data=task,chaeldar_rockslugs
+data=task,chaeldar_crawlinghands
 
 // weightings might need to be adjusted, unfortunately no data... 
 // https://oldschool.runescape.wiki/w/Update:Angler%27s_Outfit_%26_Slayer
@@ -177,3 +180,5 @@ data=task,duradel_trolls
 data=task,duradel_bluedragons
 data=task,duradel_elves
 data=task,duradel_mutatedzygomites
+data=task,duradel_bronzedragons
+data=task,duradel_turoths

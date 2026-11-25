@@ -1,0 +1,19 @@
+// UNKNOWN engineering endpoints, selected on packed dry tiles for the visible pool route.
+^mdaughter_tree_shore = 0_43_57_19_31
+^mdaughter_tree_island = 0_43_57_21_36
+^mdaughter_pole_first_island = 0_43_57_21_38
+^mdaughter_pole_second_island = 0_43_57_21_43
+^mdaughter_stone_west_island = 0_43_57_22_43
+^mdaughter_stone_center_island = 0_43_57_27_43
+// UNKNOWN engineering bridge position: the one-tile gap between the packed flat stones.
+^mdaughter_plank_bridge = 0_43_57_24_43
+// UNKNOWN engineering cave endpoints: adjacent packed dry tiles at each cave mouth.
+^mdaughter_cave_tree = 0_43_57_57_54
+^mdaughter_cave_surface = 0_43_57_56_54
+^mdaughter_cave_inside = 0_43_157_56_56
+// UNKNOWN dynamic-location lifetime; used only for temporary tree/rock states.
+^mdaughter_travel_loc_lifetime = 6000
+// Internal crossing-motion selectors, not historical values.
+^mdaughter_cross_tree = 0
+^mdaughter_cross_pole = 1
+^mdaughter_cross_plank = 2

@@ -1,0 +1,187 @@
+// CANDIDATE: Old School r15359515 says the entire quest is instanced.
+// No introducing update note found; period guides are silent. May postdate 2006.
+// UNKNOWN: exact geometry-copy layout, owner encoding and session UID.
+// Original 377 client maps/locs are copied; the engine copies no template NPCs.
+[proc,soulbane_enter]
+if (%soulbane_prog < 1 | %soulbane_prog > ^soulbane_tolna_clear) return;
+if (%soulbane_prog >= ^soulbane_tolna_intro) {
+    ~soulbane_tolna_enter;
+    return;
+}
+~soulbane_cleanup;
+def_coord $sw = region_create(^soulbane_region_levels, ^soulbane_region_zones, ^soulbane_region_zones);
+// Original four room quarters on level zero.
+def_int $x = 0;
+while ($x < 8) {
+    def_int $z = 0;
+    while ($z < 8) {
+        region_set(0, $x, $z, movecoord(0_47_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+// The bridged southwest quarter retains all original upper-plane bridge flags.
+// Its unbridged variant coexists directly east, at the original 64-tile offset.
+def_int $quarter_x = 0;
+while ($quarter_x < ^soulbane_room_zones) {
+    def_int $quarter_z = 0;
+    while ($quarter_z < ^soulbane_room_zones) {
+        region_set(0, add($quarter_x, 8), $quarter_z, movecoord(^soulbane_hope_source, multiply($quarter_x, 8), 0, multiply($quarter_z, 8)), 0);
+        def_int $level = 1;
+        while ($level < ^soulbane_region_levels) {
+            region_set($level, $quarter_x, $quarter_z, movecoord(0_47_81_0_0, multiply($quarter_x, 8), $level, multiply($quarter_z, 8)), 0);
+            $level = add($level, 1);
+        }
+        $quarter_z = add($quarter_z, 1);
+    }
+    $quarter_x = add($quarter_x, 1);
+}
+// Native input proofs hold both memories at their script-placed standing tiles.
+def_int $scene_x = 0;
+while ($scene_x < ^soulbane_memory_zones_east) {
+    def_int $scene_z = 0;
+    while ($scene_z < ^soulbane_memory_zones_north) {
+        region_set(0, $scene_x, add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
+        region_set(0, add($scene_x, ^soulbane_memory_zone_east), add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_fear_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
+        $scene_z = add($scene_z, 1);
+    }
+    $scene_x = add($scene_x, 1);
+}
+region_setexitcoord(^soulbane_surface);
+%soulbane_instance = add(region_uid, 1);
+if (%soulbane_prog >= ^soulbane_hope_active) {
+    ~soulbane_hope_enter;
+    return;
+}
+if (%soulbane_prog >= ^soulbane_confusion_active) {
+    ~soulbane_confusion_enter;
+    return;
+}
+if (%soulbane_prog >= 4) {
+    ~soulbane_fear_enter;
+    return;
+}
+p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
+// CANDIDATE: Old School Wrath and Ruin r3860917 maps this track to the Anger room.
+~music_playbyrow(music_Wrath_and_Ruin);
+if (%soulbane_prog = 1) {
+    %soulbane_prog = 2;
+    ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+}
+if (%soulbane_prog = 2) {
+    ~soulbane_rage_spawn;
+    ~soulbane_rage_meter;
+    // UNKNOWN presentation: unnamed voices use nonmodal game messages so
+    // aggressive NPCs cannot cancel an unfinished entry script.
+    mes("Why should I, Tolna, be trapped in such a wretched place?");
+    mes("Arrghh, It's not fair! Feel my ANGER!");
+}
+
+// Only the selected original memory patches are copied, at isolated offsets.
+[proc,soulbane_room_coord](coord $template)(coord)
+if (coordx($template) >= coordx(^soulbane_scene_source)) {
+    if (coordz($template) >= coordz(^soulbane_fear_scene_source)) {
+        return(region_getcoord(0, add(^soulbane_memory_tile_east, sub(coordx($template), coordx(^soulbane_fear_scene_source))), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_fear_scene_source)))));
+    }
+    return(region_getcoord(0, sub(coordx($template), coordx(^soulbane_scene_source)), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_scene_source)))));
+}
+return(region_getcoord(coordy($template), sub(coordx($template), 3008), sub(coordz($template), 5184)));
+
+[proc,soulbane_owned]()(boolean)
+if (%soulbane_instance = 0) return(false);
+if (region_findbycoord(coord) = false) return(false);
+if (add(region_uid, 1) = %soulbane_instance) return(true);
+return(false);
+
+[proc,soulbane_npc_owned]()(boolean)
+if (%npc_attacking_uid ! uid | %npc_int ! %soulbane_instance) return(false);
+return(~soulbane_owned);
+
+[oploc1,soul_bane_awall_void_small] @soulbane_exit;
+[oploc1,soul_bane_fwall_void_small] @soulbane_exit;
+[oploc1,soul_bane_cwall_void_small] @soulbane_exit;
+[oploc1,soul_bane_hwall_void_small] @soulbane_hope_exit;
+[label,soulbane_exit]
+if (~soulbane_owned = false) return;
+if (%soulbane_prog = 2 | %soulbane_prog = 4 | %soulbane_prog = ^soulbane_confusion_active | %soulbane_prog = ^soulbane_hope_active | %soulbane_prog = ^soulbane_tolna_active) {
+    if (~p_choice2_header("Yes, I don't mind starting this room again.", 1, "No, I'll finish this room first.", 2, "Do you wish to leave?") ! 1) return;
+}
+~soulbane_leave;
+
+[proc,soulbane_leave]
+~soulbane_cleanup;
+p_teleport(^soulbane_surface);
+
+// UNKNOWN: teleport exit policy; neither retained guide nor instance banner blocks it.
+// Keep same-copy teleports (including combat fixtures), but release every departure.
+[proc,soulbane_teleport_release](coord $destination)
+if (~soulbane_owned = false) return;
+if (region_findbycoord($destination) = true) {
+    if (add(region_uid, 1) = %soulbane_instance) return;
+}
+~soulbane_cleanup;
+
+// Ordinary death calls this AFTER its ordinary item/death/respawn handling.
+// The engine deletes the empty instance and all its NPCs/objects on departure.
+[proc,soulbane_cleanup]
+clearqueue(soulbane_rage_complete);
+clearqueue(soulbane_rage_credit);
+clearqueue(soulbane_fear_credit);
+clearqueue(soulbane_fear_complete);
+clearqueue(soulbane_confusion_credit);
+clearqueue(soulbane_confusion_complete);
+clearqueue(soulbane_hope_credit);
+clearqueue(soulbane_hope_complete);
+clearqueue(soulbane_tolna_intro);
+clearqueue(soulbane_tolna_credit);
+clearqueue(soulbane_tolna_poison);
+~soulbane_tolna_clear_npcs;
+walktrigger(null);
+~soulbane_clear_weapons;
+%soulbane_anger_damagedealt = 0;
+%soulbane_anger_donespecial = 0;
+%soulbane_anger_weaponmulti = 0;
+~soulbane_fear_reset;
+~soulbane_confusion_reset;
+~soulbane_hope_reset;
+~soulbane_tolna_reset;
+%soulbane_instance = 0;
+if_openoverlay(null);
+cam_reset;
+
+// Unexpected disconnects use the instance's saved surface exit. Temporary
+// state is not saved; remove a saved anger weapon without closing login modals.
+[proc,soulbane_login]
+~soulbane_clear_weapons;
+%soulbane_anger_weaponmulti = 0;
+~soulbane_fear_reset;
+~soulbane_confusion_reset;
+~soulbane_hope_reset;
+~soulbane_tolna_reset;
+
+[proc,soulbane_clear_weapons]
+def_obj $old = inv_getobj(worn, ^wearpos_rhand);
+def_int $quantity = inv_total(inv, soulbane_anger_swordq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_swordq, $quantity);
+$quantity = inv_total(inv, soulbane_anger_spearq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_spearq, $quantity);
+$quantity = inv_total(inv, soulbane_anger_maceq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_maceq, $quantity);
+$quantity = inv_total(inv, soulbane_anger_axeq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_axeq, $quantity);
+if (~soulbane_anger_weapon($old) = true) {
+    inv_del(worn, $old, 1);
+    ~update_all($old);
+}
+// Remove weapons banked through the earlier escape defect. A never-started
+// account cannot obtain one, and must not allocate a bank for this cleanup.
+if (%soulbane_prog > 0) {
+    inv_del(bank, soulbane_anger_swordq, ^max_32bit_int);
+    inv_del(bank, soulbane_anger_spearq, ^max_32bit_int);
+    inv_del(bank, soulbane_anger_maceq, ^max_32bit_int);
+    inv_del(bank, soulbane_anger_axeq, ^max_32bit_int);
+}
+
+[proc,soulbane_anger_weapon](obj $weapon)(boolean)
+if ($weapon = soulbane_anger_swordq | $weapon = soulbane_anger_spearq | $weapon = soulbane_anger_maceq | $weapon = soulbane_anger_axeq) return(true);
+return(false);

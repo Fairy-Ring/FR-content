@@ -1,0 +1,24 @@
+// UNKNOWN engineering arrivals: adjacent to original 377 ladder placements.
+// The four-floor route and outside fall region are period-guide VERIFIED.
+^dt_pyramid_floor1 = 3_45_77_33_24
+^dt_pyramid_floor2 = 2_44_77_29_35
+^dt_pyramid_floor3 = 1_43_77_30_44
+^dt_pyramid_floor4 = 0_50_145_32_12
+^dt_pyramid_up1 = 1_43_77_32_12
+^dt_pyramid_up2 = 2_44_77_29_45
+^dt_pyramid_up3 = 3_45_77_29_35
+^dt_pyramid_surface = 0_50_45_33_20
+^dt_pyramid_fall_exit = 0_50_45_33_7
+// UNKNOWN engineering timing/odds, not recovered historical values.
+^dt_pyramid_climb_delay = 2
+^dt_pyramid_hazard_interval = 20
+// UNKNOWN engineering default DT-PYRAMID-PITFALL-01: one pitfall outcome per 64 checks.
+^dt_pyramid_hazard_rolls = 64
+^dt_pyramid_trap_roll = 0
+^dt_pyramid_scarab_roll = 1
+// Four outcomes in 64 retain the existing 1-in-16 scarab chance.
+^dt_pyramid_scarab_roll_last = 4
+^dt_pyramid_scarab_lifetime = 50
+^dt_pyramid_scarab_stun = 2
+// VERIFIED period reward, in the engine's tenths-of-XP units.
+^dt_pyramid_magic_reward = 200000

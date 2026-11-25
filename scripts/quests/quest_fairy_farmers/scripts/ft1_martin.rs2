@@ -1,8 +1,7 @@
 // A Fairy Tale Part I start-gate — Martin the Master Gardener (3299) @ 3078,3258.
 // CANDIDATE last-resort 2007-base: OSRS Transcript:Fairytale I minus Skillcape /
 // overlay / toast / FT2 / RS3 Overview. Hunt 289? no.
-// Accept: %fairy_farmers_quest 0→1 only. NEVER 10 (opens Zanaris wall + guard).
-// Keep [opnpc3] pickpocket. Do not open leftover fairy_queen_symptoms.
+// Engineering stages live in quest_fairy_farmers.constant. Keep Pickpocket intact.
 
 [opnpc1,martin_the_master_farmer]
 if (%fairy_farmers_quest = 1) {
@@ -94,6 +93,7 @@ if ($go = 2) {
 ~chatplayer("<p,quiz>Do you have any ideas where I should start?");
 ~chatnpc("<p,neutral>If I were you I would start by speaking to some of the other gardeners.");
 %fairy_farmers_quest = 1;
+~send_quest_progress(questlist:fairy_farmers, %fairy_farmers_quest, ^fairy_farmers_complete);
 return;
 
 [label,ft1_martin_started]
@@ -136,4 +136,10 @@ return;
 ~chatplayer("<p,quiz>O-kay! You're the boss, any idea which flower I should look under to find a fairy?");
 ~chatnpc("<p,neutral>No, sorry, but I did hear that there were some adventurers with a similar problem in the swamps near Lumbridge. Just don't mention my name if you talk to them, they're trying to keep it a secret, but everybody actually knows what they're up to.");
 ~chatplayer("<p,neutral>Yes, I've spoken to them before.");
+if (%fairy_farmers_quest = 6) {
+    // UNKNOWN engineering hand-off: the period guide has the Godfather present next.
+    %fairy_farmers_quest = ^ft1_martin_reported;
+    %fairy_queen_check = 1;
+    %fairy_godfather_check = 1;
+}
 return;

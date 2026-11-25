@@ -1,0 +1,43 @@
+// CANDIDATE: pre-rework Farming revision 5658331 (26 January 2018).
+// Zero-offset global :00/:10/:20/:30/:40/:50 windows. The period Tip.It guide
+// supports shared ticks but describes five-minute allotment ticks instead.
+// UNKNOWN: operator decision, 19 November 2026, on Mod Ash's later
+// next-slowest-tier statement. The retained ladder is 5,10,20,40,80,160,320.
+// These diseased periods are not authenticated revision-377 values.
+[farming_growth_potato]
+table=farming_growth
+data=period,10
+data=handler,1
+data=disease_period,20
+
+// CANDIDATE: operator-adopted Old School herb family period; legacy windows.
+// UNKNOWN disease_period: operator decision, 19 November 2026 (see potato).
+[farming_growth_herb]
+table=farming_growth
+data=period,20
+data=handler,2
+data=disease_period,40
+
+// CANDIDATE pre-rework Old School family interval. Period Tip.It estimates
+// 17.5 minutes total; four full five-minute windows are not that estimate.
+// UNKNOWN disease_period: operator decision, 19 November 2026 (see potato).
+[farming_growth_flower]
+table=farming_growth
+data=period,5
+data=handler,3
+data=disease_period,10
+
+// CANDIDATE pre-rework Old School hops family: ten-minute windows.
+// Period Tip.It totals are 35/45/55/65/75 minutes, inside the phase ranges.
+// UNKNOWN disease_period: operator decision, 19 November 2026 (see potato).
+[farming_growth_hops]
+table=farming_growth
+data=period,10
+data=handler,4
+data=disease_period,20
+
+// UNKNOWN nine-step countdown on the unchanged shared five-minute clock.
+[farming_growth_compost]
+table=farming_growth
+data=period,5
+data=handler,5

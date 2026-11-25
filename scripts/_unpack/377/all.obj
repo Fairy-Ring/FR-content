@@ -10395,35 +10395,6 @@ param=sa_energy,350
 certlink=magic_longbow
 certtemplate=template_for_cert
 
-[magic_shortbow]
-name=Magic shortbow
-desc=Short and magical, but still effective.
-recol1s=7330
-recol1d=1451
-members=yes
-cost=1600
-model=obj_shortbow
-2dxof=7
-2dyof=2
-2dzoom=1200
-2dyan=124
-2dxan=508
-iop2=Wield
-wearpos=righthand
-wearpos2=lefthand
-manwear=obj_shortbow_manwear,0
-womanwear=obj_shortbow_manwear,6
-category=weapon_bow
-weight=3lb
-param=rangeattack,69
-param=levelrequire,50
-param=attackrange,7
-param=rangeattack_anim,human_bow
-param=defend_anim,human_unarmedblock
-param=rangeattack_sound,arrowlaunch2
-param=damagetype,^ranged_style
-param=specwep,^true
-param=sa_energy,350
 
 [cert_magic_shortbow]
 certlink=magic_shortbow
@@ -37445,346 +37416,34 @@ weight=1kg
 certlink=tbwt_cleaning_cloth
 certtemplate=template_for_cert
 
-[bronze_halberd]
-name=Bronze halberd
-desc=A bronze halberd.
-recol1s=15855
-recol1d=8354
-members=yes
-cost=80
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
-param=stabattack,7
-param=slashattack,8
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,1
-param=crushdefence,2
-param=strengthbonus,8
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_bronze_halberd]
 certlink=bronze_halberd
 certtemplate=template_for_cert
 
-[iron_halberd]
-name=Iron halberd
-desc=An iron halberd.
-recol1s=15855
-recol1d=8456
-members=yes
-cost=280
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
-param=stabattack,9
-param=slashattack,12
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,1
-param=crushdefence,2
-param=strengthbonus,12
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_iron_halberd]
 certlink=iron_halberd
 certtemplate=template_for_cert
 
-[steel_halberd]
-name=Steel halberd
-desc=A steel halberd.
-members=yes
-cost=1000
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
-param=stabattack,14
-param=slashattack,19
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,1
-param=crushdefence,2
-param=strengthbonus,20
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_steel_halberd]
 certlink=steel_halberd
 certtemplate=template_for_cert
 
-[black_halberd]
-name=Black halberd
-desc=A black halberd.
-recol1s=15855
-recol1d=0
-members=yes
-cost=1920
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
-param=stabattack,19
-param=slashattack,25
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,2
-param=crushdefence,3
-param=strengthbonus,20
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_black_halberd]
 certlink=black_halberd
 certtemplate=template_for_cert
 
-[mithril_halberd]
-name=Mithril halberd
-desc=A mithril halberd.
-recol1s=15855
-recol1d=6346
-members=yes
-cost=2600
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=6lb
-category=weapon_polearm
-param=stabattack,22
-param=slashattack,28
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,2
-param=crushdefence,4
-param=strengthbonus,29
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_mithril_halberd]
 certlink=mithril_halberd
 certtemplate=template_for_cert
 
-[adamant_halberd]
-name=Adamant halberd
-desc=An adamant halberd.
-recol1s=15855
-recol1d=6438
-members=yes
-cost=6400
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=8lb
-category=weapon_polearm
-param=stabattack,28
-param=slashattack,41
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,3
-param=crushdefence,4
-param=strengthbonus,42
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_adamant_halberd]
 certlink=adamant_halberd
 certtemplate=template_for_cert
 
-[rune_halberd]
-name=Rune halberd
-desc=A rune halberd.
-recol1s=15855
-recol1d=6476
-members=yes
-cost=64000
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
-param=stabattack,48
-param=slashattack,67
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,4
-param=crushdefence,5
-param=strengthbonus,68
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
 [cert_rune_halberd]
 certlink=rune_halberd
 certtemplate=template_for_cert
 
-[dragon_halberd]
-name=Dragon halberd
-desc=A dragon halberd.
-members=yes
-cost=250000
-model=obj_dragon_halberd
-2dxof=-1
-2dyof=2
-2dzoom=2160
-2dyan=12
-2dxan=584
-iop2=Wield
-manwear=obj_dragon_halberd_manwear,0
-womanwear=obj_dragon_halberd_manwear,6
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
-param=stabattack,70
-param=slashattack,95
-param=magicattack,-4
-param=stabdefence,-1
-param=slashdefence,4
-param=crushdefence,5
-param=strengthbonus,89
-param=attackrate,7
-param=attackrange,2
-param=ready_baseanim,human_staffready
-param=walk_f_baseanim,human_halberdwalk_f
-param=walk_b_baseanim,human_halberdwalk_b
-param=walk_l_baseanim,human_halberdwalk_l
-param=walk_r_baseanim,human_halberdwalk_r
-param=running_baseanim,human_halberdrunning
-param=turnonspot_baseanim,human_halberdturnonspot
-param=stabattack_anim,human_spear_spike
-param=slashattack_anim,human_scythe_sweep
-param=defend_anim,human_spear_block
-param=stab_sound,staff_stab
-param=slash_sound,scythe_slash
-param=specwep,^true
-param=sa_energy,300
 [cert_dragon_halberd]
 certlink=dragon_halberd
 certtemplate=template_for_cert
@@ -49127,387 +48786,76 @@ param=rangedefence,65
 certlink=dragon_platelegs
 certtemplate=template_for_cert
 
-[mystic_hat]
-name=Mystic hat
-desc=A magical hat.
-cost=15000
-model=obj_mystic_hat
-iop2=Wear
-manwear=obj_mystic_hat_manwear,0
-womanwear=obj_mystic_hat_womanwear,0
-manhead=obj_mystic_hat_manhead
-womanhead=obj_mystic_hat_womanhead
-members=yes
-2dyof=-18
-2dzoom=980
-2dyan=220
-2dxan=208
-wearpos=hat
-param=magicattack,15
-param=magicdefence,15
-weight=1lb
 
 [cert_mystic_hat]
 certlink=mystic_hat
 certtemplate=template_for_cert
 
-[mystic_robe_top]
-name=Mystic robe top
-desc=The upper half of a magical robe.
-cost=120000
-model=obj_mystic_robe_top
-iop2=Wear
-manwear=obj_mystic_robe_top_manwear,0
-womanwear=obj_mystic_robe_top_womanwear,0
-manwear2=obj_mystic_robe_top_manwear2
-womanwear2=obj_mystic_robe_top_womanwear2
-members=yes
-2dzoom=1870
-2dyan=176
-2dxan=376
-wearpos=torso
-param=magicattack,20
-param=magicdefence,20
-wearpos2=arms
-weight=6lb
 
 [cert_mystic_robe_top]
 certlink=mystic_robe_top
 certtemplate=template_for_cert
 
-[mystic_robe_bottom]
-name=Mystic robe bottom
-desc=The lower half of a magical robe.
-cost=80000
-model=obj_mystic_robe_bottom
-iop2=Wear
-manwear=obj_mystic_robe_bottom_manwear,0
-womanwear=obj_mystic_robe_bottom_womanwear,0
-members=yes
-2dxof=5
-2dyof=7
-2dzoom=1690
-2dyan=2024
-2dxan=408
-wearpos=legs
-param=magicattack,15
-param=magicdefence,15
-weight=4lb
 
 [cert_mystic_robe_bottom]
 certlink=mystic_robe_bottom
 certtemplate=template_for_cert
 
-[mystic_gloves]
-name=Mystic gloves
-desc=Magical gloves.
-cost=10000
-model=obj_mystic_gloves
-iop2=Wear
-manwear=obj_mystic_gloves_manwear,0
-womanwear=obj_mystic_gloves_womanwear,0
-members=yes
-2dyof=3
-2dzoom=830
-2dxan=536
-wearpos=hands
-param=magicattack,10
-param=magicdefence,10
-weight=1lb
 
 [cert_mystic_gloves]
 certlink=mystic_gloves
 certtemplate=template_for_cert
 
-[mystic_boots]
-name=Mystic boots
-desc=Magical boots.
-cost=10000
-model=obj_mystic_boots
-iop2=Wear
-manwear=obj_mystic_boots_manwear,0
-womanwear=obj_mystic_boots_womanwear,0
-members=yes
-2dyof=-4
-2dzoom=770
-2dyan=1988
-2dxan=188
-wearpos=feet
-param=magicattack,5
-param=magicdefence,5
-weight=1lb
 
 [cert_mystic_boots]
 certlink=mystic_boots
 certtemplate=template_for_cert
 
-[mystic_hat_dark]
-name=Mystic hat
-desc=A dark magical hat.
-recol1s=21243
-recol1d=14336
-recol2s=11839
-recol2d=6276
-recol3s=8599
-recol3d=0
-recol4s=23359
-recol4d=14336
-recol5s=30653
-recol5d=14336
-cost=15000
-model=obj_mystic_hat
-iop2=Wear
-manwear=obj_mystic_hat_manwear,0
-womanwear=obj_mystic_hat_womanwear,0
-manhead=obj_mystic_hat_manhead
-womanhead=obj_mystic_hat_womanhead
-members=yes
-2dyof=-18
-2dzoom=980
-2dyan=220
-2dxan=208
-wearpos=hat
-weight=1lb
 
 [cert_mystic_hat_dark]
 certlink=mystic_hat_dark
 certtemplate=template_for_cert
 
-[mystic_robe_top_dark]
-name=Mystic robe top
-desc=The upper half of a dark magical robe.
-recol1s=11839
-recol1d=6276
-recol2s=8599
-recol2d=0
-recol3s=23359
-recol3d=14336
-cost=120000
-model=obj_mystic_robe_top
-iop2=Wear
-manwear=obj_mystic_robe_top_manwear,0
-womanwear=obj_mystic_robe_top_womanwear,0
-manwear2=obj_mystic_robe_top_manwear2
-womanwear2=obj_mystic_robe_top_womanwear2
-members=yes
-2dzoom=1870
-2dyan=176
-2dxan=376
-wearpos=torso
-wearpos2=arms
-weight=6lb
 
 [cert_mystic_robe_top_dark]
 certlink=mystic_robe_top_dark
 certtemplate=template_for_cert
 
-[mystic_robe_bottom_dark]
-name=Mystic robe bottom
-desc=The lower half of a dark magical robe.
-recol1s=21243
-recol1d=14336
-recol2s=11839
-recol2d=6276
-recol3s=8599
-recol3d=0
-recol4s=30653
-recol4d=14336
-recol5s=4367
-recol5d=0
-cost=80000
-model=obj_mystic_robe_bottom
-iop2=Wear
-manwear=obj_mystic_robe_bottom_manwear,0
-womanwear=obj_mystic_robe_bottom_womanwear,0
-members=yes
-2dxof=5
-2dyof=7
-2dzoom=1690
-2dyan=2024
-2dxan=408
-wearpos=legs
-weight=4lb
 
 [cert_mystic_robe_bottom_dark]
 certlink=mystic_robe_bottom_dark
 certtemplate=template_for_cert
 
-[mystic_gloves_dark]
-name=Mystic gloves
-desc=Dark magical gloves.
-recol1s=21243
-recol1d=14336
-recol2s=11839
-recol2d=0
-cost=10000
-model=obj_mystic_gloves
-iop2=Wear
-manwear=obj_mystic_gloves_manwear,0
-womanwear=obj_mystic_gloves_womanwear,0
-members=yes
-2dyof=3
-2dzoom=830
-2dxan=536
-wearpos=hands
-weight=1lb
 
 [cert_mystic_gloves_dark]
 certlink=mystic_gloves_dark
 certtemplate=template_for_cert
 
-[mystic_boots_dark]
-name=Mystic boots
-desc=Dark magical boots.
-recol1s=4367
-recol1d=0
-cost=10000
-model=obj_mystic_boots
-iop2=Wear
-manwear=obj_mystic_boots_manwear,0
-womanwear=obj_mystic_boots_womanwear,0
-members=yes
-2dyof=-4
-2dzoom=770
-2dyan=1988
-2dxan=188
-wearpos=feet
-weight=1lb
 
 [cert_mystic_boots_dark]
 certlink=mystic_boots_dark
 certtemplate=template_for_cert
 
-[mystic_hat_light]
-name=Mystic hat
-desc=A bright magical hat.
-recol1s=21243
-recol1d=31430
-recol2s=11839
-recol2d=26425
-recol3s=8599
-recol3d=32767
-recol4s=23359
-recol4d=31430
-recol5s=30653
-recol5d=31430
-cost=15000
-model=obj_mystic_hat
-iop2=Wear
-manwear=obj_mystic_hat_manwear,0
-womanwear=obj_mystic_hat_womanwear,0
-manhead=obj_mystic_hat_manhead
-womanhead=obj_mystic_hat_womanhead
-members=yes
-2dyof=-18
-2dzoom=980
-2dyan=220
-2dxan=208
-wearpos=hat
-weight=1lb
 
 [cert_mystic_hat_light]
 certlink=mystic_hat_light
 certtemplate=template_for_cert
 
-[mystic_robe_top_light]
-name=Mystic robe top
-desc=The upper half of a bright magical robe.
-recol1s=11839
-recol1d=26425
-recol2s=8599
-recol2d=32767
-recol3s=23359
-recol3d=31430
-cost=120000
-model=obj_mystic_robe_top
-iop2=Wear
-manwear=obj_mystic_robe_top_manwear,0
-womanwear=obj_mystic_robe_top_womanwear,0
-manwear2=obj_mystic_robe_top_manwear2
-womanwear2=obj_mystic_robe_top_womanwear2
-members=yes
-2dzoom=1870
-2dyan=176
-2dxan=376
-wearpos=torso
-wearpos2=arms
-weight=6lb
 
 [cert_mystic_robe_top_light]
 certlink=mystic_robe_top_light
 certtemplate=template_for_cert
 
-[mystic_robe_bottom_light]
-name=Mystic robe bottom
-desc=The lower half of a bright magical robe.
-recol1s=21243
-recol1d=31430
-recol2s=11839
-recol2d=26425
-recol3s=8599
-recol3d=32767
-recol4s=30653
-recol4d=31430
-recol5s=4367
-recol5d=32767
-cost=80000
-model=obj_mystic_robe_bottom
-iop2=Wear
-manwear=obj_mystic_robe_bottom_manwear,0
-womanwear=obj_mystic_robe_bottom_womanwear,0
-members=yes
-2dxof=5
-2dyof=7
-2dzoom=1690
-2dyan=2024
-2dxan=408
-wearpos=legs
-weight=4lb
 
 [cert_mystic_robe_bottom_light]
 certlink=mystic_robe_bottom_light
 certtemplate=template_for_cert
 
-[mystic_gloves_light]
-name=Mystic gloves
-desc=Bright magical gloves.
-recol1s=21243
-recol1d=31430
-recol2s=11839
-recol2d=26425
-cost=10000
-model=obj_mystic_gloves
-iop2=Wear
-manwear=obj_mystic_gloves_manwear,0
-womanwear=obj_mystic_gloves_womanwear,0
-members=yes
-2dyof=3
-2dzoom=830
-2dxan=536
-wearpos=hands
-weight=1lb
 
 [cert_mystic_gloves_light]
 certlink=mystic_gloves_light
 certtemplate=template_for_cert
 
-[mystic_boots_light]
-name=Mystic boots
-desc=Bright magical boots.
-recol1s=4367
-recol1d=32767
-cost=10000
-model=obj_mystic_boots
-iop2=Wear
-manwear=obj_mystic_boots_manwear,0
-womanwear=obj_mystic_boots_womanwear,0
-members=yes
-2dyof=-4
-2dzoom=770
-2dyan=1988
-2dxan=188
-wearpos=feet
-weight=1lb
 
 [cert_mystic_boots_light]
 certlink=mystic_boots_light
@@ -49951,22 +49299,6 @@ members=yes
 iop1=Activate
 weight=2g
 
-[slayer_mirror_shield]
-name=Mirror shield
-desc=I can just about see things in this shield's reflection.
-cost=1000
-model=obj_slayer_mirror_shield
-2dxof=1
-2dzoom=1910
-2dyan=400
-2dxan=480
-iop2=Wield
-wearpos=lefthand
-weight=5lb
-manwear=obj_slayer_mirror_shield_manwear,0
-womanwear=obj_slayer_mirror_shield_manwear,6
-members=yes
-cost=5000
 
 [cert_slayer_mirror_shield]
 certlink=slayer_mirror_shield
@@ -51982,104 +51314,21 @@ model=obj_pickpocket_guide_mham
 2dyan=1876
 2dxan=28
 
-[ham_shirt]
-name=Ham shirt
-desc=A vivid crimson shirt.
-recol1s=14724
-recol1d=16423
-cost=75
-model=obj_priest_gown
-members=yes
-2dyof=7
-2dzoom=1370
-2dxan=536
-manwear=obj_priest_gown_manwear,0
-manwear2=obj_priest_gown_manwear2
-womanwear=obj_viking_top_darkbrown_womanwear2,0
-womanwear2=obj_priest_gown_womanwear2
-iop2=Wear
-wearpos=torso
-wearpos2=arms
-weight=2lb
 
 [cert_ham_shirt]
 certlink=ham_shirt
 certtemplate=template_for_cert
 
-[ham_robe]
-name=Ham robe
-desc=A vivid crimson robe.
-recol1s=2340
-recol1d=16423
-cost=75
-model=obj_priest_robe
-members=yes
-2dyof=1
-2dzoom=1940
-2dxan=572
-iop2=Wear
-manwear=obj_priest_robe_manwear,0
-womanwear=obj_priest_robe_womanwear,0
-wearpos=legs
-weight=2lb
 
 [cert_ham_robe]
 certlink=ham_robe
 certtemplate=template_for_cert
 
-[ham_hood]
-name=Ham hood
-desc=Light-weight head protection and eye shield.
-recol1s=11630
-recol1d=16423
-recol2s=7363
-recol2d=16423
-recol3s=14724
-recol3d=16423
-cost=75
-model=obj_ham_hood
-2dzoom=730
-2dyan=2036
-iop2=Wear
-manwear=obj_ham_hood_manwear,0
-womanwear=obj_ham_hood_womanwear,0
-manhead=obj_pickpocket_guide_mham
-womanhead=obj_ham_hood_womanhead
-members=yes
-wearpos=hat
-wearpos2=head
-weight=1lb
 
 [cert_ham_hood]
 certlink=ham_hood
 certtemplate=template_for_cert
 
-[ham_cloak]
-name=Ham cloak
-desc=A HAM cape.
-recol1s=15360
-recol1d=16423
-recol2s=8386
-recol2d=16423
-recol3s=31649
-recol3d=16423
-recol4s=8320
-recol4d=16423
-cost=75
-model=obj_ham_cloak
-2dxof=3
-2dyof=6
-2dzoom=2140
-2dyan=948
-2dxan=400
-iop2=Wear
-manwear=obj_red_cape_manwear,0
-manwear2=obj_ham_cloak_manwear2
-womanwear=obj_red_cape_womanwear,0
-womanwear2=obj_ham_cloak_manwear2
-members=yes
-wearpos=back
-weight=1lb
 
 [cert_ham_cloak]
 certlink=ham_cloak
@@ -52106,49 +51355,11 @@ weight=10g
 certlink=ham_badge
 certtemplate=template_for_cert
 
-[ham_gloves]
-name=Gloves
-desc=HAM gloves as worn by the Humans Against Monsters group.
-recol1s=9473
-recol1d=16423
-recol2s=10468
-recol2d=16423
-cost=75
-model=obj_gauntlets_of_cooking
-iop2=Wear
-manwear=obj_gauntlets_of_cooking_manwear,0
-womanwear=obj_gauntlets_of_cooking_womanwear,0
-2dxof=8
-2dyof=-8
-2dzoom=930
-2dyan=828
-2dxan=420
-members=yes
-wearpos=hands
-weight=1lb
 
 [cert_ham_gloves]
 certlink=ham_gloves
 certtemplate=template_for_cert
 
-[ham_boots]
-name=Boots
-desc=HAM boots as worn by the Humans Against Monsters group.
-recol1s=7298
-recol1d=16423
-model=obj_ikov_bootsoflightness
-manwear=obj_ikov_bootsoflightness_manwear,0
-womanwear=obj_ikov_bootsoflightness_womanwear,0
-iop2=Wear
-cost=75
-2dxof=1
-2dyof=-6
-2dzoom=770
-2dyan=160
-2dxan=152
-members=yes
-wearpos=feet
-weight=12oz
 
 [cert_ham_boots]
 certlink=ham_boots
@@ -52184,1303 +51395,251 @@ weight=18oz
 certlink=roving_crystal_book
 certtemplate=template_for_cert
 
-[wilderness_cape_1]
-name=Team-1 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=1
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_1]
 certlink=wilderness_cape_1
 certtemplate=template_for_cert
 
-[wilderness_cape_2]
-name=Team-2 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=2
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_2]
 certlink=wilderness_cape_2
 certtemplate=template_for_cert
 
-[wilderness_cape_3]
-name=Team-3 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=3
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_3]
 certlink=wilderness_cape_3
 certtemplate=template_for_cert
 
-[wilderness_cape_4]
-name=Team-4 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=4
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_4]
 certlink=wilderness_cape_4
 certtemplate=template_for_cert
 
-[wilderness_cape_5]
-name=Team-5 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=5
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_5]
 certlink=wilderness_cape_5
 certtemplate=template_for_cert
 
-[wilderness_cape_6]
-name=Team-6 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=6
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_6]
 certlink=wilderness_cape_6
 certtemplate=template_for_cert
 
-[wilderness_cape_7]
-name=Team-7 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=7
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_7]
 certlink=wilderness_cape_7
 certtemplate=template_for_cert
 
-[wilderness_cape_8]
-name=Team-8 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=8
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_8]
 certlink=wilderness_cape_8
 certtemplate=template_for_cert
 
-[wilderness_cape_9]
-name=Team-9 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=9
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_9]
 certlink=wilderness_cape_9
 certtemplate=template_for_cert
 
-[wilderness_cape_10]
-name=Team-10 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=10
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_10]
 certlink=wilderness_cape_10
 certtemplate=template_for_cert
 
-[wilderness_cape_11]
-name=Team-11 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=11
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_11]
 certlink=wilderness_cape_11
 certtemplate=template_for_cert
 
-[wilderness_cape_12]
-name=Team-12 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=12
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_12]
 certlink=wilderness_cape_12
 certtemplate=template_for_cert
 
-[wilderness_cape_13]
-name=Team-13 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=13
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_13]
 certlink=wilderness_cape_13
 certtemplate=template_for_cert
 
-[wilderness_cape_14]
-name=Team-14 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=14
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_14]
 certlink=wilderness_cape_14
 certtemplate=template_for_cert
 
-[wilderness_cape_15]
-name=Team-15 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=15
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_15]
 certlink=wilderness_cape_15
 certtemplate=template_for_cert
 
-[wilderness_cape_16]
-name=Team-16 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=16
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_16]
 certlink=wilderness_cape_16
 certtemplate=template_for_cert
 
-[wilderness_cape_17]
-name=Team-17 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=17
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_17]
 certlink=wilderness_cape_17
 certtemplate=template_for_cert
 
-[wilderness_cape_18]
-name=Team-18 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=18
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_18]
 certlink=wilderness_cape_18
 certtemplate=template_for_cert
 
-[wilderness_cape_19]
-name=Team-19 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=19
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_19]
 certlink=wilderness_cape_19
 certtemplate=template_for_cert
 
-[wilderness_cape_20]
-name=Team-20 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=20
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_20]
 certlink=wilderness_cape_20
 certtemplate=template_for_cert
 
-[wilderness_cape_21]
-name=Team-21 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=21
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_21]
 certlink=wilderness_cape_21
 certtemplate=template_for_cert
 
-[wilderness_cape_22]
-name=Team-22 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=22
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_22]
 certlink=wilderness_cape_22
 certtemplate=template_for_cert
 
-[wilderness_cape_23]
-name=Team-23 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=23
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_23]
 certlink=wilderness_cape_23
 certtemplate=template_for_cert
 
-[wilderness_cape_24]
-name=Team-24 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=24
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_24]
 certlink=wilderness_cape_24
 certtemplate=template_for_cert
 
-[wilderness_cape_25]
-name=Team-25 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=25
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_25]
 certlink=wilderness_cape_25
 certtemplate=template_for_cert
 
-[wilderness_cape_26]
-name=Team-26 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-recol3s=14693
-recol3d=8525
-cost=50
-team=26
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_26]
 certlink=wilderness_cape_26
 certtemplate=template_for_cert
 
-[wilderness_cape_27]
-name=Team-27 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=27
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_27]
 certlink=wilderness_cape_27
 certtemplate=template_for_cert
 
-[wilderness_cape_28]
-name=Team-28 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=28
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_28]
 certlink=wilderness_cape_28
 certtemplate=template_for_cert
 
-[wilderness_cape_29]
-name=Team-29 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=29
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_29]
 certlink=wilderness_cape_29
 certtemplate=template_for_cert
 
-[wilderness_cape_30]
-name=Team-30 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=30
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_30]
 certlink=wilderness_cape_30
 certtemplate=template_for_cert
 
-[wilderness_cape_31]
-name=Team-31 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=31
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_31]
 certlink=wilderness_cape_31
 certtemplate=template_for_cert
 
-[wilderness_cape_32]
-name=Team-32 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=32
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_32]
 certlink=wilderness_cape_32
 certtemplate=template_for_cert
 
-[wilderness_cape_33]
-name=Team-33 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=33
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_33]
 certlink=wilderness_cape_33
 certtemplate=template_for_cert
 
-[wilderness_cape_34]
-name=Team-34 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=34
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_34]
 certlink=wilderness_cape_34
 certtemplate=template_for_cert
 
-[wilderness_cape_35]
-name=Team-35 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=35
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_35]
 certlink=wilderness_cape_35
 certtemplate=template_for_cert
 
-[wilderness_cape_36]
-name=Team-36 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=36
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_36]
 certlink=wilderness_cape_36
 certtemplate=template_for_cert
 
-[wilderness_cape_37]
-name=Team-37 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=37
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_37]
 certlink=wilderness_cape_37
 certtemplate=template_for_cert
 
-[wilderness_cape_38]
-name=Team-38 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=38
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_38]
 certlink=wilderness_cape_38
 certtemplate=template_for_cert
 
-[wilderness_cape_39]
-name=Team-39 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=39
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_39]
 certlink=wilderness_cape_39
 certtemplate=template_for_cert
 
-[wilderness_cape_40]
-name=Team-40 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=40
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_40]
 certlink=wilderness_cape_40
 certtemplate=template_for_cert
 
-[wilderness_cape_41]
-name=Team-41 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=41
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_41]
 certlink=wilderness_cape_41
 certtemplate=template_for_cert
 
-[wilderness_cape_42]
-name=Team-42 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=42
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_42]
 certlink=wilderness_cape_42
 certtemplate=template_for_cert
 
-[wilderness_cape_43]
-name=Team-43 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=43
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_43]
 certlink=wilderness_cape_43
 certtemplate=template_for_cert
 
-[wilderness_cape_44]
-name=Team-44 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=44
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_44]
 certlink=wilderness_cape_44
 certtemplate=template_for_cert
 
-[wilderness_cape_45]
-name=Team-45 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=45
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_45]
 certlink=wilderness_cape_45
 certtemplate=template_for_cert
 
-[wilderness_cape_46]
-name=Team-46 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=46
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_46]
 certlink=wilderness_cape_46
 certtemplate=template_for_cert
 
-[wilderness_cape_47]
-name=Team-47 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=47
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_47]
 certlink=wilderness_cape_47
 certtemplate=template_for_cert
 
-[wilderness_cape_48]
-name=Team-48 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=48
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_48]
 certlink=wilderness_cape_48
 certtemplate=template_for_cert
 
-[wilderness_cape_49]
-name=Team-49 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=49
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_49]
 certlink=wilderness_cape_49
 certtemplate=template_for_cert
 
-[wilderness_cape_50]
-name=Team-50 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=50
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_50]
 certlink=wilderness_cape_50
@@ -54419,26 +52578,6 @@ wearpos=righthand
 certlink=mdaughter_polevault
 certtemplate=template_for_cert
 
-[mdaughter_bear_helmet]
-name=Bearhead
-desc=Quite ferocious looking.
-recol1s=15855
-recol1d=6346
-model=obj_mdaughter_bear_helmet
-cost=0
-2dxof=4
-2dzoom=690
-2dyan=1996
-2dxan=64
-iop2=Wear
-manwear=obj_mdaughter_bear_helmet_manwear,0
-womanwear=obj_mdaughter_bear_helmet_womanwear,0
-manhead=obj_mdaughter_bear_helmet_manhead
-womanhead=obj_mdaughter_bear_helmet_womanhead
-members=yes
-wearpos=hat
-wearpos2=head
-weight=1lb
 
 [giant_frog_legs]
 name=Giant frog legs
@@ -54764,26 +52903,6 @@ weight=3lb
 category=light_source_lit
 param=next_obj_stage,bullseye_lantern_unlit
 
-[wallbeast_spike_helmet]
-name=Spiny helmet
-desc=You don't want to wear it inside-out.
-cost=650
-manwear=obj_wallbeast_spike_helmet_manwear,0
-womanwear=obj_wallbeast_spike_helmet_womanwear,0
-manhead=obj_wallbeast_spike_helmet_manhead
-womanhead=obj_wallbeast_spike_helmet_womanhead
-model=obj_wallbeast_spike_helmet
-2dxof=5
-2dyof=-3
-2dzoom=660
-2dyan=440
-2dxan=444
-members=yes
-iop2=Wear
-wearpos=hat
-wearpos2=head
-wearpos3=jaw
-weight=5lb
 
 [cert_wallbeast_spike_helmet]
 certlink=wallbeast_spike_helmet
@@ -54984,26 +53103,6 @@ womanwear=obj_rubber_chicken_manwear,6
 wearpos=righthand
 weight=1lb
 
-[dwarf_goldrock_helmet]
-name=Gold helmet
-desc=Made of gold and white gold.
-model=obj_dwarf_goldrock_helmet
-2dxof=1
-2dyof=-4
-2dzoom=590
-2dyan=104
-2dxan=80
-iop2=Wear
-manwear=obj_dwarf_goldrock_helmet_manwear,0
-womanwear=obj_dwarf_goldrock_helmet_womanwear,0
-manhead=obj_leather_cowl_manhead2
-manhead2=obj_dwarf_goldrock_helmet_manhead2
-womanhead=obj_leather_cowl_womanhead2
-womanhead2=obj_dwarf_goldrock_helmet_manhead2
-members=yes
-wearpos=hat
-wearpos2=head
-weight=70lb
 
 [dwarf_rock_book]
 name=Dwarven lore
@@ -55221,21 +53320,6 @@ weight=5lb
 wearpos=righthand
 wearpos2=lefthand
 
-[dragon_plateskirt]
-name=Dragon plateskirt
-desc=This looks pretty heavy.
-model=obj_dragon_plateskirt
-2dxof=4
-2dyof=15
-2dzoom=1230
-2dxan=584
-cost=270000
-iop2=Wear
-manwear=obj_dragon_plateskirt_manwear,0
-womanwear=obj_dragon_plateskirt_womanwear,0
-members=yes
-wearpos=legs
-weight=20lb
 
 [cert_dragon_plateskirt]
 certlink=dragon_plateskirt
@@ -55272,294 +53356,6 @@ param=sa_energy,550
 
 [cert_dragon_scimitar]
 certlink=dragon_scimitar
-certtemplate=template_for_cert
-
-[feud_mayors_house_keys]
-name=Keys
-desc=Keys to the Mayor's house.
-members=yes
-model=obj_ikov_shinykey
-2dxof=-3
-2dyof=5
-2dzoom=700
-2dyan=20
-2dxan=328
-weight=10g
-
-[feud_mayors_jewels]
-name=Jewels
-desc=The Mayor of Pollnivneach's wife's jewels.
-recol1s=31649
-recol1d=17441
-recol2s=32767
-recol2d=10240
-model=obj_amulet_of_accuracy
-2dyof=-28
-2dzoom=460
-2dxan=196
-members=yes
-weight=10g
-
-[feud_karidian_turban]
-name=Karidian headpiece
-desc=Wear it on your head.
-model=obj_feud_karidian_turban
-2dzoom=590
-2dyan=252
-2dzan=2036
-2dxan=2036
-members=yes
-weight=70g
-
-[cert_feud_karidian_turban]
-certlink=feud_karidian_turban
-certtemplate=template_for_cert
-
-[feud_karidian_fakebeard]
-name=Fake beard
-desc=Makes me itch.
-model=obj_feud_karidian_fakebeard
-2dzoom=470
-2dyan=1884
-2dzan=8
-2dxan=320
-members=yes
-weight=30g
-
-[cert_feud_karidian_fakebeard]
-certlink=feud_karidian_fakebeard
-certtemplate=template_for_cert
-
-[feud_karidian_fakebeard_and_hat]
-name=Karidian disguise
-desc=Makes my face itch.
-model=obj_feud_karidian_fakebeard_and_hat
-2dxof=-3
-2dyof=-14
-2dzoom=810
-2dyan=72
-2dxan=340
-members=yes
-weight=100g
-
-[cert_feud_karidian_fakebeard_and_hat]
-certlink=feud_karidian_fakebeard_and_hat
-certtemplate=template_for_cert
-
-[feud_fib_hint]
-name=Note
-desc=A note found in the Mayor's bedroom mentioning the word 'Fibonacci'.
-recol1s=29594
-recol1d=29398
-model=obj_nulodions_notes
-2dxof=1
-2dyof=7
-2dzoom=1040
-2dyan=120
-2dxan=380
-members=yes
-iop1=Read
-weight=20g
-
-[feud_nos_note]
-name=Note
-desc=A list of 5 numbers.
-recol1s=29594
-recol1d=29398
-model=obj_nulodions_notes
-2dxof=1
-2dyof=7
-2dzoom=1040
-2dyan=120
-2dxan=380
-iop1=Read
-members=yes
-weight=20g
-
-[blackjack_oak]
-name=Oak-blackjack
-desc=A handy little club made out of oak.
-model=obj_blackjack_oak
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-manwear=obj_blackjack_oak_manwear,0
-womanwear=obj_blackjack_oak_manwear,6
-members=yes
-weight=1kg
-wearpos=righthand
-weight=4lb
-
-[blackjack_willow]
-name=Willow-blackjack
-desc=A handy little club made out of willow.
-recol1s=3137
-recol1d=20004
-model=obj_blackjack_oak
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-manwear=obj_blackjack_oak_manwear,0
-womanwear=obj_blackjack_oak_manwear,6
-cost=600
-weight=1kg
-wearpos=righthand
-weight=4lb
-
-[feud_camel_pooh_bucket]
-name=Ugthanki dung
-desc=Dung of the Camelus Horribleus variety.
-recol1s=9571
-recol1d=6306
-model=obj_feud_camel_pooh_bucket
-members=yes
-2dyof=-18
-2dzoom=1020
-2dyan=1660
-2dxan=204
-iop4=Empty
-weight=400g
-
-[feud_camel_poison_pooh_bucket]
-name=Ugthanki dung
-desc=Poor Camel, what have I fed you?
-model=obj_feud_camel_pooh_bucket
-members=yes
-2dyof=-18
-2dzoom=1020
-2dyan=1660
-2dxan=204
-iop4=Empty
-weight=400g
-
-[feud_camel_receipt]
-name=Receipt
-desc=A receipt for one 'Camelus Horribleus'.
-recol1s=29594
-recol1d=29398
-model=obj_nulodions_notes
-2dxof=1
-2dyof=7
-2dzoom=1040
-2dyan=120
-2dxan=380
-members=yes
-weight=20g
-
-[poison_from_hag]
-name=Hag's poison
-desc=A red viscous liquid in a vial.
-recol1s=15855
-recol1d=15360
-model=obj_strength4
-2dyof=-1
-2dzoom=550
-2dyan=1996
-2dxan=84
-members=yes
-weight=200g
-
-[snake_flute]
-name=Snake charm
-desc=Makes a hissing sound.
-model=obj_snake_flute
-2dxof=-3
-2dzoom=1170
-2dyan=56
-2dxan=304
-iop1=Play
-manwear=obj_snake_flute_manwear,0
-womanwear=obj_snake_flute_womanwear,0
-members=yes
-wearpos=righthand
-wearpos2=lefthand
-weight=100g
-
-[basket_for_snake]
-name=Snake basket
-desc=This is used to hold snakes.
-model=obj_basket_for_snake
-members=yes
-2dzoom=1420
-2dxan=12
-weight=500g
-
-[basket_with_snake]
-name=Snake basket full
-desc=This basket contains a snake.
-model=obj_basket_with_snake
-members=yes
-2dxof=-5
-2dyof=-1
-2dzoom=1560
-2dyan=1964
-weight=1kg
-
-[super_kebab]
-name=Super kebab
-desc=A meaty and very hot kebab.
-recol1s=8384
-recol1d=26657
-cost=3
-iop1=Eat
-model=obj_ugthanki_kebab_bad
-2dxof=4
-2dyof=1
-2dzoom=700
-2dyan=1844
-2dzan=176
-2dxan=1876
-members=yes
-weight=250g
-
-[cert_super_kebab]
-certlink=super_kebab
-certtemplate=template_for_cert
-
-[superhot_kebab_sauce]
-name=Red hot sauce
-desc=The bottle feels warm.
-model=obj_superhot_kebab_sauce
-2dyof=-1
-2dzoom=540
-2dyan=1472
-2dxan=48
-members=yes
-weight=100g
-
-[feud_desert_disguise]
-name=Desert disguise
-desc=A disguise suitable for the desert.
-model=obj_feud_karidian_fakebeard_and_hat
-iop2=Wear
-members=yes
-2dyof=-32
-2dzoom=780
-2dyan=2044
-2dxan=296
-manwear=obj_feud_desert_disguise_manwear,0
-manwear2=obj_feud_desert_disguise_manwear2
-manwear3=obj_feud_desert_disguise_manwear3
-womanwear=obj_feud_desert_disguise_womanwear,0
-womanwear2=obj_feud_desert_disguise_womanwear2
-womanwear3=obj_feud_desert_disguise_womanwear3
-manhead=obj_feud_desert_disguise_manhead
-manhead2=obj_leather_cowl_manhead2
-womanhead=obj_feud_desert_disguise_manhead
-womanhead2=obj_leather_cowl_womanhead2
-wearpos=hat
-wearpos2=head
-wearpos3=jaw
-weight=40g
-
-[cert_blackjack_willow]
-certlink=blackjack_willow
 certtemplate=template_for_cert
 
 [spinning_plate]
@@ -56155,22 +53951,6 @@ model=obj_fd_sword_cross
 cost=250
 weight=10g
 
-[staff_of_zaros]
-name=Ancient staff
-desc=A magical staff of ancient origin...
-members=yes
-model=obj_staff_of_zaros
-2dxof=-5
-2dyof=2
-2dzoom=1490
-2dyan=1400
-2dxan=148
-iop2=Wield
-manwear=obj_staff_of_zaros_manwear,0
-womanwear=obj_staff_of_zaros_manwear,6
-cost=100000
-wearpos=righthand
-weight=5lb
 
 [cert_staff_of_zaros]
 certlink=staff_of_zaros
@@ -61643,6 +59423,7 @@ members=yes
 2dxan=296
 cost=15
 weight=500g
+param=fishing_struct,fishing_struct_swamp_cave_eel
 
 [burnt_cave_eel]
 name=Burnt cave eel
@@ -61696,6 +59477,7 @@ members=yes
 iop1=Eat
 cost=5
 weight=500g
+param=fishing_struct,fishing_struct_swamp_frogspawn
 
 [cert_raw_cave_eel]
 certlink=raw_cave_eel
@@ -67832,75 +65614,8 @@ model=obj_priest_robe
 2dzoom=1940
 2dxan=572
 
-[basic_tk_helm]
-name=Initiate helm
-desc=An initiate Temple Knight's helm.
-recol1s=15855
-recol1d=25368
-recol2s=15360
-recol2d=31366
-cost=3000
-model=obj_iron_full_helm
-2dxof=-1
-2dyof=6
-2dzoom=800
-2dyan=152
-2dxan=160
-iop2=Wear
-manwear=obj_iron_full_helm_manwear,0
-womanwear=obj_iron_full_helm_womanwear,0
-manhead=obj_iron_full_helm_manhead
-womanhead=obj_iron_full_helm_womanhead
-members=yes
-wearpos=hat
-wearpos2=head
-wearpos3=jaw
-weight=5lb
 
-[basic_tk_body]
-name=Initiate platemail
-desc=An initiate Temple Knight's Armour.
-recol1s=6342
-recol1d=31366
-recol2s=15855
-recol2d=25368
-recol3s=10570
-recol3d=21140
-cost=10000
-model=obj_black_platebody_trim
-2dxof=-1
-2dzoom=1250
-2dxan=488
-iop2=Wear
-manwear=obj_black_platebody_trim_manwear,0
-manwear2=obj_iron_platebody_manwear2
-womanwear=obj_black_platebody_trim_womanwear,0
-womanwear2=obj_iron_platebody_womanwear2
-members=yes
-wearpos=torso
-wearpos2=arms
-weight=19lb
 
-[basic_tk_legs]
-name=Initiate platelegs
-desc=An initiate Temple Knight's leg armour.
-recol1s=15855
-recol1d=25368
-recol2s=10570
-recol2d=21140
-recol3s=14798
-recol3d=31366
-cost=5000
-model=obj_iron_platelegs
-2dyof=-8
-2dzoom=1740
-2dxan=444
-iop2=Wear
-manwear=obj_iron_platelegs_manwear,0
-womanwear=obj_iron_platelegs_womanwear,0
-members=yes
-wearpos=legs
-weight=17lb
 
 [rd_cupric_sulphate]
 name=Cupric sulfate
@@ -74108,104 +71823,6 @@ model=obj_pickpocket_guide_woodelf
 2dyan=1876
 2dxan=28
 
-[secret_ghost_boots]
-name=Ghostly boots
-desc=They seem to be not quite of this world...
-model=obj_secret_ghost_boots
-manwear=obj_secret_ghost_boots_manwear,0
-womanwear=obj_secret_ghost_boots_womanwear,0
-iop2=Wear
-cost=300
-2dxof=3
-2dzoom=880
-2dyan=120
-2dxan=96
-members=yes
-wearpos=feet
-weight=1g
-
-[secret_ghost_top]
-name=Ghostly robe
-desc=A particularly spooky robe top.
-model=obj_secret_ghost_top
-manwear=obj_secret_ghost_top_manwear,0
-womanwear=obj_secret_ghost_top_womanwear,0
-iop2=Wear
-cost=300
-2dyof=6
-2dzoom=1320
-2dxan=556
-members=yes
-wearpos=torso
-wearpos2=arms
-weight=1g
-
-[secret_ghost_bottom]
-name=Ghostly robe
-desc=An unearthly set of robe bottoms.
-model=obj_secret_ghost_bottom
-iop2=Wear
-cost=300
-manwear=obj_secret_ghost_bottom_manwear,0
-womanwear=obj_secret_ghost_bottom_womanwear,0
-2dzoom=1980
-2dxan=460
-members=yes
-wearpos=legs
-weight=1g
-
-[secret_ghost_hat]
-name=Ghostly hood
-desc=A ghostly hood, fit for a ghostly head.
-model=obj_secret_ghost_hat
-manwear=obj_secret_ghost_hat_manwear,0
-manwear2=obj_secret_ghost_hat_manwear2
-womanwear=obj_secret_ghost_hat_womanwear,0
-womanwear2=obj_secret_ghost_hat_womanwear2
-manhead=obj_secret_ghost_hat_manhead
-womanhead=obj_secret_ghost_hat_womanhead
-cost=300
-iop2=Wear
-2dyof=-2
-2dzoom=930
-2dyan=52
-2dxan=124
-members=yes
-weight=1g
-wearpos=hat
-wearpos2=head
-
-[secret_ghost_gloves]
-name=Ghostly gloves
-desc=They seem to fade in and out of existence...
-cost=300
-model=obj_secret_ghost_gloves
-iop2=Wear
-manwear=obj_secret_ghost_gloves_manwear,0
-womanwear=obj_secret_ghost_gloves_womanwear,0
-2dyof=10
-2dzoom=750
-2dxan=404
-members=yes
-wearpos=hands
-weight=1g
-
-[secret_ghost_cloak]
-name=Ghostly cloak
-desc=Made of a strange ghostly material...
-cost=250
-model=obj_secret_ghost_cloak
-iop2=Wear
-manwear=obj_secret_ghost_cloak_manwear,0
-womanwear=obj_secret_ghost_cloak_womanwear,0
-2dyof=8
-2dzoom=2080
-2dyan=540
-2dxan=448
-members=yes
-wearpos=back
-weight=1g
-
 [kelda_hop_seed]
 name=Kelda seed
 desc=Kelda hop seeds can only be grown underground!
@@ -74421,331 +72038,64 @@ members=yes
 wearpos=righthand
 weight=4lb
 
-[dagganoth_melee_helm]
-name=Rock-shell helm
-desc=Protective headwear made from crabs. Better than that sounds.
-cost=35200
-model=obj_dagganoth_melee_helm
-iop2=Wear
-manwear=obj_feud_desert_disguise_manwear,0
-manwear2=obj_dagganoth_melee_helm_manwear2
-womanwear=obj_feud_desert_disguise_womanwear,0
-womanwear2=obj_dagganoth_melee_helm_womanwear2
-manhead=obj_dagganoth_melee_helm_manhead
-womanhead=obj_dagganoth_melee_helm_womanhead
-members=yes
-2dzoom=620
-2dxan=60
-wearpos=hat
-wearpos2=head
-weight=6lb
 
-[dagganoth_melee_body]
-name=Rock-shell plate
-desc=A sturdy body armour made from rock crab pieces.
-cost=65000
-model=obj_dagganoth_melee_body
-iop2=Wear
-manwear=obj_dagganoth_melee_body_manwear,0
-womanwear=obj_dagganoth_melee_body_womanwear,0
-members=yes
-2dzoom=1190
-2dxan=476
-wearpos=torso
-wearpos2=arms
-weight=22lb
 
-[dagganoth_melee_legs]
-name=Rock-shell legs
-desc=Some tough leggings made from rock crab parts.
-cost=64000
-model=obj_dagganoth_melee_legs
-iop2=Wear
-manwear=obj_dagganoth_melee_legs_manwear,0
-womanwear=obj_dagganoth_melee_legs_womanwear,0
-members=yes
-2dyof=6
-2dzoom=1720
-2dxan=528
-wearpos=legs
-weight=20lb
 
-[dagganoth_ranged_helm]
-name=Spined helm
-desc=A helm fit for any Fremennik ranger.
-cost=60000
-model=obj_dagganoth_ranged_helm
-2dxof=3
-2dyof=-4
-2dzoom=810
-2dyan=156
-2dxan=44
-iop2=Wear
-manwear=obj_viking_helmet_manwear,0
-manwear2=obj_dagganoth_ranged_helm_manwear2
-womanwear=obj_viking_helmet_womanwear,0
-womanwear2=obj_dagganoth_ranged_helm_womanwear2
-manhead=obj_dagganoth_ranged_helm_manhead
-womanhead=obj_dagganoth_ranged_helm_womanhead
-members=yes
-wearpos=hat
-wearpos2=head
-weight=6lb
 
 [cert_dagganoth_ranged_helm]
 certlink=dagganoth_ranged_helm
 certtemplate=template_for_cert
 
-[dagganoth_ranged_body]
-name=Spined body
-desc=A constant reminder that I'm above a Dagannoth in the food chain.
-cost=7800
-model=obj_dagganoth_ranged_body
-2dxof=-1
-2dyof=4
-2dzoom=1140
-2dxan=460
-iop2=Wear
-manwear=obj_dagganoth_ranged_body_manwear,0
-womanwear=obj_dagganoth_ranged_body_womanwear,0
-members=yes
-wearpos=torso
-wearpos2=arms
-weight=15lb
 
 [cert_dagganoth_ranged_body]
 certlink=dagganoth_ranged_body
 certtemplate=template_for_cert
 
-[dagganoth_ranged_legs]
-name=Spined chaps
-desc=Stylish leg armour for rangers with a lingering smell of raw fish...
-cost=3900
-model=obj_dagganoth_ranged_legs
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dagganoth_ranged_legs_manwear,0
-womanwear=obj_dagganoth_ranged_legs_womanwear,0
-members=yes
-wearpos=legs
-weight=12lb
 
 [cert_dagganoth_ranged_legs]
 certlink=dagganoth_ranged_legs
 certtemplate=template_for_cert
 
-[dagganoth_mage_helm]
-name=Skeletal helm
-desc=Make your foes cower by wearing a skull as a helmet!
-cost=10000
-model=obj_dagganoth_mage_helm
-iop2=Wear
-manwear=obj_viking_helmet_manwear,0
-manwear2=obj_dagganoth_mage_helm_manwear2
-womanwear=obj_viking_helmet_womanwear,0
-womanwear2=obj_dagganoth_mage_helm_womanwear2
-manhead=obj_dagganoth_mage_helm_manhead
-womanhead=obj_dagganoth_mage_helm_manhead
-members=yes
-2dyof=-46
-2dzoom=800
-2dyan=1004
-2dxan=228
-ambient=30
-contrast=30
-wearpos=hat
-wearpos2=head
-weight=3lb
 
 [cert_dagganoth_mage_helm]
 certlink=dagganoth_mage_helm
 certtemplate=template_for_cert
 
-[dagganoth_mage_body]
-name=Skeletal top
-desc=The bones in this armour seem to vibrate with a magical quality...
-cost=45000
-model=obj_dagganoth_mage_body
-iop2=Wear
-manwear=obj_dagganoth_mage_body_manwear,0
-womanwear=obj_dagganoth_mage_body_womanwear,0
-members=yes
-2dzoom=1190
-2dxan=544
-wearpos=torso
-wearpos2=arms
-weight=11lb
 
 [cert_dagganoth_mage_body]
 certlink=dagganoth_mage_body
 certtemplate=template_for_cert
 
-[dagganoth_mage_legs]
-name=Skeletal bottoms
-desc=A superior set of strengthened slacks for any self respecting seer.
-cost=40000
-model=obj_dagganoth_mage_legs
-iop2=Wear
-manwear=obj_dagganoth_mage_legs_manwear,0
-womanwear=obj_dagganoth_mage_legs_womanwear,0
-members=yes
-2dyof=6
-2dzoom=1710
-2dxan=536
-wearpos=legs
-weight=9lb
 
 [cert_dagganoth_mage_legs]
 certlink=dagganoth_mage_legs
 certtemplate=template_for_cert
 
-[dagganoth_range_feet]
-name=Spined boots
-desc=Some finely crafted Fremennik boots, made from spined dagannoth hide.
-cost=650
-model=obj_dagganoth_range_feet
-2dxof=2
-2dyof=-2
-2dzoom=660
-2dyan=104
-2dxan=96
-members=yes
-iop2=Wear
-manwear=obj_dagganoth_range_feet_manwear,0
-womanwear=obj_dagganoth_range_feet_womanwear,0
-weight=7lb
-wearpos=feet
 
 [cert_dagganoth_range_feet]
 certlink=dagganoth_range_feet
 certtemplate=template_for_cert
 
-[dagganoth_melee_feet]
-name=Rock-shell boots
-desc=Some Fremennik boots, made from the shards of a rock crabs' shell.
-recol1s=11626
-recol1d=7398
-recol2s=8455
-recol2d=6341
-recol3s=8389
-recol3d=6341
-cost=650
-model=obj_dagganoth_range_feet
-2dxof=2
-2dyof=-2
-2dzoom=660
-2dyan=104
-2dxan=96
-members=yes
-iop2=Wear
-manwear=obj_dagganoth_range_feet_manwear,0
-womanwear=obj_dagganoth_range_feet_womanwear,0
-weight=7lb
-wearpos=feet
 
 [cert_dagganoth_melee_feet]
 certlink=dagganoth_melee_feet
 certtemplate=template_for_cert
 
-[dagganoth_mage_feet]
-name=Skeletal boots
-desc=Some finely crafted Fremennik boots, made from the bones of a wallasalki.
-recol1s=11626
-recol1d=28405
-recol2s=8455
-recol2d=6341
-recol3s=8389
-recol3d=6341
-cost=650
-model=obj_dagganoth_range_feet
-2dxof=2
-2dyof=-2
-2dzoom=660
-2dyan=104
-2dxan=96
-members=yes
-iop2=Wear
-manwear=obj_dagganoth_range_feet_manwear,0
-womanwear=obj_dagganoth_range_feet_womanwear,0
-weight=7lb
-wearpos=feet
 
 [cert_dagganoth_mage_feet]
 certlink=dagganoth_mage_feet
 certtemplate=template_for_cert
 
-[dagganoth_range_gloves]
-name=Spined gloves
-desc=Fremennik gloves stitched together from spined dagannoth hide.
-cost=650
-model=obj_dagganoth_range_gloves
-2dxof=2
-2dyof=-14
-2dzoom=710
-2dyan=2000
-2dxan=332
-members=yes
-iop2=Wear
-manwear=obj_dagganoth_range_gloves_manwear,0
-womanwear=obj_dagganoth_range_gloves_womanwear,0
-weight=7lb
-wearpos=hands
 
 [cert_dagganoth_range_gloves]
 certlink=dagganoth_range_gloves
 certtemplate=template_for_cert
 
-[dagganoth_melee_gloves]
-name=Rock-shell gloves
-desc=Fremennik gloves stitched together from rock crab shell shards.
-recol1s=11626
-recol1d=7398
-recol2s=8455
-recol2d=6341
-cost=650
-model=obj_dagganoth_range_gloves
-2dxof=2
-2dyof=-14
-2dzoom=710
-2dyan=2000
-2dxan=332
-members=yes
-iop2=Wear
-manwear=obj_dagganoth_range_gloves_manwear,0
-womanwear=obj_dagganoth_range_gloves_womanwear,0
-weight=7lb
-wearpos=hands
 
 [cert_dagganoth_melee_gloves]
 certlink=dagganoth_melee_gloves
 certtemplate=template_for_cert
 
-[dagganoth_mage_gloves]
-name=Skeletal gloves
-desc=Fremennik gloves stitched together from wallasalki bones fragments.
-recol1s=11626
-recol1d=28405
-recol2s=8455
-recol2d=6341
-recol3s=8389
-recol3d=6341
-cost=650
-model=obj_dagganoth_range_gloves
-2dxof=2
-2dyof=-14
-2dzoom=710
-2dyan=2000
-2dxan=332
-members=yes
-iop2=Wear
-manwear=obj_dagganoth_range_gloves_manwear,0
-womanwear=obj_dagganoth_range_gloves_womanwear,0
-weight=7lb
-wearpos=hands
 
 [cert_dagganoth_mage_gloves]
 certlink=dagganoth_mage_gloves
@@ -76245,76 +73595,16 @@ weight=200g
 certlink=village_rare_tuber
 certtemplate=template_for_cert
 
-[machette_opal]
-name=Opal machete
-desc=A jungle specific slashing device.
-recol1s=23254
-recol1d=29587
-recol2s=17969
-recol2d=12684
-cost=500
-model=obj_machette
-2dxof=-2
-2dyof=-12
-2dzoom=770
-2dyan=88
-2dxan=200
-iop2=Wield
-manwear=obj_machette_manwear,0
-womanwear=obj_machette_manwear,6
-members=yes
-wearpos=righthand
-weight=3lb
 
 [cert_machette_opal]
 certlink=machette_opal
 certtemplate=template_for_cert
 
-[machette_jade]
-name=Jade machete
-desc=A jungle specific slashing device.
-recol1s=23254
-recol1d=22512
-recol2s=17969
-recol2d=12684
-cost=1000
-model=obj_machette
-2dxof=-2
-2dyof=-12
-2dzoom=770
-2dyan=88
-2dxan=200
-iop2=Wield
-manwear=obj_machette_manwear,0
-womanwear=obj_machette_manwear,6
-members=yes
-wearpos=righthand
-weight=3lb
 
 [cert_machette_jade]
 certlink=machette_jade
 certtemplate=template_for_cert
 
-[machette_redtopaz]
-name=Red topaz machete
-desc=A jungle specific slashing device.
-recol1s=23254
-recol1d=30765
-recol2s=17969
-recol2d=12684
-cost=2000
-model=obj_machette
-2dxof=-2
-2dyof=-12
-2dzoom=770
-2dyan=88
-2dxan=200
-iop2=Wield
-manwear=obj_machette_manwear,0
-womanwear=obj_machette_manwear,6
-members=yes
-wearpos=righthand
-weight=3lb
 
 [cert_machette_redtopaz]
 certlink=machette_redtopaz
@@ -77376,158 +74666,36 @@ weight=5g
 certlink=roguetrader_menaphite_legs_red2
 certtemplate=template_for_cert
 
-[roguetrader_bj_assault_oak]
-name=Oak blackjack(a)
-desc=An assault blackjack.
-model=obj_roguetrader_bj_assault_oak
-manwear=obj_roguetrader_bj_assault_oak_manwear,0
-womanwear=obj_roguetrader_bj_assault_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=400
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_assault_oak]
 certlink=roguetrader_bj_assault_oak
 certtemplate=template_for_cert
 
-[roguetrader_bj_defend_oak]
-name=Oak blackjack(d)
-desc=A defensive blackjack.
-model=obj_roguetrader_bj_defend_oak
-manwear=obj_roguetrader_bj_defend_oak_manwear,0
-womanwear=obj_roguetrader_bj_defend_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=400
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_defend_oak]
 certlink=roguetrader_bj_defend_oak
 certtemplate=template_for_cert
 
-[roguetrader_bj_assault_willow]
-name=Willow blackjack(a)
-desc=An assault blackjack.
-recol1s=23009
-recol1d=17793
-model=obj_roguetrader_bj_assault_oak
-manwear=obj_roguetrader_bj_assault_oak_manwear,0
-womanwear=obj_roguetrader_bj_assault_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=800
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_assault_willow]
 certlink=roguetrader_bj_assault_willow
 certtemplate=template_for_cert
 
-[roguetrader_bj_defend_willow]
-name=Willow blackjack(d)
-desc=A defensive blackjack.
-recol1s=23009
-recol1d=17793
-model=obj_roguetrader_bj_defend_oak
-manwear=obj_roguetrader_bj_defend_oak_manwear,0
-womanwear=obj_roguetrader_bj_defend_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=800
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_defend_willow]
 certlink=roguetrader_bj_defend_willow
 certtemplate=template_for_cert
 
-[roguetrader_bj_maple]
-name=Maple blackjack
-desc=A solid bit of maple.
-recol1s=23009
-recol1d=29223
-model=obj_blackjack_oak
-manwear=obj_blackjack_oak_manwear,0
-womanwear=obj_blackjack_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=1200
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_maple]
 certlink=roguetrader_bj_maple
 certtemplate=template_for_cert
 
-[roguetrader_bj_assault_maple]
-name=Maple blackjack(a)
-desc=An assault blackjack.
-recol1s=23009
-recol1d=29223
-model=obj_roguetrader_bj_assault_oak
-manwear=obj_roguetrader_bj_assault_oak_manwear,0
-womanwear=obj_roguetrader_bj_assault_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=1600
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_assault_maple]
 certlink=roguetrader_bj_assault_maple
 certtemplate=template_for_cert
 
-[roguetrader_bj_defend_maple]
-name=Maple blackjack(d)
-desc=A defensive blackjack.
-recol1s=23009
-recol1d=29223
-model=obj_roguetrader_bj_defend_oak
-manwear=obj_roguetrader_bj_defend_oak_manwear,0
-womanwear=obj_roguetrader_bj_defend_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=1600
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_defend_maple]
 certlink=roguetrader_bj_defend_maple
@@ -78768,25 +75936,6 @@ members=yes
 weight=1g
 weight=1kg
 
-[tzhaar_throwingring]
-name=Toktz-xil-ul
-desc=A razor sharp ring of obsidian.
-members=yes
-stackable=yes
-iop2=Wield
-model=obj_tzhaar_throwingring
-2dxof=3
-2dyof=-4
-2dzoom=890
-2dyan=28
-2dxan=408
-contrast=35
-ambient=15
-manwear=obj_tzhaar_throwingring_manwear,0
-womanwear=obj_tzhaar_throwingring_manwear,6
-cost=250
-wearpos=righthand
-weight=12oz
 
 [tzhaar_staff]
 name=Toktz-mej-tal
@@ -79276,39 +76425,6 @@ model=obj_asgarnian_ale
 2dxan=140
 weight=550g
 
-[mud_battlestaff]
-name=Mud battlestaff
-desc=It's a slightly magical stick.
-cost=17000
-model=obj_mud_battlestaff
-2dxof=-2
-2dyof=-3
-2dzoom=1950
-2dyan=560
-2dxan=1816
-iop2=Wield
-manwear=obj_mud_battlestaff_manwear,0
-womanwear=obj_mud_battlestaff_manwear,6
-members=yes
-wearpos=righthand
-weight=5lb
-
-[mystic_mud_staff]
-name=Mystic mud staff
-desc=It's a slightly magical stick.
-cost=45000
-model=obj_mud_battlestaff
-2dxof=-2
-2dyof=-3
-2dzoom=1950
-2dyan=560
-2dxan=1816
-iop2=Wield
-manwear=obj_mud_battlestaff_manwear,0
-womanwear=obj_mud_battlestaff_manwear,6
-members=yes
-wearpos=righthand
-weight=5lb
 
 [invis_ring6]
 name=Onyx ring
@@ -79768,26 +76884,6 @@ weight=1lb
 certlink=white_dagger_p++
 certtemplate=template_for_cert
 
-[white_halberd]
-name=White halberd
-desc=A white halberd.
-recol1s=15855
-recol1d=25368
-recol2s=8456
-recol2d=19026
-members=yes
-cost=1920
-model=obj_halberd
-iop2=Wield
-manwear=obj_bronze_halberd_manwear,0
-womanwear=obj_bronze_halberd_manwear,6
-2dzoom=2130
-2dyan=48
-2dxan=604
-wearpos=righthand
-wearpos2=lefthand
-weight=7lb
-category=weapon_polearm
 
 [cert_white_halberd]
 certlink=white_halberd
@@ -81375,25 +78471,6 @@ weight=1kg
 certlink=fishbowl_empty
 certtemplate=template_for_cert
 
-[daganoth_cave_magic_shortbow]
-name=Seercull
-desc=An ancient Fremennik bow that was once used to battle the Moon Clan.
-recol1s=7330
-recol1d=15617
-members=yes
-cost=8000
-model=obj_daganoth_cave_magic_shortbow
-2dxof=-5
-2dyof=5
-2dzoom=1650
-2dyan=20
-2dxan=384
-iop2=Wield
-manwear=obj_daganoth_cave_magic_shortbow_manwear,0
-womanwear=obj_daganoth_cave_magic_shortbow_manwear,6
-wearpos=righthand
-wearpos2=lefthand
-weight=3lb
 
 [cert_daganoth_cave_magic_shortbow]
 certlink=daganoth_cave_magic_shortbow
@@ -82577,20 +79654,6 @@ members=yes
 ambient=10
 weight=1g
 
-[granite_legs]
-name=Granite legs
-desc=These look pretty heavy.
-cost=66000
-model=obj_granite_legs
-iop2=Wear
-manwear=obj_granite_legs_manwear,0
-womanwear=obj_granite_legs_womanwear,0
-members=yes
-2dzoom=1620
-2dyan=1960
-2dxan=276
-wearpos=legs
-weight=35lb
 
 [pot_bonemeal_wyvern]
 name=Bonemeal
@@ -84455,29 +81518,6 @@ members=yes
 iop5=Destroy
 weight=1g
 
-[handsand_pink_cape]
-name=Cape
-desc=It's a bit pink.
-recol1s=8386
-recol1d=23055
-recol2s=31649
-recol2d=30257
-recol3s=8320
-recol3d=23055
-recol4s=15360
-recol4d=14632
-model=obj_red_cape
-2dxof=3
-2dyof=6
-2dzoom=2140
-2dyan=948
-2dxan=400
-iop2=Wear
-manwear=obj_red_cape_manwear,0
-womanwear=obj_red_cape_manwear,0
-members=yes
-wearpos=back
-weight=1lb
 
 [cert_handsand_pink_cape]
 certlink=handsand_pink_cape
@@ -86203,23 +83243,6 @@ cost=30
 iop1=Drink
 weight=2lb
 
-[dragon_2h_sword]
-name=Dragon 2h sword
-desc=A two-handed Dragon Sword.
-cost=220000
-model=obj_dragon_2h_sword
-iop2=Wield
-manwear=obj_dragon_2h_sword_manwear,0
-womanwear=obj_dragon_2h_sword_manwear,6
-members=yes
-2dyof=3
-2dzoom=2022
-2dyan=1065
-2dzan=124
-2dxan=636
-wearpos=righthand
-wearpos2=lefthand
-weight=8lb
 
 [slayer_boots]
 name=Slayer boots
@@ -88906,275 +85929,61 @@ param=defend_anim,human_shield_defence
 certlink=rune_heraldic_kiteshield5
 certtemplate=template_for_cert
 
-[studded_body_trim_gold]
-name=Studded body (g)
-desc=Those studs should provide a bit more protection, nice trim too!
-recol1s=6342
-recol1d=31366
-cost=850
-model=obj_studded_body_trim_gold
-2dzoom=910
-2dxan=580
-iop2=Wear
-manwear=obj_studded_body_trim_gold_manwear,0
-womanwear=obj_studded_body_trim_gold_womanwear,0
-wearpos=torso
-weight=12lb
 
 [cert_studded_body_trim_gold]
 certlink=studded_body_trim_gold
 certtemplate=template_for_cert
 
-[studded_body_trim_fur]
-name=Studded body (t)
-desc=Those studs should provide a bit more protection, nice trim too!
-recol1s=6342
-recol1d=2080
-cost=850
-model=obj_studded_body_trim_gold
-2dzoom=910
-2dxan=580
-iop2=Wear
-manwear=obj_studded_body_trim_gold_manwear,0
-womanwear=obj_studded_body_trim_gold_womanwear,0
-wearpos=torso
-weight=12lb
 
 [cert_studded_body_trim_fur]
 certlink=studded_body_trim_fur
 certtemplate=template_for_cert
 
-[studded_chaps_trim_gold]
-name=Studded chaps (g)
-desc=Those studs should provide a bit more protection. Nice trim too!
-recol1s=6342
-recol1d=31366
-cost=750
-model=obj_studded_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_studded_chaps_trim_gold_manwear,0
-womanwear=obj_studded_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=10lb
 
 [cert_studded_chaps_trim_gold]
 certlink=studded_chaps_trim_gold
 certtemplate=template_for_cert
 
-[studded_chaps_trim_fur]
-name=Studded chaps (t)
-desc=Those studs should provide a bit more protection. Nice trim too!
-recol1s=6342
-recol1d=2080
-cost=750
-model=obj_studded_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_studded_chaps_trim_gold_manwear,0
-womanwear=obj_studded_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=10lb
 
 [cert_studded_chaps_trim_fur]
 certlink=studded_chaps_trim_fur
 certtemplate=template_for_cert
 
-[dragonhide_body_trim_gold]
-name=D-hide body(g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=31366
-cost=7800
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-wearpos=torso
-weight=15lb
 
 [cert_dragonhide_body_trim_gold]
 certlink=dragonhide_body_trim_gold
 certtemplate=template_for_cert
 
-[dragonhide_body_trim]
-name=D-hide body (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=15054
-cost=7800
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-wearpos=torso
-weight=15lb
 
 [cert_dragonhide_body_trim]
 certlink=dragonhide_body_trim
 certtemplate=template_for_cert
 
-[blue_dragonhide_body_trim_gold]
-name=D-hide body (g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=31366
-cost=9360
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-members=yes
-wearpos=torso
-weight=15lb
 
 [cert_blue_dragonhide_body_trim_gold]
 certlink=blue_dragonhide_body_trim_gold
 certtemplate=template_for_cert
 
-[blue_dragonhide_body_trim]
-name=D-hide body (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=19030
-cost=9360
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-members=yes
-wearpos=torso
-weight=15lb
 
 [cert_blue_dragonhide_body_trim]
 certlink=blue_dragonhide_body_trim
 certtemplate=template_for_cert
 
-[dragonhide_chaps_trim_gold]
-name=D-hide chaps (g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=31365
-recol2s=5250
-recol2d=31365
-cost=3900
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=12lb
 
 [cert_dragonhide_chaps_trim_gold]
 certlink=dragonhide_chaps_trim_gold
 certtemplate=template_for_cert
 
-[dragonhide_chaps_trim]
-name=D-hide chaps (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=15054
-cost=3900
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=12lb
 
 [cert_dragonhide_chaps_trim]
 certlink=dragonhide_chaps_trim
 certtemplate=template_for_cert
 
-[blue_dragonhide_chaps_trim_gold]
-name=D-hide chaps (g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=31366
-recol4s=5250
-recol4d=31366
-cost=4320
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-members=yes
-wearpos=legs
-weight=12lb
 
 [cert_blue_dragonhide_chaps_trim_gold]
 certlink=blue_dragonhide_chaps_trim_gold
 certtemplate=template_for_cert
 
-[blue_dragonhide_chaps_trim]
-name=D-hide chaps (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=19030
-cost=4320
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-members=yes
-wearpos=legs
-weight=12lb
 
 [cert_blue_dragonhide_chaps_trim]
 certlink=blue_dragonhide_chaps_trim
@@ -89224,51 +86033,11 @@ weight=2lb
 certlink=blue_skirt_trim
 certtemplate=template_for_cert
 
-[wizards_robe_trim_gold]
-name=Wizard robe (g)
-desc=I can do magic better in this.
-recol1s=14724
-recol1d=239
-recol2s=6342
-recol2d=31366
-cost=15
-model=obj_wizards_robe_trim_gold
-2dyof=7
-2dzoom=1370
-2dxan=536
-iop2=Wear
-manwear=obj_wizards_robe_trim_gold_manwear,0
-womanwear=obj_wizards_robe_trim_gold_womanwear,0
-manwear2=obj_wizards_robe_trim_gold_manwear2
-womanwear2=obj_wizards_robe_trim_gold_womanwear2
-wearpos=torso
-wearpos2=arms
-weight=2lb
 
 [cert_wizards_robe_trim_gold]
 certlink=wizards_robe_trim_gold
 certtemplate=template_for_cert
 
-[wizards_robe_trim]
-name=Wizard robe (t)
-desc=I can do magic better in this.
-recol1s=14724
-recol1d=239
-recol2s=6342
-recol2d=1057
-cost=15
-model=obj_wizards_robe_trim_gold
-2dyof=7
-2dzoom=1370
-2dxan=536
-iop2=Wear
-manwear=obj_wizards_robe_trim_gold_manwear,0
-womanwear=obj_wizards_robe_trim_gold_womanwear,0
-manwear2=obj_wizards_robe_trim_gold_manwear2
-womanwear2=obj_wizards_robe_trim_gold_womanwear2
-wearpos=torso
-wearpos2=arms
-weight=2lb
 
 [cert_wizards_robe_trim]
 certlink=wizards_robe_trim
@@ -89486,29 +86255,6 @@ members=yes
 iop5=Destroy
 weight=80g
 
-[fairy_enchanted_secateurs]
-name=Magic secateurs
-desc=The only way to kill a Tanglefoot.
-recol1s=15855
-recol1d=704
-recol2s=10570
-recol2d=352
-recol3s=5217
-recol3d=608
-model=obj_secateurs
-manwear=obj_secateurs_manwear,0
-womanwear=obj_secateurs_manwear,6
-2dxof=-1
-2dyof=11
-2dzoom=710
-2dyan=320
-2dxan=312
-members=yes
-iop2=Wield
-iop5=Destroy
-wearpos=righthand
-weight=1lb
-
 [fairy_queen_secateurs]
 name=Queen's secateurs
 desc=Contains the Fairy Queen's magic essence.
@@ -89629,194 +86375,6 @@ ambient=20
 2dxan=468
 members=yes
 weight=1kg
-
-[slayer_spray_pump_10]
-name=Fungicide spray 10
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-cost=300
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_9]
-name=Fungicide spray 9
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_8]
-name=Fungicide spray 8
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_7]
-name=Fungicide spray 7
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_6]
-name=Fungicide spray 6
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_5]
-name=Fungicide spray 5
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_4]
-name=Fungicide spray 4
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_3]
-name=Fungicide spray 3
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_2]
-name=Fungicide spray 2
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_1]
-name=Fungicide spray 1
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
-
-[slayer_spray_pump_0]
-name=Fungicide spray 0
-desc=Pumps fungicide.
-model=obj_slayer_spray_pump_10
-contrast=15
-ambient=15
-members=yes
-manwear=obj_slayer_spray_pump_10_manwear,0
-womanwear=obj_slayer_spray_pump_10_manwear,6
-2dxof=-2
-2dyof=-6
-2dzoom=912
-2dyan=1268
-2dxan=303
-wearpos=righthand
-weight=2kg
 
 [slayer_fungicide]
 name=Fungicide
@@ -94488,74 +91046,6 @@ weight=5lb
 certlink=soulbane_zaros_spear
 certtemplate=template_for_cert
 
-[soulbane_anger_swordq]
-name=Anger sword
-desc=A heavy duty sword.
-cost=26
-model=obj_soulbane_anger_swordq
-2dyof=3
-2dzoom=2128
-2dyan=6
-2dxan=498
-iop2=Wield
-manwear=obj_soulbane_anger_swordq_manwear,0
-womanwear=obj_soulbane_anger_swordq_manwear,6
-members=yes
-wearpos=righthand
-weight=4lb
-
-[soulbane_anger_axeq]
-name=Anger battleaxe
-desc=A heavy duty axe.
-cost=182
-model=obj_soulbane_anger_axeq
-2dxof=-1
-2dyof=1
-2dzoom=2256
-2dyan=519
-2dxan=1646
-iop2=Wield
-manwear=obj_soulbane_anger_axeq_manwear,0
-womanwear=obj_soulbane_anger_axeq_manwear,6
-members=yes
-wearpos=righthand
-weight=6lb
-
-[soulbane_anger_maceq]
-name=Anger mace
-desc=A heavy duty mace.
-cost=18
-iop2=Wield
-manwear=obj_soulbane_anger_maceq_manwear,0
-womanwear=obj_soulbane_anger_maceq_manwear,6
-model=obj_soulbane_anger_maceq
-2dxof=1
-2dyof=98
-2dzoom=1872
-2dyan=1994
-2dxan=294
-members=yes
-wearpos=righthand
-weight=4lb
-
-[soulbane_anger_spearq]
-name=Anger spear
-desc=A heavy duty spear.
-members=yes
-cost=26
-model=obj_soulbane_anger_spearq
-iop2=Wield
-manwear=obj_soulbane_anger_spearq_manwear,0
-womanwear=obj_soulbane_anger_spearq_manwear,6
-2dxof=1
-2dyof=1
-2dyan=2042
-2dxan=504
-members=yes
-wearpos=righthand
-wearpos2=lefthand
-weight=3g
-
 [rag_vinegar]
 name=Jug of vinegar
 desc=This wine clearly did not age well.
@@ -95997,41 +92487,7 @@ members=yes
 weight=3g
 weight=2lb
 
-[rag_ram_helm]
-name=Ram skull helm
-desc=Makes me feel baaad to the bone.
-cost=1
-model=obj_rag_ram_helm
-2dzoom=848
-2dyan=228
-2dxan=1982
-iop2=Wear
-members=yes
-manwear=obj_rag_ram_helm_manwear,0
-womanwear=obj_rag_ram_helm_womanwear,0
-manhead=obj_rag_ram_helm_manhead
-womanhead=obj_rag_ram_helm_womanhead
-weight=3g
-wearpos=hat
-weight=7lb
 
-[rag_bonesack]
-name=Bonesack
-desc=The Bonesack is a little old item that protects like leather.
-members=yes
-iop2=Wear
-model=obj_rag_bonesack
-2dxof=7
-2dyof=-10
-2dzoom=1616
-2dyan=1271
-2dxan=135
-iop2=Wear
-manwear=obj_rag_bonesack_manwear,0
-womanwear=obj_rag_bonesack_womanwear,0
-cost=1
-weight=3g
-wearpos=back
 
 [rag_bottle_wine]
 name=Bottle of wine
@@ -96065,19 +92521,6 @@ model=obj_khali_brew
 cost=1
 members=yes
 weight=1kg
-
-[leaflet_dropper_flyer]
-name=Al kharid flyer
-desc=The money off voucher has expired.
-model=obj_leaflet_dropper_flyer
-2dxof=3
-2dyof=-77
-2dzoom=724
-2dyan=138
-2dzan=194
-2dxan=263
-iop1=Read
-weight=1g
 
 [ogre_arrow_shaft_2]
 recol1s=10368

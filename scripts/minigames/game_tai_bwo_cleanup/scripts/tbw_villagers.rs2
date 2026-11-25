@@ -1,0 +1,112 @@
+// Original cache: ten three-bit fields, 1=sticks shown, 2..7=no sticks.
+// CANDIDATE: six cooldown stages, one per 300 logged-in ticks (OSRS Cleanup).
+[timer,tbw_villager_cooldown]
+def_int $start = 0;
+while ($start < 30) {
+    def_int $stage = getbit_range(%tai_bwo_villagerchat, $start, add($start, 2));
+    if ($stage > 1) {
+        %tai_bwo_villagerchat = setbit_range_toint(%tai_bwo_villagerchat, sub($stage, 1), $start, add($start, 2));
+    }
+    $start = add($start, 3);
+}
+if (~tbw_villager_has_cooldown = false) cleartimer(tbw_villager_cooldown);
+
+[proc,tbw_villager_has_cooldown]()(boolean)
+def_int $start = 0;
+while ($start < 30) {
+    if (getbit_range(%tai_bwo_villagerchat, $start, add($start, 2)) > 1) return (true);
+    $start = add($start, 3);
+}
+return (false);
+
+// Use the visible forms, not the client-hidden multi NPC.
+[proc,tbw_villager_chat_start](npc $villager)(int)
+switch_npc($villager) {
+    case tbwcu_sharimika, tbwcu_sharimika_nosticks : return (0);
+    case tbwcu_mamma_bufetta, tbwcu_mamma_bufetta_nosticks : return (3);
+    case tbwcu_layleen, tbwcu_layleen_nosticks : return (6);
+    case tbwcu_karaday, tbwcu_karaday_nosticks : return (9);
+    case tbwcu_safta_doc, tbwcu_safta_doc_nosticks : return (12);
+    case tbwcu_gabooty, tbwcu_gabooty_nosticks : return (15);
+    case tbwcu_fanellaman, tbwcu_fanellaman_nosticks : return (18);
+    case tbwcu_jagbakoba, tbwcu_jagbakoba_nosticks : return (21);
+    case tbwcu_murcaily, tbwcu_murcaily_nosticks : return (24);
+    case tbwcu_rionasta, tbwcu_rionasta_nosticks : return (27);
+}
+return (null);
+
+[opnpc1,tbwcu_sharimika] @tbw_villager_talk;
+[opnpc1,tbwcu_sharimika_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_mamma_bufetta] @tbw_villager_talk;
+[opnpc1,tbwcu_mamma_bufetta_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_layleen] @tbw_villager_talk;
+[opnpc1,tbwcu_layleen_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_karaday] @tbw_villager_talk;
+[opnpc1,tbwcu_karaday_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_safta_doc] @tbw_villager_talk;
+[opnpc1,tbwcu_safta_doc_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_gabooty] @tbw_villager_talk;
+[opnpc1,tbwcu_gabooty_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_fanellaman] @tbw_villager_talk;
+[opnpc1,tbwcu_fanellaman_nosticks] @tbw_villager_talk;
+[opnpc1,tbwcu_jagbakoba] @tbw_villager_talk;
+[opnpc1,tbwcu_jagbakoba_nosticks] @tbw_villager_talk;
+
+// UNKNOWN functional menu and messages below: no complete period transcript retained.
+[label,tbw_villager_talk]
+if (~p_choice2("Can I have some trading sticks?", 1, "No thanks.", 2) = 1) {
+    ~tbw_claim_sticks;
+}
+
+[proc,tbw_claim_sticks]
+if (~tbw_cleanup_can_work = false) return;
+if (%cleanup_progress < 2) {
+    mes("Repair part of the village fence before asking for trading sticks.");
+    return;
+}
+def_int $start = ~tbw_villager_chat_start(npc_type);
+if (%cleanup_progress < 3 & $start ! 24) {
+    mes("Ask Murcaily for your first trading sticks.");
+    return;
+}
+if (getbit_range(%tai_bwo_villagerchat, $start, add($start, 2)) ! 1) {
+    mes("This villager has no more trading sticks for you yet.");
+    return;
+}
+if (%vill_comm_points = 0) {
+    mes("You need to earn more favour before asking for trading sticks.");
+    return;
+}
+if (inv_freespace(inv) = 0 & inv_total(inv, village_trade_sticks) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+if (%vill_comm_max = 0) %vill_comm_max = %vill_comm_points;
+def_int $slice = divide(add(%vill_comm_max, sub(^tbw_payout_parts, 1)), ^tbw_payout_parts);
+def_int $clothes = ~tbw_village_clothing;
+$slice = max(1, divide(multiply($slice, add(100, multiply($clothes, ^tbw_clothing_fraction_bonus))), 100));
+$slice = min(%vill_comm_points, $slice);
+def_int $sticks = multiply($slice, ^tbw_sticks_per_favour_point);
+inv_add(inv, village_trade_sticks, $sticks);
+%vill_comm_points = sub(%vill_comm_points, $slice);
+%favour_percentage = divide(%vill_comm_points, 10);
+// Start once: another supplier's claim must not reset an existing cooldown clock.
+if (~tbw_villager_has_cooldown = false) settimer(tbw_villager_cooldown, 300);
+%tai_bwo_villagerchat = setbit_range_toint(%tai_bwo_villagerchat, 7, $start, add($start, 2));
+%cleanup_progress = 3;
+mes("You receive <tostring($sticks)> trading sticks.");
+
+[proc,tbw_village_clothing]()(int)
+def_int $count = 0;
+def_int $slot = 0;
+while ($slot < inv_size(worn)) {
+    switch_obj(inv_getobj(worn, $slot)) {
+        case tbw_villager_shirt_cream, tbw_villager_robe_cream, tbw_villager_hat_cream, tbw_villager_armband_cream, tbw_villager_sandals_cream,
+             tbw_villager_shirt_blue, tbw_villager_robe_blue, tbw_villager_hat_blue, tbw_villager_armband_blue, tbw_villager_sandals_blue,
+             tbw_villager_shirt_yellow, tbw_villager_robe_yellow, tbw_villager_hat_yellow, tbw_villager_armband_yellow, tbw_villager_sandals_yellow,
+             tbw_villager_shirt_purple, tbw_villager_robe_purple, tbw_villager_hat_purple, tbw_villager_armband_purple, tbw_villager_sandals_purple :
+            $count = add($count, 1);
+    }
+    $slot = add($slot, 1);
+}
+return ($count);

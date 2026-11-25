@@ -1,0 +1,29 @@
+// VERIFIED bridge after victory; CANDIDATE bright flash and overhead wording.
+// UNKNOWN white-overlay binding, timing and original server copy selection.
+[queue,soulbane_hope_complete]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_hope_active | %soulbane_hope_killedtally ! ^soulbane_hope_creatures) return;
+p_stopaction;
+walktrigger(soulbane_hope_resume);
+~soulbane_clear_room_npcs;
+cam_reset;
+// These two source stands are open and natively reachable in both floor copies.
+// Never move an arbitrary current tile: the two original floors differ.
+p_teleport(~soulbane_room_coord(^soulbane_hope_scene_before));
+if_openoverlay(fade_to_white);
+p_delay(max(1, divide(add(seqlength(seq_1376), 29), 30)));
+p_teleport(movecoord(coord, sub(0, ^soulbane_hope_copy_offset), 0, 0));
+// Let the real BUILD_AREA for the 64-tile move precede removal of the flash.
+p_delay(1);
+if_openoverlay(null);
+say("A bridge of hope! Tolna should feel that help is at hand by now!");
+p_delay(^soulbane_scene_overhead_ticks);
+walktrigger(null);
+%soulbane_hope_bridgepres = 1;
+%soulbane_prog = ^soulbane_hope_clear;
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+
+[walktrigger,soulbane_hope_resume]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_hope_active | %soulbane_hope_killedtally ! ^soulbane_hope_creatures) return;
+p_stopaction;
+walktrigger(soulbane_hope_resume);
+if (getqueue(soulbane_hope_complete) = 0) queue(soulbane_hope_complete, 0, 0);
