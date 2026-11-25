@@ -1,0 +1,17 @@
+[farming_tree]
+column=first,int,REQUIRED
+column=mature,int,REQUIRED
+column=last,int,REQUIRED
+column=claim,int,REQUIRED
+column=stump,int,REQUIRED
+column=level,int,REQUIRED
+column=plant_xp,int,REQUIRED
+column=check_xp,int,REQUIRED
+column=payment,namedobj,REQUIRED
+column=quantity,int,REQUIRED
+column=sapling,obj,REQUIRED
+column=growth,dbrow,REQUIRED
+column=chop_loc,loc,REQUIRED
+column=stump_loc,loc,REQUIRED
+column=roots,namedobj,REQUIRED
+column=roots_quantity,int,REQUIRED

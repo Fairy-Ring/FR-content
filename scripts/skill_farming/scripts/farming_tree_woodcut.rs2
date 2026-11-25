@@ -1,0 +1,137 @@
+// VERIFIED 377 farm-tree loc identities; CANDIDATE native Woodcutting reuse.
+// Axe ranking, success chances, logs, XP, nests and respawn times stay shared.
+// Farming stumps use the owner's original selector, not a global loc change.
+[oploc1,oak_tree_fullygrown_2] @farming_tree_woodcut_attempt;
+[oploc3,oak_tree_fullygrown_2] @farming_tree_woodcut_repeat;
+[oploc1,willow_tree_fullygrown_2] @farming_tree_woodcut_attempt;
+[oploc3,willow_tree_fullygrown_2] @farming_tree_woodcut_repeat;
+[oploc1,maple_tree_fullygrown_2] @farming_tree_woodcut_attempt;
+[oploc3,maple_tree_fullygrown_2] @farming_tree_woodcut_repeat;
+[oploc1,yew_tree_fullygrown_2] @farming_tree_woodcut_attempt;
+[oploc3,yew_tree_fullygrown_2] @farming_tree_woodcut_repeat;
+[oploc1,magic_tree_fullygrown_2] @farming_tree_woodcut_attempt;
+[oploc3,magic_tree_fullygrown_2] @farming_tree_woodcut_repeat;
+
+[proc,farming_tree_choppable](int $stage)(boolean)
+def_dbrow $crop = ~farming_tree_crop($stage);
+if ($crop = null) return(false);
+if ($stage = db_getfield($crop, farming_tree:claim, 0)) return(true);
+return(false);
+
+[proc,farming_tree_chop_data](int $stage)(dbrow)
+def_dbrow $crop = ~farming_tree_crop($stage);
+if ($crop = null) return(null);
+db_find(woodcutting_trees:tree, db_getfield($crop, farming_tree:chop_loc, 0));
+return(db_findnext);
+
+[proc,farming_tree_schedule_stump_regrow](int $patch, int $delay)
+switch_int ($patch) {
+    case 0 : softtimer(farming_tree_stump_0, $delay);
+    case 1 : softtimer(farming_tree_stump_1, $delay);
+    case 2 : softtimer(farming_tree_stump_2, $delay);
+    case 3 : softtimer(farming_tree_stump_3, $delay);
+}
+
+[softtimer,farming_tree_stump_0]
+~farming_tree_stump_regrow(0);
+
+[softtimer,farming_tree_stump_1]
+~farming_tree_stump_regrow(1);
+
+[softtimer,farming_tree_stump_2]
+~farming_tree_stump_regrow(2);
+
+[softtimer,farming_tree_stump_3]
+~farming_tree_stump_regrow(3);
+
+[proc,farming_tree_get_logs](dbrow $data, dbrow $crop, obj $axe)(boolean)
+def_int $low;
+def_int $high;
+$low, $high = ~woodcutting_successchance($data, $axe);
+if (stat_random(woodcutting, $low, $high) = false) return(false);
+def_namedobj $product = db_getfield($data, woodcutting_trees:product, 0);
+def_int $experience = db_getfield($data, woodcutting_trees:productexp, 0);
+if (~leif_intercept_wood("You get some <lowercase(oc_name($product))>.", $experience) = true) return(false);
+mes("You get some <lowercase(oc_name($product))>.");
+stat_advance(woodcutting, $experience);
+inv_add(inv, $product, 1);
+if (map_members = ^true & random(256) = 0) ~drop_bird_nest;
+if (random(8) = 0) {
+    def_int $respawnrate = db_getfield($data, woodcutting_trees:respawnrate, 0);
+    $respawnrate = ~scale_by_playercount($respawnrate);
+    def_int $patch = ~farming_tree_patch_number;
+    ~farming_tree_patch_set($patch, db_getfield($crop, farming_tree:stump, 0));
+    ~farming_tree_schedule_stump_regrow($patch, $respawnrate);
+    sound_synth(tree_fall, 1, 0);
+    anim(null, 0);
+    return(true);
+}
+return(false);
+
+[label,farming_tree_woodcut_attempt]
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+if ($patch < 0 | ~farming_tree_choppable($stage) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_dbrow $crop = ~farming_tree_crop($stage);
+def_dbrow $data = ~farming_tree_chop_data($stage);
+if ($crop = null | $data = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_namedobj $product = db_getfield($data, woodcutting_trees:product, 0);
+if (oc_members($product) = true & map_members = ^false) {
+    mes(^mes_members_feature);
+    return;
+}
+def_int $level = db_getfield($data, woodcutting_trees:levelrequired, 0);
+if (stat(woodcutting) < $level) {
+    anim(null, 0);
+    mes("You need a Woodcutting level of <tostring($level)> to chop down this tree.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    mes("Your inventory is too full to hold any more logs.");
+    return;
+}
+if (%action_delay < map_clock) {
+    if ($level > 0 & ~woodcutting_axe_checker(true) = null) return;
+    %action_delay = calc(map_clock + 3);
+    p_oploc(1);
+    return;
+}
+def_obj $axe = ~woodcutting_axe_checker(true);
+if ($axe = null) return;
+anim(struct_param(oc_param($axe, woodcutting_struct), skill_anim), 0);
+sound_synth(woodchop1, 1, 0);
+mes("You swing your axe at the tree.");
+if (%action_delay = map_clock) {
+    if (~farming_tree_get_logs($data, $crop, $axe) = true) return;
+}
+p_oploc(3);
+
+[label,farming_tree_woodcut_repeat]
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+if ($patch < 0 | ~farming_tree_choppable($stage) = false) return;
+def_dbrow $crop = ~farming_tree_crop($stage);
+def_dbrow $data = ~farming_tree_chop_data($stage);
+if ($crop = null | $data = null) return;
+def_namedobj $product = db_getfield($data, woodcutting_trees:product, 0);
+if (oc_members($product) = true & map_members = ^false) return;
+def_int $level = db_getfield($data, woodcutting_trees:levelrequired, 0);
+if (stat(woodcutting) < $level | inv_freespace(inv) < 1) return;
+def_obj $axe = ~woodcutting_axe_checker(true);
+if ($axe = null) return;
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 3);
+} else if (%action_delay = map_clock) {
+    anim(struct_param(oc_param($axe, woodcutting_struct), skill_anim), 0);
+    sound_synth(woodchop1, 1, 0);
+    mes("You swing your axe at the tree.");
+    if (~farming_tree_get_logs($data, $crop, $axe) = true) return;
+}
+p_oploc(3);
