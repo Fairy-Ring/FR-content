@@ -830,9 +830,11 @@ test('actual insect death releases before the first death delay and no later haz
   ticks(p, 40); assert.equal(hp(p), after); ownership(p, false);
 });
 
-test('real Juna story grants the competing HUD; cave release/start/fallback never takes non-dark ownership', () => {
+test('post-quest Juna story grants the competing HUD; cave release/start/fallback never takes non-dark ownership', () => {
+  World.vars = new Int32Array(types.VarSharedType.count);
   const p = fixture([], [2, 3244, 9500]);
   p.setVar(id('VarPlayerType', 'qp'), 43);
+  p.setVarBit(id('VarBitType', 'tog_juna_bowl'), 2);
   startDialogue('[oploc1,hidey_unbuilt_bush_easy]', p);
   assert(dialoguePage(p).join(' ').includes('Tell me... a story...'));
   resumeDialogue(p); assert(dialoguePage(p).includes('Okay.'));
@@ -841,7 +843,6 @@ test('real Juna story grants the competing HUD; cave release/start/fallback neve
   resumeDialogue(p);
   const junaRoot = id('Component', 'water_collected');
   assert.equal(p.overlay, junaRoot, 'the real story is the HUD grant');
-  resumeDialogue(p); resumeDialogue(p);
   ownership(p, false);
   execute('[proc,swamp_cave_release]', p); execute('[proc,swamp_cave_start]', p);
   ticks(p, 35); ownership(p, false); assert.equal(p.overlay, junaRoot);
