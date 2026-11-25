@@ -140,7 +140,8 @@ await run(async () => {
         assert.equal(constant.length, 1, `${name} named native constant ${value}`);
         expected = Number(constant[0][1]);
       } else if (['attack_anim', 'defend_anim', 'death_anim'].includes(param)) expected = SeqType.getId(value);
-      else if (['attack_sound', 'defend_sound', 'death_sound'].includes(param)) expected = packedId(contentRoot, 'synth', value);
+      else if (['attack_sound', 'defend_sound', 'death_sound', 'rangeattack_sound'].includes(param)) expected = packedId(contentRoot, 'synth', value);
+      else if (['proj_launch', 'proj_travel'].includes(param)) expected = packedId(contentRoot, 'spotanim', value);
       else expected = Number(value);
       assert(Number.isInteger(expected), `${name} supported authored server parameter ${param}`);
       assert.equal(npc.params.get(paramId), expected, `${name} source/packed parameter ${param}`);
@@ -208,7 +209,8 @@ await run(async () => {
       assert(script, `${name} resolved ${trigger}`);
       const ownedTimer = trigger === 'AI_TIMER';
       const death = trigger === 'AI_QUEUE3';
-      assert.equal(script.name, ownedTimer || death ? `[${trigger.toLowerCase()},${name}]` : `[${trigger.toLowerCase()},_]`, `${name} unchanged owned timer/death and native queue binding`);
+      const approach = [3, 4].includes(npc.params.get(ParamType.getId('damagetype')) ?? ParamType.getByName('damagetype').defaultInt);
+      assert.equal(script.name, ownedTimer || death || approach ? `[${trigger.toLowerCase()},${name}]` : `[${trigger.toLowerCase()},_]`, `${name} owned timer/death and style-selected native retaliation binding`);
     }
   }
   console.log('PASS BC-01 thirteen authored blocks, no unpack duplicates, original IDs, source/packed server fields and timer/death/queue bindings');
