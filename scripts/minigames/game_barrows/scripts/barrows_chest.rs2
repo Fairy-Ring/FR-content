@@ -23,7 +23,7 @@ if (~barrows_brother_slain($identity) = false & ~barrows_brother_find($brother) 
     if (npc_finduid(~barrows_actor_spawn($brother, $tile, ^barrows_chest_summon_lifetime)) = false) return;
     // CANDIDATE later reconstruction, not a recovered 377 transcript.
     npc_say("You dare steal from us!");
-    npc_setmode(opplayer2);
+    npc_setmode(~barrows_combat_start_mode($brother));
 }
 %barrows_chest_open = 1;
 

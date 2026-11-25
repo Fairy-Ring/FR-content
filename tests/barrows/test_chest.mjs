@@ -569,7 +569,9 @@ await run(async () => {
       assert.equal(actor.getVar(npcGenerationVar), generation, `${label}: actor captures the exact run generation`);
       assert.equal(actor.sayMessage, 'You dare steal from us!', `${label}: actor carries the CANDIDATE overhead line`);
       assert.equal(actor.target, player, `${label}: actor targets its owner, not a bystander`);
-      assert.equal(actor.targetOp, NpcMode.OPPLAYER2, `${label}: actor starts native opplayer2 mode`);
+      const expectedMode = NpcMode.OPPLAYER2;
+      assert.equal(procInt(player, 'barrows_combat_start_mode', [brotherId(identity)]), expectedMode, `${label}: config selects the native start mode`);
+      assert.equal(actor.targetOp, expectedMode, `${label}: actor starts its native player-attack mode`);
       assert.equal(actor.level, 0, `${label}: final encounter stays in tunnels`);
       assert(chebyshev(actor, player) <= 2, `${label}: uniform valid-tile placement stays within the legal 0..2 ring`);
       assert.equal(roomOf(actor), 4, `${label}: final brother remains in the central tunnel room`);

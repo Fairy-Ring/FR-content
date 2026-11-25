@@ -1,3 +1,11 @@
+// Each converted ranged/magic type selects its native approach mode by config.
+// This helper does not alter the actor, its owner or the encounter lifecycle.
+[proc,barrows_combat_start_mode](npc $type)(npc_mode)
+switch_int(nc_param($type, damagetype)) {
+    case ^ranged_style, ^magic_style : return(applayer2);
+}
+return(opplayer2);
+
 // CANDIDATE: the two level-77 skeletons cap at 10 without fitting Strength.
 // Keep native contact readiness, accuracy, prayer, delivery and retaliation.
 [ai_opplayer2,barrows_skeleton_unarmed] gosub(barrows_skeleton_attack);

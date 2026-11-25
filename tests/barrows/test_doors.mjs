@@ -108,7 +108,7 @@ await run(async () => {
   const runtime = await loadPackedRuntime(options);
   const {
     World, Player, LocType, NpcType, VarPlayerType, VarNpcType, ParamType,
-    ScriptProvider, ScriptRunner, ScriptState, JavaRandom, EntityLifeCycle, CoordGrid
+    ScriptProvider, ScriptRunner, ScriptState, JavaRandom, EntityLifeCycle, NpcMode, CoordGrid
   } = runtime;
   const runner = createRunner(runtime, { prefix: 'barrows_doors', firstUid: 30100 });
   const { procInt, procVoid, addNpc } = runner;
@@ -619,6 +619,17 @@ await run(async () => {
     assert.equal(constant('barrows_door_summon_lifetime'), 1000, 'door summon lifetime remains the configured 1000 ticks');
     assert.equal(constant('barrows_owner_check_ticks'), 1, 'owned actors retain the one-tick owner timer');
 
+    const modeProbe = makePlayer('start-mode-probe');
+    const ordinaryTypes = [
+      'barrows_bloodworm', 'barrows_rat', 'barrows_giantrat', 'barrows_spider',
+      'barrows_giantspider', 'barrows_skeleton_unarmed', 'barrows_skeleton_armed'
+    ];
+    for (const name of [...BROTHERS.map(([name]) => name), ...ordinaryTypes]) {
+      const expectedMode = NpcMode.OPPLAYER2;
+      const result = withDraws([], () => procInt(modeProbe, 'barrows_combat_start_mode', [npcId(name)]), `${name} pure start mode`);
+      assert.equal(result.value, expectedMode, `${name}: config selects its native start mode without a draw`);
+    }
+
     const drawClass = parseEnum(runtime.contentRoot, 'barrows_door_draw_class');
     const expectedDrawClass = Array.from({ length: 128 }, (_, draw) => [
       String(draw), draw < 12 ? 'brother' : draw < 64 ? 'skeleton' : draw < 96 ? 'bloodworm' : 'crypt_rat'
@@ -906,6 +917,38 @@ await run(async () => {
       assert.equal(spawnDelta(beforeNids).length, 0, 'invalid placement creates no source-side or invalid NPC');
     } finally {
       restoreBlocks(invalidBlocks);
+    }
+
+    // The real selector can spawn all six brothers and only these three monsters.
+    const modeOwner = makePlayer('door-spawn-mode');
+    const modeCases = [
+      ...BROTHERS.map(([name], rank) => ({ name, draws: [[0, 128], [rank, 6]] })),
+      { name: DOOR_TYPES.skeleton, draws: [[12, 128]] },
+      { name: DOOR_TYPES.bloodworm, draws: [[64, 128]] },
+      { name: DOOR_TYPES.crypt_rat, draws: [[96, 128]] }
+    ];
+    for (const [index, { name, draws }] of modeCases.entries()) {
+      clearNpcs();
+      const generation = 700 + index;
+      setRun(modeOwner, { phase: 1, generation, openLock: ordinaryCrossing.lock, position: ordinaryCrossing.source });
+      modeOwner.packets.length = 0;
+      const before = new Set(activeNpcs().map(npc => npc.nid));
+      withDoorSpawn(ordinaryCrossing.destination, npcId(name), draws, () => runLocAction(modeOwner, ordinaryCrossing), `${name} native door mode`);
+      const actors = spawnDelta(before);
+      assert.equal(actors.length, 1, `${name}: real traversal creates exactly one selected actor`);
+      const actor = actors[0];
+      const expectedMode = NpcMode.OPPLAYER2;
+      assert.equal(actor.type, npcId(name), `${name}: real door selects the exact NPC type`);
+      assert.equal(actor.targetOp, expectedMode, `${name}: door spawn starts its native player-attack mode`);
+      assert.equal(actor.target, modeOwner, `${name}: door spawn targets the traversing owner`);
+      assert.equal(actor.getVar(npcVars.npc_barrows_owner), modeOwner.uid, `${name}: door spawn preserves owner UID`);
+      assert.equal(actor.getVar(npcVars.npc_barrows_generation), generation, `${name}: door spawn preserves generation`);
+      assert.equal(actor.lifecycleTick, constant('barrows_door_summon_lifetime'), `${name}: door spawn preserves lifetime`);
+      assert.equal(actor.timerInterval, constant('barrows_owner_check_ticks'), `${name}: door spawn preserves owner timer`);
+      if (index < BROTHERS.length) {
+        assert(modeOwner.packets.some(packet => packet.constructor.name === 'HintArrow' && packet.type === 1 && packet.nid === actor.nid),
+          `${name}: brother spawn preserves the owner's native hint`);
+      }
     }
 
     clearNpcs();

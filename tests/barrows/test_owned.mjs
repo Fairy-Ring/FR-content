@@ -114,7 +114,9 @@ await run(async () => {
       assert.equal(actor.type, type, `${name} joins to its own brother`);
       assert.equal(actor.getVar(generation), 100 + identity, 'actor captures the run generation');
       assert.equal(actor.sayMessage, 'You dare disturb my rest!', `${name} uses the sourced CANDIDATE 2007-base overhead line`);
-      assert.equal(actor.targetOp, NpcMode.OPPLAYER2, `${name} starts the published player-attack mode without a scripted delay`);
+      const expectedMode = NpcMode.OPPLAYER2;
+      assert.equal(procInt(p, 'barrows_combat_start_mode', [type]), expectedMode, `${name} config selects its native start mode`);
+      assert.equal(actor.targetOp, expectedMode, `${name} starts its native player-attack mode without a scripted delay`);
       assert.equal(actor.target, p, `${name} targets its searching owner at spawn`);
       assert.notEqual(actor.target, bystander, `${name} does not target the second player on the owner's tile`);
       assert.equal(actor.timerInterval, 1, 'spawn arms the one-tick native ownership timer');

@@ -129,4 +129,4 @@ if ($type = null) return;
 def_coord $tile = ~barrows_door_tile($landing, $type);
 if ($tile = null) return;
 if (npc_finduid(~barrows_actor_spawn($type, $tile, ^barrows_door_summon_lifetime)) = false) return;
-npc_setmode(opplayer2);
+npc_setmode(~barrows_combat_start_mode($type));

@@ -27,4 +27,4 @@ if ($spawn = coord) return; // No eligible square: map_findsquare returns its or
 if (npc_finduid(~barrows_actor_spawn($brother, $spawn, ^barrows_crypt_summon_lifetime)) = false) return;
 npc_say("You dare disturb my rest!");
 // Published summon convention: Rashiliyia's minions target the active player.
-npc_setmode(opplayer2);
+npc_setmode(~barrows_combat_start_mode($brother));
