@@ -886,6 +886,15 @@ try {
     for (const row of report.costs) for (const opcode of Object.keys(row.added)) assert(allowed.has(opcode), `${row.npc} ${row.entry} ${row.variant}: ${opcode}`);
   });
   report.observedCallers = [...observed].sort();
+  const seededBranches = report.routeCoverage.flatMap(route => route.branches.map(branch => ({
+    script: route.script, npc: route.npc, branch: branch.branch, attempts: branch.seedAttempts
+  })));
+  const maxSeedAttempts = Math.max(0, ...seededBranches.map(branch => branch.attempts));
+  const retriedBranches = seededBranches.filter(branch => branch.attempts > 1);
+  for (const branch of retriedBranches) console.log(`SEED_SEARCH ${branch.script} npc=${branch.npc} branch=${branch.branch} attempts=${branch.attempts}`);
+  console.log(`SEED_SEARCH_SUMMARY retriedBranches=${retriedBranches.length} maxAttempts=${maxSeedAttempts}`);
+  report.routeSeedSearch.maxAttempts = maxSeedAttempts;
+  report.routeSeedSearch.retriedBranches = retriedBranches;
   report.summary = { checks, npcTypes: npcs.length, routes: npcs.reduce((n, r) => n + r.entries.length, 0), uniqueDispatchRoutes: report.routeCoverage.length, seededRouteCases: report.routeCoverage.reduce((n, r) => n + r.branches.length, 0), differentialCases: report.costs.length, passed: true };
   console.log(`RESULT PASS npc-combat-outcomes checks=${checks} npcTypes=${npcs.length} sameRunCases=${report.costs.length}`);
 } catch (error) {
