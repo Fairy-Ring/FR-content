@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {
-  World, ServerTriggerType, PlayerStat, id, obj, inv, count, seed, use,
+  World, Packet, PlayerLoading, ServerTriggerType, PlayerStat, id, obj, inv, count, seed, use,
   finish, qualified, value, set, stage, loc, npc, stand, talk, click, useOn,
   dispatch, random, remove, types
 } from './runtime.mjs';
@@ -58,6 +58,14 @@ assert.equal(stage(p), 10); assert.equal(value(p, 'enakh_statue_multivar'), 31);
 assert.equal(value(p, 'enakh_fallen_statue_multivar'), 3, 'overlapping original selector shows limbful fallen statue');
 assert.deepEqual([p.level, p.x, p.z], [0, 3127, 9325]);
 runTemple(p);
+const saved = p.save();
+assert(PlayerLoading.verify(new Packet(saved)), 'quest player produces a valid save');
+const reloaded = PlayerLoading.load(p.username, new Packet(saved), null);
+for (const name of ['enakh_quest_expositbits', 'enakh_multivarbits', 'enakh_varbits']) {
+  assert.equal(reloaded.getVar(id('VarPlayerType', name)), p.getVar(id('VarPlayerType', name)), `${name}: every puzzle and recovery flag survives relog`);
+}
+assert.equal(count(reloaded, 'camulet'), 1, 'reward survives save round-trip');
+assert.deepEqual([reloaded.level, reloaded.x, reloaded.z], [p.level, p.x, p.z], 'temple re-entry position survives relog');
 spellGates();
 auditTravel();
 // Independent boundary fixtures seed only their own branch, not the end-to-end path.

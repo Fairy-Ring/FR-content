@@ -91,7 +91,13 @@ export function auditTravel() {
   for (const row of placements.filter(row => row.kind === 'NpcType')) {
     const name = types.NpcType.get(row.type).debugname;
     if (!name.startsWith('enakh_')) continue;
-    const target = npc(name), tile = stand(p, target);
+    const target = npc(name);
+    // The live route approaches the guarding spirit from the entrance side.
+    const tile = name === 'enakh_boneguard_multinpc'
+      ? { level: target.level, x: target.x, z: target.z + target.length }
+      : approach(target);
+    assert.equal(map.isMapBlocked(tile.x, tile.z, tile.level), false, `${name}: audited NPC approach is walkable`);
+    assert(map.reachedEntity(tile.level, tile.x, tile.z, target.x, target.z, target.width, target.length, 1), `${name}: audited NPC approach reaches the real entity`);
     approaches.push({ name, target: { level: row.level, x: row.x, z: row.z }, stand: tile });
   }
   console.log('PACKED_APPROACHES', JSON.stringify(approaches));
