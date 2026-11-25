@@ -16,7 +16,8 @@ iop1=Scan
 iop2=Contact
 iop4=Playback
 weight=1g
-tradeable=no // UNKNOWN favourable quest-item policy.
+// UNKNOWN favourable quest-item policy.
+tradeable=no
 
 [wanted_solus_trophy]
 name=Solus's hat
@@ -29,4 +30,5 @@ model=obj_wanted_solus_trophy
 2dxan=144
 members=yes
 weight=1g
-tradeable=no // UNKNOWN favourable quest-item policy.
+// UNKNOWN favourable quest-item policy.
+tradeable=no
