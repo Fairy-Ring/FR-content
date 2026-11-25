@@ -56,6 +56,11 @@ try {
   check('every external compiled shared-proc caller is registered', () => assert.deepEqual(inventory.externalCallers, registered.externalCallers));
   report.externalCallers = inventory.externalCallers;
   report.npcManifest = inventory.npcs.map(({ npc, poison, entries }) => ({ npc, poison, entries: entries.map(({ trigger, script, paths }) => ({ trigger, script, paths })) }));
+  const census = report.presentationCensus = { cases: [], excluded: [] };
+  const coveredNpcTypes = new Set(inventory.npcs.map(record => record.npc));
+  for (const npc of NpcType.configs) {
+    if (npc?.debugname && !coveredNpcTypes.has(npc.debugname)) census.excluded.push(npc.debugname);
+  }
   const observed = new Set();
   const namedProcs = new Set(inventory.scripts.map(s => s.name));
   check('no published caller opts into outcomes', () => {
@@ -76,6 +81,11 @@ try {
       const actualArgs = typeof args === 'function' ? args(f) : args;
       const result = rt.observe(name, f, actualArgs, variant, rng);
       result.settled = rt.settle(f);
+      if (name.startsWith('[ai_')) census.cases.push({
+        npc: type, script: name, variant, seed: rng?.seed,
+        execution: result.snapshot.execution, error: result.snapshot.error,
+        settledError: result.settled.error, diagnostics: result.errors
+      });
       if (trackObserved) for (const caller of result.visited) observed.add(caller);
       return result;
     } finally {
@@ -620,13 +630,11 @@ try {
           f => configureRoute(f, route), route.distance ?? 1, { seed },
           nativeTolna ? 'cow' : route.npc, false);
         attempts++;
+        assert.deepEqual(result.errors, [], `${route.script} seed=${seed}: script diagnostics`);
+        assert.equal(result.snapshot.error, null, `${route.script} seed=${seed}: script execution error`);
+        assert.equal(result.settled.error, null, `${route.script} seed=${seed}: settled script execution error`);
+        assert.notEqual(result.snapshot.execution, rt.State.ABORTED, `${route.script} seed=${seed}: native route abort`);
         const actualBranch = dispatchBranch(result);
-        if (actualBranch !== branch) {
-          // Preserve existing named no-accuracy routes; never retry an error as RNG drift.
-          assert.deepEqual(result.errors, [], `${route.script} seed=${seed}: script diagnostics`);
-          assert.equal(result.snapshot.error, null, `${route.script} seed=${seed}: script execution error`);
-          assert.equal(result.settled.error, null, `${route.script} seed=${seed}: settled script execution error`);
-        }
         outcomes.push(`${seed}:${actualBranch}`);
         return { seed, result, actualBranch };
       };
@@ -652,6 +660,11 @@ try {
           nativeTolna ? 'cow' : route.npc, selected.result);
         assert.equal(dispatchBranch(result), branch, `${route.script} seed=${selected.seed} attempts=${attempts}`);
         if (nativeTolna) assertTolnaRouteStyle(result, route, branch);
+        for (const record of npcs) {
+          if (record.npc === route.npc || !record.entries.some(entry => entry.script === route.script)) continue;
+          execute(pack, record.npc, route.script, [], 'seeded', style,
+            f => configureRoute(f, { ...route, npc: record.npc }), route.distance ?? 1, { seed: selected.seed });
+        }
         branches.push({
           branch, ...seedMetadata, accuracy: result.accuracy,
           queued: result.snapshot.queued, error: result.snapshot.error
@@ -660,6 +673,68 @@ try {
     }
     report.routeCoverage.push({ script: route.script, npc: route.npc, style, profile: route.profile, stand: route.stand, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
   }
+  const rotRoute = routeSeeds.routes.find(route => route.npc === 'skeletonmage');
+  for (const [branch, seed] of Object.entries(rotRoute.rotSeeds)) {
+    check(`skeletonmage native rot ${branch}`, () => {
+      let before, clock;
+      const result = differential(rotRoute.npc, rotRoute.script, [], 'seeded', 'magic',
+        { rotBranch: branch, seed }, f => {
+          configureRoute(f, rotRoute);
+          before = [...f.player.levels];
+          clock = rt.World.currentTick;
+        }, 1, { seed }, false);
+      assert.equal(result.snapshot.execution, rt.State.FINISHED);
+      assert(result.visited.includes('[proc,npc_spell_cast]'), 'the native rot branch casts');
+      assert.deepEqual(result.accuracy, [branch === 'landed']);
+      for (const stat of [0, 1, 2]) {
+        assert.equal(result.snapshot.levels[stat], before[stat] - (branch === 'landed' ? 4 : 0));
+      }
+      assert.equal(result.settled.levels[3], before[3], 'rot deals no damage');
+      assert.equal(result.snapshot.npcVars[rt.id(VarNpcType, 'npc_action_delay')], clock + 4);
+    });
+  }
+  for (const stat of [0, 1, 2]) check(`skeletonmage declines rot below base stat=${stat}`, () => {
+    const result = differential(rotRoute.npc, rotRoute.script, [], 'seeded', 'magic',
+      { belowBaseStat: stat, seed: rotRoute.rotSeeds.landed }, f => {
+        configureRoute(f, rotRoute);
+        f.player.levels[stat]--;
+      }, 1, { seed: rotRoute.rotSeeds.landed }, false);
+    assert.equal(result.snapshot.execution, rt.State.FINISHED);
+    assert(!result.visited.includes('[proc,npc_spell_cast]'), 'rot is not cast');
+    assert(result.visited.includes('[proc,npc_default_attack]'), 'ordinary melee is retained');
+    assert(!result.events.some(event => event.op === 'STAT_SUB'), 'no drain is applied');
+  });
+  const neziRoute = routeSeeds.routes.find(route => route.script === '[ai_applayer2,nezikchened]');
+  for (const branch of ['hit', 'zero', 'miss', 'protected']) {
+    check(`nezikchened native distance-two magic ${branch}`, () => {
+      const seed = neziRoute.seeds[branch === 'protected' ? 'hit' : branch];
+      let clock, hp;
+      const result = differential(neziRoute.npc, neziRoute.script, [],
+        branch === 'protected' ? 'protected-hit' : 'seeded', 'magic',
+        { nativeSpellBranch: branch, seed, distance: 2 }, f => {
+          configureRoute(f, neziRoute);
+          clock = rt.World.currentTick;
+          hp = f.player.levels[3];
+        }, 2, { seed }, false);
+      assert.equal(result.snapshot.execution, rt.State.FINISHED);
+      assert(result.visited.includes('[proc,npc_spell_cast]'), 'native magic-distance branch casts');
+      assert.equal(result.snapshot.npcVars[rt.id(VarNpcType, 'npc_action_delay')], clock + 5);
+      assert.equal(dispatchBranch(result), branch === 'protected' ? 'miss' : branch);
+      const hits = result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]');
+      if (branch === 'hit' || branch === 'zero') {
+        assert.equal(hits.length, 1);
+        assert(hits[0].args[0] >= 0 && hits[0].args[0] <= 18);
+        assert.equal(result.settled.levels[3], hp - hits[0].args[0]);
+        const magnitude = result.events.filter(event => event.op === 'RANDOMINC').at(-1);
+        assert.equal(magnitude.in[0], 18, 'dedicated magic maximum');
+      } else {
+        assert.deepEqual(hits, []);
+        assert.equal(result.settled.levels[3], hp, 'miss or protection deals no damage');
+      }
+    });
+  }
+  census.aborts = census.cases.filter(result => result.execution === rt.State.ABORTED || result.error || result.settledError || result.diagnostics.length);
+  check('every packed native attack route branch has no script error', () => assert.deepEqual(census.aborts, []));
   check('Tolna native route manifest covers the five source styles', () => {
     const tolnaRoutes = routeSeeds.routes.filter(route => route.prelude === 'soulbane-tolna-intro');
     const expected = {

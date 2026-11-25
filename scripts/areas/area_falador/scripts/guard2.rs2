@@ -1,3 +1,20 @@
 [ai_queue1,guard2] ~npc_default_retaliate_ap;
 [ai_opplayer2,guard2] npc_setmode(applayer2);
 [ai_applayer2,guard2] ~npc_rangeattack;
+
+// CANDIDATE: Lost City 289 guard2 route and these Guards' ranged rows.
+[ai_queue1,fai_falador_guard2] ~npc_default_retaliate_ap;
+[ai_opplayer2,fai_falador_guard2] npc_setmode(applayer2);
+[ai_applayer2,fai_falador_guard2] ~npc_rangeattack;
+
+[ai_queue1,fai_falador_guard4] ~npc_default_retaliate_ap;
+[ai_opplayer2,fai_falador_guard4] npc_setmode(applayer2);
+[ai_applayer2,fai_falador_guard4] ~npc_rangeattack;
+
+[ai_queue1,fai_falador_guard5] ~npc_default_retaliate_ap;
+[ai_opplayer2,fai_falador_guard5] npc_setmode(applayer2);
+[ai_applayer2,fai_falador_guard5] ~npc_rangeattack;
+
+[ai_queue1,fai_falador_guard6] ~npc_default_retaliate_ap;
+[ai_opplayer2,fai_falador_guard6] npc_setmode(applayer2);
+[ai_applayer2,fai_falador_guard6] ~npc_rangeattack;

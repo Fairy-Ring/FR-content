@@ -15,12 +15,50 @@
       "script": "[ai_applayer2,guard2]",
       "npc": "guard2",
       "seeds": {
-        "no-accuracy": 2654435769
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
       },
-      "unsupportedBranches": {
-        "hit": "Native strict ranged presentation aborts at SOUND_SYNTH: rangeattack_sound is null, before accuracy or damage.",
-        "zero": "Native strict ranged presentation aborts before accuracy or damage.",
-        "miss": "Native strict ranged presentation aborts before accuracy or damage."
+      "style": "ranged"
+    },
+    {
+      "script": "[ai_applayer2,fai_falador_guard2]",
+      "npc": "fai_falador_guard2",
+      "style": "ranged",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,fai_falador_guard4]",
+      "npc": "fai_falador_guard4",
+      "style": "ranged",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,fai_falador_guard5]",
+      "npc": "fai_falador_guard5",
+      "style": "ranged",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,fai_falador_guard6]",
+      "npc": "fai_falador_guard6",
+      "style": "ranged",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
       }
     },
     {
@@ -156,8 +194,11 @@
       "seeds": {
         "zero": 2654435769,
         "miss": 1013904242,
-        "no-accuracy": 2415085441,
         "hit": 3189639355
+      },
+      "rotSeeds": {
+        "landed": 2175735113,
+        "failed": 2415085441
       }
     },
     {
@@ -646,14 +687,12 @@
       "script": "[ai_applayer2,nezikchened]",
       "npc": "nezikchened",
       "seeds": {
-        "no-accuracy": 2654435769
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
       },
       "distance": 2,
-      "unsupportedBranches": {
-        "hit": "At magic distance the native nezikchened_mage_attack spell has no magic_spell_table row; the wrapper aborts before accuracy.",
-        "zero": "The native spell-row lookup aborts before accuracy or damage.",
-        "miss": "The native spell-row lookup aborts before accuracy or damage."
-      }
+      "style": "magic"
     },
     {
       "script": "[ai_opplayer2,san_tojalon]",

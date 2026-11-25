@@ -247,12 +247,21 @@ routes that first draw a spell or style. Its fixtures use native equipment and
 quest state, then compute the player's cached defence with `player_combat_stat`.
 Each seed asserts the actual reached accuracy/damage branch. Base-pack mode
 compares these executions too. The manifest lists why a branch cannot exist:
-strict null ranged presentation for guard2, a missing native magic row for
-Nezikchened's AP route, non-damaging Bind/Confuse for chaos druid's AP route,
-and no accuracy roll for the troll thrower and snail routes. These native
-limitations are preserved, not repaired by the seam.
+non-damaging Bind/Confuse for chaos druid's AP route, and no accuracy roll for
+the troll thrower and snail routes. Script errors are never accepted as a
+no-accuracy branch. The ranged Guards and Nezikchened's distance cast have
+ordinary hit, zero and miss branches.
 
-The suite tries the stored seed first. If it reaches another branch, it tries at most 32 unsigned candidates `Math.imul(n, 0x9e3779b9) >>> 0` for `n=1..32`, skipping a duplicate of the stored seed. This caps an unreachable branch at 33 native fixture executions including the preferred seed. The mirror-shield trace found its replacement at candidate 3; the cap leaves headroom while bounding the cost of rebuilding native routes, especially Tolna's private-region fixture. Failed probes are not differentials or report cases/costs; each accepted branch prints and records its selected seed and total attempts. A branch mismatch with a script error fails immediately rather than entering the search. Existing named no-accuracy limitations above retain their previous behavior.
+The suite tries the stored seed first. If it reaches another branch, it tries at most 32 unsigned candidates `Math.imul(n, 0x9e3779b9) >>> 0` for `n=1..32`, skipping a duplicate of the stored seed. This caps an unreachable branch at 33 native fixture executions including the preferred seed. Failed probes are not differentials or cost cases, but enter the presentation census. Every probe rejects script errors before classifying its branch. Each accepted branch prints and records its seed and attempt count. The summary lists branches needing more than one attempt and the maximum attempt count.
+
+The registered presentation census includes every native dispatch in the
+prefix matrix, every seeded probe, and each accepted route's seeded streams
+replayed for all other packed types sharing that trigger. It asserts zero
+script errors and reports types whose dispatch reaches no watched shared
+attack segment as excluded. Dedicated native cases prove Nezikchened's
+distance-two magic hit, zero, miss and protection, and the skeleton mage's
+landed/failed rot plus each below-base stat guard. These are compiled proofs,
+not evidence of natural map access or historical presentation bindings.
 
 The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
 `-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,
