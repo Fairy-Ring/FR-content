@@ -72,3 +72,29 @@ data=disease_period,80
 table=farming_growth
 data=period,5
 data=handler,10
+
+// CANDIDATE later family periods, applied to original 377 selectors.
+// UNKNOWN disease periods: the published next-slowest-tier convention.
+[farming_growth_tree]
+table=farming_growth
+data=period,40
+data=handler,11
+data=disease_period,80
+
+[farming_growth_fruit_tree]
+table=farming_growth
+data=period,160
+data=handler,12
+data=disease_period,320
+
+[farming_growth_calquat]
+table=farming_growth
+data=period,160
+data=handler,13
+data=disease_period,320
+
+[farming_growth_spirit_tree]
+table=farming_growth
+data=period,320
+data=handler,14
+data=disease_period,640
