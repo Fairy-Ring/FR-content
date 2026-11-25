@@ -5814,6 +5814,113 @@
       }
     },
     {
+      "identity": { "debugname": "barrows_karil", "id": 2028 },
+      "unit": "BC07",
+      "evidence": {
+        "facts": ["barrows.bc-karil-skills", "barrows.bc-karil-bonuses", "barrows.bc-karil-attack", "barrows.bc-karil-maxhit"],
+        "label": "CANDIDATE",
+        "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+        "sources": [
+          { "id": "src.barrows-bc-osrs-history", "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce" },
+          { "id": "src.barrows-bc-oldschool-base-special-history", "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908" }
+        ]
+      },
+      "fields": {
+        "attack": { "value": 1 },
+        "strength": { "value": 1 },
+        "defence": { "value": 100 },
+        "magic": { "value": 1 },
+        "ranged": { "value": 100 },
+        "param:attack_anim": {
+          "value": { "ref": "seq", "name": "barrows_repeating_crossbow_fire" },
+          "evidence": {
+            "facts": ["barrows.bc-karil-attack-animation"],
+            "label": "CANDIDATE",
+            "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+            "sources": [
+              { "id": "src.barrows-bcm2-operator", "sha256": "f2e188241ee3107af2cf2afdf2884cf23046df19956de212c5a5c55381430f56" },
+              { "id": "src.barrows-bcm2-sequences", "sha256": "a8cecdb299208b3a87deb5d0113b0e2653059eb78a96aacbd1dd32a2e6c7fc88" },
+              { "id": "src.barrows-bcm2-fix-r1-study", "sha256": "35c8fe625069e9edc6a55e1e2444c5dd2104560e4e239697290481feeab5f5c2" }
+            ]
+          }
+        },
+        "param:attackbonus": { "value": 0 },
+        "param:attackrate": { "value": 4 },
+        "param:barrows_maxhit": { "value": 20 },
+        "param:crushdefence": { "value": 90 },
+        "param:damagetype": { "value": 3 },
+        "param:magicattack": { "value": -26 },
+        "param:magicdefence": { "value": 106 },
+        "param:proj_launch": {
+          "value": { "ref": "spotanim", "name": "crossbowbolt_launch" },
+          "evidence": {
+            "facts": ["barrows.bc-karil-projectile-launch"],
+            "label": "CANDIDATE",
+            "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+            "sources": [
+              { "id": "src.barrows-bcm2-operator", "sha256": "f2e188241ee3107af2cf2afdf2884cf23046df19956de212c5a5c55381430f56" },
+              { "id": "src.barrows-bcm2-packed", "sha256": "fe847696c7ca39fe27269fd86bc624421bc38ad32420bf7f3d2c6052644e3c55" },
+              { "id": "src.barrows-bcm2-fix-r1-study", "sha256": "35c8fe625069e9edc6a55e1e2444c5dd2104560e4e239697290481feeab5f5c2" }
+            ]
+          }
+        },
+        "param:proj_travel": {
+          "value": { "ref": "spotanim", "name": "crossbowbolt_travel" },
+          "evidence": {
+            "facts": ["barrows.bc-karil-projectile-travel"],
+            "label": "CANDIDATE",
+            "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+            "sources": [
+              { "id": "src.barrows-bcm2-operator", "sha256": "f2e188241ee3107af2cf2afdf2884cf23046df19956de212c5a5c55381430f56" },
+              { "id": "src.barrows-bcm2-packed", "sha256": "fe847696c7ca39fe27269fd86bc624421bc38ad32420bf7f3d2c6052644e3c55" },
+              { "id": "src.barrows-bcm2-fix-r1-study", "sha256": "35c8fe625069e9edc6a55e1e2444c5dd2104560e4e239697290481feeab5f5c2" }
+            ]
+          }
+        },
+        "param:rangeattack": { "value": 134 },
+        "param:rangeattack_sound": {
+          "value": { "ref": "synth", "name": "karil_attack" },
+          "evidence": {
+            "facts": ["barrows.bc-karil-attack-sound"],
+            "label": "CANDIDATE",
+            "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+            "sources": [
+              { "id": "src.barrows-bcm2-operator", "sha256": "f2e188241ee3107af2cf2afdf2884cf23046df19956de212c5a5c55381430f56" },
+              { "id": "src.barrows-bcm2-packed", "sha256": "fe847696c7ca39fe27269fd86bc624421bc38ad32420bf7f3d2c6052644e3c55" },
+              { "id": "src.barrows-bcm2-fix-r1-study", "sha256": "35c8fe625069e9edc6a55e1e2444c5dd2104560e4e239697290481feeab5f5c2" }
+            ]
+          }
+        },
+        "param:rangebonus": { "value": 55 },
+        "param:rangedefence": { "value": 100 },
+        "param:slashdefence": { "value": 71 },
+        "param:stabdefence": { "value": 79 },
+        "param:strengthbonus": { "value": 0 },
+        "attackrange": {
+          "value": 8,
+          "evidence": {
+            "facts": ["barrows.bc-karil-reach"],
+            "label": "CANDIDATE",
+            "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+            "sources": [
+              { "id": "src.barrows-karil-crossbow-r5886361", "sha256": "2e24b2eefaf301a6a1609975d8b9a724d8c3ca4e8eaffd585378df0f636a80f6" },
+              { "id": "src.barrows-karil-crossbow-r15360666", "sha256": "08668f386840f0a142146c896a3d7d29ad2bab12d7a49d62d4e294b3c21f7e24" },
+              { "id": "src.barrows-karil-operator-q5-answer-1125", "sha256": "543969bd8835a13c67d99fde4024713ffd6ae4f84f6598c085309a0348d55b8d" }
+            ]
+          }
+        },
+        "regenrate": {
+          "value": 16,
+          "evidence": {
+            "facts": ["barrows.bc-regen-clock"],
+            "label": "UNKNOWN",
+            "researchCommit": "4fca2827f05332dfb92a0ec45f8327bdffaf565c",
+            "sources": []
+          }
+        }
+      }
+    },
+    {
       "identity": { "debugname": "barrows_dharok", "id": 2026 },
       "unit": "BC06",
       "evidence": {

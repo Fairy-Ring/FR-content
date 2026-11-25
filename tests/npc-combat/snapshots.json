@@ -2448,6 +2448,89 @@
       }
     },
     {
+      "identity": {
+        "debugname": "barrows_karil",
+        "id": 2028
+      },
+      "contentCommit": "61fb584f315727ccf8e49d0468d004edd69d8a10",
+      "fields": {
+        "active": true,
+        "alwaysontop": true,
+        "ambient": 50,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 50,
+        "defaultmode": 1,
+        "defence": 100,
+        "desc": "A vengeful spirit corrupted by dark magic.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 100,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6675
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Karil the Tainted",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "human_ready"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 98,
+        "walkanim": {
+          "ref": "seq",
+          "name": "human_walk_f"
+        },
+        "walkanim_b": {
+          "ref": "seq",
+          "name": "human_walk_b"
+        },
+        "walkanim_l": {
+          "ref": "seq",
+          "name": "human_walk_r"
+        },
+        "walkanim_r": {
+          "ref": "seq",
+          "name": "human_walk_l"
+        },
+        "wanderrange": 5
+      }
+    },
+    {
       "identity": { "debugname": "barrows_dharok", "id": 2026 },
       "contentCommit": "4189b8458bb9d7f36abba8dc3a0a5bba9e5f33ce",
       "fields": {

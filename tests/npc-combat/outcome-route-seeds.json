@@ -3,6 +3,16 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_applayer2,barrows_karil]",
+      "npc": "barrows_karil",
+      "style": "ranged",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
       "script": "[ai_opplayer2,barrows_dharok]",
       "npc": "barrows_dharok",
       "seeds": {
