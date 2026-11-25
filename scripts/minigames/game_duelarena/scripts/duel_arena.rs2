@@ -295,7 +295,7 @@ set_player_op("Challenge", 1, ^false);
 set_player_op(null, 2, ^false);
 
 [proc,toggle_duel_challenge_off]
-if_openoverlay(null);
+if (~mta_room = 0) if_openoverlay(null);
 set_player_op(null, 1, ^false);
 
 // Messages are taken from a variety of old sources and are always in the same order
