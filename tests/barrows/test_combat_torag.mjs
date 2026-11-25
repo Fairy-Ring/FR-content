@@ -9,9 +9,9 @@ await run(async () => {
   const { engineRoot, packDir } = resolveRoots(parseOptions());
   const rt = await runtime(engineRoot, packDir);
   const load = file => import(pathToFileURL(path.join(engineRoot, file)).href);
-  const [{ default: Trigger }, { default: Player }, { default: Runner }, routefinder, { EntityLifeCycle }] = await Promise.all([
+  const [{ default: Trigger }, { default: Player }, routefinder, { EntityLifeCycle }] = await Promise.all([
     load('src/engine/script/ServerTriggerType.ts'), load('src/engine/entity/Player.ts'),
-    load('src/engine/script/ScriptRunner.ts'), load('src/engine/routefinder/index.ts'), load('src/engine/entity/EntityLifeCycle.ts')
+    load('src/engine/routefinder/index.ts'), load('src/engine/entity/EntityLifeCycle.ts')
   ]);
   const { World, Provider, State, Pointer, configs: { NpcType, VarNpcType, VarPlayerType } } = rt;
   const nv = name => rt.id(VarNpcType, name), pv = name => rt.id(VarPlayerType, name);
@@ -174,9 +174,9 @@ await run(async () => {
       assert.equal(f.npc.getVar(nv('npc_barrows_generation')), 17);
       assert.equal(f.npc.heroPoints.findHero(), f.player.hash64);
       assert.equal(f.player.getVar(pv('barrows_kills')), 0);
-      const script = Provider.getByTrigger(Trigger.AI_QUEUE2, type.id, type.category);
-      const state = Runner.init(script, f.npc, f.player, [100]); f.npc.executeScript(state);
-      assert.equal(state.execution, State.FINISHED); assert.equal(f.npc.levels[3], 0);
+      f.npc.enqueueScript(Trigger.AI_QUEUE2, 0, 100);
+      World.currentTick++; f.npc.turn(); f.player.processQueues();
+      assert.equal(f.npc.levels[3], 0, 'native damage queue receives last_int, not a synthetic proc-local argument');
       for (let tick = 0; tick < 16 && (f.npc.isActive || [...f.player.queue.all()].length); tick++) {
         World.currentTick++; if (f.npc.isActive) f.npc.turn(); f.player.processQueues();
       }
