@@ -88,6 +88,29 @@ await check('all original portal dispatchers enforce hat and level gates, then n
     finish(p,R.trigger(p,'OPLOC1',exit));assert.deepEqual([p.x,p.z,p.level],[3363,3314,0]);assert.deepEqual(balances(p),[0,0,0,0]);
   }
 });
+await check('stale Duel Arena zone queues cannot replace any MTA room overlay',()=>{
+  const rooms=[
+    ['telekinetic_teleport',3363,3315,'pizazz_telekinetic'],
+    ['alchemists_teleport',3363,3321,'pizazz_alchemy'],
+    ['enchanters_teleport',3360,3318,'pizazz_enchantment'],
+    ['graveyard_teleport',3366,3318,'pizazz_graveyard']
+  ];
+  for(const [name,x,z,overlay] of rooms){
+    const p=player({x,z:z-1});give(p,'magictraining_proghat_dull');
+    const pending=()=>[...p.queue.all(),...p.weakQueue.all()].filter(request=>request.script.name==='[queue,check_duel_arena_challenge_area]').length;
+    finish(p,run(p,'[zone,0_52_51_32_48]'));assert.equal(pending(),1,'the actual overlapping hall-zone trigger queues its Duel Arena check');
+    const target=World.getLoc(x,z,0,id('LocType',name));assert(target);
+    finish(p,R.trigger(p,'OPLOC1',target));
+    assert.equal(pending(),0,'native MTA entry cancels the already queued Duel Arena check');
+    const expected=id('Component',overlay);assert.equal(p.overlay,expected,'native entry selects the room overlay');
+    R.tick(p,2);assert.equal(p.overlay,expected,'the queue phase preserves the room overlay');
+    finish(p,run(p,'[zone,0_52_51_32_48]'));assert.equal(pending(),1,'a late stale zone callback is queued through its real script');
+    R.tick(p,2);assert.equal(pending(),0,'the late callback really executes');assert.equal(p.overlay,expected,'Duel Arena cleanup must not clear the active MTA overlay');
+    finish(p,run(p,'[proc,mta_leave]'));
+  }
+  const outside=player();outside.openMainOverlay(id('Component','overlay_duel'));
+  finish(outside,run(outside,'[proc,toggle_duel_challenge_off]'));assert.equal(outside.overlay,-1,'Duel Arena cleanup outside MTA remains unchanged');
+});
 await check('native alchemy entry refuses carried coins without losing coins or the hat',()=>{
   const p=player({x:3363,z:3320});give(p,'magictraining_proghat_dull');give(p,'coins',200);
   const target=World.getLoc(3363,3321,0,id('LocType','alchemists_teleport'));assert(target);
