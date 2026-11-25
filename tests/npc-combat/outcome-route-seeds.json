@@ -3,6 +3,15 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_opplayer2,barrows_torag]",
+      "npc": "barrows_torag",
+      "seeds": {
+        "miss": 2415085441,
+        "hit": 3668340011,
+        "zero": 1992887715
+      }
+    },
+    {
       "script": "[ai_opplayer2,_]",
       "npc": "hans",
       "seeds": {
