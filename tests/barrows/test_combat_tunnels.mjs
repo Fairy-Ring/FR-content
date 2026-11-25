@@ -106,6 +106,30 @@ await run(async () => {
         }
       }
     });
+    // Owner-only safety depends on the quiet helper's premise: area scans admit
+    // a secondary only after native map_multiway accepts its tile. The native
+    // MAP_MULTIWAY handler delegates to World.gameMap.isMulti; check the full
+    // compiled barrows_inside footprint (mapsquare 55_151, planes 0 and 3).
+    check('no Barrows interior tile is multiway for quiet area scans', () => {
+      const inside = Provider.getByName('[proc,barrows_inside]');
+      assert(inside, 'compiled barrows_inside exists');
+      const probe = fixture('barrows_bloodworm');
+      let checked = 0;
+      for (const level of [0, 3]) {
+        for (let x = 55 * 64; x < 56 * 64; x++) {
+          for (let z = 151 * 64; z < 152 * 64; z++) {
+            const coord = CoordGrid.packCoord(level, x, z);
+            const state = Runner.init(inside, probe.player, null, [coord]);
+            assert.equal(probe.player.runScript(state, true, true), State.FINISHED, 'compiled barrows_inside completes');
+            assert.equal(state.isp, 1, 'compiled barrows_inside returns one boolean');
+            assert.equal(state.popInt(), 1, `barrows_inside accepts ${CoordGrid.formatString(level, x, z)}`);
+            assert.equal(World.gameMap.isMulti(coord), false, `Barrows tile ${CoordGrid.formatString(level, x, z)}`);
+            checked++;
+          }
+        }
+      }
+      assert.equal(checked, 8192, 'all 64×64 tiles on both Barrows planes were checked');
+    });
     for (const [name, spec] of Object.entries(TYPES)) {
       check(`${name} real dispatch, subtype, maximum, one hit and four-tick delay`, () => {
         const f = fixture(name);
