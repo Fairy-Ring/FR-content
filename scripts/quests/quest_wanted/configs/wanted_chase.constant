@@ -1,0 +1,15 @@
+// UNKNOWN engineering defaults. Period sources give places and four-or-more scans,
+// not mission mapping, exact tiles, count, radius, staging or damage arithmetic.
+^wanted_field_scan_count = 5
+^wanted_flames_after_scans = 2
+^wanted_knight_after_scans = 4
+^wanted_scan_radius = 20
+^wanted_scan_delay = 2
+^wanted_actor_lifetime = 1000
+^wanted_actor_distance = 32
+^wanted_actor_search_radius = 64
+^wanted_ranger_count = 2
+^wanted_ranger_lifetime = 20
+^wanted_flames_hp_divisor = 4
+^wanted_actor_timer = 1
+^wanted_ranger_cleanup_radius = 2

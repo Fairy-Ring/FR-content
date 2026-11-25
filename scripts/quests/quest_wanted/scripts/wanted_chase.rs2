@@ -13,44 +13,44 @@ if (inv_freespace(inv) = 0) {
     return;
 }
 // Rescans cannot duplicate an active encounter. Departures/timers permit retry.
-npc_findallany(coord, 64, 0);
+npc_findallany(coord, ^wanted_actor_search_radius, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid & (npc_type = wanted_summoned_black_knight | npc_type = wanted_solus_attackable | npc_type = wanted_solus_fake_woman_base_config)) return;
 }
 anim(wanted_crystal_ball_scan, 0);
 spotanim_pl(wanted_crystal_ball_scan_spotanim, 0, 0);
 sound_synth(wanted_scan, 1, 0);
-p_delay(2); // UNKNOWN presentation, not a historical scan duration.
+p_delay(^wanted_scan_delay);
 if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
 if ($mission = 19) { ~wanted_mine_confrontation; return; }
 def_int $count = ~wanted_chase_count;
-if ($count = 4) {
-    npc_add(coord, wanted_solus, 1000);
+if ($count = ^wanted_knight_after_scans) {
+    npc_add(coord, wanted_solus, ^wanted_actor_lifetime);
     %npc_attacking_uid = uid;
     spotanim_npc(wanted_teleport, 0, 0);
     %npc_int = $mission;
-    npc_settimer(1);
+    npc_settimer(^wanted_actor_timer);
     ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Well you ARE a persistent <text_gender("fellow", "madam")> aren't you?");
     ~chatplayer("<p,neutral>I am here to take you in Solus. You can forget your little tricks.");
     ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Little tricks, you say? Well how about this one!");
     ~chatnpc_specific("Solus", wanted_solus, "<p,neutral>Say hello to my little friend! And goodbye to me!");
     if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
     npc_del;
-    npc_add(coord, wanted_summoned_black_knight, 1000);
+    npc_add(coord, wanted_summoned_black_knight, ^wanted_actor_lifetime);
     %npc_attacking_uid = uid;
     %npc_aggressive_player = uid;
     %npc_int = $mission;
-    npc_settimer(1);
+    npc_settimer(^wanted_actor_timer);
     npc_say("Solus commands you to die now!");
     npc_setmode(opplayer2);
     return;
 }
-if ($count = 2) {
-    npc_add(coord, wanted_solus, 1000);
+if ($count = ^wanted_flames_after_scans) {
+    npc_add(coord, wanted_solus, ^wanted_actor_lifetime);
     %npc_attacking_uid = uid;
     spotanim_npc(wanted_teleport, 0, 0);
     %npc_int = $mission;
-    npc_settimer(1);
+    npc_settimer(^wanted_actor_timer);
     ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>This is getting very tiresome!");
     ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>Little White Knight, I command powers beyond your imagination!");
     ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>This charade bores me!");
@@ -58,7 +58,7 @@ if ($count = 2) {
     if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
     // UNKNOWN favourable damage: most current HP, leaving at least one.
     spotanim_pl(zamorak_flame, 0, 0);
-    damage(uid, ^hitmark_damage, sub(stat(hitpoints), max(1, divide(stat(hitpoints), 4))));
+    damage(uid, ^hitmark_damage, sub(stat(hitpoints), max(1, divide(stat(hitpoints), ^wanted_flames_hp_divisor))));
     npc_del;
     p_teleport(0_46_52_41_17); // UNKNOWN reachable Falador castle courtyard staging.
     ~wanted_chase_next($mission);
@@ -68,17 +68,17 @@ if ($count = 2) {
     return;
 }
 if ($mission = 11) {
-    npc_add(coord, wanted_solus_fake_woman_base_config, 1000);
+    npc_add(coord, wanted_solus_fake_woman_base_config, ^wanted_actor_lifetime);
     %npc_attacking_uid = uid;
     %npc_int = $mission;
-    npc_settimer(1);
+    npc_settimer(^wanted_actor_timer);
     return;
 }
-npc_add(coord, wanted_solus, 1000);
+npc_add(coord, wanted_solus, ^wanted_actor_lifetime);
 %npc_attacking_uid = uid;
 spotanim_npc(wanted_teleport, 0, 0);
 %npc_int = $mission;
-npc_settimer(1);
+npc_settimer(^wanted_actor_timer);
 ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>What the...?");
 ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Well well well! I was wondering when the White Knights would come looking for me!");
 ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Well you'll have to be quicker than that, my friend!");
@@ -91,7 +91,7 @@ if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_cha
 if (inv_freespace(inv) = 0) return;
 ~wanted_chase_mark($mission);
 def_int $next = 19;
-if (~wanted_chase_count < 5) {
+if (~wanted_chase_count < ^wanted_field_scan_count) {
     $next = add(2, random(17));
     while (~wanted_chase_done($next) = 1) {
         $next = add($next, 1);
@@ -198,25 +198,26 @@ anim(wanted_human_injured_cutscene, 0);
 ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>You and what army?");
 if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) return;
 // UNKNOWN count and placement. Spawn only on the player's reachable floor tile.
-npc_add(coord, wanted_white_ranger, 20);
-%npc_attacking_uid = uid;
-spotanim_npc(ice_barrage_impact, 0, 0);
-npc_add(coord, wanted_white_ranger, 20);
-%npc_attacking_uid = uid;
-spotanim_npc(ice_barrage_impact, 0, 0);
+def_int $rangers = 0;
+while ($rangers < ^wanted_ranger_count) {
+    npc_add(coord, wanted_white_ranger, ^wanted_ranger_lifetime);
+    %npc_attacking_uid = uid;
+    spotanim_npc(ice_barrage_impact, 0, 0);
+    $rangers = add($rangers, 1);
+}
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>This one, Solus!");
 ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>You'll never take me alive!");
-npc_findall(coord, wanted_white_ranger, 2, 0);
+npc_findall(coord, wanted_white_ranger, ^wanted_ranger_cleanup_radius, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid) npc_del;
 }
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral><displayname>, Solus is very weakened, and we don't have any more fighters to spare!");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Take him out now! This might be your only chance!");
 if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) return;
-npc_add(coord, wanted_solus_attackable, 1000);
+npc_add(coord, wanted_solus_attackable, ^wanted_actor_lifetime);
 %npc_attacking_uid = uid;
 %npc_aggressive_player = uid;
-npc_settimer(1);
+npc_settimer(^wanted_actor_timer);
 npc_say("YOU DIE NOW!");
 npc_setmode(opplayer2);
 
@@ -226,7 +227,7 @@ npc_setmode(opplayer2);
 [ai_timer,wanted_solus_fake_woman_base_config] @wanted_combat_timer;
 [label,wanted_combat_timer]
 if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
-if (%wanted_main ! ^wanted_chase | distance(coord, npc_coord) > 32) { npc_del; return; }
+if (%wanted_main ! ^wanted_chase | distance(coord, npc_coord) > ^wanted_actor_distance) { npc_del; return; }
 if (npc_type = wanted_solus_attackable) {
     if (~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) npc_del;
 } else if (~wanted_chase_target ! %npc_int) npc_del;
@@ -249,7 +250,7 @@ if (npc_findhero = ^true) {
 ~npc_death;
 
 [queue,wanted_knight_defeated](int $mission)
-if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_count ! 4 | ~wanted_chase_near($mission) = false) return;
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_count ! ^wanted_knight_after_scans | ~wanted_chase_near($mission) = false) return;
 // A full inventory cannot lose progress: the next Scan can repeat the fight.
 ~wanted_chase_next($mission);
 

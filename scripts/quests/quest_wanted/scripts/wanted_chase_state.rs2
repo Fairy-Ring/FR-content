@@ -171,5 +171,5 @@ return($count);
 if ($mission = 19) return(inzone(0_45_75_0_0, 0_45_75_63_63, coord));
 def_coord $centre = ~wanted_chase_coord($mission);
 if (coordy(coord) ! coordy($centre)) return(false);
-if (distance(coord, $centre) <= 20) return(true); // UNKNOWN generous search radius.
+if (distance(coord, $centre) <= ^wanted_scan_radius) return(true);
 return(false);
