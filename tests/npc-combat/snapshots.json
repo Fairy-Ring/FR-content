@@ -2226,6 +2226,94 @@
         },
         "wanderrange": 5
       }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_torag",
+        "id": 2029
+      },
+      "contentCommit": "062d235a0e87f1ef735ffe21e1b2150937ef745b",
+      "fields": {
+        "active": true,
+        "alwaysontop": true,
+        "ambient": 50,
+        "attack": 100,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 50,
+        "defaultmode": 1,
+        "defence": 100,
+        "desc": "A vengeful spirit corrupted by dark magic.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 100,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6657,
+          6677,
+          6645,
+          6663,
+          6708,
+          6679
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Torag the Corrupted",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "human_ready"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 100,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 115,
+        "walkanim": {
+          "ref": "seq",
+          "name": "human_walk_f"
+        },
+        "walkanim_b": {
+          "ref": "seq",
+          "name": "human_walk_b"
+        },
+        "walkanim_l": {
+          "ref": "seq",
+          "name": "human_walk_r"
+        },
+        "walkanim_r": {
+          "ref": "seq",
+          "name": "human_walk_l"
+        },
+        "wanderrange": 5
+      }
     }
   ]
 }

@@ -5594,6 +5594,124 @@
           }
         }
       }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_torag",
+        "id": 2029
+      },
+      "unit": "BC03",
+      "evidence": {
+        "facts": [
+          "barrows.bc-torag-skills",
+          "barrows.bc-torag-bonuses",
+          "barrows.bc-torag-attack"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "5a3de0b73e6800fd950e74e6bc9d6d1a6628179d",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 100
+        },
+        "strength": {
+          "value": 100
+        },
+        "defence": {
+          "value": 100
+        },
+        "magic": {
+          "value": 1
+        },
+        "ranged": {
+          "value": 1
+        },
+        "param:attackrate": {
+          "value": 5
+        },
+        "param:damagetype": {
+          "value": 2
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 72
+        },
+        "param:magicattack": {
+          "value": -33
+        },
+        "param:rangeattack": {
+          "value": -11
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 221
+        },
+        "param:slashdefence": {
+          "value": 235
+        },
+        "param:crushdefence": {
+          "value": 222
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 221
+        },
+        "regenrate": {
+          "value": 16,
+          "evidence": {
+            "facts": [
+              "barrows.bc-regen-clock"
+            ],
+            "label": "UNKNOWN",
+            "researchCommit": "5a3de0b73e6800fd950e74e6bc9d6d1a6628179d",
+            "sources": []
+          }
+        },
+        "param:barrows_maxhit": {
+          "value": 25,
+          "evidence": {
+            "facts": [
+              "barrows.bc-torag-maxhit"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "5a3de0b73e6800fd950e74e6bc9d6d1a6628179d",
+            "sources": [
+              {
+                "id": "src.barrows-bc-r1-conflicts",
+                "sha256": "9d013327e4487bde32867115a6bf289d4c25c15962e88792e59cc0dc29e4c71f"
+              },
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ],
+            "sourcePriorityException": {
+              "kind": "source-priority",
+              "preferred": "src.barrows-bc-r1-conflicts",
+              "overridden": [
+                "src.barrows-bc-osrs-history"
+              ],
+              "reason": "The explicit near-target RuneScape 2007 maximum 25 outranks the later Old School maximum 23. Keep the independent skill and bonus vector; do not fit Strength."
+            }
+          }
+        }
+      }
     }
   ]
 }
