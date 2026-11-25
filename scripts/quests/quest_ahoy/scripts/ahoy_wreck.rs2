@@ -220,20 +220,21 @@ if (distance(coord, loc_coord) > 6) {
     p_aprange(6);
     return;
 }
-// Each accepted pair is one step on the mapped chain; the island/beach
-// endpoints are included so reverse jumps also land on the clicked rock.
+// The native approach may walk around a rock before line of sight is clear.
+// UNKNOWN landing tolerance: include its adjacent tiles, not only its anchor.
+// The accepted neighbours still permit only the next link in the mapped chain.
 def_boolean $valid = false;
 if (distance(coord, 0_56_55_21_30) <= 3 & coordx(coord) >= 3605 & loc_coord = 0_56_55_20_30) $valid = true;
-if ((coord = 0_56_55_20_30 & loc_coord = 0_56_55_18_30) | (coord = 0_56_55_18_30 & loc_coord = 0_56_55_20_30)) $valid = true;
-if ((coord = 0_56_55_18_30 & loc_coord = 0_56_55_15_32) | (coord = 0_56_55_15_32 & loc_coord = 0_56_55_18_30)) $valid = true;
-if ((coord = 0_56_55_15_32 & loc_coord = 0_56_55_13_32) | (coord = 0_56_55_13_32 & loc_coord = 0_56_55_15_32)) $valid = true;
-if ((coord = 0_56_55_13_32 & loc_coord = 0_56_55_11_34) | (coord = 0_56_55_11_34 & loc_coord = 0_56_55_13_32)) $valid = true;
-if ((coord = 0_56_55_11_34 & loc_coord = 0_56_55_11_36) | (coord = 0_56_55_11_36 & loc_coord = 0_56_55_11_34)) $valid = true;
-if ((coord = 0_56_55_11_36 & loc_coord = 0_56_55_13_39) | (coord = 0_56_55_13_39 & loc_coord = 0_56_55_11_36)) $valid = true;
-if ((coord = 0_56_55_13_39 & loc_coord = 0_56_55_13_41) | (coord = 0_56_55_13_41 & loc_coord = 0_56_55_13_39)) $valid = true;
-if ((coord = 0_56_55_13_41 & loc_coord = 0_56_55_15_44) | (coord = 0_56_55_15_44 & loc_coord = 0_56_55_13_41)) $valid = true;
-if ((coord = 0_56_55_15_44 & loc_coord = 0_56_55_17_44) | (coord = 0_56_55_17_44 & loc_coord = 0_56_55_15_44)) $valid = true;
-if ((coord = 0_56_55_17_44 & loc_coord = 0_56_55_22_45) | (coord = 0_56_55_22_45 & loc_coord = 0_56_55_17_44)) $valid = true;
+if ((distance(coord, 0_56_55_20_30) <= 1 & loc_coord = 0_56_55_18_30) | (distance(coord, 0_56_55_18_30) <= 1 & loc_coord = 0_56_55_20_30)) $valid = true;
+if ((distance(coord, 0_56_55_18_30) <= 1 & loc_coord = 0_56_55_15_32) | (distance(coord, 0_56_55_15_32) <= 1 & loc_coord = 0_56_55_18_30)) $valid = true;
+if ((distance(coord, 0_56_55_15_32) <= 1 & loc_coord = 0_56_55_13_32) | (distance(coord, 0_56_55_13_32) <= 1 & loc_coord = 0_56_55_15_32)) $valid = true;
+if ((distance(coord, 0_56_55_13_32) <= 1 & loc_coord = 0_56_55_11_34) | (distance(coord, 0_56_55_11_34) <= 1 & loc_coord = 0_56_55_13_32)) $valid = true;
+if ((distance(coord, 0_56_55_11_34) <= 1 & loc_coord = 0_56_55_11_36) | (distance(coord, 0_56_55_11_36) <= 1 & loc_coord = 0_56_55_11_34)) $valid = true;
+if ((distance(coord, 0_56_55_11_36) <= 1 & loc_coord = 0_56_55_13_39) | (distance(coord, 0_56_55_13_39) <= 1 & loc_coord = 0_56_55_11_36)) $valid = true;
+if ((distance(coord, 0_56_55_13_39) <= 1 & loc_coord = 0_56_55_13_41) | (distance(coord, 0_56_55_13_41) <= 1 & loc_coord = 0_56_55_13_39)) $valid = true;
+if ((distance(coord, 0_56_55_13_41) <= 1 & loc_coord = 0_56_55_15_44) | (distance(coord, 0_56_55_15_44) <= 1 & loc_coord = 0_56_55_13_41)) $valid = true;
+if ((distance(coord, 0_56_55_15_44) <= 1 & loc_coord = 0_56_55_17_44) | (distance(coord, 0_56_55_17_44) <= 1 & loc_coord = 0_56_55_15_44)) $valid = true;
+if ((distance(coord, 0_56_55_17_44) <= 1 & loc_coord = 0_56_55_22_45) | (distance(coord, 0_56_55_22_45) <= 1 & loc_coord = 0_56_55_17_44)) $valid = true;
 if (distance(coord, 0_56_55_22_45) <= 2 & coordx(coord) >= 3604 & loc_coord = 0_56_55_17_44) $valid = true;
 if ($valid = false) {
     ~displaymessage(^dm_default);

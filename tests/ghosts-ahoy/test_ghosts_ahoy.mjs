@@ -19,6 +19,8 @@ assert.equal(Environment.NODE_XPRATE, 1, 'exact reward XP requires NODE_XPRATE=1
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
 const closeHandler = new (await engineModule('network/game/client/handler/CloseModalHandler.ts')).default();
+const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
+const locHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
 function close(p) {
   assert(closeHandler.handle(new CloseModal(), p), 'native modal-close packet is accepted');
   p.processQueues();
@@ -101,6 +103,14 @@ function operate(p, loc, option = 1, choices = [], approach = false) {
   p.executeScript(state, true, true);
   finish(p, state, choices);
   return state;
+}
+function jumpRock(p, loc) {
+  const type = types.LocType.get(loc.type);
+  p.originX = p.x; p.originZ = p.z;
+  p.queueWaypoints(map.findPathToLoc(p.level, p.x, p.z, loc.x, loc.z, 1,
+    type.width, type.length, loc.angle, loc.shape, type.forceapproach));
+  assert(locHandler.handle(new OpLoc(1, loc.x, loc.z, loc.type), p), 'native rock click is accepted');
+  for (let tick = 0; (p.target || p.activeScript || p.hasWaypoints()) && tick < 24; tick++) environmentTick(p);
 }
 function checkLanding(p, label) {
   assert.equal(map.isMapBlocked(p.x, p.z, p.level), false, `${label}: packed landing is walkable`);
@@ -385,19 +395,19 @@ travel.baseLevels[PlayerStat.AGILITY] = travel.levels[PlayerStat.AGILITY] = 50;
 const rocks = [[3604, 3550], [3602, 3550], [3599, 3552], [3597, 3552], [3595, 3554],
   [3595, 3556], [3597, 3559], [3597, 3561], [3599, 3564], [3601, 3564]];
 for (const [x, z] of rocks) {
-  operate(travel, locAt('ahoy_rock_invisible', 0, x, z), 1, [], true);
+  jumpRock(travel, locAt('ahoy_rock_invisible', 0, x, z));
   assert.deepEqual(tile(travel), [0, x, z], 'clicked rock is the jump destination');
   checkLanding(travel, 'outward rock jump');
 }
-operate(travel, locAt('ahoy_rock_invisible', 0, 3601, 3564), 1, [], true);
+jumpRock(travel, locAt('ahoy_rock_invisible', 0, 3601, 3564));
 arrive(travel, 3606, 3565, 'last rock connects to the island chest approach');
 assert.deepEqual(tile(travel), [0, 3606, 3565], 'endpoint rock reaches the island bank without a fixture teleport');
 for (const [x, z] of [...rocks].reverse()) {
-  operate(travel, locAt('ahoy_rock_invisible', 0, x, z), 1, [], true);
+  jumpRock(travel, locAt('ahoy_rock_invisible', 0, x, z));
   assert.deepEqual(tile(travel), [0, x, z], 'the island route permits the real reverse jump');
   checkLanding(travel, 'return rock jump');
 }
-operate(travel, locAt('ahoy_rock_invisible', 0, 3604, 3550), 1, [], true);
+jumpRock(travel, locAt('ahoy_rock_invisible', 0, 3604, 3550));
 assert.deepEqual(tile(travel), [0, 3605, 3550], 'endpoint rock returns to the ship bank without a fixture teleport');
 travel.queueWaypoints(map.findPath(0, travel.x, travel.z, 3605, 3548));
 arrive(travel, 3605, 3548, 'first rock connects back to the gangplank');
