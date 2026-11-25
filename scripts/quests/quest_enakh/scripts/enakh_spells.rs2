@@ -4,6 +4,7 @@
 // Unrelated NPCs must retain the entire existing combat path.
 if (npc_type ! enakh_dummy_fountain & npc_type ! enakh_dummy_furnace & npc_type ! enakh_boneguard) return(false);
 if (%enakh_quest < 10) return(false);
+if (npc_type = enakh_boneguard & (%enakh_quest < 30 | %enakh_quest >= 50)) return(false);
 if (map_clock < %action_delay) return(true);
 def_boolean $matches = false;
 if (npc_type = enakh_dummy_fountain) {
@@ -11,7 +12,7 @@ if (npc_type = enakh_dummy_fountain) {
 } else if (npc_type = enakh_dummy_furnace) {
     if ($spell = ^wind_strike | $spell = ^wind_bolt | $spell = ^wind_blast | $spell = ^wind_wave) $matches = true;
 } else {
-    if ($spell = ^crumble_undead & %enakh_quest >= 30 & %enakh_quest < 50) $matches = true;
+    if ($spell = ^crumble_undead) $matches = true;
 }
 if ($matches = false) { mes("That spell does not affect this obstacle."); return(true); }
 def_dbrow $data = ~get_spell_data($spell);

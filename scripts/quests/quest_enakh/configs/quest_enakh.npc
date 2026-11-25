@@ -28,10 +28,6 @@ readyanim=human_ready
 op1=Talk-to
 head1=npc_professor_oddenstein_head
 head2=idk_man_jaw_long_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_aristarchus]
 name=Aristarchus
@@ -62,10 +58,6 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_pointy_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_boneguard]
 name=Boneguard
@@ -78,10 +70,6 @@ walkanim=enakh_boneguard_walk
 readyanim=enakh_boneguard_ready
 turnspeed=0
 head1=npc_3129_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_bone_pile]
 name=Pile of bones
@@ -91,10 +79,6 @@ vislevel=hide
 size=2
 op1=Climb-over
 turnspeed=0
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_desert_spirit]
 name=Desert Spirit
@@ -122,10 +106,6 @@ walkanim=human_secret_ghost_transwalk_f
 readyanim=human_secret_ghost_transready
 op1=Talk-to
 head1=npc_3131_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_dummy_fountain]
 name=Crust of ice
@@ -136,10 +116,6 @@ size=2
 turnspeed=0
 op2=Melt
 minimap=no
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_dummy_furnace]
 name=Furnace grate
@@ -162,20 +138,12 @@ size=2
 turnspeed=0
 op2=Clear
 minimap=no
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_enakhra_multinpc]
 vislevel=1
 multivar=enakh_enakhra_form
 multinpc=0,enakh_enakhra_hooded
 multinpc=1,enakh_enakhra_mahjarrat
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_enakhra_hooded]
 name=Enakhra
@@ -204,10 +172,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=obj_castlewars_cloak_saradomin_womanhead
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_enakhra_mahjarrat]
 name=Enakhra
@@ -236,10 +200,6 @@ resizev=140
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 head1=npc_3138_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_akthanakos_multinpc]
 vislevel=1
@@ -247,10 +207,6 @@ multivar=enakh_akthanakos_form
 multinpc=0,enakh_akthanakos_boneguard
 multinpc=1,enakh_akthanakos_freed
 multinpc=2,enakh_akthanakos_mahjarrat
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_akthanakos_boneguard]
 name=Boneguard
@@ -263,10 +219,6 @@ walkanim=enakh_boneguard_walk
 readyanim=enakh_boneguard_ready
 resizev=100
 head1=npc_3140_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_akthanakos_freed]
 name=Akthanakos
@@ -294,10 +246,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=npc_3141_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_akthanakos_mahjarrat]
 name=Akthanakos
@@ -325,10 +273,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=npc_3138_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_lazim_statue_east_multinpc]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -336,10 +280,6 @@ readyanim=human_staffready
 vislevel=1
 multivar=enakh_where_is_lazim
 multinpc=0,enakh_lazim
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_lazim_fallen_statue_east_multinpc]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -347,10 +287,6 @@ readyanim=human_staffready
 vislevel=1
 multivar=enakh_where_is_lazim
 multinpc=1,enakh_lazim
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_lazim_pedestal_multinpc]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -358,10 +294,6 @@ readyanim=human_staffready
 vislevel=1
 multivar=enakh_where_is_lazim
 multinpc=2,enakh_lazim
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_lazim_altar_multinpc]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -369,10 +301,6 @@ readyanim=human_staffready
 vislevel=1
 multivar=enakh_where_is_lazim
 multinpc=3,enakh_lazim
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_lazim]
 name=Lazim
@@ -404,10 +332,6 @@ walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halbe
 readyanim=human_staffready
 op1=Talk-to
 head1=npc_drunk1_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_cutscene_enakhra]
 name=Enakhra
@@ -436,10 +360,6 @@ resizev=140
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 head1=npc_3148_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_cutscene_akthanakos]
 name=Akthanakos
@@ -464,10 +384,6 @@ vislevel=hide
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 head1=npc_3149_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_cutscene_knight]
 name=Knight
@@ -496,10 +412,6 @@ walkanim=human_dh_weapon_walk,human_dh_weapon_walk,human_dh_weapon_walk,human_dh
 readyanim=human_dh_weapon_ready
 vislevel=hide
 head1=npc_3150_head
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [enakh_cutscene_skeleton]
 name=Skeleton
@@ -508,10 +420,6 @@ model1=poh_skeleton_8
 walkanim=skeleton_walk
 readyanim=skeleton_ready
 vislevel=1
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
 
 [npcid_3152]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -520,7 +428,3 @@ multivar=enakh_akthanakos_form
 multinpc=0,enakh_akthanakos_boneguard
 multinpc=1,enakh_akthanakos_freed
 multinpc=2,enakh_akthanakos_mahjarrat
-// UNKNOWN: Keep this quest NPC stationary for map-scene stability.
-moverestrict=nomove
-defaultmode=none
-wanderrange=0
