@@ -158,11 +158,13 @@
       "[ai_applayer2,druid]",
       "[ai_applayer2,wizard]",
       "[ai_opplayer2,druid]",
+      "[proc,barrows_ahrim_attack]",
       "[proc,dt_fareed_cast]",
       "[proc,waterbirth_other_spinolyp_magic_attack]",
       "[proc,waterbirth_prime_attack]"
     ],
     "npc_debuff_allowed": [
+      "[proc,barrows_ahrim_attack]",
       "[proc,chaos_druid_spell]"
     ],
     "npc_spell_fail": [
