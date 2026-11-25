@@ -258,9 +258,17 @@ The suite tries the stored seed first. If it reaches another branch, it tries at
 
 The registered presentation census includes every native dispatch in the
 prefix matrix, every seeded probe, and each accepted route's seeded streams
-replayed for all other packed types sharing that trigger. It asserts zero
-script errors and reports types whose dispatch reaches no watched shared
-attack segment as excluded. Dedicated native cases prove Nezikchened's
+replayed for all other packed types sharing that trigger. It also resolves
+every relevant type's native AP route, including bodies with no watched shared
+call, at its packed attackrange. Read production distance predicates select
+near/far classes, including Dessous's chase threshold. Each class runs the
+variant matrix and selected seed streams. Private-region preludes run before
+the disclosed position and negative-state fixtures; distant Hope cases start
+after its melee wait. Zero attackrange is tested as a zero edge distance.
+The report records actual dispatch edge distances and the tested type/range
+matrix. The census asserts zero script errors, prints the excluded-type count
+and requires the exact list in `outcome-census-exclusions.json`. Dedicated
+native cases prove Nezikchened's
 distance-two magic hit, zero, miss and protection, and the skeleton mage's
 landed/failed rot plus each below-base stat guard. Standard Confuse, Weaken,
 Curse and rot queue no damage hit and draw no hitmark, even on success.

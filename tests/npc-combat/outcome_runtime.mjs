@@ -107,21 +107,24 @@ export async function runtime(engine, pack) {
     const npc = new Npc(0, player.x + distance, player.z, config.size, config.size, EntityLifeCycle.RESPAWN, 1, config.id, config.blockwalk);
     World.addNpc(npc, -1); npc.lastMovement = -100;
     npc.setVar(id(VarNpcType, 'npc_aggressive_player'), player.uid);
+    applyVariant({ player, npc }, variant, style);
+    return { player, npc };
+  }
+  function applyVariant({ player, npc }, variant, style) {
     if (variant.startsWith('protected')) player.setVar(id(VarPlayerType, style === 'melee' ? 'prayer14' : style === 'ranged' ? 'prayer13' : 'prayer12'), 1);
-    if (variant === 'pending') npc.setVar(id(VarNpcType, 'npc_action_delay'), 110);
+    if (variant === 'pending') npc.setVar(id(VarNpcType, 'npc_action_delay'), World.currentTick + 10);
     if (variant === 'target-loss') {
-      npc.setVar(id(VarNpcType, 'npc_lastcombat'), 100);
+      npc.setVar(id(VarNpcType, 'npc_lastcombat'), World.currentTick);
       npc.setVar(id(VarNpcType, 'npc_attacking_uid'), player.uid + 1);
-      player.setVar(id(VarPlayerType, 'lastcombat'), 100);
+      player.setVar(id(VarPlayerType, 'lastcombat'), World.currentTick);
       player.setVar(id(VarPlayerType, 'aggressive_npc'), npc.uid + 1);
     }
     if (variant === 'npc-busy') {
-      npc.setVar(id(VarNpcType, 'npc_lastcombat'), 100);
+      npc.setVar(id(VarNpcType, 'npc_lastcombat'), World.currentTick);
       npc.setVar(id(VarNpcType, 'npc_aggressive_player'), player.uid + 1);
     }
     if (variant === 'dead-npc') npc.levels[3] = 0;
     if (variant === 'dead-player') { player.levels[3] = 0; player.setVar(id(VarPlayerType, 'death'), 1); }
-    return { player, npc };
   }
   function run(name, f, args = []) {
     const script = Provider.getByName(name); assert(script, name);
@@ -224,5 +227,5 @@ export async function runtime(engine, pack) {
     const externalCallers = Object.fromEntries(watched.map(name => [name, scripts.filter(script => !script.info.sourceFilePath.startsWith('scripts/skill_combat/scripts/npc/') && (edges.get(script.name) ?? []).includes(`[proc,${name}]`)).map(script => script.name).sort()]).filter(([, callers]) => callers.length));
     return { npcs, externalCallers, scripts, edges };
   }
-  return { World, Provider, State, Pointer, configs, id, param, spell, field, select, fixture, run, observe, settle, dispose, inventory };
+  return { World, Provider, State, Pointer, configs, id, param, spell, field, select, fixture, applyVariant, run, observe, settle, dispose, inventory };
 }

@@ -61,6 +61,11 @@ try {
   for (const npc of NpcType.configs) {
     if (npc?.debugname && !coveredNpcTypes.has(npc.debugname)) census.excluded.push(npc.debugname);
   }
+  console.log(`PRESENTATION_CENSUS excludedTypes=${census.excluded.length}`);
+  check('excluded NPC types require an explicit census-list edit', () => {
+    const exclusions = JSON.parse(fs.readFileSync(path.join(here, 'outcome-census-exclusions.json'), 'utf8'));
+    assert.deepEqual([...census.excluded].sort(), [...exclusions].sort());
+  });
   const observed = new Set();
   const namedProcs = new Set(inventory.scripts.map(s => s.name));
   check('no published caller opts into outcomes', () => {
@@ -69,20 +74,24 @@ try {
     }
     for (const name of ['npc_meleeattack_outcome', 'npc_default_attack_outcome', 'npc_rangeattack_outcome', 'npc_cast_spell_outcome']) assert(namedProcs.has(`[proc,${name}]`), name);
   });
-  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type, trackObserved = true) {
+  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type, trackObserved = true, lateVariant = false) {
     rt.select(directory);
-    const f = rt.fixture(fixtureType, variant, style, distance);
+    const f = rt.fixture(fixtureType, lateVariant ? 'hit' : variant, style, distance);
     let cleanup;
     try {
       if (configure) {
         const configured = configure(f);
         if (typeof configured === 'function') cleanup = configured;
       }
+      if (lateVariant) rt.applyVariant(f, variant, style);
       const actualArgs = typeof args === 'function' ? args(f) : args;
+      const dispatchDistance = Math.max(
+        f.npc.x - f.player.x, f.player.x - (f.npc.x + f.npc.width - 1),
+        f.npc.z - f.player.z, f.player.z - (f.npc.z + f.npc.length - 1), 0);
       const result = rt.observe(name, f, actualArgs, variant, rng);
       result.settled = rt.settle(f);
       if (name.startsWith('[ai_')) census.cases.push({
-        npc: type, script: name, variant, seed: rng?.seed,
+        npc: type, script: name, variant, seed: rng?.seed, distance: dispatchDistance,
         execution: result.snapshot.execution, error: result.snapshot.error,
         settledError: result.settled.error, diagnostics: result.errors
       });
@@ -673,6 +682,82 @@ try {
     }
     report.routeCoverage.push({ script: route.script, npc: route.npc, style, profile: route.profile, stand: route.stand, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
   }
+  // Read distance predicates, not guesses about an NPC's style. These are the
+  // near/far classes in each reachable production block. Dessous also divides
+  // the distant class at chase_distance=5. Timers/player attack handlers are
+  // outside this native NPC attack census.
+  const distanceClasses = new Map([
+    ['[ai_applayer2,king_dragon]', [1, 2]],
+    ['[label,dragon_ai_applayer2]', [1, 2]],
+    ['[ai_applayer2,kalphite_queen]', [1, 2]],
+    ['[ai_applayer2,kalphite_flyingqueen]', [1, 2]],
+    ['[ai_applayer2,_macro_event_rock_golem]', [1, 2]],
+    ['[ai_applayer2,nezikchened]', [1, 2]],
+    ['[proc,wyvern_attack_style]', [1, 2]],
+    ['[proc,zygomite_attack_style]', [1, 2]],
+    ['[proc,killerwatt_attack_style]', [1, 2]], // killerwatt_melee_distance=1
+    ['[proc,dt_kamil_attack]', [1, 2]], // dt_ice_kamil_adjacent_radius=1
+    ['[proc,dt_dessous_attack]', [1, 2, 5, 6]],
+    ['[proc,soulbane_hope_npc_attack]', [1, 2]],
+    ['[proc,soulbane_tolna_melee_range]', [1, 2]] // cardinal edge / outside it
+  ]);
+  function attackClosure(name, seen = new Set()) {
+    if (seen.has(name)) return seen;
+    seen.add(name);
+    for (const target of inventory.edges.get(name) ?? []) attackClosure(target, seen);
+    return seen;
+  }
+  census.distanceCoverage = [];
+  for (const record of npcs) {
+    const type = NpcType.getByName(record.npc);
+    const entries = [...record.entries];
+    // Some AP bodies (notably KBD's far fire) reach no watched shared segment,
+    // although the type's OP body does. Resolve them natively, too.
+    const ap = rt.Provider.getByTrigger(ServerTriggerType.AI_APPLAYER2, type.id, type.category);
+    if (ap && !entries.some(entry => entry.script === ap.name)) {
+      entries.push({ script: ap.name, trigger: 'AI_APPLAYER2' });
+    }
+    for (const entry of entries) {
+      const closure = attackClosure(entry.script);
+      const distances = new Set([1]);
+      if (entry.trigger === 'AI_APPLAYER2') distances.add(type.attackrange);
+      for (const name of closure) for (const distance of distanceClasses.get(name) ?? []) distances.add(distance);
+      const route = routeSeeds.routes.find(route => route.script === entry.script)
+        ?? routeSeeds.routes.find(route => record.entries.some(entry => entry.script === route.script));
+      assert(route, `${record.npc} has a disclosed route fixture`);
+      const streams = report.routeCoverage.find(route => route.script === entry.script)?.branches.map(branch => branch.seed)
+        ?? Object.values(route.seeds);
+      const profile = { ...route, npc: record.npc };
+      const style = route.style ?? 'melee';
+      for (const distance of [...distances].sort((a, b) => a - b)) {
+        assert(Number.isInteger(distance) && distance >= 0, `${record.npc} attack distance ${distance}`);
+        const prepare = f => {
+          const cleanup = configureRoute(f, profile);
+          try {
+            // Disclosed actor-position fixture, after any native private-region
+            // prelude. Native teleport maintains zone presence and also places
+            // the dead-player negative control, unlike p_telejump_safe.
+            f.player.teleport(f.npc.x - distance, f.npc.z, f.npc.level);
+            assert.deepEqual([f.player.level, f.player.x, f.player.z],
+              [f.npc.level, f.npc.x - distance, f.npc.z],
+              `${record.npc} reaches native edge distance ${distance}`);
+            if (distance > 1 && closure.has('[proc,soulbane_hope_npc_attack]')) {
+              f.npc.setVar(rt.id(VarNpcType, 'soulbane_hope_melee_until'), rt.World.currentTick);
+            }
+            return cleanup;
+          } catch (error) { cleanup?.(); throw error; }
+        };
+        // Private native life/intro preludes require living actors. Apply each
+        // negative-control state only after that prelude has produced them.
+        for (const variant of variants) execute(pack, record.npc, entry.script, [], variant, style,
+          prepare, distance, null, route.prelude === 'soulbane-tolna-intro' ? 'cow' : record.npc, true, true);
+        for (const seed of streams) execute(pack, record.npc, entry.script, [], 'seeded', style,
+          prepare, distance, { seed }, route.prelude === 'soulbane-tolna-intro' ? 'cow' : record.npc, true, true);
+        census.distanceCoverage.push({ npc: record.npc, script: entry.script, distance, attackrange: type.attackrange });
+      }
+    }
+  }
+  console.log(`PRESENTATION_CENSUS distanceCases=${census.distanceCoverage.length}`);
   for (const name of ['confuse', 'weaken', 'curse']) for (const variant of ['hit', 'miss']) {
     check(`standard NPC ${name} ${variant} has no damage hitmark`, () => {
       const row = rt.spell(name);
