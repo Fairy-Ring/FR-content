@@ -1,0 +1,9 @@
+// UNKNOWN: player-favourable server-only combat defaults for Evil Spirit and Fever Spider; not historical values.
+^deal_combat_attack_rate = 6
+^deal_combat_attack_bonus = 0
+^deal_combat_strength_bonus = 0
+^deal_combat_stab_defence = 0
+^deal_combat_slash_defence = 0
+^deal_combat_crush_defence = 0
+^deal_combat_magic_defence = 0
+^deal_combat_ranged_defence = 0

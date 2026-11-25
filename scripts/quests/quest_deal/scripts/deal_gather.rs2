@@ -1,0 +1,118 @@
+// VERIFIED identities/patch faces: 377 cache. CANDIDATE messages: retained transcript.
+[oplocu,deal_blindweed_weeds3] ~deal_patch_use;
+[oplocu,deal_blindweed_weeds2] ~deal_patch_use;
+[oplocu,deal_blindweed_weeds1] ~deal_patch_use;
+[oplocu,deal_blindweed_empty] ~deal_patch_use;
+[oplocu,deal_blindweed_seed] ~deal_patch_use;
+[oplocu,deal_blindweed_fullygrown] ~deal_patch_use;
+
+[proc,deal_patch_use]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if (%deal_quest ! 2) return;
+~deal_growth_check;
+if ($used = rake & %deal_farming < 3) {
+    anim(farming_raking, 0);
+    p_delay(2);
+    %deal_farming = add(%deal_farming, 1);
+    return;
+}
+if ($used ! deal_blindweed_seed | %deal_farming ! 3) return;
+if (stat(farming) < 40) {
+    mes("You must be a Level 40 Farmer to plant those.");
+    return;
+}
+if (inv_total(inv, dibber) = 0) return;
+inv_del(inv, deal_blindweed_seed, 1);
+%deal_farming = 4;
+// UNKNOWN favourable engineering duration: next real-minute boundary, no disease/death roll.
+%deal_growth_at = add(date_minutes, ^deal_growth_minutes);
+settimer(deal_growth, ^deal_growth_check_ticks);
+mes("You plant a seed in the blindweed patch.");
+
+[proc,deal_growth_check]
+if (%deal_farming = 4 & date_minutes >= %deal_growth_at) {
+    %deal_farming = 5;
+    cleartimer(deal_growth);
+}
+
+[timer,deal_growth]
+~deal_growth_check;
+if (%deal_farming ! 4) cleartimer(deal_growth);
+
+[oploc1,deal_blindweed_fullygrown]
+p_arrivedelay;
+if (%deal_quest ! 2 | %deal_farming ! 5) return;
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, deal_blindweed, 1);
+%deal_farming = 3;
+// No invented harvest message: retained research explicitly leaves it unknown.
+
+[oploc1,deal_blindweed_weeds3] ~deal_patch_inspect;
+[oploc1,deal_blindweed_weeds2] ~deal_patch_inspect;
+[oploc1,deal_blindweed_weeds1] ~deal_patch_inspect;
+[oploc1,deal_blindweed_empty] ~deal_patch_inspect;
+[oploc1,deal_blindweed_seed] ~deal_patch_inspect;
+
+[proc,deal_patch_inspect]
+~deal_growth_check;
+if (%deal_farming = 4) {
+    settimer(deal_growth, ^deal_growth_check_ticks);
+    mes("This is a blindweed patch. The soil has not been treated. The patch has something growing in it.");
+} else if (%deal_farming = 5) {
+    mes("This is a blindweed patch. The soil has not been treated. The patch (Crop) is fully grown.");
+} else {
+    mes("This is a blindweed patch. The soil has not been treated. The patch needs weeding.");
+}
+
+[oploc1,deal_overgrown_patch]
+mes("The soil here is too poor to farm on.");
+
+[oplocu,deal_stagnant]
+def_obj $used = last_useitem;
+def_int $slot = last_useslot;
+p_arrivedelay;
+if (%deal_quest ! 4 | $used ! bucket_empty) return;
+inv_setslot(inv, $slot, deal_stagnant_bucket, 1);
+mes("You scoop up a bucket of stagnant water.");
+
+[opnpc1,deal_squid] ~deal_fish;
+[opnpcu,deal_squid]
+if (last_useitem = fishbowl_net) ~deal_fish;
+else ~displaymessage(^dm_default);
+
+[proc,deal_fish]
+if (%deal_quest ! 6) return;
+if (inv_total(inv, fishbowl_net) = 0) {
+    mes("You do not have the correct equipment to fish here.");
+    return;
+}
+if (stat(fishing) < 50) return;
+if (inv_freespace(inv) = 0) {
+    mes("You do not have any free space for anything that you will catch!");
+    return;
+}
+mes("You dunk the bowl in the water...");
+p_delay(^deal_fishing_delay_ticks);
+// UNKNOWN equal catch weights; period guide accepts either of the two creatures.
+if (random(2) = 0) inv_add(inv, deal_slugling, 1);
+else inv_add(inv, deal_karamthulhu, 1);
+%deal_squidfish = min(15, add(%deal_squidfish, 1));
+mes("...and you catch some Sluglings!");
+
+[oploc1,deal_broomcupboard]
+p_arrivedelay;
+loc_change(deal_broomcupboard_open, ^deal_cupboard_open_ticks);
+
+[oploc2,deal_broomcupboard_open]
+def_int $choice = ~p_choice4("A rake", 1, "A seed dibber", 2, "A watering can", 3, "All of the above!", 4);
+if ($choice = 1 | $choice = 4) ~deal_give_tool(rake);
+if ($choice = 2 | $choice = 4) ~deal_give_tool(dibber);
+if ($choice = 3 | $choice = 4) ~deal_give_tool(watering_can_8);
+
+[oploc3,deal_broomcupboard_open]
+p_arrivedelay;
+loc_change(deal_broomcupboard, ^deal_cupboard_open_ticks);

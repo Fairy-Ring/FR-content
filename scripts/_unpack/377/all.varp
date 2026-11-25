@@ -368,8 +368,6 @@ type=player_uid
 
 [varp246_unused]
 
-[varp247_unused]
-
 [varp248_unused]
 
 [varp249_unused]
@@ -844,8 +842,6 @@ scope=perm
 
 [worn_set]
 
-[disease]
-
 [varp457_bits]
 
 [varp458_bits]
@@ -1148,9 +1144,6 @@ transmit=yes
 
 
 [desert]
-transmit=yes
-
-[deal_var]
 transmit=yes
 
 [varp603_unused]
