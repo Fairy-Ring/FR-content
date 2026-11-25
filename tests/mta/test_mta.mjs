@@ -69,8 +69,26 @@ await check('confirmed hat destruction loses points, other items do not, warning
   run(p,'[proc,mta_destroy_warning]',[obj('magictraining_proghat_dull')]);assert(p.packets.some(packet=>String(packet.text).includes('Pizazz Points')));
   run(p,'[proc,mta_destroyed]',[obj('magictraining_proghat_dull')]);assert.deepEqual(balances(p),[0,0,0,0]);
 });
+await check('private Telekinetic statue remains owner-only after the native 100-tick reveal deadline',()=>{
+  const owner=player({x:3336,z:9718}),other=player({x:3336,z:9718});
+  finish(owner,run(owner,'[proc,mta_telekinetic_start]',[2]));
+  const state=finish(owner,run(owner,'[proc,mta_telekinetic_position]'));
+  const packed=state.intStack[state.isp-1],x=(packed>>>14)&16383,z=packed&16383,level=packed>>>28;
+  const type=obj('magictraining_guardianstatue');
+  const statue=World.getObjOfReceiver(x,z,level,type,owner.hash64);
+  assert(statue,'the compiled maze creates the owner’s actual private statue');
+  assert.equal(World.getObj(x,z,level,type,other.hash64),null,'another player cannot find the new private statue');
+  const started=World.currentTick;
+  for(let tick=0;tick<101;tick++){World.currentTick++;statue.turn();}
+  assert(World.currentTick-started>100,'the real object lifecycle crosses the reveal deadline');
+  assert.equal(World.getObj(x,z,level,type,other.hash64),null,'another player cannot find the statue after 101 native object turns');
+  assert.equal(statue.receiver64,owner.hash64,'the reveal attempt retains the private owner');
+  assert.equal(World.getObj(x,z,level,type,owner.hash64),statue,'the owner retains the same active statue');
+  assert(statue.isValid(owner.hash64),'the original statue remains active after the reveal attempt');
+  finish(owner,run(owner,'[proc,mta_telekinetic_cleanup]'));
+});
 await check('all MTA room items and hats are untradeable without cache option changes',()=>{
-  for(const name of ['magictraining_proghat_dull','magictraining_proghat_energised','magictraining_proghat_full','magictraining_leather_boots','magictraining_adamant_kiteshield','magictraining_adamant_med_helm','magictraining_emerald','magictraining_rune_longsword','magictraining_enchan_cylinder','magictraining_enchan_cube','magictraining_enchan_icosahendron','magictraining_enchan_pentamid','magictraining_enchan_shapeorb','magictraining_dragonstone','magictraining_bones1','magictraining_bones2','magictraining_bones3','magictraining_bones4'])assert.equal(configs.ObjType.get(obj(name)).tradeable,false,name);
+  for(const name of ['magictraining_guardianstatue','magictraining_proghat_dull','magictraining_proghat_energised','magictraining_proghat_full','magictraining_leather_boots','magictraining_adamant_kiteshield','magictraining_adamant_med_helm','magictraining_emerald','magictraining_rune_longsword','magictraining_enchan_cylinder','magictraining_enchan_cube','magictraining_enchan_icosahendron','magictraining_enchan_pentamid','magictraining_enchan_shapeorb','magictraining_dragonstone','magictraining_bones1','magictraining_bones2','magictraining_bones3','magictraining_bones4'])assert.equal(configs.ObjType.get(obj(name)).tradeable,false,name);
 });
 await check('all original portal dispatchers enforce hat and level gates, then native exits clear each room',()=>{
   const rooms=[
@@ -141,6 +159,16 @@ await check('login room recovery preserves saved wallets, maze streak and peache
     assert.equal(count(p,'lawrune'),3);assert.deepEqual(balances(p),[2,3,4,5]);assert.equal(p.getVar(id('VarPlayerType','varp625_bits')),4);assert.equal(p.getVarBit(id('VarBitType','magictraining_bonespeaches')),1);
     const restored=PlayerLoading.load(p.username,new Packet(p.save()),null);assert(restored);assert.deepEqual(balances(restored),[2,3,4,5]);assert.equal(restored.getVar(id('VarPlayerType','varp625_bits')),4);assert.equal(restored.getVarBit(id('VarBitType','magictraining_bonespeaches')),1);
   }
+});
+await check('the real login root dispatches MTA recovery without losing saved progress',()=>{
+  const p=player({x:3364,z:9650});give(p,'magictraining_proghat_dull');give(p,'magictraining_enchan_shapeorb');give(p,'lawrune',3);
+  setBalances(p,[2,3,4,5]);p.setVar(id('VarPlayerType','varp625_bits'),4);p.setVarBit(id('VarBitType','magictraining_bonespeaches'),1);
+  finish(p,run(p,'[login,_]'));
+  assert(p.messages.includes('Welcome to RuneScape.'),'the actual compiled login trigger ran');
+  assert.deepEqual([p.x,p.z,p.level],[3363,3314,0],'the login hook itself returns an arena player to the hall');
+  assert.equal(count(p,'magictraining_enchan_shapeorb'),0,'the login hook clears room-only items');
+  assert.equal(count(p,'magictraining_proghat_dull'),1);assert.equal(count(p,'lawrune'),3);
+  assert.deepEqual(balances(p),[2,3,4,5]);assert.equal(p.getVar(id('VarPlayerType','varp625_bits')),4);assert.equal(p.getVarBit(id('VarBitType','magictraining_bonespeaches')),1);
 });
 await check('chamber dragonstones spawn on reachable packed floor, stay bounded, permit native pickup and respawn',async()=>{
   const map=await R.load('engine/GameMap.ts');const p=player({x:3364,z:9650});give(p,'magictraining_proghat_dull');

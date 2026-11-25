@@ -80696,18 +80696,6 @@ model=obj_trail_clue_easy_simple001
 2dxan=360
 
 
-[magictraining_guardianstatue]
-name=Guardian statue
-desc=The statue looks like he can be moved.
-model=obj_magictraining_guardianstatue
-members=yes
-op3=Observe
-op4=Reset
-2dyof=-6
-2dzoom=1560
-2dyan=1876
-2dxan=140
-weight=20lb
 
 [magictraining_bookofmagic]
 name=Mage's book

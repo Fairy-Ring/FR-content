@@ -322,3 +322,18 @@ model=obj_magictraining_bones4
 2dxan=608
 members=yes
 weight=1g
+
+// UNKNOWN: room-only statue is untradeable; all original 377 fields are retained.
+[magictraining_guardianstatue]
+tradeable=no
+name=Guardian statue
+desc=The statue looks like he can be moved.
+model=obj_magictraining_guardianstatue
+members=yes
+op3=Observe
+op4=Reset
+2dyof=-6
+2dzoom=1560
+2dyan=1876
+2dxan=140
+weight=20lb
