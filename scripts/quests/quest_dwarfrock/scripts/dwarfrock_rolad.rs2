@@ -1,10 +1,14 @@
 // Between a Rock — Rolad first Talk-to + pages return. Ice Mountain.
 // CANDIDATE last-resort 2007-base (OSRS Transcript: Rolad the scholar /
 // Talking to Rolad again). Hunt 289? no.
-// Stay dwarfrock_quest 10. Never 110. Cite bar-rolad-next-377.md +
-// bar-pages-leftover-377.md.
+// UNKNOWN product gates distinguish the initial page hunt from the schematic search.
 
 [opnpc1,dwarfrock_rolad]
+if (%dwarfrock_quest >= 40 & %dwarfrock_quest < 50) @dwarfrock_rolad_schematic;
+if (%dwarfrock_quest >= 20) {
+    if (inv_total(inv, dwarf_rock_book) = 0) ~dwarfrock_give_item(dwarf_rock_book);
+    @bar_rolad_has_book;
+}
 if (%dwarfrock_quest < 10) {
     ~displaymessage(^dm_default);
     return;
@@ -58,6 +62,7 @@ if ($pages > 0) {
 ~chatplayer("<p,quiz>What, in the mining guild?");
 ~chatnpc("<p,neutral>No no, I never go there, I'm not a member you know. But I sometimes go down to the regular mines to study the conditions of the working dwarf.");
 ~chatplayer("<p,happy>Okay, thanks, I'll go and look for the pages then.");
+%dwarfrock_rolad_schematics_heardof = 1;
 return;
 
 [label,bar_rolad_has_book]

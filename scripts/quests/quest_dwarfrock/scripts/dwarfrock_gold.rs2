@@ -1,9 +1,8 @@
-// Between a Rock — gold Use-on + furnace gold CB. No Fire / dest / 110.
-// CANDIDATE last-resort 2007-base (OSRS Going for the gold). Hunt 289? no.
-// One [opnpcu,dwarfrock_dondakan]. Cite bar-gold-cannonball-stop-377.md.
+// CANDIDATE recipes/dialogue: between-a-rock facts and retained transcript.
+// UNKNOWN stage 20 is the product Read gate. The gold shot never transports the player.
 
 [opnpcu,dwarfrock_dondakan]
-if (%dwarfrock_quest < 10) {
+if (%dwarfrock_quest < 20) {
     ~displaymessage(^dm_default);
     return;
 }
@@ -49,7 +48,15 @@ return;
 def_int $fire = ~p_choice2("Yes, I'm sure this will crack open the rock.", 1, "No, I'd rather sell it for a huge profit.", 2);
 if ($fire = 1) {
     ~chatplayer("<p,happy>Yes, I'm sure this will crack open the rock.");
-    return;
+    if (inv_total(inv, dwarf_rock_cannonball_gold) < 1) return;
+    ~chatnpc("<p,neutral>It breaks my heart to ruin such a fine piece of crafting, but it's your gold... Alright, let's load it up then.");
+    inv_del(inv, dwarf_rock_cannonball_gold, 1);
+    %dwarfrock_fired_gold_cannonball = 1;
+    if (%dwarfrock_quest < 30) %dwarfrock_quest = 30;
+    mes("The cannon fires the golden cannonball through the passage.");
+    ~chatnpc("<p,shock>Did... did... did you see that?");
+    ~chatplayer("<p,happy>The cannonball went right through it!");
+    @dwarfrock_dondakan_proposal;
 }
 ~chatplayer("<p,neutral>No, on second thought, I'd rather sell it for a huge profit.");
 ~chatnpc("<p,neutral>Nice idea, <displayname()>, but no one will buy a golden cannonball!");

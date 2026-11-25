@@ -1,0 +1,133 @@
+// CANDIDATE 2007-base: gold weakens the Avatar, 6 ore permits damage and 15
+// selects the weaker form; highest combat skill selects its counter-style.
+// UNKNOWN favourable engineering: deterministic ore/swing and style tie breaks,
+// immunity below 6 rather than an unsourced regeneration rate; no gold deletion.
+[oploc1,dwarf_gold_mine] @dwarfrock_mine_gold;
+[oploc1,dwarf_gold_mine_r] @dwarfrock_mine_gold;
+[oploc1,dwarf_gold_mine_l] @dwarfrock_mine_gold;
+[oploc2,dwarf_gold_mine] mes("This rock contains gold.");
+[oploc2,dwarf_gold_mine_r] mes("This rock contains gold.");
+[oploc2,dwarf_gold_mine_l] mes("This rock contains gold.");
+
+[label,dwarfrock_mine_gold]
+if (stat(mining) < 40) { mes("You need a Mining level of 40 to mine this rock."); return; }
+def_obj $pickaxe = ~pickaxe_checker;
+if ($pickaxe = null) { mes("You need a pickaxe to mine this rock."); return; }
+if (inv_freespace(inv) = 0) { mes("Your inventory is too full to hold any more gold."); return; }
+anim(oc_param($pickaxe, mining_animation), 0);
+p_delay(2); // UNKNOWN favourable fixed successful swing, not an original rate.
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, gold_ore, 1);
+stat_advance(mining, 650); // CANDIDATE normal gold ore experience: 65.
+mes("You manage to mine some gold.");
+p_oploc(1);
+
+[oploc1,dwarf_firewall_straight] @dwarfrock_jump_flame;
+[oploc1,dwarf_firewall_diagonal] @dwarfrock_jump_flame;
+[oploc1,dwarf_firewall_centre_straight] @dwarfrock_avatar_begin;
+[oploc1,dwarf_firewall_centre_diagonal] @dwarfrock_avatar_begin;
+[oploc2,dwarf_firewall_centre_straight] @dwarfrock_avatar_begin;
+[oploc2,dwarf_firewall_centre_diagonal] @dwarfrock_avatar_begin;
+
+[label,dwarfrock_jump_flame]
+if (~dwarfrock_in_mine = false | inv_total(worn, dwarf_goldrock_helmet) = 0) return;
+// UNKNOWN crossing geometry: jump to the adjacent tile on the opposite side.
+def_int $dx = 0;
+def_int $dz = 0;
+if (coordx(coord) < coordx(loc_coord)) $dx = 1;
+else if (coordx(coord) > coordx(loc_coord)) $dx = -1;
+if (coordz(coord) < coordz(loc_coord)) $dz = 1;
+else if (coordz(coord) > coordz(loc_coord)) $dz = -1;
+p_telejump(movecoord(loc_coord, $dx, 0, $dz));
+
+[label,dwarfrock_avatar_begin]
+if (%dwarfrock_quest ! 60 | ~dwarfrock_in_mine = false | inv_total(worn, dwarf_goldrock_helmet) = 0) return;
+// One live Avatar per owner; other players neither block nor share the encounter.
+npc_findallany(coord, 64, 0);
+while (npc_findnext = true) {
+    if (npc_category = dwarfrock_avatar & %npc_attacking_uid = uid) return;
+}
+~chatnpc_specific("Arzinian Being of Bordanzan", dwarf_rock_actual_demon, "<p,angry>You did not heed my messages to stay away! You have brought doom down on to yourself!");
+~chatnpc_specific("Arzinian Being of Bordanzan", dwarf_rock_actual_demon, "<p,neutral>There are many aspects to my being and there are many skills I possess.");
+~chatnpc_specific("Arzinian Being of Bordanzan", dwarf_rock_actual_demon, "<p,angry>Behold, as my avatar descends to your level to extinguish the flame of your puny existence!");
+if (%dwarfrock_quest ! 60 | ~dwarfrock_in_mine = false) return;
+// UNKNOWN spawn tile: the player's reachable interaction tile; no wall-side guess.
+npc_add(coord, ~dwarfrock_avatar_type(inv_total(inv, gold_ore)), 800);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+npc_settimer(1);
+npc_setmode(opplayer2);
+
+[proc,dwarfrock_avatar_type](int $gold)(npc)
+def_int $style = 0; // melee skill wins ties, then ranged over magic (UNKNOWN).
+if (stat_base(ranged) > max(stat_base(attack), stat_base(strength))) $style = 1;
+if (stat_base(magic) > max(max(stat_base(attack), stat_base(strength)), stat_base(ranged))) $style = 2;
+if ($style = 0) {
+    if ($gold >= 15) return(dwarf_rock_avatar_mage_yellow);
+    if ($gold >= 6) return(dwarf_rock_avatar_mage_green);
+    return(dwarf_rock_avatar_mage);
+}
+if ($style = 1) {
+    if ($gold >= 15) return(dwarf_rock_avatar_warrior_yellow);
+    if ($gold >= 6) return(dwarf_rock_avatar_warrior_green);
+    return(dwarf_rock_avatar_warrior);
+}
+if ($gold >= 15) return(dwarf_rock_avatar_archer_yellow);
+if ($gold >= 6) return(dwarf_rock_avatar_archer_green);
+return(dwarf_rock_avatar_archer);
+
+[proc,dwarfrock_avatar_attackable]()(boolean)
+if (%npc_attacking_uid ! uid | %dwarfrock_quest ! 60 | ~dwarfrock_in_mine = false | inv_total(worn, dwarf_goldrock_helmet) = 0) return(false);
+if (inv_total(inv, gold_ore) >= 6) return(true);
+return(false);
+
+[ai_spawn,_dwarfrock_avatar]
+npc_settimer(1);
+
+[ai_timer,_dwarfrock_avatar]
+if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
+if (%dwarfrock_quest ! 60 | ~dwarfrock_in_mine = false | inv_total(worn, dwarf_goldrock_helmet) = 0) { npc_del; return; }
+def_npc $type = ~dwarfrock_avatar_type(inv_total(inv, gold_ore));
+if (npc_type ! $type) {
+    npc_changetype_keepall($type, 800);
+    if (npc_stat(hitpoints) > npc_basestat(hitpoints)) npc_statsub(hitpoints, sub(npc_stat(hitpoints), npc_basestat(hitpoints)), 0);
+}
+
+[ai_queue1,_dwarfrock_avatar]
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+~npc_default_retaliate;
+
+[ai_queue2,_dwarfrock_avatar]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~dwarfrock_avatar_attackable = false | %npc_aggressive_player ! uid) { npc_damage(^hitmark_block, 0); return; }
+~npc_default_damage(last_int);
+
+[ai_opplayer2,_dwarfrock_avatar]
+if (uid ! %npc_attacking_uid) { npc_setmode(none); return; }
+if (npc_type = dwarf_rock_avatar_warrior | npc_type = dwarf_rock_avatar_warrior_green | npc_type = dwarf_rock_avatar_warrior_yellow) {
+    ~npc_default_attack;
+    return;
+}
+npc_setmode(applayer2);
+
+[ai_applayer2,_dwarfrock_avatar]
+if (uid ! %npc_attacking_uid) { npc_setmode(none); return; }
+if (npc_type = dwarf_rock_avatar_archer | npc_type = dwarf_rock_avatar_archer_green | npc_type = dwarf_rock_avatar_archer_yellow) {
+    ~npc_rangeattack;
+    return;
+}
+// UNKNOWN spell presentation, using the native magic combat path (no custom damage).
+def_int $maxhit = 12; // UNKNOWN engineering magic maximum; weaker yellow form uses 8.
+if (npc_type = dwarf_rock_avatar_mage_yellow) $maxhit = 8;
+~npc_cast_spell_with_forced_max_hit(^fire_blast, npc_param(attackrate), $maxhit);
+
+[ai_queue3,_dwarfrock_avatar]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid & ~dwarfrock_avatar_attackable = true) queue(dwarfrock_avatar_defeated, 0, 0);
+}
+~npc_death;
+
+[queue,dwarfrock_avatar_defeated]
+if (%dwarfrock_quest ! 60 | ~dwarfrock_in_mine = false) return;
+%dwarfrock_quest = 100;
+~dwarfrock_exit;

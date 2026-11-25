@@ -230,6 +230,7 @@
     }
   },
   "deliberatelyTemporary": {
+    "dwarfrock_puzzle": "Original reserved slot 237: temporary schematic overlay offsets, rotations and selection. Reinitialized when opening the puzzle; solved progress lives in dwarfrock_main.",
     "temp": "Explicit scope=temp shared sextant, puzzle, still and dialogue scratch register; no durable player progress.",
     "damagetype": "Derived combat mode, equipment bonus, animation, sound or hit value; rebuilt from equipment and attack style.",
     "damagestyle": "Derived combat mode, equipment bonus, animation, sound or hit value; rebuilt from equipment and attack style.",
@@ -960,7 +961,7 @@
     "varp221_unused": "temp",
     "varp235_unused": "temp",
     "varp236_unused": "temp",
-    "varp237_unused": "temp",
+    "dwarfrock_puzzle": "temp",
     "varp238_unused": "temp",
     "varp239_unused": "temp",
     "varp240_unused": "temp",

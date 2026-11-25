@@ -1,0 +1,558 @@
+// Original 377 NPC blocks moved from all.npc; all packed fields and IDs are retained.
+
+[dwarfrock_multi_dondakan]
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+alwaysontop=yes
+vislevel=1
+multivar=dwarfrock_quest
+multinpc=0,dwarfrock_dondakan
+multinpc=10,dwarfrock_dondakan
+multinpc=20,dwarfrock_dondakan
+multinpc=30,dwarfrock_dondakan
+multinpc=40,dwarfrock_dondakan
+multinpc=50,dwarfrock_dondakan
+multinpc=60,dwarfrock_dondakan
+multinpc=70,dwarfrock_dondakan
+multinpc=80,dwarfrock_dondakan
+multinpc=90,dwarfrock_dondakan
+multinpc=100,dwarfrock_dondakan
+multinpc=110,dwarfrock_dondakan_noaxe
+
+[dwarfrock_dondakan]
+name=Dondakan the Dwarf
+desc=A short, old and gold loving guy.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_mountaini2
+model4=npc_dwarf_mountaini3
+model5=npc_1837
+model6=npc_dwarf_normali6
+recol1s=7266
+recol1d=17866
+recol2s=16912
+recol2d=8721
+recol3s=9475
+recol3d=9410
+recol4s=10434
+recol4d=29561
+recol5s=15855
+recol5d=9444
+vislevel=hide
+alwaysontop=yes
+op1=Talk-to
+head1=npc_lawgof2_head
+
+[dwarfrock_dondakan_noaxe]
+name=Dondakan the Dwarf
+desc=A short, old and gold loving guy.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_mountaini2
+model4=npc_dwarf_mountaini3
+model5=npc_1837
+recol1s=7266
+recol1d=17866
+recol2s=16912
+recol2d=8721
+recol3s=9475
+recol3d=9410
+recol4s=10434
+recol4d=29561
+recol5s=15855
+recol5d=9444
+vislevel=hide
+alwaysontop=yes
+op1=Talk-to
+head1=npc_lawgof2_head
+
+[dwarfrock_fake_dondakan]
+name=Dondakan the Dwarf
+desc=A short, old and gold loving guy.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_mountaini2
+model4=npc_dwarf_mountaini3
+model5=npc_1837
+model6=npc_dwarf_normali6
+recol1s=7266
+recol1d=17866
+recol2s=16912
+recol2d=8721
+recol3s=9475
+recol3d=9410
+recol4s=10434
+recol4d=29561
+recol5s=15855
+recol5d=9444
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+head1=npc_lawgof2_head
+
+[dwarfrock_engineer1]
+name=Dwarven Engineer
+desc=A short angry guy.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_mountaini2
+model4=npc_dwarf_mountaini3
+model5=npc_dwarf_normali5
+model6=npc_1840
+recol1s=7266
+recol1d=12615
+recol2s=15855
+recol2d=17900
+recol3s=9475
+recol3d=9410
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+op1=Talk-to
+head1=npc_lawgof2_head
+
+[dwarfrock_rolad]
+name=Rolad
+desc=He looks a little absent-minded.
+model1=npc_mcannonguard
+model2=npc_dwarf_mountain
+model3=npc_dwarf_mountaini2
+model4=npc_1841
+model5=npc_dwarf_normali5
+model6=npc_1841i2
+recol1s=15855
+recol1d=24242
+recol2s=3171
+recol2d=10469
+recol3s=10434
+recol3d=22945
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+alwaysontop=yes
+vislevel=hide
+op1=Talk-to
+head1=npc_mcannonguard_head
+head2=npc_councillor_halgrive_head
+
+[dwarfrock_engineer2]
+name=Khorvak, a dwarven engineer
+desc=The little guy is having trouble standing up right.
+model1=npc_upassdwarf3
+model2=npc_dwarf_mountain
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+model6=npc_macro_dwarfi2
+recol1s=7266
+recol1d=12615
+recol2s=15855
+recol2d=17900
+recol3s=7298
+recol3d=10469
+readyanim=dwarf_drunkready
+walkanim=dwarf_drunkwalk
+vislevel=hide
+op1=Talk-to
+head1=npc_upassdwarf3_head
+
+[dwarfrock_ferryman1]
+name=Dwarven Ferryman
+desc=It's probably you who will be paying the ferryman.
+model1=npc_mcannonguard
+model2=npc_dwarf_mountain
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+recol1s=15855
+recol1d=22058
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+op1=Talk-to
+head1=npc_mcannonguard_head
+
+[dwarfrock_ferryman2]
+name=Dwarven Ferryman
+desc=It's probably you who will be paying the ferryman.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+recol1s=15855
+recol1d=22058
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+op1=Talk-to
+head1=npc_lawgof2_head
+
+[dwarfrock_multi_gold_boatman]
+readyanim=dwarf_ready
+walkanim=dwarf_walk
+vislevel=1
+multivar=dwarfrock_quest
+multinpc=110,dwarfrock_gold_boatman
+
+[dwarfrock_gold_boatman]
+name=Dwarven Boatman
+desc=He seems to be in charge of the ship on the river.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+readyanim=dwarf_ready
+walkanim=dwarf_walk
+vislevel=hide
+op1=Talk-to
+head1=npc_lawgof2_head
+
+[dwarfrock_boatman_bruv1]
+name=Miodvetnir
+desc=He seems deeply engaged in conversation with his fellow boatmen.
+model1=npc_dwarf_normal
+model2=npc_dwarf_mountain
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+model6=npc_1847
+recol1s=15855
+recol1d=8526
+recol2s=15785
+recol2d=13811
+recol3s=10434
+recol3d=23218
+recol4s=12677
+recol4d=23218
+recol5s=12677
+recol5d=13811
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+resizeh=120
+resizev=100
+vislevel=hide
+op1=Talk-to
+head1=npc_lawgof2_head
+head2=npc_1847_head
+
+[dwarfrock_boatman_bruv2]
+name=Dernu
+desc=He seems deeply engaged in conversation with his fellow boatmen.
+model1=npc_mcannonguard
+model2=npc_dwarf_mountain
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+model6=npc_1847
+recol1s=15855
+recol1d=13737
+recol2s=15785
+recol2d=11623
+recol3s=10434
+recol3d=23218
+recol4s=12677
+recol4d=11623
+recol5s=12677
+recol5d=11623
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+resizeh=115
+resizev=120
+vislevel=hide
+op1=Talk-to
+head1=npc_mcannonguard_head
+head2=npc_1847_head
+
+[dwarfrock_boatman_bruv3]
+name=Derni
+desc=He seems deeply engaged in conversation with his fellow boatmen.
+model1=npc_upassdwarf3
+model2=npc_dwarf_mountain
+model3=npc_dwarf_mountaini2
+model4=npc_dwarf_mountaini3
+model5=npc_dwarf_normali5
+model6=npc_1847
+recol1s=7266
+recol1d=12615
+recol2s=15855
+recol2d=17900
+recol3s=12677
+recol3d=11522
+recol4s=10434
+recol4d=19021
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+resizeh=110
+resizev=105
+op1=Talk-to
+head1=npc_upassdwarf3_head
+head2=npc_1847_head
+
+[dwarf_rock_avatar_warrior]
+name=Arzinian Avatar of Strength
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing strength.
+model1=npc_1850
+model2=npc_1850i2
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=hide
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+
+[dwarf_rock_avatar_warrior_green]
+name=Arzinian Avatar of Strength
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing strength.
+model1=npc_1850
+model2=npc_1850i2
+recol1s=15007
+recol1d=13899
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=125
+// UNKNOWN: Existing unpacked combat stats are retained; no source validates them.
+hitpoints=100
+attack=110
+strength=100
+defence=95
+resizeh=115
+resizev=115
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+// UNKNOWN: Product-owned combat defaults; source does not recover the mode, range or timer.
+defaultmode=none
+wanderrange=0
+maxrange=32
+timer=1
+// UNKNOWN: The historical style binding is not recovered; use the Strength form's melee path.
+param=damagetype,^crush_style
+// UNKNOWN: The packed avatar attack sequence is used for the Strength form.
+param=attack_anim,rock_avatar_attack
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
+
+[dwarf_rock_avatar_warrior_yellow]
+name=Arzinian Avatar of Strength
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing strength.
+model1=npc_1850
+model2=npc_1850i2
+recol1s=15007
+recol1d=27430
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=75
+// UNKNOWN: Existing unpacked combat stats are retained; no source validates them.
+hitpoints=70
+attack=70
+strength=65
+defence=50
+resizeh=100
+resizev=100
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+// UNKNOWN: Product-owned combat defaults; source does not recover the mode, range or timer.
+defaultmode=none
+wanderrange=0
+maxrange=32
+timer=1
+// UNKNOWN: The historical style binding is not recovered; use the Strength form's melee path.
+param=damagetype,^crush_style
+// UNKNOWN: The packed avatar attack sequence is used for the Strength form.
+param=attack_anim,rock_avatar_attack
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
+
+[dwarf_rock_avatar_archer]
+name=Arzinian Avatar of Ranging
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing ranging.
+model1=npc_1850
+model2=npc_1853
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=hide
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+
+[dwarf_rock_avatar_archer_green]
+name=Arzinian Avatar of Ranging
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing ranging.
+model1=npc_1850
+model2=npc_1853
+recol1s=15007
+recol1d=13899
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=125
+// UNKNOWN: Existing unpacked combat stats are retained; no source validates them.
+hitpoints=100
+attack=10
+strength=100
+defence=120
+// UNKNOWN: Mirror the retained Strength level; the original Ranged level is unrecovered.
+ranged=100
+resizeh=115
+resizev=115
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+// UNKNOWN: Product-owned combat defaults; source does not recover the mode, range or timer.
+defaultmode=none
+wanderrange=0
+maxrange=32
+// UNKNOWN: Five-tile native ranged reach is an engineering default.
+attackrange=5
+timer=1
+// UNKNOWN: The historical style binding is not recovered; use the ranged form's native style.
+param=damagetype,^ranged_style
+// UNKNOWN: The packed avatar attack sequence is used for the Ranged form.
+param=attack_anim,rock_avatar_archer_attack
+// UNKNOWN: No historical ranged attack or strength bonuses are recovered; use zero.
+param=rangeattack,0
+param=rangebonus,0
+// UNKNOWN: No packed avatar projectile binding is recorded; use packed 377 arrow effects.
+param=proj_launch,iron_arrow_launch
+param=proj_travel,iron_arrow_travel
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
+
+[dwarf_rock_avatar_archer_yellow]
+name=Arzinian Avatar of Ranging
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing ranging.
+model1=npc_1850
+model2=npc_1853
+recol1s=15007
+recol1d=27430
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=75
+// UNKNOWN: Existing unpacked combat stats are retained; no source validates them.
+hitpoints=70
+attack=10
+strength=40
+defence=75
+// UNKNOWN: Mirror the retained Strength level; the original Ranged level is unrecovered.
+ranged=40
+resizeh=100
+resizev=100
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+// UNKNOWN: Product-owned combat defaults; source does not recover the mode, range or timer.
+defaultmode=none
+wanderrange=0
+maxrange=32
+// UNKNOWN: Five-tile native ranged reach is an engineering default.
+attackrange=5
+timer=1
+// UNKNOWN: The historical style binding is not recovered; use the ranged form's native style.
+param=damagetype,^ranged_style
+// UNKNOWN: The packed avatar attack sequence is used for the Ranged form.
+param=attack_anim,rock_avatar_archer_attack
+// UNKNOWN: No historical ranged attack or strength bonuses are recovered; use zero.
+param=rangeattack,0
+param=rangebonus,0
+// UNKNOWN: No packed avatar projectile binding is recorded; use packed 377 arrow effects.
+param=proj_launch,iron_arrow_launch
+param=proj_travel,iron_arrow_travel
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
+
+[dwarf_rock_avatar_mage]
+name=Arzinian Avatar of Magic
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing magic.
+model1=npc_1850
+model2=npc_1856
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=hide
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+
+[dwarf_rock_avatar_mage_green]
+name=Arzinian Avatar of Magic
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing magic.
+model1=npc_1850
+model2=npc_1856
+recol1s=15007
+recol1d=13899
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=125
+// UNKNOWN: Existing unpacked combat stats are retained; no source validates them.
+hitpoints=100
+attack=10
+strength=90
+defence=120
+// UNKNOWN: Mirror the retained Strength level; the original Magic level is unrecovered.
+magic=90
+resizeh=115
+resizev=115
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+// UNKNOWN: Product-owned combat defaults; source does not recover the mode, range or timer.
+defaultmode=none
+wanderrange=0
+maxrange=32
+timer=1
+// UNKNOWN: The historical style binding is not recovered; use the Magic form's native style.
+param=damagetype,^magic_style
+// UNKNOWN: The packed avatar casting sequence is used for the Magic form.
+param=magicattack_anim,rock_avatar_mage_attack
+// UNKNOWN: No historical magic attack bonus is recovered; use zero.
+param=magicattack,0
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
+
+[dwarf_rock_avatar_mage_yellow]
+name=Arzinian Avatar of Magic
+desc=It is the avatar of the Arzinian Being of Bordanzan, representing magic.
+model1=npc_1850
+model2=npc_1856
+recol1s=15007
+recol1d=27430
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+vislevel=75
+// UNKNOWN: Existing unpacked combat stats are retained; no source validates them.
+hitpoints=70
+attack=10
+strength=50
+defence=75
+// UNKNOWN: Mirror the retained Strength level; the original Magic level is unrecovered.
+magic=50
+resizeh=100
+resizev=100
+op2=Attack
+head1=npc_1850_head
+category=dwarfrock_avatar
+// UNKNOWN: Product-owned combat defaults; source does not recover the mode, range or timer.
+defaultmode=none
+wanderrange=0
+maxrange=32
+timer=1
+// UNKNOWN: The historical style binding is not recovered; use the Magic form's native style.
+param=damagetype,^magic_style
+// UNKNOWN: The packed avatar casting sequence is used for the Magic form.
+param=magicattack_anim,rock_avatar_mage_attack
+// UNKNOWN: No historical magic attack bonus is recovered; use zero.
+param=magicattack,0
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
+
+[dwarf_rock_actual_demon]
+name=Arzinian Being of Bordanzan
+desc=It's the Arzinian Being, whatever that is, that comes from Bordanzan, wherever that is.
+model1=npc_1850
+model2=npc_1856
+walkanim=rock_avatar_walk
+readyanim=rock_avatar_ready
+op1=Talk-to
+vislevel=781
+head1=npc_1850_head

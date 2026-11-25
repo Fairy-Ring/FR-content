@@ -22,3 +22,5 @@ weight=70lb
 param=slashdefence,10
 param=crushdefence,20
 param=rangedefence,10
+// UNKNOWN: Quest-item tradeability is not sourced; untradeable by policy.
+tradeable=no
