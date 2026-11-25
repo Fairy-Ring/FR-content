@@ -22,7 +22,7 @@ region_set(0, 0, 0, 0_44_52_32_16, 0);
 region_set(0, 1, 0, 0_44_52_40_16, 0);
 region_set(0, 0, 1, 0_44_52_32_24, 0);
 region_set(0, 1, 1, 0_44_52_40_24, 0);
-p_telejump(region_getcoord(0, 4, 3));
+p_telejump(region_getcoord(0, 3, 3));
 %devious_altar = 1;
 walktrigger(devious_scene_cancel);
 cam_moveto(region_getcoord(0, 5, 0), 500, 232, 232);
