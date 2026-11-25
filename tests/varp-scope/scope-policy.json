@@ -423,7 +423,10 @@
     "barbarian_course_progress": "perm",
     "barcrawl": "perm",
     "barrows": "perm",
+    "barrows_countdowns": "perm",
+    "barrows_generation": "perm",
     "barrows_kills": "perm",
+    "barrows_state": "perm",
     "beehive_free": "perm",
     "biodummy": "perm",
     "bioerrand": "perm",
@@ -1150,6 +1153,9 @@
     "zq_rash_timer": "temp"
   },
   "declarationReasons": {
+    "barrows_state": "Selected crypt, run phase and durable puzzle state survive pre-loot logout and departure; paid departure resets them through the Barrows core.",
+    "barrows_generation": "Saved run generation rejects stale owned actors and queued credit across logout, reset and the next run.",
+    "barrows_countdowns": "Saved Prayer and paid-collapse remainders resume after login without charging offline time or rearming a fresh interval.",
     "musicplay": "Auto/manual playback mode. Login explicitly selects auto again; no unlock or paid progress is held here.",
     "musicloop": "Current-session loop toggle and soft timer. A new login has neither a running loop timer nor an active song to resume.",
     "currentsong": "Currently playing MIDI id. Login clears it and region playback chooses a song again.",
