@@ -311,7 +311,7 @@ if (%ahoy_questvar >= ^ahoy_complete) {
 if (%deal_quest >= ^deal_complete) {
     $questpoints = add($questpoints, ^deal_questpoints);
 }
-if (%devious_main = ^devious_complete) {
+if (%devious_main >= ^devious_complete) {
     $questpoints = add($questpoints, ^devious_questpoints);
 }
 if (%dwarfrock_quest >= ^dwarfrock_complete) {
