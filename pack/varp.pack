@@ -197,7 +197,7 @@
 196=feud_trial_villager
 197=desertrescue
 198=desertrescue_map_mechanisms
-199=varp199_unused
+199=mta_telekinetic_points
 200=totemquest
 201=handelmort_traps_disabled
 202=hopper_full
@@ -214,12 +214,12 @@
 213=itwatchtower_bits
 214=gutanoth_gold
 215=gnomeball_owedball
-216=varp216_unused
+216=mta_alchemy_points
 217=pk_prey1
 218=pk_prey2
 219=death
-220=varp220_unused
-221=varp221_unused
+220=mta_enchantment_points
+221=mta_graveyard_points
 222=demonstart
 223=hazeelcultquest
 224=hazeelcult_valves

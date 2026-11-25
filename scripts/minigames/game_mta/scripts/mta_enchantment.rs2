@@ -1,0 +1,209 @@
+// VERIFIED 377 loc options and item identities: mta-enchant-377.md §4.
+[oploc1,cube_pile] ~mta_enchant_take(magictraining_enchan_cube);
+[oploc1,cylinder_pile] ~mta_enchant_take(magictraining_enchan_cylinder);
+[oploc1,icosahedron_pile] ~mta_enchant_take(magictraining_enchan_icosahendron);
+[oploc1,pentamid_pile] ~mta_enchant_take(magictraining_enchan_pentamid);
+[oploc1,hole_10803] ~mta_enchant_deposit;
+
+[proc,mta_enchantment_enter]
+if (~mta_room ! 3) return;
+cleartimer(mta_enchantment_ground);
+// varp627 bits 0-3 count shapes to the next ten, 4-28 pending points,
+// 29-30 bonus-shape index. Other original fields remain untouched.
+%varp627_bits = setbit_range_toint(%varp627_bits, 0, 0, 28);
+%varp627_bits = setbit_range_toint(%varp627_bits, 0, 29, 30);
+%magictraining_enchan_orbtotal = 0;
+%magictraining_ench_convcount = 0;
+~mta_enchantment_ground;
+// UNKNOWN favourable-player engineering cadence; not a recovered spawn timer.
+settimer(mta_enchantment_ground, ^mta_dragonstone_spawn_interval);
+~mta_hud;
+
+[proc,mta_enchantment_cleanup]
+cleartimer(mta_enchantment_ground);
+if (inv_total(inv, magictraining_enchan_cube) > 0) inv_del(inv, magictraining_enchan_cube, inv_total(inv, magictraining_enchan_cube));
+if (inv_total(inv, magictraining_enchan_cylinder) > 0) inv_del(inv, magictraining_enchan_cylinder, inv_total(inv, magictraining_enchan_cylinder));
+if (inv_total(inv, magictraining_enchan_icosahendron) > 0) inv_del(inv, magictraining_enchan_icosahendron, inv_total(inv, magictraining_enchan_icosahendron));
+if (inv_total(inv, magictraining_enchan_pentamid) > 0) inv_del(inv, magictraining_enchan_pentamid, inv_total(inv, magictraining_enchan_pentamid));
+if (inv_total(inv, magictraining_enchan_shapeorb) > 0) inv_del(inv, magictraining_enchan_shapeorb, inv_total(inv, magictraining_enchan_shapeorb));
+if (inv_total(inv, magictraining_dragonstone) > 0) inv_del(inv, magictraining_dragonstone, inv_total(inv, magictraining_dragonstone));
+%varp627_bits = setbit_range_toint(%varp627_bits, 0, 0, 28);
+%varp627_bits = setbit_range_toint(%varp627_bits, 0, 29, 30);
+%magictraining_enchan_orbtotal = 0;
+%magictraining_ench_convcount = 0;
+
+[proc,mta_enchantment_hud]
+if (~mta_room ! 3) return;
+if_settext(pizazz_enchantment:com_3, "<tostring(%mta_enchantment_points)>");
+// UNKNOWN functional text for the bonus icon; initial target is Cube and the
+// cycle follows the HUD's Cube, Cylinder, Icosahedron, Pentamid order.
+switch_int(getbit_range(%varp627_bits, 29, 30)) {
+    case 0 : if_settext(pizazz_enchantment:com_12, "Bonus: Cube");
+    case 1 : if_settext(pizazz_enchantment:com_12, "Bonus: Cylinder");
+    case 2 : if_settext(pizazz_enchantment:com_12, "Bonus: Icosahedron");
+    case 3 : if_settext(pizazz_enchantment:com_12, "Bonus: Pentamid");
+}
+
+[proc,mta_enchant_take](namedobj $item)
+if (~mta_room ! 3) return;
+if (inv_itemspace(inv, $item, 1, inv_size(inv)) = false) {
+    // UNKNOWN functional refusal wording.
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, $item, 1);
+// UNKNOWN functional pickup wording.
+mes("You take a shape from the pile.");
+
+[proc,mta_enchant_shape](obj $item)(int)
+switch_obj($item) {
+    case magictraining_enchan_cube : return(0);
+    case magictraining_enchan_cylinder : return(1);
+    case magictraining_enchan_icosahendron : return(2);
+    case magictraining_enchan_pentamid : return(3);
+}
+return(-1);
+
+[proc,mta_enchant_level](int $spell)(int)
+switch_int($spell) {
+    case ^enchant_lvl1 : return(1);
+    case ^enchant_lvl2 : return(2);
+    case ^enchant_lvl3 : return(3);
+    case ^enchant_lvl4 : return(4);
+    case ^enchant_lvl5 : return(5);
+}
+return(0);
+
+[proc,mta_enchant](int $spell, int $slot)(boolean)
+// Keep the shared spell path byte-for-byte for every non-Enchantment-room cast.
+if (~mta_room ! 3) return(false);
+def_obj $initial_obj = inv_getobj(inv, $slot);
+if ($initial_obj = null | inv_total(inv, $initial_obj) < 1) return(false);
+def_int $shape = ~mta_enchant_shape($initial_obj);
+def_boolean $dragonstone = false;
+if ($initial_obj = magictraining_dragonstone) $dragonstone = true;
+if ($shape < 0 & $dragonstone = false) return(false);
+def_int $level = ~mta_enchant_level($spell);
+if ($level = 0) {
+    // UNKNOWN functional refusal wording for unsupported enchant buttons.
+    mes("You can't use that enchantment spell on this item.");
+    return(true);
+}
+def_dbrow $spell_data = ~get_spell_data($spell);
+if ($spell_data = null) return(true);
+if (~check_spell_requirements($spell_data) = false) return(true);
+
+// Reuse the matching ordinary enchant spell's authored animation and sound.
+def_namedobj $visual_obj;
+def_seq $anim;
+def_spotanim $spotanim;
+def_synth $sound;
+switch_int($level) {
+    case 1 : $visual_obj, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spell_data, sapphire_ring);
+    case 2 : $visual_obj, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spell_data, emerald_ring);
+    case 3 : $visual_obj, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spell_data, ruby_ring);
+    case 4 : $visual_obj, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spell_data, diamond_ring);
+    case 5 : $visual_obj, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spell_data, dragonstone_ring);
+}
+
+// VERIFIED 2006 Jagex KB: ordinary shape=1 point, bonus shape=+1, and the
+// tenth matching shape adds the spell-level bonus. Dragonstones pay 2x level.
+// UNKNOWN timing default: points are banked here and awarded on orb deposit.
+def_int $pending = getbit_range(%varp627_bits, 4, 28);
+if ($dragonstone = true) {
+    $pending = add($pending, calc(2 * $level));
+} else {
+    def_int $bonus_shape = getbit_range(%varp627_bits, 29, 30);
+    def_int $shape_count = add(getbit_range(%varp627_bits, 0, 3), 1);
+    $pending = add($pending, 1);
+    if ($shape = $bonus_shape) $pending = add($pending, 1);
+    if ($shape_count >= 10) {
+        if ($shape = $bonus_shape) $pending = add($pending, $level);
+        $shape_count = 0;
+    }
+    %varp627_bits = setbit_range_toint(%varp627_bits, $shape_count, 0, 3);
+    // CANDIDATE: Sal's later guide says the bonus changes after about 8 or 9
+    // conversions. Choose 8 as the favourable-player boundary.
+    def_int $rotation_count = add(%magictraining_ench_convcount, 1);
+    if ($rotation_count >= 8) {
+        $rotation_count = 0;
+        $bonus_shape = add($bonus_shape, 1);
+        if ($bonus_shape >= 4) $bonus_shape = 0;
+        %varp627_bits = setbit_range_toint(%varp627_bits, $bonus_shape, 29, 30);
+    }
+    %magictraining_ench_convcount = $rotation_count;
+}
+%varp627_bits = setbit_range_toint(%varp627_bits, $pending, 4, 28);
+if_settabactive(^tab_magic);
+inv_setslot(inv, $slot, magictraining_enchan_shapeorb, 1);
+~delete_spell_runes($spell_data);
+// CANDIDATE 2007 guide says chamber enchant XP is reduced but gives no amount.
+// UNKNOWN favourable-player engineering default: retain 90% of the authored spell XP.
+def_int $enchant_room_xp_tenths = divide(multiply(db_getfield($spell_data, magic_spell_table:experience, 0), ^mta_enchantment_xp_percent), 100);
+stat_advance(magic, $enchant_room_xp_tenths);
+if ($anim ! null) anim($anim, 0);
+if ($spotanim ! null) spotanim_pl($spotanim, 92, 0);
+if ($sound ! null) sound_synth($sound, 0, 0);
+// UNKNOWN functional cast wording.
+mes("The item turns into an orb.");
+~mta_hud;
+p_delay(1);
+return(true);
+
+[proc,mta_enchant_deposit]
+if (~mta_room ! 3) return;
+def_int $orbs = inv_total(inv, magictraining_enchan_shapeorb);
+if ($orbs < 1) {
+    // UNKNOWN functional refusal wording.
+    mes("You don't have any orbs to deposit.");
+    return;
+}
+def_int $points = getbit_range(%varp627_bits, 4, 28);
+def_int $total = add(%magictraining_enchan_orbtotal, $orbs);
+def_int $rewards = 0;
+inv_del(inv, magictraining_enchan_shapeorb, $orbs);
+while ($total >= 20) {
+    $total = sub($total, 20);
+    $rewards = add($rewards, 1);
+    // VERIFIED 15 April 2006 Jagex KB: three runes selected at random.
+    switch_int(random(3)) {
+        case 0 : inv_add(inv, bloodrune, 3);
+        case 1 : inv_add(inv, deathrune, 3);
+        case 2 : inv_add(inv, cosmicrune, 3);
+    }
+}
+%magictraining_enchan_orbtotal = $total;
+%varp627_bits = setbit_range_toint(%varp627_bits, 0, 4, 28);
+if ($points > 0) ~mta_award(3, $points);
+// UNKNOWN functional deposit wording.
+mes("You deposit the orbs.");
+if ($rewards > 0) mes("The hole rewards you with <tostring($rewards)> set(s) of runes.");
+
+// VERIFIED 15 April 2006 KB 2334: dragonstones spawn on the chamber floor.
+// UNKNOWN engineering placement: five spaced floor positions around the central platform.
+[proc,mta_dragonstone_tile](int $index)(coord)
+switch_int($index) {
+    case 0 : return(0_52_150_35_34);
+    case 1 : return(0_52_150_41_40);
+    case 2 : return(0_52_150_35_46);
+    case 3 : return(0_52_150_29_40);
+    case 4 : return(0_52_150_41_46);
+}
+return(null);
+
+[proc,mta_enchantment_ground]
+if (~mta_room ! 3) return;
+def_int $index = 0;
+// UNKNOWN engineering lifetime; bounded public spawns are not duplicated by another entrant.
+while ($index < ^mta_dragonstone_spawn_count) {
+    def_coord $tile = ~mta_dragonstone_tile($index);
+    if (obj_find($tile, magictraining_dragonstone) = false) obj_addall($tile, magictraining_dragonstone, 1, ^mta_dragonstone_lifetime);
+    $index = add($index, 1);
+}
+
+[timer,mta_enchantment_ground]
+if (~mta_room ! 3) {
+    cleartimer(mta_enchantment_ground);
+    return;
+}
+~mta_enchantment_ground;

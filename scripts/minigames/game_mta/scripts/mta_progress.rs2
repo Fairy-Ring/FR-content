@@ -1,0 +1,70 @@
+// VERIFIED roles/caps: mage-training-arena.period-progress-hat-role / period-point-caps.
+// UNKNOWN functional wording: original guardian and hat conversations were not recovered.
+[opnpc1,magictraining_guard_entrance]
+if (map_members = ^false) { mes("You need to be on a members' server to use this feature."); return; }
+if (~mta_has_hat = true) { ~mta_report_points; return; }
+if (inv_freespace(inv) = 0) { mes("You don't have enough inventory space."); return; }
+inv_add(inv, magictraining_proghat_dull, 1);
+~mta_hat_colour;
+mes("Take this Progress hat into the training rooms. Talk to it to check your Pizazz points.");
+
+[proc,mta_is_hat](obj $item)(boolean)
+if ($item = magictraining_proghat_dull | $item = magictraining_proghat_energised | $item = magictraining_proghat_full) return(true);
+return(false);
+
+[proc,mta_has_hat]()(boolean)
+if (inv_total(inv, magictraining_proghat_dull) > 0 | inv_total(inv, magictraining_proghat_energised) > 0 | inv_total(inv, magictraining_proghat_full) > 0 | inv_total(worn, magictraining_proghat_dull) > 0 | inv_total(worn, magictraining_proghat_energised) > 0 | inv_total(worn, magictraining_proghat_full) > 0) return(true);
+return(false);
+
+[opheld1,magictraining_proghat_dull] ~mta_report_points;
+[opheld1,magictraining_proghat_energised] ~mta_report_points;
+[opheld1,magictraining_proghat_full] ~mta_report_points;
+
+[proc,mta_report_points]
+mes("Telekinetic Pizazz Points: <tostring(%mta_telekinetic_points)>");
+mes("Alchemist Pizazz Points: <tostring(%mta_alchemy_points)>");
+mes("Enchantment Pizazz Points: <tostring(%mta_enchantment_points)>");
+mes("Graveyard Pizazz Points: <tostring(%mta_graveyard_points)>");
+
+[proc,mta_award](int $room, int $amount)
+if ($amount < 1) return;
+switch_int($room) {
+    case 1 : %mta_telekinetic_points = min(4000, add(%mta_telekinetic_points, $amount));
+    case 2 : %mta_alchemy_points = min(8000, add(%mta_alchemy_points, $amount));
+    case 3 : %mta_enchantment_points = min(16000, add(%mta_enchantment_points, $amount));
+    case 4 : %mta_graveyard_points = min(4000, add(%mta_graveyard_points, $amount));
+}
+~mta_hat_colour;
+~mta_hud;
+
+[proc,mta_hat_colour]
+// UNKNOWN favourable engineering thresholds: energised after any points, full only at all four caps.
+def_namedobj $hat = magictraining_proghat_dull;
+if (%mta_telekinetic_points > 0 | %mta_alchemy_points > 0 | %mta_enchantment_points > 0 | %mta_graveyard_points > 0) { $hat = magictraining_proghat_energised; }
+if (%mta_telekinetic_points = 4000 & %mta_alchemy_points = 8000 & %mta_enchantment_points = 16000 & %mta_graveyard_points = 4000) { $hat = magictraining_proghat_full; }
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    if (~mta_is_hat(inv_getobj(inv, $slot)) = true) inv_setslot(inv, $slot, $hat, 1);
+    $slot = add($slot, 1);
+}
+if (~mta_is_hat(inv_getobj(worn, ^wearpos_hat)) = true) {
+    inv_setslot(worn, ^wearpos_hat, $hat, 1);
+    buildappearance(worn);
+}
+
+[proc,mta_destroy_warning](obj $item)
+if (~mta_is_hat($item) = true) {
+    // CANDIDATE exact warning: pre-2017 OSRS hat field; period KB independently verifies loss.
+    if_settext(destroy_this_object:com_11, "How dare you destroy me? You'll lose your Pizazz Points!");
+    if_settext(destroy_this_object:com_12, "Destroy Hat?");
+}
+
+[proc,mta_destroyed](obj $item)
+if (~mta_is_hat($item) = false) return;
+// VERIFIED period-accurate loss, explicitly approved in unit ruling 2.
+%mta_telekinetic_points = 0;
+%mta_alchemy_points = 0;
+%mta_enchantment_points = 0;
+%mta_graveyard_points = 0;
+~mta_hat_colour;
+~mta_hud;

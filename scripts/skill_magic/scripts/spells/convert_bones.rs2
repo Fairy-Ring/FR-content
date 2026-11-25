@@ -4,6 +4,7 @@
 // handles converting bones to bananas. will handle bones to peaches later on too.
 [label,magic_spell_convert_bones](int $spell)
 if (p_finduid(uid) = true) {
+    if (~mta_bones(false) = true) { return; }
     // look for spell in db
     def_dbrow $spell_data = ~get_spell_data($spell);
     if (~check_spell_requirements($spell_data) = false) {

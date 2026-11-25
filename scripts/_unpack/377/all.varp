@@ -286,8 +286,6 @@ scope=perm
 transmit=yes
 
 
-[varp199_unused]
-
 [hopper_full]
 scope=perm
 
@@ -312,8 +310,6 @@ scope=perm
 [gnomeball_owedball]
 scope=perm
 
-[varp216_unused]
-
 [pk_prey1]
 protect=no
 type=player_uid
@@ -323,10 +319,6 @@ protect=no
 type=player_uid
 
 [death]
-
-[varp220_unused]
-
-[varp221_unused]
 
 [gnome_cocktail_bits1]
 
@@ -1197,15 +1189,9 @@ transmit=yes
 
 [varp624_bits]
 
-[varp625_bits]
-
-[varp626_bits]
-
 [varp627_bits]
 
 [varp628_bits]
-
-[magictraining6]
 
 [varp630_unused]
 

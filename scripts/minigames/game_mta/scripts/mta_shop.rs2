@@ -1,12 +1,114 @@
-// Leftover magic_training_arena_shop 15944.
-// Official Update: Mage Training Arena 4 Jan 2006. Hunt 289? no.
-// Rewards Guardian leftover op4=Trade-with. Stock is packed 727
-// magictraining_inventory 347 (377 obj names only). Dummy 99999 footers stay.
-// Buy / four Pizazz totals later. Do not invent Infinity enchant.
-
+// Prices VERIFIED: April 2006 KB, mage-training-arena.price-*.
+// Currency conjunction / predecessor consumption CANDIDATE; inherited stock policy UNKNOWN.
 [opnpc4,magictraining_guard_rewards]
+~mta_shop_open;
+
+[proc,mta_shop_open]
+if (map_members = ^false) { mes("You need to be on a members' server to use this feature."); return; }
 inv_transmit(magictraining_inventory, magic_training_arena_shop:com_3);
 if_openmain(magic_training_arena_shop);
+~mta_shop_totals;
 
 [if_close,magic_training_arena_shop]
 inv_stoptransmit(magic_training_arena_shop:com_3);
+
+[proc,mta_shop_totals]
+if_settext(magic_training_arena_shop:com_10, "<tostring(%mta_telekinetic_points)>");
+if_settext(magic_training_arena_shop:com_11, "<tostring(%mta_enchantment_points)>");
+if_settext(magic_training_arena_shop:com_12, "<tostring(%mta_alchemy_points)>");
+if_settext(magic_training_arena_shop:com_13, "<tostring(%mta_graveyard_points)>");
+
+[proc,mta_price](obj $item)(int, int, int, int, obj)
+switch_obj($item) {
+    case magictraining_wand_beg : return(30, 30, 300, 30, null);
+    case magictraining_wand_appr : return(60, 60, 600, 60, magictraining_wand_beg);
+    case magictraining_wand_teach : return(150, 200, 1500, 150, magictraining_wand_appr);
+    case magictraining_wand_master : return(240, 240, 2400, 240, magictraining_wand_teach);
+    case magictraining_infinitytop : return(400, 450, 4000, 400, null);
+    case magictraining_infinityhat : return(350, 400, 3000, 350, null);
+    case magictraining_infinityboots : return(120, 120, 1200, 120, null);
+    case magictraining_infinitygloves : return(175, 225, 1500, 175, null);
+    case magictraining_infinitybottom : return(450, 500, 5000, 450, null);
+    case magictraining_bookofmagic : return(500, 550, 6000, 500, null);
+    case magictraining_peachspell : return(200, 300, 2000, 200, null);
+    case mistrune, dustrune, mudrune, smokerune, steamrune, lavarune : return(1, 1, 15, 1, null);
+    case cosmicrune : return(0, 0, 5, 0, null);
+    case chaosrune : return(0, 1, 5, 1, null);
+    case naturerune : return(0, 1, 0, 1, null);
+    case deathrune : return(2, 1, 20, 1, null);
+    case lawrune : return(2, 0, 0, 0, null);
+    case soulrune, bloodrune : return(2, 2, 25, 2, null);
+    case default : return(-1, -1, -1, -1, null);
+}
+
+[inv_button1,magic_training_arena_shop:com_3]
+if (last_slot < 0 | last_slot > 23) return;
+def_obj $item = inv_getobj(magictraining_inventory, last_slot);
+if ($item = null) return;
+def_int $tele; def_int $alch; def_int $ench; def_int $grave; def_obj $previous;
+$tele, $alch, $ench, $grave, $previous = ~mta_price($item);
+if ($tele < 0) return;
+// UNKNOWN plain functional price wording; exact original was not recovered.
+mes("<oc_name($item)>: <tostring($tele)> Telekinetic, <tostring($alch)> Alchemist, <tostring($ench)> Enchantment, <tostring($grave)> Graveyard Pizazz Points.");
+
+[inv_button2,magic_training_arena_shop:com_3]
+if (last_slot < 0 | last_slot > 23) return;
+~mta_buy(last_slot);
+
+[proc,mta_buy](int $slot)
+if (map_members = ^false) { mes("You need to be on a members' server to use this feature."); return; }
+if ($slot < 0 | $slot > 23) return;
+def_obj $item = inv_getobj(magictraining_inventory, $slot);
+if ($item = null) return;
+def_int $tele; def_int $alch; def_int $ench; def_int $grave; def_obj $previous;
+$tele, $alch, $ench, $grave, $previous = ~mta_price($item);
+if ($tele < 0) return;
+if (inv_getnum(magictraining_inventory, $slot) < 1) { mes("The shop has run out of stock."); return; }
+if (%mta_telekinetic_points < $tele) { mes("You don't have enough Telekinetic Pizazz Points."); return; }
+if (%mta_alchemy_points < $alch) { mes("You don't have enough Alchemist Pizazz Points."); return; }
+if (%mta_enchantment_points < $ench) { mes("You don't have enough Enchantment Pizazz Points."); return; }
+if (%mta_graveyard_points < $grave) { mes("You don't have enough Graveyard Pizazz Points."); return; }
+if ($previous ! null & inv_total(inv, $previous) = 0) {
+    // UNKNOWN functional refusal; VERIFIED inventory predecessor requirement.
+    mes("You need the previous wand in your inventory.");
+    return;
+}
+if ($item = magictraining_peachspell & %magictraining_bonespeaches = 1) {
+    // UNKNOWN favourable default: repeat unlock never debits points.
+    mes("You already know Bones to Peaches.");
+    return;
+}
+if ($item ! magictraining_peachspell & $previous = null & inv_itemspace(inv, $item, 1, inv_size(inv)) = false) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+// Atomic settlement: no suspension between checks, all debits and delivery.
+if ($previous ! null) inv_del(inv, $previous, 1);
+%mta_telekinetic_points = sub(%mta_telekinetic_points, $tele);
+%mta_alchemy_points = sub(%mta_alchemy_points, $alch);
+%mta_enchantment_points = sub(%mta_enchantment_points, $ench);
+%mta_graveyard_points = sub(%mta_graveyard_points, $grave);
+if ($item = magictraining_peachspell) {
+    inv_del(magictraining_inventory, $item, 1);
+    %magictraining_bonespeaches = 1;
+} else {
+    inv_moveitem_uncert(magictraining_inventory, inv, $item, 1);
+}
+~mta_hat_colour;
+~mta_shop_totals;
+
+[opnpc1,magictraining_guard_rewards]
+// UNKNOWN dialogue route and wording. VERIFIED manual price/seller; no invented copy limit.
+def_int $option = ~p_choice2("Trade Pizazz points.", 1, "Buy an Arena Book (200 coins).", 2);
+if ($option = 1) { ~mta_shop_open; return; }
+~mta_buy_manual;
+
+[proc,mta_buy_manual]
+if (map_members = ^false) { mes("You need to be on a members' server to use this feature."); return; }
+if (inv_total(inv, coins) < 200) { mes("You don't have enough coins."); return; }
+if (inv_itemspace(inv, magictraining_arenalorebook, 1, inv_size(inv)) = false & inv_total(inv, coins) ! 200) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, coins, 200);
+inv_add(inv, magictraining_arenalorebook, 1);

@@ -2,6 +2,7 @@
 [opheldt,magic:lowlvl_alchemy]@magic_spell_low_alch(^lowlvl_alchemy, last_item);
 
 [label,magic_spell_high_alch](int $spell, obj $item)
+if (~mta_alchemy($spell, $item) = true) { return; }
 if_settabactive(^tab_magic);
 if_close;
 // look for spell in db
@@ -38,6 +39,7 @@ p_delay(3);
 
 
 [label,magic_spell_low_alch](int $spell, obj $item)
+if (~mta_alchemy($spell, $item) = true) { return; }
 if_settabactive(^tab_magic); // osrs always sets tab back
 if_close;
 // look for spell in db

@@ -3,6 +3,7 @@
 
 // todo: telegrabbing
 [label,magic_spell_telegrab]
+if (~mta_telekinetic_cast = true) { return; }
 // look for spell in db
 def_dbrow $spell_data = ~get_spell_data(^telekinetic_grab);
 if (~check_spell_requirements($spell_data) = false) {
