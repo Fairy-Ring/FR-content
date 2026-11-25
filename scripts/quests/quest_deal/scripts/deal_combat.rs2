@@ -22,7 +22,7 @@ npc_add(^deal_spirit_spawn, deal_evil_spirit, ^deal_spirit_lease_ticks);
 %npc_attacking_uid = uid;
 %npc_macro_event_target = uid; // Existing shared combat owner gate, including magic.
 %npc_action_delay = map_clock;
-npc_setmode(applayer2);
+npc_setmode(opplayer2);
 npc_settimer(1);
 mes("The Evil Spirit is forced from the controls!");
 
@@ -43,9 +43,8 @@ if (%death = ^true | %deal_quest ! 9 | distance(^deal_spirit_spawn, coord) > ^de
 if (%npc_aggressive_player ! %npc_attacking_uid) return;
 if (finduid(%npc_attacking_uid) = false | ~npc_retal_ready = false) return;
 %npc_action_delay = add(map_clock, divide(npc_param(attackrate), 2));
-npc_setmode(applayer2);
+npc_setmode(opplayer2);
 
-[ai_applayer2,deal_evil_spirit] ~npc_default_attack;
 [ai_opplayer2,deal_evil_spirit] ~npc_default_attack;
 [ai_queue2,deal_evil_spirit] ~npc_default_damage(last_int);
 [ai_queue3,deal_evil_spirit]
@@ -61,8 +60,7 @@ if (%deal_quest ! 9) return;
 mes("You have banished the Evil Spirit!");
 
 [ai_opplayer2,deal_fever_spiders1] ~deal_spider_attack;
-[ai_applayer2,deal_fever_spiders1] ~deal_spider_attack;
-[ai_queue1,deal_fever_spiders1] ~npc_default_retaliate_ap;
+[ai_queue1,deal_fever_spiders1] ~npc_default_retaliate;
 
 [proc,deal_spider_attack]
 def_boolean $ready;
