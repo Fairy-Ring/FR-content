@@ -123,8 +123,17 @@ export default async function testTelekinetic(R) {
       for(const direction of directions){
         const next=slide(p,current.statue,direction);
         if(!next||same(current.statue,next))continue;
-        const stand={x:direction.dx>0?maxX+1:direction.dx<0?minX-1:current.statue.x,z:direction.dz>0?maxZ+1:direction.dz<0?minZ-1:current.statue.z,level:start.level};
-        if(!outside.has(key(stand)))continue;
+        let stand;
+        const previous=playerPosition(p),target={...current.statue,width:1,length:1};
+        for(let distance=1;distance<=p.apRange;distance++){
+          const candidate={x:current.statue.x+direction.dx*distance,z:current.statue.z+direction.dz*distance,level:start.level};
+          if(!outside.has(key(candidate)))continue;
+          setPlayerPosition(p,candidate);
+          const admitted=p.inApproachDistance(p.apRange,target);
+          setPlayerPosition(p,previous);
+          if(admitted){stand=candidate;break;}
+        }
+        if(!stand)continue;
         const nextKey=`${key(next)}|${key(stand)}`;
         if(seen.has(nextKey))continue;
         seen.add(nextKey);
@@ -151,6 +160,7 @@ export default async function testTelekinetic(R) {
     assert(from,'active maze keeps its original statue coordinate');
     const statue=statueAt(p,from);
     assert(statue,'Telekinetic Grab targets the actual current-player statue object');
+    assert(p.inApproachDistance(p.apRange,statue),'each compiled cast must pass the real engine approach range and visibility checks');
     finish(p,run(p,grabScript,[],statue));
   }
   function playRoute(p,route,reward=2){
