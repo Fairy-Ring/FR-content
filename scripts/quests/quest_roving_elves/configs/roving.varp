@@ -1,0 +1,6 @@
+// Original 377 slots 402 and 403, unchanged client encoding.
+[roving_elves_quest]
+scope=perm
+
+[roving_elves_bits]
+scope=perm

@@ -1,0 +1,34 @@
+// VERIFIED: RuneHQ 17 November 2005, crystal bow 70 Ranged;
+// crystal shield 70 Defence and 50 Agility. Reuse native equipment gates.
+[opheld2,roving_crystal_bow_new] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_1000] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_900] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_800] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_700] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_600] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_500] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_400] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_300] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_200] @levelrequire_ranged(70, last_slot);
+[opheld2,roving_crystal_bow_100] @levelrequire_ranged(70, last_slot);
+
+[opheld2,roving_crystal_shield_new] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_1000] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_900] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_800] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_700] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_600] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_500] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_400] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_300] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_200] @roving_shield_equip(last_slot);
+[opheld2,roving_crystal_shield_100] @roving_shield_equip(last_slot);
+
+[label,roving_shield_equip](int $slot)
+if (stat_base(agility) < 50) {
+    // UNKNOWN functional refusal wording; the 50 Agility requirement is VERIFIED.
+    mes("You are not a high enough level to use this item.");
+    mes("You need to have an agility level of 50.");
+    return;
+}
+@levelrequire_defence(70, $slot);

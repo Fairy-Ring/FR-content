@@ -1,0 +1,50 @@
+// CANDIDATE briefing/enchant wording retained from the existing pre-SoE transcript.
+// VERIFIED sequence: Tip.It / RuneHQ 2005. UNKNOWN functional recovery wording.
+[proc,roving_eluned]()(boolean)
+if (%roving_elves_quest >= ^roving_complete) {
+    return(false);
+}
+if (%roving_elves_quest = 0) {
+    ~chatnpc("<p,neutral>Please speak to Islwyn first.");
+    return(true);
+}
+if (%roving_elves_quest = ^roving_started) {
+    ~chatplayer("<p,neutral>Hey there, Islwyn said you might be able to help me. He told me you'd know how to consecrate ground for an elven burrial. I need to consecrate Glarial's new resting place.");
+    ~chatnpc("<p,neutral>That I do... It is also elvish tradition to plant a specially enchanted crystal seed at the graves of our ancestors. The seed will create guardians to protect the area. Unfortunately the crystal seed must be tuned to the person it's protecting... a new seed won't do. But you should be able to recover the seed from her old tomb. I'm not very familiar with the lands to the east so I couldn't tell you where her old tomb is I'm afraid.");
+    ~chatplayer("<p,neutral>That's okay, I've been there before. It's just south east of Baxtorian Falls.");
+    ~chatnpc("<p,neutral>Excellent. Now, the tomb's guardians will be protecting the seed, you'll need to defeat one of them to get it. Once you have it, return to me and I will re-enchant it.");
+    ~chatplayer("<p,neutral>Okay, I'll be back as soon as I have it.");
+    %roving_elves_quest = ^roving_get_seed;
+    return(true);
+}
+if (%roving_elves_quest = ^roving_get_seed) {
+    if (inv_total(inv, roving_old_consecration_seed) > 0) {
+        ~chatnpc("<p,neutral>Hello, any luck finding the consecration seed?");
+        ~chatplayer("<p,neutral>Yes I have it here.");
+        mes("You hand the crystal seed to Eluned.");
+        ~chatplayer("<p,neutral>How odd. I can see her lips moving... But there's no sound.");
+        // The existing seed's slot is reused, even with a full inventory.
+        inv_del(inv, roving_old_consecration_seed, 1);
+        inv_add(inv, roving_new_consecration_seed, 1);
+        %roving_elves_quest = ^roving_seed_enchanted;
+        ~chatnpc("<p,neutral>Plant this seed in Glarial's new tomb, close to her remains. With it in place, she will rest in peace.");
+        ~chatplayer("<p,neutral>Okay, will do.");
+    } else {
+        ~chatnpc("<p,neutral>You should be able to find it in her old resting place, I think you said it was south east of Baxtorian Falls. You'll need to defeat one of the old tomb's guardians to obtain it. Bring it to me as soon as you find it, then I can re-enchant it.");
+    }
+    return(true);
+}
+if (%roving_elves_quest = ^roving_seed_enchanted) {
+    if (inv_total(inv, roving_new_consecration_seed) = 0 & inv_total(bank, roving_new_consecration_seed) = 0) {
+        if (inv_freespace(inv) = 0) {
+            ~chatnpc("<p,neutral>Please make room in your inventory for another consecration seed.");
+            return(true);
+        }
+        // CANDIDATE replacement: retained OSRS quest guide; avoids lost-seed stranding.
+        inv_add(inv, roving_new_consecration_seed, 1);
+    }
+    ~chatnpc("<p,neutral>Plant this seed in Glarial's new tomb, close to her remains. With it in place, she will rest in peace.");
+    return(true);
+}
+~chatnpc("<p,happy>You should tell Islwyn that you have planted the seed.");
+return(true);

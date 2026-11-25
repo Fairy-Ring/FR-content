@@ -1,0 +1,24 @@
+// VERIFIED: Tip.It 2005: Plant beside the chalice, with a spade, grows a crystal tree.
+// UNKNOWN engineering: one-tile ring around the original 2x2 chalice and visual delays.
+// Functional messages are UNKNOWN; no period transcript is retained for this step.
+[opheld1,roving_new_consecration_seed]
+~roving_plant;
+
+[proc,roving_plant]
+if (%roving_elves_quest ! ^roving_seed_enchanted | inv_total(inv, roving_new_consecration_seed) = 0) {
+    return;
+}
+if (inzone(^roving_plant_southwest, ^roving_plant_northeast, coord) = false) {
+    mes("You need to plant the seed close to Glarial's remains beneath the waterfall.");
+    return;
+}
+if (inv_total(inv, spade) = 0) {
+    mes("You need a spade to plant the seed.");
+    return;
+}
+anim(human_dig, 0);
+p_delay(^roving_plant_delay);
+inv_del(inv, roving_new_consecration_seed, 1);
+%roving_elves_quest = ^roving_planted;
+loc_add(coord, roving_crystal_growth, 0, centrepiece_straight, ^roving_tree_lifetime);
+mes("You plant the consecration seed. A small crystal tree grows, then disappears.");

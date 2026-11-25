@@ -734,12 +734,6 @@ transmit=yes
 [bankpin_len]
 scope=perm
 
-[roving_elves_quest]
-scope=perm
-
-[roving_elves_bits]
-scope=perm
-
 [bankpin_mode]
 scope=perm
 
@@ -762,8 +756,6 @@ scope=perm
 
 [varp413_bits]
 transmit=yes
-
-[roving_update_ilfeen_chant]
 
 [onesmallfavourmulti]
 transmit=yes

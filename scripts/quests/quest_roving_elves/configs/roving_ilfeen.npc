@@ -1,0 +1,20 @@
+[roving_update_female_woodelf]
+name=Ilfeen
+desc=A female elf.
+model1=npc_1679i5
+model2=npc_1679
+model3=npc_1679i2
+model4=obj_cape_of_legends_womanwear
+model5=npc_1679i3
+model6=npc_1679i4
+recol1s=17132
+recol1d=15715
+recol2s=14858
+recol2d=18918
+recol3s=32727
+recol3d=24207
+vislevel=hide
+walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
+readyanim=human_ready
+op1=Talk-to
+head1=npc_1679_head
