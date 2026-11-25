@@ -154,6 +154,7 @@ jobs:
           run_test 'tests/varp-morph-transmit/test_varp_morph_transmit.mjs + tests/varp-morph-transmit/test_ernest_scene.mjs' node --import tsx --test ../content/tests/varp-morph-transmit/test_varp_morph_transmit.mjs ../content/tests/varp-morph-transmit/test_ernest_scene.mjs
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
+          run_test tests/devious-minds/test_devious_minds.mjs node --import tsx ../content/tests/devious-minds/test_devious_minds.mjs
           run_test tests/mountain-daughter/test_mountain_daughter.mjs node --import tsx ../content/tests/mountain-daughter/test_mountain_daughter.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/armourrows/test_armourrows.mjs node --import tsx ../content/tests/armourrows/test_armourrows.mjs
