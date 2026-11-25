@@ -5,11 +5,11 @@
 if (%wanted_main ! ^wanted_chase | inv_total(inv, wanted_crystal_ball) = 0) return;
 def_int $mission = ~wanted_chase_target;
 if (~wanted_chase_near($mission) = false) {
-    mes("There is no sign of Solus here."); // UNKNOWN functional scan notice.
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Scan results are negative, <displayname>. Savant out.");
     return;
 }
 if (inv_freespace(inv) = 0) {
-    mes("You need one free inventory space before scanning."); // UNKNOWN notice; period space requirement.
+    mes("Before scanning, make sure you have one free inventory space!"); // Period guide wording, game-message presentation UNKNOWN.
     return;
 }
 // Rescans cannot duplicate an active encounter. Departures/timers permit retry.

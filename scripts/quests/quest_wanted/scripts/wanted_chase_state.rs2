@@ -5,14 +5,14 @@ switch_int ($mission) {
     case 1 : return(0_54_54_48_30);
     case 2 : return(1_38_54_33_39);
     case 3 : return(0_49_52_55_34);
-    case 4 : return(0_39_48_53_22);
+    case 4 : return(0_39_48_53_21);
     case 5 : return(0_45_49_33_29);
-    case 6 : return(0_43_49_44_20);
+    case 6 : return(0_43_49_44_19);
     case 7 : return(0_38_50_7_25);
     case 8 : return(0_38_48_10_18);
     case 9 : return(0_50_149_20_24);
     case 10 : return(0_46_54_11_49);
-    case 11 : return(0_51_150_41_0);
+    case 11 : return(0_51_150_37_5);
     case 12 : return(0_51_50_36_11);
     case 13 : return(0_40_57_60_22);
     case 14 : return(0_41_51_38_39);
