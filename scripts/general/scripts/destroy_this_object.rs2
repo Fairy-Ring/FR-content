@@ -273,6 +273,7 @@ def_int $count = inv_getnum(inv, $slot);
 if_settext(destroy_this_object:com_13, oc_name($obj));
 if_settext(destroy_this_object:com_11, ^string_empty);
 if_settext(destroy_this_object:com_12, ^string_empty);
+~mta_destroy_warning($obj);
 inv_clear(destroy_this_object_display);
 inv_setslot(destroy_this_object_display, 0, $display_obj, $count);
 inv_transmit(destroy_this_object_display, destroy_this_object:com_0);
@@ -283,6 +284,9 @@ p_pausebutton;
 inv_stoptransmit(destroy_this_object:com_0);
 inv_clear(destroy_this_object_display);
 if (last_com = destroy_this_object:com_4) {
-    if (inv_getobj(inv, $slot) = $obj) inv_delslot(inv, $slot);
+    if (inv_getobj(inv, $slot) = $obj) {
+        inv_delslot(inv, $slot);
+        ~mta_destroyed($obj);
+    }
 }
 if_close;
