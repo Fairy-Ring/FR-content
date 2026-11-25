@@ -1,7 +1,7 @@
 // Actual held options from wanted.obj-set: Scan 1, Contact 2, Playback 4.
-// In the intelligence slice Scan and Contact both open Savant. Neither selects
-// a hunt destination or clue. Playback uses the observation-record handler.
+// Stage 9 uses the field scan. Other stages retain Savant and Playback.
 [opheld1,wanted_crystal_ball]
+if (%wanted_main = ^wanted_chase) { ~wanted_chase_scan; return; }
 @wanted_savant_contact;
 
 [opheld2,wanted_crystal_ball]
