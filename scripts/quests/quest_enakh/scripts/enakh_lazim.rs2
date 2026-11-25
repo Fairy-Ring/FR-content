@@ -1,15 +1,28 @@
-// Enakhra's Lament start-gate — Lazim (enakh_lazim 3147) @ 3191,2926.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Starting out minus
-// Overview / toast / Camulet / temple. Hunt 289? no.
-// Accept: %enakh_quest 0→1 only. Never 10. No sandstone hand-in / statue.
-// Bind the child, not the multi parent. Cite enakhra-start-talk-377.md §4.
+// Enakhra's Lament start gate — Lazim (enakh_lazim 3147) at 3191,2926.
+// VERIFIED listed minimums: 50 Crafting, 45 Firemaking, 43 Prayer, 39 Magic.
+// UNKNOWN historical Talk-to enforcement. This refusal is a functional default.
+// CANDIDATE last-resort 2007-base transcript supplies the retained start speech.
+// Surface acceptance writes stage 1. The temple proc owns stages 10 and above.
+// Bind the concrete NPC child, not the map's multi parent.
 
 [opnpc1,enakh_lazim]
+if (%enakh_quest >= 10) {
+    ~enakh_temple_lazim;
+    return;
+}
 if (%enakh_quest >= 1) {
+    if (%enakh_quest = 1 & %enakh_statue_multivar = 3) {
+        @enakh_lazim_head_choice;
+        return;
+    }
     @enakh_lazim_started;
+    return;
+}
+if (stat_base(crafting) < 50 | stat_base(firemaking) < 45 | stat_base(prayer) < 43 | stat_base(magic) < 39) {
+    ~chatnpc("<p,neutral>You need Crafting level 50, Firemaking level 45, Prayer level 43, and Magic level 39 to help me.");
+    return;
 }
 @enakh_lazim_pitch;
-
 [label,enakh_lazim_pitch]
 ~chatnpc("<p,quiz>Ah, an adventurer. Could you spare some of your time to help me?");
 ~chatplayer("<p,quiz>Why, what's the matter?");
@@ -37,8 +50,16 @@ if (%enakh_quest = 0) {
 @enakh_lazim_brief;
 
 [label,enakh_lazim_started]
+if (%enakh_statue_multivar = 1) {
+    @enakh_lazim_body_brief;
+    return;
+}
+if (%enakh_statue_multivar = 2) {
+    @enakh_lazim_slim_brief;
+    return;
+}
 @enakh_lazim_brief;
-
+return;
 [label,enakh_lazim_brief]
 ~chatplayer("<p,quiz>What should I be doing to make your statue?");
 ~chatnpc("<p,neutral>There is a stone quarry nearby; I require several blocks of sandstone in order to make the statue.");
@@ -54,4 +75,34 @@ if ($w = 1) {
     return;
 }
 ~chatplayer("<p,neutral>Okay, I'll get on with it.");
+return;
+
+// UNKNOWN functional dialogue and option mapping. Values map to Lazim,
+// Zamorak, Icthlarin, and camel heads in that order.
+[label,enakh_lazim_head_choice]
+~chatnpc("<p,neutral>The statue is ready for a head. Which one should I make?");
+def_int $head = ~p_choice4("Lazim", 0, "Zamorak", 1, "Icthlarin", 2, "Camel", 3);
+%enakh_choose_statue_head = $head;
+if ($head = 0) {
+    ~chatplayer("<p,neutral>A head of Lazim.");
+} else if ($head = 1) {
+    ~chatplayer("<p,neutral>A head of Zamorak.");
+} else if ($head = 2) {
+    ~chatplayer("<p,neutral>A head of Icthlarin.");
+} else {
+    ~chatplayer("<p,neutral>A camel head.");
+}
+~chatnpc("<p,neutral>Mine granite and use your chisel on it to make the head.");
+return;
+
+// UNKNOWN functional wording; the 2 May 2006 guide verifies the 20 kg body step.
+[label,enakh_lazim_body_brief]
+~chatplayer("<p,quiz>The base is in place. What should I do next?");
+~chatnpc("<p,neutral>Bring me twenty kilograms of sandstone for the statue body.");
+return;
+
+// UNKNOWN functional wording; the period guide says to chisel the statue stand.
+[label,enakh_lazim_slim_brief]
+~chatplayer("<p,quiz>The body is in place. What should I do next?");
+~chatnpc("<p,neutral>Use your chisel on the statue stand to carve it slimmer. Then talk to me again.");
 return;

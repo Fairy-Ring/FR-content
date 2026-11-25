@@ -1,10 +1,10 @@
-// Enakhra sandstone take — [opnpcu,enakh_lazim] only. Do not rewrite Talk-to.
-// Period 23 Jan: hold 1/2/5/10 to exact 32 then exact 20. Carry stores kg (CANDIDATE).
-// Statue 0 = 32 kg base lump. Statue 1 = 20 kg body lump. Never 10 / Camulet / dest.
+// Sandstone hand-in for Lazim. The 2 May 2006 guide describes 32 kg, then 20 kg.
+// CANDIDATE mined sizes: 1, 2, 5, and 10 kg. Carry stores kilograms here.
+// UNKNOWN recovery default: repeat a hand-in if the active lump is lost.
+// Statue stage 0 returns the 32 kg base. Stage 1 returns the 20 kg body.
 // Cite enakhra-sandstone-period-media-377.md §2.
-
 [opnpcu,enakh_lazim]
-if (%enakh_quest < 1) {
+if (%enakh_quest ! 1) {
     ~displaymessage(^dm_default);
     return;
 }
@@ -26,20 +26,31 @@ if ($used = enakh_sandstone_tiny | $used = cert_enakh_sandstone_tiny) {
     ~displaymessage(^dm_default);
     return;
 }
+if (inv_total(inv, $used) < 1) {
+    return;
+}
 def_int $need = 32;
 if (%enakh_statue_multivar = 1) {
     $need = 20;
 }
-if (calc(%enakh_lazim_carrying_stone + $kg) > $need) {
+def_int $next = calc(%enakh_lazim_carrying_stone + $kg);
+if ($next > $need) {
     ~chatnpc("<p,neutral>That's more than I need for this part. Bring me a smaller block.");
     return;
 }
-if (calc(%enakh_lazim_carrying_stone + $kg) = $need & inv_freespace(inv) < 1) {
+// A remaining certificate stack does not free its slot when one is removed.
+def_int $needs_slot = 0;
+if ($used = cert_enakh_sandstone_tiny | $used = cert_enakh_sandstone_small | $used = cert_enakh_sandstone_medium | $used = cert_enakh_sandstone_large) {
+    if (inv_total(inv, $used) > 1) {
+        $needs_slot = 1;
+    }
+}
+if ($next = $need & inv_freespace(inv) < 1 & $needs_slot = 1) {
     ~chatnpc("<p,sad>You do not have room for the finished block.");
     return;
 }
 inv_del(inv, $used, 1);
-%enakh_lazim_carrying_stone = calc(%enakh_lazim_carrying_stone + $kg);
+%enakh_lazim_carrying_stone = $next;
 mes("You give Lazim the sandstone.");
 if (%enakh_lazim_carrying_stone < $need) {
     ~chatnpc("<p,neutral>I will hold that for you.");

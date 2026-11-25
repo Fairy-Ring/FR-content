@@ -1,25 +1,25 @@
-// Enakhra statue craft — chisel 32 kg lump → base, place on Flat ground.
-// Period 23 Jan: Use chisel → base and legs; place on flat ground beside him.
-// Gametext CANDIDATE. Do not bind [opheldu,chisel] (live gems).
-// Statue 0→1 base, 1→2 body, 2→3 slim. No head / Camulet / 10.
-// Cite enakhra-sandstone-period-media-377.md §2.
+// Enakhra surface statue: build the base and body, slim the statue, then place a head.
+// VERIFIED 2 May 2006 guide process. Current stage integers 0->1->2->3 are UNKNOWN.
+// UNKNOWN head option mapping: Lazim, Zamorak, Icthlarin, camel use values 0-3.
+// UNKNOWN destination tile default: collapse to the mapped temple start at 3127,9325,0.
+// Accept both chisels because the historical item choice remains UNKNOWN.
 
 [opheldu,enakh_sandstone_huge_base+legs]
 if (last_useitem ! chisel & last_useitem ! enakh_chisel) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%enakh_quest < 1) {
+if (inv_total(inv, last_useitem) < 1) {
+    return;
+}
+if (%enakh_quest ! 1) {
     ~displaymessage(^dm_default);
     return;
 }
 if (inv_total(inv, enakh_sandstone_huge_base+legs) < 1) {
     return;
 }
-if (inv_freespace(inv) < 1) {
-    mes("You need some inventory space to do that.");
-    return;
-}
+// The input lump frees its slot for the crafted base, even when inventory is full.
 inv_del(inv, enakh_sandstone_huge_base+legs, 1);
 inv_add(inv, enakh_sandstone_crafted_base+legs, 1);
 mes("You chisel the sandstone into a statue base.");
@@ -30,12 +30,15 @@ if (last_useitem ! enakh_sandstone_crafted_base+legs) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%enakh_quest < 1) {
+if (%enakh_quest ! 1) {
     ~displaymessage(^dm_default);
     return;
 }
 if (%enakh_statue_multivar ! 0) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, enakh_sandstone_crafted_base+legs) < 1) {
     return;
 }
 inv_del(inv, enakh_sandstone_crafted_base+legs, 1);
@@ -48,17 +51,17 @@ if (last_useitem ! chisel & last_useitem ! enakh_chisel) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%enakh_quest < 1) {
+if (inv_total(inv, last_useitem) < 1) {
+    return;
+}
+if (%enakh_quest ! 1) {
     ~displaymessage(^dm_default);
     return;
 }
 if (inv_total(inv, enakh_sandstone_huge_body) < 1) {
     return;
 }
-if (inv_freespace(inv) < 1) {
-    mes("You need some inventory space to do that.");
-    return;
-}
+// The input lump frees its slot for the crafted body, even when inventory is full.
 inv_del(inv, enakh_sandstone_huge_body, 1);
 inv_add(inv, enakh_sandstone_crafted_body, 1);
 mes("You chisel the sandstone into a statue body.");
@@ -69,12 +72,15 @@ if (last_useitem ! enakh_sandstone_crafted_body) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%enakh_quest < 1) {
+if (%enakh_quest ! 1) {
     ~displaymessage(^dm_default);
     return;
 }
 if (%enakh_statue_multivar ! 1) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, enakh_sandstone_crafted_body) < 1) {
     return;
 }
 inv_del(inv, enakh_sandstone_crafted_body, 1);
@@ -87,8 +93,11 @@ if (last_useitem ! chisel & last_useitem ! enakh_chisel) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%enakh_quest < 1) {
+if (%enakh_quest ! 1) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, last_useitem) < 1) {
     return;
 }
 if (%enakh_statue_multivar ! 2) {
@@ -99,29 +108,44 @@ if (%enakh_statue_multivar ! 2) {
 mes("You chisel the statue a bit slimmer.");
 return;
 
-// Head place — Use one of the four stone heads on the headless statue.
-// Keys 4-7 = lazim / zamorak / icthlarin / camel (statue multi multiloc).
-// Visual only: no crack / bighole / %enakh_quest write / Camulet / dest.
-// CANDIDATE line (2007-base minus Changes). Cite spine-17-remaining-impl-377.md
-// §5 + enakh-head-place-next-377.md.
-
+// UNKNOWN mapping values 0-3 to heads. Placing the selected head causes the
+// VERIFIED period-guide collapse. The destination tile is an engineering default.
 [oplocu,enakh_statue_stage_3]
-if (last_useitem = enakh_statue_head_lazim) { @enakh_place_head(4); return; }
-if (last_useitem = enakh_statue_head_zamorak) { @enakh_place_head(5); return; }
-if (last_useitem = enakh_statue_head_icthlarin) { @enakh_place_head(6); return; }
-if (last_useitem = enakh_statue_head_camel) { @enakh_place_head(7); return; }
+if (%enakh_quest ! 1 | %enakh_statue_multivar ! 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = enakh_statue_head_lazim) { @enakh_place_head(enakh_statue_head_lazim); return; }
+if (last_useitem = enakh_statue_head_zamorak) { @enakh_place_head(enakh_statue_head_zamorak); return; }
+if (last_useitem = enakh_statue_head_icthlarin) { @enakh_place_head(enakh_statue_head_icthlarin); return; }
+if (last_useitem = enakh_statue_head_camel) { @enakh_place_head(enakh_statue_head_camel); return; }
 ~displaymessage(^dm_default);
+return;
 
-[label,enakh_place_head](int $stage)
-if (%enakh_quest < 1) {
+[label,enakh_place_head](obj $head)
+if (%enakh_quest ! 1 | %enakh_statue_multivar ! 3) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%enakh_statue_multivar ! 3) {
-    ~displaymessage(^dm_default);
+if (inv_total(inv, $head) < 1) {
     return;
 }
-inv_del(inv, last_useitem, 1);
-%enakh_statue_multivar = $stage;
-mes("You place the stone head on the statue.");
+def_obj $expected = enakh_statue_head_lazim;
+if (%enakh_choose_statue_head = 1) {
+    $expected = enakh_statue_head_zamorak;
+} else if (%enakh_choose_statue_head = 2) {
+    $expected = enakh_statue_head_icthlarin;
+} else if (%enakh_choose_statue_head = 3) {
+    $expected = enakh_statue_head_camel;
+}
+if ($head ! $expected) {
+    mes("That is not the head chosen for the statue.");
+    return;
+}
+inv_del(inv, $head, 1);
+%enakh_statue_multivar = calc(28 + %enakh_choose_statue_head);
+%enakh_where_is_lazim = 1;
+%enakh_quest = 10;
+mes("The statue collapses into the temple below.");
+p_teleport(0_48_145_55_45);
 return;

@@ -1,0 +1,384 @@
+// VERIFIED process: Tip.It capture 2 May 2006, temple and barrier sections.
+// UNKNOWN: stage encoding, functional messages, exact movement tiles, recovery.
+// Original 377 varps and overlapping multi selectors are retained; no new state.
+
+[proc,enakh_temple_lazim]
+if (%enakh_quest >= ^enakh_complete) {
+    // UNKNOWN favourable exit/recovery choice, also available after a relog.
+    if (~p_choice2("I lost my Camulet.", 1, "Please take me outside.", 2) = 1) {
+        ~enakh_recover_camulet;
+    } else {
+        p_telejump(0_49_45_54_45);
+    }
+    return;
+}
+def_int $choice = ~p_choice4("May I have the statue's head?", 1, "I lost a stone limb.", 2, "How do I leave?", 3, "What should I do next?", 4);
+switch_int ($choice) {
+    case 1 :
+        def_namedobj $head = enakh_statue_head_lazim;
+        switch_int (%enakh_choose_statue_head) {
+            case 1 : $head = enakh_statue_head_zamorak;
+            case 2 : $head = enakh_statue_head_icthlarin;
+            case 3 : $head = enakh_statue_head_camel;
+        }
+        ~enakh_recover_item($head);
+    case 2 :
+        if (%enakh_left_armlock = 0 & %enakh_left_arm_taken = 1) ~enakh_recover_item(enakh_arm_left);
+        if (%enakh_right_armlock = 0 & %enakh_right_arm_taken = 1) ~enakh_recover_item(enakh_arm_right);
+        if (%enakh_left_leglock = 0 & %enakh_left_leg_taken = 1) ~enakh_recover_item(enakh_leg_left);
+        if (%enakh_right_leglock = 0 & %enakh_right_leg_taken = 1) ~enakh_recover_item(enakh_leg_right);
+    case 3 :
+        // UNKNOWN favourable recovery: Lazim always offers the surface route.
+        p_telejump(0_49_45_54_45);
+    case 4 :
+        if (%enakh_quest < 20) {
+            ~chatnpc("<p,neutral>Use the statue's limbs to open the doors. The sigils open the inner doors. Take soft clay and granite to the pedestal upstairs.");
+        } else if (%enakh_quest < 30) {
+            ~chatnpc("<p,neutral>Restore the braziers, clear the furnace, melt the fountain and feed Pentyn.");
+        } else {
+            ~chatnpc("<p,neutral>Go through the barrier and use Crumble Undead on the boneguard. Help the prisoner beyond it.");
+        }
+}
+
+[proc,enakh_recover_item](namedobj $item)
+if (inv_total(inv, $item) > 0 | inv_total(bank, $item) > 0 | inv_total(worn, $item) > 0) return;
+if (inv_freespace(inv) = 0) {
+    mes("You need some inventory space.");
+    return;
+}
+inv_add(inv, $item, 1);
+
+[oplocu,_enakh_fallen_statue]
+if (%enakh_quest < 10) return;
+if (last_useitem ! chisel & last_useitem ! enakh_chisel) return;
+if (%enakh_left_arm_taken = 0) {
+    if (inv_freespace(inv) = 0) { mes("You need some inventory space."); return; }
+    inv_add(inv, enakh_arm_left, 1);
+    %enakh_left_arm_taken = 1;
+} else if (%enakh_right_arm_taken = 0) {
+    if (inv_freespace(inv) = 0) { mes("You need some inventory space."); return; }
+    inv_add(inv, enakh_arm_right, 1);
+    %enakh_right_arm_taken = 1;
+} else if (%enakh_left_leg_taken = 0) {
+    if (inv_freespace(inv) = 0) { mes("You need some inventory space."); return; }
+    inv_add(inv, enakh_leg_left, 1);
+    %enakh_left_leg_taken = 1;
+} else if (%enakh_right_leg_taken = 0) {
+    if (inv_freespace(inv) = 0) { mes("You need some inventory space."); return; }
+    inv_add(inv, enakh_leg_right, 1);
+    %enakh_right_leg_taken = 1;
+} else {
+    mes("Lazim can replace a lost limb.");
+    return;
+}
+anim(enakh_player_chisel, 0);
+mes("You chisel a limb from the fallen statue.");
+
+[oploc1,enakh_door_left_arm] @enakh_limb_door(enakh_arm_left, %enakh_left_armlock);
+[oploc1,enakh_door_right_arm] @enakh_limb_door(enakh_arm_right, %enakh_right_armlock);
+[oploc1,enakh_door_left_leg] @enakh_limb_door(enakh_leg_left, %enakh_left_leglock);
+[oploc1,enakh_door_right_leg] @enakh_limb_door(enakh_leg_right, %enakh_right_leglock);
+[oplocu,enakh_door_left_arm] @enakh_limb_use(enakh_arm_left, %enakh_left_armlock);
+[oplocu,enakh_door_right_arm] @enakh_limb_use(enakh_arm_right, %enakh_right_armlock);
+[oplocu,enakh_door_left_leg] @enakh_limb_use(enakh_leg_left, %enakh_left_leglock);
+[oplocu,enakh_door_right_leg] @enakh_limb_use(enakh_leg_right, %enakh_right_leglock);
+
+[label,enakh_limb_use](obj $item, int $unlocked)
+if (last_useitem ! $item) { mes("That does not fit the recess."); return; }
+@enakh_limb_door($item, $unlocked);
+
+[label,enakh_limb_door](obj $item, int $unlocked)
+if (%enakh_quest < 10) return;
+if ($unlocked = 0) {
+    if (inv_total(inv, $item) = 0) { mes("You need the matching stone limb."); return; }
+    inv_del(inv, $item, 1);
+    switch_obj ($item) {
+        case enakh_arm_left : %enakh_left_armlock = 1;
+        case enakh_arm_right : %enakh_right_armlock = 1;
+        case enakh_leg_left : %enakh_left_leglock = 1;
+        case enakh_leg_right : %enakh_right_leglock = 1;
+    }
+}
+~enakh_cross_door;
+
+[oploc1,enakh_pedestal_sigil_z] ~enakh_take_sigil(enakh_sigil_z);
+[oploc1,enakh_pedestal_sigil_m] ~enakh_take_sigil(enakh_sigil_m);
+[oploc1,enakh_pedestal_sigil_r] ~enakh_take_sigil(enakh_sigil_r);
+[oploc1,enakh_pedestal_sigil_k] ~enakh_take_sigil(enakh_sigil_k);
+
+[proc,enakh_take_sigil](namedobj $item)
+if (%enakh_quest < 10) return;
+// UNKNOWN favourable recovery: the original pedestal replaces a lost sigil.
+~enakh_recover_item($item);
+
+[oploc1,enakh_door_z_sigil] @enakh_sigil_door(enakh_sigil_z, %enakh_z_door);
+[oploc1,enakh_door_m_sigil] @enakh_sigil_door(enakh_sigil_m, %enakh_m_door);
+[oploc1,enakh_door_r_sigil] @enakh_sigil_door(enakh_sigil_r, %enakh_r_door);
+[oploc1,enakh_door_k_sigil] @enakh_sigil_door(enakh_sigil_k, %enakh_k_door);
+[oplocu,enakh_door_z_sigil] @enakh_sigil_use(enakh_sigil_z, %enakh_z_door);
+[oplocu,enakh_door_m_sigil] @enakh_sigil_use(enakh_sigil_m, %enakh_m_door);
+[oplocu,enakh_door_r_sigil] @enakh_sigil_use(enakh_sigil_r, %enakh_r_door);
+[oplocu,enakh_door_k_sigil] @enakh_sigil_use(enakh_sigil_k, %enakh_k_door);
+
+[label,enakh_sigil_use](obj $item, int $unlocked)
+if (last_useitem ! $item) { mes("That does not fit the recess."); return; }
+@enakh_sigil_door($item, $unlocked);
+
+[label,enakh_sigil_door](obj $item, int $unlocked)
+if (%enakh_quest < 10) return;
+if ($unlocked = 0) {
+    if (inv_total(inv, $item) = 0) { mes("You need the matching sigil."); return; }
+    inv_del(inv, $item, 1);
+    switch_obj ($item) {
+        case enakh_sigil_z : %enakh_z_door = 1;
+        case enakh_sigil_m : %enakh_m_door = 1;
+        case enakh_sigil_r : %enakh_r_door = 1;
+        case enakh_sigil_k : %enakh_k_door = 1;
+    }
+}
+~enakh_cross_door;
+
+// UNKNOWN map-derived crossing. Each orientation crosses its actual wall edge.
+[proc,enakh_cross_door]
+def_coord $dest = loc_coord;
+switch_int (loc_angle) {
+    case 0 : if (coordx(coord) >= coordx(loc_coord)) $dest = movecoord($dest, -1, 0, 0);
+    case 1 : if (coordz(coord) <= coordz(loc_coord)) $dest = movecoord($dest, 0, 0, 1);
+    case 2 : if (coordx(coord) <= coordx(loc_coord)) $dest = movecoord($dest, 1, 0, 0);
+    case 3 : if (coordz(coord) >= coordz(loc_coord)) $dest = movecoord($dest, 0, 0, -1);
+}
+p_telejump($dest);
+
+[oplocu,_enakh_pedestal]
+if (%enakh_quest < 10) return;
+if (last_useitem = softclay) {
+    inv_del(inv, softclay, 1);
+    inv_add(inv, enakh_camel_mould_positive, 1);
+    %enakh_seen_pedestal = 1;
+    mes("You make a mould of the head-shaped recess.");
+    return;
+}
+if (last_useitem ! enakh_stone_head_akthanakos) {
+    %enakh_used_wrong_head_on_pedestal = 1;
+    mes("That head does not fit the pedestal.");
+    return;
+}
+if (%enakh_pedestal_head = 1) return;
+inv_del(inv, enakh_stone_head_akthanakos, 1);
+%enakh_pedestal_head = 1;
+%enakh_where_is_lazim = 2;
+if (%enakh_quest < 20) %enakh_quest = 20;
+mes("The stone head fits. The four rooms must now be restored.");
+~enakh_barrier_progress;
+
+[opheldu,enakh_camel_mould_positive]
+if (last_useitem ! softclay | %enakh_quest < 10) return;
+inv_del(inv, softclay, 1);
+inv_add(inv, enakh_camel_mask, 1);
+mes("You make a camel mask.");
+
+[oploc1,_enakh_brazier]
+if (~enakh_has_light = false) { mes("You need a lit lantern to investigate the brazier."); return; }
+def_obj $fuel = ~enakh_brazier_fuel;
+mes("The remains are from <oc_name($fuel)>.");
+
+[oplocu,_enakh_brazier]
+if (%enakh_quest < 10 | %enakh_blood_room = 1) return;
+if (stat(firemaking) < 45) { mes("You need level 45 Firemaking."); return; }
+if (~enakh_has_light = false) { mes("You need a lit lantern."); return; }
+if (inv_total(inv, tinderbox) = 0) { mes("You need a tinderbox."); return; }
+def_obj $fuel = ~enakh_brazier_fuel;
+if (last_useitem ! $fuel) { mes("That is not the fuel this brazier needs."); return; }
+def_int $bit = ~enakh_brazier_bit;
+if (getbit_range(%enakh_multivarbits, $bit, $bit) = 1) return;
+inv_del(inv, $fuel, 1);
+%enakh_multivarbits = setbit_range_toint(%enakh_multivarbits, 1, $bit, $bit);
+mes("You light the brazier.");
+if (%enakh_brazier_1_multivar = 1 & %enakh_brazier_2_multivar = 1 & %enakh_brazier_3_multivar = 1 & %enakh_brazier_4_multivar = 1 & %enakh_brazier_5_multivar = 1 & %enakh_brazier_6_multivar = 1) {
+    %enakh_blood_room = 1;
+    ~enakh_barrier_progress;
+}
+
+[proc,enakh_brazier_bit]()(int)
+if (coordz(loc_coord) = 9306) {
+    if (coordx(loc_coord) = 3114) return(5);
+    if (coordx(loc_coord) = 3116) return(6);
+    return(7);
+}
+if (coordx(loc_coord) = 3114) return(8);
+if (coordx(loc_coord) = 3116) return(9);
+return(10);
+
+[proc,enakh_brazier_fuel]()(obj)
+switch_int (~enakh_brazier_bit) {
+    case 5 : return(logs);
+    case 6 : return(oak_logs);
+    case 7 : return(willow_logs);
+    case 8 : return(maple_logs);
+    case 9 : return(unlit_candle);
+}
+return(coal);
+
+[proc,enakh_has_light]()(boolean)
+if (inv_total(inv, bullseye_lantern_lit) > 0 | inv_total(inv, oil_lantern_lit) > 0 | inv_total(inv, candle_lantern_lit) > 0 | inv_total(inv, candle_lantern_black_lit) > 0 | inv_total(inv, tog_sapphire_lantern_lit) > 0) return(true);
+return(false);
+
+[opnpc1,enakh_pentyn]
+// UNKNOWN functional wording; period guide specifies feeding him cake.
+if (%enakh_shadow_room = 0) { ~chatnpc("<p,sad>Please bring me some cake."); return; }
+~chatnpc("<p,happy>Thank you for the food.");
+
+[opnpcu,enakh_pentyn]
+if (%enakh_quest < 10 | %enakh_shadow_room = 1) return;
+if (last_useitem ! cake) { mes("Pentyn needs cake."); return; }
+inv_del(inv, cake, 1);
+%enakh_shadow_room = 1;
+~enakh_barrier_progress;
+~chatnpc("<p,happy>Thank you for the food.");
+
+[opnpc2,enakh_dummy_fountain] mes("Use a fire spell to melt the ice.");
+[opnpc2,enakh_dummy_furnace] mes("Use a wind spell to clear the furnace.");
+[opnpc2,enakh_boneguard] mes("Use Crumble Undead to free the trapped spirit.");
+
+[proc,enakh_barrier_progress]
+if (%enakh_quest >= 30) return;
+if (%enakh_pedestal_head = 1 & %enakh_blood_room = 1 & %enakh_ice_room = 1 & %enakh_smoke_room = 1 & %enakh_shadow_room = 1) {
+    %enakh_quest = 30;
+    mes("The magic barrier no longer blocks your way.");
+}
+
+[oploc1,enakh_magic_wall]
+if (%enakh_quest < 30) { mes("The four rooms and pedestal must be restored first."); return; }
+// All three cached barrier tiles span the same east/west line.
+if (coordz(coord) < 9320) { p_telejump(1_48_145_32_40); return; }
+p_telejump(1_48_145_32_38);
+
+[oploc1,enakh_temple_ladderup]
+if (%enakh_quest < 10) return;
+if (coordy(loc_coord) = 1 & coordz(loc_coord) = 9332 & %enakh_quest < 30) return;
+p_telejump(movecoord(loc_coord, 0, 1, -1));
+
+[oploc1,enakh_temple_ladderdown]
+if (%enakh_quest < 10) return;
+p_telejump(movecoord(loc_coord, 0, -1, -1));
+
+[oploc1,enakh_temple_pillar_ladder]
+if (%enakh_quest < 50) { mes("You must pass the boneguard first."); return; }
+// Map-derived: the upper ledge lies outside each pillar's facing edge.
+if (loc_angle = 2) { p_telejump(movecoord(loc_coord, 0, 1, -1)); return; }
+p_telejump(movecoord(loc_coord, 0, 1, 1));
+
+[oploc1,enakh_temple_pillar_ladder_top]
+if (%enakh_quest < 50) return;
+// The lower room is on the opposite side of the same edge.
+if (loc_angle = 2) { p_telejump(movecoord(loc_coord, 0, -1, 1)); return; }
+p_telejump(movecoord(loc_coord, 0, -1, -1));
+
+[opnpc1,enakh_bone_pile]
+if (%enakh_quest < 50) return;
+if (coordz(coord) > 9307) { p_telejump(2_48_145_32_25); return; }
+p_telejump(2_48_145_32_30);
+
+[opnpc1,enakh_akthanakos_boneguard]
+if (%enakh_quest < 50) return;
+if (%enakh_player_helps_akthanakos = 1) {
+    ~chatnpc("<p,neutral>Repair the wall. Add a five-kilogram sandstone block, then chisel it. Do this three times.");
+    return;
+}
+if (%prayer14 = 0 | stat(prayer) < 1) {
+    mes("Protect from Melee will let you speak safely to the boneguard.");
+    return;
+}
+~chatnpc("<p,neutral>Will you repair the wall and help me escape?");
+if (~p_choice2("I will help you.", 1, "Not now.", 2) = 2) return;
+%enakh_player_helps_akthanakos = 1;
+mes("Take sandstone from the rubble. Add it to the wall and chisel it into place.");
+
+[oploc1,enakh_rubblepile_by_largewall]
+if (%enakh_player_helps_akthanakos = 0 | %enakh_quest >= 60) return;
+if (inv_freespace(inv) = 0) { mes("You need some inventory space."); return; }
+inv_add(inv, enakh_sandstone_medium, 1);
+mes("You take a five-kilogram sandstone block.");
+
+[oplocu,_enakh_wall]
+if (%enakh_player_helps_akthanakos = 0 | %enakh_quest ! 50) return;
+if (last_useitem = enakh_sandstone_medium) {
+    if (%enakh_largewall_needs_trimming = 1) { mes("Chisel the last block before adding another."); return; }
+    inv_del(inv, enakh_sandstone_medium, 1);
+    %enakh_largewall_needs_trimming = 1;
+    mes("You add the sandstone to the wall.");
+    return;
+}
+if (last_useitem ! chisel & last_useitem ! enakh_chisel) return;
+if (%enakh_largewall_needs_trimming = 0) { mes("Add a five-kilogram sandstone block first."); return; }
+%enakh_largewall_needs_trimming = 0;
+%enakh_largewall_multivar = add(%enakh_largewall_multivar, 1);
+anim(enakh_player_chisel, 0);
+mes("You chisel the sandstone into place.");
+if (%enakh_largewall_multivar = 3) {
+    %enakh_quest = 60;
+    %enakh_akthanakos_form = 1;
+    %enakh_enakhra_form = 1;
+    // UNKNOWN concise presentation of the period guide's wall/climax cutscene.
+    ~mesbox("The wall is restored. Akthanakos breaks free of the boneguard and confronts Enakhra.");
+}
+
+[opnpc1,enakh_enakhra_hooded]
+if (%enakh_quest >= 60) return;
+~chatnpc("<p,neutral>You should leave this place.");
+
+[opnpc1,enakh_akthanakos_freed] ~enakh_finish;
+[opnpc1,enakh_akthanakos_mahjarrat]
+if (%enakh_quest >= ^enakh_complete) { ~enakh_recover_camulet; return; }
+~enakh_finish;
+
+[proc,enakh_finish]
+if (%enakh_quest ! 60) return;
+if (inv_freespace(inv) = 0) { mes("You need some inventory space for the Camulet."); return; }
+~chatnpc("<p,neutral>Take this Camulet as thanks for freeing me.");
+// Recheck after the modal: terminal writer precedes all once-only rewards.
+if (%enakh_quest ! 60) return;
+%enakh_quest = ^enakh_complete;
+%enakh_akthanakos_form = 2;
+%enakh_where_is_lazim = 3;
+%enakh_camulet_charge = 4; // CANDIDATE: retained 2007 four-charge attribution.
+inv_add(inv, camulet, 1);
+// UNKNOWN favourable selection: period Tip.It says 5k(or7k); 23 May official says7k.
+stat_advance(crafting, 70000);
+stat_advance(firemaking, 70000);
+stat_advance(mining, 70000);
+stat_advance(magic, 70000);
+~send_quest_complete(questlist:enakh, camulet, 200, ^enakh_questpoints, "You have completed Enakhra's Lament!", "7,000 Crafting XP|7,000 Firemaking XP|7,000 Mining XP|7,000 Magic XP|A Camulet");
+
+[proc,enakh_recover_camulet]
+// UNKNOWN favourable replacement does not refill charges or repeat XP.
+if (%enakh_quest < ^enakh_complete) return;
+~enakh_recover_item(camulet);
+
+[opheld3,camulet]
+mes("The Camulet has <tostring(%enakh_camulet_charge)> charges remaining.");
+
+[opheld4,camulet]
+if (%enakh_quest < ^enakh_complete) return;
+if (%enakh_camulet_charge = 0) { mes("The Camulet needs camel dung to recharge it."); return; }
+if (~wilderness_level(coord) > 20) { mes("You cannot teleport beyond level 20 Wilderness."); return; }
+if (~pre_tele_checks(coord) = false) return;
+%enakh_camulet_charge = sub(%enakh_camulet_charge, 1);
+// UNKNOWN exact tile, VERIFIED temple destination family. No later surface upgrade.
+~player_teleport_normal(1_48_145_31_30);
+
+[opheldu,camulet]
+// The reverse direction was added later. Retain the period Camulet-on-dung use.
+mes("Use the Camulet on camel dung to recharge it.");
+
+[opheldu,feud_camel_pooh_bucket]
+if (%enakh_quest < ^enakh_complete | last_useitem ! camulet) return;
+inv_del(inv, feud_camel_pooh_bucket, 1);
+inv_add(inv, bucket_empty, 1);
+%enakh_camulet_charge = 4; // CANDIDATE pool size; UNKNOWN refill scale.
+mes("You recharge the Camulet.");
+
+[oploc1,enakh_bighole]
+if (%enakh_quest < 10) return;
+p_telejump(0_48_145_54_45);
+

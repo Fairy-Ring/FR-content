@@ -2,6 +2,7 @@
 [opnpct,magic:crumble_undead] ~pvm_crumble_undead;
 
 [proc,pvm_crumble_undead]
+if (~enakh_puzzle_spell(^crumble_undead) = true) return;
 // order of these checks are from osrs:
 // - action_delay check
 // - rune requirements

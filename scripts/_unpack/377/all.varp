@@ -1230,13 +1230,6 @@ transmit=yes
 [agility_pyramid]
 transmit=yes
 
-[enakh_multivarbits]
-transmit=yes
-scope=perm
-
-[enakh_varbits]
-scope=perm
-transmit=yes
 
 [boardgames_runesquares_va]
 transmit=yes

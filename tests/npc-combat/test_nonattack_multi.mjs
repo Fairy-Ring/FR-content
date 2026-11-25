@@ -254,12 +254,17 @@ try {
         assert.deepEqual(effects(f), before, `${baseName} selector ${slot}: salve has no combat effects`);
 
         const crumble = observe('[proc,pvm_crumble_undead]', f);
-        assert(crumble.visited.includes('[proc,check_spell_requirements]'), `${baseName} selector ${slot}: packed Crumble runes pass their check`);
-        assert(crumble.visited.includes('[proc,player_in_combat_check2]'), `${baseName} selector ${slot}: Crumble combat check passes`);
-        assert(crumble.visited.includes('[proc,npc_combat_hasop]'), `${baseName} selector ${slot}: Crumble uses the shared gate`);
-        assert(crumble.snapshot.messages.includes("You can't attack this npc."), `${baseName} selector ${slot}: Crumble refuses at op2 admission`);
-        assert(!crumble.visited.includes('[proc,npc_is_attackable_opt]'), `${baseName} selector ${slot}: Crumble stops before spell admission`);
-        assert.deepEqual(effects(f), before, `${baseName} selector ${slot}: Crumble spends no runes or combat resources`);
+        if (baseName === 'enakh_boneguard_multinpc' && (slot === 30 || slot === 40)) {
+          assert(crumble.visited.includes('[proc,enakh_puzzle_spell]'), `${baseName} selector ${slot}: Crumble uses its active quest puzzle`);
+          assert.equal(f.player.getVarBit(id(VarBitType, 'enakh_quest')), 50, `${baseName} selector ${slot}: Crumble frees the Boneguard`);
+        } else {
+          assert(crumble.visited.includes('[proc,check_spell_requirements]'), `${baseName} selector ${slot}: packed Crumble runes pass their check`);
+          assert(crumble.visited.includes('[proc,player_in_combat_check2]'), `${baseName} selector ${slot}: Crumble combat check passes`);
+          assert(crumble.visited.includes('[proc,npc_combat_hasop]'), `${baseName} selector ${slot}: Crumble uses the shared gate`);
+          assert(crumble.snapshot.messages.includes("You can't attack this npc."), `${baseName} selector ${slot}: Crumble refuses at op2 admission`);
+          assert(!crumble.visited.includes('[proc,npc_is_attackable_opt]'), `${baseName} selector ${slot}: Crumble stops before spell admission`);
+          assert.deepEqual(effects(f), before, `${baseName} selector ${slot}: Crumble spends no runes or combat resources`);
+        }
 
         f.player.setVar(id(VarPlayerType, 'aggressive_npc'), f.npc.uid);
         f.npc.setVar(id(VarNpcType, 'npc_attacking_uid'), f.player.uid);

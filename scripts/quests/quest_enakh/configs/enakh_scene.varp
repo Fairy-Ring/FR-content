@@ -1,0 +1,7 @@
+[enakh_multivarbits]
+transmit=yes
+scope=perm
+
+[enakh_varbits]
+scope=perm
+transmit=yes
