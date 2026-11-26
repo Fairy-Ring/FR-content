@@ -1,6 +1,7 @@
 [oploc1,_rc_altar] @runecraft_runes;
 
 [oplocu,_rc_altar]
+if (loc_type = death_altar & last_useitem = mourning_crystal_new_sample) { ~mep2_charge_crystal; return; }
 if (oc_category(last_useitem) = talismans) {
     @runecraft_craft_tiaras(loc_type, last_useitem, last_useslot);
 } else {
