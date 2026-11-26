@@ -57,6 +57,7 @@
       "[proc,soulbane_hope_npc_attack]",
       "[proc,soulbane_rage_npc_attack]",
       "[proc,soulbane_tolna_npc_attack]",
+      "[proc,templetrek_hostile_attack_player]",
       "[proc,vampire_attack]"
     ],
     "npc_meleeattack": [
@@ -154,6 +155,7 @@
       "[ai_applayer2,_troll_thrower]",
       "[proc,chaoselemental_primary]",
       "[proc,soulbane_hope_ranged]",
+      "[proc,templetrek_snail_attack_player]",
       "[proc,wyvern_breath]",
       "[proc,wyvern_ranged]",
       "[proc,zygomite_attack]"

@@ -269,6 +269,27 @@ try {
     assert.equal(npc.getVar(owner) >>> 0, f.player.uid, 'native life changes retain their owner');
     assert.equal(npc.getVar(marker), regionHandle, 'native life changes retain their private region');
   }
+  function advanceTrekGhast(f, route, instance) {
+    const visible = rt.id(rt.configs.NpcType, route.npc);
+    const invisibleName = route.npc.replace('_vis_', '_invis_');
+    const invisibleType = rt.id(rt.configs.NpcType, invisibleName);
+    const invisible = [...rt.World.npcs].find(npc => npc.type === invisibleType && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
+    assert(invisible, 'native trek encounter creates its owned invisible ghast');
+    f.npc = invisible;
+    const pouch = rt.id(rt.configs.ObjType, 'druid_pouch');
+    f.player.invAdd(rt.id(rt.configs.InvType, 'inv'), pouch, 2);
+    f.player.lastUseItem = pouch;
+    f.player.lastUseSlot = 0;
+    const script = rt.Provider.getByName(`[opnpcu,${invisibleName}]`);
+    assert(script, 'packed original ghast pouch handler');
+    const state = ScriptRunner.init(script, f.player, invisible);
+    state.pointerAdd(ScriptPointer.ProtectedActivePlayer);
+    f.player.executeScript(state, true, true);
+    assert.notEqual(state.execution, rt.State.ABORTED, 'real owned ghast pouch use does not abort');
+    pumpTolnaNpcQueues(f, invisible, () => invisible.type === visible && state.execution === rt.State.FINISHED, 16);
+    assert.equal(invisible.type, visible, 'only native pouch use reveals the route ghast');
+    assert.equal(invisible.getVar(rt.id(VarNpcType, 'npc_attacking_uid')) >>> 0, f.player.uid, 'native reveal retains trek ownership');
+  }
   function configureRoute(f, route) {
     for (const stat of [1, 6]) { f.player.levels[stat] = 20; f.player.baseLevels[stat] = 20; }
     if (route.equipment) f.player.invAdd(rt.id(rt.configs.InvType, 'worn'), rt.id(rt.configs.ObjType, route.equipment), 1);
@@ -324,6 +345,7 @@ try {
         }
         if (route.prelude === 'soulbane-hope-lives') advanceHopeLives(f, route, instance);
         else if (route.prelude === 'soulbane-tolna-intro') advanceTolnaIntro(f, route, instance, createdInstances, before);
+        else if (route.prelude === 'templetrek-ghasts') advanceTrekGhast(f, route, instance);
         else assert.equal(route.prelude, undefined, `${route.script}: known native route prelude`);
         if (route.prelude !== 'soulbane-tolna-intro') {
           f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
