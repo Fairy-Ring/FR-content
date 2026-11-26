@@ -22,10 +22,11 @@ if ($from_outside = true & %mourning_quest < ^mep1_escorted) {
     return;
 }
 def_coord $gate_coord = loc_coord;
+// UNKNOWN: One tile north of the anchor is walkable on both sides of both packed gates.
 loc_change(elf_village_treegate_open, 3);
 p_delay(0);
 if ($from_outside = true) {
-    p_teleport(movecoord($gate_coord, 1, 0, 0));
+    p_teleport(movecoord($gate_coord, 1, 0, 1));
 } else {
-    p_teleport(movecoord($gate_coord, -1, 0, 0));
+    p_teleport(movecoord($gate_coord, -1, 0, 1));
 }

@@ -267,7 +267,7 @@ function walkRoute(p, x, z, label) {
   }
   assert(moveHandler.handle(new MoveClick(route.map(value => CoordGrid.unpackCoord(value)), 0, false), p), `${label}: native walking packet accepted`);
   for (let step = 0; step <= steps && (p.x !== x || p.z !== z); step++) {
-    p.resetEntity(false); tick(p); p.processInteraction();
+    p.resetEntity(false); tick(p); p.processInteraction(); World.processZones();
   }
   assert.deepEqual(tile(p), [before[0], x, z], `${label}: native movement reaches the route endpoint without fixture repositioning`);
   console.log(`ROUTE ${label}: ${before.join(',')} -> ${tile(p).join(',')}; ${steps} checked walking step(s)`);
@@ -290,6 +290,7 @@ function operateHere(p, target, name) {
   assert(p.inOperableDistance(target), `${name}: reached by the preceding continuous route`);
   assert(locHandler.handle(new OpLoc(1, target.x, target.z, target.type), p));
   packedTrigger(p, `[oploc1,${name}]`); p.processInteraction(); finish(p);
+  for (let step = 0; step < 3; step++) { tick(p); World.processZones(); }
 }
 const textSince = (p, mark) => p.packets.slice(mark)
   .filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ');
@@ -407,15 +408,17 @@ try {
   check('both Lletya tree placements connect the actual landing to the roving camp and back, with an unconditional exit', () => {
     for (const z of [3191, 3195]) {
       const p = fixture(1); place(p, { level: 0, x: 2353, z: 3172 });
-      walkRoute(p, 2306, z, 'Lletya landing to the inside of the tree gate');
+      walkRoute(p, 2306, z + 1, 'Lletya landing to the inside of the tree gate');
       operateHere(p, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
       assert(p.x < 2306, 'native Pass exits Lletya');
+      assert(!map.isMapBlocked(p.x, p.z, p.level), 'native exit lands on original walkable terrain');
       walkRoute(p, 2289, 3145, 'tree gate exit to the original roving camp');
-      walkRoute(p, 2304, z, 'roving camp to the outside of the tree gate');
+      walkRoute(p, 2304, z + 1, 'roving camp to the outside of the tree gate');
       operateHere(p, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
       assert(p.x >= 2306, 'eligible native Pass re-enters Lletya');
+      assert(!map.isMapBlocked(p.x, p.z, p.level), 'native entry lands on original walkable terrain');
       walkRoute(p, 2353, 3172, 'tree gate entry to the actual Lletya landing');
-      const q = fixture(0); place(q, { level: 0, x: 2306, z });
+      const q = fixture(0); place(q, { level: 0, x: 2306, z: z + 1 });
       operateHere(q, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
       assert(q.x < 2306, 'even an unstarted player can leave and cannot be stranded');
       const outside = tile(q), mark = q.packets.length;
