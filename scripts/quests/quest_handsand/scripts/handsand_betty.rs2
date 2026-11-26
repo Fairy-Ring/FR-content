@@ -1,0 +1,97 @@
+// VERIFIED recipe/doorway sequence: Tip.It capture 20060502085646.
+// UNKNOWN functional wording and loss recovery; no later dialogue is asserted authentic.
+[proc,handsand_betty]()(boolean)
+if (%handsand_quest < ^handsand_betty | %handsand_quest > ^handsand_serum_ready) return(^false);
+if (%handsand_quest = ^handsand_serum_ready) {
+    if (~handsand_give(handsand_truthserum) = ^false) return(^true);
+    mes("The serum is ready. Distract Sandy and put it in his coffee.");
+    return(^true);
+}
+if (%handsand_quest = ^handsand_incomplete_serum) {
+    if (~handsand_give(handsand_truthserum) = ^false) return(^true);
+    if (inv_total(inv, handsand_sand) = 0) {
+        mes("Pickpocket Sandy for something of his to finish the truth serum.");
+        return(^true);
+    }
+    inv_del(inv, handsand_sand, 1);
+    %handsand_serum = add(4, random(3));
+    %handsand_quest = ^handsand_serum_ready;
+    mes("Betty adds Sandy's sand to the serum. It will now work on him.");
+    return(^true);
+}
+if (inv_total(inv, handsand_rose_lens) > 0) {
+    %handsand_counter_multi = 1;
+    mes("Stand just inside the doorway and use the rose tinted lens on the counter.");
+    return(^true);
+}
+if (inv_total(inv, handsand_bottle_water) > 0 | inv_total(inv, handsand_redberry_juice) > 0 | inv_total(inv, handsand_pink_dye) > 0) {
+    mes("Add redberries and then white berries to the bottled water. Use the pink dye on a bullseye lantern lens.");
+    return(^true);
+}
+if (inv_total(inv, vial_empty) = 0) {
+    mes("Betty needs an empty vial to prepare the truth serum.");
+    return(^true);
+}
+inv_del(inv, vial_empty, 1);
+inv_add(inv, handsand_bottle_water, 1);
+%handsand_serum = 1;
+mes("Betty takes the vial and gives you bottled water. Make pink dye with redberries and white berries, then dye a bullseye lantern lens.");
+return(^true);
+
+[opheldu,handsand_bottle_water]
+def_obj $used = last_useitem;
+if (~handsand_mix(handsand_bottle_water, $used) = ^false) ~displaymessage(^dm_default);
+[opheldu,handsand_redberry_juice]
+def_obj $used = last_useitem;
+if (~handsand_mix(handsand_redberry_juice, $used) = ^false) ~displaymessage(^dm_default);
+[opheldu,handsand_pink_dye]
+def_obj $used = last_useitem;
+if (~handsand_mix(handsand_pink_dye, $used) = ^false) ~displaymessage(^dm_default);
+
+[proc,handsand_mix](obj $first, obj $second)(boolean)
+if ($first = redberries & $second = handsand_bottle_water | $second = redberries & $first = handsand_bottle_water) {
+    if (%handsand_quest ! ^handsand_betty) return(^true);
+    if (inv_total(inv, redberries) = 0 | inv_total(inv, handsand_bottle_water) = 0) return(^true);
+    inv_del(inv, redberries, 1);
+    inv_del(inv, handsand_bottle_water, 1);
+    inv_add(inv, handsand_redberry_juice, 1);
+    mes("You add the redberries to the bottled water.");
+    return(^true);
+}
+if ($first = white_berries & $second = handsand_redberry_juice | $second = white_berries & $first = handsand_redberry_juice) {
+    if (%handsand_quest ! ^handsand_betty) return(^true);
+    if (inv_total(inv, white_berries) = 0 | inv_total(inv, handsand_redberry_juice) = 0) return(^true);
+    inv_del(inv, white_berries, 1);
+    inv_del(inv, handsand_redberry_juice, 1);
+    inv_add(inv, handsand_pink_dye, 1);
+    mes("You add the white berries and make pink dye.");
+    return(^true);
+}
+if ($first = handsand_pink_dye & $second = bullseye_lantern_lens | $second = handsand_pink_dye & $first = bullseye_lantern_lens) {
+    if (%handsand_quest ! ^handsand_betty) return(^true);
+    if (inv_total(inv, handsand_pink_dye) = 0 | inv_total(inv, bullseye_lantern_lens) = 0) return(^true);
+    inv_del(inv, handsand_pink_dye, 1);
+    inv_del(inv, bullseye_lantern_lens, 1);
+    inv_add(inv, handsand_rose_lens, 1);
+    inv_add(inv, vial_empty, 1);
+    mes("You make a rose tinted lens.");
+    return(^true);
+}
+return(^false);
+
+// Approach handler preserves the doorway tile instead of walking to the counter.
+[aplocu,handsand_counter]
+if (last_useitem ! handsand_rose_lens | %handsand_quest ! ^handsand_betty) return;
+// CANDIDATE doorway from 377 m47_50: door at local8,59, shop interior west.
+if (coord ! 0_47_50_7_59) {
+    mes("Stand just inside Betty's doorway so the light passes through the lens.");
+    return;
+}
+if (inv_total(inv, handsand_rose_lens) = 0) return;
+// CANDIDATE: the later transcript describes the lens shattering in the heat.
+inv_del(inv, handsand_rose_lens, 1);
+inv_add(inv, handsand_truthserum, 1);
+%handsand_counter_multi = 0;
+%handsand_serum = 2;
+%handsand_quest = ^handsand_incomplete_serum;
+mes("Rose coloured light falls on the vial. Betty gives you the incomplete truth serum.");

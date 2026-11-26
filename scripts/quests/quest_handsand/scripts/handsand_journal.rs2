@@ -1,0 +1,22 @@
+// UNKNOWN functional journal wording summarises the period Tip.It walkthrough.
+[if_button,questlist:handsand]
+def_string $text;
+switch_int (%handsand_quest) {
+    case 0 : $text = "Speak to Bert by Yanille's sandpit.|I need 17 Thieving and 49 Crafting.";
+    case ^handsand_hand : $text = "Take the severed hand to the Guard Captain at Yanille's Dragon Inn. He wants a beer.";
+    case ^handsand_captain : $text = "Ring the bell outside the Wizards' Guild in Yanille and show Zavistic Rarve the hand.";
+    case ^handsand_identified : $text = "The hand belongs to Clarence, Zavistic's student. Ask Bert about his work.";
+    case ^handsand_bert_rota : $text = "Visit Bert's employer Sandy in his office south of Brimhaven's restaurant.";
+    case ^handsand_sandy_met : $text = "Search Sandy's desk. Read the rotas with both copies in my inventory to compare them.";
+    case ^handsand_rotas_compared : $text = "The two rotas are different. Ask Bert about the discrepancies.";
+    case ^handsand_scroll : $text = "Take Bert's magical scroll to Zavistic Rarve at the Wizards' Guild.";
+    case ^handsand_betty : $text = "Ask Betty in Port Sarim for truth serum. Bring an empty vial.|Add redberries, then white berries to her bottled water. Dye a bullseye lantern lens.|Talk to Betty, stand just inside her doorway and use the rose tinted lens on the counter.|Zavistic can teleport me to Port Sarim if I use an empty vial on him.";
+    case ^handsand_incomplete_serum : $text = "Pickpocket Sandy for some sand from his pocket. Bring it and the incomplete serum to Betty.";
+    case ^handsand_serum_ready : $text = "Distract Sandy with one of the three stories. Quickly use the truth serum on his coffee while he looks away.";
+    case ^handsand_coffee_dosed : $text = "Activate the magical orb. Ask Sandy all three questions to record his confession.";
+    case ^handsand_confession : $text = "Take the recording, five earth runes and a bucket of sand to Zavistic Rarve.";
+    case ^handsand_spell : $text = "Zavistic's spell helps Bert. Speak to Mazion at Entrana's sandpit to recover Clarence's remains.";
+    case ^handsand_head : $text = "Take Clarence's head to Zavistic Rarve.";
+    case default : $text = "@red@QUEST COMPLETE!|Bert can deliver 84 buckets of sand to my bank once a day.";
+}
+~quest_journal("The Hand in the Sand", $text);

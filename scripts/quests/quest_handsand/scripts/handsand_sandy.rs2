@@ -1,0 +1,113 @@
+// VERIFIED investigation sequence: Tip.It capture 20060502085646.
+// UNKNOWN functional wording, distraction window and three-option encoding.
+[opnpc1,handsand_sandy0]
+if (%handsand_quest = ^handsand_bert_rota) {
+    %handsand_quest = ^handsand_sandy_met;
+    ~chatnpc("<p,angry>I don't want anyone prying into my business.");
+    return;
+}
+if (%handsand_quest = ^handsand_serum_ready) {
+    def_int $choice = ~p_choice3("There is a monkey outside.", 1, "Someone is stealing your sand.", 2, "Look at that strange bird.", 3);
+    if ($choice = sub(%handsand_serum, 3)) {
+        %handsand_sandy_multi = 1;
+        settimer(handsand_attention, ^handsand_distraction_ticks);
+        mes("Sandy looks out of the window. His coffee is unattended.");
+    } else {
+        mes("Sandy ignores the distraction.");
+    }
+    return;
+}
+if (%handsand_quest = ^handsand_coffee_dosed) {
+    if (inv_total(inv, handsand_orb_recording) = 0) {
+        mes("Activate the magical orb before questioning Sandy.");
+        return;
+    }
+    def_int $question = ~p_choice3("Why are Bert's rotas different?", 1, "What happened to Clarence?", 2, "Why did you kill him?", 3);
+    if ($question = 1) {
+        ~chatnpc("<p,neutral>I changed Bert's rota so he would work longer hours.");
+        %handsand_question1 = 1;
+    } else if ($question = 2) {
+        ~chatnpc("<p,neutral>I killed Clarence and put his body in the sand.");
+        %handsand_question2 = 1;
+    } else {
+        ~chatnpc("<p,neutral>He discovered what I had done to Bert's rota. I used magic to change Bert's memory.");
+        %handsand_question3 = 1;
+    }
+    if (%handsand_question1 = 1 & %handsand_question2 = 1 & %handsand_question3 = 1) {
+        %handsand_quest = ^handsand_confession;
+        mes("The orb contains Sandy's full confession. Take it to Zavistic Rarve.");
+    }
+    return;
+}
+if (%handsand_quest >= ^handsand_confession) {
+    mes("You have the evidence you need from Sandy.");
+} else {
+    mes("Sandy refuses to discuss his business. His desk is piled with paperwork.");
+}
+
+[opnpc3,handsand_sandy0]
+if (%handsand_quest < ^handsand_betty | %handsand_quest > ^handsand_serum_ready) {
+    mes("You have no reason to search Sandy's pockets.");
+    return;
+}
+if (stat(thieving) < 17) {
+    mes("You need level 17 Thieving to pickpocket Sandy.");
+    return;
+}
+if (~handsand_give(handsand_sand) = ^false) return;
+anim(human_pickpocket, 0);
+mes("You take a handful of sand from Sandy's pocket.");
+
+[oploc1,handsand_desk]
+if (%handsand_quest < ^handsand_sandy_met | %handsand_quest > ^handsand_scroll) {
+    mes("The desk is piled high with paperwork.");
+    return;
+}
+if (~handsand_give(handsand_rota_sandy) = ^false) return;
+mes("You find Sandy's copy of Bert's work rota. Compare it with Bert's copy.");
+
+[opheld1,handsand_rota_bert]
+~handsand_compare_rotas;
+[opheld1,handsand_rota_sandy]
+~handsand_compare_rotas;
+[opheldu,handsand_rota_bert]
+if (last_useitem = handsand_rota_sandy) ~handsand_compare_rotas;
+[opheldu,handsand_rota_sandy]
+if (last_useitem = handsand_rota_bert) ~handsand_compare_rotas;
+
+[proc,handsand_compare_rotas]
+if (%handsand_quest < ^handsand_sandy_met | %handsand_quest > ^handsand_rotas_compared) return;
+if (inv_total(inv, handsand_rota_bert) = 0 | inv_total(inv, handsand_rota_sandy) = 0) {
+    mes("Bring both copies of the rota to compare them.");
+    return;
+}
+%handsand_quest = ^handsand_rotas_compared;
+mes("The rotas have different working hours. Ask Bert about the discrepancies.");
+
+[oplocu,handsand_coffee]
+def_obj $used = last_useitem;
+if ($used ! handsand_truthserum) return;
+if (%handsand_quest ! ^handsand_serum_ready | %handsand_sandy_multi ! 1) {
+    mes("Distract Sandy before adding the serum to his coffee.");
+    return;
+}
+inv_del(inv, handsand_truthserum, 1);
+%handsand_serum = 7;
+%handsand_sandy_multi = 0;
+%handsand_coffee_multi = 1;
+%handsand_quest = ^handsand_coffee_dosed;
+cleartimer(handsand_attention);
+mes("You put the truth serum in the coffee. Sandy drinks it.");
+
+[timer,handsand_attention]
+%handsand_sandy_multi = 0;
+cleartimer(handsand_attention);
+
+[opheld1,handsand_orb_storage]
+if (%handsand_quest < ^handsand_coffee_dosed | %handsand_quest > ^handsand_confession) {
+    mes("Wait until Sandy has drunk the truth serum before activating the orb.");
+    return;
+}
+inv_del(inv, handsand_orb_storage, 1);
+inv_add(inv, handsand_orb_recording, 1);
+mes("You activate the magical orb to record Sandy's confession.");

@@ -9,7 +9,19 @@ if (%handsand_quest < 1) {
     ~chatnpc("<p,neutral>Need more beer...");
     return;
 }
-if (%handsand_quest >= 2) {
+if (%handsand_quest > ^handsand_captain) {
+    mes("The Guard Captain directs you to the Wizards' Guild.");
+    return;
+}
+if (%handsand_quest = ^handsand_captain) {
+    if (inv_total(bank, handsand_beerhand) > 0) {
+        mes("Your beer soaked hand is in your bank.");
+        return;
+    }
+    if (inv_freespace(inv) = 0 & inv_total(inv, handsand_beerhand) = 0) {
+        mes("You need a free inventory space.");
+        return;
+    }
     if (inv_total(inv, handsand_beerhand) < 1) {
         // lost the beer-soaked hand — the captain fished it back out of his beer
         ~chatplayer("<p,neutral>Hello Sir!");
@@ -19,6 +31,15 @@ if (%handsand_quest >= 2) {
         mes("The Guard Captain fished the hand out of his beer and hands it to you.");
         return;
     }
+    return;
+}
+if (stat(thieving) < 17 | stat(crafting) < 49) {
+    mes("You need level 17 Thieving and level 49 Crafting to investigate the hand.");
+    return;
+}
+if (inv_total(inv, handsand_sandyhand) = 0) {
+    mes("Ask Bert for the hand before reporting it.");
+    return;
 }
 if (inv_total(inv, beer) < 1) {
     ~chatnpc("<p,neutral>Need more beer...");

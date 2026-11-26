@@ -1,0 +1,19 @@
+// UNKNOWN engineering stage encoding; sequence VERIFIED by Tip.It 2 May 2006.
+^handsand_hand = 1
+^handsand_captain = 2
+^handsand_identified = 3
+^handsand_bert_rota = 4
+^handsand_sandy_met = 5
+^handsand_rotas_compared = 6
+^handsand_scroll = 7
+^handsand_betty = 8
+^handsand_incomplete_serum = 9
+^handsand_serum_ready = 10
+^handsand_coffee_dosed = 11
+^handsand_confession = 12
+^handsand_spell = 13
+^handsand_head = 14
+// UNKNOWN engineering distraction duration, not an authentic timing claim.
+^handsand_distraction_ticks = 30
+// UNKNOWN engineering reset: rolling 24 hours, period guide says only once a day.
+^handsand_sand_interval_minutes = 1440
