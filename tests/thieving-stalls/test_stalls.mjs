@@ -42,6 +42,13 @@ const profiles = [...published, ...regional];
 const selectedIds = new Set([...profiles.map(([, key]) => key), 'dwarf_market_clothes', 'seed_stall'].map(key => id('LocType', key)));
 const approvalBit = id('VarBitType', 'misc_approval');
 const miscApprovalLossStalls = new Set(['misc_fish_market', 'misc_veg_market']);
+const vegetableRewardMessages = {
+  potato: 'You steal a potato.',
+  cabbage: 'You steal a cabbage.',
+  onion: 'You steal an onion.',
+  tomato: 'You steal a tomato.',
+  garlic: 'You steal some garlic.'
+};
 const placements = [];
 for (const filename of fs.readdirSync(path.join(content, 'maps')).filter(name => /^m\d+_\d+\.jm2$/.test(name))) {
   const [, mx, mz] = /^m(\d+)_(\d+)\.jm2$/.exec(filename).map(Number);
@@ -385,6 +392,9 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
     proc(p, 'stealing_check_for_reward', row.id);
     assert.equal(count(p, loot[index][0]), 1);
     assert.equal(snapshot(p).filter(Boolean).length, 1);
+    if (key === 'misc_veg_market' || key === 'etc_veg_market') {
+      assert.deepEqual(p.messages, [vegetableRewardMessages[loot[index][0]]]);
+    }
   });
   test(`${key}: native steal, lockout bit, empty form, timer and approval`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level);
@@ -512,6 +522,21 @@ for (const ownerOnly of [true, false]) {
     if (!ownerOnly) {
       assert(watching.some(npc => npc.type === guard && npc.getVar(id('VarNpcType', 'npc_aggressive_player')) === p.uid));
     }
+  });
+}
+for (const key of ['mm_stall_food', 'mm_stall_magic', 'mm_stall_scimitar', 'viking_fish_market', 'viking_fur_market']) {
+  test(`${key}: uncompleted period quest blocks theft`, () => {
+    const [kind, , level] = profiles.find(([, name]) => name === key);
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const original = id('LocType', key);
+    const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), level);
+    const ape = key.startsWith('mm_');
+    p.setVar(id('VarPlayerType', ape ? 'mm_main' : 'viking'), ape ? 8 : 9);
+    execute(p, loc);
+    assert.equal(p.stats[PlayerStat.THIEVING], before);
+    assert.equal(snapshot(p).filter(Boolean).length, 0);
+    assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
+    assert.equal(loc.type, original);
   });
 }
 for (const [key, questVar, incomplete, complete, unrelatedQuest] of [
