@@ -4,6 +4,10 @@
 return(enum(loc, int, farming_soil_patch, loc_type));
 
 [proc,farming_soil_treatment](int $index)(int)
+if ($index >= 27 & $index <= 38) {
+    def_int $treebit = multiply(sub($index, 27), 2);
+    return(getbit_range(%farming_tree_soil, $treebit, add($treebit, 1)));
+}
 if ($index >= 20 & $index < 24) {
     def_int $bushbit = add(8, multiply(sub($index, 20), 2));
     return(getbit_range(%farming_state_temp_3, $bushbit, add($bushbit, 1)));
@@ -18,6 +22,11 @@ return(getbit_range(%varp516_bits, $bit, add($bit, 1)));
 
 [proc,farming_soil_set_treatment](int $index, int $treatment)
 if (~farming_soil_treatment($index) = $treatment) return;
+if ($index >= 27 & $index <= 38) {
+    def_int $treebit = multiply(sub($index, 27), 2);
+    %farming_tree_soil = setbit_range_toint(%farming_tree_soil, $treatment, $treebit, add($treebit, 1));
+    return;
+}
 if ($index >= 20) {
     if ($index < 24) {
         def_int $bushbit = add(8, multiply(sub($index, 20), 2));
@@ -107,7 +116,11 @@ mes(~farming_soil_application_message($index, $treatment));
 // Fill two names in the single authored database string; allotment has no "patch".
 [proc,farming_soil_application_message](int $index, int $treatment)(string)
 def_string $patch = "allotment";
-if ($index >= 20 & $index < 24) $patch = "bush patch";
+if ($index >= 35 & $index <= 37) $patch = "spirit tree patch";
+else if ($index = 38) $patch = "calquat tree patch";
+else if ($index >= 31 & $index <= 34) $patch = "fruit tree patch";
+else if ($index >= 27 & $index <= 30) $patch = "tree patch";
+else if ($index >= 20 & $index < 24) $patch = "bush patch";
 else if ($index = 24) $patch = "cactus patch";
 else if ($index = 25) $patch = "belladonna patch";
 else if ($index = 26) $patch = "mushroom patch";

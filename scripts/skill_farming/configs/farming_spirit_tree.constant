@@ -1,0 +1,4 @@
+// VERIFIED 377 patch placements; their adjacent landing tiles below are UNKNOWN engineering choices.
+^farming_spirit_tree_patch_1 = 0_47_50_51_56
+^farming_spirit_tree_patch_2 = 0_40_60_52_16
+^farming_spirit_tree_patch_3 = 0_43_50_49_1

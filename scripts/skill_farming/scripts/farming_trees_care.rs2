@@ -1,0 +1,67 @@
+// VERIFIED period fees; CANDIDATE one-planting care and noted payments reuse
+// the published gardener contract. Specialty trees have no period gardener.
+[proc,farming_trees_protection_hire](int $patch)(boolean)
+if ($patch < 16 | $patch >= 24) return(false);
+if (~farming_protection_watched($patch) = true) return(false);
+def_int $stage = ~farming_protection_stage($patch);
+if ($patch < 20) {
+    if (~farming_tree_is_diseased($stage) = true | ~farming_tree_is_dead($stage) = true) return(false);
+} else {
+    if (~farming_fruit_tree_is_diseased($stage) = true | ~farming_fruit_tree_is_dead($stage) = true) return(false);
+}
+def_dbrow $crop;
+def_int $first;
+def_int $mature;
+$crop, $first, $mature = ~farming_protection_crop($patch);
+if ($crop = null | $stage < $first | $stage >= $mature) return(false);
+def_obj $payment;
+def_int $quantity;
+$payment, $quantity = ~farming_protection_cost($crop);
+def_obj $noted = oc_cert($payment);
+def_int $plain = min($quantity, inv_total(inv, $payment));
+def_int $available = $plain;
+if ($noted ! $payment) $available = add($available, inv_total(inv, $noted));
+if ($available < $quantity) return(false);
+if ($plain > 0) inv_del(inv, $payment, $plain);
+if ($plain < $quantity) inv_del(inv, $noted, sub($quantity, $plain));
+%farming_protection = setbit_range_toint(%farming_protection, 1, $patch, $patch);
+return(true);
+
+// UNKNOWN engineering service boundary: a mature tree or its stump only.
+// The brief assigns the 200-coin fee. No crop, fruit or roots are awarded.
+[proc,farming_tree_gardener_clear](int $patch)(boolean)
+if ($patch < 16 | $patch >= 24) return(false);
+def_int $stage = ~farming_protection_stage($patch);
+if ($patch < 20) {
+    if (~farming_tree_can_clear($stage) = false) return(false);
+} else {
+    if (~farming_fruit_tree_can_clear($stage) = false) return(false);
+}
+if (inv_total(inv, coins) < 200) return(false);
+inv_del(inv, coins, 200);
+if ($patch < 20) ~farming_tree_patch_set(sub($patch, 16), ^farming_veg_weeded);
+else ~farming_fruit_tree_patch_set(sub($patch, 20), ^farming_veg_weeded);
+return(true);
+
+[proc,farming_trees_is_dead](int $patch, int $stage)(boolean)
+if ($patch < 20) return(~farming_tree_is_dead($stage));
+return(~farming_fruit_tree_is_dead($stage));
+
+[proc,farming_trees_is_diseased](int $patch, int $stage)(boolean)
+if ($patch < 20) return(~farming_tree_is_diseased($stage));
+return(~farming_fruit_tree_is_diseased($stage));
+
+[proc,farming_trees_can_clear](int $patch)(boolean)
+def_int $stage = ~farming_protection_stage($patch);
+if ($patch < 20) return(~farming_tree_can_clear($stage));
+return(~farming_fruit_tree_can_clear($stage));
+
+// UNKNOWN plain functional clearing wording: no original transcript held.
+// Ordinary paid care continues through the existing shared dialogue.
+[label,farming_trees_gardener_pay]
+def_int $patch = ~farming_gardener_patch;
+def_int $clear = ~p_choice2("Clear my tree for 200 coins.", 1, "No, leave it.", 2);
+if ($clear = 1) {
+    if (~farming_tree_gardener_clear($patch) = true) mes("The gardener clears your tree.");
+    else mes("You need 200 coins to have your tree cleared.");
+}

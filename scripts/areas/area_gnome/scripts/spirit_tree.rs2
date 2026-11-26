@@ -3,6 +3,7 @@ if(%grandtree ! ^grandtree_complete) {
     ~mesbox("The tree doesn't feel like talking.");
     return;
 }
+if (~farming_spirit_tree_available = true) { @farming_spirit_tree_network; return; }
 ~mesbox("The tree talks in an old tired voice...");
 ~mesbox("You friend of gnome people, you friend of mine.|Would you like me to take you somewhere?");
 switch_int(~p_choice2("No thanks, old tree.", 1, "Where can I go?", 2)) {
@@ -27,6 +28,7 @@ if(%treequest ! ^tree_complete) {
     ~mesbox("The tree doesn't feel like talking.");
     return;
 }
+if (~farming_spirit_tree_available = true) { @farming_spirit_tree_network; return; }
 ~mesbox("The tree talks in an old tired voice...");
 ~mesbox("You friend of gnome people, you friend of mine.|Would you like me to take you somewhere?");
 switch_int(~p_choice2("No thanks, old tree.", 1, "Where can I go?", 2)) {
@@ -51,6 +53,7 @@ if(%treequest ! ^tree_complete) {
     ~mesbox("The tree doesn't feel like talking.");
     return;
 }
+if (~farming_spirit_tree_available = true) { @farming_spirit_tree_network; return; }
 ~mesbox("The young spirit tree talks...");
 ~mesbox("Hello gnome friend. Would you like to|travel to the home of the tree gnomes?");
 switch_int(~p_choice2("Yes please.", 1, "No thank you.", 2)) {

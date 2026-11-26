@@ -352,8 +352,6 @@ type=player_uid
 
 [varp245_unused]
 
-[varp246_unused]
-
 [varp248_unused]
 
 [varp249_unused]
@@ -922,18 +920,6 @@ transmit=yes
 
 [varp501_bits]
 transmit=yes
-
-[farming_tree_varp]
-transmit=yes
-scope=perm
-
-[farming_fruit_tree_varp]
-transmit=yes
-scope=perm
-
-[farming_special_tree_varp]
-transmit=yes
-scope=perm
 
 [farming_varp_9]
 transmit=yes

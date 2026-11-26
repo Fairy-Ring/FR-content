@@ -47,6 +47,10 @@
 ^farming_handler_belladonna = 8
 ^farming_handler_mushroom = 9
 ^farming_handler_pots = 10
+^farming_handler_tree = 11
+^farming_handler_fruit_tree = 12
+^farming_handler_calquat = 13
+^farming_handler_spirit_tree = 14
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5

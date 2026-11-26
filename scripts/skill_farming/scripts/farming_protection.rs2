@@ -17,6 +17,14 @@ switch_loc (loc_type) {
     case farming_bush_patch_2 : return(13);
     case farming_bush_patch_3 : return(14);
     case farming_bush_patch_4 : return(15);
+    case farming_tree_patch_1 : return(16);
+    case farming_tree_patch_2 : return(17);
+    case farming_tree_patch_3 : return(18);
+    case farming_tree_patch_4 : return(19);
+    case farming_fruit_tree_patch_1 : return(20);
+    case farming_fruit_tree_patch_2 : return(21);
+    case farming_fruit_tree_patch_3 : return(22);
+    case farming_fruit_tree_patch_4 : return(23);
     case default : return(-1);
 }
 
@@ -43,10 +51,20 @@ switch_npc (npc_type) {
     case farming_gardener_bush_2 : return(13);
     case farming_gardener_bush_3 : return(14);
     case farming_gardener_bush_4 : return(15);
+    case farming_gardener_tree_1 : return(16);
+    case farming_gardener_tree_2 : return(17);
+    case farming_gardener_tree_3 : return(18);
+    case farming_gardener_tree_4 : return(19);
+    case farming_gardener_fruit_1 : return(20);
+    case farming_gardener_fruit_2 : return(21);
+    case farming_gardener_fruit_3 : return(22);
+    case farming_gardener_fruit_4 : return(23);
     case default : return(-1);
 }
 
 [proc,farming_protection_stage](int $patch)(int)
+if ($patch >= 16 & $patch < 20) return(~farming_tree_patch_stage(sub($patch, 16)));
+if ($patch >= 20 & $patch < 24) return(~farming_fruit_tree_patch_stage(sub($patch, 20)));
 if ($patch < 4) {
     def_int $bit = multiply($patch, 8);
     return(getbit_range(%farming_allotment_varp_1, $bit, add($bit, 7)));
@@ -65,6 +83,16 @@ return(getbit_range(%farming_bush_varp, $bit, add($bit, 7)));
 [proc,farming_protection_crop](int $patch)(dbrow, int, int)
 def_int $stage = ~farming_protection_stage($patch);
 def_dbrow $crop;
+if ($patch >= 16 & $patch < 20) {
+    $crop = ~farming_tree_crop($stage);
+    if ($crop = null) return(null, 0, 0);
+    return($crop, db_getfield($crop, farming_tree:first, 0), db_getfield($crop, farming_tree:mature, 0));
+}
+if ($patch >= 20 & $patch < 24) {
+    $crop = ~farming_fruit_tree_crop($stage);
+    if ($crop = null) return(null, 0, 0);
+    return($crop, db_getfield($crop, farming_fruit_tree:first, 0), db_getfield($crop, farming_fruit_tree:mature, 0));
+}
 if ($patch < 8) {
     $crop = ~farming_allotment_crop($stage);
     if ($crop = null) return(null, 0, 0);
@@ -82,6 +110,10 @@ return($crop, db_getfield($crop, farming_bush:first, 0), db_getfield($crop, farm
 // VERIFIED Tip.It Farming guide, captured 28 April 2006: Farmer charge tables.
 // Full sacks/baskets are payment items, not a loose-produce equivalent.
 [proc,farming_protection_cost](dbrow $crop)(obj, int)
+if ($crop ! null) {
+    if (db_getrowtable($crop) = farming_tree) return(db_getfield($crop, farming_tree:payment, 0), db_getfield($crop, farming_tree:quantity, 0));
+    if (db_getrowtable($crop) = farming_fruit_tree) return(db_getfield($crop, farming_fruit_tree:payment, 0), db_getfield($crop, farming_fruit_tree:quantity, 0));
+}
 if ($crop = farming_allotment_potato) return(bucket_compost, 2);
 if ($crop = farming_allotment_onion) return(sack_potato_10, 1);
 if ($crop = farming_allotment_cabbage) return(sack_onion_10, 1);
@@ -109,6 +141,7 @@ return(null, 0);
 // CANDIDATE later gardener account: one payment per planting, notes accepted.
 // The final inventory check precedes every mutation. A refusal consumes nothing.
 [proc,farming_protection_hire](int $patch)(boolean)
+if ($patch >= 16) return(~farming_trees_protection_hire($patch));
 if (~farming_protection_watched($patch) = true) return(false);
 def_dbrow $crop;
 def_int $first;
@@ -140,8 +173,12 @@ return(true);
 [label,farming_gardener_pay]
 ~chatplayer("Would you look after my crops for me?");
 def_int $patch = ~farming_gardener_patch;
+if ($patch >= 16 & ~farming_trees_can_clear($patch) = true) {
+    @farming_trees_gardener_pay;
+    return;
+}
 if ($patch = -1) {
-    // Unmapped tree families remain outside this unit; no care bit is allocated for them.
+    // This NPC has no supported paid-care patch.
     ~chatnpc("You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
     return;
 }
@@ -168,7 +205,16 @@ if (~farming_protection_watched($patch) = true) {
     return;
 }
 def_int $stage = ~farming_protection_stage($patch);
-if ($patch >= 12) {
+if ($patch >= 16) {
+    if (~farming_trees_is_dead($patch, $stage) = true) {
+        ~chatnpc("That patch is dead - it's too late for me to do anything about it now.");
+        return;
+    }
+    if (~farming_trees_is_diseased($patch, $stage) = true) {
+        ~chatnpc("That patch is diseased - you should cure it before asking me to be responsible for it!");
+        return;
+    }
+} else if ($patch >= 12) {
     if (~farming_bush_is_dead($stage) = true) {
         ~chatnpc("That patch is dead - it's too late for me to do anything about it now.");
         return;

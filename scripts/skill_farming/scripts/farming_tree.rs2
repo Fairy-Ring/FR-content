@@ -1,0 +1,163 @@
+// VERIFIED 377 cache selector bytes and Tip.It Farming guide values.
+// Disease and death use the original +64 and +128 cache bands.
+[proc,farming_tree_crop_lookup](int $stage, boolean $shifted)(dbrow)
+def_dbrow $crop = farming_tree_oak;
+if ($shifted = true) {
+    if (($stage > db_getfield($crop, farming_tree:first, 0) & $stage < db_getfield($crop, farming_tree:mature, 0)) | $stage = db_getfield($crop, farming_tree:claim, 0)) return($crop);
+} else if ($stage >= db_getfield($crop, farming_tree:first, 0) & $stage <= db_getfield($crop, farming_tree:stump, 0)) {
+    return($crop);
+}
+$crop = farming_tree_willow;
+if ($shifted = true) {
+    if (($stage > db_getfield($crop, farming_tree:first, 0) & $stage < db_getfield($crop, farming_tree:mature, 0)) | $stage = db_getfield($crop, farming_tree:claim, 0)) return($crop);
+} else if ($stage >= db_getfield($crop, farming_tree:first, 0) & $stage <= db_getfield($crop, farming_tree:stump, 0)) {
+    return($crop);
+}
+$crop = farming_tree_maple;
+if ($shifted = true) {
+    if (($stage > db_getfield($crop, farming_tree:first, 0) & $stage < db_getfield($crop, farming_tree:mature, 0)) | $stage = db_getfield($crop, farming_tree:claim, 0)) return($crop);
+} else if ($stage >= db_getfield($crop, farming_tree:first, 0) & $stage <= db_getfield($crop, farming_tree:stump, 0)) {
+    return($crop);
+}
+$crop = farming_tree_yew;
+if ($shifted = true) {
+    if (($stage > db_getfield($crop, farming_tree:first, 0) & $stage < db_getfield($crop, farming_tree:mature, 0)) | $stage = db_getfield($crop, farming_tree:claim, 0)) return($crop);
+} else if ($stage >= db_getfield($crop, farming_tree:first, 0) & $stage <= db_getfield($crop, farming_tree:stump, 0)) {
+    return($crop);
+}
+$crop = farming_tree_magic;
+if ($shifted = true) {
+    if (($stage > db_getfield($crop, farming_tree:first, 0) & $stage < db_getfield($crop, farming_tree:mature, 0)) | $stage = db_getfield($crop, farming_tree:claim, 0)) return($crop);
+} else if ($stage >= db_getfield($crop, farming_tree:first, 0) & $stage <= db_getfield($crop, farming_tree:stump, 0)) {
+    return($crop);
+}
+return(null);
+
+[proc,farming_tree_crop](int $stage)(dbrow)
+if ($stage < 0 | $stage > 255) return(null);
+if ($stage >= ^farming_tree_dead_offset) return(~farming_tree_crop_lookup(sub($stage, ^farming_tree_dead_offset), true));
+if ($stage >= ^farming_tree_diseased_offset) return(~farming_tree_crop_lookup(sub($stage, ^farming_tree_diseased_offset), true));
+return(~farming_tree_crop_lookup($stage, false));
+
+[proc,farming_tree_is_diseased](int $stage)(boolean)
+if ($stage < ^farming_tree_diseased_offset | $stage >= ^farming_tree_dead_offset) return(false);
+def_dbrow $crop = ~farming_tree_crop_lookup(sub($stage, ^farming_tree_diseased_offset), true);
+if ($crop = null) return(false);
+return(true);
+
+[proc,farming_tree_is_dead](int $stage)(boolean)
+if ($stage < ^farming_tree_dead_offset | $stage > 255) return(false);
+def_dbrow $crop = ~farming_tree_crop_lookup(sub($stage, ^farming_tree_dead_offset), true);
+if ($crop = null) return(false);
+return(true);
+
+// Patch indices are local to the four original tree bytes.
+[proc,farming_tree_patch_number]()(int)
+switch_loc (loc_type) {
+    case farming_tree_patch_1 : return(0);
+    case farming_tree_patch_2 : return(1);
+    case farming_tree_patch_3 : return(2);
+    case farming_tree_patch_4 : return(3);
+    case default : return(-1);
+}
+
+[proc,farming_tree_patch_stage](int $patch)(int)
+switch_int ($patch) {
+    case 0 : return(%farming_tree_varp_0_7);
+    case 1 : return(%farming_tree_varp_8_15);
+    case 2 : return(%farming_tree_varp_16_23);
+    case 3 : return(%farming_tree_varp_24_31);
+    case default : return(-1);
+}
+
+[proc,farming_tree_patch_set_visible](int $patch, int $stage)
+if ($patch < 0 | $patch > 3 | $stage < 0 | $stage > 255) return;
+def_int $before = ~farming_tree_patch_stage($patch);
+def_dbrow $before_crop = ~farming_tree_crop($before);
+if ($before_crop ! null) {
+    if ($before = db_getfield($before_crop, farming_tree:stump, 0) & $stage ! $before) {
+        switch_int ($patch) {
+            case 0 : clearsofttimer(farming_tree_stump_0);
+            case 1 : clearsofttimer(farming_tree_stump_1);
+            case 2 : clearsofttimer(farming_tree_stump_2);
+            case 3 : clearsofttimer(farming_tree_stump_3);
+        }
+    }
+}
+switch_int ($patch) {
+    case 0 : %farming_tree_varp_0_7 = $stage;
+    case 1 : %farming_tree_varp_8_15 = $stage;
+    case 2 : %farming_tree_varp_16_23 = $stage;
+    case 3 : %farming_tree_varp_24_31 = $stage;
+}
+
+[proc,farming_tree_patch_set](int $patch, int $stage)
+if ($patch < 0 | $patch > 3 | $stage < 0 | $stage > 255) return;
+def_int $before = ~farming_tree_patch_stage($patch);
+if ($stage = ^farming_veg_weeded & ~farming_tree_crop($before) ! null) {
+    ~farming_soil_clear(add(27, $patch));
+    ~farming_protection_clear(add(16, $patch));
+}
+~farming_tree_patch_set_visible($patch, $stage);
+
+[proc,farming_tree_stump_regrow](int $patch)
+if ($patch < 0 | $patch > 3) return;
+def_int $stage = ~farming_tree_patch_stage($patch);
+def_dbrow $crop = ~farming_tree_crop($stage);
+if ($crop = null | $stage ! db_getfield($crop, farming_tree:stump, 0)) return;
+~farming_tree_patch_set_visible($patch, db_getfield($crop, farming_tree:claim, 0));
+
+[proc,farming_tree_can_clear](int $stage)(boolean)
+def_dbrow $crop = ~farming_tree_crop($stage);
+if ($crop = null) return(false);
+if ($stage = db_getfield($crop, farming_tree:mature, 0) | $stage = db_getfield($crop, farming_tree:claim, 0) | $stage = db_getfield($crop, farming_tree:stump, 0)) return(true);
+return(false);
+
+[proc,farming_tree_sapling](obj $sapling)(dbrow)
+db_find(farming_tree:sapling, $sapling);
+return(db_findnext);
+
+// CANDIDATE shared growth loop; the family callback uses 40-minute windows.
+// Chopping uses the source woodcutting respawn fields for its visible stump.
+[proc,farming_tree_advance](dbrow $crop, int $stage, int $steps, int $treatment, int $window)(int)
+if ($steps <= 0) return($stage);
+if (~farming_tree_is_dead($stage) = true) return($stage);
+def_int $first = db_getfield($crop, farming_tree:first, 0);
+def_int $mature = db_getfield($crop, farming_tree:mature, 0);
+def_int $claim = db_getfield($crop, farming_tree:claim, 0);
+def_int $stump = db_getfield($crop, farming_tree:stump, 0);
+// UNKNOWN offline fallback: a saved stump recovers at the next family window.
+if ($stage = $stump) return($claim);
+def_dbrow $growth = db_getfield($crop, farming_tree:growth, 0);
+def_int $after;
+if (~farming_tree_is_diseased($stage) = true) {
+    // Translate the original tree byte to the shared helper's failure bands.
+    $after = ~farming_crop_advance(add($stage, ^farming_tree_shared_state_offset), $steps, $first, add($claim, 1), false, $treatment, $growth, $window);
+    if ($after = add($claim, 1)) return($claim);
+} else {
+    if ($stage >= $mature) return($stage);
+    $after = ~farming_crop_advance($stage, $steps, $first, $mature, false, $treatment, $growth, $window);
+}
+if ($after >= ^farming_diseased_offset) return(sub($after, ^farming_tree_shared_state_offset));
+return($after);
+
+[proc,farming_tree_advance_all](int $steps, int $window)
+if ($steps <= 0) return;
+def_int $patch = 0;
+while ($patch < 4) {
+    def_int $before = ~farming_tree_patch_stage($patch);
+    def_dbrow $crop = ~farming_tree_crop($before);
+    if ($crop ! null & ~farming_tree_is_dead($before) = false) {
+        def_int $first = db_getfield($crop, farming_tree:first, 0);
+        def_int $mature = db_getfield($crop, farming_tree:mature, 0);
+        def_int $after;
+        if (~farming_protection_watched(add(16, $patch)) = true & $before >= $first & $before < $mature & ~farming_tree_is_diseased($before) = false) {
+            $after = min($mature, add($before, $steps));
+        } else {
+            $after = ~farming_tree_advance($crop, $before, $steps, ~farming_soil_treatment(add(27, $patch)), $window);
+        }
+        ~farming_soil_mature(add(27, $patch), $before, $after, $mature);
+        if ($after ! $before) ~farming_tree_patch_set_visible($patch, $after);
+    }
+    $patch = add($patch, 1);
+}

@@ -1,0 +1,451 @@
+// Visible tree patch actions. Inspect on nonempty child forms delegates to the
+// shared, sourced/UNKNOWN patch-status handler; empty weed forms stay shared.
+[oplocu,farming_tree_patch_1] @farming_tree_use;
+[oplocu,farming_tree_patch_2] @farming_tree_use;
+[oplocu,farming_tree_patch_3] @farming_tree_use;
+[oplocu,farming_tree_patch_4] @farming_tree_use;
+[oplocu,tree_patch_weeded] @farming_tree_use;
+[oplocu,tree_patch_weeds_1] @farming_tree_rake_use;
+[oplocu,tree_patch_weeds_2] @farming_tree_rake_use;
+[oplocu,tree_patch_weeds_3] @farming_tree_rake_use;
+[oploc3,tree_patch_weeds_1] @farming_tree_rake_continue;
+[oploc3,tree_patch_weeds_2] @farming_tree_rake_continue;
+[oploc3,tree_patch_weeds_3] @farming_tree_rake_continue;
+
+[oplocu,oak_tree_seedling] @farming_tree_use;
+[oploc2,oak_tree_seedling] @farming_inspect;
+[oplocu,oak_tree_1] @farming_tree_use;
+[oploc2,oak_tree_1] @farming_inspect;
+[oplocu,oak_tree_2] @farming_tree_use;
+[oploc2,oak_tree_2] @farming_inspect;
+[oplocu,oak_tree_3] @farming_tree_use;
+[oploc2,oak_tree_3] @farming_inspect;
+[oplocu,oak_tree_fullygrown_1] @farming_tree_use;
+[oploc2,oak_tree_fullygrown_1] @farming_inspect;
+[oploc1,oak_tree_fullygrown_1] @farming_tree_check_health;
+[oplocu,oak_tree_fullygrown_2] @farming_tree_use;
+[oploc2,oak_tree_fullygrown_2] @farming_inspect;
+[oplocu,oak_tree_diseased_1] @farming_tree_diseased_use;
+[oploc2,oak_tree_diseased_1] @farming_inspect;
+[oplocu,oak_tree_diseased_2] @farming_tree_diseased_use;
+[oploc2,oak_tree_diseased_2] @farming_inspect;
+[oplocu,oak_tree_diseased_3] @farming_tree_diseased_use;
+[oploc2,oak_tree_diseased_3] @farming_inspect;
+[oplocu,oak_tree_diseased_fullygrown] @farming_tree_diseased_use;
+[oploc2,oak_tree_diseased_fullygrown] @farming_inspect;
+[oplocu,oak_tree_dead_1] @farming_tree_dead_use;
+[oploc2,oak_tree_dead_1] @farming_inspect;
+[oplocu,oak_tree_dead_2] @farming_tree_dead_use;
+[oploc2,oak_tree_dead_2] @farming_inspect;
+[oplocu,oak_tree_dead_3] @farming_tree_dead_use;
+[oploc2,oak_tree_dead_3] @farming_inspect;
+[oplocu,oak_tree_dead_fullygrown] @farming_tree_dead_use;
+[oploc2,oak_tree_dead_fullygrown] @farming_inspect;
+[oplocu,oak_tree_stump] @farming_tree_stump_use;
+[oploc2,oak_tree_stump] @farming_inspect;
+
+[oplocu,willow_tree_seedling] @farming_tree_use;
+[oploc2,willow_tree_seedling] @farming_inspect;
+[oplocu,willow_tree_1] @farming_tree_use;
+[oploc2,willow_tree_1] @farming_inspect;
+[oplocu,willow_tree_2] @farming_tree_use;
+[oploc2,willow_tree_2] @farming_inspect;
+[oplocu,willow_tree_3] @farming_tree_use;
+[oploc2,willow_tree_3] @farming_inspect;
+[oplocu,willow_tree_4] @farming_tree_use;
+[oploc2,willow_tree_4] @farming_inspect;
+[oplocu,willow_tree_5] @farming_tree_use;
+[oploc2,willow_tree_5] @farming_inspect;
+[oplocu,willow_tree_fullygrown_1] @farming_tree_use;
+[oploc2,willow_tree_fullygrown_1] @farming_inspect;
+[oploc1,willow_tree_fullygrown_1] @farming_tree_check_health;
+[oplocu,willow_tree_fullygrown_2] @farming_tree_use;
+[oploc2,willow_tree_fullygrown_2] @farming_inspect;
+[oplocu,willow_tree_diseased_1] @farming_tree_diseased_use;
+[oploc2,willow_tree_diseased_1] @farming_inspect;
+[oplocu,willow_tree_diseased_2] @farming_tree_diseased_use;
+[oploc2,willow_tree_diseased_2] @farming_inspect;
+[oplocu,willow_tree_diseased_3] @farming_tree_diseased_use;
+[oploc2,willow_tree_diseased_3] @farming_inspect;
+[oplocu,willow_tree_diseased_4] @farming_tree_diseased_use;
+[oploc2,willow_tree_diseased_4] @farming_inspect;
+[oplocu,willow_tree_diseased_5] @farming_tree_diseased_use;
+[oploc2,willow_tree_diseased_5] @farming_inspect;
+[oplocu,willow_tree_diseased_fullygrown] @farming_tree_diseased_use;
+[oploc2,willow_tree_diseased_fullygrown] @farming_inspect;
+[oplocu,willow_tree_dead_1] @farming_tree_dead_use;
+[oploc2,willow_tree_dead_1] @farming_inspect;
+[oplocu,willow_tree_dead_2] @farming_tree_dead_use;
+[oploc2,willow_tree_dead_2] @farming_inspect;
+[oplocu,willow_tree_dead_3] @farming_tree_dead_use;
+[oploc2,willow_tree_dead_3] @farming_inspect;
+[oplocu,willow_tree_dead_4] @farming_tree_dead_use;
+[oploc2,willow_tree_dead_4] @farming_inspect;
+[oplocu,willow_tree_dead_5] @farming_tree_dead_use;
+[oploc2,willow_tree_dead_5] @farming_inspect;
+[oplocu,willow_tree_dead_fullygrown] @farming_tree_dead_use;
+[oploc2,willow_tree_dead_fullygrown] @farming_inspect;
+[oplocu,willow_tree_stump] @farming_tree_stump_use;
+[oploc2,willow_tree_stump] @farming_inspect;
+
+[oplocu,maple_tree_seedling] @farming_tree_use;
+[oploc2,maple_tree_seedling] @farming_inspect;
+[oplocu,maple_tree_1] @farming_tree_use;
+[oploc2,maple_tree_1] @farming_inspect;
+[oplocu,maple_tree_2] @farming_tree_use;
+[oploc2,maple_tree_2] @farming_inspect;
+[oplocu,maple_tree_3] @farming_tree_use;
+[oploc2,maple_tree_3] @farming_inspect;
+[oplocu,maple_tree_4] @farming_tree_use;
+[oploc2,maple_tree_4] @farming_inspect;
+[oplocu,maple_tree_5] @farming_tree_use;
+[oploc2,maple_tree_5] @farming_inspect;
+[oplocu,maple_tree_6] @farming_tree_use;
+[oploc2,maple_tree_6] @farming_inspect;
+[oplocu,maple_tree_7] @farming_tree_use;
+[oploc2,maple_tree_7] @farming_inspect;
+[oplocu,maple_tree_fullygrown_1] @farming_tree_use;
+[oploc2,maple_tree_fullygrown_1] @farming_inspect;
+[oploc1,maple_tree_fullygrown_1] @farming_tree_check_health;
+[oplocu,maple_tree_fullygrown_2] @farming_tree_use;
+[oploc2,maple_tree_fullygrown_2] @farming_inspect;
+[oplocu,maple_tree_diseased_1] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_1] @farming_inspect;
+[oplocu,maple_tree_diseased_2] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_2] @farming_inspect;
+[oplocu,maple_tree_diseased_3] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_3] @farming_inspect;
+[oplocu,maple_tree_diseased_4] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_4] @farming_inspect;
+[oplocu,maple_tree_diseased_5] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_5] @farming_inspect;
+[oplocu,maple_tree_diseased_6] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_6] @farming_inspect;
+[oplocu,maple_tree_diseased_7] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_7] @farming_inspect;
+[oplocu,maple_tree_diseased_fullygrown] @farming_tree_diseased_use;
+[oploc2,maple_tree_diseased_fullygrown] @farming_inspect;
+[oplocu,maple_tree_dead_1] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_1] @farming_inspect;
+[oplocu,maple_tree_dead_2] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_2] @farming_inspect;
+[oplocu,maple_tree_dead_3] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_3] @farming_inspect;
+[oplocu,maple_tree_dead_4] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_4] @farming_inspect;
+[oplocu,maple_tree_dead_5] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_5] @farming_inspect;
+[oplocu,maple_tree_dead_6] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_6] @farming_inspect;
+[oplocu,maple_tree_dead_7] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_7] @farming_inspect;
+[oplocu,maple_tree_dead_fullygrown] @farming_tree_dead_use;
+[oploc2,maple_tree_dead_fullygrown] @farming_inspect;
+[oplocu,maple_tree_stump] @farming_tree_stump_use;
+[oploc2,maple_tree_stump] @farming_inspect;
+
+[oplocu,yew_tree_seedling] @farming_tree_use;
+[oploc2,yew_tree_seedling] @farming_inspect;
+[oplocu,yew_tree_1] @farming_tree_use;
+[oploc2,yew_tree_1] @farming_inspect;
+[oplocu,yew_tree_2] @farming_tree_use;
+[oploc2,yew_tree_2] @farming_inspect;
+[oplocu,yew_tree_3] @farming_tree_use;
+[oploc2,yew_tree_3] @farming_inspect;
+[oplocu,yew_tree_4] @farming_tree_use;
+[oploc2,yew_tree_4] @farming_inspect;
+[oplocu,yew_tree_5] @farming_tree_use;
+[oploc2,yew_tree_5] @farming_inspect;
+[oplocu,yew_tree_6] @farming_tree_use;
+[oploc2,yew_tree_6] @farming_inspect;
+[oplocu,yew_tree_7] @farming_tree_use;
+[oploc2,yew_tree_7] @farming_inspect;
+[oplocu,yew_tree_8] @farming_tree_use;
+[oploc2,yew_tree_8] @farming_inspect;
+[oplocu,yew_tree_9] @farming_tree_use;
+[oploc2,yew_tree_9] @farming_inspect;
+[oplocu,yew_tree_fullygrown_1] @farming_tree_use;
+[oploc2,yew_tree_fullygrown_1] @farming_inspect;
+[oploc1,yew_tree_fullygrown_1] @farming_tree_check_health;
+[oplocu,yew_tree_fullygrown_2] @farming_tree_use;
+[oploc2,yew_tree_fullygrown_2] @farming_inspect;
+[oplocu,yew_tree_diseased_1] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_1] @farming_inspect;
+[oplocu,yew_tree_diseased_2] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_2] @farming_inspect;
+[oplocu,yew_tree_diseased_3] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_3] @farming_inspect;
+[oplocu,yew_tree_diseased_4] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_4] @farming_inspect;
+[oplocu,yew_tree_diseased_5] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_5] @farming_inspect;
+[oplocu,yew_tree_diseased_6] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_6] @farming_inspect;
+[oplocu,yew_tree_diseased_7] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_7] @farming_inspect;
+[oplocu,yew_tree_diseased_8] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_8] @farming_inspect;
+[oplocu,yew_tree_diseased_9] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_9] @farming_inspect;
+[oplocu,yew_tree_diseased_fullygrown] @farming_tree_diseased_use;
+[oploc2,yew_tree_diseased_fullygrown] @farming_inspect;
+[oplocu,yew_tree_dead_1] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_1] @farming_inspect;
+[oplocu,yew_tree_dead_2] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_2] @farming_inspect;
+[oplocu,yew_tree_dead_3] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_3] @farming_inspect;
+[oplocu,yew_tree_dead_4] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_4] @farming_inspect;
+[oplocu,yew_tree_dead_5] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_5] @farming_inspect;
+[oplocu,yew_tree_dead_6] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_6] @farming_inspect;
+[oplocu,yew_tree_dead_7] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_7] @farming_inspect;
+[oplocu,yew_tree_dead_8] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_8] @farming_inspect;
+[oplocu,yew_tree_dead_9] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_9] @farming_inspect;
+[oplocu,yew_tree_dead_fullygrown] @farming_tree_dead_use;
+[oploc2,yew_tree_dead_fullygrown] @farming_inspect;
+[oplocu,yew_tree_stump] @farming_tree_stump_use;
+[oploc2,yew_tree_stump] @farming_inspect;
+
+[oplocu,magic_tree_seedling] @farming_tree_use;
+[oploc2,magic_tree_seedling] @farming_inspect;
+[oplocu,magic_tree_1] @farming_tree_use;
+[oploc2,magic_tree_1] @farming_inspect;
+[oplocu,magic_tree_2] @farming_tree_use;
+[oploc2,magic_tree_2] @farming_inspect;
+[oplocu,magic_tree_3] @farming_tree_use;
+[oploc2,magic_tree_3] @farming_inspect;
+[oplocu,magic_tree_4] @farming_tree_use;
+[oploc2,magic_tree_4] @farming_inspect;
+[oplocu,magic_tree_5] @farming_tree_use;
+[oploc2,magic_tree_5] @farming_inspect;
+[oplocu,magic_tree_6] @farming_tree_use;
+[oploc2,magic_tree_6] @farming_inspect;
+[oplocu,magic_tree_7] @farming_tree_use;
+[oploc2,magic_tree_7] @farming_inspect;
+[oplocu,magic_tree_8] @farming_tree_use;
+[oploc2,magic_tree_8] @farming_inspect;
+[oplocu,magic_tree_9] @farming_tree_use;
+[oploc2,magic_tree_9] @farming_inspect;
+[oplocu,magic_tree_10] @farming_tree_use;
+[oploc2,magic_tree_10] @farming_inspect;
+[oplocu,magic_tree_11] @farming_tree_use;
+[oploc2,magic_tree_11] @farming_inspect;
+[oplocu,magic_tree_fullygrown_1] @farming_tree_use;
+[oploc2,magic_tree_fullygrown_1] @farming_inspect;
+[oploc1,magic_tree_fullygrown_1] @farming_tree_check_health;
+[oplocu,magic_tree_fullygrown_2] @farming_tree_use;
+[oploc2,magic_tree_fullygrown_2] @farming_inspect;
+[oplocu,magic_tree_diseased_1] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_1] @farming_inspect;
+[oplocu,magic_tree_diseased_2] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_2] @farming_inspect;
+[oplocu,magic_tree_diseased_3] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_3] @farming_inspect;
+[oplocu,magic_tree_diseased_4] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_4] @farming_inspect;
+[oplocu,magic_tree_diseased_5] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_5] @farming_inspect;
+[oplocu,magic_tree_diseased_6] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_6] @farming_inspect;
+[oplocu,magic_tree_diseased_7] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_7] @farming_inspect;
+[oplocu,magic_tree_diseased_8] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_8] @farming_inspect;
+[oplocu,magic_tree_diseased_9] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_9] @farming_inspect;
+[oplocu,magic_tree_diseased_10] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_10] @farming_inspect;
+[oplocu,magic_tree_diseased_11] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_11] @farming_inspect;
+[oplocu,magic_tree_diseased_fullygrown] @farming_tree_diseased_use;
+[oploc2,magic_tree_diseased_fullygrown] @farming_inspect;
+[oplocu,magic_tree_dead_1] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_1] @farming_inspect;
+[oplocu,magic_tree_dead_2] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_2] @farming_inspect;
+[oplocu,magic_tree_dead_3] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_3] @farming_inspect;
+[oplocu,magic_tree_dead_4] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_4] @farming_inspect;
+[oplocu,magic_tree_dead_5] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_5] @farming_inspect;
+[oplocu,magic_tree_dead_6] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_6] @farming_inspect;
+[oplocu,magic_tree_dead_7] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_7] @farming_inspect;
+[oplocu,magic_tree_dead_8] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_8] @farming_inspect;
+[oplocu,magic_tree_dead_9] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_9] @farming_inspect;
+[oplocu,magic_tree_dead_10] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_10] @farming_inspect;
+[oplocu,magic_tree_dead_11] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_11] @farming_inspect;
+[oplocu,magic_tree_dead_fullygrown] @farming_tree_dead_use;
+[oploc2,magic_tree_dead_fullygrown] @farming_inspect;
+[oplocu,magic_tree_stump] @farming_tree_stump_use;
+[oploc2,magic_tree_stump] @farming_inspect;
+
+[label,farming_tree_rake_use]
+if (~farming_pots_fill_on_patch = true) return;
+if (last_useitem ! rake) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~farming_tree_rake_step(false);
+
+[label,farming_tree_rake_continue]
+~farming_tree_rake_step(true);
+
+[proc,farming_tree_rake_step](boolean $repeat)
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+if ($patch < 0 | $stage < 0 | $stage >= ^farming_veg_weeded | inv_total(inv, rake) < 1) return;
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+if ($repeat = true & %action_delay > map_clock) {
+    p_oploc(3);
+    return;
+}
+anim(farming_raking, 0);
+inv_add(inv, weeds, 1);
+stat_advance(farming, ^farming_weed_xp);
+$stage = add($stage, 1);
+~farming_tree_patch_set($patch, $stage);
+if ($stage < ^farming_veg_weeded) {
+    %action_delay = calc(map_clock + ^farming_rake_step_ticks);
+    p_oploc(3);
+}
+
+[label,farming_tree_use]
+if (~farming_pots_fill_on_patch = true) return;
+def_int $patch = ~farming_tree_patch_number;
+if ($patch < 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_tree_patch_stage($patch);
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply($stage);
+    return;
+}
+if ($stage = ^farming_veg_weeded) {
+    def_dbrow $crop = ~farming_tree_sapling(last_useitem);
+    if ($crop = null) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    def_int $level = db_getfield($crop, farming_tree:level, 0);
+    if (stat_base(farming) < $level) {
+        // UNKNOWN functional wording; no period planting transcript retained.
+        mes("You need a Farming level of <tostring($level)> to plant this tree.");
+        return;
+    }
+    if (inv_total(inv, spade) < 1) {
+        // UNKNOWN functional wording; the cache confirms the required spade.
+        mes("You need a spade to plant a tree sapling.");
+        return;
+    }
+    if (inv_getobj(inv, last_useslot) ! last_useitem) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    anim(farming_seed_dibbing, 0);
+    inv_setslot(inv, last_useslot, plantpot_empty, 1);
+    ~farming_tree_patch_set($patch, db_getfield($crop, farming_tree:first, 0));
+    stat_advance(farming, db_getfield($crop, farming_tree:plant_xp, 0));
+    // UNKNOWN functional wording.
+    mes("You plant the tree sapling.");
+    return;
+}
+if (last_useitem = rake) {
+    ~displaymessage(^dm_farming_patch_planted);
+    return;
+}
+def_dbrow $crop = ~farming_tree_crop($stage);
+if ($crop ! null) {
+    if ($stage = db_getfield($crop, farming_tree:claim, 0)) {
+        switch_obj (last_useitem) {
+            case bronze_axe, iron_axe, steel_axe, black_axe, mithril_axe, adamant_axe, rune_axe, dragon_axe :
+                p_oploc(1);
+                return;
+        }
+    }
+}
+~displaymessage(^dm_default);
+
+[label,farming_tree_diseased_use]
+if (~farming_pots_fill_on_patch = true) return;
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+if ((last_useitem = secateurs | last_useitem = fairy_enchanted_secateurs) & ~farming_tree_is_diseased($stage) = true) {
+    anim(pruning_all, 0);
+    ~farming_tree_patch_set($patch, sub($stage, ^farming_tree_diseased_offset));
+    // UNKNOWN functional wording; cache guidance specifies pruning, not this line.
+    mes("You prune the tree.");
+    return;
+}
+if (last_useitem = rake) ~displaymessage(^dm_farming_patch_planted);
+else ~displaymessage(^dm_default);
+
+[label,farming_tree_dead_use]
+if (~farming_pots_fill_on_patch = true) return;
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+if (last_useitem = spade & ~farming_tree_is_dead($stage) = true) {
+    anim(human_dig, 0);
+    ~farming_tree_patch_set($patch, ^farming_veg_weeded);
+    // UNKNOWN functional wording; no source identifies a roots reward here.
+    mes("You dig up the dead tree.");
+    return;
+}
+if (last_useitem = rake) ~displaymessage(^dm_farming_patch_planted);
+else ~displaymessage(^dm_default);
+
+// VERIFIED period guidance says a spade-cleared tree stump yields its roots.
+[label,farming_tree_stump_use]
+if (~farming_pots_fill_on_patch = true) return;
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+def_dbrow $crop = ~farming_tree_crop($stage);
+if (last_useitem = spade & $crop ! null & $stage = db_getfield($crop, farming_tree:stump, 0)) {
+    def_namedobj $roots = db_getfield($crop, farming_tree:roots, 0);
+    def_int $quantity = db_getfield($crop, farming_tree:roots_quantity, 0);
+    if (inv_freespace(inv) < $quantity) {
+        anim(null, 0);
+        // UNKNOWN functional wording; one inventory slot is required for the sourced root reward.
+        mes("Your inventory is too full to hold any more tree roots.");
+        return;
+    }
+    anim(human_dig, 0);
+    inv_add(inv, $roots, $quantity);
+    ~farming_tree_patch_set($patch, ^farming_veg_weeded);
+    return;
+}
+if (last_useitem = rake) ~displaymessage(^dm_farming_patch_planted);
+else ~displaymessage(^dm_default);
+
+[label,farming_tree_check_health]
+def_int $patch = ~farming_tree_patch_number;
+def_int $stage = ~farming_tree_patch_stage($patch);
+def_dbrow $crop = ~farming_tree_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if ($stage ! db_getfield($crop, farming_tree:mature, 0)) {
+    ~displaymessage(^dm_default);
+    return;
+}
+stat_advance(farming, db_getfield($crop, farming_tree:check_xp, 0));
+~farming_tree_patch_set($patch, db_getfield($crop, farming_tree:claim, 0));
+// UNKNOWN functional wording.
+mes("The tree is healthy.");

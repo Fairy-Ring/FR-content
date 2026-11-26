@@ -1,0 +1,23 @@
+// Original 377 client selector words. Keep every original field and identity.
+// SOFT growth needs access during modals, as with the published crop families.
+[farming_tree_varp]
+transmit=yes
+scope=perm
+protect=no
+
+[farming_fruit_tree_varp]
+transmit=yes
+scope=perm
+protect=no
+
+[farming_special_tree_varp]
+transmit=yes
+scope=perm
+protect=no
+
+// UNKNOWN engineering layout in assigned unused original server-only slot 246.
+// Twelve two-bit treatments: wood 0..7, fruit 8..15, spirit 16..21, calquat 22..23.
+// Bits 24..31 stay untouched; original selectors distinguish unclaimed health XP.
+[farming_tree_soil]
+scope=perm
+protect=no
