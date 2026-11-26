@@ -136,8 +136,8 @@ function pairCase(style, scenario) {
     for (const name of ['com_stabdef', 'com_slashdef', 'com_crushdef', 'com_rangedef', 'com_magicdef'])
       variable(q, name, 1);
     if (scenario.area === 'castle') {
-      variable(p, 'castlewars_team', scenario.team ?? 1);
-      variable(q, 'castlewars_team', scenario.sameTeam ? scenario.team ?? 1 : 2);
+      variable(p, 'castlewars_team', scenario.team ?? 0);
+      variable(q, 'castlewars_team', scenario.sameTeam ? scenario.team ?? 0 : 1);
     }
     if (scenario.area === 'duel') {
       variable(p, 'duel2accept', scenario.wrongOpponent ? -1 : q.uid);
@@ -155,6 +155,7 @@ function pairCase(style, scenario) {
     const permission = integer(p, style === 'magic' ? 'pvp_is_attackable_opt' : 'pvp_is_attackable', q);
     const permissionAllowed = scenario.allowPermission ?? scenario.allow;
     assert.equal(permission, permissionAllowed ? 1 : 0, `${style} ${scenario.label}: explicit permission`);
+    if (scenario.message) assert(p.messages.includes(scenario.message), `${style} ${scenario.label}: permission refusal message`);
     p.messages.length = 0;
     const hp = q.levels[3]; const xp = [...p.stats];
     const runes = p.invTotal(inv, id('ObjType', 'mindrune'));
@@ -177,6 +178,7 @@ function pairCase(style, scenario) {
       assert.equal(variable(p, 'pk_skull'), 0, 'refused attack never skulls');
       assert.equal(p.invTotal(inv, id('ObjType', 'mindrune')), runes, 'refused spell costs no runes');
       assert(p.messages.length > 0, `${style} ${scenario.label}: refusal is player-visible`);
+      if (scenario.message) assert(p.messages.includes(scenario.message), `${style} ${scenario.label}: native refusal message`);
     }
   } finally { dispose(p); dispose(q); }
 }
@@ -188,9 +190,11 @@ for (const style of ['melee', 'ranged', 'magic']) {
     { label: 'safe target', safeTarget: true, allow: false },
     { label: 'outside combat-level range', outOfRange: true, allow: false },
     { label: 'single-way occupied opponent', busy: true, allow: false },
-    { label: 'Saradomin ally', area: 'castle', sameTeam: true, team: 1, allow: false },
-    { label: 'Zamorak ally', area: 'castle', sameTeam: true, team: 2, allow: false },
-    { label: 'Castle Wars enemy', area: 'castle', allow: true },
+    { label: 'Saradomin ally', area: 'castle', sameTeam: true, team: 0,
+      message: "Saradomin won't let you attack your allies!", allow: false },
+    { label: 'Zamorak ally', area: 'castle', sameTeam: true, team: 1,
+      message: "Zamorak wants you to kill your enemies!", allow: false },
+    { label: 'Castle Wars enemy', area: 'castle', team: 0, allow: true },
     { label: 'started duel', area: 'duel', allow: true },
     { label: 'wrong duel opponent', area: 'duel', wrongOpponent: true, allow: false },
     { label: 'duel countdown', area: 'duel', notStarted: true, allow: false },
