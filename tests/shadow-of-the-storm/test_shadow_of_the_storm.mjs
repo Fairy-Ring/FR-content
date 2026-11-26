@@ -733,7 +733,7 @@ check('original stairs and portals retain open landings and do not pre-empt The 
     nativeLocRow(player, portal, [], 'accepted cult entry with lost quest items');
     openLanding(player, [2, 2720, 4884], 'cult portal');
     assert(denath.isActive, 'portal entry preserves the original mapped Denath');
-    assert.equal(denath.getVar(ownerVar), 0, 'mapped cult actors do not acquire a player owner');
+    assert.equal(denath.getVar(ownerVar), unownedOwner, 'mapped cult actors do not acquire a player owner');
     assert.equal(playerVariable(player, 'golem_a'), questConstant('golem_complete'));
   } finally { cleanupQuestRun(player, actors); }
 });
