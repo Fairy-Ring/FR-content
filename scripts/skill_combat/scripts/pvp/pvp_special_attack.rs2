@@ -54,6 +54,7 @@ switch_obj($weapon) {
     case rune_claws : @pvp_rune_claws_sa;
     case abyssal_whip : @pvp_abyssal_whip_sa;
     case dragon_scimitar : @pvp_dragon_scimitar_sa;
+    case darklight : @agrith_darklight_pvp_special;
     case default :
         // UNKNOWN engineering safeguard: a weapon with a special bar and no special handler attacks normally with the special turned off.
         %sa_attack = ^false;

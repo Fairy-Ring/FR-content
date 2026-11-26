@@ -72,7 +72,7 @@ const expectedCost = new Map([
     ['dragon_dagger', 250], ['dragon_dagger_p', 250], ['dragon_spear', 250], ['dragon_spear_p', 250],
     ['dragon_longsword', 250], ['dragon_battleaxe', 1000], ['dragon_mace', 250], ['rune_claws', 250],
     ['tbwt_dragon_spear_kp', 250], ['dragon_halberd', 300], ['abyssal_whip', 500],
-    ['granite_maul', 500], ['dragon_scimitar', 550]
+    ['granite_maul', 500], ['dragon_scimitar', 550], ['darklight', 500]
 ]);
 const directEffects = new Set(['excalibur', 'dragon_battleaxe']);
 const pvmHandler = {
@@ -83,7 +83,7 @@ const pvmHandler = {
     dragon_longsword: 'pvm_dragon_longsword_sa', dragon_mace: 'pvm_dragon_mace_sa',
     rune_claws: 'pvm_rune_claws_sa', dragon_halberd: 'pvm_dragon_halberd_sa',
     abyssal_whip: 'pvm_abyssal_whip_sa', granite_maul: 'pvm_granite_maul_sa',
-    dragon_scimitar: 'pvm_dragon_scimitar_sa'
+    dragon_scimitar: 'pvm_dragon_scimitar_sa', darklight: 'agrith_darklight_special'
 };
 const pvpHandler = {
     rune_thrownaxe: 'pvp_rune_thrownaxe_sa', magic_longbow: 'pvp_magic_longbow_sa',
@@ -93,7 +93,7 @@ const pvpHandler = {
     dragon_longsword: 'pvp_dragon_longsword_sa', dragon_mace: 'pvp_dragon_mace_sa',
     rune_claws: 'pvp_rune_claws_sa', dragon_halberd: 'pvp_dragon_halberd_sa',
     abyssal_whip: 'pvp_abyssal_whip_sa', granite_maul: 'pvp_granite_maul_sa',
-    dragon_scimitar: 'pvp_dragon_scimitar_sa'
+    dragon_scimitar: 'pvp_dragon_scimitar_sa', darklight: 'agrith_darklight_pvp_special'
 };
 const stunWeapons = new Set(['dragon_spear', 'dragon_spear_p', 'tbwt_dragon_spear_kp']);
 const doubleHitWeapons = new Set(['dragon_dagger', 'dragon_dagger_p', 'magic_shortbow']);
