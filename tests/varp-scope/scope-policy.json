@@ -241,6 +241,7 @@
     }
   },
   "deliberatelyTemporary": {
+    "elenaquest_extra_bits": "Original temporary Plague City scene bit bank; home Elena visibility is derived from saved elenaquest by the progress setter and login, not independently saved quest progress.",
     "dwarfrock_puzzle": "Original reserved slot 237: temporary schematic overlay offsets, rotations and selection. Reinitialized when opening the puzzle; solved progress lives in dwarfrock_main.",
     "ahoy_last_signer": "Current-session previous petition signer UID; logout clears only repeat protection, never earned signatures.",
     "varp413_bits": "Original transmitted Rune-Draw scores and unpaid current round; close resets it, while wins persist separately.",
