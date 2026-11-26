@@ -14,3 +14,12 @@
 // CANDIDATE: Keldagrim bakery takes four times the ordinary bakery's time in
 // the checked OSRS history; preserve that ratio against the published eight ticks.
 ^regional_dwarf_bakery_respawn_ticks = 32
+
+// CANDIDATE: reuse the Rellekka fish profile's selected raw delay.
+^regional_fish_stall_respawn_ticks = 32
+
+// UNKNOWN raw ticks: convert TipIt's one-second average by the published silver ratio.
+^regional_veg_stall_respawn_ticks = 4
+
+// UNKNOWN amount: later Fish/Veg histories give no per-theft value. One raw point is the selected default.
+^regional_misc_stall_approval_loss = 1
