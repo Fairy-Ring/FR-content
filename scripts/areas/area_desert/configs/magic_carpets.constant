@@ -12,3 +12,8 @@
 ^magic_carpet_sophanem = 0_51_43_22_61
 ^magic_carpet_menaphos = 0_50_43_44_61
 ^magic_carpet_nardah = 0_53_45_8_38
+
+// UNKNOWN engineering flight speed: bounded by the engine's two-tile jump test.
+^magic_carpet_tiles_per_tick = 2
+// Client cycles are 20ms; the normal 600ms server tick contains 30 cycles.
+^magic_carpet_client_cycles_per_tick = 30
