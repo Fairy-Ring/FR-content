@@ -12,10 +12,10 @@ return($missing);
 if ($missing <= 0 | inv_total(inv, $item) > 0) return(0);
 return(1);
 
-[proc,garden_allotment_mature](int $stage, obj $produce)(boolean)
+[proc,garden_allotment_mature](int $stage, obj $seed)(boolean)
 def_dbrow $crop = ~farming_allotment_crop($stage);
 if ($crop = null) return(false);
-if (~farming_allotment_seed($produce) ! $crop) return(false);
+if (~farming_allotment_seed($seed) ! $crop) return(false);
 def_int $base = modulo($stage, ^farming_watered_offset);
 if ($base < db_getfield($crop, farming_allotment:mature, 0)) return(false);
 // Accept only the ordinary and watered forms, not disease/death offsets.
@@ -173,7 +173,7 @@ if (%garden_lyra_varbit >= 2) {
     @garden_lyra_recovery;
     return;
 }
-if (~garden_allotment_mature(%farming_allotment_varp_2_16_23, onion) = true | ~garden_allotment_mature(%farming_allotment_varp_2_24_31, onion) = true) {
+if (~garden_allotment_mature(%farming_allotment_varp_2_16_23, onion_seed) = true | ~garden_allotment_mature(%farming_allotment_varp_2_24_31, onion_seed) = true) {
     @garden_lyra_reward;
     return;
 }
@@ -295,7 +295,7 @@ if (%garden_kragen_varbit >= 2) {
     @garden_kragen_recovery;
     return;
 }
-if (~garden_allotment_mature(%farming_allotment_varp_2_8_15, cabbage) = true | ~garden_allotment_mature(%farming_allotment_varp_2_0_7, cabbage) = true) {
+if (~garden_allotment_mature(%farming_allotment_varp_2_8_15, cabbage_seed) = true | ~garden_allotment_mature(%farming_allotment_varp_2_0_7, cabbage_seed) = true) {
     @garden_kragen_reward;
     return;
 }
