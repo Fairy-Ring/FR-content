@@ -1,0 +1,15 @@
+// VERIFIED qualitative training benefit: RuneHQ Rat Pits, 18 April 2006.
+// UNKNOWN exact increments approved by Main. Preserve every unrelated bit,
+// especially bits 27..30, owned by the Recipe for Disaster hellrat counter.
+[proc,ratpits_growth_reward](int $state, obj $cat, int $kills)(int)
+def_int $ceiling = 320;
+def_int $stage = ~ratpits_cat_stage($cat);
+// Do not step across the equality-triggered native growth transition. The
+// next ordinary growth timer must perform the kitten/cat transformation.
+if ($stage = 1) $ceiling = 119;
+if ($stage = 2) $ceiling = 319;
+def_int $growth = getbit_range($state, 11, 19);
+$state = setbit_range_toint($state, min($ceiling, add($growth, ^ratpits_growth_reward)), 11, 19);
+$state = setbit_range_toint($state, min(100, add(getbit_range($state, 20, 26), $kills)), 20, 26);
+if ($stage = 1) $state = setbit_range_toint($state, max(0, sub(getbit_range($state, 5, 10), ^ratpits_attention_reward)), 5, 10);
+return($state);

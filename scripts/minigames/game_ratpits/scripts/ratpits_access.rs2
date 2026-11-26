@@ -1,0 +1,19 @@
+// VERIFIED loc identities from the original 377 maps. UNKNOWN engineering
+// adjacent landing tiles avoid each ladder/manhole's blocked footprint.
+// Keldagrim exterior stairs are delivered by b-stalls-stairs, not this unit.
+[proc,ratpits_entrance](int $venue)
+if (%ratcatch_var < ^ratcatch_complete) {
+    mes("Complete Rat Catchers first.");
+    return;
+}
+switch_int ($venue) {
+    case 1 : ~climb_ladder(0_41_150_38_41, false);
+    case 2 : ~climb_ladder(0_45_79_16_41, false);
+}
+
+[proc,ratpits_exit](int $venue)
+if (%varp283_unused ! null) ~ratpits_logout;
+switch_int ($venue) {
+    case 1 : ~climb_ladder(^ratcatch_mansion_town_exit, true);
+    case 2 : ~climb_ladder(0_51_53_3_9, true);
+}

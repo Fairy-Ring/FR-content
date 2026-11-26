@@ -1,0 +1,102 @@
+// VERIFIED room identities: original 377 jm2 maps; CANDIDATE cat-stage gates:
+// RuneHQ guide and early-2007 Rat Pits history (see rat-pits research subject).
+[proc,ratpits_venue](coord $at)(int)
+if (inzone(0_41_150_0_0, 0_41_150_63_63, $at) = true) return(1);
+if (inzone(0_45_79_0_0, 0_45_79_63_63, $at) = true) return(2);
+if (inzone(0_30_73_0_0, 0_30_73_63_63, $at) = true) return(3);
+if (inzone(0_46_150_0_0, 0_46_150_63_63, $at) = true) return(4);
+return(0);
+
+[proc,ratpits_cat_stage](obj $cat)(int)
+// Native hellcat item identities work independently of b-rfd-s2's follower
+// configuration links. That unit owns those links and all pet.rs2 changes.
+switch_obj ($cat) {
+    case kittenobject_hell : return(1);
+    case growncatobject_hell : return(2);
+    case overgrowncatobject_hell : return(3);
+    case wileycatobject_hell : return(4);
+    case lazycatobject_hell : return(0);
+}
+if (oc_category($cat) = kitten) return(1);
+if (oc_category($cat) = cat) return(2);
+if (oc_category($cat) = overgrown) return(3);
+if (oc_category($cat) = ratcatch_wilycat) return(4);
+return(0);
+
+[proc,ratpits_stage_allowed](int $venue, category $stage)(boolean)
+if ($venue = 1 & $stage = kitten) return(true);
+if ($venue = 2 & $stage = cat) return(true);
+if ($venue = 3 & $stage = overgrown) return(true);
+if ($venue = 4 & $stage = ratcatch_wilycat) return(true);
+return(false);
+
+[proc,ratpits_eligible](int $venue)(boolean)
+if (%ratcatch_var < ^ratcatch_complete) {
+    mes("Complete Rat Catchers first.");
+    return(false);
+}
+if ($venue < 1 | $venue > 4 | ~ratpits_venue(coord) ! $venue) return(false);
+if (%follower_obj = null) {
+    mes("Bring your following cat.");
+    return(false);
+}
+if (~ratpits_cat_stage(%follower_obj) ! $venue) {
+    mes("Cat stage not eligible for this pit.");
+    return(false);
+}
+if (.npc_finduid(%follower_uid) = false) {
+    mes("Bring your following cat.");
+    return(false);
+}
+if (.%npc_attacking_uid ! uid | .npc_type ! oc_param(%follower_obj, follower_id)) {
+    mes("Bring your own following cat.");
+    return(false);
+}
+return(true);
+
+[proc,ratpits_min_stake](int $venue)(int)
+if ($venue < 1 | $venue > 4) return(0);
+return(^ratpits_minimum);
+
+[proc,ratpits_max_stake](int $venue)(int)
+if ($venue < 1 | $venue > 4) return(0);
+return(^ratpits_maximum);
+
+[proc,ratpits_target](int $venue)(int)
+if ($venue < 1 | $venue > 4) return(0);
+return(^ratpits_rats_to_win);
+
+[proc,ratpits_host](int $venue)(npc)
+switch_int ($venue) {
+    case 1 : return(vc_gambler_rich1);
+    case 2 : return(vc_gambler_rich3);
+    case 3 : return(vc_dwarf_rich1);
+    case 4 : return(vc_gambler_rich3);
+}
+return(null);
+
+[proc,ratpits_lobby](int $venue)(coord)
+switch_int ($venue) {
+    case 1 : return(0_41_150_36_22);
+    case 2 : return(0_45_79_29_20);
+    case 3 : return(0_30_73_18_17);
+    case 4 : return(0_46_150_40_56);
+}
+return(0_0_0_0_0);
+
+[mapzone,0_41_150]
+~ratpits_enter;
+@music_playbyregion(coord);
+
+[proc,ratpits_enter]
+set_player_op("Challenge", 1, ^false);
+
+[mapzoneexit,0_41_150] ~ratpits_leave;
+[mapzoneexit,0_45_79] ~ratpits_leave;
+[mapzoneexit,0_30_73] ~ratpits_leave;
+[mapzoneexit,0_46_150] ~ratpits_leave;
+
+[proc,ratpits_leave]
+if (~ratpits_venue(coord) ! 0) return;
+if (%varp283_unused ! null) ~ratpits_logout;
+set_player_op(null, 1, ^false);

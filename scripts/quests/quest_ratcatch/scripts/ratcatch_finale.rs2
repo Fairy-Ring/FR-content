@@ -35,6 +35,7 @@ if (%ratcatch_var = 20) {
 ~ratcatch_cat_services;
 
 [oploc1,vc_manhole_open]
+if (loc_coord = 0_51_53_3_8) { ~ratpits_entrance(2); return; }
 if (loc_coord ! 0_47_50_10_32) return;
 if (%ratcatch_var < 16) {
     mes("Speak to The Face before entering.");
@@ -44,6 +45,8 @@ if (%ratcatch_var < 16) {
 ~climb_ladder(0_46_150_18_50, false);
 
 [proc,ratcatch_pit_ladder]()(boolean)
+if (loc_coord = 0_41_150_37_41) { ~ratpits_exit(1); return(true); }
+if (loc_coord = 0_45_79_15_41) { ~ratpits_exit(2); return(true); }
 if (coordx(loc_coord) ! 2962 | coordz(loc_coord) ! 9651) return(false);
 ~climb_ladder(0_47_50_10_31, true);
 return(true);

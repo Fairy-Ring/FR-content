@@ -1,0 +1,181 @@
+// CANDIDATE Rat Pits is a race against rats, not cat-versus-cat combat.
+// UNKNOWN engineering execution uses the existing NPC melee roll procedures.
+// All tunable unauthenticated values are named in ratpits.constant.
+[proc,ratpits_tick]
+if (%ratpits_phase = 0) { npc_settimer(0); return; }
+~ratpits_missing;
+if (%ratpits_phase = 3) { ~ratpits_finish; return; }
+if (finduid(%ratpits_player_a) = false | .finduid(%ratpits_player_b) = false) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    ~ratpits_finish;
+    return;
+}
+if (%varp283_unused ! npc_uid | .%varp283_unused ! npc_uid | ~ratpits_venue(coord) ! %ratpits_venue | ~ratpits_venue(.coord) ! %ratpits_venue) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    ~ratpits_finish;
+    return;
+}
+if (map_clock >= %ratpits_deadline) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    ~ratpits_finish;
+    return;
+}
+if (%ratpits_phase = 1) { ~ratpits_start; return; }
+if (map_clock >= %ratpits_fatigue_at) {
+    %ratpits_result = 0;
+    if (%ratpits_score_a > %ratpits_score_b) %ratpits_result = 1;
+    if (%ratpits_score_b > %ratpits_score_a) %ratpits_result = 2;
+    %ratpits_phase = 3;
+    ~ratpits_finish;
+    return;
+}
+// Both sides receive the same round before the result is decided.
+def_int $a = ~ratpits_combat_side(1);
+def_int $b = ~ratpits_combat_side(2);
+~ratpits_progress;
+if ($a = 0 & $b = 0) return;
+if (($a = 1 & $b = 1) | ($a > 1 & $b > 1)) %ratpits_result = 0;
+else if ($a = 1 | $b > 1) %ratpits_result = 1;
+else %ratpits_result = 2;
+%ratpits_phase = 3;
+~ratpits_finish;
+
+[proc,ratpits_place_cats]
+def_npc_uid $host = npc_uid;
+def_int $venue = %ratpits_venue;
+def_npc_uid $a = %ratpits_cat_a;
+def_npc_uid $b = %ratpits_cat_b;
+p_teleport(~ratpits_owner_tile($venue, 1));
+.p_teleport(~ratpits_owner_tile($venue, 2));
+if (npc_finduid($a) = true) {
+    npc_setmode(none);
+    npc_settimer(0);
+    npc_telejump(~ratpits_cat_tile($venue, 1));
+}
+if (npc_finduid($b) = true) {
+    npc_setmode(none);
+    npc_settimer(0);
+    npc_telejump(~ratpits_cat_tile($venue, 2));
+}
+if (npc_finduid($host) = false) return;
+
+[proc,ratpits_spawn_rat](int $side)
+def_npc_uid $host = npc_uid;
+def_int $venue = %ratpits_venue;
+def_int $style = %ratpits_style_a;
+if ($side = 2) $style = %ratpits_style_b;
+npc_add(~ratpits_rat_tile($venue, $side), ~ratpits_rat_type($venue, $style), ^max_32bit_int);
+npc_setmode(none);
+npc_settimer(0);
+def_npc_uid $rat = npc_uid;
+if (npc_finduid($host) = false) return;
+if ($side = 1) %ratpits_rat_a = $rat;
+else %ratpits_rat_b = $rat;
+
+[proc,ratpits_remove_rats]
+def_npc_uid $host = npc_uid;
+def_npc_uid $a = %ratpits_rat_a;
+def_npc_uid $b = %ratpits_rat_b;
+if (npc_finduid($a) = true) npc_del;
+if (npc_finduid($b) = true) npc_del;
+if (npc_finduid($host) = false) return;
+%ratpits_rat_a = null;
+%ratpits_rat_b = null;
+
+[proc,ratpits_cat_health](npc_uid $cat)(int)
+def_npc_uid $host = npc_uid;
+def_int $hp = -1;
+if (npc_finduid($cat) = true) $hp = npc_stat(hitpoints);
+if (npc_finduid($host) = false) return(-1);
+return($hp);
+
+// Return 0 continuing, 1 target reached, 2 cat killed, 3 cat withdrawn.
+[proc,ratpits_combat_side](int $side)(int)
+def_npc_uid $host = npc_uid;
+def_npc_uid $cat = %ratpits_cat_a;
+def_npc_uid $rat = %ratpits_rat_a;
+def_int $style = %ratpits_style_a;
+def_int $score = %ratpits_score_a;
+def_player_uid $owner = %ratpits_player_a;
+if ($side = 2) {
+    $cat = %ratpits_cat_b;
+    $rat = %ratpits_rat_b;
+    $style = %ratpits_style_b;
+    $score = %ratpits_score_b;
+    $owner = %ratpits_player_b;
+}
+if (finduid($owner) = false) return(3);
+if (%follower_uid ! $cat) return(3);
+if (npc_finduid($cat) = false) {
+    if (npc_finduid($host) = false) return(3);
+    if ($side = 1) %ratpits_dead_a = 1;
+    else %ratpits_dead_b = 1;
+    return(2);
+}
+if (npc_stat(hitpoints) <= 0) {
+    if (npc_finduid($host) = false) return(3);
+    if ($side = 1) %ratpits_dead_a = 1;
+    else %ratpits_dead_b = 1;
+    return(2);
+}
+if (($style = 1 & npc_stat(hitpoints) <= divide(npc_basestat(hitpoints), ^ratpits_cautious_hp_divisor)) | ($style = 2 & npc_stat(hitpoints) <= ^ratpits_endurance_retreat_hp)) {
+    if (npc_finduid($host) = false) return(3);
+    return(3);
+}
+def_int $cat_attack = ~npc_melee_attack_roll_typeless;
+def_int $cat_damage = ~npc_melee_maxhit;
+def_int $cat_defence = ~npc_defence_roll_specific(^crush_style);
+// UNKNOWN arithmetic for the sourced relative tactic strengths.
+if ($style = 1) { $cat_attack = divide($cat_attack, ^ratpits_defensive_divisor); $cat_defence = multiply($cat_defence, ^ratpits_defensive_divisor); }
+if ($style = 4) { $cat_attack = multiply($cat_attack, ^ratpits_berserk_multiplier); $cat_defence = divide($cat_defence, ^ratpits_berserk_multiplier); }
+npc_anim(cat_pounce, 0);
+if (.npc_finduid($rat) = true) npc_walk(.npc_coord);
+if (npc_finduid($rat) = false) { if (npc_finduid($host) = false) return(3); return(3); }
+def_int $rat_defence = ~npc_defence_roll_specific(^crush_style);
+if (randominc($cat_attack) > randominc($rat_defence)) {
+    $cat_damage = randominc($cat_damage);
+    if ($cat_damage > 0) npc_damage(^hitmark_damage, $cat_damage);
+    else npc_damage(^hitmark_block, 0);
+} else npc_damage(^hitmark_block, 0);
+if (npc_stat(hitpoints) <= 0) {
+    npc_del;
+    if (npc_finduid($host) = false) return(3);
+    $score = add($score, 1);
+    if ($side = 1) %ratpits_score_a = $score;
+    else %ratpits_score_b = $score;
+    if ($score >= ~ratpits_target(%ratpits_venue)) return(1);
+    ~ratpits_spawn_rat($side);
+    return(0);
+}
+def_int $rat_attack = ~npc_melee_attack_roll_typeless;
+def_int $rat_damage = ~npc_melee_maxhit;
+npc_anim(rat_attack, 0);
+if (npc_finduid($cat) = false) { if (npc_finduid($host) = false) return(3); return(3); }
+if (randominc($rat_attack) > randominc($cat_defence)) {
+    $rat_damage = randominc($rat_damage);
+    if ($rat_damage > 0) npc_damage(^hitmark_damage, $rat_damage);
+    else npc_damage(^hitmark_block, 0);
+} else npc_damage(^hitmark_block, 0);
+def_int $hp = npc_stat(hitpoints);
+if (npc_finduid($host) = false) return(3);
+if ($hp <= 0) {
+    if ($side = 1) %ratpits_dead_a = 1;
+    else %ratpits_dead_b = 1;
+    return(2);
+}
+return(0);
+
+[proc,ratpits_progress]
+if (finduid(%ratpits_player_a) = false | .finduid(%ratpits_player_b) = false) return;
+def_int $target = ~ratpits_target(%ratpits_venue);
+if_settext(cat_defeated:com_0, "<displayname>");
+if_settext(cat_defeated:com_1, "<.displayname>");
+if_settext(cat_defeated:com_4, tostring(sub($target, %ratpits_score_a)));
+if_settext(cat_defeated:com_5, tostring(sub($target, %ratpits_score_b)));
+.if_settext(cat_defeated:com_0, "<.displayname>");
+.if_settext(cat_defeated:com_1, "<displayname>");
+.if_settext(cat_defeated:com_4, tostring(sub($target, %ratpits_score_b)));
+.if_settext(cat_defeated:com_5, tostring(sub($target, %ratpits_score_a)));

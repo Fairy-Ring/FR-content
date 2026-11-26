@@ -1,0 +1,6 @@
+// UNKNOWN engineering safety policy, approved by Main: escrow and unpaid credit
+// survive logout. Native host/login returns this balance without requiring a new wager.
+[ratpits_purse]
+scope=perm
+size=1
+stackall=yes

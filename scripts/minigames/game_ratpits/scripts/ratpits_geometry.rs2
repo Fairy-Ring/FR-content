@@ -1,0 +1,50 @@
+// VERIFIED native cages: original 377 vc_rat_wall* / vc_dwarfrat_wall* LOC
+// placements in m41_150, m45_79, m30_73 and m46_150. Exact race starts and
+// outside-wall observation tiles are UNKNOWN engineering placement choices.
+[proc,ratpits_owner_tile](int $venue, int $side)(coord)
+switch_int ($venue) {
+    case 1 : if ($side = 1) return(0_41_150_27_32); else return(0_41_150_29_32);
+    case 2 : if ($side = 1) return(0_45_79_26_23); else return(0_45_79_30_23);
+    case 3 : if ($side = 1) return(0_30_73_30_28); else return(0_30_73_36_25);
+    case 4 : if ($side = 1) return(0_46_150_45_28); else return(0_46_150_45_29);
+}
+return(0_0_0_0_0);
+
+[proc,ratpits_cat_tile](int $venue, int $side)(coord)
+switch_int ($venue) {
+    case 1 : if ($side = 1) return(0_41_150_27_36); else return(0_41_150_29_40);
+    case 2 : if ($side = 1) return(0_45_79_26_27); else return(0_45_79_30_33);
+    case 3 : if ($side = 1) return(0_30_73_30_32); else return(0_30_73_36_32);
+    case 4 : if ($side = 1) return(0_46_150_41_33); else return(0_46_150_45_38);
+}
+return(0_0_0_0_0);
+
+[proc,ratpits_rat_tile](int $venue, int $side)(coord)
+switch_int ($venue) {
+    case 1 : if ($side = 1) return(0_41_150_27_37); else return(0_41_150_29_41);
+    case 2 : if ($side = 1) return(0_45_79_26_28); else return(0_45_79_30_32);
+    case 3 : if ($side = 1) return(0_30_73_30_33); else return(0_30_73_36_33);
+    case 4 : if ($side = 1) return(0_46_150_41_34); else return(0_46_150_45_39);
+}
+return(0_0_0_0_0);
+
+[proc,ratpits_rat_type](int $venue, int $style)(npc)
+switch_int ($venue) {
+    case 1 :
+        if ($style = 1) return(pitrat_ardougne_def);
+        if ($style = 4) return(pitrat_ardougne_agr);
+        return(pitrat_ardougne_neu);
+    case 2 :
+        if ($style = 1) return(pitrat_varrock_def);
+        if ($style = 4) return(pitrat_varrock_agr);
+        return(pitrat_varrock_neu);
+    case 3 :
+        if ($style = 1) return(pitrat_keldagrim_def);
+        if ($style = 4) return(pitrat_keldagrim_agr);
+        return(pitrat_keldagrim_neu);
+    case 4 :
+        if ($style = 1) return(pitrat_sarim_def);
+        if ($style = 4) return(pitrat_sarim_agr);
+        return(pitrat_sarim_neu);
+}
+return(null);

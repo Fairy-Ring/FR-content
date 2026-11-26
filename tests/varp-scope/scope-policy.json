@@ -279,6 +279,7 @@
     }
   },
   "deliberatelyTemporary": {
+    "varp283_unused": "UNKNOWN engineering Rat Pits session token in reserved original slot 283; server-only native host UID, discarded after atomic settlement and logout. Escrow and owed credit live in the permanent ratpits_purse inventory.",
     "dt_stranger_uid": "Original server-only slot 420 holds only the active owned Stranger NPC UID. Logout removes that actor and discards this session token, without changing any diamond or quest progress.",
     "rogue_suduku1": "Original server-only slot 541: temporary Rune Sudoku selector, board size and per-session generation counter in uncovered high bits; board and clue inventories are temporary, and closing or reopening resets interaction state.",
     "fightpits_state": "UNKNOWN engineering session participation and admission combat level in reserved original server-only slot 410; logout removes the participant and login recovers arena coordinates.",

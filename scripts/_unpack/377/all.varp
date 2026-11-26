@@ -409,6 +409,9 @@ scope=perm
 scope=perm
 
 [varp283_unused]
+type=npc_uid
+scope=temp
+protect=no
 
 [ring_of_recoil]
 scope=perm

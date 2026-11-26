@@ -1,0 +1,91 @@
+// VERIFIED pre-bid tactics and relative strengths: RuneHQ, 18 April 2006.
+// UNKNOWN functional menu labels connect those controls to the original walls.
+[ai_timer,vc_gambler_rich1] ~ratpits_tick;
+[ai_timer,vc_gambler_rich3] ~ratpits_tick;
+[ai_timer,vc_dwarf_rich1] ~ratpits_tick;
+
+[opnpc1,vc_gambler_rich1] ~ratpits_host_menu;
+[opnpc1,vc_gambler_rich3] ~ratpits_host_menu;
+[opnpc1,vc_dwarf_rich1] ~ratpits_host_menu;
+
+[proc,ratpits_host_menu]
+if (~ratpits_venue(coord) = 0) return;
+if (%ratcatch_var < ^ratcatch_complete) { mes("Complete Rat Catchers first."); return; }
+~ratpits_claim;
+if (%varp283_unused ! null) {
+    if (npc_finduid(%varp283_unused) = true) {
+        if (~ratpits_session = true) {
+            if (%ratpits_phase = 1) { ~ratpits_offer_open; return; }
+            if (%ratpits_phase = 2) { ~ratpits_controls; return; }
+            ~ratpits_finish;
+            return;
+        }
+    }
+}
+mes("Challenge another player in this pit. Equal wagers: <tostring(^ratpits_minimum)> to <tostring(^ratpits_maximum)> coins.");
+if (inv_total(inv, ratpits_manual) = 0 & inv_freespace(inv) > 0) inv_add(inv, ratpits_manual, 1);
+
+[oploc1,vc_rat_wall1] ~ratpits_wall;
+[oploc1,vc_rat_wall2] ~ratpits_wall;
+[oploc1,vc_rat_wall1_inactive] ~ratpits_wall;
+[oploc1,vc_rat_wall2_inactive] ~ratpits_wall;
+[oploc1,vc_dwarfrat_wall1] ~ratpits_wall;
+[oploc1,vc_dwarfrat_wall2] ~ratpits_wall;
+[oploc1,vc_dwarfrat_wall1_inactive] ~ratpits_wall;
+[oploc1,vc_dwarfrat_wall2_inactive] ~ratpits_wall;
+
+[proc,ratpits_wall]
+if (~ratpits_venue(loc_coord) ! ~ratpits_venue(coord)) return;
+if (npc_finduid(%varp283_unused) = false) { mes("No active match."); return; }
+if (~ratpits_session = true) {
+    if (%ratpits_phase = 2) ~ratpits_controls;
+    return;
+}
+mes("No active match.");
+
+[proc,ratpits_controls]
+def_int $choice = ~p_choice2("Retreat", 1, "Continue watching", 2);
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 2) return;
+if ($choice = 1) ~ratpits_cancel;
+
+[proc,ratpits_choose_tactic]()(int)
+return(~p_choice4("Just take care of yourself", 1, "Stay in there as long as you can", 2, "No guts, No glory", 3, "Go berserk!", 4));
+
+[proc,ratpits_tactic](int $style)
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 1) return;
+if (inv_total(worn, ics_little_amulet_of_catspeak) = 0 | $style < 1 | $style > 4) return;
+if (%ratpits_player_a = uid) %ratpits_style_a = $style;
+else %ratpits_style_b = $style;
+
+[oplocu,vc_rat_wall1] ~ratpits_feed(last_useitem);
+[oplocu,vc_rat_wall2] ~ratpits_feed(last_useitem);
+[oplocu,vc_rat_wall1_inactive] ~ratpits_feed(last_useitem);
+[oplocu,vc_rat_wall2_inactive] ~ratpits_feed(last_useitem);
+[oplocu,vc_dwarfrat_wall1] ~ratpits_feed(last_useitem);
+[oplocu,vc_dwarfrat_wall2] ~ratpits_feed(last_useitem);
+[oplocu,vc_dwarfrat_wall1_inactive] ~ratpits_feed(last_useitem);
+[oplocu,vc_dwarfrat_wall2_inactive] ~ratpits_feed(last_useitem);
+
+[proc,ratpits_feed](obj $food)
+if (~ratpits_venue(loc_coord) ! ~ratpits_venue(coord)) return;
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 2) return;
+def_int $heal = 0;
+switch_obj ($food) {
+    case raw_shrimp : $heal = ^ratpits_shrimp_heal;
+    case raw_tuna : $heal = ^ratpits_tuna_heal;
+    case default : return;
+}
+if (inv_total(inv, $food) = 0) return;
+def_npc_uid $host = npc_uid;
+def_npc_uid $cat = %ratpits_cat_a;
+if (%ratpits_player_b = uid) $cat = %ratpits_cat_b;
+if (%follower_uid ! $cat) return;
+if (npc_finduid($cat) = false) { if (npc_finduid($host) = false) return; return; }
+if (npc_stat(hitpoints) <= 0 | npc_stat(hitpoints) >= npc_basestat(hitpoints)) { if (npc_finduid($host) = false) return; return; }
+inv_del(inv, $food, 1);
+npc_statheal(hitpoints, $heal, 0);
+if (npc_finduid($host) = false) return;
+mes("Cat fed.");

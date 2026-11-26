@@ -1,0 +1,30 @@
+// CANDIDATE early-2007 Rat Pits wiki revision 29863 (28 May 2007):
+// equal stakes, minimum 100, maximum 50,000. Later 20,000 cap is subtracted.
+// CANDIDATE 2007rshelp guide supplies the 100-coin increment.
+^ratpits_minimum = 100
+^ratpits_maximum = 50000
+^ratpits_wager_step = 100
+// VERIFIED Ardougne five-rat target: RuneHQ capture, 18 April 2006.
+// CANDIDATE five elsewhere: 2007rshelp, with RuneHQ's varying-target conflict.
+^ratpits_rats_to_win = 5
+// UNKNOWN engineering cadence and bounded abort, approved by Main.
+^ratpits_combat_interval = 4
+^ratpits_match_ticks = 1000
+^ratpits_offer_ticks = 1000
+// UNKNOWN functional presentation duration and combat/feeding arithmetic.
+^ratpits_result_ticks = 8
+^ratpits_defensive_divisor = 2
+^ratpits_cautious_hp_divisor = 2
+^ratpits_endurance_retreat_hp = 1
+^ratpits_berserk_multiplier = 2
+^ratpits_shrimp_heal = 3
+^ratpits_tuna_heal = 10
+
+// VERIFIED fatigue score comparison, UNKNOWN duration approved by Main.
+^ratpits_fatigue_ticks = 600
+// UNKNOWN pagination of the sourced manual text.
+^ratpits_manual_last_page = 8
+
+// UNKNOWN amounts for the VERIFIED qualitative post-match training benefit.
+^ratpits_growth_reward = 1
+^ratpits_attention_reward = 1
