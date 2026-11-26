@@ -449,6 +449,7 @@ if (%phoenixgang > ^phoenixgang_not_started & %blackarmgang ! ^blackarmgang_comp
 ~send_quest_progress_colour(questlist:viking, %viking, ^viking_complete);
 ~send_quest_progress_colour(questlist:regicide, %regicide_quest, ^regicide_complete);
 ~send_quest_progress_colour(questlist:routequest, %routequest, ^routequest_complete);
+~send_quest_progress_colour(questlist:myreque_2, %myreque_2_quest, ^myreque_2_complete);
 ~send_quest_progress_colour(questlist:misc, %misc_quest, ^misc_complete);
 ~send_quest_progress_colour(questlist:ikov, %ikov, ^ikov_completed_armadyl);
 ~send_quest_progress_colour(questlist:biohazard, %biohazard, ^biohazard_complete);
