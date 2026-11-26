@@ -229,3 +229,4 @@ assert.equal(count(cooler, 'hundred_dwarf_hot_rockcake'), 0);
 assert.equal(count(cooler, 'hundred_dwarf_cool_rockcake'), 1);
 
 console.log(`PASS RFD Mountain Dwarf inspect, native guest route, recipe, recovery, rock cake and once-only reward; cake stand ${cakeStand.join(',')}`);
+process.exit(0);

@@ -322,3 +322,4 @@ assert.equal(types.NpcType.get(id('NpcType', 'goblin_cook')).name, 'Goblin Cook'
 assert.equal(types.NpcType.get(id('NpcType', 'goblin_cook_charred')).name, 'Goblin Cook');
 assert.equal(types.NpcType.get(id('NpcType', 'goblin_cook_on_wall')).name, 'Goblin Cook');
 console.log('PASS RFD Goblin Generals: staged blast, native route, recipes, recovery, cocktail regression and once-only rescue');
+process.exit(0);

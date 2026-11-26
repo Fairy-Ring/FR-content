@@ -315,6 +315,10 @@ assert.equal(peteStage(p), 5);
 assert.equal(count(p, 'hundred_pirate_mudskipper_hide'), 0);
 talk(p, nung);
 assert.equal(peteStage(p), 5, 'missing wire and needle cannot open pen');
+const pen = nativeLoc('pen_wall_doorl', rows => rows.find(row => row.level === 1));
+operate(p, pen, 1, { from: [1, 2974, 9513] });
+assert.deepEqual(tile(p), [1, 2974, 9513], 'native pen approach refuses entry before Nung receives the wire and needle');
+assert.equal(peteStage(p), 5);
 give(p, 'bronzecraftwire', 3);
 give(p, 'needle');
 talk(p, nung);
@@ -325,8 +329,7 @@ const cavernExit = nativeLoc('seabed2_cavewall_mudskipper_caveexitl', rows => ro
 operate(p, cavernExit);
 assert.deepEqual(tile(p), [1, 2949, 9514]);
 assertLanding(tile(p), 'cavern return', [2949, 9513], [2944, 3007, 9472, 9535]);
-const pen = nativeLoc('pen_wall_doorl', rows => rows.find(row => row.level === 1));
-operate(p, pen, 1, { accept: at => at[2] <= 9513 });
+operate(p, pen, 1, { accept: at => at[2] <= 9513, from: [1, 2974, 9513] });
 assert.deepEqual(tile(p), [1, 2974, 9516]);
 assertLanding(tile(p), 'crab pen', [2972, 9516], [2967, 2980, 9515, 9524]);
 killForItem('hundred_pirate_giant_crab', 'hundred_pirate_giant_crab_meat');
@@ -424,3 +427,4 @@ for (const [button, heading] of [[2, 'Mountain Dwarf'], [3, 'Goblin Generals'], 
   assert.match(text(p), new RegExp(heading));
 }
 console.log('PASS RFD Slice 1 hub, Another Cook, Pirate Pete, maps, chest, journals and shared-owner regressions');
+process.exit(0);

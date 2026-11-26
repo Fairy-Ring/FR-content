@@ -130,6 +130,16 @@ if (%100_pirate_quest_var = ^rfd_pete_nung_wire) {
 
 [oploc1,pen_wall_doorl] @rfd_pete_pen;
 [oploc1,pen_wall_doorr] @rfd_pete_pen;
+[aploc1,pen_wall_doorl] @rfd_pete_pen_approach;
+[aploc1,pen_wall_doorr] @rfd_pete_pen_approach;
+[label,rfd_pete_pen_approach]
+// UNKNOWN engineering approach for the original one-sided wall doors.
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_pete_pen;
+
 [label,rfd_pete_pen]
 if (coordz(coord) >= 9515) {
     p_telejump(^rfd_pete_pen_outside);
