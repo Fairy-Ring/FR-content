@@ -1,0 +1,31 @@
+// UNKNOWN concise functional journal wording; flow is VERIFIED by period Tip.It.
+[if_button,questlist:agrith]
+def_string $text;
+if (%agrith_quest >= ^agrith_complete) {
+    $text = "@str@I defeated Agrith-Naar and obtained Darklight.|@red@QUEST COMPLETE!";
+} else if (%agrith_quest = 120) {
+    $text = "I defeated Agrith-Naar.|I must choose my combat experience reward.|Father Reen or Father Badden can help me finish.";
+} else if (%agrith_quest >= 110) {
+    $text = "I must lead the ritual in reverse and defeat Agrith-Naar.|Silverlight must be equipped for the final blow.|If I leave, I can return and chant again.";
+} else if (%agrith_quest = 100) {
+    $text = "Everyone is ready. I should speak to Matthew in the throne room.";
+} else if (%agrith_quest >= 80) {
+    $text = "Denath was Agrith-Naar. We sent him back!|I must collect the fallen wizards' sigils and bring Evil Dave,|the two desert monks and the golem to help with another ritual.|The strange implement can open the golem's head.";
+} else if (%agrith_quest = 70) {
+    $text = "I must stand at the empty southern place in the ritual circle|and chant Denath's words using my demonic sigil.";
+} else if (%agrith_quest = 60) {
+    $text = "The golem saw Josef hide a book in one of four broken kilns.|I should look in the kilns in Uzer and show Matthew the book.|I need a silver-cast demonic sigil before the ritual.";
+} else if (%agrith_quest = 50) {
+    $text = "Josef fled with Denath's book.|I should ask the golem what happened last night.";
+} else if (%agrith_quest = 40) {
+    $text = "I learned Denath's incantation. He can remind me of the words.|Jennifer has a demonic sigil mould; I need a silver bar and a furnace.|I should also speak to Matthew.";
+} else if (%agrith_quest >= 30) {
+    $text = "Evil Dave let me join the cult. I should enter the portal|and speak to Denath in the throne room.";
+} else if (%agrith_quest >= 20) {
+    $text = "I must join the cult under Uzer.|Evil Dave wants me to wield blackened Silverlight and|wear at least two other pieces of black clothing.|Black mushrooms can darken Silverlight.";
+} else if (%agrith_quest > 0) {
+    $text = "Father Reen asked me to speak to Father Badden in Uzer.";
+} else {
+    $text = "I can begin by speaking to Father Reen in southern Al Kharid.|I need to complete Demon Slayer and The Golem,|and have level 30 Crafting.";
+}
+~quest_journal("Shadow of the Storm", $text);

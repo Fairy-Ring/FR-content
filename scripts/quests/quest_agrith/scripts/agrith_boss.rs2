@@ -1,0 +1,116 @@
+// VERIFIED: period Tip.It q125, melee/magic demon and retreat pullback.
+// CANDIDATE: Old School lethal-Silverlight requirement and 12 HP restoration.
+[proc,agrith_attackable]()(boolean)
+if (%agrith_owner = uid & %agrith_quest = 110) return(true);
+return(false);
+
+[proc,agrith_find_boss]()(boolean)
+if (~agrith_in_room = false) return(false);
+npc_findall(region_getcoord(0, 32, 35), agrith_naar, 24, 0);
+while (npc_findnext = true) {
+    if (%agrith_owner = uid) return(true);
+}
+return(false);
+
+[proc,agrith_spawn_boss]
+if (%agrith_quest ! 110 | ~agrith_in_room = false) return;
+if (~agrith_find_boss = true) return;
+// UNKNOWN staging: the original floor copied privately; the proof checks size 3.
+~mesbox("Agrith-Naar appears and strikes Matthew down!");
+if (npc_findexact(region_getcoord(0, 34, 34), agrith_matthew) = true) {
+    npc_anim(human_death, 0);
+    p_delay(^agrith_story_death_delay);
+    npc_del;
+}
+npc_add(region_getcoord(0, 31, 37), agrith_naar, 2000);
+%agrith_owner = uid;
+%npc_aggressive_player = uid;
+npc_settimer(1);
+npc_setmode(applayer2);
+hint_npc;
+
+[opnpc2,agrith_naar]
+if (~agrith_attackable = false) {
+    mes("That is not your enemy.");
+    return;
+}
+@player_combat_start;
+
+[apnpc2,agrith_naar]
+if (~agrith_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_timer,agrith_naar]
+if (finduid(%agrith_owner) = false) {
+    npc_del;
+    return;
+}
+if (~agrith_in_room = false | %agrith_quest ! 110 | stat(hitpoints) = 0) {
+    hint_stop;
+    npc_del;
+    return;
+}
+// Retaliation is mutable; it must never replace this encounter's immutable owner.
+%npc_aggressive_player = %agrith_owner;
+
+[ai_applayer2,agrith_naar] @agrith_attack;
+[ai_opplayer2,agrith_naar] @agrith_attack;
+[label,agrith_attack]
+if (finduid(%agrith_owner) = false) return;
+%npc_aggressive_player = %agrith_owner;
+if (~agrith_attackable = false | stat(hitpoints) = 0) return;
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
+// CANDIDATE: close melee / distant Fire Blast, avoiding the protected style.
+def_boolean $magic = false;
+if (~check_protect_prayer(^magic_style) = false & (npc_range(coord) > 1 | ~check_protect_prayer(^crush_style) = true)) $magic = true;
+if (npc_range(coord) > 1 & p_finduid(%agrith_owner) = true) {
+    // VERIFIED pullback; UNKNOWN exact landing. The radius-two ring around
+    // this size-three boss's centre is adjacent to, but outside, its footprint.
+    def_coord $centre = movecoord(npc_coord, 1, 0, 1);
+    def_coord $landing = map_findsquare($centre, 2, 2, ^map_findsquare_lineofwalk);
+    if ($landing = $centre) return;
+    mes("Agrith-Naar pulls you back towards him!");
+    p_telejump($landing);
+}
+if ($magic = true) {
+    ~npc_cast_spell_with_forced_max_hit(^fire_blast, npc_param(attackrate), ^agrith_magic_maxhit);
+} else {
+    ~npc_default_attack;
+}
+
+[ai_queue2,agrith_naar]
+if (npc_stat(hitpoints) = 0) return;
+if (finduid(%agrith_owner) = false) {
+    npc_del;
+    return;
+}
+if (~agrith_attackable = false) return;
+def_int $damage = last_int;
+def_obj $sword = inv_getobj(worn, ^wearpos_rhand);
+if ($damage >= npc_stat(hitpoints) & (($sword ! silverlight & $sword ! agrith_silverlight_dyed) | npc_range(coord) > 1)) {
+    ~npc_default_damage(sub(npc_stat(hitpoints), 1));
+    npc_statheal(hitpoints, 11, 0);
+    mes("Only Silverlight can deliver the final blow!");
+    return;
+}
+~npc_default_damage($damage);
+
+[ai_queue3,agrith_naar]
+def_player_uid $owner = %agrith_owner;
+def_coord $death_tile = npc_coord;
+// The shared death path binds its secondary NPC pointer for the Slayer hook.
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+if (p_finduid($owner) = true & %agrith_quest = 110) {
+    // CANDIDATE: subtract the dated 2021 replacement of ordinary ashes.
+    obj_add($death_tile, ashes, 1, ^lootdrop_duration);
+    queue(agrith_defeated, 0, 0);
+}
+
+[queue,agrith_defeated]
+if (%agrith_quest ! 110) return;
+%agrith_quest = 120;
+hint_stop;
+p_stopaction;
+~mesbox("You have defeated Agrith-Naar. His blood transforms Silverlight into Darklight.");
+~agrith_reward;

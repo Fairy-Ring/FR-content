@@ -2315,6 +2315,28 @@
         "miss": 2415085441,
         "zero": 683130215
       }
+    },
+    {
+      "script": "[ai_applayer2,agrith_naar]",
+      "npc": "agrith_naar",
+      "playerVars": { "agrith_quest": 110 },
+      "npcVars": { "agrith_owner": "target" },
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_opplayer2,agrith_naar]",
+      "npc": "agrith_naar",
+      "playerVars": { "agrith_quest": 110 },
+      "npcVars": { "agrith_owner": "target" },
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
     }
   ]
 }

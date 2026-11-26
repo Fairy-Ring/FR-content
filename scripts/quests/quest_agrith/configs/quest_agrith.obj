@@ -1,0 +1,180 @@
+// Original 377 agrith_* object rows and Darklight moved from all.obj; all client fields retained.
+
+[agrith_silverlight_dyed]
+name=Silverlight
+desc=The magical sword 'Silverlight', stained black with mushroom ink.
+recol1s=15825
+recol1d=0
+recol2s=31649
+recol2d=8456
+members=yes
+cost=50
+model=obj_silverlight
+2dxof=-2
+2dyof=-4
+2dzoom=980
+2dyan=864
+2dzan=84
+2dxan=196
+iop2=Wield
+manwear=obj_silverlight_manwear,0
+womanwear=obj_silverlight_manwear,6
+wearpos=righthand
+weight=4lb
+// CANDIDATE: the 377 Silverlight server combat row is reused for its recoloured form.
+category=weapon_slash
+param=stabattack,9
+param=slashattack,14
+param=crushattack,-2
+param=slashdefence,3
+param=crushdefence,2
+param=magicdefence,1
+param=strengthbonus,12
+param=attackrate,5
+param=slashattack_anim,human_sword_slash
+param=stabattack_anim,human_sword_stab
+param=defend_anim,human_sword_def
+param=slash_sound,hacksword_slash
+param=stab_sound,hacksword_stab
+// UNKNOWN: quest-specific item; untradeable default where no period source establishes tradeability.
+tradeable=no
+
+[darklight]
+name=Darklight
+desc=The magical sword 'Silverlight', enhanced with the blood of Agrith-Naar.
+recol1s=15825
+recol1d=4162
+recol2s=31649
+recol2d=6342
+members=yes
+cost=500
+model=obj_silverlight
+2dxof=-2
+2dyof=-4
+2dzoom=980
+2dyan=864
+2dzan=84
+2dxan=196
+iop2=Wield
+manwear=obj_silverlight_manwear,0
+womanwear=obj_silverlight_manwear,6
+wearpos=righthand
+weight=4lb
+// CANDIDATE: current OSRS Darklight table; the 377 row supplies client fields only.
+category=weapon_slash
+param=stabattack,10
+param=slashattack,16
+param=crushattack,-2
+param=slashdefence,3
+param=crushdefence,2
+param=magicdefence,2
+param=strengthbonus,13
+param=attackrate,5
+param=slashattack_anim,human_sword_slash
+param=stabattack_anim,human_sword_stab
+param=defend_anim,human_sword_def
+param=slash_sound,hacksword_slash
+param=stab_sound,hacksword_stab
+param=levelrequire,1
+param=specwep,^true
+param=sa_energy,500
+// CANDIDATE: the retained current OSRS Darklight infobox says untradeable.
+tradeable=no
+
+[agrith_sigil_mould]
+name=Demonic sigil mould
+desc=Used to make the sigil of the demon Agrith-Naar.
+cost=0
+model=obj_agrith_sigil_mould
+2dyan=880
+2dxan=212
+members=yes
+weight=1lb
+// UNKNOWN: quest-specific item; untradeable default where no period source establishes tradeability.
+tradeable=no
+
+[agrith_sigil]
+name=Demonic sigil
+desc=A sigil used for the summoning of the demon Agrith-Naar.
+cost=0
+model=obj_agrith_sigil
+manwear=obj_agrith_sigil_manwear,0
+womanwear=obj_agrith_sigil_manwear,6
+2dzoom=1340
+2dyan=684
+2dxan=344
+members=yes
+iop1=Chant
+weight=4lb
+// UNKNOWN: quest-specific item; untradeable default where no period source establishes tradeability.
+tradeable=no
+
+[agrith_book]
+name=Demonic tome
+desc=Will this book help in summoning Agrith-Naar?
+model=obj_agrith_book
+2dxof=2
+2dyof=4
+2dzoom=1090
+2dyan=1944
+2dxan=304
+members=yes
+cost=0
+iop1=Read
+weight=1kg
+weight=1lb
+// UNKNOWN: quest-specific item; untradeable default where no period source establishes tradeability.
+tradeable=no
+
+[agrith_desert_shirt_dyed]
+name=Black desert shirt
+desc=A desert shirt stained black with mushroom ink.
+recol1s=14724
+recol1d=4226
+model=obj_priest_gown
+2dyof=7
+2dzoom=1370
+2dxan=536
+cost=40
+iop2=Wear
+manwear=obj_priest_gown_manwear2,0
+womanwear=obj_priest_gown_womanwear2,0
+manwear2=obj_priest_gown_manwear
+womanwear2=obj_priest_gown_womanwear
+members=yes
+wearpos=torso
+wearpos2=arms
+weight=2lb
+// UNKNOWN: quest-specific clothing; untradeable default where no period source establishes tradeability.
+tradeable=no
+
+[cert_agrith_desert_shirt_dyed]
+certlink=agrith_desert_shirt_dyed
+certtemplate=template_for_cert
+// UNKNOWN: certificate form of a quest-specific item; untradeable default.
+tradeable=no
+
+[agrith_desert_robe_dyed]
+name=Black desert robe
+desc=A desert robe stained black with mushroom ink.
+recol1s=2340
+recol1d=4226
+model=obj_priest_robe
+2dyof=1
+2dzoom=1940
+2dxan=572
+cost=30
+iop2=Wear
+manwear=obj_priest_robe_manwear,0
+womanwear=obj_priest_robe_womanwear,0
+members=yes
+wearpos=legs
+weight=2lb
+// UNKNOWN: quest-specific clothing; untradeable default where no period source establishes tradeability.
+tradeable=no
+
+[cert_agrith_desert_robe_dyed]
+certlink=agrith_desert_robe_dyed
+certtemplate=template_for_cert
+// UNKNOWN: certificate form of a quest-specific item; untradeable default.
+tradeable=no

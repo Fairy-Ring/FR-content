@@ -33,14 +33,19 @@ if(%golem_a < ^golem_doors_open) {
     mes("You can't find any way to open the door.");
     return;
 }
+if (~agrith_portal_check = false) return;
 mes("You step into the portal.");
 p_arrivedelay;
-p_teleport(2_42_76_32_20);
+if (%agrith_quest >= 30 & %agrith_quest < ^agrith_complete) {
+    ~agrith_enter;
+} else {
+    p_teleport(2_42_76_32_20);
+}
 if(%golem_a = ^golem_doors_open) {
     %golem_a = ^golem_entered_portal;
     mes("This room is dominated by a colossal horned skeleton!");
 }
-@music_playbyregionplane(coord);
+@music_playbyregionplane(2_42_76_32_20);
 
 [oploc1,golem_demon_portal]
 mes("You step into the portal.");
@@ -106,6 +111,7 @@ inv_del(inv, golem_mushroom, 1);
 
 [opheldu,golem_mushroom]
 def_obj $used_with = inv_getobj(inv, last_useslot);
+if (~agrith_dye($used_with) = true) return;
 
 // Using with empty vial works in osrs as well, but not in rs3, assume it's a "QoL change" done for osrs at some point.
 if($used_with ! pestle_and_mortar) {

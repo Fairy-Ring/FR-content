@@ -61867,89 +61867,6 @@ hillskew=yes
 ambient=20
 contrast=40
 
-[agrith_kiln_1]
-width=2
-length=2
-active=yes
-multivar=agrith_quest
-multiloc=0,golem_kiln_smashed1
-multiloc=10,golem_kiln_smashed1
-multiloc=20,golem_kiln_smashed1
-multiloc=30,golem_kiln_smashed1
-multiloc=40,golem_kiln_smashed1
-multiloc=50,golem_kiln_smashed1
-multiloc=60,golem_kiln_smashed1_lookin
-multiloc=70,golem_kiln_smashed1
-multiloc=80,golem_kiln_smashed1
-multiloc=90,golem_kiln_smashed1
-multiloc=100,golem_kiln_smashed1
-multiloc=110,golem_kiln_smashed1
-multiloc=120,golem_kiln_smashed1
-multiloc=124,golem_kiln_smashed1
-multiloc=125,golem_kiln_smashed1
-
-[agrith_kiln_2]
-width=2
-length=2
-active=yes
-multivar=agrith_quest
-multiloc=0,golem_kiln_smashed2
-multiloc=10,golem_kiln_smashed2
-multiloc=20,golem_kiln_smashed2
-multiloc=30,golem_kiln_smashed2
-multiloc=40,golem_kiln_smashed2
-multiloc=50,golem_kiln_smashed2
-multiloc=60,golem_kiln_smashed2_lookin
-multiloc=70,golem_kiln_smashed2
-multiloc=80,golem_kiln_smashed2
-multiloc=90,golem_kiln_smashed2
-multiloc=100,golem_kiln_smashed2
-multiloc=110,golem_kiln_smashed2
-multiloc=120,golem_kiln_smashed2
-multiloc=124,golem_kiln_smashed2
-multiloc=125,golem_kiln_smashed2
-
-[agrith_kiln_3]
-width=2
-length=2
-active=yes
-multivar=agrith_quest
-multiloc=0,golem_kiln_smashed3
-multiloc=10,golem_kiln_smashed3
-multiloc=20,golem_kiln_smashed3
-multiloc=30,golem_kiln_smashed3
-multiloc=40,golem_kiln_smashed3
-multiloc=50,golem_kiln_smashed3
-multiloc=60,golem_kiln_smashed3_lookin
-multiloc=70,golem_kiln_smashed3
-multiloc=80,golem_kiln_smashed3
-multiloc=90,golem_kiln_smashed3
-multiloc=100,golem_kiln_smashed3
-multiloc=110,golem_kiln_smashed3
-multiloc=120,golem_kiln_smashed3
-multiloc=124,golem_kiln_smashed3
-multiloc=125,golem_kiln_smashed3
-
-[agrith_kiln_4]
-width=2
-length=2
-active=yes
-multivar=agrith_quest
-multiloc=0,golem_kiln_smashed3
-multiloc=10,golem_kiln_smashed3
-multiloc=20,golem_kiln_smashed3
-multiloc=30,golem_kiln_smashed3
-multiloc=40,golem_kiln_smashed3
-multiloc=50,golem_kiln_smashed3
-multiloc=60,golem_kiln_smashed3_lookin
-multiloc=70,golem_kiln_smashed3
-multiloc=80,golem_kiln_smashed3
-multiloc=90,golem_kiln_smashed3
-multiloc=100,golem_kiln_smashed3
-multiloc=110,golem_kiln_smashed3
-multiloc=120,golem_kiln_smashed3
-multiloc=124,golem_kiln_smashed3
-multiloc=125,golem_kiln_smashed3
 
 [golem_kiln_smashed1_lookin]
 name=Broken kiln
@@ -61975,15 +61892,6 @@ width=2
 length=2
 op1=Look-in
 
-[agrith_wizard_rubble]
-blockwalk=no
-width=2
-length=2
-active=yes
-multivar=agrith_quest
-multiloc=90,sez_agrith_rubble_wiz
-multiloc=100,sez_agrith_rubble_wiz
-multiloc=110,sez_agrith_rubble_wiz
 
 [sez_agrith_rubble_wiz]
 name=Eric
@@ -61995,18 +61903,6 @@ width=2
 length=2
 active=yes
 
-[agrith_portal_closing]
-name=Portal
-desc=It looks like the magic is failing!
-model=golem_demon_portal
-model2=golem_demon_portali2
-recol1s=12684
-recol1d=5285
-recol2s=10570
-recol2d=4228
-width=3
-anim=summon_portal_end
-op1=Enter
 
 [summon_floor_spotanim_loc]
 name=Magic circle
