@@ -1,20 +1,27 @@
-// The Lost Tribe — Sigmund (castle) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:The Lost Tribe minus overlay).
-// First write %lost_tribe_quest 0 -> 1. Chat + write only — no cellar dest,
-// no pickpocket loot, do not retouch lost_tribe_book.rs2 (already residual).
-// Review: Yes echoes the player line the plan names.
-// Cite red-19-start-impl-377.md §7.
-
+// VERIFIED prerequisites and quest offer: retained 2006-05-02 Tip.It q101.
+// UNKNOWN functional dialogue and witness encoding in original contact bits.
 [opnpc1,lost_tribe_sigmund_there]
-~chatnpc("<p,neutral>Can I help you?");
-~chatplayer("<p,neutral>Do you have any quests for me?");
-~chatnpc("<p,neutral>There was recently some damage to the castle cellar.");
-~chatnpc("<p,neutral>Part of the wall has collapsed.");
-def_int $go = ~p_choice2("So what do you need me to do?", 1, "Sorry, I'm not interested.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>Sorry, I'm not interested.");
+if (%lost_tribe_quest > 0) {
+    ~chatnpc("<p,neutral>Speak to the Duke about the disturbance in the cellar.");
     return;
 }
-~chatplayer("<p,quiz>So what do you need me to do?");
-~chatnpc("<p,neutral>You should ask people around the town about it.");
+if (%runemysteries ! ^runemysteries_complete | %goblinquest ! ^gobdip_complete | stat_base(mining) < 17 | stat_base(agility) < 13 | stat_base(thieving) < 13) {
+    ~chatnpc("<p,neutral>You need to complete Rune Mysteries and Goblin Diplomacy, and have 17 Mining, 13 Agility and 13 Thieving.");
+    return;
+}
+~chatnpc("<p,neutral>There was recently some damage to the castle cellar.");
+if (~p_choice2("So what do you need me to do?", 1, "Sorry, I'm not interested.", 2) = 2) return;
+~chatnpc("<p,neutral>You should ask people around the town about it, and report to Duke Horacio.");
+%lost_tribe_contact = random(4);
 %lost_tribe_quest = 1;
+~losttribe_progress;
+
+[opnpc3,lost_tribe_sigmund_there]
+if (%lost_tribe_quest = 0) return;
+if (stat(thieving) < 13) {
+    mes("You need a Thieving level of 13 to pick Sigmund's pocket.");
+    return;
+}
+// UNKNOWN favourable success rule: the period guide records no failed key theft.
+~losttribe_give(lost_tribe_chest_key);
+mes("You find a small key.");

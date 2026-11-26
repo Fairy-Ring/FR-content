@@ -1,0 +1,114 @@
+// VERIFIED beats/rewards: retained Tip.It q101 (2006-05-02).
+// UNKNOWN functional dialogue, intermediate writes and travel landing tiles.
+[proc,losttribe_bow]
+if (%lost_tribe_quest ! 7) return;
+if (npc_find(coord, lost_tribe_mistag, 5, 0) = true) {
+    %lost_tribe_contact = 1;
+    mes("Mistag recognises your goblin greeting.");
+}
+
+[opnpc1,lost_tribe_mistag]
+if (%lost_tribe_quest < 7 | (%lost_tribe_quest = 7 & %lost_tribe_contact = 0)) {
+    ~chatnpc("<p,neutral>You must greet me as a friend.");
+    return;
+}
+if (%lost_tribe_quest = 7) {
+    ~chatnpc("<p,neutral>We broke through the wall by accident. Please tell the ruler of the above-people that we mean no harm.");
+    %lost_tribe_quest = 8;
+    ~losttribe_progress;
+    return;
+}
+if (%lost_tribe_quest = 10) {
+    if (inv_total(inv, lost_tribe_treaty) = 0) {
+        ~chatnpc("<p,neutral>Bring the peace treaty from your Duke.");
+        return;
+    }
+    @losttribe_sign_treaty;
+}
+def_int $choice = ~p_choice3("Can you take me back to the entrance?", 1, "I'd like to sell some ore.", 2, "I found this brooch.", 3);
+if ($choice = 1) {
+    ~chatnpc("<p,neutral>Follow me.");
+    walktrigger(null);
+    p_teleport(0_50_150_30_10);
+} else if ($choice = 2) {
+    if (%lost_tribe_quest < ^lost_tribe_complete) {
+        ~chatnpc("<p,neutral>We must make peace before we can trade.");
+        return;
+    }
+    ~losttribe_sell_ore;
+} else if (inv_total(inv, lost_tribe_brooch) > 0 & %lost_tribe_returned_brooch = 0) {
+    ~chatnpc("<p,neutral>Thank you for returning our brooch. Take this mining helmet.");
+    inv_del(inv, lost_tribe_brooch, 1);
+    %lost_tribe_returned_brooch = 1;
+    ~losttribe_give(cave_goblin_mining_helmet_unlit);
+}
+
+[opnpc1,lost_tribe_guide_1op]
+~chatnpc("<p,neutral>I can guide you through the tunnels to Mistag.");
+if (~p_choice2("Yes, please.", 1, "No, thank you.", 2) = 2) return;
+walktrigger(null);
+p_teleport(0_51_150_53_15);
+
+[proc,losttribe_sell_ore]
+// CANDIDATE prices will be backed by the retained Old School Mistag source.
+def_int $iron = inv_total(inv, iron_ore);
+def_int $silver = inv_total(inv, silver_ore);
+def_int $price = add(multiply($iron, 13), multiply($silver, 60));
+if ($price = 0) {
+    ~chatnpc("<p,neutral>I buy iron and silver ore. You do not have any to sell.");
+    return;
+}
+~chatnpc("<p,neutral>I will pay <tostring($price)> coins for your iron and silver ore.");
+if (~p_choice2("Yes, please.", 1, "No, thank you.", 2) = 2) return;
+inv_del(inv, iron_ore, $iron);
+inv_del(inv, silver_ore, $silver);
+if (inv_total(inv, coins) > 0 | inv_freespace(inv) > 0) inv_add(inv, coins, $price);
+else obj_add(coord, coins, $price, ^lootdrop_duration);
+
+[label,losttribe_sign_treaty]
+// VERIFIED signing meeting and Sigmund's laughter. UNKNOWN scene composition.
+// Keep the treaty and stage until the scene ends so an interrupted scene is replayable.
+~chatnpc("<p,neutral>Let us meet your Duke and sign this treaty.");
+p_stopaction;
+walktrigger(losttribe_scene_cancel);
+npc_add(0_51_150_53_14, lost_tribe_cutscene_duke, 100);
+%npc_attacking_uid = uid;
+npc_facesquare(0_51_150_55_14);
+npc_add(0_51_150_55_14, lost_tribe_cutscene_urtag, 100);
+%npc_attacking_uid = uid;
+npc_facesquare(0_51_150_53_14);
+npc_add(0_51_150_56_17, lost_tribe_cutscene_sigmund, 100);
+%npc_attacking_uid = uid;
+cam_moveto(0_51_150_54_10, 400, 232, 232);
+cam_lookat(0_51_150_54_14, 100, 232, 232);
+~mesbox("Duke Horacio and Ur-tag sign the peace treaty between Lumbridge and the Dorgeshuun.");
+~chatnpc_specific("Duke Horacio", lost_tribe_cutscene_duke, "<p,neutral>There will be peace between our peoples.");
+~chatnpc_specific("Ur-tag", lost_tribe_cutscene_urtag, "<p,neutral>The Dorgeshuun welcome this peace.");
+~chatnpc_specific("Sigmund", lost_tribe_cutscene_sigmund, "<p,laugh>Ha ha ha!");
+~losttribe_scene_cleanup;
+walktrigger(null);
+if (%lost_tribe_quest ! 10 | inv_total(inv, lost_tribe_treaty) = 0) return;
+inv_del(inv, lost_tribe_treaty, 1);
+%lost_tribe_quest = ^lost_tribe_complete;
+stat_advance(mining, 30000);
+if (inv_freespace(inv) > 0) inv_add(inv, ring_of_life, 1);
+else obj_add(coord, ring_of_life, 1, ^lootdrop_duration);
+~send_quest_complete(questlist:lost_tribe, ring_of_life, 200, ^lost_tribe_questpoints, "You have completed The Lost Tribe!", "3,000 Mining XP|Ring of life|Access to the Dorgeshuun Mines|Goblin Bow and Goblin Dance");
+
+[opnpc1,lost_tribe_sigmund_ham_there]
+~chatnpc("<p,angry>Leave me alone!");
+
+[walktrigger,losttribe_scene_cancel]
+~losttribe_scene_cleanup;
+walktrigger(null);
+
+[proc,losttribe_scene_cleanup]
+cam_reset;
+npc_findallany(0_51_150_55_15, 8, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) {
+        switch_npc (npc_type) {
+            case lost_tribe_cutscene_duke, lost_tribe_cutscene_urtag, lost_tribe_cutscene_sigmund : npc_del;
+        }
+    }
+}

@@ -1,5 +1,83 @@
-// Both placed parents select this original child at stages 4-11.
-// The earned cellar/maze route belongs to the unfinished Lost Tribe unit.
-// Keep the visible op, but no mine teleport, progress or invented refusal.
+// VERIFIED route and pickaxe breach: retained Tip.It q101 (2006-05-02).
+// UNKNOWN engineering landing tiles, checked against the original packed map.
+[oplocu,lost_tribe_cellar_hole_blocking]
+if (%lost_tribe_quest ! 3) {
+    mes("You should speak to Duke Horacio first.");
+    return;
+}
+if (~pickaxe_checker = null | oc_category(last_useitem) ! weapon_pickaxe) {
+    mes("You need a pickaxe to clear the rubble.");
+    return;
+}
+anim(oc_param(last_useitem, mining_animation), 0);
+%lost_tribe_quest = 4;
+~losttribe_progress;
+mes("You clear the rubble from the hole.");
+
 [oploc1,lost_tribe_cavewall_hole_walldecor]
-return;
+if (coordx(coord) < 3220) {
+    if (~swamp_cave_light = 0 | (inv_total(inv, tinderbox) = 0 & inv_total(inv, cave_goblin_mining_helmet_lit) = 0 & inv_total(worn, cave_goblin_mining_helmet_lit) = 0)) {
+        // UNKNOWN favourable entry safeguard; the period guide lists both items.
+        mes("Bring a lit light source and a tinderbox before entering the tunnels.");
+        return;
+    }
+    p_teleport(0_50_150_22_18);
+    walktrigger(losttribe_maze_step);
+} else {
+    p_teleport(0_50_150_18_18);
+    walktrigger(null);
+}
+
+[oplocu,lost_tribe_hole_2] @losttribe_dig_swamp;
+[oplocu,goblin_cavewall_anotherhole_filler] @losttribe_dig_swamp;
+
+[oplocu,goblin_cavewall_anotherhole2]
+@losttribe_dig_swamp;
+
+[label,losttribe_dig_swamp]
+if (%lost_tribe_quest < 4) {
+    mes("You should investigate the castle cellar first.");
+    return;
+}
+if (~pickaxe_checker = null | oc_category(last_useitem) ! weapon_pickaxe) {
+    mes("You need a pickaxe to clear the rubble.");
+    return;
+}
+%lost_tribe_hole_2_dug = 1;
+mes("You clear the passage to the swamp caves.");
+
+[oploc1,lost_tribe_hole_2]
+if (%lost_tribe_hole_2_dug = 0) {
+    mes("The passage is blocked by rubble.");
+    return;
+}
+@losttribe_swamp_passage;
+
+[oploc1,goblin_cavewall_anotherhole1]
+@losttribe_swamp_passage;
+
+[label,losttribe_swamp_passage]
+if (coordz(coord) >= 9602) {
+    p_teleport(0_50_149_24_63);
+    walktrigger(null);
+    ~swamp_cave_start;
+} else {
+    p_teleport(0_50_150_24_4);
+    walktrigger(losttribe_maze_step);
+    ~swamp_cave_exit;
+}
+
+// VERIFIED wrong turns lead to the Lumbridge Slayer Caves (Tip.It q101).
+// UNKNOWN trap detection footprint and safe recovery tile; no invented damage.
+[walktrigger,losttribe_maze_step]
+if (coordz(coord) < 9600 | coordz(coord) > 9663 | coordx(coord) < 3220 | coordx(coord) > 3327) {
+    walktrigger(null);
+    return;
+}
+if (loc_find(coord, lost_tribe_trap_floor) = true | loc_find(coord, lost_tribe_trap_ceiling) = true | loc_find(coord, lost_tribe_trap_pass) = true) {
+    p_stopaction;
+    walktrigger(null);
+    p_teleport(0_50_149_24_63);
+    ~swamp_cave_start;
+    mes("You lose your way and emerge in the swamp caves.");
+}

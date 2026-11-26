@@ -1,0 +1,42 @@
+// VERIFIED: retained 2006-05-02 Tip.It q101, H.A.M. chest and silverware crate.
+// UNKNOWN functional messages and favourable lost-shirt replacement policy.
+[oploc1,lost_tribe_chest]
+@losttribe_open_chest;
+
+[oplocu,lost_tribe_chest]
+if (last_useitem ! lost_tribe_chest_key) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@losttribe_open_chest;
+
+[label,losttribe_open_chest]
+if (%lost_tribe_quest = 0 | %lost_tribe_quest >= 10) {
+    mes("The chest is locked.");
+    return;
+}
+if (inv_total(inv, lost_tribe_chest_key) = 0) {
+    mes("You need the key to this chest.");
+    return;
+}
+if (%lost_tribe_ham = 0) {
+    %lost_tribe_ham = 1;
+    ~losttribe_give(ham_hood);
+    ~losttribe_give(ham_shirt);
+    ~losttribe_give(ham_robe);
+    ~losttribe_give(ham_cloak);
+    ~losttribe_give(ham_badge);
+    ~losttribe_give(ham_gloves);
+    ~losttribe_give(ham_boots);
+} else if (%lost_tribe_sigmund_accused = 0) {
+    ~losttribe_give(ham_shirt);
+}
+mes("You find H.A.M. robes in Sigmund's chest.");
+
+[oploc1,lost_tribe_crate]
+if (%lost_tribe_quest ! 9 | %lost_tribe_sigmund_accused = 0) {
+    mes("You find nothing of interest.");
+    return;
+}
+~losttribe_give(lost_tribe_silverware);
+mes("You find the stolen silverware.");
