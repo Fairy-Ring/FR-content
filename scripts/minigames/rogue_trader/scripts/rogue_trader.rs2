@@ -156,11 +156,11 @@ mes("You hear the locking mechanism click open!");
 if (%feud_var < ^feud_complete | %runemysteries ! ^runemysteries_complete | %roguetrader_runes < 3) return;
 if ($large = 0 & %roguetrader_justobt_runes = 1) {
     %roguetrader_stallvar = 1;
-    ~openshop(roguetrader_alim_runeretail_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, 0, "Ali's Discount Wares.");
+    ~openshop(roguetrader_alim_runeretail_inv, ^roguetrader_shop_buy, ^roguetrader_rune_shop_sell, 0, "Ali's Discount Wares.");
 }
 if ($large = 1 & %roguetrader_runes = 4) {
     %roguetrader_stallvar = 4;
-    ~openshop(roguetrader_alim_runewholesale_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, 0, "Ali's Discount Wares.");
+    ~openshop(roguetrader_alim_runewholesale_inv, ^roguetrader_shop_buy, ^roguetrader_rune_shop_sell, 0, "Ali's Discount Wares.");
 }
 
 [proc,roguetrader_casket_fail](int $method)

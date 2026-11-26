@@ -12,12 +12,14 @@
 // VERIFIED: Tip.It, 15 April 2006, urchin payment and matching supply count.
 ^roguetrader_urchin_price = 100
 ^roguetrader_supply_count = 3
-// UNKNOWN engineering prices: ordinary Morrisane shop multipliers, no new currency.
+// UNKNOWN engineering buy factor, clothes/blackjack sell factor and stock delta.
 ^roguetrader_shop_buy = 550
 ^roguetrader_shop_sell = 1000
 ^roguetrader_shop_delta = 10
-// UNKNOWN engineering casket bundles and discounts; no total offer survives in the guide.
+// UNKNOWN engineering casket bundles and unseen discount; no exact offer survives.
 ^roguetrader_small_bundle = 20
 ^roguetrader_large_bundle = 25
 ^roguetrader_unseen_percent = 90
-^roguetrader_inspect_sell = 950
+// VERIFIED: Tip.It, 15 April 2006, lower bound of the 105%-110% rune-price range.
+// Blood/Body/Chaos/Death/Law/Nature/Soul/elementals; Cosmic is a documented conflict.
+^roguetrader_rune_shop_sell = 1050

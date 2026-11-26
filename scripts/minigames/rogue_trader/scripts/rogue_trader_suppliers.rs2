@@ -27,7 +27,6 @@ if ($choice = 1) {
     def_namedobj $pelt = null;
     if (inv_total(inv, cow_hide) >= ^roguetrader_supply_count) $pelt = cow_hide;
     else if (inv_total(inv, grey_wolf_fur) >= ^roguetrader_supply_count) $pelt = grey_wolf_fur;
-    else if (inv_total(inv, village_snake_skin) >= ^roguetrader_supply_count) $pelt = village_snake_skin;
     else if (inv_total(inv, fur) >= ^roguetrader_supply_count) $pelt = fur;
     else if (inv_total(inv, wool) >= ^roguetrader_supply_count) $pelt = wool;
     if ($pelt = null) {

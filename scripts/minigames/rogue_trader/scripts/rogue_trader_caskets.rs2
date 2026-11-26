@@ -1,5 +1,5 @@
 // VERIFIED offer shape: Tip.It Rogue Trader, capture 15 April 2006.
-// UNKNOWN bundle quantities and discount factors: favourable engineering values.
+// UNKNOWN bundle quantities and unseen bulk discount: favourable engineering values.
 // Every offer is private and can be declined without losing the permanent stock unlock.
 [proc,roguetrader_casket_opened](int $large)
 ~roguetrader_completion;
@@ -37,7 +37,7 @@ $price = max(1, calc($price * ^roguetrader_unseen_percent / 100));
 def_int $choice = ~p_choice3("Buy all the runes for <tostring($price)> coins.", 1, "Let me see the runes first.", 2, "Not now.", 3);
 if ($choice = 3) return;
 if ($choice = 2) {
-    ~openshop(roguetrader_alim_runedump, ^roguetrader_shop_buy, ^roguetrader_inspect_sell, 0, "Ali's Discount Wares.");
+    ~openshop(roguetrader_alim_runedump, ^roguetrader_shop_buy, ^roguetrader_rune_shop_sell, 0, "Ali's Discount Wares.");
     return;
 }
 if (inv_total(inv, coins) < $price) {

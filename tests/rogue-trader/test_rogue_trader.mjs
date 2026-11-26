@@ -32,7 +32,7 @@ function random(values, action) {
   try { const result = action(); assert.equal(rolls.length, 0, 'each expected roll executes'); return result; }
   finally { JavaRandom.nextDouble = previous; }
 }
-function buy(p, name, expectedShop) {
+function buy(p, name, expectedShop, expectedPrice, close = true) {
   assert.equal(p.modalMain, id('Component', 'shop_template'), 'real shop interface opens');
   assert.equal(value(p, 'shop'), id('InvType', expectedShop));
   const com = id('Component', 'shop_template:inv');
@@ -46,7 +46,8 @@ function buy(p, name, expectedShop) {
   assert.equal(count(p, name), before.count + 1);
   assert.equal(stock.getItemCount(obj(name)), before.stock - 1);
   assert(count(p, 'coins') < before.coins, 'stock is purchased, not granted');
-  p.closeModal();
+  if (expectedPrice !== undefined) assert.equal(before.coins - count(p, 'coins'), expectedPrice, `${name}: native Buy 1 charges the expected unit price`);
+  if (close) p.closeModal();
 }
 
 test('pre-Feud Morrisane stays on the existing wares route and all unlocks remain gated', () => {
@@ -82,6 +83,11 @@ test('Siamun accepts only three matching unnoted supplies and both clothes shops
   p.invAdd(inv, obj('cert_cow_hide'), 3);
   talk(p, 'ics_little_linen2', [2]);
   assert.equal(rt(p, 'clothes'), 1, 'bank notes do not satisfy pelts');
+  p.invAdd(inv, obj('village_snake_skin'), 3);
+  const withSnakeskin = inventory(p);
+  talk(p, 'ics_little_linen2', [2]);
+  assert.deepEqual(inventory(p), withSnakeskin, 'snakeskin is outside the retained period pelt list');
+  assert.equal(rt(p, 'clothes'), 1);
   p.invAdd(inv, obj('cow_hide'), 3);
   talk(p, 'ics_little_linen2', [2]);
   assert.equal(count(p, 'cow_hide'), 0); assert.equal(count(p, 'cert_cow_hide'), 3);
@@ -409,4 +415,31 @@ test('simultaneous puzzles and selectors belong to their own player', () => {
   assert.equal(board(second, true)[secondSlot], 7, 'closing one board cannot clear the other');
   assert.equal(rt(second, 'playing_sudoku'), 1);
   assert(button(second, 'inter_295:com_10'));
+});
+
+test('permanent rune shops and inspected caskets use the period 105 percent price bound, with the unchanged Cosmic exception', () => {
+  const p = runeOrder();
+  assert.equal(types.ObjType.get(obj('cosmicrune')).cost, 50, 'the cached Cosmic value is not changed to fit the guide anomaly');
+  const smallPrices = elemental.map(name => [name, 4]);
+  const largePrices = [
+    ['naturerune', 189], ['lawrune', 252], ['chaosrune', 94], ['deathrune', 189],
+    ['mindrune', 3], ['bodyrune', 3], ['bloodrune', 420], ['cosmicrune', 52], ['soulrune', 315]
+  ];
+  function checkPrices(stock, prices) {
+    for (const [name, price] of prices) {
+      assert.equal(Math.trunc(types.ObjType.get(obj(name)).cost * 105 / 100), price, `${name}: 105 percent of unchanged cache cost`);
+      buy(p, name, stock, price, false);
+    }
+    p.closeModal();
+  }
+  random([0, 0], () => ali(p, [5, 1, 1, 2]));
+  checkPrices('roguetrader_alim_runedump', smallPrices);
+  ali(p, [5, 3, 1]);
+  checkPrices('roguetrader_alim_runeretail_inv', smallPrices);
+  const clues = openPuzzle(p, true);
+  fillPuzzle(p, true, clues, solveBoard(clues, 9));
+  submit(p, true, [2]);
+  checkPrices('roguetrader_alim_runedump', largePrices);
+  ali(p, [5, 3, 2]);
+  checkPrices('roguetrader_alim_runewholesale_inv', largePrices);
 });
