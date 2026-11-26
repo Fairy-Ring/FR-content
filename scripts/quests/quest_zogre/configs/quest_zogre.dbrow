@@ -1,0 +1,7 @@
+// UNKNOWN: historical sources give no comp-bow stringing level or XP; use the parent-owned named UNKNOWN constants.
+[stringing_zogre_comp_bow]
+table=fletching_table
+data=item,unstrung_zogre_bow
+data=product,zogre_bow,1
+data=level,^zogre_comp_string_level
+data=experience,^zogre_comp_string_xp

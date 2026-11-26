@@ -1,0 +1,11 @@
+// VERIFIED: src.quest-registry-tipit-qp-100 (Tip.It guide 100, captured 2006-05-02) lists achey wood, bowstrings and Relicym's balm at Uglug Nar's shop; a 4-dose balm sale unlocks lower prices.
+// UNKNOWN: the 377 shop stock counts and inventory settings are not given; 10 initial/base stock per item and a shared restocking inventory are favourable engineering defaults.
+[uglug_nar_shop]
+scope=shared
+size=40
+restock=yes
+stackall=yes
+allstock=no
+stock1=achey_tree_logs,10,10
+stock2=bow_string,10,10
+stock3=relicyms_balm4,10,10
