@@ -89,6 +89,7 @@ if (%elenaquest >= ^quest_elena_freed_elena) %plaguecity_elena_at_home = 1;
 
 // A fresh login cannot retain the session timers for saved Smoke torch bits.
 if (%fd_torch_count1 ! 0 | %fd_torch_count2 ! 0 | %fd_torch_count3 ! 0 | %fd_torch_count4 ! 0) ~dt_smoke_logout;
+if (%deserttreasure >= ^dt_stage_hunts & %deserttreasure < ^dt_stage_complete) ~dt_stranger_login;
 
 if(inzone(movecoord(^grandtree_jail_coord, 0, 0, -2), movecoord(^grandtree_jail_coord, 3, 0, 2), coord) = true) {
     ~grandtree_spawn_charlie;

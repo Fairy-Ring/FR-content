@@ -13,6 +13,7 @@ if (%darkness_level ! 0) ~swamp_cave_release;
 ~pest_logout;
 ~barrows_logout;
 if (%deserttreasure >= ^dt_stage_hunts) ~dt_smoke_logout;
+if (%dt_stranger_uid ! null) ~dt_stranger_logout;
 ~farming_logout;
 ~feud_trial_release;
 ~fightcaves_logout;
