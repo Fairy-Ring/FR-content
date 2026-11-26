@@ -1,0 +1,6 @@
+// UNKNOWN engineering interval for the specially imported, fertile palace soil.
+// The existing shared Farming clock also reconciles these stages after logout.
+[garden_growth]
+table=farming_growth
+data=period,5
+data=handler,15
