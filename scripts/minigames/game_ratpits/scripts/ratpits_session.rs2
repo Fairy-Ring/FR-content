@@ -318,8 +318,11 @@ if (npc_finduid(%varp283_unused) = true) {
 
 [proc,ratpits_login]
 %varp283_unused = null;
+// Inventory reads materialize a container. Only venue login needs recovery;
+// retained credit outside a venue remains claimable from its pit host.
+if (~ratpits_venue(coord) = 0) return;
 ~ratpits_claim;
-if (~ratpits_venue(coord) ! 0) set_player_op("Challenge", 1, ^false);
+set_player_op("Challenge", 1, ^false);
 
 [softtimer,ratpits_result_close]
 clearsofttimer(ratpits_result_close);

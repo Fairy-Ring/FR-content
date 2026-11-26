@@ -1,5 +1,6 @@
 // Rat Pits runtime coverage uses compiled scripts, actual venue NPCs and packed collision only.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   World, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType as T,
   types, map, nativeNpcRows, nativeLocRows, id, obj, inv, worn, bank, v, b,
@@ -608,6 +609,23 @@ for (const spec of venues) {
   tickHost(repeat);
   assert.equal(npcValue(repeat, 'ratpits_phase'), 0, `venue ${spec.id} resets for an immediate rematch`);
 }
+
+// Ordinary global lifecycle callbacks must not materialize a Rat Pits purse,
+// even for a completed Rat Catchers account that has never entered a pit.
+for (const questStage of [0, completeStage]) {
+  const p = player({ cat: null });
+  p.setVarBit(stageVar, questStage);
+  assert.equal(p.invs.has(purse), false);
+  run(p, '[login,_]');
+  assert.equal(p.invs.has(purse), false, 'ordinary login does not allocate an empty purse');
+  run(p, '[logout,_]');
+  assert.equal(p.invs.has(purse), false, 'ordinary logout does not allocate an empty purse');
+}
+assert.doesNotMatch(
+  readFileSync(new URL('../../scripts/minigames/game_ratpits/configs/ratpits_377.npc', import.meta.url), 'utf8'),
+  /^(?:wanderrange|maxrange|defaultmode|timer|blockwalk)=/m,
+  'moved native NPCs retain their original movement, collision and idle world-tick RNG behavior'
+);
 
 console.log('Rat Pits: four authentic venues, admission, escrow, tactics, combat, recovery and repeatable settlement passed');
 process.exit(0);
