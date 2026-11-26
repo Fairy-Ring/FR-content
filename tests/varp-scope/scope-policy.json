@@ -2,6 +2,8 @@
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
     "farming_state_temp_3": "UNKNOWN engineering storage: original word 529 bits 8..15 hold four durable bush soil treatments. Retain those preparations across logout and offline crop growth while preserving the original low-byte varbit.",
+    "giantdwarf_company_work": "UNKNOWN engineering storage: original slot 250 keeps accepted company orders and completed work across logout; only the online deadline queue is discarded.",
+    "giantdwarf_statue_work": "UNKNOWN engineering storage: original slot 249 keeps book, machine, boots and axe work across logout without transmitting new client state.",
     "macro_event_origin_coord": "U01 lifecycle departure O reuses unused original slot 59; no client reader or varbit base. Kept separately from intended destination D across reconnect."
   },
   "inheritedPermanent": [
@@ -600,7 +602,9 @@
     "garden_varp_1": "perm",
     "garden_varp_2": "temp",
     "ghast_delay": "temp",
+    "giantdwarf_company_work": "perm",
     "giantdwarf_main": "perm",
+    "giantdwarf_statue_work": "perm",
     "gnome_bar_progress": "perm",
     "gnome_batta_bits1": "temp",
     "gnome_batta_bits2": "temp",
@@ -976,8 +980,6 @@
     "varp246_unused": "temp",
     "varp247_unused": "temp",
     "varp248_unused": "temp",
-    "varp249_unused": "temp",
-    "varp250_unused": "temp",
     "varp251_unused": "temp",
     "varp252_unused": "temp",
     "varp271_unused": "temp",
