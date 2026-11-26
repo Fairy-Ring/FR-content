@@ -1,4 +1,5 @@
 [opnpc1,elena2_vis]
+if (%biohazard = ^biohazard_complete & %mourning_quest >= ^mep1_toxin_task & %mourning_quest <= ^mep1_food_poisoned) @mep1_elena;
 switch_int(%biohazard) { // ^biohazard_used_birdfeed intentionally has no dialogue!
     case ^biohazard_complete :
         ~chatplayer("<p,happy>Hello Elena.");
