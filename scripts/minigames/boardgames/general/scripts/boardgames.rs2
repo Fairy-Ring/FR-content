@@ -47,6 +47,13 @@ if(.%duel2accept = uid) {
 %boardgames_varbit = 0;
 %boardgames_varbit2 = 0;
 
+[proc,.reset_boardgames_varp]
+.%boardgames_varbit = 0;
+.%boardgames_varbit2 = 0;
+
+[queue,boardgames_restore_tabs]
+if (%boardgames_ingame = 0) ~initalltabs;
+
 [proc,boardgames_hide_tabs]
 if_settab(null, 0);
 if_settab(null, 1);
@@ -72,11 +79,30 @@ if (.p_finduid(.uid) = true) {
 }
 
 [mapzone,0_34_77]
-set_player_op("Challenge", 1, ^false);
+~boardgames_enter;
 @music_playbyregion(coord);
 
+[proc,boardgames_enter]
+// CANDIDATE: Lost City 289 and the Games Room rank system start at 1000.
+if (%boardgames_draughts_rank < 1) %boardgames_draughts_rank = 1000;
+if (%boardgames_runelink_rank < 1) %boardgames_runelink_rank = 1000;
+if (%boardgames_runesquares_rank < 1) %boardgames_runesquares_rank = 1000;
+if (%boardgames_runeversi_rank < 1) %boardgames_runeversi_rank = 1000;
+set_player_op("Challenge", 1, ^false);
+
 [mapzoneexit,0_34_77]
-~reset_boardgames_varp;
+~boardgames_leave;
+
+[proc,boardgames_leave]
+if (~in_games_room(coord) = true) return;
+// Preserve the destination of an external teleport after session cleanup.
+def_coord $destination = coord;
+if (%boardgames_ingame = 1) {
+    ~boardgames_logout;
+} else {
+    ~reset_boardgames_varp;
+}
+if (coord ! $destination) p_teleport($destination);
 set_player_op(null, 1, ^false);
 
 [proc,in_games_room](coord $coord)(boolean)
@@ -248,25 +274,23 @@ if (%boardgames_myturn = 0) {
 }
 
 [proc,boardgames_table_setup]
-def_int $current_table = ~find_next_boardgames_table;
+// The original unsigned seven-bit field represents failure as 127, not -1.
+%boardgames_tablenum = 127;
+if (~boardgames_admission_ready = false) return;
+if (.p_finduid(%duel2accept) = false) return;
 
-if($current_table = -1) {
-    //There's probably a mes for this? Guess
+%boardgames_challengeroom = 0;
+.%boardgames_challengeroom = 0;
+if (~boardgames_in_experienced_challenge_room = true) {
+    %boardgames_challengeroom = 1;
+    .%boardgames_challengeroom = 1;
+}
+def_int $current_table = ~find_next_boardgames_table;
+if ($current_table = -1) {
     mes("All tables are currently full!");
     return;
 }
-
-def_int $quadrant = divide($current_table, 16);
-def_int $local_table = modulo($current_table, 16);
-
-if(loc_find(~get_boardgames_table_coord($current_table), boardgames_table) = false) {
-    return;
-}
-
-if (.p_finduid(%duel2accept) = false) {
-    mes("That player is no longer available.");
-    return;
-}
+if (loc_find(~get_boardgames_table_coord($current_table), boardgames_table) = false) return;
 
 %boardgames_tablenum = $current_table;
 .%boardgames_tablenum = $current_table;
@@ -317,10 +341,8 @@ if(loc_find(.coord, boardgames_barstool_white) = true) {
 anim(human_sittingdown_ready, 0);
 .anim(human_sittingdown_ready, 0);
 
-//Todo: Figure out the exact seating order
-//Figure out how the tables upstairs work.. if you challenge from inside the experienced zone?
-//Challenging upstairs in the general area just teleports you back to table 0 downstairs.
 [proc,get_boardgames_table_coord](int $tablenum)(coord)
+if ($tablenum >= 48) return (~get_boardgames_table_coord_upstairs($tablenum));
 def_int $x = 0;
 def_int $z = 0;
 def_int $quadrant = divide($tablenum, 12);
@@ -336,9 +358,9 @@ if ($local_table < 4) {
     $col = 3;
 } else if ($local_table < 10) {
     $row = 3;
-    $col = modulo($local_table, 9);
+    $col = sub(9, $local_table);
 } else {
-    $row = modulo($local_table, 12);
+    $row = sub(12, $local_table);
     $col = 0;
 }
 
@@ -373,9 +395,34 @@ if($quadrant = 1) {
 
 return (movecoord(0_34_77_0_0, $x, 0, $z));
 
+// CANDIDATE: Lost City 289 table order; coordinates verified against map 34_77.
+[proc,get_boardgames_table_coord_upstairs](int $tablenum)(coord)
+def_int $local_table = modulo(sub($tablenum, 48), 12);
+def_int $quadrant = divide(sub($tablenum, 48), 12);
+def_int $x = 0;
+def_int $z = 0;
+switch_int ($local_table) {
+    case 0 : $x = 18; $z = 29;
+    case 1 : $x = 19; $z = 19;
+    case 2 : $x = 20; $z = 24;
+    case 3 : $x = 20; $z = 26;
+    case 4 : $x = 20; $z = 29;
+    case 5 : $x = 21; $z = 21;
+    case 6 : $x = 22; $z = 29;
+    case 7 : $x = 24; $z = 20;
+    case 8 : $x = 26; $z = 20;
+    case 9 : $x = 29; $z = 18;
+    case 10 : $x = 29; $z = 20;
+    case 11 : $x = 29; $z = 22;
+}
+if ($quadrant = 1 | $quadrant = 2) $x = sub(63, $x);
+if ($quadrant = 2 | $quadrant = 3) $z = sub(63, $z);
+return (movecoord(1_34_77_0_0, $x, 0, $z));
+
 [proc,find_next_boardgames_table]()(int)
-def_int $i = 0;
-while ($i < 48) {
+def_int $i = multiply(%boardgames_challengeroom, 48);
+def_int $max = add($i, 48);
+while ($i < $max) {
     def_coord $check_coord = ~get_boardgames_table_coord($i);
     if (loc_find($check_coord, boardgames_table) = true) {
             return ($i);
@@ -407,3 +454,62 @@ mes("This door is locked.");
 //From rs3, no longer has op in osrs
 [oploc1,boardgames_noticeboard]
 ~mesbox("No running with scissors!");
+
+[proc,boardgames_numeric_rank]()(int)
+switch_int (%boardgames_game) {
+    case 0 : return (%boardgames_draughts_rank);
+    case 1 : return (%boardgames_runelink_rank);
+    case 2 : return (%boardgames_runesquares_rank);
+    case 3 : return (%boardgames_runeversi_rank);
+}
+
+[proc,.boardgames_numeric_rank]()(int)
+switch_int (.%boardgames_game) {
+    case 0 : return (.%boardgames_draughts_rank);
+    case 1 : return (.%boardgames_runelink_rank);
+    case 2 : return (.%boardgames_runesquares_rank);
+    case 3 : return (.%boardgames_runeversi_rank);
+}
+
+[proc,boardgames_in_experienced_challenge_room]()(boolean)
+// CANDIDATE: Lost City 289 selects the rank-room zone, not the public level-one lobby.
+switch_int (%boardgames_game) {
+    case 0 : return (inzone(1_34_77_16_8, 1_34_77_23_15, coord));
+    case 1 : return (inzone(1_34_77_40_8, 1_34_77_47_15, coord));
+    case 2 : return (inzone(1_34_77_8_16, 1_34_77_15_23, coord));
+    case 3 : return (inzone(1_34_77_48_16, 1_34_77_55_23, coord));
+}
+
+[proc,boardgames_admission_ready]()(boolean)
+if (.p_finduid(%duel2accept) = false) return (false);
+if (.%duel2accept ! uid | %boardgames_ingame = 1 | .%boardgames_ingame = 1) return (false);
+if (~in_games_room(coord) = false | ~in_games_room(.coord) = false) return (false);
+if (%boardgames_game ! .%boardgames_game | %boardgames_piece = .%boardgames_piece) return (false);
+if (coordy(coord) ! coordy(.coord)) return (false);
+if (~boardgames_in_experienced_challenge_room = true) {
+    // CANDIDATE: require the relevant game's experienced-room rank on both sides.
+    if (~boardgames_numeric_rank < 1500 | ~.boardgames_numeric_rank < 1500) return (false);
+}
+return (true);
+
+[proc,boardgames_release_table]
+def_coord $table = ~get_boardgames_table_coord(%boardgames_tablenum);
+if (loc_find($table, ~get_boardgames_table) = true) loc_change(~get_boardgames_table, 1);
+// Restore both original stools even when a player has already teleported away.
+def_int $x = -1;
+while ($x <= 1) {
+    def_int $z = -1;
+    while ($z <= 1) {
+        if (loc_find(movecoord($table, $x, 0, $z), boardgames_barstool_invis) = true) loc_change(boardgames_barstool_invis, 1);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+
+[proc,boardgames_logout]
+// Legacy games retain their existing modal-close queues and settlement.
+if (%boardgames_ingame ! 1) return;
+switch_int (%boardgames_game) {
+    case 2 : ~runesquares_disconnect;
+    case 3 : ~runeversi_disconnect;
+}

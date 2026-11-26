@@ -1,0 +1,32 @@
+// UNKNOWN engineering protection policy: match the working RuneLink/Draughts
+// multiplayer fields. A player's open board prevents protected foreign access.
+// Original transmitted fields, ids and rank persistence are unchanged.
+[boardgames_runesquares_va]
+protect=no
+transmit=yes
+scope=temp
+
+[boardgames_runesquares_vb]
+protect=no
+transmit=yes
+scope=temp
+
+[boardgames_runesquares_ha]
+protect=no
+transmit=yes
+scope=temp
+
+[boardgames_runesquares_hb]
+protect=no
+transmit=yes
+scope=temp
+
+[boardgames_runesquares_rank]
+protect=no
+transmit=yes
+scope=perm
+
+[boardgames_runeversi_rank]
+protect=no
+transmit=yes
+scope=perm

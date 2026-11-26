@@ -1,0 +1,1034 @@
+// CANDIDATE: Reversi uses an 8x8 board; a legal placement brackets and flips
+// opponent pieces in any of the eight directions. The early-OSRS rules support
+// majority scoring and passing when the next player has no legal placement.
+
+// Each original selection component has an independent button event.
+[if_button,boardgames_runeversi_options:com_81]
+~set_boardgames_timepermove(0);
+[if_button,boardgames_runeversi_options:com_84]
+~set_boardgames_timepermove(0);
+[if_button,boardgames_runeversi_options:com_77]
+~set_boardgames_timepermove(1);
+[if_button,boardgames_runeversi_options:com_76]
+~set_boardgames_timepermove(1);
+[if_button,boardgames_runeversi_options:com_79]
+~set_boardgames_timepermove(2);
+[if_button,boardgames_runeversi_options:com_82]
+~set_boardgames_timepermove(2);
+[if_button,boardgames_runeversi_options:com_80]
+~set_boardgames_timepermove(3);
+[if_button,boardgames_runeversi_options:com_83]
+~set_boardgames_timepermove(3);
+
+[if_button,boardgames_runeversi_options:com_87]
+~set_boardgames_piece(1);
+[if_button,boardgames_runeversi_options:com_88]
+~set_boardgames_piece(1);
+[if_button,boardgames_runeversi_options:com_101]
+~set_boardgames_piece(2);
+[if_button,boardgames_runeversi_options:com_90]
+~set_boardgames_piece(2);
+[if_button,boardgames_runeversi_options:com_102]
+~set_boardgames_piece(3);
+[if_button,boardgames_runeversi_options:com_91]
+~set_boardgames_piece(3);
+[if_button,boardgames_runeversi_options:com_103]
+~set_boardgames_piece(4);
+[if_button,boardgames_runeversi_options:com_92]
+~set_boardgames_piece(4);
+[if_button,boardgames_runeversi_options:com_104]
+~set_boardgames_piece(5);
+[if_button,boardgames_runeversi_options:com_93]
+~set_boardgames_piece(5);
+[if_button,boardgames_runeversi_options:com_105]
+~set_boardgames_piece(6);
+[if_button,boardgames_runeversi_options:com_94]
+~set_boardgames_piece(6);
+[if_button,boardgames_runeversi_options:com_106]
+~set_boardgames_piece(7);
+[if_button,boardgames_runeversi_options:com_95]
+~set_boardgames_piece(7);
+[if_button,boardgames_runeversi_options:com_107]
+~set_boardgames_piece(8);
+[if_button,boardgames_runeversi_options:com_96]
+~set_boardgames_piece(8);
+[if_button,boardgames_runeversi_options:com_108]
+~set_boardgames_piece(9);
+[if_button,boardgames_runeversi_options:com_97]
+~set_boardgames_piece(9);
+[if_button,boardgames_runeversi_options:com_109]
+~set_boardgames_piece(10);
+[if_button,boardgames_runeversi_options:com_98]
+~set_boardgames_piece(10);
+[if_button,boardgames_runeversi_options:com_110]
+~set_boardgames_piece(11);
+[if_button,boardgames_runeversi_options:com_99]
+~set_boardgames_piece(11);
+[if_button,boardgames_runeversi_options:com_111]
+~set_boardgames_piece(12);
+[if_button,boardgames_runeversi_options:com_100]
+~set_boardgames_piece(12);
+
+[if_button,boardgames_runeversi_options:com_113]
+~toggle_boardgames_ranked;
+[if_button,boardgames_runeversi_options:com_112]
+~toggle_boardgames_ranked;
+
+
+[if_button,boardgames_runeversi_options:com_67]
+%boardgames_closinginterface = 1;
+if_close;
+if (.finduid(%duel2accept) = false) {
+    ~runeversi_cancel_challenge;
+    mes("That player is no longer available.");
+    return;
+}
+if (.busy = true) {
+    ~runeversi_cancel_challenge;
+    mes("Other player is busy at the moment.");
+    return;
+}
+if (~in_games_room(.coord) = false) {
+    ~runeversi_cancel_challenge;
+    mes("Other player has left the area.");
+    return;
+}
+if (.%duel2accept = uid) {
+    if (~boardgames_admission_ready = false) {
+        ~runeversi_cancel_challenge;
+        // UNKNOWN: plain functional refusal; the shared admission guard owns the exact cause.
+        mes("This challenge can no longer be started.");
+        return;
+    }
+    ~boardgames_table_setup;
+    // Original unsigned seven-bit sentinel: 127 means no table was assigned.
+    if (%boardgames_tablenum = 127) {
+        ~runeversi_cancel_challenge;
+        return;
+    }
+    if (.p_finduid(%duel2accept) = false) {
+        ~boardgames_release_table;
+        ~runeversi_cancel_challenge;
+        return;
+    }
+    %boardgames_control = 0;
+    .%boardgames_control = 1;
+    if_openoverlay(null);
+    set_skill_level(0);
+    ~update_bas;
+    .if_openoverlay(null);
+    .set_skill_level(0);
+    ~.update_bas;
+    ~runeversi_init_board;
+    ~.runeversi_init_board;
+    ~runeversi_first_turn;
+} else {
+    %boardgames_closinginterface = 0;
+    mes("Sending challenge...");
+    ~send_boardgames_challenge_request;
+}
+
+
+[if_button,inter_349:com_161]
+~runeversi_play(0);
+[if_button,inter_349:com_162]
+~runeversi_play(1);
+[if_button,inter_349:com_163]
+~runeversi_play(2);
+[if_button,inter_349:com_164]
+~runeversi_play(3);
+[if_button,inter_349:com_165]
+~runeversi_play(4);
+[if_button,inter_349:com_166]
+~runeversi_play(5);
+[if_button,inter_349:com_167]
+~runeversi_play(6);
+[if_button,inter_349:com_168]
+~runeversi_play(7);
+[if_button,inter_349:com_169]
+~runeversi_play(8);
+[if_button,inter_349:com_170]
+~runeversi_play(9);
+[if_button,inter_349:com_171]
+~runeversi_play(10);
+[if_button,inter_349:com_172]
+~runeversi_play(11);
+[if_button,inter_349:com_173]
+~runeversi_play(12);
+[if_button,inter_349:com_174]
+~runeversi_play(13);
+[if_button,inter_349:com_175]
+~runeversi_play(14);
+[if_button,inter_349:com_176]
+~runeversi_play(15);
+[if_button,inter_349:com_177]
+~runeversi_play(16);
+[if_button,inter_349:com_178]
+~runeversi_play(17);
+[if_button,inter_349:com_179]
+~runeversi_play(18);
+[if_button,inter_349:com_180]
+~runeversi_play(19);
+[if_button,inter_349:com_181]
+~runeversi_play(20);
+[if_button,inter_349:com_182]
+~runeversi_play(21);
+[if_button,inter_349:com_183]
+~runeversi_play(22);
+[if_button,inter_349:com_184]
+~runeversi_play(23);
+[if_button,inter_349:com_185]
+~runeversi_play(24);
+[if_button,inter_349:com_186]
+~runeversi_play(25);
+[if_button,inter_349:com_187]
+~runeversi_play(26);
+[if_button,inter_349:com_188]
+~runeversi_play(27);
+[if_button,inter_349:com_189]
+~runeversi_play(28);
+[if_button,inter_349:com_190]
+~runeversi_play(29);
+[if_button,inter_349:com_191]
+~runeversi_play(30);
+[if_button,inter_349:com_192]
+~runeversi_play(31);
+[if_button,inter_349:com_193]
+~runeversi_play(32);
+[if_button,inter_349:com_194]
+~runeversi_play(33);
+[if_button,inter_349:com_195]
+~runeversi_play(34);
+[if_button,inter_349:com_196]
+~runeversi_play(35);
+[if_button,inter_349:com_197]
+~runeversi_play(36);
+[if_button,inter_349:com_198]
+~runeversi_play(37);
+[if_button,inter_349:com_199]
+~runeversi_play(38);
+[if_button,inter_349:com_200]
+~runeversi_play(39);
+[if_button,inter_349:com_201]
+~runeversi_play(40);
+[if_button,inter_349:com_202]
+~runeversi_play(41);
+[if_button,inter_349:com_203]
+~runeversi_play(42);
+[if_button,inter_349:com_204]
+~runeversi_play(43);
+[if_button,inter_349:com_205]
+~runeversi_play(44);
+[if_button,inter_349:com_206]
+~runeversi_play(45);
+[if_button,inter_349:com_207]
+~runeversi_play(46);
+[if_button,inter_349:com_208]
+~runeversi_play(47);
+[if_button,inter_349:com_209]
+~runeversi_play(48);
+[if_button,inter_349:com_210]
+~runeversi_play(49);
+[if_button,inter_349:com_211]
+~runeversi_play(50);
+[if_button,inter_349:com_212]
+~runeversi_play(51);
+[if_button,inter_349:com_213]
+~runeversi_play(52);
+[if_button,inter_349:com_214]
+~runeversi_play(53);
+[if_button,inter_349:com_215]
+~runeversi_play(54);
+[if_button,inter_349:com_216]
+~runeversi_play(55);
+[if_button,inter_349:com_217]
+~runeversi_play(56);
+[if_button,inter_349:com_218]
+~runeversi_play(57);
+[if_button,inter_349:com_219]
+~runeversi_play(58);
+[if_button,inter_349:com_220]
+~runeversi_play(59);
+[if_button,inter_349:com_221]
+~runeversi_play(60);
+[if_button,inter_349:com_222]
+~runeversi_play(61);
+[if_button,inter_349:com_223]
+~runeversi_play(62);
+[if_button,inter_349:com_224]
+~runeversi_play(63);
+
+[if_button,inter_349:com_95]
+if (%boardgames_ingame ! 1 | %boardgames_viewing = 1) return;
+if (.finduid(%duel2accept) = false) {
+    ~runeversi_disconnect;
+    return;
+}
+if (%boardgames_drawrequested = 1 | .%boardgames_drawrequested = 1) {
+    ~runeversi_finish_game(0, 2, false);
+    return;
+}
+%boardgames_drawrequested = 1;
+.%boardgames_drawrequested = 1;
+// Existing boardgames draw-request wording reused from RuneLink/Draughts.
+if_settext(inter_349:com_147, "Asking opponent for a draw...");
+.if_settext(inter_349:com_147, "Your opponent asked for a draw.");
+if_settext(inter_349:com_143, "");
+.if_settext(inter_349:com_143, "");
+
+[proc,runeversi_cancel_challenge]
+%boardgames_closinginterface = 0;
+%boardgames_tablenum = 127;
+if (.finduid(%duel2accept) = true) .%boardgames_tablenum = 127;
+%duel2accept = null;
+~reset_boardgames_varp;
+
+[proc,runeversi_init_board]
+%boardgames_ingame = 1;
+%boardgames_gameended = 0;
+%boardgames_viewing = 0;
+%boardgames_myturn = 0;
+%boardgames_numturns = 0;
+%boardgames_drawrequested = 0;
+%boardgames_closemode = ^boardgames_loss;
+minimap_toggle(1);
+
+
+%boardgames_closinginterface = 1;
+if_openmain(inter_349);
+%boardgames_closinginterface = 0;
+
+if_setobject(inter_349:com_158, ~get_boardgames_rune_obj(%boardgames_piece), 72);
+if_setobject(inter_349:com_159, ~get_boardgames_rune_obj(.%boardgames_piece), 72);
+if (%boardgames_rankedgame = 1) {
+    if_settext(inter_349:com_67, "<displayname> (<tostring(%boardgames_runeversi_rank)>)");
+    if_settext(inter_349:com_76, "<.displayname> (<tostring(.%boardgames_runeversi_rank)>)");
+} else {
+    if_settext(inter_349:com_67, "<displayname>");
+    if_settext(inter_349:com_76, "<.displayname>");
+}
+if_settext(inter_349:com_148, "Runeversi");
+if_settext(inter_349:com_147, "Place a rune to bracket an opponent's rune.");
+if_settext(inter_349:com_143, "");
+if_settext(inter_349:com_99, "");
+
+inv_clear(boardgames_boardinv);
+def_namedobj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_namedobj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+// CANDIDATE: standard four-disc Reversi opening; the second player's display is rotated 180 degrees.
+if (%boardgames_control = 1) {
+    inv_setslot(boardgames_boardinv, 27, $own, 1);
+    inv_setslot(boardgames_boardinv, 36, $own, 1);
+    inv_setslot(boardgames_boardinv, 28, $opponent, 1);
+    inv_setslot(boardgames_boardinv, 35, $opponent, 1);
+} else {
+    inv_setslot(boardgames_boardinv, 28, $own, 1);
+    inv_setslot(boardgames_boardinv, 35, $own, 1);
+    inv_setslot(boardgames_boardinv, 27, $opponent, 1);
+    inv_setslot(boardgames_boardinv, 36, $opponent, 1);
+}
+~boardgames_hide_tabs;
+inv_transmit(boardgames_boardinv, inter_349:com_160);
+
+[proc,.runeversi_init_board]
+.%boardgames_ingame = 1;
+.%boardgames_gameended = 0;
+.%boardgames_viewing = 0;
+.%boardgames_myturn = 0;
+.%boardgames_numturns = 0;
+.%boardgames_drawrequested = 0;
+.%boardgames_closemode = ^boardgames_loss;
+.minimap_toggle(1);
+
+
+.%boardgames_closinginterface = 1;
+.if_openmain(inter_349);
+.%boardgames_closinginterface = 0;
+
+.if_setobject(inter_349:com_158, ~get_boardgames_rune_obj(.%boardgames_piece), 72);
+.if_setobject(inter_349:com_159, ~get_boardgames_rune_obj(%boardgames_piece), 72);
+if (.%boardgames_rankedgame = 1) {
+    .if_settext(inter_349:com_67, "<.displayname> (<tostring(.%boardgames_runeversi_rank)>)");
+    .if_settext(inter_349:com_76, "<displayname> (<tostring(%boardgames_runeversi_rank)>)");
+} else {
+    .if_settext(inter_349:com_67, "<.displayname>");
+    .if_settext(inter_349:com_76, "<displayname>");
+}
+.if_settext(inter_349:com_148, "Runeversi");
+.if_settext(inter_349:com_147, "Place a rune to bracket an opponent's rune.");
+.if_settext(inter_349:com_143, "");
+.if_settext(inter_349:com_99, "");
+
+.inv_clear(boardgames_boardinv);
+def_namedobj $own = ~get_boardgames_player_rune(.%boardgames_piece);
+def_namedobj $opponent = ~get_boardgames_player_rune(%boardgames_piece);
+if (.%boardgames_control = 1) {
+    .inv_setslot(boardgames_boardinv, 27, $own, 1);
+    .inv_setslot(boardgames_boardinv, 36, $own, 1);
+    .inv_setslot(boardgames_boardinv, 28, $opponent, 1);
+    .inv_setslot(boardgames_boardinv, 35, $opponent, 1);
+} else {
+    .inv_setslot(boardgames_boardinv, 28, $own, 1);
+    .inv_setslot(boardgames_boardinv, 35, $own, 1);
+    .inv_setslot(boardgames_boardinv, 27, $opponent, 1);
+    .inv_setslot(boardgames_boardinv, 36, $opponent, 1);
+}
+~.boardgames_hide_tabs;
+.inv_transmit(boardgames_boardinv, inter_349:com_160);
+
+
+[proc,runeversi_first_turn]
+def_int $rand = random(2);
+if ($rand = 0) {
+    ~runeversi_set_turn(true, "You move first!", "");
+} else {
+    ~runeversi_set_turn(false, "", "You move first!");
+}
+
+[proc,runeversi_set_turn](boolean $local_turn, string $local_message, string $other_message)
+if (.finduid(%duel2accept) = false) {
+    ~runeversi_disconnect;
+    return;
+}
+clearsofttimer(runeversi_force_move);
+clearsofttimer(boardgames_sitting_anim);
+.%boardgames_myturn = 0;
+.%boardgames_drawrequested = 0;
+%boardgames_drawrequested = 0;
+.clearsofttimer(runeversi_force_move);
+.clearsofttimer(boardgames_sitting_anim);
+
+if ($local_turn = true) {
+    %boardgames_myturn = 1;
+    if_settext(inter_349:com_99, "<displayname>");
+    .if_settext(inter_349:com_99, "<displayname>");
+    if_settext(inter_349:com_147, $local_message);
+    .if_settext(inter_349:com_147, $other_message);
+    if_settext(inter_349:com_143, "");
+    .if_settext(inter_349:com_143, "");
+    softtimer(runeversi_force_move, ~get_sandtimer_interval);
+    softtimer(boardgames_sitting_anim, ~random_range(5,9));
+    .anim(human_sittingdown_ready, 0);
+} else {
+    %boardgames_myturn = 0;
+    .%boardgames_myturn = 1;
+    if_settext(inter_349:com_99, "<.displayname>");
+    .if_settext(inter_349:com_99, "<.displayname>");
+    if_settext(inter_349:com_147, $local_message);
+    .if_settext(inter_349:com_147, $other_message);
+    if_settext(inter_349:com_143, "");
+    .if_settext(inter_349:com_143, "");
+    .softtimer(runeversi_force_move, ~get_sandtimer_interval);
+    .softtimer(boardgames_sitting_anim, ~random_range(5,9));
+    anim(human_sittingdown_ready, 0);
+}
+
+// Read-only rule helpers inspect only the local board inventory.
+
+[proc,runeversi_flip_count](int $target_slot, obj $own, obj $opponent)(int)
+if ($target_slot < 0 | $target_slot > 63) return (0);
+if (inv_getobj(boardgames_boardinv, $target_slot) ! null) return (0);
+
+def_int $start_row = divide($target_slot, 8);
+def_int $start_col = modulo($target_slot, 8);
+def_int $total_flips = 0;
+def_int $dr = -1;
+while ($dr <= 1) {
+    def_int $dc = -1;
+    while ($dc <= 1) {
+        if ($dr ! 0 | $dc ! 0) {
+            def_int $row = add($start_row, $dr);
+            def_int $col = add($start_col, $dc);
+            def_int $line_flips = 0;
+            while ($row >= 0 & $row < 8 & $col >= 0 & $col < 8) {
+                def_int $slot = add(multiply($row, 8), $col);
+                def_obj $cell = inv_getobj(boardgames_boardinv, $slot);
+                if ($cell = $opponent) {
+                    $line_flips = add($line_flips, 1);
+                    $row = add($row, $dr);
+                    $col = add($col, $dc);
+                } else {
+                    if ($cell = $own & $line_flips > 0) {
+                        $total_flips = add($total_flips, $line_flips);
+                    }
+                    $row = -1;
+                }
+            }
+        }
+        $dc = add($dc, 1);
+    }
+    $dr = add($dr, 1);
+}
+return ($total_flips);
+
+[proc,runeversi_is_legal_move](int $target_slot, obj $own, obj $opponent)(boolean)
+if ($target_slot < 0 | $target_slot > 63) return (false);
+if (inv_getobj(boardgames_boardinv, $target_slot) ! null) return (false);
+if (~runeversi_flip_count($target_slot, $own, $opponent) > 0) return (true);
+return (false);
+
+[proc,runeversi_has_legal_move](obj $own, obj $opponent)(boolean)
+def_int $slot = 0;
+while ($slot < 64) {
+    if (~runeversi_is_legal_move($slot, $own, $opponent) = true) return (true);
+    $slot = add($slot, 1);
+}
+return (false);
+
+[proc,runeversi_count_discs](obj $piece)(int)
+def_int $slot = 0;
+def_int $count = 0;
+while ($slot < 64) {
+    if (inv_getobj(boardgames_boardinv, $slot) = $piece) $count = add($count, 1);
+    $slot = add($slot, 1);
+}
+return ($count);
+
+[proc,runeversi_count_empty]()(int)
+def_int $slot = 0;
+def_int $count = 0;
+while ($slot < 64) {
+    if (inv_getobj(boardgames_boardinv, $slot) = null) $count = add($count, 1);
+    $slot = add($slot, 1);
+}
+return ($count);
+
+[proc,runeversi_apply_move](int $target_slot)(boolean)
+def_obj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+def_namedobj $own_item = ~get_boardgames_player_rune(%boardgames_piece);
+if (~runeversi_is_legal_move($target_slot, $own, $opponent) = false) return (false);
+
+def_int $start_row = divide($target_slot, 8);
+def_int $start_col = modulo($target_slot, 8);
+def_int $dr = -1;
+while ($dr <= 1) {
+    def_int $dc = -1;
+    while ($dc <= 1) {
+        if ($dr ! 0 | $dc ! 0) {
+            def_int $row = add($start_row, $dr);
+            def_int $col = add($start_col, $dc);
+            def_int $line_flips = 0;
+            while ($row >= 0 & $row < 8 & $col >= 0 & $col < 8) {
+                def_int $slot = add(multiply($row, 8), $col);
+                if (inv_getobj(boardgames_boardinv, $slot) = $opponent) {
+                    $line_flips = add($line_flips, 1);
+                    $row = add($row, $dr);
+                    $col = add($col, $dc);
+                } else {
+                    if ($line_flips > 0 & inv_getobj(boardgames_boardinv, $slot) = $own) {
+                        def_int $flip_row = add($start_row, $dr);
+                        def_int $flip_col = add($start_col, $dc);
+                        def_int $remaining = $line_flips;
+                        while ($remaining > 0) {
+                            def_int $flip_slot = add(multiply($flip_row, 8), $flip_col);
+                            inv_setslot(boardgames_boardinv, $flip_slot, $own_item, 1);
+                            $flip_row = add($flip_row, $dr);
+                            $flip_col = add($flip_col, $dc);
+                            $remaining = sub($remaining, 1);
+                        }
+                    }
+                    $row = -1;
+                }
+            }
+        }
+        $dc = add($dc, 1);
+    }
+    $dr = add($dr, 1);
+}
+inv_setslot(boardgames_boardinv, $target_slot, $own_item, 1);
+return (true);
+
+
+[proc,runeversi_other_flip_count](int $target_slot, obj $own, obj $opponent)(int)
+if ($target_slot < 0 | $target_slot > 63) return (0);
+if (.inv_getobj(boardgames_boardinv, $target_slot) ! null) return (0);
+def_int $start_row = divide($target_slot, 8);
+def_int $start_col = modulo($target_slot, 8);
+def_int $total_flips = 0;
+def_int $dr = -1;
+while ($dr <= 1) {
+    def_int $dc = -1;
+    while ($dc <= 1) {
+        if ($dr ! 0 | $dc ! 0) {
+            def_int $row = add($start_row, $dr);
+            def_int $col = add($start_col, $dc);
+            def_int $line_flips = 0;
+            while ($row >= 0 & $row < 8 & $col >= 0 & $col < 8) {
+                def_int $slot = add(multiply($row, 8), $col);
+                def_obj $cell = .inv_getobj(boardgames_boardinv, $slot);
+                if ($cell = $opponent) {
+                    $line_flips = add($line_flips, 1);
+                    $row = add($row, $dr);
+                    $col = add($col, $dc);
+                } else {
+                    if ($cell = $own & $line_flips > 0) {
+                        $total_flips = add($total_flips, $line_flips);
+                    }
+                    $row = -1;
+                }
+            }
+        }
+        $dc = add($dc, 1);
+    }
+    $dr = add($dr, 1);
+}
+return ($total_flips);
+
+[proc,runeversi_other_is_legal_move](int $target_slot, obj $own, obj $opponent)(boolean)
+if ($target_slot < 0 | $target_slot > 63) return (false);
+if (.inv_getobj(boardgames_boardinv, $target_slot) ! null) return (false);
+if (~runeversi_other_flip_count($target_slot, $own, $opponent) > 0) return (true);
+return (false);
+
+[proc,.runeversi_apply_move](int $target_slot)(boolean)
+if (.finduid(%duel2accept) = false) return (false);
+def_obj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+def_namedobj $own_item = ~get_boardgames_player_rune(%boardgames_piece);
+if (~runeversi_other_is_legal_move($target_slot, $own, $opponent) = false) return (false);
+def_int $start_row = divide($target_slot, 8);
+def_int $start_col = modulo($target_slot, 8);
+def_int $dr = -1;
+while ($dr <= 1) {
+    def_int $dc = -1;
+    while ($dc <= 1) {
+        if ($dr ! 0 | $dc ! 0) {
+            def_int $row = add($start_row, $dr);
+            def_int $col = add($start_col, $dc);
+            def_int $line_flips = 0;
+            while ($row >= 0 & $row < 8 & $col >= 0 & $col < 8) {
+                def_int $slot = add(multiply($row, 8), $col);
+                if (.inv_getobj(boardgames_boardinv, $slot) = $opponent) {
+                    $line_flips = add($line_flips, 1);
+                    $row = add($row, $dr);
+                    $col = add($col, $dc);
+                } else {
+                    if ($line_flips > 0 & .inv_getobj(boardgames_boardinv, $slot) = $own) {
+                        def_int $flip_row = add($start_row, $dr);
+                        def_int $flip_col = add($start_col, $dc);
+                        def_int $remaining = $line_flips;
+                        while ($remaining > 0) {
+                            def_int $flip_slot = add(multiply($flip_row, 8), $flip_col);
+                            .inv_setslot(boardgames_boardinv, $flip_slot, $own_item, 1);
+                            $flip_row = add($flip_row, $dr);
+                            $flip_col = add($flip_col, $dc);
+                            $remaining = sub($remaining, 1);
+                        }
+                    }
+                    $row = -1;
+                }
+            }
+        }
+        $dc = add($dc, 1);
+    }
+    $dr = add($dr, 1);
+}
+.inv_setslot(boardgames_boardinv, $target_slot, $own_item, 1);
+.inv_transmit(boardgames_boardinv, inter_349:com_160);
+return (true);
+
+[proc,runeversi_play](int $target_slot)(boolean)
+if (%boardgames_ingame ! 1 | %boardgames_viewing = 1) return (false);
+if (%boardgames_myturn = 0) {
+    if_settext(inter_349:com_147, "It is not your turn!");
+    return (false);
+}
+if (.finduid(%duel2accept) = false) {
+    ~runeversi_disconnect;
+    return (false);
+}
+def_obj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+if (~runeversi_is_legal_move($target_slot, $own, $opponent) = false) {
+    // UNKNOWN: reuses the established boardgames illegal-move feedback.
+    if_settext(inter_349:com_147, "Illegal move!");
+    return (false);
+}
+if (~runeversi_other_is_legal_move(sub(63, $target_slot), $own, $opponent) = false) return (false);
+
+clearsofttimer(runeversi_force_move);
+clearsofttimer(boardgames_sitting_anim);
+if (~runeversi_apply_move($target_slot) = false) return (false);
+if (~.runeversi_apply_move(sub(63, $target_slot)) = false) {
+    ~runeversi_disconnect;
+    return (false);
+}
+if (%boardgames_numturns < 4) %boardgames_numturns = add(%boardgames_numturns, 1);
+if (.%boardgames_numturns < 4) .%boardgames_numturns = add(.%boardgames_numturns, 1);
+
+~runeversi_resolve_after_move;
+return (true);
+
+[proc,runeversi_resolve_after_move]
+def_obj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+if (~runeversi_count_empty = 0) {
+    ~runeversi_resolve_final_score(0);
+    return;
+}
+def_boolean $local_can_move = ~runeversi_has_legal_move($own, $opponent);
+def_boolean $other_can_move = ~runeversi_has_legal_move($opponent, $own);
+if ($local_can_move = false & $other_can_move = false) {
+    ~runeversi_resolve_final_score(1);
+} else if ($other_can_move = false) {
+    // UNKNOWN: functional automatic-pass status wording.
+    ~runeversi_set_turn(true, "Opponent has no legal move; play again.", "No legal move; your turn is skipped.");
+} else {
+    ~runeversi_set_turn(false, "", "");
+}
+
+[proc,runeversi_resolve_final_score](int $reason)
+def_obj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+def_int $own_count = ~runeversi_count_discs($own);
+def_int $other_count = ~runeversi_count_discs($opponent);
+if ($own_count > $other_count) {
+    ~runeversi_finish_game(1, $reason, false);
+} else if ($own_count < $other_count) {
+    ~runeversi_finish_game(2, $reason, false);
+} else {
+    ~runeversi_finish_game(0, $reason, false);
+}
+
+// UNKNOWN engineering default: a timeout auto-plays a random legal placement.
+
+[softtimer,runeversi_force_move]
+if (%boardgames_game = 3 & %boardgames_ingame = 1 & %boardgames_gameended = 0 & %boardgames_myturn = 1) ~runeversi_find_and_force_move;
+
+[proc,runeversi_find_and_force_move]
+if (%boardgames_ingame ! 1 | %boardgames_myturn ! 1) return;
+if (.finduid(%duel2accept) = false) {
+    ~runeversi_disconnect;
+    return;
+}
+def_obj $own = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
+def_int $start = random(64);
+def_int $tries = 0;
+def_int $chosen = -1;
+while ($tries < 64) {
+    def_int $slot = modulo(add($start, $tries), 64);
+    if (~runeversi_is_legal_move($slot, $own, $opponent) = true) {
+        $chosen = $slot;
+        $tries = 64;
+    }
+    $tries = add($tries, 1);
+}
+if ($chosen ! -1) {
+    ~runeversi_play($chosen);
+} else {
+    def_boolean $other_can_move = ~runeversi_has_legal_move($opponent, $own);
+    if ($other_can_move = true) {
+        // UNKNOWN: timer recovery for an already forced-pass state.
+        ~runeversi_set_turn(false, "No legal move; your turn is skipped.", "Your opponent has no legal move.");
+    } else {
+        ~runeversi_resolve_final_score(1);
+    }
+}
+
+[proc,runeversi_finish_game](int $local_result, int $reason, boolean $disconnecting)
+if (%boardgames_ingame ! 1 | %boardgames_gameended = 1) return;
+if (.finduid(%duel2accept) = false) {
+    %boardgames_ingame = 0;
+    %boardgames_gameended = 1;
+    if_close;
+    ~boardgames_release_table;
+    if (p_finduid(uid) = true) {
+        if (~in_games_room(coord) = true) p_teleport(movecoord(^runeversi_room_tele_coord, 0, %boardgames_challengeroom, 0));
+    }
+    ~runeversi_disconnect;
+    return;
+}
+def_int $table_num = %boardgames_tablenum;
+def_boolean $opponent_present = true;
+def_int $own_challengeroom = %boardgames_challengeroom;
+def_int $other_challengeroom = 0;
+if ($opponent_present = true) $other_challengeroom = .%boardgames_challengeroom;
+
+def_int $rank_change = 0;
+def_obj $own_piece = ~get_boardgames_player_rune(%boardgames_piece);
+def_obj $opponent_piece = null;
+def_int $own_count = ~runeversi_count_discs($own_piece);
+def_int $other_count = 0;
+def_int $own_rank = %boardgames_runeversi_rank;
+def_int $other_rank = 0;
+if ($opponent_present = true) {
+    $opponent_piece = ~get_boardgames_player_rune(.%boardgames_piece);
+    $other_count = ~runeversi_count_discs($opponent_piece);
+    $other_rank = .%boardgames_runeversi_rank;
+}
+
+// CANDIDATE: follow the established boardgames ranked-game eligibility and capped rank-change convention.
+if ($opponent_present = true & %boardgames_rankedgame = 1 & %boardgames_numturns > 3 & $local_result ! 0) {
+    if ($local_result = 1) {
+        $rank_change = ~calculate_rank_change($other_rank, $own_rank);
+        %boardgames_runeversi_rank = add($own_rank, $rank_change);
+        if (%boardgames_runeversi_rank > 60000) %boardgames_runeversi_rank = 60000;
+        .%boardgames_runeversi_rank = sub($other_rank, $rank_change);
+        if (.%boardgames_runeversi_rank < 1) .%boardgames_runeversi_rank = 1;
+    } else {
+        $rank_change = ~calculate_rank_change($own_rank, $other_rank);
+        %boardgames_runeversi_rank = sub($own_rank, $rank_change);
+        if (%boardgames_runeversi_rank < 1) %boardgames_runeversi_rank = 1;
+        .%boardgames_runeversi_rank = add($other_rank, $rank_change);
+        if (.%boardgames_runeversi_rank > 60000) .%boardgames_runeversi_rank = 60000;
+    }
+}
+
+def_int $other_result = 0;
+if ($local_result = 1) $other_result = 2;
+else if ($local_result = 2) $other_result = 1;
+
+%boardgames_ingame = 0;
+%boardgames_viewing = 1;
+%boardgames_myturn = 0;
+%boardgames_drawrequested = 0;
+if ($opponent_present = true) {
+    .%boardgames_ingame = 0;
+    .%boardgames_viewing = 1;
+    .%boardgames_myturn = 0;
+    .%boardgames_drawrequested = 0;
+}
+%boardgames_gameended = 1;
+if ($opponent_present = true) .%boardgames_gameended = 1;
+
+clearsofttimer(runeversi_force_move);
+clearsofttimer(boardgames_sitting_anim);
+minimap_toggle(0);
+if ($opponent_present = true) {
+    .clearsofttimer(runeversi_force_move);
+    .clearsofttimer(boardgames_sitting_anim);
+    .minimap_toggle(0);
+    .queue(boardgames_restore_tabs, 0, 0);
+}
+
+// Release the occupied table before the game pair state is reset.
+if ($table_num ! 127) ~boardgames_release_table;
+%boardgames_tablenum = 127;
+if ($opponent_present = true) .%boardgames_tablenum = 127;
+if_close;
+if ($opponent_present = true) .if_close;
+
+// Open boards make players busy. Close both before protected movement/tab access.
+// UNKNOWN: use the named Runeversi landing point and preserve each admission floor.
+if (p_finduid(uid) = true) {
+    if ($disconnecting = false | ~in_games_room(coord) = true) {
+        p_teleport(movecoord(^runeversi_room_tele_coord, 0, $own_challengeroom, 0));
+        anim(null, 0);
+    }
+    ~initalltabs;
+}
+if (.p_finduid(%duel2accept) = true) {
+    if ($opponent_present = true & ~in_games_room(.coord) = true) {
+        .p_teleport(movecoord(^runeversi_room_tele_coord, 0, $other_challengeroom, 0));
+        .anim(null, 0);
+    }
+}
+
+
+
+if ($disconnecting = false) {
+    ~runeversi_show_result($local_result, $reason, $rank_change, $opponent_present, $own_count, $other_count);
+}
+if ($opponent_present = true) {
+    ~.runeversi_show_result($other_result, $reason, $rank_change, true, $other_count, $own_count);
+}
+if ($table_num ! 127) {
+    ~runeversi_update_spectators($table_num, $local_result, $reason);
+    if (.finduid(%duel2accept) = false) $opponent_present = false;
+}
+
+if ($disconnecting = true) {
+    inv_clear(boardgames_boardinv);
+    %duel2accept = null;
+    ~reset_boardgames_varp;
+    if ($opponent_present = true) {
+        .%duel2accept = null;
+        ~.reset_boardgames_varp;
+    }
+}
+
+[proc,runeversi_show_result](int $result, int $reason, int $rank_change, boolean $opponent_present, int $own_count, int $other_count)
+%boardgames_closinginterface = 1;
+if_openmain(inter_352);
+%boardgames_closinginterface = 0;
+if_setobject(inter_352:com_136, ~get_boardgames_rune_obj(%boardgames_piece), 72);
+if ($opponent_present = true) if_setobject(inter_352:com_137, ~get_boardgames_rune_obj(.%boardgames_piece), 72);
+if ($opponent_present = true) {
+    if (%boardgames_rankedgame = 1) {
+        if_settext(inter_352:com_67, "<displayname> (<tostring(%boardgames_runeversi_rank)>)");
+        if_settext(inter_352:com_76, "<.displayname> (<tostring(.%boardgames_runeversi_rank)>)");
+    } else {
+        if_settext(inter_352:com_67, "<displayname>");
+        if_settext(inter_352:com_76, "<.displayname>");
+    }
+} else {
+    if_settext(inter_352:com_67, "<displayname>");
+    if_settext(inter_352:com_76, "Opponent");
+}
+if_settext(inter_352:com_94, "It's a draw!");
+if ($result = 1) if_settext(inter_352:com_94, "You win!");
+else if ($result = 2) if_settext(inter_352:com_94, "You lose!");
+
+// UNKNOWN: concise end reasons and score line make the original summary interface usable.
+if ($reason = 0) if_settext(inter_352:com_93, "The board is full.");
+else if ($reason = 1) if_settext(inter_352:com_93, "Neither player can move.");
+else if ($reason = 2) if_settext(inter_352:com_93, "A draw was agreed.");
+else if ($reason = 3) {
+    if ($result = 1) if_settext(inter_352:com_93, "Player resigned.");
+    else if_settext(inter_352:com_93, "You resigned.");
+} else if ($reason = 4) if_settext(inter_352:com_93, "Player disconnected.");
+
+if ($rank_change > 0 & $result ! 0 & %boardgames_rankedgame = 1 & %boardgames_numturns > 3) {
+    if ($result = 1) {
+        if_settext(inter_352:com_89, "Score <tostring($own_count)>-<tostring($other_count)>; rank +<tostring($rank_change)>");
+    } else {
+        if_settext(inter_352:com_89, "Score <tostring($own_count)>-<tostring($other_count)>; rank -<tostring($rank_change)>");
+    }
+} else {
+    if_settext(inter_352:com_89, "Score <tostring($own_count)>-<tostring($other_count)>");
+}
+inv_transmit(boardgames_boardinv, inter_352:com_138);
+if ($result = 1) midi_jingle("boardgames victory");
+else if ($result = 2) midi_jingle("boardgames defeat");
+else midi_jingle("boardgames draw");
+
+[proc,.runeversi_show_result](int $result, int $reason, int $rank_change, boolean $opponent_present, int $own_count, int $other_count)
+if (.finduid(%duel2accept) = false) return;
+.%boardgames_closinginterface = 1;
+.if_openmain(inter_352);
+.%boardgames_closinginterface = 0;
+.if_setobject(inter_352:com_136, ~get_boardgames_rune_obj(.%boardgames_piece), 72);
+.if_setobject(inter_352:com_137, ~get_boardgames_rune_obj(%boardgames_piece), 72);
+if (.%boardgames_rankedgame = 1) {
+    .if_settext(inter_352:com_67, "<.displayname> (<tostring(.%boardgames_runeversi_rank)>)");
+    .if_settext(inter_352:com_76, "<displayname> (<tostring(%boardgames_runeversi_rank)>)");
+} else {
+    .if_settext(inter_352:com_67, "<.displayname>");
+    .if_settext(inter_352:com_76, "<displayname>");
+}
+.if_settext(inter_352:com_94, "It's a draw!");
+if ($result = 1) .if_settext(inter_352:com_94, "You win!");
+else if ($result = 2) .if_settext(inter_352:com_94, "You lose!");
+if ($reason = 0) .if_settext(inter_352:com_93, "The board is full.");
+else if ($reason = 1) .if_settext(inter_352:com_93, "Neither player can move.");
+else if ($reason = 2) .if_settext(inter_352:com_93, "A draw was agreed.");
+else if ($reason = 3) {
+    if ($result = 1) .if_settext(inter_352:com_93, "Player resigned.");
+    else .if_settext(inter_352:com_93, "You resigned.");
+} else if ($reason = 4) .if_settext(inter_352:com_93, "Player disconnected.");
+if ($rank_change > 0 & $result ! 0 & .%boardgames_rankedgame = 1 & .%boardgames_numturns > 3) {
+    if ($result = 1) .if_settext(inter_352:com_89, "Score <tostring($own_count)>-<tostring($other_count)>; rank +<tostring($rank_change)>");
+    else .if_settext(inter_352:com_89, "Score <tostring($own_count)>-<tostring($other_count)>; rank -<tostring($rank_change)>");
+} else {
+    .if_settext(inter_352:com_89, "Score <tostring($own_count)>-<tostring($other_count)>");
+}
+.inv_transmit(boardgames_boardinv, inter_352:com_138);
+if ($result = 1) .midi_jingle("boardgames victory");
+else if ($result = 2) .midi_jingle("boardgames defeat");
+else .midi_jingle("boardgames draw");
+
+
+[proc,runeversi_update_spectators](int $table_num, int $local_result, int $reason)
+def_string $winner_message = "It's a draw!";
+def_string $status_message = "A draw was agreed.";
+if ($local_result = 1) $winner_message = "<displayname> has won!";
+else if ($local_result = 2) $winner_message = "<.displayname> has won!";
+if ($reason = 0) $status_message = "The board is full.";
+else if ($reason = 1) $status_message = "Neither player can move.";
+else if ($reason = 3) $status_message = "Player resigned.";
+else if ($reason = 4) $status_message = "Player disconnected.";
+huntall(~get_boardgames_table_coord($table_num), 1, 0);
+while (.huntnext = true) {
+    if (.uid ! uid & .uid ! %duel2accept & .%boardgames_game = %boardgames_game & .%boardgames_tablenum = $table_num & .%boardgames_viewing = 1 & .%boardgames_ingame = 0) {
+        .if_settext(inter_352:com_94, $winner_message);
+        .if_settext(inter_352:com_93, $status_message);
+        .softtimer(boardgames_close_spectate, 15);
+    }
+}
+
+[proc,runeversi_disconnect]
+if (%boardgames_ingame = 1) {
+    ~runeversi_finish_game(2, 3, true);
+    return;
+}
+clearsofttimer(runeversi_force_move);
+clearsofttimer(boardgames_sitting_anim);
+%boardgames_ingame = 0;
+%boardgames_myturn = 0;
+%boardgames_viewing = 0;
+inv_clear(boardgames_boardinv);
+if_close;
+if (%boardgames_tablenum ! 127) ~boardgames_release_table;
+%boardgames_tablenum = 127;
+%duel2accept = null;
+~reset_boardgames_varp;
+minimap_toggle(0);
+queue(boardgames_restore_tabs, 0, 0);
+
+[queue,runeversi_game_end]
+~runeversi_finish_game(2, 3, false);
+
+[if_close,inter_349]
+if (%boardgames_ingame = 1 & %boardgames_gameended = 0) queue(runeversi_game_end, 0, 0);
+
+[if_close,boardgames_runeversi_options]
+if (%boardgames_closinginterface = 0) {
+    %duel2accept = null;
+    ~reset_boardgames_varp;
+}
+
+[if_close,inter_352]
+clearsofttimer(boardgames_close_spectate);
+minimap_toggle(0);
+queue(boardgames_restore_tabs, 0, 0);
+%boardgames_viewing = 0;
+%boardgames_myturn = 0;
+%duel2accept = null;
+~reset_boardgames_varp;
+
+[oploc1,boardgames_table_runeversi]
+if (%boardgames_ingame = 1) return;
+%boardgames_game = 3;
+%boardgames_viewing = 1;
+minimap_toggle(1);
+~boardgames_hide_tabs;
+def_boolean $found_game = false;
+huntall(loc_coord, 1, 0);
+while (.huntnext = true) {
+    if (.%boardgames_ingame = 1 & .%boardgames_game = 3 & .%boardgames_viewing = 0 & ~get_boardgames_table_coord(.%boardgames_tablenum) = loc_coord) {
+        $found_game = true;
+        %boardgames_tablenum = .%boardgames_tablenum;
+        if (.%boardgames_control = 1) {
+            if_setobject(inter_352:com_137, ~get_boardgames_rune_obj(.%boardgames_piece), 72);
+            if (.%boardgames_rankedgame = 1) {
+                if_settext(inter_352:com_76, "<.displayname> (<tostring(.%boardgames_runeversi_rank)>)");
+            } else {
+                if_settext(inter_352:com_76, "<.displayname>");
+            }
+        } else {
+            if_setobject(inter_352:com_136, ~get_boardgames_rune_obj(.%boardgames_piece), 72);
+            if (.%boardgames_rankedgame = 1) {
+                if_settext(inter_352:com_67, "<.displayname> (<tostring(.%boardgames_runeversi_rank)>)");
+            } else {
+                if_settext(inter_352:com_67, "<.displayname>");
+            }
+        }
+        if_settext(inter_352:com_94, "Runeversi");
+        if_settext(inter_352:com_93, "Watching a game.");
+        if_settext(inter_352:com_89, "");
+        if (.%boardgames_control = 0) invother_transmit(.uid, boardgames_boardinv, inter_352:com_138);
+    }
+}
+if ($found_game = false) {
+    %boardgames_viewing = 0;
+    minimap_toggle(0);
+    ~initalltabs;
+    // UNKNOWN: plain message for an empty table.
+    mes("There is no Runeversi game at this table.");
+    return;
+}
+if_settext(inter_352:com_93, "Watching a game.");
+clearsofttimer(boardgames_close_spectate);
+if_openmain(inter_352);

@@ -1123,25 +1123,6 @@ transmit=yes
 transmit=yes
 
 
-[boardgames_runesquares_va]
-transmit=yes
-
-[boardgames_runesquares_vb]
-transmit=yes
-
-[boardgames_runesquares_ha]
-transmit=yes
-
-[boardgames_runesquares_hb]
-transmit=yes
-
-[boardgames_runesquares_rank]
-transmit=yes
-scope=perm
-
-[boardgames_runeversi_rank]
-transmit=yes
-scope=perm
 
 [varp650_unused]
 
