@@ -367,7 +367,7 @@ if (distance(coord, loc_coord) > 1) {
     p_aprange(1);
     return;
 }
-// VERIFIED period solution: the bottom-right of the four collected tiles.
+// UNKNOWN item-to-picture mapping implements the VERIFIED bottom-right instruction.
 // UNKNOWN functional option labels; no later puzzle interface is substituted.
 def_int $choice = ~p_choice4("Top-left tile", 1, "Top-right tile", 2, "Bottom-left tile", 3, "Bottom-right tile", 4);
 if ($choice ! 4 | inv_total(inv, roguesden_puzzle_mosaic_tile4) < 1) return;
@@ -485,17 +485,21 @@ if (distance(coord, $start) > 0) {
 ~roguesden_guard_throw;
 [apnpcu,roguesden_guard3]
 ~roguesden_guard_throw;
+[opnpcu,roguesden_guard1]
+~roguesden_guard_throw;
+[opnpcu,roguesden_guard2]
+~roguesden_guard_throw;
+[opnpcu,roguesden_guard3]
+~roguesden_guard_throw;
 
 [proc,roguesden_guard_throw]
 if (~roguesden_active = false | last_useitem ! roguesden_flash_powder) return;
-if (npc_range(coord) > 3) {
-    p_aprange(3);
+if (npc_range(coord) > ^roguesden_powder_range) {
+    p_aprange(^roguesden_powder_range);
     return;
 }
-if (npc_range(coord) < 3 & %roguesden_guard_stun_until <= map_clock) {
-    ~roguesden_guard_contact;
-    return;
-}
+// A running approach can enter the catch radius during this interaction phase.
+// An accepted throw wins here unless the earlier watch already ended the run.
 if (inv_total(inv, roguesden_flash_powder) < 1) return;
 inv_del(inv, roguesden_flash_powder, 1);
 %roguesden_guard_stun_until = add(map_clock, 10);
@@ -527,11 +531,11 @@ npc_settimer(0);
 
 [proc,roguesden_guard_watch](npc $kind)
 if (~roguesden_active = false) return;
-if (npc_find(coord, $kind, 2, 0) = true) ~roguesden_guard_contact;
+if (npc_find(coord, $kind, ^roguesden_guard_catch_range, 0) = true) ~roguesden_guard_contact;
 
 [proc,roguesden_guard_contact]
 if (~roguesden_active = false) return;
-if (npc_range(coord) >= 3 | %roguesden_guard_stun_until > map_clock) return;
+if (npc_range(coord) > ^roguesden_guard_catch_range | %roguesden_guard_stun_until > map_clock) return;
 if (lineofsight(coord, npc_coord) = false) return;
 %roguesden_guard_stun_until = 0;
 npc_anim(human_ready, 0);

@@ -68,23 +68,9 @@ if (inv_freespace(inv) < 1) {
     mes("You need a free inventory space before cracking the safe.");
     return;
 }
-// CANDIDATE early-OSRS maze safe roll: 0..199 against current Thieving.
-if (random(200) < stat(thieving)) {
-    // CANDIDATE: 3/8 Rogue kit, 5/8 equipment. UNKNOWN: uniform piece selection.
-    def_namedobj $reward = roguesden_kit;
-    if (random(8) >= 3) {
-        switch_int(random(5)) {
-            case 0 : $reward = roguesden_body;
-            case 1 : $reward = roguesden_helm;
-            case 2 : $reward = roguesden_legs;
-            case 3 : $reward = roguesden_gloves;
-            case 4 : $reward = roguesden_boots;
-        }
-    }
-    ~roguesden_leave(1);
-    inv_add(inv, $reward, 1);
-    // UNKNOWN functional success wording; the later crate choice is omitted.
-    mes("You crack the safe and receive a Rogue's reward.");
+// CANDIDATE: pass on 0..current Thieving, inclusive, from the 0..199 roll.
+if (random(200) <= stat(thieving)) {
+    ~roguesden_vault_reward;
     return;
 }
 if (random(2) = 0) {
@@ -98,10 +84,28 @@ def_int $before = stat(thieving);
 stat_sub(thieving, 1, 0);
 def_int $lost = sub($before, stat(thieving));
 if ($lost > 0) ~roguesden_maze_drain_thieving($lost);
-// CANDIDATE failure response: the other half drain one Thieving level.
+// CANDIDATE: the other half drain one Thieving level and still take the reward roll.
 // UNKNOWN functional drain wording.
 if ($lost > 0) {
     mes("The safe drains one level of Thieving, but you continue.");
 } else {
     mes("You resist the safe's drain and continue.");
 }
+~roguesden_vault_reward;
+
+[proc,roguesden_vault_reward]
+// CANDIDATE: 3/8 Rogue kit, 5/8 equipment. UNKNOWN: uniform piece selection.
+def_namedobj $reward = roguesden_kit;
+if (random(8) >= 3) {
+    switch_int(random(5)) {
+        case 0 : $reward = roguesden_body;
+        case 1 : $reward = roguesden_helm;
+        case 2 : $reward = roguesden_legs;
+        case 3 : $reward = roguesden_gloves;
+        case 4 : $reward = roguesden_boots;
+    }
+}
+~roguesden_leave(1);
+inv_add(inv, $reward, 1);
+// UNKNOWN functional success wording; the later crate choice is omitted.
+mes("You crack the safe and receive a Rogue's reward.");

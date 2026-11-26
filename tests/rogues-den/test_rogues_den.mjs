@@ -296,6 +296,7 @@ function automaticCrossing(p, approach, landing, label) {
 }
 const shownPlayers = new WeakSet();
 function useOnNpc(p, name, n) {
+  p.originX = p.x; p.originZ = p.z;
   if (!shownPlayers.has(p)) { rsbuf.addPlayer(p.slot); shownPlayers.add(p); }
   p.buildArea.rebuild();
   const appearance = p.generateAppearance();
@@ -314,15 +315,16 @@ function useOnNpc(p, name, n) {
   assert(rsbuf.hasNpc(p.slot, n.nid), 'actual guard is in the native received NPC view');
   const action = mazeTrace && { kind: 'itemOnNpc', name, npc: types.NpcType.get(n.type).debugname, x: n.x, z: n.z, level: n.level };
   if (action) mazeTrace.push(action);
+  const before = count(p, name);
   assert(npcUseHandler.handle(new OpNpcU(n.nid, obj(name), slotOf(p, name), invCom), p), 'production item-on-NPC input accepts the guard and powder');
-  const script = requireBoundHandler(p,
+  requireBoundHandler(p,
     p.inOperableDistance(n) ? (p.getOpTrigger() ?? p.getApTrigger()) : p.getApTrigger(),
     'powder on the actual visible guard');
-  const state = ScriptRunner.init(script, p, n);
-  p.executeScript(state, true, true);
-  finish(p, state);
+  for (let tick = 0; tick < 20 && active(p) && count(p, name) === before; tick++) environmentTick(p);
+  assert(active(p), 'native powder approach stuns without catching the player');
+  assert.equal(count(p, name), before - 1, 'native powder use consumes exactly one');
+  p.clearInteraction();
   if (action) action.landing = tile(p);
-  return state;
 }
 
 for (const name of [...equipment, 'roguesden_kit', ...mazeItems]) {
@@ -581,19 +583,68 @@ assert.deepEqual([...pieces].sort(), [...equipment].sort(), 'all five original r
   execute('[proc,roguesden_login]', p); execute('[proc,roguesden_logout]', p);
   assert.deepEqual([p.stats[PlayerStat.AGILITY], p.stats[PlayerStat.THIEVING]], awarded, 'cleared recovery hooks cannot pay partial-run XP again');
 }
-const failedStates = [];
-for (const consequence of [0, 0.99]) {
-  const { p, target } = vaultFixture(), before = p.levels[PlayerStat.THIEVING];
-  withRolls([0.999, consequence], () => operation(p, target, 'Crack'));
-  failedStates.push(active(p));
-  assert.equal([...equipment, 'roguesden_kit'].reduce((total, name) => total + count(p, name), 0), 0, 'bad safe roll cannot award equipment');
-  if (active(p)) {
-    assert.equal(p.levels[PlayerStat.THIEVING], before - 1, 'non-ejection safe failure consumes one Thieving level');
-    heldAction(p, 'roguesden_gem', 1);
-  }
+const rewards = p => [...equipment, 'roguesden_kit'].reduce((total, name) => total + count(p, name), 0);
+for (const level of [6, 50]) for (const roll of [level, level + 1]) {
+  const { p, target } = vaultFixture();
+  p.levels[PlayerStat.THIEVING] = level; // Isolated current-visible-skill boundary.
+  withRolls([(roll + 0.5) / 200, 0], () => operation(p, target, 'Crack'));
   clean(p);
+  assert.equal(rewards(p), Number(roll === level), `vault roll ${roll}: T passes, T+1 ejects at visible Thieving ${level}`);
 }
-assert.deepEqual(failedStates.sort(), [false, true], 'the two bad-roll consequences are ejection or further drain');
+{
+  const { p, target } = vaultFixture(), before = p.stats[PlayerStat.THIEVING];
+  withRolls([0.999, 0.75, 0.99, 0], () => operation(p, target, 'Crack'));
+  clean(p);
+  assert.equal(count(p, 'roguesden_body'), 1, 'non-ejected failed check still takes the equipment reward roll');
+  assert.equal(p.stats[PlayerStat.THIEVING] - before, 120, 'failed check records its one-level drain before completion XP');
+}
+{
+  const { p, target } = vaultFixture();
+  p.levels[PlayerStat.THIEVING] -= 6;
+  execute('[proc,roguesden_maze_drain_thieving]', p, [6]);
+  const before = p.stats[PlayerStat.THIEVING];
+  withRolls([0.999, 0], () => operation(p, target, 'Crack'));
+  clean(p);
+  assert.equal(rewards(p), 0, 'ejected failed check takes no reward roll');
+  assert.equal(p.stats[PlayerStat.THIEVING] - before, 360, 'ejection pays only the existing half-rate progress');
+}
+let equipmentBuckets = 0;
+for (let bucket = 0; bucket < 8; bucket++) {
+  const { p, target } = vaultFixture();
+  withRolls([0, (bucket + 0.5) / 8, 0], () => operation(p, target, 'Crack'));
+  clean(p);
+  assert.equal(count(p, 'roguesden_kit'), Number(bucket < 3), 'exactly the first three reward buckets award a kit');
+  equipmentBuckets += equipment.reduce((total, name) => total + count(p, name), 0);
+}
+assert.equal(equipmentBuckets, 5, 'exactly five of eight reward buckets award equipment');
+for (const [level, expectedRewards] of [[50, 251], [6, 207]]) {
+  let awarded = 0;
+  // Exhaust the compiled check's 200 rolls and both equally likely ejection
+  // outcomes. Duplicate successful checks preserve that common denominator.
+  for (let roll = 0; roll < 200; roll++) for (const eject of [0, 1]) {
+    const { p, target } = vaultFixture();
+    p.levels[PlayerStat.THIEVING] = level; // Independent odds fixture, not a traversed run.
+    const first = (roll + 0.5) / 200;
+    withRolls(roll <= level ? [first, 0] : [first, (eject + 0.5) / 2, 0], () => operation(p, target, 'Crack'));
+    clean(p);
+    awarded += rewards(p);
+  }
+  assert.equal(awarded, expectedRewards, `compiled vault reward outcomes at visible Thieving ${level}`);
+  if (level === 50) assert.equal((100 * awarded / 400 * equipmentBuckets / 8).toFixed(2), '39.22', 'source equipment chance at Thieving 50');
+  else assert.equal((100 * awarded / 400).toFixed(2), '51.75', 'source any-reward chance at route-drained Thieving 6');
+}
+{
+  const { p, target } = vaultFixture();
+  p.levels[PlayerStat.THIEVING] -= 44; // Independent fixture for the actual route's visible level.
+  execute('[proc,roguesden_maze_drain_thieving]', p, [44]);
+  const before = p.stats[PlayerStat.THIEVING];
+  operation(p, target, 'Crack'); // Natural RNG: assert either legal outcome, never retry.
+  clean(p);
+  const won = rewards(p), xp = p.stats[PlayerStat.THIEVING] - before;
+  assert(won === 0 || won === 1, 'one natural-RNG crack at visible Thieving 6 has a legal reward count');
+  assert(won ? xp === 44 * 120 || xp === 45 * 120 : xp === 44 * 60, 'natural outcome pays its exact completion or ejection progress');
+}
+console.log('PASS inclusive vault boundaries, drain-then-reward/ejection, 3/8 kit, exact 39.22%/51.75% rates and one natural-RNG crack');
 const kitTools = new Set();
 for (let choice = 1; choice <= 4; choice++) {
   const p = fixture();
@@ -782,6 +833,31 @@ for (const name of ['roguesden_trap_floor_spinningblades_0', 'roguesden_trap_flo
   assert(active(p), 'the ranged powder throw protects its genuine crossing');
   for (let tick = 0; tick < 12 && active(p); tick++) environmentTick(p);
   clean(p);
+}
+{
+  const guard = [...World.npcs].find(n => n.x === 3018 && n.z === 5072);
+  assert(guard, 'running regression uses the original northern guard');
+  const starts = [[4, 3014, 5072], [5, 3013, 5071], [6, 3012, 5069], [7, 3011, 5069], [8, 3010, 5069], [9, 3009, 5069]];
+  let runningOvershot = false;
+  for (const running of [false, true]) for (const [range, x, z] of starts) {
+    World.currentTick += 20; // Isolate each fixture beyond the previous ten-tick stun.
+    const p = enter(fixture());
+    seed(p, ['roguesden_flash_powder']); // Independent approach fixture, not route-earned powder.
+    p.teleport(x, z, 1);
+    p.runanim = id('SeqType', 'human_running'); p.run = Number(running); p.runenergy = 10000;
+    assert.equal(Math.max(Math.abs(p.x - guard.x), Math.abs(p.z - guard.z)), range);
+    const start = tile(p);
+    useOnNpc(p, 'roguesden_flash_powder', guard);
+    assert.notDeepEqual(tile(p), start, 'native approach, not fixture teleportation, moves toward the guard');
+    const throwRange = Math.max(Math.abs(p.x - guard.x), Math.abs(p.z - guard.z));
+    assert(throwRange <= 3, `${running ? 'running' : 'walking'} from range ${range} reaches the throw window`);
+    runningOvershot ||= running && throwRange < 3;
+    walk(p, { x: 3017, z: 5072, level: 1 });
+    assert(active(p), `${running ? 'running' : 'walking'} throw from range ${range} protects real close contact`);
+    heldAction(p, 'roguesden_gem', 1); clean(p);
+  }
+  assert(runningOvershot, 'regression exercises a real running step past range three');
+  console.log('PASS native walking and running powder approaches from every range 4-9, including running overshoot and protected contact');
 }
 for (const name of mazeItems.filter(name => name !== 'roguesden_gem')) {
   const p = enter(fixture());

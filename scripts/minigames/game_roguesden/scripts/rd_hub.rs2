@@ -30,7 +30,7 @@ mes("Brian hands you a Mystic jewel.");
 
 [opnpc3,roguesden_trader]
 if (stat_base(agility) < 50 | stat_base(thieving) < 50) {
-    // VERIFIED 50/50 Lost and Found gate; wording is functional.
+    // CANDIDATE 50/50 Lost and Found gate; wording is functional.
     mes("You need level 50 Agility and Thieving to use Lost and Found.");
     return;
 }
