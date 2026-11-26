@@ -1,0 +1,14 @@
+// Temporary standalone entry points approved by Main. Replaced by Zogre hooks at integration.
+[oploc1,zogre_outdoor_bell]
+loc_anim(zogre_bell_ring);
+if (npc_find(0_40_48_38_14, zogre_human_zavistic_rarve, 3, ^false) = ^false) {
+    npc_add(0_40_48_38_14, zogre_human_zavistic_rarve, 100);
+}
+mes("Zavistic Rarve answers the bell.");
+
+[opnpc1,zogre_human_zavistic_rarve]
+if (~handsand_zavistic = ^false) mes("Zavistic Rarve is busy with guild business.");
+
+[opnpcu,zogre_human_zavistic_rarve]
+def_obj $used = last_useitem;
+if (~handsand_zavistic_use($used) = ^false) ~displaymessage(^dm_default);
