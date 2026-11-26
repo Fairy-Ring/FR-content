@@ -1,5 +1,6 @@
 [proc,quest_elena_set_progress](int $stage)
 %elenaquest = $stage;
+if ($stage >= ^quest_elena_freed_elena) %plaguecity_elena_at_home = 1;
 ~send_quest_progress(questlist:elena, %elenaquest, ^elena_complete);
 
 [queue,quest_elena_complete]
