@@ -1489,7 +1489,7 @@ check('native save/reload retains member readiness and replaces the abandoned es
   const p = player(saved);
   assert.equal(stage(p), 150);
   assert.equal((p.getVar(id('VarPlayerType', 'myreque2_extravar')) >>> 13) & 3, 3);
-  place(p, 3517, 9838);
+  place(p, 3491, 9824);
   talk(p, spawn(p, 'route_ivan_strom'), [1]);
   landing(p, [2838, 4579, 0], 'restart after actual player reload');
   for (const name of ['burgh_ivan_strom_temple_ambush', 'burgh_ivan_temple_vampire_juve_1', 'burgh_ivan_temple_vampire_juve_2']) {
