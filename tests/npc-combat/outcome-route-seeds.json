@@ -8,7 +8,7 @@
       "position": { "x": 3285, "z": 9192, "level": 0 },
       "playerVars": { "ics_little_var": 6 },
       "npcVars": { "npc_attacking_uid": "target" },
-      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+      "seeds": { "hit": 1013904242, "miss": 2415085441, "zero": 1992887715 }
     },
     {
       "script": "[ai_opplayer2,ics_little_crondis]",
@@ -41,7 +41,7 @@
       "position": { "x": 3305, "z": 9195, "level": 0 },
       "playerVars": { "ics_little_var": 19 },
       "npcVars": { "npc_attacking_uid": "target" },
-      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+      "seeds": { "hit": 3668340011, "miss": 2415085441, "zero": 1992887715 }
     },
     {
       "script": "[ai_opplayer2,deal_evil_spirit]",
