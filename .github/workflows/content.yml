@@ -204,6 +204,7 @@ jobs:
           run_test tests/pickpocketing/test_pickpocketing.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/pickpocketing/test_pickpocketing.mjs
           run_test tests/thieving-stalls/test_stalls.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --random-seed=377 --import tsx ../content/tests/thieving-stalls/test_stalls.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
+          run_test tests/slayer-gates/test_slayer_gates.mjs node --import tsx ../content/tests/slayer-gates/test_slayer_gates.mjs
           run_test tests/npc-poison/test_poison.mjs node --import tsx ../content/tests/npc-poison/test_poison.mjs
           run_test tests/slayer-selector/test_proportional.mjs node --import tsx ../content/tests/slayer-selector/test_proportional.mjs --artifact-dir "$RUNNER_TEMP/slayer-proportional"
           run_test tests/login/test_follower_login.mjs node --import tsx ../content/tests/login/test_follower_login.mjs
