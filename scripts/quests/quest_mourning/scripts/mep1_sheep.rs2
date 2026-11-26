@@ -1,11 +1,11 @@
-[opheldu,empty_ogre_bellows] @mep1_dye_bellows;
+[opheldu,empty_ogre_bellows] @mep1_dye_bellows(last_useitem);
 [opheldu,mourning_paint_gun] @mep1_load_gun;
 [opheld1,mourning_paint_gun] @mep1_empty_gun;
 
-[label,mep1_dye_bellows]
+[label,mep1_dye_bellows](obj $dye)
 if (%mourning_quest ! ^mep1_device_fixed) return;
 if (inv_total(inv, empty_ogre_bellows) < 1) return;
-switch_obj(last_useitem) {
+switch_obj($dye) {
     case reddye :
         inv_del(inv, reddye, 1);
         inv_del(inv, empty_ogre_bellows, 1);

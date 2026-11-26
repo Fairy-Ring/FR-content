@@ -2,6 +2,7 @@
 [opheldu,reddye]
 switch_obj (last_useitem) 
 {
+    case empty_ogre_bellows : @mep1_dye_bellows(reddye);
     case ahoy_toy_boat_repaired : ~ahoy_dye_repaired_boat(reddye);
     case bluedye : @craft_dyes(purpledye);
     case yellowdye : @craft_dyes(orangedye);
@@ -12,6 +13,7 @@ switch_obj (last_useitem)
 [opheldu,bluedye]
 switch_obj (last_useitem) 
 {
+    case empty_ogre_bellows : @mep1_dye_bellows(bluedye);
     case ahoy_toy_boat_repaired : ~ahoy_dye_repaired_boat(bluedye);
     case reddye : @craft_dyes(purpledye);
     case yellowdye : @craft_dyes(greendye);
@@ -23,6 +25,7 @@ switch_obj (last_useitem)
 [opheldu,yellowdye]
 switch_obj (last_useitem) 
 {
+    case empty_ogre_bellows : @mep1_dye_bellows(yellowdye);
     case ahoy_toy_boat_repaired : ~ahoy_dye_repaired_boat(yellowdye);
     case reddye : @craft_dyes(orangedye);
     case bluedye : @craft_dyes(greendye);
@@ -34,6 +37,7 @@ switch_obj (last_useitem)
 [opheldu,greendye]
 switch_obj (last_useitem) 
 {
+    case empty_ogre_bellows : @mep1_dye_bellows(greendye);
     case ahoy_toy_boat_repaired : ~ahoy_dye_repaired_boat(greendye);
     case black_cape, red_cape, blue_cape, yellow_cape, purple_cape, orange_cape : @craft_capes(last_useitem, greendye);
     case default : ~displaymessage(^dm_default);
