@@ -176,8 +176,6 @@ womanwear=obj_mourning_paint_gun_manwear,6
 2dyan=1532
 members=yes
 cost=150
-// UNKNOWN server-only category for the native ranged hit roll; client fields remain unchanged.
-category=weapon_thrown
 iop2=Wield
 iop1=Empty
 wearpos=righthand

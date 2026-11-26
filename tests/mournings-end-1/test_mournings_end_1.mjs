@@ -292,6 +292,7 @@ function loadGun(p, toad) {
   takeOffGun(p); useItems(p, toad, 'mourning_paint_gun');
   assert(held(p, 'mourning_paint_gun', 2)); finish(p);
   assert.equal(count(p, 'mourning_paint_gun', worn), 1, 'native Wield equips the fixed device');
+  assert(p.getVar(varp('com_rangeattack')) > 0, 'native ranged hit roll is available without a ranged weapon category');
 }
 function questPoints(p) {
   const state = execute('[proc,count_questpoints]', p);
@@ -304,6 +305,7 @@ try {
     const names = [...source.matchAll(/^\[([^\]]+)\]/gm)].map(match => match[1]);
     assert(names.length > 0);
     for (const name of [...names, 'gasmask']) assert.equal(types.ObjType.get(obj(name)).tradeable, false, name);
+    assert.equal(types.ObjType.get(obj('mourning_paint_gun')).category, -1, 'fixed device is not generic disposable ranged ammunition');
     const state = types.VarPlayerType.get(varp('mep1_oronwen_ready_at'));
     assert.equal(state.transmit, false);
     assert.match(fs.readFileSync(path.join(contentRoot, 'scripts/quests/quest_mourning/configs/quest_mourning.varp'), 'utf8'), /\[mep1_oronwen_ready_at\][\s\S]*?scope=perm/);
