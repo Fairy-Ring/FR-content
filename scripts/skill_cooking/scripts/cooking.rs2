@@ -2,10 +2,6 @@
 if (last_useitem = mourning_toxic_naphtha) @mep1_heat_toxin;
 @attempt_cook_item(last_useitem);
 [oplocu,_cooking_fire]
-if (last_useitem = spit_skewered_chompy) {
-    @rfd_skrach_cook_skewered_chompy;
-    return;
-}
 if (last_useitem = mourning_toxic_naphtha) @mep1_fire_toxin;
 if(oc_param(last_useitem, unlit_arrow) = ^true) { // might not work on every fire?
     @light_firearrow(last_useitem);
@@ -15,6 +11,10 @@ if(oc_param(last_useitem, unlit_arrow) = ^true) { // might not work on every fir
 
 
 [label,attempt_cook_item](obj $uncooked_item)
+if ($uncooked_item = spit_skewered_chompy & lc_category(loc_type) = cooking_fire) {
+    @rfd_skrach_cook_skewered_chompy;
+    return;
+}
 if ($uncooked_item = hundred_pirate_raw_fishcake) @rfd_pete_cook;
 if ($uncooked_item = 100guide_guidecake_uncooked) {
     @rfd_guide_cook;

@@ -4,10 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  World, types, PlayerStat, nativeLocRows, nativeLoc, nativeNpc, player, position, skill, floorTiles, map,
+  World, ScriptProvider, ServerTriggerType, types, PlayerStat, nativeLocRows, nativeLoc, nativeNpc, player, position, skill, floorTiles, map,
   stand, operate, talk, useItems, useLoc, run, give, count, bit, setBit, setVar,
   text, id, obj, inv, com, capture, showNpc, walkable, load, finish
 } from '../rfd-s1/runtime.mjs';
+import { EntityLifeCycle } from '../regicide-travel/runtime.mjs';
 
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const config = path.join(content, 'scripts/quests/quest_100/configs');
@@ -35,6 +36,7 @@ const OpNpcHandler = await load('network/game/client/handler/OpNpcHandler.ts');
 const InvButton = await load('network/game/client/model/InvButton.ts');
 const InvButtonHandler = await load('network/game/client/handler/InvButtonHandler.ts');
 const JavaRandom = await load('util/JavaRandom.ts');
+const Loc = await load('engine/entity/Loc.ts');
 const heldHandler = new OpHeldHandler();
 const npcHandler = new OpNpcHandler();
 const invButtonHandler = new InvButtonHandler();
@@ -316,6 +318,53 @@ for (const [balloonCount, option] of [[1, 5], [2, 4]]) {
   run(p, '[proc,rfd_guest_reward]', { args: [6] });
   assert.deepEqual({ stats: [...p.stats], qp: p.getVar(id('VarPlayerType', 'qp')), tally: bit(p, 'hundred_subquest_tally') }, once,
     'the shared reward latch prevents a duplicate Skrach reward');
+}
+
+// Named fire handlers must reach the shared cooking dispatch; ovens must not roast the quest skewer.
+{
+  const [level, x, z] = coordinate('rfd_skrach_karamja_arrow_tree');
+  const sources = ['fire', 'range'].map((name, offset) => {
+    const type = types.LocType.get(id('LocType', name));
+    const target = new Loc(level, x + offset * 2, z - 1, type.width, type.length, EntityLifeCycle.DESPAWN, type.id, 10, 0);
+    World.addLoc(target, -1);
+    return target;
+  });
+  const [fire, oven] = sources;
+  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOCU, fire.type, types.LocType.get(fire.type).category).name,
+    '[oplocu,fire]', 'the original named OSF fire trigger overrides the cooking category');
+  try {
+    for (const [source, progress, cooking, roasts] of [
+      [fire, stage('chompy_skewered'), 99, true],
+      [fire, stage('tree_cut_twice'), 99, false],
+      [fire, stage('chompy_skewered'), 40, false],
+      [oven, stage('chompy_skewered'), 99, false]
+    ]) {
+      const { p } = fixture(progress, { cooking });
+      give(p, 'spit_skewered_chompy');
+      const xp = p.stats[PlayerStat.COOKING];
+      withRandom(0, () => useLoc(p, 'spit_skewered_chompy', source));
+      assert.equal(count(p, 'spit_skewered_chompy'), roasts ? 0 : 1, 'only an eligible fire roast consumes the skewer');
+      assert.equal(count(p, 'spit_iron'), roasts ? 1 : 0);
+      assert.equal(count(p, 'cooked_chompy'), roasts ? 1 : 0);
+      assert.equal(bit(p, '100_ogre_prog'), roasts ? stage('chompy_roasted') : progress);
+      assert.equal(bit(p, '100_ogre_jubbly_boat_visible'), roasts ? 1 : 0);
+      assert.equal(bit(p, '100_ogre_boat_free_ride'), roasts ? 1 : 0);
+      assert.equal(p.stats[PlayerStat.COOKING] - xp, roasts ? stage('chompy_cook_xp') : 0);
+    }
+    const { p: brewer } = fixture(stage('tree_cut_twice'));
+    give(brewer, 'bowl_water');
+    useLoc(brewer, 'bowl_water', fire);
+    assert.equal(count(brewer, 'bowl_water'), 0);
+    assert.equal(count(brewer, 'bowl_hot_water'), 1, 'the named OSF heating branch remains intact');
+    const { p: cook } = fixture(stage('tree_cut_twice'));
+    give(cook, 'raw_beef');
+    withRandom(0, () => useLoc(cook, 'raw_beef', fire));
+    assert.equal(count(cook, 'raw_beef'), 0);
+    assert.equal(count(cook, 'cooked_meat'), 1, 'ordinary fire cooking still uses the generic recipe');
+    assert.equal(bit(cook, '100_ogre_prog'), stage('tree_cut_twice'), 'ordinary cooking does not advance Skrach');
+  } finally {
+    for (const source of sources) World.removeLoc(source, 0);
+  }
 }
 
 // The first return is free only after a successful Karamja roast; later rides use aggregate fares.
