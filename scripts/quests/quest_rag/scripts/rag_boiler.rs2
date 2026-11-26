@@ -44,6 +44,33 @@ inv_add(inv, pot_empty, 1);
 [opheld4,rag_pot_monkey_bone] @rag_empty_bone;
 [opheld4,rag_pot_giant_rat_bone] @rag_empty_bone;
 [opheld4,rag_pot_giant_bat_bone] @rag_empty_bone;
+[opheld4,rag_pot_wolf_bone] @rag_empty_bone;
+[opheld4,rag_pot_bat_bone] @rag_empty_bone;
+[opheld4,rag_pot_rat_bone] @rag_empty_bone;
+[opheld4,rag_pot_baby_blue_dragon_bone] @rag_empty_bone;
+[opheld4,rag_pot_ogre_bone] @rag_empty_bone;
+[opheld4,rag_pot_jogre_bone] @rag_empty_bone;
+[opheld4,rag_pot_zogre_bone] @rag_empty_bone;
+[opheld4,rag_pot_mogre_bone] @rag_empty_bone;
+[opheld4,rag_pot_dagganoth_bone] @rag_empty_bone;
+[opheld4,rag_pot_snake_bone] @rag_empty_bone;
+[opheld4,rag_pot_zombie_bone] @rag_empty_bone;
+[opheld4,rag_pot_werewolf_bone] @rag_empty_bone;
+[opheld4,rag_pot_moss_giant_bone] @rag_empty_bone;
+[opheld4,rag_pot_fire_giant_bone] @rag_empty_bone;
+[opheld4,rag_pot_ice_giant_bone] @rag_empty_bone;
+[opheld4,rag_pot_terrorbird_bone] @rag_empty_bone;
+[opheld4,rag_pot_ghoul_bone] @rag_empty_bone;
+[opheld4,rag_pot_troll_bone] @rag_empty_bone;
+[opheld4,rag_pot_seagull_bone] @rag_empty_bone;
+[opheld4,rag_pot_undead_cow_bone] @rag_empty_bone;
+[opheld4,rag_pot_experiment_bone] @rag_empty_bone;
+[opheld4,rag_pot_rabbit_bone] @rag_empty_bone;
+[opheld4,rag_pot_baby_basilisk_bone] @rag_empty_bone;
+[opheld4,rag_pot_desert_lizard_bone] @rag_empty_bone;
+[opheld4,rag_pot_cave_goblin_bone] @rag_empty_bone;
+[opheld4,rag_pot_vulture_bone] @rag_empty_bone;
+[opheld4,rag_pot_jackal_bone] @rag_empty_bone;
 [label,rag_empty_bone]
 inv_del(inv, last_item, 1);
 inv_add(inv, pot_empty, 1);
@@ -54,7 +81,7 @@ inv_add(inv, pot_empty, 1);
 [oplocu,rag_potboiler_onfire] @rag_use_boiler;
 [oplocu,rag_potboiler_with_pot_boiled] @rag_use_boiler;
 [label,rag_use_boiler]
-if (~rag_stage ! 1) return;
+if (~rag_stage ! 1 & (~rag_stage < ^rag_complete | ~rag_wishlist_state ! 1)) return;
 if (%rag_boiler = 0 & oc_category(last_useitem) = category_22) {
     // CANDIDATE: the OSRS guide requires the log's Firemaking level.
     if (stat(firemaking) < oc_param(last_useitem, levelrequire)) {
@@ -68,9 +95,16 @@ if (%rag_boiler = 0 & oc_category(last_useitem) = category_22) {
 if (%rag_boiler = 1) {
     def_int $bone = ~rag_bone_index(last_useitem);
     if ($bone > 0) {
+        if ($bone > 8 & ~rag_wishlist_state ! 1) return;
         if (last_useitem = ~rag_potted($bone)) {
             inv_del(inv, last_useitem, 1);
-            %rag_inv_check = $bone;
+            if ($bone > 8) {
+                %rag_wishlist = setbit(%rag_wishlist, 29);
+                %rag_inv_check = sub($bone, 8);
+            } else {
+                %rag_wishlist = clearbit(%rag_wishlist, 29);
+                %rag_inv_check = $bone;
+            }
             %rag_boiler = 2;
             return;
         }
@@ -93,8 +127,9 @@ if (inv_freespace(inv) < 1) {
     ~displaymessage(^dm_invspace);
     return;
 }
-inv_add(inv, ~rag_potted(%rag_inv_check), 1);
+inv_add(inv, ~rag_potted(~rag_boiler_bone), 1);
 %rag_inv_check = 0;
+%rag_wishlist = clearbit(%rag_wishlist, 29);
 %rag_boiler = 1;
 
 [oploc1,rag_potboiler_with_pot_boiled]
@@ -103,9 +138,10 @@ if (inv_freespace(inv) < 2) {
     ~displaymessage(^dm_invspace);
     return;
 }
-inv_add(inv, ~rag_polished(%rag_inv_check), 1);
+inv_add(inv, ~rag_polished(~rag_boiler_bone), 1);
 inv_add(inv, pot_empty, 1);
 %rag_inv_check = 0;
+%rag_wishlist = clearbit(%rag_wishlist, 29);
 %rag_boiler = 0;
 
 [proc,rag_login]

@@ -2,7 +2,7 @@
 // Subtract the later start overlay and restore the recorded pre-2022 sack line.
 [opnpc1,rag_odd_old_man]
 if (~rag_stage >= ^rag_complete) {
-    ~chatnpc("<p,neutral>I'm always on the lookout for fresh bones, so if you see some bring them right over.");
+    ~rag_wishlist_talk;
     return;
 }
 if (~rag_stage = 1) {

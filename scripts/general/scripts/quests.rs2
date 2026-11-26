@@ -387,6 +387,9 @@ if (%tog_juna_bowl >= ^tog_quest_complete) {
 if (~rag_stage >= ^rag_complete) {
     $questpoints = add($questpoints, ^rag_questpoints);
 }
+if (~rag_wishlist_state = 2) {
+    $questpoints = add($questpoints, 1);
+}
 if (%roving_elves_quest >= ^roving_complete) {
     $questpoints = add($questpoints, ^roving_questpoints);
 }

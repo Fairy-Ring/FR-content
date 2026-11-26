@@ -127,6 +127,16 @@ check(seenEqualityDifferences.size === equalityDifferences.size, 'every named eq
   seed(p, [[quest.fixture[0][0], quest.fixture[0][1] + 16]]);
   expectedFailure(count(p) === 0, quest.name, 'high bit leaves computed colour complete but raw-varp equality loses two points');
 }
+// Rag's post-quest wish-list adds a separate point without changing Part1.
+{
+  const p = player();
+  seed(p, [['rag_quest', 2]]);
+  check(count(p) === 1, 'Rag Part1 alone retains its original one quest point');
+  seed(p, [['rag_wishlist', 1 << 27]]);
+  check(count(p) === 1, 'active wish-list awards no additional quest point');
+  seed(p, [['rag_wishlist', 2 << 27]]);
+  check(count(p) === 2, 'rewarded wish-list adds exactly one quest point');
+}
 {
   const p = player();
   for (const quest of quests) {

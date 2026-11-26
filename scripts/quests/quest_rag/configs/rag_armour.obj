@@ -15,6 +15,7 @@ womanhead=obj_rag_ram_helm_womanhead
 weight=3g
 wearpos=hat
 weight=7lb
+tradeable=no
 // VERIFIED defences: RuneHQ Rag and Bone Man guide, captured 24 April 2006.
 // CANDIDATE other bonuses: Old School Ram skull helm revision 145589 (2013-05-21).
 param=rangeattack,-2
@@ -40,6 +41,7 @@ womanwear=obj_rag_bonesack_womanwear,0
 cost=1
 weight=3g
 wearpos=back
+tradeable=no
 // VERIFIED defences: RuneHQ Rag and Bone Man guide, captured 24 April 2006.
 // CANDIDATE other bonuses: Old School Bonesack revision 155096 (2013-07-06).
 param=stabdefence,4

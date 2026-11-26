@@ -28,7 +28,7 @@ export function value(name) {
 const lineAt = offset => questSource.slice(0, offset).split('\n').length;
 const counterStart = questSource.indexOf('[proc,count_questpoints]');
 const listStart = questSource.indexOf('[proc,update_questlist]');
-export const blocks = [...questSource.slice(counterStart, listStart).matchAll(/if \((.*?)\) \{[^{}]*?\$questpoints = add\(\$questpoints, \^(\w+)\);[^{}]*?\}/gs)].map(match => ({
+export const blocks = [...questSource.slice(counterStart, listStart).matchAll(/if \(([^{}\n]*?)\) \{[^{}]*?\$questpoints = add\(\$questpoints, \^(\w+)\);[^{}]*?\}/gs)].map(match => ({
   condition: match[1], pointsConstant: match[2], line: lineAt(counterStart + match.index)
 }));
 
