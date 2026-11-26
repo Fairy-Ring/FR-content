@@ -81,7 +81,6 @@ if (%spy = 1) {
 // Tiffy owns testing intro/accept (spoke + permanent introduced). BKF spy 0–3 untouched.
 if (%rd_main >= ^recruitmentdrive_complete) {
     @wanted_amik;
-    return;
 } else if (%rd_main > 0) {
     @recruitment_drive_sir_amik_in_progress;
 }
