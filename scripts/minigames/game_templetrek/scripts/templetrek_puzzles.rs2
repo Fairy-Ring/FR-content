@@ -14,7 +14,8 @@ if (%templetrek_last_event = 8) {
     while ($row < 5) {
         def_int $column = 0;
         while ($column < 2) {
-            loc_add(~templetrek_room_coord(movecoord(0_32_78_11_13, $column, 0, $row)), templetrek_route_direction, 0, centrepiece_straight, 0);
+            // VERIFIED original model suffix _0: this marker is a ground decoration.
+            loc_add(~templetrek_room_coord(movecoord(0_32_78_11_13, $column, 0, $row)), templetrek_route_direction, 0, grounddecor, 0);
             $column = add($column, 1);
         }
         $row = add($row, 1);

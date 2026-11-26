@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { World, ScriptProvider, ScriptState, ServerTriggerType as T, PlayerStat, types, engineModule, id, obj, inv, worn, player, seed, count, inventory, execute, button, tile, useLoc as nativeUseLoc, held, use, settle, interactionTick, map } from '../swamp-caves/runtime.mjs';
 
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
@@ -357,6 +358,14 @@ pathOut(puzzle.level, puzzle.x, puzzle.z, 'bridge far-bank landing');
 proc(puzzle, 'templetrek_enter_event', [8]);
 assert.deepEqual([puzzle.level, puzzle.x & 63, puzzle.z & 63], [0, 12, 9], 'bog begins on original southern bank');
 pathOut(puzzle.level, puzzle.x, puzzle.z, 'bog entry');
+const originalBogModels = readFileSync(new URL('../../pack/model.pack', import.meta.url), 'utf8');
+assert.deepEqual(Array.from(originalBogModels.matchAll(/^\d+=(templetrek_route_direction(?:_\w+)?)$/gm), match => match[1]), ['templetrek_route_direction_0'], 'the original Bog model exists only as ground decoration');
+for (let row = 0; row < 5; row++) {
+    for (let column = 0; column < 2; column++) {
+        const patch = loc(puzzle, 'templetrek_route_direction', packed(0, 32, 78, 11 + column, 13 + row));
+        assert.equal(patch.shape, 22, 'every native Bog patch uses its original renderable model shape');
+    }
+}
 seed(puzzle, ['knife']);
 at = room(puzzle, packed(0, 32, 78, 13, 11));
 puzzle.teleport(at.x, at.z, at.level);
