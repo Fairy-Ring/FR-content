@@ -1,6 +1,7 @@
-// UNKNOWN engineering safety policy, approved by Main: escrow and unpaid credit
-// survive logout. Native host/login returns this balance without requiring a new wager.
+// UNKNOWN engineering escrow survives logout. Only a validated match may
+// transfer its departing owner's stake to the opponent's private purse.
 [ratpits_purse]
 scope=perm
 size=1
 stackall=yes
+protect=no

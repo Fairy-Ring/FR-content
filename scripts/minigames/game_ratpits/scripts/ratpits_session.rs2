@@ -145,12 +145,35 @@ if (%ratpits_phase = 2) {
         mes("A worn Catspeak amulet is required to call your cat back.");
         return;
     }
-    // CANDIDATE retreat forfeits the wager, but returns the surviving cat.
-    if (%ratpits_player_a = uid) %ratpits_result = 2;
-    else %ratpits_result = 1;
+    ~ratpits_forfeit;
+    return;
 } else {
     %ratpits_result = 0;
 }
+%ratpits_phase = 3;
+if_close;
+
+// A deliberate departure settles its financial loss before another input can
+// turn it into a disconnect refund. Only the private escrow is unprotected.
+[proc,ratpits_forfeit]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase = 3) return;
+if (%ratpits_phase = 1) { ~ratpits_cancel; return; }
+if (.finduid(~ratpits_opponent) = false) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    return;
+}
+if (.%varp283_unused ! npc_uid) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    return;
+}
+def_int $stake = inv_total(ratpits_purse, coins);
+inv_del(ratpits_purse, coins, $stake);
+.inv_add(ratpits_purse, coins, $stake);
+if (%ratpits_player_a = uid) %ratpits_result = 2;
+else %ratpits_result = 1;
 %ratpits_phase = 3;
 if_close;
 
@@ -268,6 +291,7 @@ if ($dead = 1 & %follower_uid = $cat) {
     mes("Cat defeated.");
 } else if (%follower_uid = $cat) {
     if (npc_finduid($cat) = true) {
+        ~ratpits_cat_restore;
         npc_setmode(none);
         npc_telejump(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk));
         npc_setmode(playerfollow);

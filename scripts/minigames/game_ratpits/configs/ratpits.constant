@@ -28,3 +28,11 @@
 // UNKNOWN amounts for the VERIFIED qualitative post-match training benefit.
 ^ratpits_growth_reward = 1
 ^ratpits_attention_reward = 1
+
+// UNKNOWN pit-only fallback for native cats without combat statistics.
+// The adult profile matches the existing lazy-cat 14/6/6/2 basis, not history.
+^ratpits_native_profile_min_hp = 2
+^ratpits_unprofiled_hitpoints = 14
+^ratpits_unprofiled_attack = 6
+^ratpits_unprofiled_strength = 6
+^ratpits_unprofiled_defence = 2

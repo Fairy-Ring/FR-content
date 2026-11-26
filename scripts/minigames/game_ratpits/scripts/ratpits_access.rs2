@@ -12,8 +12,9 @@ switch_int ($venue) {
 }
 
 [proc,ratpits_exit](int $venue)
-if (%varp283_unused ! null) ~ratpits_logout;
+if (%varp283_unused ! null) ~ratpits_forfeit;
 switch_int ($venue) {
     case 1 : ~climb_ladder(^ratcatch_mansion_town_exit, true);
     case 2 : ~climb_ladder(0_51_53_3_9, true);
+    case 4 : ~climb_ladder(0_47_50_10_31, true);
 }

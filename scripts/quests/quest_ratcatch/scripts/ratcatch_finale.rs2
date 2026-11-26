@@ -48,5 +48,5 @@ if (%ratcatch_var < 16) {
 if (loc_coord = 0_41_150_37_41) { ~ratpits_exit(1); return(true); }
 if (loc_coord = 0_45_79_15_41) { ~ratpits_exit(2); return(true); }
 if (coordx(loc_coord) ! 2962 | coordz(loc_coord) ! 9651) return(false);
-~climb_ladder(0_47_50_10_31, true);
+~ratpits_exit(4);
 return(true);

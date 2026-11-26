@@ -97,6 +97,5 @@ set_player_op("Challenge", 1, ^false);
 [mapzoneexit,0_46_150] ~ratpits_leave;
 
 [proc,ratpits_leave]
-if (~ratpits_venue(coord) ! 0) return;
-if (%varp283_unused ! null) ~ratpits_logout;
-set_player_op(null, 1, ^false);
+if (%varp283_unused ! null) ~ratpits_forfeit;
+if (~ratpits_venue(coord) = 0) set_player_op(null, 1, ^false);

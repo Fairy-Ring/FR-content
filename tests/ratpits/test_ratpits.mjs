@@ -586,12 +586,157 @@ for (const hardDeadline of [false, true]) {
   assert.equal(coinTotal(a, b), 200);
 }
 
+// The original overgrown type stays unmodified. Real actor levels receive a
+// pit-only profile, with no fixture HP or rat-stat overrides in these races.
+{
+  const a = makeTrainer(3), b = makeTrainer(3, { catspeak: true });
+  const felineA = cat(a), felineB = cat(b);
+  const nativeBases = [...felineA.baseLevels];
+  assert.equal(nativeBases[NpcStat.HITPOINTS], 1, 'the native overgrown type still has its original one-HP default');
+  const host = openOffer(a, b, [], [1]);
+  startMatch(a, b, host);
+  const maximum = runNpcProc(felineA, 'ratpits_cat_max_health').popInt();
+  assert(maximum > nativeBases[NpcStat.HITPOINTS], 'the unprofiled overgrown cat receives a playable pit HP basis');
+  assert.equal(felineA.levels[NpcStat.HITPOINTS], maximum);
+  for (const stat of [NpcStat.ATTACK, NpcStat.STRENGTH, NpcStat.DEFENCE]) {
+    assert(felineA.levels[stat] > nativeBases[stat], 'the missing native combat stat receives the named pit profile');
+  }
+  for (let round = 0; round < 100 && npcValue(host, 'ratpits_phase') === 2; round++) {
+    World.currentTick += host.timerInterval - 1;
+    withRandomSequence([0.999], () => tickHost(host));
+  }
+  assert.equal(npcValue(host, 'ratpits_score_a'), 5, 'a real overgrown cat completes five full-health Keldagrim rats without an HP override');
+  assert.equal(npcValue(host, 'ratpits_score_b'), 0);
+  assert.equal(npcValue(host, 'ratpits_phase'), 0);
+  assert.equal(a.invTotal(inv, obj('coins')), 200);
+  assert.equal(b.invTotal(inv, obj('coins')), 0);
+  for (const [owner, feline] of [[a, felineA], [b, felineB]]) {
+    assert.equal(owner.getVar(v('follower_uid')), feline.uid, 'the native overgrown follower survives the completed race');
+    assert.deepEqual([...feline.baseLevels], nativeBases, 'the pit never changes native NPC base statistics');
+    assert.deepEqual([...feline.levels], nativeBases, 'the temporary profile does not escape the pit');
+  }
+}
+
+// Adversarial native rolls make both cats miss and the rats hit for maximum
+// damage. Cautious must stop at half of the pit profile before any cat dies.
+{
+  const a = makeTrainer(3, { catspeak: true }), b = makeTrainer(3);
+  const felineA = cat(a), felineB = cat(b);
+  const host = openOffer(a, b, [1]);
+  startMatch(a, b, host);
+  const maximum = runNpcProc(felineA, 'ratpits_cat_max_health').popInt();
+  const threshold = Math.floor(maximum / 2);
+  for (let round = 0; round < maximum - threshold; round++) {
+    World.currentTick += host.timerInterval - 1;
+    withRandomSequence([0, 0.999, 0.999, 0, 0.999], () => tickHost(host));
+    assert.equal(npcValue(host, 'ratpits_phase'), 2, 'Cautious remains active before its next half-health check');
+  }
+  assert.equal(felineA.levels[NpcStat.HITPOINTS], threshold, 'real rat damage reaches the half-health retreat threshold');
+  withRandomSequence([0, 0.999, 0.999, 0, 0.999], () => tickHost(host));
+  assert.equal(npcValue(host, 'ratpits_phase'), 0);
+  assert.equal(npcValue(host, 'ratpits_dead_a'), 0, 'Cautious causes zero cat deaths');
+  assert.equal(npcValue(host, 'ratpits_dead_b'), 0);
+  assert.equal(a.getVar(v('follower_uid')), felineA.uid);
+  assert.equal(b.getVar(v('follower_uid')), felineB.uid);
+  assert(felineA.levels[NpcStat.HITPOINTS] > 0 && felineB.levels[NpcStat.HITPOINTS] > 0);
+  assert.equal(b.invTotal(inv, obj('coins')), 200, 'a safe automatic retreat still forfeits the wager');
+}
+
+// Stay-in-there starts a genuine race, takes real rat damage and accepts native
+// raw-fish feeding against the pit maximum instead of the one-HP native base.
+{
+  const a = makeTrainer(3, { catspeak: true }), b = makeTrainer(3, { catspeak: true });
+  const feline = cat(a), opponentCat = cat(b);
+  const host = openOffer(a, b, [2], [2]);
+  startMatch(a, b, host);
+  const maximum = runNpcProc(feline, 'ratpits_cat_max_health').popInt();
+  for (let round = 0; round < 10; round++) {
+    World.currentTick += host.timerInterval - 1;
+    withRandomSequence([0, 0.999, 0.999, 0, 0.999], () => tickHost(host));
+    assert.equal(npcValue(host, 'ratpits_phase'), 2, 'Stay-in-there does not withdraw immediately or die while above one HP');
+  }
+  const damagedHp = feline.levels[NpcStat.HITPOINTS];
+  assert.equal(damagedHp, maximum - 10, 'the real NPC carries ten landed rat hits without fixture HP writes');
+  const wall = target('loc', 'vc_dwarfrat_wall1', rows => rows.find(row => row.mx === 30 && row.mz === 73));
+  add(a, 'raw_shrimp', 2); add(a, 'raw_tuna', 2);
+  interact(a, wall, T.OPLOCU, 'raw_shrimp');
+  assert.equal(feline.levels[NpcStat.HITPOINTS], damagedHp + 3, 'raw shrimp heals the real overgrown cat by three');
+  assert.equal(a.invTotal(inv, obj('raw_shrimp')), 1);
+  interact(a, wall, T.OPLOCU, 'raw_tuna');
+  assert.equal(feline.levels[NpcStat.HITPOINTS], maximum, 'raw tuna heals up to the dedicated pit maximum');
+  assert.equal(a.invTotal(inv, obj('raw_tuna')), 1);
+  interact(a, wall, T.OPLOCU, 'raw_shrimp');
+  assert.equal(a.invTotal(inv, obj('raw_shrimp')), 1, 'a full-health overgrown cat consumes no extra fish');
+  assert.equal(opponentCat.levels[NpcStat.HITPOINTS], damagedHp, 'feeding affects only the owner cat');
+  run(a, '[proc,ratpits_logout]');
+  tickHost(host);
+  assert.equal(a.invTotal(inv, obj('coins')), 100);
+  assert.equal(b.invTotal(inv, obj('coins')), 100);
+  assert.equal(a.getVar(v('follower_uid')), feline.uid);
+}
+
+// A losing trainer cannot turn a deliberate exit into a refund. Commit the
+// loss even while the recipient is busy and the leaver logs out before reset.
+for (const departure of ['native-ladder', 'mapzone-exit', 'controller-observation']) {
+  const a = makeTrainer(4, { catspeak: true }), b = makeTrainer(4);
+  const felineA = cat(a), felineB = cat(b);
+  const host = openOffer(a, b, [1]);
+  startMatch(a, b, host);
+  for (let round = 0; round < 50 && npcValue(host, 'ratpits_score_b') < 4 && npcValue(host, 'ratpits_phase') === 2; round++) {
+    World.currentTick += host.timerInterval - 1;
+    withRandomSequence([0.999], () => tickHost(host));
+  }
+  assert.equal(npcValue(host, 'ratpits_score_a'), 0);
+  assert.equal(npcValue(host, 'ratpits_score_b'), 4, 'the departing owner is genuinely losing zero to four');
+  a.invDel(worn, obj('ics_little_amulet_of_catspeak'), 1);
+  b.delayed = true;
+  b.delayedUntil = World.currentTick + 1000;
+  assert.equal(b.canAccess(), false, 'the winner cannot yet be acquired for protected settlement');
+  if (departure === 'native-ladder') {
+    const ladder = target('loc', 'vc_ladder', rows => rows.find(row => row.mx === 46 && row.mz === 150));
+    interact(a, ladder, T.OPLOC1);
+    assert.deepEqual(tile(a), [0, 3018, 3231], 'the actual Sarim exit ladder still reaches its source landing');
+  } else {
+    a.teleport(3018, 3231, 0);
+    if (departure === 'mapzone-exit') run(a, '[mapzoneexit,0_46_150]');
+    else tickHost(host);
+  }
+  assert.equal(a.invTotal(purse, obj('coins')), 0, `${departure}: leaving forfeits the trailing owner's escrow immediately`);
+  assert.equal(b.invTotal(purse, obj('coins')), 200, `${departure}: the opponent owns the entire wager before deferred cleanup`);
+  run(a, '[logout,_]');
+  assert.equal(a.invTotal(inv, obj('coins')), 0, 'logout after deliberate departure cannot undo its forfeiture');
+  assert.equal(b.invTotal(purse, obj('coins')), 200);
+  b.delayed = false;
+  b.delayedUntil = 0;
+  tickHost(host);
+  assert.equal(npcValue(host, 'ratpits_phase'), 0);
+  assert.equal(b.invTotal(inv, obj('coins')), 200, `${departure}: the opponent receives the whole wager exactly once`);
+  assert.equal(coinTotal(a, b), 200);
+  assert.equal(a.getVar(v('follower_uid')), felineA.uid, 'the departing owner retains the same surviving cat');
+  assert.equal(b.getVar(v('follower_uid')), felineB.uid);
+  assert.equal(felineA.targetOp, NpcMode.PLAYERFOLLOW);
+  assert.equal(felineB.targetOp, NpcMode.PLAYERFOLLOW);
+  run(a, '[proc,ratpits_forfeit]');
+  runNpcProc(host, 'ratpits_finish');
+  assert.equal(coinTotal(a, b), 200, 'repeated departure and cleanup cannot duplicate the pot');
+}
+{
+  const a = makeTrainer(4), b = makeTrainer(4);
+  const host = openOffer(a, b);
+  a.teleport(3018, 3231, 0);
+  run(a, '[mapzoneexit,0_46_150]');
+  tickHost(host);
+  assert.equal(npcValue(host, 'ratpits_phase'), 0);
+  assert.equal(a.invTotal(inv, obj('coins')), 100, 'a pre-match exit is still a non-paying cancellation');
+  assert.equal(b.invTotal(inv, obj('coins')), 100);
+}
+
 // Every native controller completes a whole real five-rat race and permits another session.
 for (const spec of venues) {
   const a = makeTrainer(spec.id), b = makeTrainer(spec.id);
   const host = openOffer(a, b);
   startMatch(a, b, host);
-  setHp(cat(a), 100); setHp(cat(b), 100);
+  if (spec.id !== 3) { setHp(cat(a), 100); setHp(cat(b), 100); }
   for (let round = 0; round < 5; round++) {
     setHp(getRat(host, 1), 1);
     setHp(getRat(host, 2), 10000);

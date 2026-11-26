@@ -11,9 +11,17 @@ if (finduid(%ratpits_player_a) = false | .finduid(%ratpits_player_b) = false) {
     ~ratpits_finish;
     return;
 }
-if (%varp283_unused ! npc_uid | .%varp283_unused ! npc_uid | ~ratpits_venue(coord) ! %ratpits_venue | ~ratpits_venue(.coord) ! %ratpits_venue) {
+if (%varp283_unused ! npc_uid | .%varp283_unused ! npc_uid) {
     %ratpits_result = 0;
     %ratpits_phase = 3;
+    ~ratpits_finish;
+    return;
+}
+if (~ratpits_venue(coord) ! %ratpits_venue | ~ratpits_venue(.coord) ! %ratpits_venue) {
+    if (~ratpits_venue(coord) = %ratpits_venue) {
+        if (finduid(%ratpits_player_b) = false) return;
+    }
+    ~ratpits_forfeit;
     ~ratpits_finish;
     return;
 }
@@ -53,11 +61,13 @@ p_teleport(~ratpits_owner_tile($venue, 1));
 if (npc_finduid($a) = true) {
     npc_setmode(none);
     npc_settimer(0);
+    ~ratpits_cat_prepare;
     npc_telejump(~ratpits_cat_tile($venue, 1));
 }
 if (npc_finduid($b) = true) {
     npc_setmode(none);
     npc_settimer(0);
+    ~ratpits_cat_prepare;
     npc_telejump(~ratpits_cat_tile($venue, 2));
 }
 if (npc_finduid($host) = false) return;
@@ -121,7 +131,7 @@ if (npc_stat(hitpoints) <= 0) {
     else %ratpits_dead_b = 1;
     return(2);
 }
-if (($style = 1 & npc_stat(hitpoints) <= divide(npc_basestat(hitpoints), ^ratpits_cautious_hp_divisor)) | ($style = 2 & npc_stat(hitpoints) <= ^ratpits_endurance_retreat_hp)) {
+if (($style = 1 & npc_stat(hitpoints) <= divide(~ratpits_cat_max_health, ^ratpits_cautious_hp_divisor)) | ($style = 2 & npc_stat(hitpoints) <= ^ratpits_endurance_retreat_hp)) {
     if (npc_finduid($host) = false) return(3);
     return(3);
 }
@@ -179,3 +189,23 @@ if_settext(cat_defeated:com_5, tostring(sub($target, %ratpits_score_b)));
 .if_settext(cat_defeated:com_1, "<displayname>");
 .if_settext(cat_defeated:com_4, tostring(sub($target, %ratpits_score_b)));
 .if_settext(cat_defeated:com_5, tostring(sub($target, %ratpits_score_a)));
+
+// UNKNOWN temporary combat basis for a native cat whose base HP is below two.
+// Native actor levels carry real damage; its original type and bases stay intact.
+[proc,ratpits_cat_prepare]
+if (npc_basestat(hitpoints) >= ^ratpits_native_profile_min_hp) return;
+npc_statadd(hitpoints, sub(^ratpits_unprofiled_hitpoints, npc_stat(hitpoints)), 0);
+npc_statadd(attack, sub(^ratpits_unprofiled_attack, npc_stat(attack)), 0);
+npc_statadd(strength, sub(^ratpits_unprofiled_strength, npc_stat(strength)), 0);
+npc_statadd(defence, sub(^ratpits_unprofiled_defence, npc_stat(defence)), 0);
+
+[proc,ratpits_cat_max_health]()(int)
+if (npc_basestat(hitpoints) < ^ratpits_native_profile_min_hp) return(^ratpits_unprofiled_hitpoints);
+return(npc_basestat(hitpoints));
+
+[proc,ratpits_cat_restore]
+if (npc_basestat(hitpoints) >= ^ratpits_native_profile_min_hp) return;
+npc_statheal(hitpoints, 0, 0);
+npc_statheal(attack, 0, 0);
+npc_statheal(strength, 0, 0);
+npc_statheal(defence, 0, 0);
