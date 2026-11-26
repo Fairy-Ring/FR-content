@@ -18,7 +18,6 @@ const built = [
 const left = [
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_repaired', 1, [1, 2]],
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_damaged', 0, [1]],
-  ['hundred_goodchest', 'hundred_goodchest_base', 3, [1, 2, 3]],
   ['mausoleum', 'mausoleum', null, [1]]
 ];
 const builtFever = [
@@ -188,6 +187,46 @@ for (const [root, visible, state, options] of builtFever) {
   }
   console.log(`PASS built Cabin Fever: ${root} -> ${visible}, options ${options.join(',')}`);
 }
+const rfdChests = natural('hundred_goodchest');
+assert(rfdChests.length, 'RFD chest has an original placement');
+for (const placement of rfdChests) {
+  for (const stage of [0, 1, 2, 3]) {
+    for (const option of [1, 2, 3]) {
+      const loc = locAt(placement), p = fixture(placement);
+      // Resolve the native handler from its visible form, then exercise its unlock guard.
+      setForm(p, loc, 3);
+      arm(p, loc, option);
+      assert.equal(p.getApTrigger(), null, `RFD chest option ${option} uses its built OP handler`);
+      const script = p.getOpTrigger();
+      assert(script, `RFD chest option ${option} resolves through production dispatch`);
+      assert.equal(script.info.sourceFilePath, 'scripts/quests/quest_100/scripts/rfd_hub.rs2',
+        `RFD chest option ${option} reaches its owning quest`);
+      const before = [p.modalMain, p.modalSide, p.invListeners.length];
+      setForm(p, loc, stage);
+      finish(p, script, loc);
+      if (stage < 3) {
+        assert.deepEqual([p.modalMain, p.modalSide, p.invListeners.length], before,
+          `RFD stage ${stage} cannot open chest option ${option}`);
+        continue;
+      }
+      assert.equal(p.resolveLocTypeForTrigger(types.LocType.get(loc.type)).id,
+        id('LocType', 'hundred_goodchest_base'), 'unlocked RFD chest shows its original service form');
+      if (option === 1) {
+        bank(p);
+      } else {
+        const stock = id('InvType', option === 2 ? 'hundred_foodchest1' : 'hundred_rewardchest1');
+        assert.equal(p.getVar(id('VarPlayerType', 'shop')), stock, 'RFD chest opens the matching first-tier stock');
+        assert.equal(p.modalMain, component('shop_template'));
+        assert.equal(p.modalSide, component('shop_template_side'));
+        for (const [inventory, target] of [[id('InvType', 'inv'), 'shop_template_side:inv'], [stock, 'shop_template:inv']]) {
+          assert(p.invListeners.some(l => l.type === inventory && l.com === component(target)),
+            `RFD chest option ${option} uses the published ${target} listener`);
+        }
+      }
+    }
+  }
+}
+console.log('PASS RFD chest: all three native OP handlers, unlock guards and published bank/shop listeners');
 for (const [root, visible, state, options] of left) {
   const all = natural(root);
   assert(all.length, `${root} has an original placement`);
