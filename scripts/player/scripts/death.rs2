@@ -17,6 +17,7 @@ if (~roguesden_active = true) { ~roguesden_death; return; }
 if (%macro_event = ^macro_lost_and_found) {
     ~macro_event_cleanup(%macro_event, %macro_event_uid);
 }
+if (%macro_event = ^macro_frogs) ~macro_event_cleanup(%macro_event, %macro_event_uid);
 if (%darkness_level ! 0) ~swamp_cave_release;
 // The queue owns protected player access; snapshot before any death delay.
 // Marker 2 is an earned pending claim and must survive ordinary death.
