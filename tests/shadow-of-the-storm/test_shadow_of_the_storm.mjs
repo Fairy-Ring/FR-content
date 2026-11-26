@@ -36,12 +36,14 @@ const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/
 const { ProtectedActivePlayer } = await import(pathToFileURL(path.join(engine, 'src/engine/script/ScriptPointer.ts')).href);
 const { ParamHelper } = await import(pathToFileURL(path.join(engine, 'src/cache/config/ParamHelper.ts')).href);
 const JavaRandom = await engineModule('util/JavaRandom.ts');
+const ScriptVarType = await engineModule('cache/config/ScriptVarType.ts');
 
 const invId = requiredId(types.InvType, 'inv');
 const wornId = requiredId(types.InvType, 'worn');
 const invCom = requiredId(types.Component, 'inventory:inv');
 const wornCom = requiredId(types.Component, 'wornitems:worn');
 const ownerVar = requiredId(types.VarNpcType, 'agrith_owner');
+const unownedOwner = ScriptVarType.getDefault(types.VarNpcType.get(ownerVar).type);
 const delayVar = requiredId(types.VarNpcType, 'npc_action_delay');
 const aggressiveVar = requiredId(types.VarNpcType, 'npc_aggressive_player');
 const questBit = requiredId(types.VarBitType, 'agrith_quest');
@@ -582,7 +584,7 @@ function ownedNpc(player, name) {
 function mappedNpc(name) {
   const npcType = id('NpcType', name);
   for (const npc of World.npcs) {
-    if (npc.isActive && npc.type === npcType && npc.level === 2 && npc.getVar(ownerVar) === 0) return npc;
+    if (npc.isActive && npc.type === npcType && npc.level === 2 && npc.getVar(ownerVar) === unownedOwner) return npc;
   }
   assert.fail(`the built original map contains an active, unowned ${name}`);
 }
@@ -782,7 +784,7 @@ check('original unowned cult actors serve each account without duplicate pre-rit
     runPlayerScript(other, '[proc,agrith_room_enter]');
     assert.deepEqual([...World.npcs].filter(npc => npc.isActive && cultTypes.has(npc.type)).map(npc => npc.nid), before,
       'entering with either account adds no duplicate pre-ritual cult actors');
-    for (const npc of originals) assert.equal(npc.getVar(ownerVar), 0, 'mapped actors stay unowned');
+    for (const npc of originals) assert.equal(npc.getVar(ownerVar), unownedOwner, 'mapped actors stay unowned');
     for (const account of [player, other]) {
       addItem(account, 'agrith_book');
       addItem(account, 'agrith_sigil');
