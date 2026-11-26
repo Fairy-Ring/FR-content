@@ -1,5 +1,5 @@
 // VERIFIED flow: retained Tip.It q125, 2 May 2006, walkthrough.
-// UNKNOWN: concise functional dialogue and staging coordinates. Original maps/models.
+// UNKNOWN: concise functional dialogue and temporary-recruit staging. Dialogue uses the original mapped cult actors.
 [opnpc1,agrith_dave]
 if (%agrith_quest < 20 | %agrith_quest >= ^agrith_complete) return;
 if (%agrith_quest = 80) {
@@ -76,14 +76,6 @@ return(inzone(2_42_76_22_16, 2_42_76_42_54, coord));
 [proc,agrith_room_enter]
 if (%agrith_quest < 30 | %agrith_quest >= ^agrith_complete) return;
 ~agrith_clear_cult;
-if (%agrith_quest < 120 & ~agrith_find_boss = false) ~agrith_spawn_cult(agrith_matthew, 2_42_76_34_34);
-~agrith_spawn_cult(agrith_jennifer, 2_42_76_28_34);
-if (%agrith_quest < 80) {
-    ~agrith_spawn_cult(agrith_denath, 2_42_76_32_39);
-    ~agrith_spawn_cult(agrith_eric, 2_42_76_35_37);
-    ~agrith_spawn_cult(agrith_tanya, 2_42_76_28_37);
-    ~agrith_spawn_cult(agrith_patrick, 2_42_76_32_42);
-}
 if (%agrith_quest >= 100) {
     ~agrith_spawn_cult(agrith_badden_sigil, 2_42_76_35_37);
     ~agrith_spawn_cult(agrith_reen_sigil, 2_42_76_28_37);
@@ -110,19 +102,13 @@ if (finduid(%agrith_owner) = false) {
 }
 if (~agrith_in_room = false | %agrith_quest >= ^agrith_complete) npc_del;
 
-[ai_timer,agrith_denath] ~agrith_cult_cleanup;
-[ai_timer,agrith_matthew] ~agrith_cult_cleanup;
-[ai_timer,agrith_jennifer] ~agrith_cult_cleanup;
-[ai_timer,agrith_eric] ~agrith_cult_cleanup;
-[ai_timer,agrith_tanya] ~agrith_cult_cleanup;
-[ai_timer,agrith_patrick] ~agrith_cult_cleanup;
 [ai_timer,agrith_badden_sigil] ~agrith_cult_cleanup;
 [ai_timer,agrith_reen_sigil] ~agrith_cult_cleanup;
 [ai_timer,agrith_golem_sigil] ~agrith_cult_cleanup;
 [ai_timer,agrith_dave_sigil] ~agrith_cult_cleanup;
 
 [opnpc1,agrith_denath]
-if (%agrith_owner ! uid | %agrith_quest < 30 | %agrith_quest >= 80) return;
+if (%agrith_quest < 30 | %agrith_quest >= 80) return;
 if (%agrith_quest = 30) {
     ~agrith_choose_words;
     %agrith_quest = 40;
@@ -133,7 +119,7 @@ if (%agrith_quest = 30) {
 ~chatnpc("<p,neutral>You will also need a demonic sigil. Jennifer has the mould.");
 
 [opnpc1,agrith_jennifer]
-if (%agrith_owner ! uid | %agrith_quest < 40 | %agrith_quest >= ^agrith_complete) return;
+if (%agrith_quest < 40 | %agrith_quest >= ^agrith_complete) return;
 if (calc(inv_total(inv, agrith_sigil_mould) + inv_total(bank, agrith_sigil_mould)) = 0) {
     if (inv_freespace(inv) < 1) {
         mes("You need a free inventory space for the mould.");
@@ -144,7 +130,7 @@ if (calc(inv_total(inv, agrith_sigil_mould) + inv_total(bank, agrith_sigil_mould
 ~chatnpc("<p,neutral>Use the mould and a silver bar at a furnace to make your demonic sigil.");
 
 [opnpc1,agrith_matthew]
-if (%agrith_owner ! uid | %agrith_quest < 40) return;
+if (%agrith_quest < 40) return;
 if (%agrith_quest = 40) {
     ~chatnpc("<p,neutral>Josef read Denath's book last night. Then he ran through the portal with it.");
     ~chatnpc("<p,neutral>Perhaps the golem outside saw where he went.");
@@ -200,13 +186,17 @@ while (inv_total(inv, agrith_sigil) < $needed & inv_freespace(inv) > 0) inv_add(
 [opnpc1,agrith_eric] @agrith_cult_greeting;
 [opnpc1,agrith_tanya] @agrith_cult_greeting;
 [opnpc1,agrith_patrick] @agrith_cult_greeting;
-[opnpc1,agrith_dave_sigil] @agrith_cult_greeting;
+[opnpc1,agrith_dave_sigil]
+if (%agrith_owner ! uid) return;
+@agrith_cult_greeting;
 [opnpc1,agrith_badden_sigil] @agrith_monk_after_ritual;
 [opnpc1,agrith_reen_sigil] @agrith_monk_after_ritual;
-[opnpc1,agrith_golem_sigil] @agrith_cult_greeting;
+[opnpc1,agrith_golem_sigil]
+if (%agrith_owner ! uid) return;
+@agrith_cult_greeting;
 [opnpc1,agrith_golem_throneroom] @agrith_cult_greeting;
 [label,agrith_cult_greeting]
-if (%agrith_owner ! uid) return;
+if (%agrith_quest < 30 | %agrith_quest >= ^agrith_complete) return;
 ~chatnpc("<p,neutral>We must finish the ritual.");
 
 [label,agrith_monk_after_ritual]

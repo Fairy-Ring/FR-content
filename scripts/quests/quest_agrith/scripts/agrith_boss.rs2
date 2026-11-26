@@ -15,10 +15,6 @@ return(false);
 if (%agrith_quest ! 110 | ~agrith_in_room = false) return;
 if (~agrith_find_boss = true) return;
 // UNKNOWN staging: original throne-room floor; the packed-map proof checks size 3.
-npc_findall(2_42_76_32_35, agrith_matthew, 24, 0);
-while (npc_findnext = true) {
-    if (%agrith_owner = uid) npc_del;
-}
 ~mesbox("Agrith-Naar appears and strikes Matthew down!");
 npc_add(2_42_76_31_37, agrith_naar, 2000);
 %agrith_owner = uid;
