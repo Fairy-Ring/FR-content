@@ -2,7 +2,7 @@
 // Transcript dialogue is CANDIDATE; per-villager timing and theft amounts are named UNKNOWN choices.
 
 [opnpc1,feud_street_urchin]
-if (%feud_var = ^feud_complete & %roguetrader_blackjacks = 1 & %roguetrader_bjtold_ali = 1) { ~roguetrader_blackjack_urchin; return; }
+if (%feud_var = ^feud_complete & %roguetrader_blackjacks >= 1 & %roguetrader_bjtold_ali = 1) { ~roguetrader_blackjack_urchin; return; }
 if (%feud_var >= ^feud_menaphites_defeated) {
     ~chatnpc("<p,quiz>What do you want?");
     return;
