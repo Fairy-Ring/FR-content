@@ -81,7 +81,7 @@ const regionExceptions = new Map(exceptions.regionsAndLevels.map(r => [execution
 const collisionExceptions = new Map(exceptions.blockedOrFloorless.map(r => [executionKey(r), r]));
 assert.equal(regionExceptions.size, exceptions.regionsAndLevels.length);
 assert.equal(regionExceptions.size, 30, 'exact inherited remote-region and non-adjacent-level exceptions');
-assert.equal(collisionExceptions.size, 2, 'exactly the two inherited Fenkenstrain up landings');
+assert.equal(collisionExceptions.size, 0, 'no inherited blocked or floorless landing remains');
 for (const [list, classification] of [[regionExceptions, 'inherited link to another region or a non-adjacent level'], [collisionExceptions, 'inherited landing that the collision data calls blocked or floorless']]) {
   for (const [id, exception] of list) {
     assert.equal(exception.class, classification);
@@ -123,6 +123,43 @@ const blastFurnaceLinks = new Map([
   ['blast_furnace_stairs_up:0_30_77_19_28:2', { destination: [0, 2931, 10195], counterpart: { name: 'dwarf_keldagrim_factory_stairs', coord: '0_45_159_50_20', angle: 1 } }],
   ['dwarf_keldagrim_factory_stairs:0_45_159_50_20:1', { destination: [0, 1939, 4958], counterpart: { name: 'blast_furnace_stairs_up', coord: '0_30_77_19_28', angle: 2 } }]
 ]);
+// The Rat Pits entrance joins its native outside and inside maps, not local scenery.
+const ratPitLinks = new Map([
+  ['vc_keldagrim_stairs_upper:0_45_159_34_12:2', { destination: [1, 1943, 4705], counterpart: { name: 'vc_keldagrim_stairs_lower', coord: '1_30_73_23_31', angle: 2 } }],
+  ['vc_keldagrim_stairs_lower:1_30_73_23_31:2', { destination: [0, 2914, 10187], counterpart: { name: 'vc_keldagrim_stairs_upper', coord: '0_45_159_34_12', angle: 2 } }]
+]);
+const ratPitAlcoves = new Set([
+  'dwarf_keldagrim_stairs_lower@0_30_73_22_32:oploc1:0',
+  'vc_keldagrim_stairs_upper@0_45_159_34_12:oploc1:0'
+]);
+const ratPitAlcoveExits = [
+  row(manifest.find(entry => entry.name === 'dwarf_keldagrim_stairs_upper' && entry.coord === '1_30_73_22_33')),
+  row(manifest.find(entry => entry.name === 'vc_keldagrim_stairs_lower' && entry.coord === '1_30_73_23_31'))
+];
+const ratPitEntry = row(manifest.find(entry => entry.name === 'vc_keldagrim_stairs_upper'));
+const ratPitExit = row(manifest.find(entry => entry.name === 'vc_keldagrim_stairs_lower'));
+for (const stage of [0, 14]) {
+  const result = execute({ ...ratPitEntry, varbits: { ratcatch_var: stage } }, null, ratPitEntry.start);
+  assert.deepEqual(result.destination, ratPitEntry.start, `Rat Pits entry refuses stage ${stage}`);
+  assert.equal(fallback(result.messages), false, 'locked Rat Pits entry is a real refusal, not a missing handler');
+  assert.ok(result.messages.length > 0, 'locked entry explains the refusal');
+}
+for (const stage of [15, 127]) {
+  const result = execute({ ...ratPitEntry, varbits: { ratcatch_var: stage } }, null, ratPitEntry.start);
+  assert.deepEqual(result.destination, ratPitEntry.destination, `Rat Pits entry admits stage ${stage}`);
+  assert.deepEqual(result.messages, [], 'unlocked Rat Pits entry has no refusal');
+}
+const ratPitUnconditionalExit = execute({ ...ratPitExit, varbits: {} }, null, ratPitExit.start);
+assert.deepEqual(ratPitUnconditionalExit.destination, ratPitExit.destination, 'Rat Pits exit never requires quest progress');
+assert.deepEqual(ratPitUnconditionalExit.messages, []);
+const retainedFallbacks = manifest.filter(entry => entry.status === 'fallback');
+assert.equal(retainedFallbacks.length, 20, 'only explicitly owned or structurally missing residual routes remain');
+assert.equal(retainedFallbacks.filter(entry => /pyramid/i.test(entry.name)).length, 12, 'Agility Pyramid flights remain owned by their course');
+assert.equal(retainedFallbacks.filter(entry => entry.coord.includes('_44_79_')).length, 4, 'Ratcatchers mansion flights remain quest-owned');
+assert.equal(retainedFallbacks.filter(entry => entry.name === '100_dave_celler_stairs').length, 1, 'RFD cellar remains quest-owned');
+assert.deepEqual(retainedFallbacks.filter(entry => entry.inaccessibleApproach).map(entry => `${entry.name}@${entry.coord}`).sort(),
+  ['agility_pyramid_steps1@1_47_73_32_21', 'scenery_1723@1_47_152_52_48'], 'only the owned pyramid fixture and floorless Dwarven Mine ghost are inaccessible');
+assert.equal(retainedFallbacks.filter(entry => entry.coord === '1_48_48_20_32').length, 2, 'only the tutorial down menu choice and operation lack a native counterpart');
 // Original 377 walls and light block enclose this single-tile stair alcove.
 // Its immediate return climb must provide the non-empty escape upstairs.
 const returnOnlyAlcoves = new Set([
@@ -161,21 +198,21 @@ for (const entry of manifest) {
       const collision = collisionExceptions.get(executionKey(entry));
       const jiggig = jiggigLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
       const blastFurnace = blastFurnaceLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
+      const ratPit = ratPitLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
       if (blastFurnace) {
         assert.deepEqual(result.destination, blastFurnace.destination, 'Blast Furnace has the exact packed landing and level');
         assert.deepEqual(entry.counterpart, blastFurnace.counterpart, 'Blast Furnace uses its exact native counterpart');
         assert.equal(result.destination[0], decode(blastFurnace.counterpart.coord)[0], 'Blast Furnace arrives on its native counterpart level');
+      } else if (ratPit) {
+        assert.deepEqual(result.destination, ratPit.destination, 'Rat Pits has the exact packed landing and level');
+        assert.deepEqual(entry.counterpart, ratPit.counterpart, 'Rat Pits uses its exact native counterpart');
       } else if (jiggig) {
         assert.deepEqual(result.destination, jiggig.destination, 'Jiggig has the exact packed landing and level');
         assert.deepEqual(entry.counterpart, jiggig.counterpart, 'Jiggig uses its exact native counterpart');
         assert.equal(result.destination[0], decode(jiggig.counterpart.coord)[0], 'Jiggig arrives on its native counterpart level');
       } else if (!region) assert.equal(Math.abs(result.destination[0] - source.level), 1, 'adjacent-level link');
       else assert.ok(Math.abs(result.destination[0] - source.level) !== 1 || (result.destination[1] >> 6) !== (source.x >> 6) || (result.destination[2] >> 6) !== (source.z >> 6), 'the named inherited region/level exception remains an exception');
-      if (!collision) walkable(result.destination);
-      else {
-        assert.equal(map.isMapBlocked(result.destination[1], result.destination[2], result.destination[0]), true, 'inherited blocked Fenkenstrain landing is preserved');
-        assert.equal(floors.has(result.destination.join(',')), false, 'inherited floorless Fenkenstrain landing is preserved');
-      }
+      walkable(result.destination);
       if (entry.status === 'new') assert.ok(!region && !collision, 'new links have no exception');
       if (entry.counterpart) {
         const counterpart = locs.find(r => r.name === entry.counterpart.name && r.coord === entry.counterpart.coord && r.angle === entry.counterpart.angle);
@@ -189,13 +226,28 @@ for (const entry of manifest) {
           assert.equal(counterpart.name, 'mourning_temple_stairs_base');
           assert.equal(counterpart.coord, '1_29_72_37_50');
           assert.ok(reachable(result.destination, counterpart), 'the return-only alcove can immediately operate its native staircase');
+        } else if (ratPitAlcoves.has(executionKey(entry))) {
+          assert.ok([[1, 1942, 4706], [1, 1943, 4706], [1, 1943, 4705]].some(tile =>
+            tile.every((value, axis) => value === result.destination[axis])), 'the native Rat Pits landing stays within its three-tile alcove');
+          for (const exit of ratPitAlcoveExits) {
+            const exitStand = routeEnd(result.destination, tile => reachable(tile, exit));
+            assert.ok(exitStand, `${exit.name}: the native alcove reaches this staircase exit`);
+            const escaped = execute({ ...exit, varbits: {} }, null, exitStand);
+            assert.equal(fallback(escaped.messages), false, `${exit.name}: the real staircase exits without a fallback`);
+            assert.deepEqual(escaped.destination, exit.destination, `${exit.name}: the exit has its exact level-zero landing`);
+            assert.equal(escaped.destination[0], 0);
+            walkable(escaped.destination);
+            assert.ok(routeEnd(escaped.destination, tile =>
+              Math.max(Math.abs(tile[1] - escaped.destination[1]), Math.abs(tile[2] - escaped.destination[2])) >= 2),
+            `${exit.name}: the native staircase exit has a non-empty level-zero escape`);
+          }
         } else {
           assert.ok(routeEnd(result.destination, t => Math.max(Math.abs(t[1] - result.destination[1]), Math.abs(t[2] - result.destination[2])) >= 2), 'landing is not enclosed');
         }
         const type = types.LocType.get(types.LocType.getId(counterpart.name));
         const returningDown = counterpart.level > source.level;
         const trigger = type.op[returningDown ? 2 : 1] ? `oploc${returningDown ? 3 : 2}` : 'oploc1';
-        const returned = execute({ ...counterpart, trigger }, null, end);
+        const returned = execute({ ...counterpart, trigger, varbits: entry.varbits }, null, end);
         assert.equal(fallback(returned.messages), false, 'counterpart has a real return operation');
         assert.equal(returned.destination[0], source.level, 'round trip returns to the original level');
         walkable(returned.destination);

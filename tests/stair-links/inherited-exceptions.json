@@ -351,30 +351,5 @@
       "class": "inherited link to another region or a non-adjacent level"
     }
   ],
-  "blockedOrFloorless": [
-    {
-      "name": "fenk_stairs_lv1",
-      "coord": "0_55_55_17_31",
-      "trigger": "oploc1",
-      "choice": null,
-      "destination": [
-        1,
-        3537,
-        3553
-      ],
-      "class": "inherited landing that the collision data calls blocked or floorless"
-    },
-    {
-      "name": "fenk_stairs_lv1",
-      "coord": "0_55_55_39_31",
-      "trigger": "oploc1",
-      "choice": null,
-      "destination": [
-        1,
-        3559,
-        3553
-      ],
-      "class": "inherited landing that the collision data calls blocked or floorless"
-    }
-  ]
+  "blockedOrFloorless": []
 }

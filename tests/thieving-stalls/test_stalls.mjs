@@ -25,6 +25,10 @@ const regional = [
   ['dwarf_gem', 'dwarf_market_gems', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 0, 'dwarf_market_empty_stall'],
   ['dwarf_silver', 'dwarf_market_silver', 50, 540, 100, [['silver_ore', 128]], 0, 'dwarf_market_empty_stall'],
   ['viking_fish', 'viking_fish_market', 42, 420, 32, [['raw_salmon', 14], ['raw_tuna', 5], ['raw_lobster', 1]], 9, 'viking_market'],
+  ['misc_fish', 'misc_fish_market', 42, 420, 32, [['raw_salmon', 14], ['raw_tuna', 5], ['raw_lobster', 1]], 0, 'market'],
+  ['etc_fish', 'etc_fish_market', 42, 420, 32, [['raw_salmon', 14], ['raw_tuna', 5], ['raw_lobster', 1]], 0, 'market'],
+  ['misc_veg', 'misc_veg_market', 1, 100, 4, [['potato', 3], ['cabbage', 2], ['onion', 2], ['tomato', 2], ['garlic', 1]], 0, 'market'],
+  ['etc_veg', 'etc_veg_market', 1, 100, 4, [['potato', 3], ['cabbage', 2], ['onion', 2], ['tomato', 2], ['garlic', 1]], 0, 'market'],
   ['dwarf_bakery', 'dwarf_market_bakery', 5, 160, 32, [['cake', 13], ['bread', 5], ['chocolate_slice', 2]], 0, 'dwarf_market_empty_stall'],
   ['dwarf_crafting', 'dwarf_market_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'dwarf_market_empty_stall'],
   ['monkey_crafting', 'mm_stall_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'mm_desk'],
@@ -35,8 +39,16 @@ const regional = [
   ['wine', 'rag_market_stall', 22, 270, 34, [['rag_bottle_wine', 11], ['grapes', 17], ['jug_empty', 39], ['jug_water', 20], ['jug_wine', 13]], 0, 'rag_market_stall_empty']
 ];
 const profiles = [...published, ...regional];
-const left = ['misc_fish_market', 'misc_veg_market', 'etc_fish_market', 'etc_veg_market'];
-const selectedIds = new Set([...profiles.map(([, key]) => key), ...left, 'dwarf_market_clothes', 'seed_stall'].map(key => id('LocType', key)));
+const selectedIds = new Set([...profiles.map(([, key]) => key), 'dwarf_market_clothes', 'seed_stall'].map(key => id('LocType', key)));
+const approvalBit = id('VarBitType', 'misc_approval');
+const miscApprovalLossStalls = new Set(['misc_fish_market', 'misc_veg_market']);
+const vegetableRewardMessages = {
+  potato: 'You steal a potato.',
+  cabbage: 'You steal a cabbage.',
+  onion: 'You steal an onion.',
+  tomato: 'You steal a tomato.',
+  garlic: 'You steal some garlic.'
+};
 const placements = [];
 for (const filename of fs.readdirSync(path.join(content, 'maps')).filter(name => /^m\d+_\d+\.jm2$/.test(name))) {
   const [, mx, mz] = /^m(\d+)_(\d+)\.jm2$/.exec(filename).map(Number);
@@ -105,6 +117,9 @@ function fixture(row, locs, level, caught = false, observer = () => true) {
       p.setLevel(PlayerStat.THIEVING, level);
       p.setVar(id('VarPlayerType', 'viking'), 10); // Seed: prerequisite quest, not written by theft.
       p.setVar(id('VarPlayerType', 'mm_main'), 9); // Seed: the quest registry's completion stage.
+      if (row.debugname === 'stealing_misc_fish_stall' || row.debugname === 'stealing_misc_veg_stall') {
+        p.setVar(id('VarPlayerType', 'misc_quest'), 100); // Seed: the Miscellania stall prerequisite.
+      }
       return { p, loc, xp: p.stats[PlayerStat.THIEVING] };
     }
     World.currentTick++;
@@ -377,9 +392,13 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
     proc(p, 'stealing_check_for_reward', row.id);
     assert.equal(count(p, loot[index][0]), 1);
     assert.equal(snapshot(p).filter(Boolean).length, 1);
+    if (key === 'misc_veg_market' || key === 'etc_veg_market') {
+      assert.deepEqual(p.messages, [vegetableRewardMessages[loot[index][0]]]);
+    }
   });
-  test(`${key}: native steal, published lockout bit, empty and automatic return`, () => {
+  test(`${key}: native steal, lockout bit, empty form, timer and approval`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level);
+    p.setVarBit(approvalBit, 2); // Seed: raw kingdom approval before the successful theft.
     // player() already registers the fixture player in World.players.
     const duration = Math.trunc(ticks * (4000 - Math.min(World.getTotalPlayers(), 2000)) / 4000);
     execute(p, loc);
@@ -389,23 +408,38 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
     assert.equal(produced[0][1], 1);
     assert(loot.some(([name]) => id('ObjType', name) === produced[0][0]));
     assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), bit ? 1 << bit : 0);
+    assert.equal(p.getVarBit(approvalBit), miscApprovalLossStalls.has(key) ? 1 : 2);
     assert.equal(loc.lifecycleTick, duration);
     restore(loc, empty, original);
   });
-  test(`${key}: below-level native attempt has no reward, XP or depletion`, () => {
+  if (miscApprovalLossStalls.has(key)) {
+    test(`${key}: approval loss clamps at zero`, () => {
+      const { p, loc } = fixture(row, locs, level);
+      p.setVarBit(approvalBit, 0);
+      execute(p, loc);
+      assert.equal(p.getVarBit(approvalBit), 0);
+      restore(loc, empty, original);
+    });
+  }
+  // Native players cannot have a skill level below one; the level-one success case covers that minimum.
+  if (level > 1) test(`${key}: below-level native attempt has no reward, XP or depletion`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level - 1);
+    p.setVarBit(approvalBit, 2);
     execute(p, loc);
     assert.equal(p.stats[PlayerStat.THIEVING], before);
     assert.equal(snapshot(p).filter(Boolean).length, 0);
     assert.equal(loc.type, original);
+    assert.equal(p.getVarBit(approvalBit), 2);
   });
   test(`${key}: full inventory native attempt has no reward, XP or depletion`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level);
     p.invAdd(inv, id('ObjType', 'logs'), 28);
     const beforeInv = snapshot(p);
+    p.setVarBit(approvalBit, 2);
     execute(p, loc);
     assert.deepEqual(snapshot(p), beforeInv);
     assert.equal(p.stats[PlayerStat.THIEVING], before);
+    assert.equal(p.getVarBit(approvalBit), 2);
     assert.equal(loc.type, original);
   });
   if (key === 'mm_stall_crafting' || key === 'mm_stall_magic') {
@@ -456,10 +490,12 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
   } else if (row.columnValues[1]?.length || row.columnValues[2]?.length) {
     test(`${key}: original owner/guard seeing theft prevents reward and depletion`, () => {
       const { p, loc, xp: before } = fixture(row, locs, level, true);
+      p.setVarBit(approvalBit, 2);
       execute(p, loc);
       assert.equal(p.stats[PlayerStat.THIEVING], before);
       assert.equal(snapshot(p).filter(Boolean).length, 0);
       assert.equal(loc.type, original);
+      assert.equal(p.getVarBit(approvalBit), 2);
     });
   } else {
     test(`${key}: period None-to-elude row has no owner or guard`, () => {
@@ -503,6 +539,38 @@ for (const key of ['mm_stall_food', 'mm_stall_magic', 'mm_stall_scimitar', 'viki
     assert.equal(loc.type, original);
   });
 }
+for (const [key, questVar, incomplete, complete, unrelatedQuest] of [
+  ['misc_fish_market', 'misc_quest', 90, 100, 'viking'],
+  ['misc_veg_market', 'misc_quest', 90, 100, 'viking'],
+  ['etc_fish_market', 'viking', 9, 10, 'misc_quest'],
+  ['etc_veg_market', 'viking', 9, 10, 'misc_quest']
+]) {
+  const [kind, , level, xp] = profiles.find(([, name]) => name === key);
+  const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+  const original = id('LocType', key), locs = placements.filter(loc => loc.type === original);
+  test(`${key}: incomplete island quest blocks theft and approval loss`, () => {
+    const { p, loc, xp: before } = fixture(row, locs, level);
+    p.setVar(id('VarPlayerType', questVar), incomplete);
+    p.setVar(id('VarPlayerType', unrelatedQuest), 0);
+    p.setVarBit(approvalBit, 2);
+    execute(p, loc);
+    assert.equal(p.stats[PlayerStat.THIEVING], before);
+    assert.equal(snapshot(p).filter(Boolean).length, 0);
+    assert.equal(p.getVarBit(approvalBit), 2);
+    assert.equal(loc.type, original);
+  });
+  test(`${key}: the completed island quest is sufficient`, () => {
+    const { p, loc, xp: before } = fixture(row, locs, level);
+    p.setVar(id('VarPlayerType', questVar), complete);
+    p.setVar(id('VarPlayerType', unrelatedQuest), 0);
+    p.setVarBit(approvalBit, 2);
+    execute(p, loc);
+    assert.equal(p.stats[PlayerStat.THIEVING] - before, xp);
+    assert.equal(snapshot(p).filter(Boolean).length, 1);
+    assert.equal(p.getVarBit(approvalBit), miscApprovalLossStalls.has(key) ? 1 : 2);
+    restore(loc, 'market', original);
+  });
+}
 for (const key of ['mm_stall_general', 'mm_stall_crafting']) {
   test(`${key}: no invented quest-completion gate`, () => {
     const [kind, , level, xp, , , , empty] = profiles.find(([, name]) => name === key);
@@ -516,7 +584,7 @@ for (const key of ['mm_stall_general', 'mm_stall_crafting']) {
     restore(loc, empty, original);
   });
 }
-for (const key of [...left, 'dwarf_market_clothes']) {
+for (const key of ['dwarf_market_clothes']) {
   test(`${key}: no theft, XP, depletion or kingdom-state invention`, () => {
     const original = id('LocType', key);
     const locs = placements.filter(loc => loc.type === original);
@@ -535,7 +603,7 @@ for (const key of [...left, 'dwarf_market_clothes']) {
       assert.equal(snapshot(p).filter(Boolean).length, 0);
       assert.deepEqual(Array.from(p.vars), beforeVars);
       assert.equal(loc.type, original);
-      if (key === 'dwarf_market_clothes') assert(p.messages.includes("You don't really see anything you'd want to steal from this stall."));
+      assert(p.messages.includes("You don't really see anything you'd want to steal from this stall."));
     }
   });
 }

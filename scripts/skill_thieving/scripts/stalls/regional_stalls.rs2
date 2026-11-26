@@ -25,6 +25,31 @@ if (%viking < ^viking_complete) {
 [oploc2,dwarf_market_crafting]
 @attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
 
+// CANDIDATE gates: current Veg text distinguishes island quests; earliest Fish/Veg histories say Throne for both.
+[oploc2,misc_fish_market]
+if (%misc_quest < ^misc_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,misc_veg_market]
+if (%misc_quest < ^misc_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,etc_fish_market]
+if (%viking < ^viking_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,etc_veg_market]
+if (%viking < ^viking_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
 // VERIFIED no theft: Tip.It, 27 April 2006. CANDIDATE exact line: OSRS rev 14196263.
 [oploc2,dwarf_market_clothes]
 mes("You don't really see anything you'd want to steal from this stall.");
@@ -68,4 +93,13 @@ switch_loc (loc_type) {
     case viking_fish_market :
         longqueue(stolen_from_stall_vikingfish, ^vikingfish_stall_timer, ^discard, 0);
         %thieving_stall_timer = setbit(%thieving_stall_timer, ^vikingfish_stall_index);
+}
+
+// CANDIDATE trigger; UNKNOWN amount: later Fish/Veg histories give direction, not a decrement.
+if (loc_type = misc_fish_market | loc_type = misc_veg_market) {
+    if (%misc_approval > ^regional_misc_stall_approval_loss) {
+        %misc_approval = sub(%misc_approval, ^regional_misc_stall_approval_loss);
+    } else {
+        %misc_approval = 0;
+    }
 }

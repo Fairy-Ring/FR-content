@@ -51,6 +51,11 @@ export function execute(row, choice = null, start = approach(row)) {
   const p = new Player(`stairs_${slot}`, BigInt(slot), BigInt(slot));
   p.slot = slot; p.pid = slot; p.uid = slot;
   p.vars.fill(0);
+  for (const [name, value] of Object.entries(row.varbits ?? {})) {
+    const id = types.VarBitType.getId(name);
+    assert.notEqual(id, -1, `fixture varbit exists: ${name}`);
+    p.setVarBit(id, value);
+  }
   [p.level, p.x, p.z] = start;
   const messages = [];
   p.messageGame = text => messages.push(text);
