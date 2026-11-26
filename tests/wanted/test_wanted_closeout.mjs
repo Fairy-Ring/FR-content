@@ -19,6 +19,7 @@ const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/en
 const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
 const { ScriptOpcodeMap } = await import(pathToFileURL(path.join(engine, 'src/engine/script/ScriptOpcode.ts')).href);
 const Environment = await load('src/util/Environment.ts');
+const route = await load('src/engine/routefinder/index.ts');
 assert.equal(Environment.NODE_XPRATE, 1, 'completion XP is measured without a rate multiplier');
 
 const types = {};
@@ -33,6 +34,8 @@ const DbTableIndex = await load('src/cache/config/DbTableIndex.ts');
 DbTableIndex.init();
 assert(ScriptProvider.load(pack) > 0, 'packed production scripts load');
 World.currentTick = 1;
+// The isolated fixture allocates the rescue zone so ordinary teleport validation runs.
+route.allocateIfAbsent(2985, 3345, 0);
 
 const maps = new Map();
 function entries(kind) {
@@ -130,7 +133,8 @@ function drive(p, result, choices = []) {
         } else if (result.exec === ScriptState.SUSPENDED) {
             World.currentTick = Math.max(World.currentTick + 1, p.delayedUntil ?? 0);
             p.delayed = false;
-            result.exec = p.runScript(result.state, true, true);
+            p.executeScript(result.state, true, true);
+            result.exec = result.state.execution;
         } else if (result.exec === ScriptState.PAUSEBUTTON) {
             const menu = result.state.script.name.match(/^\[proc,p_choice([2345])(?:_header)?\]$/);
             if (menu) {
@@ -138,7 +142,8 @@ function drive(p, result, choices = []) {
                 p.lastCom = id('interface', `multi${menu[1]}:com_${remaining.shift()}`);
             }
             World.currentTick++;
-            result.exec = p.runScript(result.state, true, true);
+            p.executeScript(result.state, true, true);
+            result.exec = result.state.execution;
         } else {
             assert.fail(`unexpected script execution ${result.exec}: ${result.state.script.name}`);
         }
@@ -222,7 +227,12 @@ function attributedDeath(p, trigger, target, hero = p, randoms = []) {
     p.closeModal(false);
     target.heroPoints.addHero(hero.hash64, 10);
     target.setVar(id('varn', 'npc_aggressive_player'), hero.uid);
-    return withRandom(randoms, () => drive(p, run(p, `[ai_queue3,${trigger}]`, target)));
+    return withRandom(randoms, () => {
+        const result = drive(p, run(p, `[ai_queue3,${trigger}]`, target));
+        p.processQueues();
+        if (p.activeScript) drive(p, { state: p.activeScript, target: null, exec: p.activeScript.execution });
+        return result;
+    });
 }
 
 // The stage-8 Canifis entry is the real S4-to-chase writer; no mission bit is pre-seeded.
@@ -388,7 +398,7 @@ assert.equal(count(p, 'wanted_solus_trophy'), 1);
 // Tiffy still routes through Recruitment Drive into Wanted; Savant recovery respects held/banked items and space.
 inventory(p).remove(id('obj', 'wanted_crystal_ball'), 1);
 p.closeModal(false); clearText(p);
-talk(p, 'rd_teleporter_guy', [1, 1]);
+talk(p, 'rd_teleporter_guy', [1]);
 assert.equal(get(p, 'wanted_main'), 10);
 assert.equal(count(p, 'wanted_crystal_ball'), 1, 'post-quest Tiffy replaces a genuinely missing CommOrb');
 function assignment(p) {
@@ -445,7 +455,7 @@ assert.equal(p.stats[PlayerStat.SLAYER] - beforeSlayer, 50000, 'repeat Amik talk
 
 inventory(p).remove(id('obj', 'wanted_crystal_ball'), 1);
 p.closeModal(false); clearText(p);
-talk(p, 'rd_teleporter_guy', [1, 1]);
+talk(p, 'rd_teleporter_guy', [1]);
 assert.equal(get(p, 'wanted_main'), 11);
 assert.equal(count(p, 'wanted_crystal_ball'), 1, 'Tiffy remains reachable after Wanted completion');
 
