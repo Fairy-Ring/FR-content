@@ -306,7 +306,7 @@ walkable(2657, 2584, 0, 2657, 2583, 'original south gate open/close approach');
 }
 // Native queued damage and Npc.turn(), not a manually invoked death/timer label.
 // Hold player turns until both the death handler and the next timer have run,
-// proving they queue one result each even when loss overlaps the final deadline.
+// proving they share one result per participant even at the final deadline.
 for (let phase = 0; phase < 5; phase++) {
   const players = [player(), player()];
   try {
@@ -332,7 +332,8 @@ for (let phase = 0; phase < 5; phase++) {
     for (const p of players) {
       const finishes = [...p.queue.all()].filter(request => request.script.name === '[queue,pest_finish]');
       assert.equal(finishes.length, 1, `phase${phase}: native death/timer race queues each participant exactly once`);
-      assert.equal(finishes[0].args[2], 2, `phase${phase}: queued result is a loss`);
+      // Native longqueue prepends its logout policy to the script arguments.
+      assert.equal(finishes[0].args[3], 2, `phase${phase}: queued result is a loss`);
     }
     drain(...players);
     for (const [index, p] of players.entries()) {
@@ -345,7 +346,7 @@ for (let phase = 0; phase < 5; phase++) {
     assert.equal(knight.isActive, false, `phase${phase}: region cleanup removes the dead controller`);
   } finally { for (const p of players) cleanup(p); }
 }
-console.log('PASS natural Void Knight death: native damage queue and NPC turns, all5timer alignments, one loss per participant');
+console.log('PASS natural Void Knight death: native damage queue and NPC turns, all five timer alignments, one loss per participant');
 {
   const p = player();
   try {
