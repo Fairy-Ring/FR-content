@@ -155,4 +155,5 @@ if (~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true
     return(false);
 }
 if (~fightcaves_teleport_check($coord) = false) return(false);
+if (~fightpits_teleport_check($coord) = false) return(false);
 return(true);

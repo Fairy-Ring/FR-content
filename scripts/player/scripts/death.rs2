@@ -34,6 +34,10 @@ if (~fightcaves_owned = true) {
     ~fightcaves_player_death;
     return;
 }
+if (~fightpits_in_arena(coord) = true) {
+    ~fightpits_player_death;
+    return;
+}
 
 ~player_death;
 midi_jingle(death2);

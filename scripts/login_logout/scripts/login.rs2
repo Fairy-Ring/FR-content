@@ -115,6 +115,7 @@ cam_reset;
 if (~swamp_cave_inside(coord) = true) ~swamp_cave_start;
 ~barrows_resume;
 ~fightcaves_login;
+~fightpits_login;
 ~giant_mole_environment_start;
 ~dt_pyramid_start;
 if (~dwarfrock_in_mine = true) settimer(dwarfrock_inside, 1);
