@@ -50,7 +50,7 @@ walktrigger(null);
 p_teleport(0_51_150_54_15);
 
 [proc,losttribe_sell_ore]
-// CANDIDATE prices will be backed by the retained Old School Mistag source.
+// CANDIDATE prices: retained 2014 Old School Mistag revision 230432.
 def_int $iron = inv_total(inv, iron_ore);
 def_int $silver = inv_total(inv, silver_ore);
 def_int $price = add(multiply($iron, 13), multiply($silver, 60));
