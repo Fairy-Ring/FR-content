@@ -11,3 +11,16 @@
 ^garden_king_plinth = 0_50_54_33_31
 // Handler 11..14 belong to the shared tree families.
 ^garden_growth_handler = 15
+
+// Trade bundles: Elstan and Kragen VERIFIED period guides; the rest CANDIDATE OSRS List.
+// UNKNOWN engineering: planting consumes one complete corresponding bundle.
+^garden_delphinium_bundle = 4
+^garden_orchid_bundle = 3
+^garden_snowdrop_bundle = 4
+^garden_vine_bundle = 4
+^garden_rose_bundle = 3
+
+// CANDIDATE OSRS White tree fruit oldid=15318045; exact period amounts UNKNOWN.
+^garden_fruit_farming_xp = 120
+^garden_fruit_heal = 3
+^garden_fruit_energy = 1000
