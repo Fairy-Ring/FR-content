@@ -3,6 +3,7 @@
 // twelve tribes → symbol plates). Leftover arrows com_18 next / com_19 back.
 
 [opheld1,lost_tribe_book]
+~losttribe_read_book;
 %book_page = 0;
 if_openmain(inter_272);
 @leftover_goblin_book_show;
