@@ -8,6 +8,7 @@ if (last_useitem = zogre_artifacts) @zogre_grish;
 [label,zogre_grish]
 if (%zogre >= ^zogre_complete) {
     ~chatnpc("<p,happy>Thank you for returning the ogre artefact.");
+    ~zogre_give(zogre_tomb_artefact_key);
     return;
 }
 if (%zogre = 12 & inv_total(inv, zogre_artifacts) > 0) {
