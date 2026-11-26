@@ -518,8 +518,28 @@ for (const [label, x, z, size] of [
     assert(!map.isMapBlocked(x + dx, z + dz, 2), `${label}: whole original-model footprint is walkable`);
   }
 }
-const assertPuzzleLanding = label =>
-  assertLanding(p, [1, 1864, 4958], { x: 1863, z: 4958 }, label);
+const assertPuzzleLanding = label => {
+  assertLanding(p, [1, 1864, 4956], { x: 1863, z: 4956 }, label);
+  const [level, x, z] = tile(p);
+  for (const [name, targetX, targetZ] of [
+    ['keldagrim_track_junction_control_box', 1860, 4955],
+    ['keldagrim_track_junction_card_box', 1862, 4954],
+    ['forget_train_cart', 1864, 4957]
+  ]) {
+    const type = id('LocType', name), config = types.LocType.get(type);
+    const target = World.getLoc(targetX, targetZ, level, type);
+    assert(target, `${label}: original mapped ${name}`);
+    const route = map.findPathToLoc(level, x, z, targetX, targetZ, 1,
+      target.width, target.length, target.angle, target.shape, config.forceapproach);
+    const last = route.at(-1);
+    const endX = last === undefined ? x : (last >>> 14) & 0x3fff;
+    const endZ = last === undefined ? z : last & 0x3fff;
+    assert(map.reachedLoc(level, endX, endZ, targetX, targetZ, target.width, target.length,
+      1, target.angle, target.shape, config.forceapproach),
+    `${label}: packed route from the actual landing reaches ${name} without repositioning`);
+  }
+  assert.deepEqual(tile(p), [level, x, z], `${label}: route checks never move the player`);
+};
 assertPuzzleLanding('original control-room cart entrance');
 const greenCard = 'turnleft_trackjunction_control_card';
 const yellowCard = 'turnright_trackjunction_control_card';

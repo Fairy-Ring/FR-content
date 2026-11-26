@@ -4,7 +4,7 @@
 ^forget_tracks_station_landing = 0_45_158_37_51
 // Original puzzle cart and box coordinates; safe player tile is UNKNOWN.
 ^forget_tracks_puzzle_cart = 1_29_77_8_29
-^forget_tracks_puzzle_start = 1_29_77_8_30
+^forget_tracks_puzzle_start = 1_29_77_8_28
 ^forget_tracks_card_box_coord = 1_29_77_6_26
 // UNKNOWN scene/reading-room coordinates; original room identity and packed collision are tested.
 ^forget_tracks_witness_landing = 2_29_77_12_55

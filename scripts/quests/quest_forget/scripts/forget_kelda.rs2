@@ -422,7 +422,7 @@ if ($choice = 1) {
         ~chatnpc("<p,neutral>Bring me an empty beer glass and I can fill it.");
         return(true);
     }
-    // UNKNOWN replacement prose; Tip.It says the barmaid replaces lost stout.
+    // UNKNOWN replacement prose; CANDIDATE lost-stout replacement from the retained OSRS transcript.
     inv_changeslot(inv, beer_glass, kelda_stout, 1);
     ~chatnpc("<p,neutral>Here is your replacement Kelda stout.");
 } else {
