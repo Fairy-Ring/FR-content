@@ -93,7 +93,7 @@ inv_del(inv, lost_tribe_treaty, 1);
 stat_advance(mining, 30000);
 if (inv_freespace(inv) > 0) inv_add(inv, ring_of_life, 1);
 else obj_add(coord, ring_of_life, 1, ^lootdrop_duration);
-~send_quest_complete(questlist:lost_tribe, ring_of_life, 200, ^lost_tribe_questpoints, "You have completed The Lost Tribe!", "3,000 Mining XP|Ring of life|Access to the Dorgeshuun Mines|Goblin Bow and Goblin Dance");
+~send_quest_complete(questlist:lost_tribe, ring_of_life, 200, ^lost_tribe_questpoints, "You have completed The Lost Tribe!", "3,000 Mining XP|Ring of life|Access to the Dorgeshuun Mines|Goblin Bow and Dance");
 
 [opnpc1,lost_tribe_sigmund_ham_there]
 ~chatnpc("<p,angry>Leave me alone!");
