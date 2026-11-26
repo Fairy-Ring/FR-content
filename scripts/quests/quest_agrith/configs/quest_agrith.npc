@@ -154,6 +154,8 @@ head1=idk_man_hair_tonsure_head
 head2=idk_man_jaw_pointy_head
 
 [agrith_denath]
+wanderrange=0
+moverestrict=nomove
 name=Denath
 desc=A practicer of dark arts.
 model1=npc_2904
@@ -193,6 +195,8 @@ head2=npc_1901_headi2
 head3=npc_2904_head
 
 [agrith_eric]
+wanderrange=0
+moverestrict=nomove
 name=Eric
 desc=He looks nervous.
 model1=npc_2906
@@ -278,6 +282,8 @@ head2=npc_2906_head
 head3=idk_man_jaw_pointy_head
 
 [agrith_matthew]
+wanderrange=0
+moverestrict=nomove
 name=Matthew
 desc=He looks confused.
 model1=npc_2906
@@ -321,6 +327,8 @@ head1=obj_pickpocket_guide_man
 head2=npc_2906_head
 
 [agrith_jennifer]
+wanderrange=0
+moverestrict=nomove
 name=Jennifer
 desc=She looks enigmatic.
 model1=obj_viking_helmet_womanwear
@@ -380,6 +388,8 @@ head1=idk_woman_hair_short_head
 head2=npc_2906_head
 
 [agrith_tanya]
+wanderrange=0
+moverestrict=nomove
 name=Tanya
 desc=She looks scary.
 model1=npc_2913
@@ -443,6 +453,8 @@ head1=obj_pickpocket_guide_warrior
 head2=npc_2906_head
 
 [agrith_patrick]
+wanderrange=0
+moverestrict=nomove
 name=Patrick
 desc=He looks enthusiastic.
 model1=npc_2906
