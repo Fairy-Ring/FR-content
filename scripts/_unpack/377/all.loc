@@ -48392,131 +48392,12 @@ model=zogre_stand
 blockrange=no
 op1=Search
 
-[lost_tribe_cellar_wall]
-active=yes
-occlude=yes
-multivar=lost_tribe_quest
-multiloc=0,lost_tribe_cellar_hole_normal
-multiloc=1,lost_tribe_cellar_hole_blocking
-multiloc=2,lost_tribe_cellar_hole_blocking
-multiloc=3,lost_tribe_cellar_hole_blocking
-multiloc=4,lost_tribe_cavewall_hole_walldecor
-multiloc=5,lost_tribe_cavewall_hole_walldecor
-multiloc=6,lost_tribe_cavewall_hole_walldecor
-multiloc=7,lost_tribe_cavewall_hole_walldecor
-multiloc=8,lost_tribe_cavewall_hole_walldecor
-multiloc=9,lost_tribe_cavewall_hole_walldecor
-multiloc=10,lost_tribe_cavewall_hole_walldecor
-multiloc=11,lost_tribe_cavewall_hole_walldecor
-
-[lost_tribe_cellar_wall_back]
-active=yes
-mapscene=36
-multivar=lost_tribe_quest
-multiloc=0,lost_tribe_cavewall_hole_normal
-multiloc=1,lost_tribe_cavewall_hole_normal
-multiloc=2,lost_tribe_cavewall_hole_normal
-multiloc=3,lost_tribe_cavewall_hole_normal
-multiloc=4,lost_tribe_cavewall_hole_walldecor
-multiloc=5,lost_tribe_cavewall_hole_walldecor
-multiloc=6,lost_tribe_cavewall_hole_walldecor
-multiloc=7,lost_tribe_cavewall_hole_walldecor
-multiloc=8,lost_tribe_cavewall_hole_walldecor
-multiloc=9,lost_tribe_cavewall_hole_walldecor
-multiloc=10,lost_tribe_cavewall_hole_walldecor
-multiloc=11,lost_tribe_cavewall_hole_walldecor
-
-[lost_tribe_cellar_rubble]
-multivar=lost_tribe_quest
-multiloc=1,lost_tribe_cellar_hole_floorrubble
-multiloc=2,lost_tribe_cellar_hole_floorrubble
-multiloc=3,lost_tribe_cellar_hole_floorrubble
-multiloc=4,lost_tribe_cellar_hole_floorrubble
-multiloc=5,lost_tribe_cellar_hole_floorrubble
-multiloc=6,lost_tribe_cellar_hole_floorrubble
-multiloc=7,lost_tribe_cellar_hole_floorrubble
-multiloc=8,lost_tribe_cellar_hole_floorrubble
-multiloc=9,lost_tribe_cellar_hole_floorrubble
-multiloc=10,lost_tribe_cellar_hole_floorrubble
-
-[lost_tribe_cellar_hole]
-model=lost_tribe_cellar_hole
-sharelight=yes
-active=no
-
-[lost_tribe_cellar_hole_floorrubble]
-model=lost_tribe_cellar_hole_floorrubble
-active=no
-
-[lost_tribe_cellar_hole_blocking]
-name=Rubble
-desc=It looks like the hole in the wall has been blocked with rubble.
-model=lost_tribe_cellar_hole_blocking
-active=yes
-
-[lost_tribe_cellar_hole_normal]
-name=Shelves
-desc=How exciting, some shelves.
-model=lost_tribe_cellar_hole_normal
-active=yes
-
-[lost_tribe_cavewall_hole_walldecor]
-name=Hole
-desc=A hole in the wall.
-model=lost_tribe_cavewall_hole_walldecor
-active=yes
-op1=Squeeze-through
-
-[lost_tribe_cavewall_hole]
-model=lost_tribe_cavewall_hole
-active=no
-sharelight=yes
-mapscene=36
-
-[lost_tribe_cavewall_hole_floorrubble]
-model=lost_tribe_cavewall_hole_floorrubble
-active=no
 
 [goblin_cavewall_hole_inside]
 model=goblin_cavewall_hole_inside
 active=no
 blockwalk=no
 blockrange=no
-
-[lost_tribe_cavewall_hole_normal]
-name=Wall
-desc=A rock wall.
-model=lost_tribe_cavewall_hole_normal
-active=yes
-blockrange=no
-
-[lost_tribe_chest]
-name=Chest
-desc=It has a letter 'S' on the lock.
-model=arena_guard_chest_shut
-active=yes
-op1=Open
-forceapproach=north
-
-[lost_tribe_crate]
-name=Crate
-desc=Used for storage.
-model=merlincrate_empty
-op1=Search
-
-[lost_tribe_hole_2]
-name=Hole
-desc=A narrow hole in the wall.
-model=lost_tribe_hole2
-width=3
-sharelight=yes
-op1=Squeeze-through
-active=yes
-
-[lost_tribe_hole_2_walldecor]
-active=no
-multivar=lost_tribe_hole_2_dug
-multiloc=0,goblin_cavewall_anotherhole_filler
 
 [goblin_cavewall_anotherhole1]
 name=Hole
@@ -48530,13 +48411,6 @@ name=Rubble
 desc=Rubble is blocking the passage.
 model=goblin_cavewall_anotherhole2
 width=3
-
-[lost_tribe_bookcase]
-name=Bookcase
-desc=A good source of books!
-model=bookcase2
-op1=Search
-forceapproach=east
 
 [goblin_cavewall_hole_walldecor]
 model=lost_tribe_cavewall_hole_walldecor
@@ -48737,42 +48611,6 @@ sharelight=yes
 model=goblin_cavewall_hole1
 width=2
 active=no
-
-[lost_tribe_collapsing_floor]
-model=lost_tribe_collapsing_floor
-active=no
-anim=collapsing_floor
-blockwalk=no
-hillskew=yes
-forcedecor=yes
-sharelight=yes
-
-[lost_tribe_collapsing_roof_location]
-name=Boulder
-desc=I dont think i can get through this way.
-model=collapsing_roof_location
-breakroutefinding=yes
-
-[lost_tribe_trap_ceiling]
-name=Nothing
-desc=An eye-wrenching nexus of utter negation!
-model=tog_weeping_wall_offr
-breakroutefinding=yes
-active=yes
-
-[lost_tribe_trap_floor]
-name=Nothing
-desc=An eye-wrenching nexus of utter negation!
-model=tog_weeping_wall_offr
-breakroutefinding=yes
-active=yes
-
-[lost_tribe_trap_pass]
-name=Nothing
-desc=An eye-wrenching nexus of utter negation!
-model=tog_weeping_wall_offr
-breakroutefinding=yes
-active=yes
 
 [goblin_cavewall_hole_floorrubble]
 model=lost_tribe_cavewall_hole_floorrubble

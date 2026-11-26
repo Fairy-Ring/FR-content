@@ -59306,69 +59306,6 @@ certtemplate=template_for_cert
 certlink=cave_eel
 certtemplate=template_for_cert
 
-[lost_tribe_brooch]
-name=Brooch
-desc=A stone brooch with a symbol on it.
-model=obj_lost_tribe_brooch
-members=yes
-2dzoom=690
-2dyan=2024
-2dxan=504
-cost=1
-iop1=Look-at
-weight=2g
-
-[lost_tribe_book]
-name=Goblin symbol book
-desc=A book about the ancient goblin tribes.
-model=obj_lost_tribe_book
-2dyof=26
-2dzoom=750
-2dyan=124
-2dxan=276
-iop1=Read
-members=yes
-cost=1
-weight=1kg
-
-[lost_tribe_chest_key]
-name=Key
-desc=The key you stole from Sigmund.
-model=obj_ikov_shinykey
-2dxof=-3
-2dyof=5
-2dzoom=700
-2dyan=20
-2dxan=328
-members=yes
-weight=10g
-
-[lost_tribe_silverware]
-name=Silverware
-desc=You found the Lumbridge silverware in the HAM cave.
-model=obj_lost_tribe_silverware
-members=yes
-2dxof=8
-2dyof=17
-2dzoom=1690
-2dyan=2020
-2dxan=296
-cost=1
-weight=50g
-
-[lost_tribe_treaty]
-name=Peace treaty
-desc=A peace treaty between Lumbridge and the Cave Goblins.
-members=yes
-cost=1
-model=obj_newcomer_map
-2dxof=-1
-2dyof=56
-2dzoom=990
-2dyan=1716
-2dxan=264
-weight=1oz
-
 [cave_goblin_mining_helmet_lit]
 name=Mining helmet
 desc=A helmet with a lamp on it.
