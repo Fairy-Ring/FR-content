@@ -15,6 +15,12 @@ const InvButton = await load('network/game/client/model/InvButton.ts');
 const InvButtonHandler = await load('network/game/client/handler/InvButtonHandler.ts');
 const OpObj = await load('network/game/client/model/OpObj.ts');
 const OpObjHandler = await load('network/game/client/handler/OpObjHandler.ts');
+const OpLoc = await load('network/game/client/model/OpLoc.ts');
+const OpLocHandler = await load('network/game/client/handler/OpLocHandler.ts');
+const MoveClick = await load('network/game/client/model/MoveClick.ts');
+const MoveClickHandler = await load('network/game/client/handler/MoveClickHandler.ts');
+const ResumePauseButton = await load('network/game/client/model/ResumePauseButton.ts');
+const ResumePauseButtonHandler = await load('network/game/client/handler/ResumePauseButtonHandler.ts');
 const cook = nativeNpc('cook');
 const murphy = nativeNpc('murphy');
 const kitchenDoor = nativeLoc('hundred_lumbridge_door', rows => rows.find(row => row.x > 3000));
@@ -72,6 +78,39 @@ const kitchenStart = stand(blocked, kitchenDoor);
 operate(blocked, kitchenDoor);
 assert.equal(stage(blocked), 0);
 assert.deepEqual(tile(blocked), kitchenStart, 'uninvited account stays outside');
+
+// Interrupt each real entry message with a ground click, not an auto-drained script.
+const entryMessages = [
+  "The guests gather for the cook's banquet.",
+  'The Culinaromancer attacks. The gypsy stops time to protect the guests.'
+];
+const frozenSelectors = ['100dwarfvisible', '100goblinsvisible', '100piratevisible', '100guidevisible', '100davevisible', '100ogrevisible', '100amikvisible', '100monkeyvisible', '100culinaromancervisible'];
+for (let message = 0; message < entryMessages.length; message++) {
+  const interrupted = player();
+  setVar(interrupted, 'cookquest', 2);
+  setBit(interrupted, 'hundred_main_quest_var', 2);
+  stand(interrupted, kitchenDoor);
+  assert.equal(new OpLocHandler().handle(new OpLoc(1, kitchenDoor.x, kitchenDoor.z, kitchenDoor.type), interrupted), true);
+  assert(interrupted.tryInteract(true), 'native door action starts the feast entry');
+  assert.equal(interrupted.activeScript?.execution, ScriptState.PAUSEBUTTON);
+  if (message === 1) {
+    assert.equal(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), interrupted), true);
+    assert.equal(interrupted.activeScript?.execution, ScriptState.PAUSEBUTTON);
+  }
+  assert(text(interrupted).includes(entryMessages[message]), `entry message ${message + 1} is actually displayed`);
+  const paused = interrupted.activeScript;
+  assert.equal(new MoveClickHandler().handle(new MoveClick([{ x: interrupted.x, z: interrupted.z + 1 }], 0, false), interrupted), true);
+  assert.equal(interrupted.activeScript, null, `ground click aborts entry message ${message + 1}`);
+  assert.equal(paused.execution, ScriptState.PAUSEBUTTON, 'the cancelled script did not run its remaining instructions');
+  assert.equal(stage(interrupted), 3, 'interruption preserves the committed frozen stage');
+  for (const name of frozenSelectors) assert.equal(bit(interrupted, name), 1, `${name} survives interrupted entry`);
+  assert.deepEqual(tile(interrupted), [0, 1861, 5317], 'interruption leaves the player in the banquet room, not the sealed feast room');
+  assertLanding(tile(interrupted), 'interrupted banquet entry', [1861, 5318], [1856, 1871, 5312, 5331]);
+  assert(interrupted.inOperableDistance(banquetDoor), 'the interrupted landing is beside the original exit');
+  operate(interrupted, banquetDoor, 1, { from: tile(interrupted) });
+  assert.deepEqual(tile(interrupted), [0, 3207, 3216], 'the native exit remains usable after interruption');
+  assert.equal(stage(interrupted), 3, 'using the exit does not roll back the committed stage');
+}
 
 // Shared Cook priority: unfinished Cook\'s Assistant, clues and Lost Tribe keep ownership.
 setVar(blocked, 'cookquest', 1);
@@ -139,7 +178,6 @@ operate(p, kitchenDoor);
 assert.equal(stage(p), 3, 'first entry writes the frozen banquet stage');
 assert.deepEqual(tile(p), [0, 1861, 5317]);
 assertLanding(tile(p), 'banquet landing', [1861, 5318], [1856, 1871, 5312, 5331]);
-assertLanding([0, 1861, 5341], 'feast landing', [1861, 5342], [1856, 1871, 5340, 5355]);
 for (const name of ['100dwarfvisible', '100goblinsvisible', '100piratevisible', '100guidevisible', '100davevisible', '100ogrevisible', '100amikvisible', '100monkeyvisible', '100culinaromancervisible']) assert.equal(bit(p, name), 1, `${name} frozen selector`);
 for (const name of ['hundred_dwarf_ambassador_base', 'hundred_goblin1_base', 'hundred_goblin2_base', 'hundred_pirate_base', 'hundred_guide_base', 'hundred_dave_base', 'hundred_ogre_base', 'hundred_varze_base']) {
   assert.equal(visibleLoc(p, guestLoc(name)), id('LocType', name), `${name} visible frozen form`);

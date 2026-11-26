@@ -18,9 +18,6 @@ if (coordx(coord) < 2000) {
     return;
 }
 if (%hundred_main_quest_var = ^rfd_feast_ready) {
-    p_telejump(^rfd_feast_landing);
-    ~mesbox("The guests gather for the cook's banquet.");
-    ~mesbox("The Culinaromancer attacks. The gypsy stops time to protect the guests.");
     %100dwarfvisible = 1;
     %100goblinsvisible = 1;
     %100piratevisible = 1;
@@ -31,6 +28,12 @@ if (%hundred_main_quest_var = ^rfd_feast_ready) {
     %100monkeyvisible = 1;
     %100culinaromancervisible = 1;
     %hundred_main_quest_var = ^rfd_frozen;
+    // Settle the safe room and its exit before either cancellable message pause.
+    ~rfd_prepare_banquet;
+    p_telejump(^rfd_banquet_landing);
+    ~mesbox("The guests gather for the cook's banquet.");
+    ~mesbox("The Culinaromancer attacks. The gypsy stops time to protect the guests.");
+    return;
 }
 ~rfd_prepare_banquet;
 p_telejump(^rfd_banquet_landing);
