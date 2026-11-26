@@ -668,6 +668,8 @@ head1=npc_omart_head
 [burgh_ivan_temple_vampire_juve_1]
 // UNKNOWN: ten-cycle ownership cleanup must survive a native target-mode reset.
 timer=10
+// UNKNOWN mechanism for VERIFIED alternating distraction (Tip.It 2006-04-09).
+param=npc_forcemulti,^true
 name=Vampyre Juvinate
 desc=An initiate juvenile vampire.
 model1=npc_3514
@@ -693,6 +695,8 @@ head1=npc_3514_head
 [burgh_ivan_temple_vampire_juve_2]
 // UNKNOWN: ten-cycle ownership cleanup must survive a native target-mode reset.
 timer=10
+// UNKNOWN mechanism for VERIFIED alternating distraction (Tip.It 2006-04-09).
+param=npc_forcemulti,^true
 name=Vampyre Juvinate
 desc=An initiate juvenile vampire.
 model1=npc_3514

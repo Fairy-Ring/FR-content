@@ -1469,6 +1469,53 @@ check('a real owner hit distracts the hostile and lets gifted-sickle Ivan deal n
   assert(hits.some(hit => hit > 0), 'Ivan must land actual native damage, not just play a combat animation');
 });
 
+check('native alternating attacks distract both escort vampyres and earn both real kill credits', () => {
+  const p = player();
+  setStage(p, 130);
+  const { follower, first, second } = startEscort(p, { food: 3 });
+  give(p, 'rune_scimitar');
+  itemOption(p, 'rune_scimitar', 2);
+  place(p, 2838, 4579);
+  const cycle = () => {
+    tick(p);
+    turnNpcs(follower, first, second);
+    p.resetEntity(false);
+  };
+  const attack = actor => {
+    const hp = actor.levels[NpcStat.HITPOINTS];
+    showNpc(p, actor);
+    assert(handlers.OpNpc.handle(new messages.OpNpc(2, actor.nid), p));
+    for (let turns = 0; turns < 40
+      && (actor.levels[NpcStat.HITPOINTS] === hp || actor.target !== p); turns++) cycle();
+    assert(actor.levels[NpcStat.HITPOINTS] < hp,
+      `alternating native Attack must damage ${actor.type}: ${p.messages.slice(-5).join(' | ')}`);
+    assert.equal(actor.target, p, 'a real owner hit must divert the hostile away from Ivan');
+    assert(actor.heroPoints.some(hero => hero.hash64 === p.hash64 && hero.points > 0),
+      'each distraction must carry real native owner damage credit');
+  };
+  JavaRandom.setSeed(0);
+  attack(first);
+  for (let turns = 0; turns < 8
+    && p.getVar(id('VarPlayerType', 'aggressive_npc')) !== first.uid; turns++) cycle();
+  assert.equal(p.getVar(id('VarPlayerType', 'aggressive_npc')), first.uid,
+    'the first hostile really holds the native single-combat lock before switching');
+  attack(second);
+  assert.equal(first.target, p);
+  assert.equal(second.target, p);
+  attack(first);
+  for (const actor of [first, second]) {
+    showNpc(p, actor);
+    assert(handlers.OpNpc.handle(new messages.OpNpc(2, actor.nid), p));
+    for (let turns = 0; turns < 200 && actor.isActive; turns++) cycle();
+    assert.equal(actor.isActive, false, 'ordinary native combat must actually defeat both hostiles');
+  }
+  p.processQueues();
+  assert.equal((p.getVar(id('VarPlayerType', 'myreque2_extravar')) >>> 16) & 3, 3,
+    'only the two actual owned deaths earn both escort kill bits');
+  assert.equal(follower.isActive, true, 'distracting both hostiles keeps the provisioned Ivan alive');
+  assert.equal(stage(p), 150, 'the kills alone cannot replace the real Paterdomus handoff');
+});
+
 check('native member order, optional provisions, actual escort kills, following and Drezel arrival', () => {
   const p = player();
   setStage(p, 130);
