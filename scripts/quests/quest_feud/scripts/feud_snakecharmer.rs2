@@ -9,6 +9,7 @@
 // missing both needs two. No stage changes or later dialogue.
 
 [opnpc1,feud_snakecharmer]
+if (~ratcatch_charmer_talk = true) return;
 ~chatplayer("<p,happy>Wow a snake charmer. Can I have a go? Can I have a go? Please?");
 mes("The snake charmer fails to acknowledge you, he seems too deep into the music to notice you.");
 return;
@@ -22,6 +23,7 @@ if (inv_total(inv, coins) < ^feud_charmer_coin_cost) {
     return;
 }
 inv_del(inv, coins, ^feud_charmer_coin_cost);
+if (~ratcatch_charmer_bowl = true) return;
 mes("The snake charmer snaps out of his trance and directs his full attention to you.");
 ~chatplayer("<p,happy>Wow a snake charmer. Can I have a go? Can I have a go? Please?");
 def_int $space = 0;

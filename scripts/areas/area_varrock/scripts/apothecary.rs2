@@ -1,5 +1,6 @@
 [opnpc1,apothecary]
 if (~twocats_apothecary_hook = true) return;
+if (~ratcatch_apothecary_hook = true) return;
 if(%rjquest = ^romeojuliet_spoken_father) {
     @apothecary_lawrence_sent;
 } else if(%rjquest = ^romeojuliet_spoken_apothecary) {

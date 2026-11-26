@@ -72,6 +72,7 @@ if (stat(woodcutting) < 27) {
 ~chatnpc("<p,happy>Miaooow!");
 
 [opnpc1,vc_hooknosed_jack]
+if (~ratcatch_jack_hook = true) return;
 ~chatplayer("<p,happy>Hello.");
 ~chatnpc("<p,neutral>What?");
 ~chatnpc("<p,neutral>Actually I've got no time for this. I don't want to talk to you.");

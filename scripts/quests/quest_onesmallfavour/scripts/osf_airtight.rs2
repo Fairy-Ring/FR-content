@@ -33,6 +33,10 @@ if (last_useitem = rag_vinegar) {
     ~rag_fill_vinegar;
     return;
 }
+if (last_useitem = weeds) {
+    ~ratcatch_make_weedpot;
+    return;
+}
 ~displaymessage(^dm_default);
 
 [label,osf_lid_on_pot]

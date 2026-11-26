@@ -8,6 +8,7 @@
 // Hag handover is later. No teleport or quest-state mutation.
 
 [opheld1,snake_flute]
+if (~ratcatch_flute_open = true) return;
 @feud_capture_snake;
 
 [opnpcu,feud_desert_snake]

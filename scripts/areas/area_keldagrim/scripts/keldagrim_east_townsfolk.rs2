@@ -127,6 +127,7 @@ else {
 
 // CANDIDATE: Transcript:Smokin' Joe 14429469, before the 26 June 2024 Ratcatchers rewrite.
 [opnpc1,vc_smokin_joe]
+if (~ratcatch_joe_hook = true) return;
 ~chatplayer("<p,neutral>Hello!");
 ~chatplayer("<p,neutral>Hey!");
 ~chatplayer("<p,neutral>Yo, shortstuff!");
