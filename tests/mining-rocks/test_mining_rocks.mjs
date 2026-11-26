@@ -191,10 +191,30 @@ for (const spec of expected.built) {
   assert.equal(loc.lifecycleTick, -1);
   console.log(`PASS ${spec.name}: ${ore.name}; Prospect, Mine, empty refusals, depletion and respawn`);
 }
+assert.deepEqual(expected.questOwned, ['swamp_rock1'], 'only the native Skrach rocks are quest-owned');
+for (const name of expected.questOwned) {
+  const loc = native(name);
+  const p = player(loc);
+  const script = dispatch(p, loc, 1);
+  assert(script, `${name}: Mine dispatches to its owning quest`);
+  assert.equal(script.name, `[oploc1,${name}]`);
+  assert.equal(path.relative(content, path.resolve(content, script.info.sourceFilePath)), 'scripts/quests/quest_100/scripts/rfd_skrach.rs2');
+  assert.equal(rows.filter(row => row.columnValues[rockColumn].includes(loc.type)).length, 0, `${name}: no generic ore row`);
+  assert.equal(dispatch(p, loc, 2), null, `${name}: Prospect has no generic ore handler`);
+  const xp = p.stats[PlayerStat.MINING];
+  const rock = id('ObjType', 'rock');
+  const carried = p.invTotal(inv, rock);
+  const type = loc.type;
+  execute(p, loc, 1, `[oploc1,${name}]`);
+  assert.equal(p.invTotal(inv, rock), carried, `${name}: an account outside the quest scope receives no ballast`);
+  assert.equal(p.stats[PlayerStat.MINING], xp, `${name}: an account outside the quest scope receives no Mining XP`);
+  assert.equal(loc.type, type, `${name}: quest refusal does not deplete the native loc`);
+  console.log(`PASS ${name}: scoped quest-owned Mine, no generic ore route, ordinary account refused`);
+}
 for (const name of expected.left) {
   const loc = native(name);
   const p = player(loc);
   for (const option of [1, 2]) assert.equal(dispatch(p, loc, option), null, `${name}: left option ${option} still has no handler`);
 }
-console.log(`RESULT PASS mining rocks: ${expected.built.length} built types; ${expected.left.length} left types; unchanged ordinary ore rules`);
+console.log(`RESULT PASS mining rocks: ${expected.built.length} built types; ${expected.questOwned.length} quest-owned type; ${expected.left.length} left types; unchanged ordinary ore rules`);
 process.exit(0);

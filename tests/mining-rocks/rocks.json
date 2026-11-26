@@ -606,7 +606,8 @@
       "depletionLabel": "CANDIDATE"
     }
   ],
-  "left": [
+  "questOwned": [
     "swamp_rock1"
-  ]
+  ],
+  "left": []
 }
