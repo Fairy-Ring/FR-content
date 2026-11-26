@@ -1,12 +1,76 @@
-// Leftover void_knights_training 18691.
-// Official Pest 18 Apr 2006; 24 Apr “just combat xp”. Hunt 289? no.
-// Void kit / in-game HUD 6 Jun 2006 is OOS. Cancel is leftover client close.
-// Confirm / skill spend later. Dummy leftover Points CS1 stays.
-
+// 377 `void_knights_training` has seven skill choices and one Confirm button.
+// Its buttons expose no amount choice; later packs and batch bonuses are out of era.
 [opnpc3,pest_voidknight_1] @pest_open_training;
 [opnpc3,pest_voidknight_2] @pest_open_training;
 [opnpc3,pest_voidknight_3] @pest_open_training;
 [opnpc3,pest_voidknight_4] @pest_open_training;
 
 [label,pest_open_training]
+%if1 = 0;
 if_openmain(void_knights_training);
+~pest_points_display;
+
+[if_button,void_knights_training:com_68] %if1 = 1;
+[if_button,void_knights_training:com_75] %if1 = 1;
+[if_button,void_knights_training:com_69] %if1 = 2;
+[if_button,void_knights_training:com_76] %if1 = 2;
+[if_button,void_knights_training:com_70] %if1 = 3;
+[if_button,void_knights_training:com_77] %if1 = 3;
+[if_button,void_knights_training:com_71] %if1 = 4;
+[if_button,void_knights_training:com_78] %if1 = 4;
+[if_button,void_knights_training:com_72] %if1 = 5;
+[if_button,void_knights_training:com_79] %if1 = 5;
+[if_button,void_knights_training:com_73] %if1 = 6;
+[if_button,void_knights_training:com_80] %if1 = 6;
+[if_button,void_knights_training:com_74] %if1 = 7;
+[if_button,void_knights_training:com_81] %if1 = 7;
+
+[if_button,void_knights_training:com_87]
+if (%if1 < 1 | %if1 > 7) {
+    return;
+}
+// CANDIDATE: reverse the official 17 July 2007 XP reduction, not modern rates.
+// UNKNOWN: exact old integer rounding and Prayer factor 50; approved beta defaults.
+switch_int (%if1) {
+    case 1 : ~pest_redeem(attack, 100);
+    case 2 : ~pest_redeem(strength, 100);
+    case 3 : ~pest_redeem(defence, 100);
+    case 4 : ~pest_redeem(ranged, 100);
+    case 5 : ~pest_redeem(magic, 100);
+    case 6 : ~pest_redeem(hitpoints, 100);
+    case 7 : ~pest_redeem(prayer, 50);
+}
+
+[proc,pest_points_display]
+if_settext(void_knights_training:com_91, "Points: <tostring(%pest_points)>");
+
+[proc,pest_redeem](stat $stat, int $factor)
+def_int $points = max(0, min(15, %pest_points));
+if ($points < 1) {
+    return;
+}
+def_int $level = stat_base($stat);
+if ($level < 25) {
+    // CANDIDATE level floor from the current Old School reward page.
+    return;
+}
+def_int $xp = multiply(divide(multiply($level, $level), 600), $factor);
+%pest_points = sub($points, 1);
+// stat_advance takes XP in tenths.
+stat_advance($stat, multiply($xp, 10));
+~pest_points_display;
+
+[proc,pest_award]
+def_int $points = max(0, min(15, %pest_points));
+%pest_points = min(15, add($points, 1));
+// CANDIDATE: later Old School reward formula; no period amount was recovered.
+def_int $coin_reward = multiply(~player_combat_level, 10);
+if (inv_itemspace(inv, coins, $coin_reward, inv_size(inv)) = true) {
+    inv_add(inv, coins, $coin_reward);
+} else if (inv_itemspace(bank, coins, $coin_reward, inv_size(bank)) = true) {
+    inv_add(bank, coins, $coin_reward);
+    // UNKNOWN favourable overflow default; parent calls this after returning to dock.
+} else {
+    // UNKNOWN favourable overflow default; this is private to the current player.
+    obj_add(coord, coins, $coin_reward, ^lootdrop_duration);
+}

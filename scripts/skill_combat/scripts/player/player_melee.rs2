@@ -34,6 +34,7 @@ if (~player_npc_melee_hit_roll(%damagetype) = true) {
     def_int $damage_capped = min($damage, npc_stat(hitpoints));
     ~give_combat_experience(%damagestyle, $damage_capped, %npc_combat_xp_multiplier);
     npc_heropoints($damage_capped);
+    ~pest_hit_activity($damage_capped);
 }
 
 def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);

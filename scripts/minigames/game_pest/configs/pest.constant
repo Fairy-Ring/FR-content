@@ -1,0 +1,18 @@
+// VERIFIED: official 24 April 2006 boarding and reward requirements.
+^pest_min_combat = 40
+^pest_reward_activity = 50
+// UNKNOWN favourable beta default approved for solo and small groups.
+^pest_min_players = 1
+// VERIFIED: 24 April lander priority applies beyond the 25-player capacity.
+^pest_max_players = 25
+// UNKNOWN engineering countdown; no authentic waiting HUD exists before June.
+^pest_wait_ticks = 100
+// VERIFIED: 18 April news describes a twenty-minute defence.
+^pest_match_ticks = 2000
+// UNKNOWN engineering landing anchors on the original packed craft and piers.
+^pest_wait_coord = 0_41_41_36_16
+^pest_dock_coord = 0_41_41_33_15
+^pest_match_lander = 0_41_40_34_51
+^pest_knight_coord = 0_41_40_32_32
+^pest_sarim_landing = 0_47_50_34_3
+^pest_outpost_landing = 0_41_41_34_52

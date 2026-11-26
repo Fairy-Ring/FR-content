@@ -1,0 +1,9 @@
+// VERIFIED outbound Port Sarim Squire route: official release, 18 April 2006.
+// UNKNOWN return route, both landing tiles and functional wording.
+[opnpc1,pest_squire_ship_portsarim]
+mes("The Squire takes you to the Void Knights' Outpost.");
+p_teleport(^pest_outpost_landing);
+
+[opnpc1,pest_squire_ship_island]
+mes("The Squire takes you to Port Sarim.");
+p_teleport(^pest_sarim_landing);

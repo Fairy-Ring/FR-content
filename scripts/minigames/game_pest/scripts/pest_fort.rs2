@@ -1,0 +1,131 @@
+// UNKNOWN arena anchors use original 377 Pest fort forms only.
+[proc,pest_fort_spawn]
+loc_add(~pest_match_coord(^pest_fort_repair_barricade_coord), pest_barricade_damaged, 0, wall_straight, ^max_32bit_int);
+loc_add(~pest_match_coord(^pest_fort_repair_gate_coord), pest_wall_gate_damaged_1, 3, wall_straight, ^max_32bit_int);
+loc_add(~pest_match_coord(^pest_fort_open_gate_coord), pest_wall_gate_fixed_mirror, 3, wall_straight, ^max_32bit_int);
+
+[proc,pest_fort_repair]
+if (~pest_owned = false) return;
+def_boolean $repairable = false;
+if (loc_type = pest_wall_range_damaged_1 | loc_type = pest_wall_range_damaged_2 | loc_type = pest_wall_norange_damaged_1 | loc_type = pest_wall_norange_damaged_2 | loc_type = pest_wall_destroyed_1 | loc_type = pest_wall_destroyed_2 | loc_type = pest_barricade_damaged | loc_type = pest_barricade_damaged_bottom | loc_type = pest_barricade_damaged_top | loc_type = pest_barricade_destroyed | loc_type = pest_barricade_destroyed_bottom | loc_type = pest_barricade_destroyed_top | loc_type = pest_wall_gate_damaged_1 | loc_type = pest_wall_gate_damaged_1_open | loc_type = pest_wall_gate_damaged_1_mirror | loc_type = pest_wall_gate_damaged_1_mirror_open | loc_type = pest_wall_gate_damaged_2 | loc_type = pest_wall_gate_damaged_2_open | loc_type = pest_wall_gate_damaged_2_mirror | loc_type = pest_wall_gate_damaged_2_mirror_open | loc_type = pest_wall_gate_destroyed | loc_type = pest_wall_gate_destroyed_open | loc_type = pest_wall_gate_destroyed_mirror | loc_type = pest_wall_gate_destroyed_mirror_open) {
+    $repairable = true;
+}
+if ($repairable = false) return;
+if (inv_total(inv, hammer) < 1) {
+    mes("You need a hammer to repair the fort.");
+    return;
+}
+if (inv_total(inv, logs) < 1) {
+    mes("You need a log to repair the fort.");
+    return;
+}
+
+// Restored forms and item/Xp amounts are UNKNOWN engineering behavior.
+if (loc_type = pest_wall_range_damaged_1 | loc_type = pest_wall_range_damaged_2 | loc_type = pest_wall_destroyed_1 | loc_type = pest_wall_destroyed_2) {
+    loc_change(pest_wall_range_fixed, ^max_32bit_int);
+} else if (loc_type = pest_wall_norange_damaged_1 | loc_type = pest_wall_norange_damaged_2) {
+    loc_change(pest_wall_norange_fixed, ^max_32bit_int);
+} else if (loc_type = pest_barricade_damaged | loc_type = pest_barricade_destroyed) {
+    loc_change(pest_barricade_fixed, ^max_32bit_int);
+} else if (loc_type = pest_barricade_damaged_bottom | loc_type = pest_barricade_destroyed_bottom) {
+    loc_change(pest_barricade_fixed_bottom, ^max_32bit_int);
+} else if (loc_type = pest_barricade_damaged_top | loc_type = pest_barricade_destroyed_top) {
+    loc_change(pest_barricade_fixed_top, ^max_32bit_int);
+} else if (loc_type = pest_wall_gate_damaged_1_mirror_open | loc_type = pest_wall_gate_damaged_2_mirror_open | loc_type = pest_wall_gate_destroyed_mirror_open) {
+    loc_change(pest_wall_gate_fixed_mirror_open, ^max_32bit_int);
+} else if (loc_type = pest_wall_gate_damaged_1_mirror | loc_type = pest_wall_gate_damaged_2_mirror | loc_type = pest_wall_gate_destroyed_mirror) {
+    loc_change(pest_wall_gate_fixed_mirror, ^max_32bit_int);
+} else if (loc_type = pest_wall_gate_damaged_1_open | loc_type = pest_wall_gate_damaged_2_open | loc_type = pest_wall_gate_destroyed_open) {
+    loc_change(pest_wall_gate_fixed_open, ^max_32bit_int);
+} else {
+    loc_change(pest_wall_gate_fixed, ^max_32bit_int);
+}
+inv_del(inv, logs, 1);
+stat_advance(crafting, ^pest_fort_crafting_xp_tenths);
+~pest_activity(5);
+mes("You repair the damaged fort section.");
+
+[proc,pest_fort_open]
+if (~pest_owned = false) return;
+if (loc_type = pest_wall_gate_fixed) {
+    ~pest_fort_gate_change(pest_wall_gate_fixed_open, 1);
+} else if (loc_type = pest_wall_gate_fixed_open) {
+    ~pest_fort_gate_change(pest_wall_gate_fixed, 3);
+} else if (loc_type = pest_wall_gate_fixed_mirror) {
+    ~pest_fort_gate_change(pest_wall_gate_fixed_mirror_open, 3);
+} else if (loc_type = pest_wall_gate_fixed_mirror_open) {
+    ~pest_fort_gate_change(pest_wall_gate_fixed_mirror, 1);
+} else if (loc_type = pest_wall_gate_damaged_1) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_1_open, 1);
+} else if (loc_type = pest_wall_gate_damaged_1_open) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_1, 3);
+} else if (loc_type = pest_wall_gate_damaged_1_mirror) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_1_mirror_open, 3);
+} else if (loc_type = pest_wall_gate_damaged_1_mirror_open) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_1_mirror, 1);
+} else if (loc_type = pest_wall_gate_damaged_2) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_2_open, 1);
+} else if (loc_type = pest_wall_gate_damaged_2_open) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_2, 3);
+} else if (loc_type = pest_wall_gate_damaged_2_mirror) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_2_mirror_open, 3);
+} else if (loc_type = pest_wall_gate_damaged_2_mirror_open) {
+    ~pest_fort_gate_change(pest_wall_gate_damaged_2_mirror, 1);
+} else if (loc_type = pest_wall_gate_destroyed) {
+    ~pest_fort_gate_change(pest_wall_gate_destroyed_open, 1);
+} else if (loc_type = pest_wall_gate_destroyed_open) {
+    ~pest_fort_gate_change(pest_wall_gate_destroyed, 3);
+} else if (loc_type = pest_wall_gate_destroyed_mirror) {
+    ~pest_fort_gate_change(pest_wall_gate_destroyed_mirror_open, 3);
+} else if (loc_type = pest_wall_gate_destroyed_mirror_open) {
+    ~pest_fort_gate_change(pest_wall_gate_destroyed_mirror, 1);
+}
+
+// UNKNOWN hinge geometry: rotate the original leaf, retaining its tile and client fields.
+[proc,pest_fort_gate_change](loc $next, int $turn)
+def_coord $where = loc_coord;
+def_int $angle = modulo(add(loc_angle, $turn), 4);
+loc_del(^max_32bit_int);
+loc_add($where, $next, $angle, wall_straight, ^max_32bit_int);
+
+[oploc3,pest_wall_range_damaged_1] ~pest_fort_repair;
+[oploc3,pest_wall_norange_damaged_1] ~pest_fort_repair;
+[oploc3,pest_wall_range_damaged_2] ~pest_fort_repair;
+[oploc3,pest_wall_norange_damaged_2] ~pest_fort_repair;
+[oploc3,pest_wall_destroyed_1] ~pest_fort_repair;
+[oploc3,pest_wall_destroyed_2] ~pest_fort_repair;
+[oploc3,pest_barricade_damaged] ~pest_fort_repair;
+[oploc3,pest_barricade_damaged_bottom] ~pest_fort_repair;
+[oploc3,pest_barricade_damaged_top] ~pest_fort_repair;
+[oploc3,pest_barricade_destroyed] ~pest_fort_repair;
+[oploc3,pest_barricade_destroyed_bottom] ~pest_fort_repair;
+[oploc3,pest_barricade_destroyed_top] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_1] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_1_open] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_1_mirror] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_1_mirror_open] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_2] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_2_open] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_2_mirror] ~pest_fort_repair;
+[oploc3,pest_wall_gate_damaged_2_mirror_open] ~pest_fort_repair;
+[oploc3,pest_wall_gate_destroyed] ~pest_fort_repair;
+[oploc3,pest_wall_gate_destroyed_open] ~pest_fort_repair;
+[oploc3,pest_wall_gate_destroyed_mirror] ~pest_fort_repair;
+[oploc3,pest_wall_gate_destroyed_mirror_open] ~pest_fort_repair;
+
+[oploc1,pest_wall_gate_fixed] ~pest_fort_open;
+[oploc1,pest_wall_gate_fixed_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_fixed_mirror] ~pest_fort_open;
+[oploc1,pest_wall_gate_fixed_mirror_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_1] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_1_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_1_mirror] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_1_mirror_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_2] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_2_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_2_mirror] ~pest_fort_open;
+[oploc1,pest_wall_gate_damaged_2_mirror_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_destroyed] ~pest_fort_open;
+[oploc1,pest_wall_gate_destroyed_open] ~pest_fort_open;
+[oploc1,pest_wall_gate_destroyed_mirror] ~pest_fort_open;
+[oploc1,pest_wall_gate_destroyed_mirror_open] ~pest_fort_open;

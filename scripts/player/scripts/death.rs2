@@ -38,6 +38,10 @@ if (~fightpits_in_arena(coord) = true) {
     ~fightpits_player_death;
     return;
 }
+if (~pest_owned = true) {
+    ~pest_player_death;
+    return;
+}
 
 ~player_death;
 midi_jingle(death2);
