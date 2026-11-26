@@ -109,7 +109,7 @@ const OWNER_PREDICATES = [
     { proc: 'slayer_horror_unlocked', categories: ['slayer_dagannoth'] },
     { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'] },
     { proc: 'slayer_deserttreasure_unlocked', categories: ['slayer_dustdevil'] },
-    { proc: 'slayer_mourning2_unlocked', categories: ['slayer_darkbeast'] },
+    { proc: 'slayer_mourning2_unlocked', categories: ['slayer_darkbeast'], gate: { variable: 'mourning_quest_part2', threshold: 5 } },
     {
         proc: 'slayer_skippy_unlocked',
         categories: ['slayer_mogre'],
