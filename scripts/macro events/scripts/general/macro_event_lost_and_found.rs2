@@ -1,7 +1,6 @@
 // Noting here until gas chest macro event is added: 245.2 varp macro_chest_gas_coord is renamed to macro_event_target_coord
 // https://www.youtube.com/watch?v=Pc0gLKWblPQ (aug 2008)
 // https://www.youtube.com/watch?v=BX_WYBKR-MU (june 2007)
-//TODO Add this to teleport spells & ess mine teleportation (to and from?)
 
 [mapzone,0_36_74] 
 if (%macro_event = ^macro_lost_and_found) {
@@ -104,10 +103,10 @@ if (%macro_event ! ^macro_lost_and_found |
     return;
 }
 def_coord $destination = %macro_event_target_coord;
+if (stat(hitpoints) = 0) return;
+~macro_arena1_laf_compensation;
 ~player_teleport_normal($destination);
 if (coord ! $destination) {
     return;
 }
-//TODO: Give 2x runes of spell originally casted or 8-14 noted rune essence if teleporting to/from ess mine (based on macro_event_target_coord?)
-//~doubleobjbox(lawrune, airrune, "Abyssal Services apologise for any inconvenience. Please|accept these runes in way of recompense.", 150);
 ~objbox(blankrune, "Abyssal Services apologise for any inconvenience. Please|accept these runes in way of recompense.", 150, 0, divide(^objbox_height, 2));

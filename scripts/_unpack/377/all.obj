@@ -73276,53 +73276,6 @@ model=obj_slayerguide_dark_beast
 2dxan=120
 
 
-[drill_top]
-name=Camo top
-desc=Examine what?
-model=obj_drill_top
-2dyof=3
-2dzoom=1360
-2dyan=92
-2dzan=1932
-2dxan=416
-iop2=Wear
-manwear=obj_drill_top_manwear,0
-manwear2=obj_doctor_gown_manwear2
-womanwear=obj_drill_top_womanwear,0
-womanwear2=obj_doctor_gown_womanwear2
-wearpos=torso
-wearpos2=arms
-weight=6lb
-
-[drill_bottoms]
-name=Camo bottoms
-desc=Examine what?
-model=obj_drill_bottoms
-2dyof=6
-2dzoom=2060
-2dyan=1924
-2dzan=104
-2dxan=596
-iop2=Wear
-manwear=obj_drill_bottoms_manwear,0
-womanwear=obj_drill_bottoms_womanwear,0
-wearpos=legs
-weight=5lb
-
-[drill_helm]
-name=Camo helmet
-desc=Examine what?
-model=obj_drill_helm
-2dzoom=660
-2dxan=168
-iop2=Wear
-manwear=obj_drill_helm_manwear,0
-womanwear=obj_drill_helm_manwear,6
-manhead=obj_drill_helm_manhead
-womanhead=obj_drill_helm_manhead
-wearpos=hat
-weight=5lb
-
 [cert_drill_top]
 name=Camo top
 desc=Examine what?

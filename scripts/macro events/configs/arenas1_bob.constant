@@ -1,0 +1,6 @@
+// VERIFIED source range: Sal describes one or two correct feeds; the fixed two-feed choice is UNKNOWN.
+^macro_bob_correct_feeds = 2
+// UNKNOWN engineering cap: the required-feed counter occupies thirteen bits.
+^macro_bob_count_max = 8191
+// UNKNOWN engineering reward amount: 650 XP represented in tenths.
+^macro_bob_experience = 6500

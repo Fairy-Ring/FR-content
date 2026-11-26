@@ -1,0 +1,146 @@
+// VERIFIED source range: one or two correct feeds; sal-scaperune-pre.body#155-168.
+// UNKNOWN engineering choices: fixed two-feed threshold, four-way native-cluster draw, and UI text.
+// Native source: seven evil_bob_net OBJ placements and four fishing_spot_8986 cardinal clusters in maps/m39_74.jm2.
+[proc,macro_bob_start](stat $training)
+if ($training ! fishing & $training ! magic) return;
+if (~macro_arena1_enter(^macro_bob, 0_39_74_28_42) = false) return;
+def_int $direction = random(4);
+def_int $magic = 0;
+if ($training = magic) $magic = 1;
+%macro_transmit = setbit_range_toint(%macro_transmit, $direction, 0, 1);
+%macro_transmit = setbit_range_toint(%macro_transmit, $magic, 2, 2);
+%macro_transmit = setbit_range_toint(%macro_transmit, 0, 3, 15);
+%macro_transmit = setbit_range_toint(%macro_transmit, ^macro_bob_correct_feeds, 16, 28);
+mes("Pick up a net from the island before fishing.");
+
+
+[proc,macro_bob_spot_direction]()(int)
+def_coord $center = %macro_event_target_coord;
+def_int $x = coordx(loc_coord);
+def_int $z = coordz(loc_coord);
+def_int $center_x = coordx($center);
+def_int $center_z = coordz($center);
+def_int $delta_x = sub(max($x, $center_x), min($x, $center_x));
+def_int $delta_z = sub(max($z, $center_z), min($z, $center_z));
+if ($delta_x > $delta_z) {
+    if ($x < $center_x) return(0);
+    return(3);
+}
+if ($z < $center_z) return(2);
+if ($z > $center_z) return(1);
+return(0);
+
+[proc,macro_bob_sleeping]()(boolean)
+if (getbit_range(%macro_transmit, 3, 15) >= getbit_range(%macro_transmit, 16, 28)) return(true);
+return(false);
+
+
+[opnpc1,macro_evil_bob_male_servant]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+~mesbox("Speak with the female servant to learn which fishing spot to use.");
+
+[opnpc1,macro_evil_bob_female_servant]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+switch_int (getbit_range(%macro_transmit, 0, 1)) {
+    case 0 : ~mesbox("Use the west fishing spots."); return;
+    case 1 : ~mesbox("Use the north fishing spots."); return;
+    case 2 : ~mesbox("Use the south fishing spots."); return;
+    case 3 : ~mesbox("Use the east fishing spots."); return;
+}
+
+[opnpc1,macro_evil_bob_island]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+if (~macro_bob_sleeping = true) {
+    ~mesbox("Evil Bob is asleep. Use the nearby portal to leave.");
+} else {
+    ~mesbox("Evil Bob is hungry. Bring him a raw fish.");
+}
+
+[oplocu,fishing_spot_8986]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+if (last_useitem ! evil_bob_net | inv_total(inv, evil_bob_net) = 0) return;
+def_namedobj $fish = evil_bob_cooked_fish_incorrect;
+if (~macro_bob_spot_direction = getbit_range(%macro_transmit, 0, 1)) $fish = evil_bob_cooked_fish_correct;
+if (inv_itemspace(inv, $fish, 1, inv_size(inv)) = false) {
+    mes("You need more inventory space.");
+    return;
+}
+inv_add(inv, $fish, 1);
+
+[oplocu,uncooking_pot]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+def_namedobj $raw;
+if (last_useitem = evil_bob_cooked_fish_correct) {
+    $raw = evil_bob_uncooked_fish_correct;
+} else if (last_useitem = evil_bob_cooked_fish_incorrect) {
+    $raw = evil_bob_uncooked_fish_incorrect;
+} else {
+    mes("Use a cooked fish on the pot.");
+    return;
+}
+if (inv_total(inv, last_useitem) = 0) return;
+inv_del(inv, last_useitem, 1);
+inv_add(inv, $raw, 1);
+mes("The fish is now raw.");
+
+[opnpcu,macro_evil_bob_island]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+if (last_useitem = evil_bob_cooked_fish_correct | last_useitem = evil_bob_cooked_fish_incorrect) {
+    ~mesbox("Evil Bob will not eat cooked fish. Use the pot first.");
+    return;
+}
+if (last_useitem = evil_bob_uncooked_fish_correct | last_useitem = evil_bob_uncooked_fish_incorrect) {
+    ~macro_bob_feed(last_useitem);
+} else {
+    ~mesbox("Use a raw fish on Evil Bob.");
+}
+
+[proc,macro_bob_feed](obj $fish)
+if (~macro_arena1_owned(^macro_bob) = false) return;
+if ($fish ! evil_bob_uncooked_fish_correct & $fish ! evil_bob_uncooked_fish_incorrect) return;
+if (inv_total(inv, $fish) = 0) return;
+if (~macro_bob_sleeping = true) {
+    ~mesbox("Evil Bob is asleep. Use the nearby portal to leave.");
+    return;
+}
+def_int $required = getbit_range(%macro_transmit, 16, 28);
+if ($fish = evil_bob_uncooked_fish_incorrect) {
+    inv_del(inv, $fish, 1);
+    if ($required < ^macro_bob_count_max) {
+        $required = add($required, 1);
+        %macro_transmit = setbit_range_toint(%macro_transmit, $required, 16, 28);
+        ~mesbox("Evil Bob rejects the fish. His appetite has increased.");
+    } else {
+        ~mesbox("Evil Bob rejects the fish.");
+    }
+    return;
+}
+def_int $correct = add(getbit_range(%macro_transmit, 3, 15), 1);
+inv_del(inv, $fish, 1);
+%macro_transmit = setbit_range_toint(%macro_transmit, $correct, 3, 15);
+if (~macro_bob_sleeping = true) {
+    if (getbit_range(%macro_transmit, 2, 2) = 0) {
+        stat_advance(fishing, ^macro_bob_experience);
+    } else {
+        stat_advance(magic, ^macro_bob_experience);
+    }
+    ~mesbox("Evil Bob falls asleep. Use the nearby portal to leave.");
+} else {
+    ~mesbox("Evil Bob accepts the fish. Bring him another.");
+}
+
+[oploc1,portal_8987]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+~macro_arena1_return(^macro_bob);
+
+[proc,macro_bob_cleanup]
+inv_del(inv, evil_bob_net, ^max_32bit_int);
+inv_del(inv, evil_bob_cooked_fish_correct, ^max_32bit_int);
+inv_del(inv, evil_bob_cooked_fish_incorrect, ^max_32bit_int);
+inv_del(inv, evil_bob_uncooked_fish_correct, ^max_32bit_int);
+inv_del(inv, evil_bob_uncooked_fish_incorrect, ^max_32bit_int);
+inv_del(bank, evil_bob_net, ^max_32bit_int);
+inv_del(bank, evil_bob_cooked_fish_correct, ^max_32bit_int);
+inv_del(bank, evil_bob_cooked_fish_incorrect, ^max_32bit_int);
+inv_del(bank, evil_bob_uncooked_fish_correct, ^max_32bit_int);
+inv_del(bank, evil_bob_uncooked_fish_incorrect, ^max_32bit_int);

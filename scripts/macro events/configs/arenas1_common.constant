@@ -1,0 +1,11 @@
+^macro_arnav = 15
+^macro_drill = 16
+^macro_bob = 17
+^macro_forester = 18
+^macro_leo = 19
+// CANDIDATE outfit cash fallback: random-events.value-forester-duplicate / value-drill-coins.
+^macro_arena1_coins = 500
+// UNKNOWN engineering Arnav reward amount.
+^macro_arnav_coins = 240
+// UNKNOWN engineering number of incorrect unlock submissions before dismissal.
+^macro_arnav_attempts = 3

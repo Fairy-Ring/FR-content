@@ -1,0 +1,119 @@
+// UNKNOWN engineering lifecycle: original shared arena state survives reconnect.
+[proc,macro_arena1_enter](int $event, coord $destination)(boolean)
+if (p_finduid(uid) = false) return(false);
+if (~macro_event_allowed = false) return(false);
+if ($event < ^macro_arnav | $event > ^macro_leo) return(false);
+if_close;
+%macro_event_origin_coord = coord;
+%macro_event_target_coord = $destination;
+%macro_event_uid = null;
+%macro_transmit = 0;
+%macro_event = $event;
+if (coord ! $destination) p_telejump($destination);
+return(true);
+
+[proc,macro_arena1_owned](int $event)(boolean)
+if (%macro_event ! $event) return(false);
+if (stat(hitpoints) = 0) return(false);
+if ($event = ^macro_arnav) return(true);
+if ($event < ^macro_drill | $event > ^macro_leo) return(false);
+if (%macro_event_target_coord = null) return(false);
+// Original arenas fit within their native map square, not an invented instance.
+if (coordy(coord) ! coordy(%macro_event_target_coord)) return(false);
+if (divide(coordx(coord), 64) ! divide(coordx(%macro_event_target_coord), 64)) return(false);
+if (divide(coordz(coord), 64) ! divide(coordz(%macro_event_target_coord), 64)) return(false);
+return(true);
+
+[proc,macro_arena1_return](int $event)
+if (~macro_arena1_owned($event) = false) return;
+def_coord $origin = %macro_event_origin_coord;
+// UNKNOWN recovery destination when a departure is unavailable, never 0,0.
+if ($origin = null | $origin = 0_0_0_0_0) $origin = 0_50_50_22_18;
+~macro_event_cleanup($event, %macro_event_uid);
+if_close;
+p_telejump($origin);
+cam_reset;
+
+[proc,macro_arena1_fail](int $event)
+if (~macro_arena1_owned($event) = false) return;
+def_coord $destination;
+if (map_members = ^true) {
+    $destination = enum(int, coord, macro_event_fail_teleports_members, random(enum_getoutputcount(macro_event_fail_teleports_members)));
+} else {
+    $destination = enum(int, coord, macro_event_fail_teleports_free, random(enum_getoutputcount(macro_event_fail_teleports_free)));
+}
+~macro_event_cleanup($event, %macro_event_uid);
+if_close;
+~p_telejump_safe($destination);
+
+// Called only after the central encounter-token check. Never recursively clears.
+[proc,macro_event_arenas1_dispatch](int $action)(boolean)
+if (%macro_event < ^macro_arnav | %macro_event > ^macro_leo) return(false);
+if ($action = 2) {
+    if (%macro_event = ^macro_bob) ~macro_bob_cleanup;
+    if (%macro_event = ^macro_leo) ~macro_leo_cleanup;
+    if (%macro_event = ^macro_drill) %macro_digger_var_4 = 0;
+    if (%macro_event = ^macro_forester) {
+        inv_del(inv, raw_macro_pheasant_good, ^max_32bit_int);
+        inv_del(inv, raw_macro_pheasant_bad, ^max_32bit_int);
+    }
+    %macro_transmit = 0;
+    return(true);
+}
+if ($action = 1) {
+    if (%macro_event = ^macro_arnav & npc_finduid(%macro_event_uid) = true) {
+        if (%npc_macro_event_target = uid) npc_del;
+        %macro_event_uid = null;
+    }
+    return(true);
+}
+if ($action = 0) {
+    if (~macro_arena1_owned(%macro_event) = false) {
+        ~macro_event_cleanup(%macro_event, %macro_event_uid);
+    } else {
+        ~initalltabs;
+        if (%macro_event = ^macro_arnav) ~macro_arnav_actor;
+    }
+    return(true);
+}
+return(false);
+
+// UNKNOWN engineering overflow policy: store earned rewards in the bank.
+// No ground reward is left behind in an arena after the player returns.
+[proc,macro_arena1_give](namedobj $item, int $quantity)
+if (inv_itemspace(inv, $item, $quantity, inv_size(inv)) = true) {
+    inv_add(inv, $item, $quantity);
+} else {
+    if (inv_itemspace(bank, $item, $quantity, inv_size(bank)) = true) {
+        inv_add(bank, $item, $quantity);
+        mes("Reward stored in your bank.");
+    } else {
+        def_coord $drop = %macro_event_origin_coord;
+        if (%macro_event = ^macro_lost_and_found) $drop = %macro_event_target_coord;
+        if ($drop = null | $drop = 0_0_0_0_0) $drop = coord;
+        obj_add($drop, $item, $quantity, ^lootdrop_duration);
+        mes("Your reward is on the ground at your return location.");
+    }
+}
+
+[proc,macro_arena1_clothing](namedobj $first, namedobj $second, namedobj $third)
+if (~obj_gettotal($first) = 0) {
+    ~macro_arena1_give($first, 1);
+} else if (~obj_gettotal($second) = 0) {
+    ~macro_arena1_give($second, 1);
+} else if (~obj_gettotal($third) = 0) {
+    ~macro_arena1_give($third, 1);
+} else {
+    ~macro_arena1_give(coins, ^macro_arena1_coins);
+}
+
+// Staff entry selects real admission procs. It never sets puzzle success.
+[debugproc,macro_arena1](string $name)
+if (p_finduid(uid) = false) return;
+switch_int (compare($name, "arnav")) { case 0 : ~macro_arnav_start; return; }
+switch_int (compare($name, "drill")) { case 0 : ~macro_drill_start; return; }
+switch_int (compare($name, "bob")) { case 0 : ~macro_bob_start(fishing); return; } // UNKNOWN fixture skill default.
+switch_int (compare($name, "forester")) { case 0 : ~macro_forester_start; return; }
+switch_int (compare($name, "leo")) { case 0 : ~macro_leo_start; return; }
+switch_int (compare($name, "lost-and-found")) { case 0 : ~macro_laf_start(coord); return; }
+mes("Use arnav, drill, bob, forester, leo or lost-and-found.");

@@ -1,0 +1,18 @@
+// AFK_EVENT itself is gated by NODE_RANDOM_EVENTS. The staff trigger bypasses
+// scheduling only, never the puzzle or its existing ownership/escape guards.
+[proc,macro_arena1_teleport](dbrow $spell)(boolean)
+if (afk_event = ^false) return(false);
+if (~macro_event_allowed = false) return(false);
+def_coord $destination = map_findsquare(db_getfield($spell, magic_spell_table:tele_coord, 0), 0, 2, ^map_findsquare_lineofwalk);
+if ($destination = null) return(false);
+~delete_spell_runes($spell);
+~give_spell_xp($spell);
+~macro_laf_start($destination);
+return(true);
+
+// VERIFIED period RuneHQ compensation: one law rune and three air runes.
+// No guessed double-rune table or cosmetic reward stands in for the grant.
+[proc,macro_arena1_laf_compensation]
+if (%macro_event ! ^macro_lost_and_found) return;
+~macro_arena1_give(lawrune, 1);
+~macro_arena1_give(airrune, 3);

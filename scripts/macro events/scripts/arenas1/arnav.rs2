@@ -1,0 +1,93 @@
+// VERIFIED mechanics: period Sal's guide, Capt' Arnav. Original interface inter_64.
+// UNKNOWN engineering reel ordering, randomization, three-attempt dismissal and reward amount.
+// This event occurs beside the player; no separate Arnav arena exists in the 377 map.
+[proc,macro_arnav_start]
+def_coord $actor = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($actor = null) return;
+if (~macro_arena1_enter(^macro_arnav, coord) = false) return;
+%macro_transmit = add(add(multiply(random(4), 64), multiply(random(4), 256)), multiply(random(4), 1024));
+~macro_arnav_actor;
+
+[proc,macro_arnav_actor]
+if (%macro_event ! ^macro_arnav) return;
+if (npc_finduid(%macro_event_uid) = true) {
+    if (%npc_macro_event_target = uid) return;
+}
+def_coord $actor = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($actor = null) return;
+npc_add($actor, macro_combilock_pirate, 1000);
+%npc_macro_event_target = uid;
+%macro_event_uid = npc_uid;
+npc_setmode(playerfollow);
+npc_settimer(1);
+
+[ai_timer,macro_combilock_pirate]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_arnav) = false) {
+    npc_del;
+    return;
+}
+if (~macro_event_lost = true) ~macro_overworld_finish(^macro_arnav);
+
+[opnpc1,macro_combilock_pirate]
+if (~macro_arena1_owned(^macro_arnav) = false | %macro_event_uid ! npc_uid | %npc_macro_event_target ! uid) return;
+~macro_arnav_screen;
+
+[proc,macro_arnav_symbol](int $index)(obj)
+switch_int ($index) {
+    case 0 : return(gold_ring);
+    case 1 : return(gold_necklace);
+    case 2 : return(gold_bar);
+}
+return(coins);
+
+[proc,macro_arnav_screen]
+if (~macro_arena1_owned(^macro_arnav) = false) return;
+def_int $left = getbit_range(%macro_transmit, 0, 1);
+def_int $middle = getbit_range(%macro_transmit, 2, 3);
+def_int $right = getbit_range(%macro_transmit, 4, 5);
+if_setobject(inter_64:com_3, ~macro_arnav_symbol(modulo(add($left, 3), 4)), 400);
+if_setobject(inter_64:com_4, ~macro_arnav_symbol(modulo(add($middle, 3), 4)), 400);
+if_setobject(inter_64:com_5, ~macro_arnav_symbol(modulo(add($right, 3), 4)), 400);
+if_setobject(inter_64:com_6, ~macro_arnav_symbol($left), 400);
+if_setobject(inter_64:com_7, ~macro_arnav_symbol($middle), 400);
+if_setobject(inter_64:com_8, ~macro_arnav_symbol($right), 400);
+if_setobject(inter_64:com_9, ~macro_arnav_symbol(modulo(add($left, 1), 4)), 400);
+if_setobject(inter_64:com_10, ~macro_arnav_symbol(modulo(add($middle, 1), 4)), 400);
+if_setobject(inter_64:com_11, ~macro_arnav_symbol(modulo(add($right, 1), 4)), 400);
+if_settext(inter_64:com_16, oc_name(~macro_arnav_symbol(getbit_range(%macro_transmit, 6, 7))));
+if_settext(inter_64:com_17, oc_name(~macro_arnav_symbol(getbit_range(%macro_transmit, 8, 9))));
+if_settext(inter_64:com_18, oc_name(~macro_arnav_symbol(getbit_range(%macro_transmit, 10, 11))));
+if_openmain(inter_64);
+
+[if_button,inter_64:com_20] ~macro_arnav_rotate(0, 1);
+[if_button,inter_64:com_21] ~macro_arnav_rotate(2, 1);
+[if_button,inter_64:com_22] ~macro_arnav_rotate(4, 1);
+[if_button,inter_64:com_23] ~macro_arnav_rotate(0, 3);
+[if_button,inter_64:com_24] ~macro_arnav_rotate(2, 3);
+[if_button,inter_64:com_25] ~macro_arnav_rotate(4, 3);
+[proc,macro_arnav_rotate](int $shift, int $direction)
+if (~macro_arena1_owned(^macro_arnav) = false) return;
+def_int $before = getbit_range(%macro_transmit, $shift, add($shift, 1));
+def_int $after = modulo(add($before, $direction), 4);
+%macro_transmit = setbit_range_toint(%macro_transmit, $after, $shift, add($shift, 1));
+~macro_arnav_screen;
+
+[if_button,inter_64:com_19]
+if (~macro_arena1_owned(^macro_arnav) = false) return;
+if (getbit_range(%macro_transmit, 0, 5) = getbit_range(%macro_transmit, 6, 11)) {
+    ~macro_arena1_give(coins, ^macro_arnav_coins);
+    ~macro_arena1_return(^macro_arnav);
+} else {
+    %macro_transmit = add(%macro_transmit, 4096);
+    // UNKNOWN minimal functional feedback, not reconstructed pirate speech.
+    mes("The combination is incorrect.");
+    if (getbit_range(%macro_transmit, 12, 15) >= ^macro_arnav_attempts) {
+        ~macro_arena1_fail(^macro_arnav);
+    } else {
+        ~macro_arnav_screen;
+    }
+}

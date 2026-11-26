@@ -1,0 +1,12 @@
+// UNKNOWN engineering relog persistence for original Gravedigger state.
+[macro_digger_var]
+scope=perm
+
+[macro_digger_var_2]
+scope=perm
+
+[macro_digger_var_3]
+scope=perm
+
+[macro_digger_var_4]
+scope=perm

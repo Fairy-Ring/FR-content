@@ -1,0 +1,8 @@
+// UNKNOWN engineering distribution: equal request and sign chances for the four exercise identities.
+^macro_drill_exercise_weights = 4
+// CANDIDATE: four successive correct exercises, from the earliest retained Old School statement.
+// random-events.value-drill-count; src.random-events-wiki-osrs-120970.
+^macro_drill_required_correct = 4
+// UNKNOWN Main ruling: 100 game ticks from admission; timely and zero wrong mats roll 1/2/3 missing pieces with weights 2/1/1.
+^macro_drill_timely_ticks = 100
+^macro_drill_reward_weights = 4
