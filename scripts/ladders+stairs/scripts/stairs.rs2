@@ -1003,28 +1003,16 @@ switch_coord (loc_coord) {
 }
 
 [oploc1,mourning_temple_circle_stairs_base]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~mep2_temple_circle_stairs_up;
 
 [oploc1,mourning_temple_circle_stairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~mep2_temple_circle_stairs_down;
 
 [oploc1,mourning_temple_stairs_base]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~mep2_temple_stairs_up;
 
 [oploc1,mourning_temple_stairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~mep2_temple_stairs_down;
 
 [oploc1,deal_stairs_bottom]
 ~deal_stairs(true);
