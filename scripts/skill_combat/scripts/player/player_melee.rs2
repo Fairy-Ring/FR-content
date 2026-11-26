@@ -31,6 +31,7 @@ if (~player_npc_melee_hit_roll(%damagetype) = true) {
     }
     $damage = randominc(~npc_max_dealt($maxhit, 0));
     $damage = ~soulbane_rage_hit($damage, false);
+    if (inv_getobj(worn, ^wearpos_rhand) = gadderanks_warhammer) $damage = ~myreque2_gadderhammer_hit($damage);
     def_int $damage_capped = min($damage, npc_stat(hitpoints));
     ~give_combat_experience(%damagestyle, $damage_capped, %npc_combat_xp_multiplier);
     npc_heropoints($damage_capped);

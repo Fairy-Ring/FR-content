@@ -37,6 +37,7 @@ p_opnpc(2);
     case abyssal_whip : @pvm_abyssal_whip_sa;
     case rune_claws : @pvm_rune_claws_sa;
     case dragon_scimitar : @pvm_dragon_scimitar_sa;
+    case burgh_rod_command_final_10, burgh_rod_command_final_9, burgh_rod_command_final_8, burgh_rod_command_final_7, burgh_rod_command_final_6, burgh_rod_command_final_5, burgh_rod_command_final_4, burgh_rod_command_final_3, burgh_rod_command_final_2, burgh_rod_command_final_1 : @myreque2_rod_capture;
     case default :
         // UNKNOWN engineering safeguard: a weapon with a special bar and no special handler attacks normally with the special turned off.
         %sa_attack = ^false;

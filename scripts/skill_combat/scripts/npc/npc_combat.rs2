@@ -91,6 +91,7 @@ return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
 // "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
 // magic callers (pass spell id or 0). Quest-local ai_queue2 remains secondary.
 [proc,npc_max_dealt](int $maxhit, int $spell)(int)
+if (~myreque2_combat_actor = true) return(~myreque2_max_dealt($maxhit, $spell));
 if (npc_category = dwarfrock_avatar & ~dwarfrock_avatar_attackable = false) return(0);
 if (npc_type = fairy_tanglefoot) return(~ft1_tanglefoot_max_dealt($maxhit, $spell));
 if (~soulbane_rage_npc = true) return(~soulbane_rage_max(min($maxhit, npc_param(max_dealt)), $spell));
@@ -159,6 +160,7 @@ return(npc_hasop(2));
 
 // Existing op2 truthiness policy, except for the named noncombat multi bases.
 [proc,npc_is_attackable]()(boolean)
+if (~myreque2_attackable = false) return(false);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
@@ -279,6 +281,7 @@ return (false);
 
 // this proc is used for magic (TODO 377: re-enable later!!)
 [proc,npc_is_attackable_opt]()(boolean)
+if (~myreque2_attackable = false) return(false);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
@@ -382,6 +385,7 @@ return (false);
 // Area scans call this only after multiway admits the secondary NPC tile.
 // Dialogue-specific refusal branches are absent because their maps are single-combat.
 [proc,npc_is_attackable_opt_quiet]()(boolean)
+if (~myreque2_attackable = false) return(false);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
