@@ -43,6 +43,7 @@ const { default: ScriptState } = await eng('engine/script/ScriptState.ts');
 const { ScriptOpcode } = await eng('engine/script/ScriptOpcode.ts');
 const { default: IfButton } = await eng('network/game/client/model/IfButton.ts');
 const { default: IfButtonHandler } = await eng('network/game/client/handler/IfButtonHandler.ts');
+const { PlayerStat } = await eng('engine/entity/PlayerStat.ts');
 
 for (const type of [VarPlayerType, VarBitType, VarNpcType, NpcType, SeqType, InvType, FontType, MesanimType, Component, DbRowType, DbTableType, EnumType, ObjType, ParamType]) type.load(pack);
 DbTableIndex.init();
@@ -507,10 +508,26 @@ for (const [stage, introduced] of [[0, 0], [1, 1], [50, 1]]) {
   const other = player();
   other.setVarBit(id('varbit', 'giantdwarf_quest'), stage);
   other.setVarBit(id('varbit', 'giantdwarf_veldaban_introduced'), introduced);
-  talkVeldaban(other);
-  assert(other.packets.some(message => message.text?.includes('Have you heard?')),
-    `existing Forget dispatch outside unfinished GD state ${stage}/${introduced} is unchanged`);
+  const refusal = talkVeldaban(other);
+  assert(other.packets.some(message => message.text?.includes(stage < 50 ? 'The Giant Dwarf' : 'Hemenster Fishing Contest')),
+    `Forget prerequisite refusal outside unfinished GD state ${stage}/${introduced}`);
+  finishBriefing(other, refusal, false);
+  assert.equal(other.getVarBit(id('varbit', 'giantdwarf_quest')), stage, 'refusal preserves Giant Dwarf progress');
+  assert.equal(other.getVarBit(id('varbit', 'giantdwarf_veldaban_introduced')), introduced, 'refusal preserves the briefing flag');
+  assert.equal(other.getVarBit(id('varbit', 'forget_quest')), 0, 'prerequisite refusal does not start Forget');
 }
+const eligible = player();
+eligible.setVarBit(id('varbit', 'giantdwarf_quest'), 50);
+eligible.setVarBit(id('varbit', 'giantdwarf_veldaban_introduced'), 1);
+eligible.setVar(id('varp', 'fishingcompo'), 5);
+eligible.levels[PlayerStat.FARMING] = 17;
+eligible.levels[PlayerStat.COOKING] = 22;
+const offer = talkVeldaban(eligible);
+assert(eligible.packets.some(message => message.text?.includes('Have you heard?')),
+  'completed prerequisites retain the original Forget dispatch');
+finishBriefing(eligible, offer, false);
+assert.equal(eligible.getVarBit(id('varbit', 'giantdwarf_quest')), 50, 'declining Forget preserves completed Giant Dwarf');
+assert.equal(eligible.getVarBit(id('varbit', 'forget_quest')), 0, 'declining the eligible offer does not start Forget');
 const inProgress = player();
 inProgress.setVarBit(id('varbit', 'giantdwarf_quest'), 2);
 inProgress.setVarBit(id('varbit', 'giantdwarf_veldaban_introduced'), 1);
@@ -521,7 +538,7 @@ assert(inProgress.packets.some(message => message.text?.startsWith('How are you 
 finishBriefing(inProgress, reminder, true);
 assert.equal(inProgress.getVarBit(id('varbit', 'giantdwarf_quest')), 2, 'the reminder preserves Giant Dwarf progress');
 assert.equal(inProgress.getVarBit(id('varbit', 'forget_quest')), 1, 'the reminder preserves concurrent Forgettable Tale progress');
-console.log('OK saved HQ recovery; the stage-two reminder preserves both quests, and inactive/completed Giant Dwarf keeps Forget dispatch');
+console.log('OK saved HQ recovery; the stage-two reminder preserves both quests, and Forget prerequisites preserve the eligible offer');
 const { trip: emptyTrip } = runIntro();
 assertRestoredBonuses(emptyTrip, []);
 const interrupted = runIntro([], true);
