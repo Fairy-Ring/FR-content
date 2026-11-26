@@ -1,0 +1,242 @@
+// Original 377 vat/barrel bands. Kelda stout retains its quest-owned scripts.
+// UNKNOWN: functional feedback below is not a recovered period transcript.
+
+[oplocu,brewing_vat_2] @brewing_vat_use;
+[oplocu,vat_bad_ale] @brewing_vat_use;
+[oplocu,vat_bad_cider] @brewing_vat_use;
+
+[label,brewing_vat_use]
+def_obj $used = last_useitem;
+p_arrivedelay;
+~brewing_add(~brewing_site, $used);
+
+[proc,brewing_site]()(int)
+if (loc_type = brewing_vat_1 | loc_type = brewing_barrel_1 | loc_type = vat_valve_1) return(1);
+return(2);
+
+// Shared empty/water/barley handlers still enter the quest's label first.
+[proc,brewing_route_vat]()(boolean)
+def_obj $used = last_useitem;
+if (loc_type ! brewing_vat_1 & loc_type ! brewing_vat_2) return(false);
+if (loc_type = brewing_vat_1) {
+    if (last_useitem = kelda_hops | %brewing_vat_varbit_1 >= 68) return(false);
+    if (%forget_quest = 10 & (last_useitem = bucket_water | last_useitem = barley_malt)) return(false);
+}
+p_arrivedelay;
+~brewing_add(~brewing_site, $used);
+return(true);
+
+[proc,brewing_vat](int $site)(int)
+if ($site = 1) return(%brewing_vat_varbit_1);
+return(%brewing_vat_varbit_2);
+
+[proc,brewing_set_vat](int $site, int $value)
+if ($site = 1) %brewing_vat_varbit_1 = $value;
+else %brewing_vat_varbit_2 = $value;
+
+[proc,brewing_barrel](int $site)(int)
+if ($site = 1) return(%brewing_barrel_varbit_1);
+return(%brewing_barrel_varbit_2);
+
+[proc,brewing_set_barrel](int $site, int $value)
+if ($site = 1) %brewing_barrel_varbit_1 = $value;
+else %brewing_barrel_varbit_2 = $value;
+
+[proc,brewing_recipe_row](int $number)(dbrow)
+db_find(brewing_recipe:number, $number);
+return(db_findnext);
+
+[proc,brewing_add](int $site, obj $used)
+~brewing_update($site);
+def_int $stage = ~brewing_vat($site);
+if ($used = bucket_water & $stage = 0) {
+    if (inv_total(inv, bucket_water) < 2) {
+        mes("You need two buckets of water.");
+        return;
+    }
+    inv_del(inv, bucket_water, 2);
+    inv_add(inv, bucket_empty, 2);
+    ~brewing_set_vat($site, 1);
+    mes("You add two buckets of water to the vat.");
+    return;
+}
+if ($used = barley_malt & $stage = 1) {
+    if (inv_total(inv, barley_malt) < 2) {
+        mes("You need two barley malt.");
+        return;
+    }
+    inv_del(inv, barley_malt, 2);
+    ~brewing_set_vat($site, 2);
+    mes("You add two barley malt to the vat.");
+    return;
+}
+db_find(brewing_recipe:ingredient, $used);
+def_dbrow $recipe = db_findnext;
+if ($recipe ! null) {
+    def_int $number = db_getfield($recipe, brewing_recipe:number, 0);
+    if (($number = 10 & $stage ! 0) | ($number ! 10 & $stage ! 2)) {
+        mes("The vat is not ready for that ingredient.");
+        return;
+    }
+    def_int $required = db_getfield($recipe, brewing_recipe:level, 0);
+    if (stat(cooking) < $required) {
+        mes("You need a Cooking level of <tostring($required)> to brew this drink.");
+        return;
+    }
+    def_int $amount = db_getfield($recipe, brewing_recipe:amount, 0);
+    if (inv_total(inv, $used) < $amount) {
+        mes("You need <tostring($amount)> <lowercase(oc_name($used))>.");
+        return;
+    }
+    inv_del(inv, $used, $amount);
+    if ($used = apple_mush) inv_add(inv, bucket_empty, $amount);
+    ~brewing_set_vat($site, add(4, multiply(sub($number, 1), 6)));
+    mes("You add the <lowercase(oc_name($used))> to the vat.");
+    return;
+}
+if ($used = ale_yeast & $stage >= 4 & $stage <= 58 & modulo(sub($stage, 4), 6) = 0) {
+    $recipe = ~brewing_recipe_row(add(divide(sub($stage, 4), 6), 1));
+    def_int $required = db_getfield($recipe, brewing_recipe:level, 0);
+    if (stat(cooking) < $required) {
+        mes("You need a Cooking level of <tostring($required)> to brew this drink.");
+        return;
+    }
+    inv_changeslot(inv, ale_yeast, pot_empty, 1);
+    ~brewing_set_vat($site, add($stage, 1));
+    // UNKNOWN storage: two 16-bit global 640-minute window origins in slot 419.
+    // Each field spans over 79 years without changing any client config.
+    def_int $first = multiply(sub($site, 1), 16);
+    %brewing_clock = setbit_range_toint(%brewing_clock, modulo(divide(date_minutes, ^brewing_window_minutes), 65536), $first, add($first, 15));
+    mes("You add the ale yeast and leave the drink to ferment.");
+    return;
+}
+mes("The vat is not ready for that ingredient.");
+
+[proc,brewing_update_all]
+// Farming uses a soft timer. Defer protected vat writes to a normal queue,
+// so growth cannot interrupt a player's current protected interaction.
+queue*(brewing_growth_update, 0)();
+
+[queue,brewing_growth_update]
+~brewing_update(1);
+~brewing_update(2);
+
+[proc,brewing_update](int $site)
+def_int $stage = ~brewing_vat($site);
+if ($stage < 5 | $stage > 60) return;
+def_int $phase = modulo(sub($stage, 4), 6);
+if ($phase ! 1 & $phase ! 2) return;
+def_int $first = multiply(sub($site, 1), 16);
+def_int $started = getbit_range(%brewing_clock, $first, add($first, 15));
+def_int $elapsed = modulo(add(sub(modulo(divide(date_minutes, ^brewing_window_minutes), 65536), $started), 65536), 65536);
+def_int $base = sub($stage, $phase);
+if ($elapsed >= ^brewing_ferment_windows) {
+    def_int $roll = random(128);
+    if ($roll < ^brewing_bad_weight) {
+        if ($base = 58) ~brewing_set_vat($site, 65);
+        else ~brewing_set_vat($site, 64);
+    } else if ($roll < add(^brewing_bad_weight, ^brewing_mature_weight)) {
+        ~brewing_set_vat($site, add($base, 4));
+    } else {
+        ~brewing_set_vat($site, add($base, 3));
+    }
+} else if ($elapsed >= 1) {
+    ~brewing_set_vat($site, add($base, 2));
+}
+
+[oploc1,vat_valve_2]
+p_arrivedelay;
+~brewing_turn_valve(2);
+
+[proc,brewing_turn_valve](int $site)
+~brewing_update($site);
+def_int $stage = ~brewing_vat($site);
+if ($stage = 0) {
+    mes("The vat is empty.");
+    return;
+}
+if (~brewing_barrel($site) ! 0) {
+    mes("Empty the barrel before turning the valve.");
+    return;
+}
+if ($stage = 64 | $stage = 65) {
+    ~brewing_set_barrel($site, sub($stage, 63));
+    ~brewing_set_vat($site, 0);
+    mes("You turn the valve. The barrel contains bad drink.");
+    return;
+}
+def_int $number = add(divide(sub($stage, 4), 6), 1);
+def_int $phase = modulo(sub($stage, 4), 6);
+if ($stage >= 7 & $stage <= 62 & ($phase = 3 | $phase = 4)) {
+    def_int $barrel = multiply($number, 8);
+    if ($phase = 4) $barrel = add($barrel, 128);
+    ~brewing_set_barrel($site, $barrel);
+    ~brewing_set_vat($site, 0);
+    def_dbrow $recipe = ~brewing_recipe_row($number);
+    // UNKNOWN award event: grant the listed batch XP once on valve transfer.
+    // UNKNOWN mature default: use the recipe's listed XP, with no invented bonus.
+    def_int $normalxp;
+    def_int $maturexp;
+    $normalxp, $maturexp = db_getfield($recipe, brewing_recipe:experience, 0);
+    if ($phase = 4) stat_advance(cooking, $maturexp);
+    else stat_advance(cooking, $normalxp);
+    mes("You turn the valve and fill the barrel.");
+    return;
+}
+// A deliberate discard is confirmed. It cannot pre-empt Kelda's own valve.
+mes("The vat contains unfinished or bad drink.");
+if (~p_choice2("Drain the vat.", 1, "Keep it.", 2) = 2) return;
+~brewing_set_vat($site, 0);
+mes("You drain the vat.");
+
+[label,brewing_barrel_level]
+p_arrivedelay;
+def_int $state = ~brewing_barrel(~brewing_site);
+if ($state < 8) mes("The barrel contains no finished drink.");
+else mes("There are <tostring(sub(8, modulo($state, 8)))> pints in the barrel.");
+
+[label,brewing_barrel_use]
+def_obj $used = last_useitem;
+def_int $slot = last_useslot;
+p_arrivedelay;
+def_int $site = ~brewing_site;
+def_int $state = ~brewing_barrel($site);
+if ($state < 8 | ($used ! beer_glass & $used ! calquat_fruit_keg_empty)) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $quality = 0;
+def_int $number = divide($state, 8);
+if ($number >= 17) {
+    $quality = 1;
+    $number = sub($number, 16);
+}
+def_dbrow $recipe = ~brewing_recipe_row($number);
+def_int $remaining = sub(8, modulo($state, 8));
+def_namedobj $normal;
+def_namedobj $mature;
+def_int $taken = 1;
+if ($used = calquat_fruit_keg_empty) {
+    if ($remaining < 4) {
+        mes("There are fewer than four pints left in the barrel.");
+        return;
+    }
+    $taken = 4;
+    $normal, $mature = db_getfield($recipe, brewing_recipe:keg, 0);
+} else {
+    $normal, $mature = db_getfield($recipe, brewing_recipe:pint, 0);
+}
+if ($quality = 1) inv_setslot(inv, $slot, $mature, 1);
+else inv_setslot(inv, $slot, $normal, 1);
+if ($remaining = $taken) ~brewing_set_barrel($site, 0);
+else ~brewing_set_barrel($site, add($state, $taken));
+mes("You fill the <lowercase(oc_name($used))> from the barrel.");
+
+[oploc1,barrel_bad_ale] @brewing_barrel_drain;
+[oploc1,barrel_bad_cider] @brewing_barrel_drain;
+[oploc1,barrel_unfinished_ale] @brewing_barrel_drain;
+
+[label,brewing_barrel_drain]
+p_arrivedelay;
+~brewing_set_barrel(~brewing_site, 0);
+mes("You drain the barrel.");
