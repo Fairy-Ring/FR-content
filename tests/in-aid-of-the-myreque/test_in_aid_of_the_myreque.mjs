@@ -17,6 +17,7 @@ const World = (await load('engine/World.ts')).default;
 const map = await load('engine/GameMap.ts');
 const Player = (await load('engine/entity/Player.ts')).default;
 const Npc = (await load('engine/entity/Npc.ts')).default;
+const resolveNpcType = (await load('engine/entity/resolveNpcType.ts')).default;
 const { EntityLifeCycle } = await load('engine/entity/EntityLifeCycle.ts');
 const { PlayerStat } = await load('engine/entity/PlayerStat.ts');
 const { NpcStat } = await load('engine/entity/NpcStat.ts');
@@ -538,6 +539,21 @@ check('original store ladders, real repairs, lost crate, observable stocking, ba
   assert.equal(count(p, 'tinderbox'), 1, 'lighting retains the ordinary tool');
   assert.equal(p.getVarBit(id('VarBitType', 'burgh_furnace_fix')), 3);
   assert.equal(stage(p), 90);
+  assert.equal(p.getVarBit(id('VarBitType', 'blood_tithe_visible')), 1, 'lighting the furnace reveals the original tithe actors');
+  place(p, 3513, 3241);
+  for (const [base, visible] of [
+    ['burgh_gadderanks_multinpc', 'burgh_gadderanks'],
+    ['burgh_juve1_multinpc', 'burgh_vampire_juve1_blood_tithe'],
+    ['burgh_juve2_multinpc', 'burgh_vampire_juve2_blood_tithe'],
+    ['burgh_villager_tithe_multinpc', 'burgh_villager_blood_tithe']
+  ]) {
+    const npc = spawn(p, base);
+    const resolved = resolveNpcType(configs.NpcType.get(npc.type), p);
+    assert.equal(resolved.id, id('NpcType', visible), `${base}: earned visibility resolves the original map base`);
+    assert.equal(resolved.op[0], 'Talk-to');
+    assert.equal(entryScripts.get(talk(p, npc)), `[opnpc1,${visible}]`, 'native input dispatches the visible form');
+  }
+  assert.equal(stage(p), 110, 'the revealed original conversations start the tithe encounter');
   assert.equal(entryScripts.get(clickLoc(p, furnace, [], 2)), '[oploc2,_smithing_furnace]');
 });
 

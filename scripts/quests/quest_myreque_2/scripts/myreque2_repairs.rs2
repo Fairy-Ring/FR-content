@@ -444,6 +444,7 @@ if ($state = 2) {
     if (last_useitem ! tinderbox) return;
     if (inv_total(inv, tinderbox) < 1) return;
     %burgh_furnace_fix = 3;
+    %blood_tithe_visible = 1;
     ~myreque2_set_stage(^myreque2_furnace);
     mes("You light the furnace.");
 }
