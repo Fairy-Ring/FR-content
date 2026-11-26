@@ -1,9 +1,11 @@
 [ai_queue3,slayer_icefiend_1]
 gosub(npc_death);
-if (npc_findhero = ^false) {
+if (npc_findhero = ^true) {
+    if (p_finduid(uid) = ^true) ~rfd_dwarf_icefiend;
+    else queue(rfd_dwarf_icefiend, 0, 0);
+} else {
     return;
 }
-~rfd_dwarf_icefiend;
 
 // Default drop from config.
 obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);
