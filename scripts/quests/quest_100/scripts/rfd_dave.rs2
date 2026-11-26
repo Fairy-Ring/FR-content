@@ -96,7 +96,10 @@ inv_del(inv, hundred_dave_stew, 1);
 [opheldu,stew] @rfd_dave_mix(last_useitem, stew);
 [opheldu,hundred_dave_stew] @rfd_dave_mix(last_useitem, hundred_dave_stew);
 [label,rfd_dave_mix](obj $spice, obj $stew)
-if (%hundred_dave_main < ^rfd_dave_spices | stat(cooking) < ^rfd_dave_cooking) return;
+if (%hundred_dave_main < ^rfd_dave_spices | stat(cooking) < ^rfd_dave_cooking) {
+    ~displaymessage(^dm_default);
+    return;
+}
 def_int $colour;
 def_namedobj $next;
 $colour, $next = ~rfd_dave_spice($spice);

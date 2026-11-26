@@ -27,7 +27,7 @@ if (%hundred_main_quest_var = 0) {
 ~send_quest_progress_colour(recipe_for_disaster:com_4, %100_pirate_quest_var, ^rfd_guest_complete);
 ~send_quest_progress_colour(recipe_for_disaster:com_5, %100guide_prog, ^rfd_guest_complete);
 ~send_quest_progress_colour(recipe_for_disaster:com_6, %hundred_dave_main, ^rfd_dave_complete);
-~send_quest_progress_colour(recipe_for_disaster:com_10, %100_ogre_prog, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_7, %100_ogre_prog, ^rfd_guest_complete);
 if_openmain(recipe_for_disaster);
 
 [if_close,recipe_for_disaster]
@@ -90,7 +90,7 @@ if (%hundred_dave_main = ^rfd_dave_complete) {
 }
 ~quest_journal("Freeing Evil Dave", $text);
 
-[if_button,recipe_for_disaster:com_10]
+[if_button,recipe_for_disaster:com_7]
 def_string $text;
 if (%100_ogre_prog = ^rfd_guest_complete) {
     $text = "@str@I freed Skrach Uglogwee with cooked Jubbly.|@red@GUEST RESCUED!";

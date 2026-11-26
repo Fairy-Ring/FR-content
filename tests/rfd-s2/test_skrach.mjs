@@ -450,7 +450,8 @@ for (const [balloonCount, option] of [[1, 5], [2, 4]]) {
   assert.equal(count(p, 'hammer'), 1);
   assert.equal(p.stats[PlayerStat.SMITHING] - beforeXp, 250, 'candidate recipe awards the standard iron-bar XP');
   assert.equal(types.ObjType.get(obj('spit_iron')).tradeable, true, 'original cache spit remains tradeable');
-  for (const name of ['spit_skewered_chompy', '100_jubbly_balloon_toad_brown', '100_jubbly_balloon_toad_white', '100_jubbly_meat_raw', '100_jubbly_meat_cooked', '100_jubbly_meat_burned']) {
+  assert.equal(types.ObjType.get(obj('spit_skewered_chompy')).tradeable, true, 'ordinary skewered Chompy remains tradeable like its iron spit');
+  for (const name of ['100_jubbly_balloon_toad_brown', '100_jubbly_balloon_toad_white', '100_jubbly_meat_raw', '100_jubbly_meat_cooked', '100_jubbly_meat_burned']) {
     assert.equal(types.ObjType.get(obj(name)).tradeable, false, `${name} remains an untradeable quest item`);
   }
 }

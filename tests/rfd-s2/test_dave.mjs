@@ -63,6 +63,24 @@ function mix(p, recipe, reverse = false) {
   assert.deepEqual(doses(p), recipe);
 }
 
+// Ordinary use-item feedback survives the quest and Cooking gates and non-spice inputs.
+const defaultUse = player();
+run(defaultUse, '[proc,displaymessage]', { args: [0] }); // Confirmed dm_default constant.
+const defaultMessages = [...defaultUse.messages];
+assert(defaultMessages.length, 'ordinary default use-item message is nonempty');
+for (const [progress, cooking, item] of [[0, 25, 'hundred_dave_spice_red_1'], [4, 24, 'hundred_dave_spice_red_1'], [4, 25, 'bucket_milk']]) {
+  const q = player();
+  setBit(q, 'hundred_dave_main', progress);
+  skill(q, 'cooking', cooking);
+  give(q, 'stew'); give(q, item);
+  useItems(q, item, 'stew');
+  assert.deepEqual(q.messages, defaultMessages, `ordinary stew fallback at Dave stage ${progress}, Cooking ${cooking}, item ${item}`);
+  assert.equal(count(q, 'stew'), 1);
+  assert.equal(count(q, item), 1);
+  assert.equal(count(q, 'hundred_dave_stew'), 0);
+  assert.deepEqual(doses(q), [0, 0, 0, 0]);
+}
+
 for (const missing of ['fluffs', 'agrith_quest', 'cooking']) {
   const p = player(), guest = frozen(p);
   if (missing === 'fluffs') setVar(p, 'fluffs', 5);

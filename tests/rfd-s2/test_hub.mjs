@@ -49,9 +49,19 @@ for (let index = 0; index < guests.length; index++) {
 assert.equal(qp() - initialQP, 6, 'six rescued guests add six QP beside the introduction point');
 assert.equal(qp(), 7, 'the introduction plus six guests contributes seven total RFD QP');
 assert.equal(bit(p, 'hundred_main_quest_var'), 3, 'six guests do not finish the whole quest');
-for (const [button, title] of [[5, 'Lumbridge Guide'], [6, 'Evil Dave'], [10, 'Skrach Uglogwee']]) {
+const skrachJournal = types.Component.get(com('recipe_for_disaster:com_7'));
+assert.equal(skrachJournal.buttonType, types.Component.BUTTON, 'Skrach uses a normal Quest Journal button');
+assert.equal(skrachJournal.text, "Skrach 'Bone Cruncher' Uglogwee");
+const closeWindow = types.Component.get(com('recipe_for_disaster:com_10'));
+assert.equal(closeWindow.buttonType, types.Component.CLOSE_BUTTON);
+assert.equal(closeWindow.text, 'Close Window');
+for (const [button, title] of [[5, 'Lumbridge Guide'], [6, 'Evil Dave'], [7, 'Skrach Uglogwee']]) {
+  const packetStart = p.packets.length;
   run(p, '[if_button,questlist:hundred_main]');
   assert.equal(p.modalMain, com('recipe_for_disaster'));
+  const colours = p.packets.slice(packetStart).filter(packet => packet.constructor.name === 'IfSetColour');
+  assert(colours.some(packet => packet.component === skrachJournal.id), 'Skrach journal row receives progress colour');
+  assert(!colours.some(packet => packet.component === closeWindow.id), 'Close Window is never recoloured');
   capture(p, () => assert(new IfButtonHandler().handle(new IfButton(com(`recipe_for_disaster:com_${button}`)), p)));
   assert.match(text(p), new RegExp(title));
   assert.match(text(p), /GUEST RESCUED/);
