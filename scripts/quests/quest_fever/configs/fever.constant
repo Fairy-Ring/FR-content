@@ -14,9 +14,9 @@
 ^fever_port_pier = 0_57_54_61_40
 ^fever_mos_deck = 1_57_46_35_5
 ^fever_mos_pier = 0_57_46_36_10
-^fever_own_hold = 0_28_75_23_35
-^fever_own_deck = 1_28_75_23_35
-^fever_enemy_hold = 0_28_75_32_30
+^fever_own_hold = 0_28_75_22_35
+^fever_own_deck = 1_28_75_22_35
+^fever_enemy_hold = 0_28_75_31_30
 ^fever_enemy_deck = 1_28_75_32_28
-^fever_own_mast = 2_28_75_23_31
-^fever_enemy_mast = 2_28_75_32_34
+^fever_own_mast = 2_28_75_24_30
+^fever_enemy_mast = 2_28_75_31_35

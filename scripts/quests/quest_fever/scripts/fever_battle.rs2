@@ -1,8 +1,8 @@
 // VERIFIED sequence: Tip.It guide captured 11 April 2006. UNKNOWN functional text and movement geometry.
 [oploc1,fever_ship_ladder]
 if (coordx(loc_coord) > 3000) {
-    if (loc_angle = 3) p_telejump(movecoord(loc_coord, 1, 1, 0));
-    else p_telejump(movecoord(loc_coord, 0, 1, -1));
+    if (loc_angle = 3) p_telejump(movecoord(loc_coord, -1, 1, 0));
+    else p_telejump(movecoord(loc_coord, 0, 1, 1));
     return;
 }
 if (coordx(loc_coord) < 1820) p_telejump(^fever_own_deck);
@@ -10,8 +10,8 @@ else p_telejump(^fever_enemy_deck);
 
 [oploc1,fever_ship_laddertop]
 if (coordx(loc_coord) > 3000) {
-    if (loc_angle = 3) p_telejump(movecoord(loc_coord, 1, -1, 0));
-    else p_telejump(movecoord(loc_coord, 0, -1, -1));
+    if (loc_angle = 3) p_telejump(movecoord(loc_coord, -1, -1, 0));
+    else p_telejump(movecoord(loc_coord, 0, -1, 1));
     return;
 }
 if (coordx(loc_coord) < 1820) p_telejump(^fever_own_hold);
