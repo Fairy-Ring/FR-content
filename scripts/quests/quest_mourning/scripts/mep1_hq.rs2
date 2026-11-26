@@ -32,7 +32,7 @@ p_teleport(^mep1_surface);
 [oploc1,mourner_hideout_door4] ~open_and_close_door2(mourner_hideout_door4_open, ~check_axis_locactive(coord), door_open);
 [oploc1,mourner_hideout_door3]
 // The gnome's room is south of its packed gate. Never lock somebody inside.
-if (coordz(coord) >= 4633 & inv_total(inv, mourning_gnome_key) = 0) {
+if (coordz(coord) > coordz(loc_coord) & inv_total(inv, mourning_gnome_key) = 0) {
     mes("The door is locked. You need the tarnished key.");
     return;
 }
