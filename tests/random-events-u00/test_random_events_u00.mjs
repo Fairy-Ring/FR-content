@@ -14,7 +14,7 @@ function identities() {
   const genie = types.NpcType.get(requiredId(types.NpcType, 'macro_geni'));
   return { genie: { id: genie.id, models: [...genie.models], ops: genie.op }, bronzePickaxe: requiredId(types.ObjType, 'bronze_pickaxe'), pickaxeHandle: requiredId(types.ObjType, 'macro_pickaxehandle'), bronzeHead: requiredId(types.ObjType, 'macro_bronze_pickaxehead'), rock: requiredId(types.LocType, 'copperrock1'), lumbridgeButton: requiredId(types.Component, 'magic:lumbridge_teleport'), appendages: [1, 2, 3, 4].map(i => requiredId(types.LocType, `macro_laf_appendage_${i}`)) };
 }
-const names = ['swarm', 'genie', 'drunken-dwarf', 'mysterious-old-man', 'candlelight', 'strange-plant', 'lost-pickaxe', 'smoking-rock', 'rock-golem', 'tree-spirit', 'ent', 'lost-axe', 'big-fish', 'river-troll', 'whirlpool', 'zombie', 'shade', 'watchman', 'poisonous-gas', 'lost-and-found'];
+const names = ['swarm', 'genie', 'drunken-dwarf', 'mysterious-old-man', 'candlelight', 'strange-plant', 'lost-pickaxe', 'smoking-rock', 'rock-golem', 'tree-spirit', 'ent', 'lost-axe', 'big-fish', 'river-troll', 'whirlpool', 'zombie', 'shade', 'watchman', 'poisonous-gas', 'lost-and-found', 'capn-hand', 'rick-turpentine', 'jekyll', 'evil-chicken', 'frogs', 'certers', 'sandwich-lady'];
 const spawners = ['macro_event_general_spawn', 'macro_event_lost_pickaxe_spawn', 'macro_event_gas_spawn', 'macro_event_rock_golem_spawn', 'macro_event_dryad_spawn', 'macro_event_ent_spawn', 'macro_event_lost_axe_spawn', 'macro_event_bigfish_spawn', 'macro_event_river_troll_spawn', 'macro_event_whirlpool_spawn', 'macro_event_zombie_spawn', 'macro_event_shade_spawn', 'macro_event_watchman_spawn', 'macro_event_macro_gas_chest', 'macro_laf_start'];
 let serial = 0;
 let passed = 0;
@@ -143,9 +143,9 @@ for (let index = 1; index <= names.length; index++) check(`packed accepted name 
   const result = run(p, names[index - 1]);
   assert.equal(result.entries.length, 1, JSON.stringify(p.messages));
   const call = result.entries[0];
-  const expected = index <= 6 ? spawners[0] : spawners[index - 6];
+  const expected = index <= 6 || index >= 21 ? spawners[0] : spawners[index - 6];
   assert.equal(call.name, `[proc,${expected}]`);
-  assert.deepEqual(call.ints, index <= 6 ? [index] : index === 13 ? [requiredId(types.ObjType, 'net')] : index === 20 ? [(3213 << 14) | 3424] : []);
+  assert.deepEqual(call.ints, index >= 21 ? [index - 13] : index <= 6 ? [index] : index === 13 ? [requiredId(types.ObjType, 'net')] : index === 20 ? [(3213 << 14) | 3424] : []);
   if ([8, 11, 19].includes(index)) {
     assert(call.loc && World.getLoc(call.loc.x, call.loc.z, call.loc.level, call.loc.type), 'bound target is a genuine map loc');
     assert(p.inOperableDistance(World.getLoc(call.loc.x, call.loc.z, call.loc.level, call.loc.type)), 'bound target is within the engine operate reach');
