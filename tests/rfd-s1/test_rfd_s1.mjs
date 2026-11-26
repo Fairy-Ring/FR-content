@@ -106,7 +106,7 @@ for (let message = 0; message < entryMessages.length; message++) {
   for (const name of frozenSelectors) assert.equal(bit(interrupted, name), 1, `${name} survives interrupted entry`);
   assert.deepEqual(tile(interrupted), [0, 1861, 5317], 'interruption leaves the player in the banquet room, not the sealed feast room');
   assertLanding(tile(interrupted), 'interrupted banquet entry', [1861, 5318], [1856, 1871, 5312, 5331]);
-  assert(interrupted.inOperableDistance(banquetDoor), 'the interrupted landing is beside the original exit');
+  assert.equal(Math.max(Math.abs(interrupted.x - banquetDoor.x), Math.abs(interrupted.z - banquetDoor.z)), 1, 'the interrupted landing is beside the original exit');
   operate(interrupted, banquetDoor, 1, { from: tile(interrupted) });
   assert.deepEqual(tile(interrupted), [0, 3207, 3216], 'the native exit remains usable after interruption');
   assert.equal(stage(interrupted), 3, 'using the exit does not roll back the committed stage');
