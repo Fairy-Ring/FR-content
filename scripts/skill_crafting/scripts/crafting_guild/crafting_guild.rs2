@@ -18,6 +18,7 @@ if (~check_axis(coord, loc_coord, loc_angle) = true) {
 }
 
 [opnpc1,master_crafter]
+if (%swansong = 120) { @swan_master_crafter; }
 ~chatnpc("<p,confused>Yeah?"); // animationId = 575
 ~chatplayer("<p,happy>Hello."); // animationId = 567
 ~chatnpc("<p,confused>Whassup?"); // animationId = 575

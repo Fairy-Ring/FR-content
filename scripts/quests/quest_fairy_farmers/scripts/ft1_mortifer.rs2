@@ -1,5 +1,10 @@
 // CANDIDATE wording: fairytale-1.dlg.malignius-mortifer.
 [opnpc1,elemental_wizard_boss]
+if ((%swansong >= 110 & %swansong <= 140) | %swansong >= ^swansong_complete) {
+    if (%fairy_farmers_quest < ^ft1_zandar) @swan_mortifer;
+    // UNKNOWN functional topic captions; preserve the existing secateurs branch.
+    if (~p_choice2("Swan Song.", 1, "Fairytale I.", 2) = 1) @swan_mortifer;
+}
 if (%fairy_farmers_quest < ^ft1_zandar) return;
 if (%fairy_farmers_quest >= ^ft1_enchanted) {
     if (~obj_gettotal(fairy_enchanted_secateurs) = 0 & %farming_tools_fairysecateurs = 0) {

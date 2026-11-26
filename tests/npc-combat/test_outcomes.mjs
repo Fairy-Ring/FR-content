@@ -332,6 +332,7 @@ try {
         }
       }
       for (const [name, value] of Object.entries(route.npcVars ?? {})) f.npc.setVar(rt.id(VarNpcType, name), value === 'target' ? f.player.uid : value);
+      if (route.activeNpcVar) f.player.setVar(rt.id(VarPlayerType, route.activeNpcVar), f.npc.uid);
       rt.run('[proc,player_combat_stat]', f);
       return cleanup;
     } catch (error) {
