@@ -2107,7 +2107,7 @@
     {
       "script": "[ai_opplayer2,burgh_gadderanks_attackable]",
       "npc": "burgh_gadderanks_attackable",
-      "playerVars": { "myreque_2_quest": 110 },
+      "playerVars": { "myreque_2_quest": 110, "juvinate_deaths": 3 },
       "npcVars": { "npc_aggressive_player": "target" },
       "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
     },
