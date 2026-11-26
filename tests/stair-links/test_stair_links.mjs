@@ -23,7 +23,7 @@ for (const file of ['stairs.rs2', 'ladders.rs2']) {
   const headers = [...text.matchAll(/^\[(oploc[1-5]),([^\]]+)\].*$/gm)];
   for (const [index, header] of headers.entries()) {
     const block = text.slice(header.index + header[0].length, headers[index + 1]?.index ?? text.length);
-    if ((block.includes('switch_coord') && (block.includes('@unhandled_stairs') || block.includes('unhandled ladder'))) || /if \(\$coord = [0-3]_\d+_\d+_\d+_\d+\) \{[\s\S]*?\} else \{\s*mes\("unhandled ladder/.test(block) || /^\s*~deal_stairs\((?:true|false)\);/m.test(block)) {
+    if ((block.includes('switch_coord') && (block.includes('@unhandled_stairs') || block.includes('unhandled ladder'))) || /if \(\$coord = [0-3]_\d+_\d+_\d+_\d+\) \{[\s\S]*?\} else \{\s*mes\("unhandled ladder/.test(block) || /^\s*~deal_stairs\((?:true|false)\);/m.test(block) || /^\s*~zogre_stairs;/m.test(block)) {
       handlers.push({ name: header[2], trigger: header[1] });
     }
   }
@@ -111,6 +111,13 @@ function walkable(destination) {
   assert.equal(map.isMapBlocked(x, z, level), false, 'engine-loaded collision leaves the landing walkable');
   assert.ok(floors.has(destination.join(',')), 'the landing has a 377 floor');
 }
+// Native Jiggig flights connect levels 0 and 2, unlike the adjacent-level stairs.
+const jiggigLinks = new Map([
+  ['ogre_stairs_down:0_38_47_53_34:0', { destination: [2, 2478, 9436], counterpart: { name: 'ogre_stairs', coord: '2_38_147_46_29', angle: 1 } }],
+  ['ogre_stairs:2_38_147_46_29:1', { destination: [0, 2485, 3045], counterpart: { name: 'ogre_stairs_down', coord: '0_38_47_53_34', angle: 0 } }],
+  ['ogre_stairs_down:2_38_147_11_9:1', { destination: [0, 2443, 9416], counterpart: { name: 'ogre_stairs', coord: '0_38_147_11_9', angle: 1 } }],
+  ['ogre_stairs:0_38_147_11_9:1', { destination: [2, 2443, 9420], counterpart: { name: 'ogre_stairs_down', coord: '2_38_147_11_9', angle: 1 } }]
+]);
 const failures = [];
 const counts = { inherited: 0, new: 0, fallback: 0, roundTrips: 0 };
 for (const entry of manifest) {
@@ -142,7 +149,12 @@ for (const entry of manifest) {
       assert.equal(fallback(result.messages), false, 'linked operation never prints the fallback');
       const region = regionExceptions.get(executionKey(entry));
       const collision = collisionExceptions.get(executionKey(entry));
-      if (!region) assert.equal(Math.abs(result.destination[0] - source.level), 1, 'adjacent-level link');
+      const jiggig = jiggigLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
+      if (jiggig) {
+        assert.deepEqual(result.destination, jiggig.destination, 'Jiggig has the exact packed landing and level');
+        assert.deepEqual(entry.counterpart, jiggig.counterpart, 'Jiggig uses its exact native counterpart');
+        assert.equal(result.destination[0], decode(jiggig.counterpart.coord)[0], 'Jiggig arrives on its native counterpart level');
+      } else if (!region) assert.equal(Math.abs(result.destination[0] - source.level), 1, 'adjacent-level link');
       else assert.ok(Math.abs(result.destination[0] - source.level) !== 1 || (result.destination[1] >> 6) !== (source.x >> 6) || (result.destination[2] >> 6) !== (source.z >> 6), 'the named inherited region/level exception remains an exception');
       if (!collision) walkable(result.destination);
       else {
