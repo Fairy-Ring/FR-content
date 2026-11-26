@@ -91,7 +91,8 @@ let serial = 0;
 export function player() {
   const n = ++serial;
   const p = new Player(`rfd_fixture_${n}`, BigInt(80000 + n), BigInt(800000 + n));
-  Object.assign(p, { pid: n, slot: n, uid: n, isActive: true, lastMovement: 0 });
+  const uid = ((Number(p.username37 & 0x1fffffn) << 11) | n) >>> 0;
+  Object.assign(p, { pid: n, slot: n, uid, isActive: true, lastMovement: 0 });
   p.vars.fill(0);
   p.stats.fill(getExpByLevel(50));
   p.baseLevels.fill(50);
@@ -108,7 +109,6 @@ export function player() {
   World.playerLoop.add(p.hash64, p);
   position(p, [0, 3207, 3216]);
   run(p, '[proc,initalltabs]');
-  p.invListenOnCom(inv, com('inventory:inv'), p.uid);
   return p;
 }
 export function text(p) {
