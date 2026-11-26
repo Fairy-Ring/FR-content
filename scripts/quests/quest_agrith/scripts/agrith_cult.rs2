@@ -1,0 +1,236 @@
+// VERIFIED flow: retained Tip.It q125, 2 May 2006, walkthrough.
+// UNKNOWN: concise functional dialogue and staging coordinates. Original maps/models.
+[opnpc1,agrith_dave]
+if (%agrith_quest < 20 | %agrith_quest >= ^agrith_complete) return;
+if (%agrith_quest = 80) {
+    // UNKNOWN staging of the period-verified storm death, on the passage floor.
+    def_npc_uid $dave = npc_uid;
+    def_coord $fall = movecoord(npc_coord, -1, 0, 0);
+    npc_add($fall, agrith_tanya, 2000);
+    %agrith_owner = uid;
+    npc_setmode(none);
+    npc_settimer(5);
+    npc_anim(human_death, 0);
+    p_delay(^agrith_story_death_delay);
+    obj_add($fall, agrith_sigil, 1, ^lootdrop_duration);
+    npc_del;
+    if (npc_finduid($dave) = false) return;
+    %agrith_quest = 90;
+    %agrith_reen_uzer = 1;
+    ~mesbox("Tanya is struck by the storm. Her demonic sigil falls to the ground.");
+}
+if (%agrith_quest = 90) {
+    ~chatnpc("<p,scared>I don't want to go back in there!");
+    if (~p_choice2("We need you to help summon Agrith-Naar back.", 1, "Not yet.", 2) = 1) {
+        %agrith_convinced_dave = 2;
+        ~chatnpc("<p,neutral>All right. I'll go back.");
+    }
+    return;
+}
+if (%agrith_quest = 20) {
+    ~chatnpc("<p,neutral>Are you evil?");
+    if (~p_choice2("I am evil. Can I join your group?", 1, "Not really.", 2) ! 1) return;
+    if (~agrith_black_clothing < 3 | inv_getobj(worn, ^wearpos_rhand) ! agrith_silverlight_dyed) {
+        ~chatnpc("<p,neutral>You don't look evil. Wear black, and make that sword black too.");
+        return;
+    }
+    %agrith_quest = 30;
+    ~chatnpc("<p,happy>You can join our group. Go through the portal.");
+    return;
+}
+~chatnpc("<p,happy>Welcome! Soon we'll summon the great demon!");
+
+[proc,agrith_black_clothing]()(int)
+// VERIFIED count: blackened sword plus two clothing items (period guide).
+// UNKNOWN favourable whitelist beyond the guide's listed original cache items.
+def_int $count = 0;
+def_int $slot = 0;
+while ($slot < inv_size(worn)) {
+    switch_obj(inv_getobj(worn, $slot)) {
+        case agrith_silverlight_dyed, agrith_desert_shirt_dyed, agrith_desert_robe_dyed,
+             priest_gown, priest_robe, blackwizhat, blackrobetop, blackrobebottom,
+             black_dragonhide_body, black_dragonhide_chaps, mystic_hat_dark,
+             black_robe, black_skirt, black_cape, black_platebody, black_chainbody,
+             black_platelegs, black_plateskirt, black_med_helm, black_full_helm,
+             black_platebody_trim, black_platelegs_trim, black_full_helm_trim,
+             black_platebody_gold, black_platelegs_gold, black_full_helm_gold,
+             black_plateskirt_trim, black_plateskirt_gold :
+            $count = add($count, 1);
+    }
+    $slot = add($slot, 1);
+}
+return($count);
+
+[proc,agrith_portal_check]()(boolean)
+// Preserve every Golem stage, including a completed Golem before this quest starts.
+if (%agrith_quest = 0 | %agrith_quest >= ^agrith_complete) return(true);
+if (%agrith_quest < 30) {
+    mes("You must speak to Evil Dave before joining the group.");
+    return(false);
+}
+return(true);
+
+[proc,agrith_in_room]()(boolean)
+return(inzone(2_42_76_22_16, 2_42_76_42_54, coord));
+
+[proc,agrith_room_enter]
+if (%agrith_quest < 30 | %agrith_quest >= ^agrith_complete) return;
+~agrith_clear_cult;
+if (%agrith_quest < 120 & ~agrith_find_boss = false) ~agrith_spawn_cult(agrith_matthew, 2_42_76_34_34);
+~agrith_spawn_cult(agrith_jennifer, 2_42_76_28_34);
+if (%agrith_quest < 80) {
+    ~agrith_spawn_cult(agrith_denath, 2_42_76_32_39);
+    ~agrith_spawn_cult(agrith_eric, 2_42_76_35_37);
+    ~agrith_spawn_cult(agrith_tanya, 2_42_76_28_37);
+    ~agrith_spawn_cult(agrith_patrick, 2_42_76_32_42);
+}
+if (%agrith_quest >= 100) {
+    ~agrith_spawn_cult(agrith_badden_sigil, 2_42_76_35_37);
+    ~agrith_spawn_cult(agrith_reen_sigil, 2_42_76_28_37);
+    ~agrith_spawn_cult(agrith_golem_sigil, 2_42_76_32_42);
+    ~agrith_spawn_cult(agrith_dave_sigil, 2_42_76_29_40);
+}
+
+[proc,agrith_spawn_cult](npc $type, coord $tile)
+npc_add($tile, $type, 2000);
+%agrith_owner = uid;
+npc_setmode(none);
+npc_settimer(5);
+
+[proc,agrith_clear_cult]
+npc_huntall(2_42_76_32_35, 24, 0);
+while (npc_findnext = true) {
+    if (%agrith_owner = uid & npc_type ! agrith_naar) npc_del;
+}
+
+[proc,agrith_cult_cleanup]
+if (finduid(%agrith_owner) = false) {
+    npc_del;
+    return;
+}
+if (~agrith_in_room = false | %agrith_quest >= ^agrith_complete) npc_del;
+
+[ai_timer,agrith_denath] ~agrith_cult_cleanup;
+[ai_timer,agrith_matthew] ~agrith_cult_cleanup;
+[ai_timer,agrith_jennifer] ~agrith_cult_cleanup;
+[ai_timer,agrith_eric] ~agrith_cult_cleanup;
+[ai_timer,agrith_tanya] ~agrith_cult_cleanup;
+[ai_timer,agrith_patrick] ~agrith_cult_cleanup;
+[ai_timer,agrith_badden_sigil] ~agrith_cult_cleanup;
+[ai_timer,agrith_reen_sigil] ~agrith_cult_cleanup;
+[ai_timer,agrith_golem_sigil] ~agrith_cult_cleanup;
+[ai_timer,agrith_dave_sigil] ~agrith_cult_cleanup;
+
+[opnpc1,agrith_denath]
+if (%agrith_owner ! uid | %agrith_quest < 30 | %agrith_quest >= 80) return;
+if (%agrith_quest = 30) {
+    ~agrith_choose_words;
+    %agrith_quest = 40;
+}
+// CANDIDATE vocabulary: current OSRS transcript; order is player-specific (period guide).
+~chatnpc("<p,neutral>You must memorize the incantation carefully.");
+~chatnpc("<p,neutral><~agrith_word(%agrith_incantation_1)> <~agrith_word(%agrith_incantation_2)> <~agrith_word(%agrith_incantation_3)> <~agrith_word(%agrith_incantation_4)> <~agrith_word(%agrith_incantation_5)>.");
+~chatnpc("<p,neutral>You will also need a demonic sigil. Jennifer has the mould.");
+
+[opnpc1,agrith_jennifer]
+if (%agrith_owner ! uid | %agrith_quest < 40 | %agrith_quest >= ^agrith_complete) return;
+if (calc(inv_total(inv, agrith_sigil_mould) + inv_total(bank, agrith_sigil_mould)) = 0) {
+    if (inv_freespace(inv) < 1) {
+        mes("You need a free inventory space for the mould.");
+        return;
+    }
+    inv_add(inv, agrith_sigil_mould, 1);
+}
+~chatnpc("<p,neutral>Use the mould and a silver bar at a furnace to make your demonic sigil.");
+
+[opnpc1,agrith_matthew]
+if (%agrith_owner ! uid | %agrith_quest < 40) return;
+if (%agrith_quest = 40) {
+    ~chatnpc("<p,neutral>Josef read Denath's book last night. Then he ran through the portal with it.");
+    ~chatnpc("<p,neutral>Perhaps the golem outside saw where he went.");
+    %agrith_quest = 50;
+    return;
+}
+if (%agrith_quest = 60 & inv_total(inv, agrith_book) > 0) {
+    if (inv_total(inv, agrith_sigil) = 0) {
+        ~chatnpc("<p,neutral>Make your demonic sigil before we begin.");
+        return;
+    }
+    ~chatnpc("<p,neutral>The words in the book are in reverse order. I'm not happy about this ritual.");
+    %agrith_quest = 70;
+    return;
+}
+if (%agrith_quest = 70) {
+    ~chatnpc("<p,neutral>Take the empty place at the head of the circle, and chant with your sigil.");
+    return;
+}
+if (%agrith_quest = 80 | %agrith_quest = 90) {
+    ~agrith_recover_sigils;
+    if (%agrith_quest = 90 & %agrith_convinced_dave = 2 & %agrith_badden_uzer = 2 & %agrith_reen_uzer = 2 & %agrith_convinced_golem = 1 & inv_total(inv, agrith_sigil) >= 4) {
+        inv_del(inv, agrith_sigil, 3);
+        %agrith_quest = 100;
+        ~agrith_room_enter;
+        ~chatnpc_specific(nc_name(agrith_matthew), agrith_matthew, "<p,neutral>Everyone is ready. We must perform the ritual in reverse this time.");
+    } else {
+        ~chatnpc("<p,neutral>We sent Denath back. He was Agrith-Naar! Bring Dave, the two monks and the golem back, with the fallen wizards' sigils.");
+    }
+    return;
+}
+if (%agrith_quest = 100) {
+    ~chatnpc("<p,neutral>Are you ready to fight Agrith-Naar?");
+    if (~p_choice2("I am ready.", 1, "Not yet.", 2) = 1) {
+        %agrith_quest = 110;
+        ~chatnpc("<p,neutral>Lead the ritual in reverse order.");
+    }
+    return;
+}
+if (%agrith_quest = 110) {
+    ~chatnpc("<p,neutral>Chant the words in reverse order to summon him. Use your blackened Silverlight to finish him.");
+    return;
+}
+if (%agrith_quest = 120) ~agrith_reward;
+
+[proc,agrith_recover_sigils]
+// UNKNOWN favourable recovery: the dead wizards' abandoned sigils remain recoverable.
+// This also recovers the player's own lost sigil after the first ritual.
+def_int $needed = 3;
+if (%agrith_quest >= 90) $needed = 4;
+while (inv_total(inv, agrith_sigil) < $needed & inv_freespace(inv) > 0) inv_add(inv, agrith_sigil, 1);
+
+[opnpc1,agrith_eric] @agrith_cult_greeting;
+[opnpc1,agrith_tanya] @agrith_cult_greeting;
+[opnpc1,agrith_patrick] @agrith_cult_greeting;
+[opnpc1,agrith_dave_sigil] @agrith_cult_greeting;
+[opnpc1,agrith_badden_sigil] @agrith_monk_after_ritual;
+[opnpc1,agrith_reen_sigil] @agrith_monk_after_ritual;
+[opnpc1,agrith_golem_sigil] @agrith_cult_greeting;
+[opnpc1,agrith_golem_throneroom] @agrith_cult_greeting;
+[label,agrith_cult_greeting]
+if (%agrith_owner ! uid) return;
+~chatnpc("<p,neutral>We must finish the ritual.");
+
+[label,agrith_monk_after_ritual]
+if (%agrith_owner ! uid) return;
+if (%agrith_quest = 120) {
+    ~agrith_reward;
+    return;
+}
+@agrith_cult_greeting;
+
+[proc,agrith_golem_talk]
+if (%agrith_quest = 50) {
+    ~chatnpc_specific(nc_name(golem_fixed_golem), golem_fixed_golem, "<p,neutral>I saw Josef hide a book in a broken kiln last night.");
+    %agrith_kiln = random(4);
+    %agrith_quest = 60;
+} else if (%agrith_quest = 90 & %agrith_convinced_golem = 0) {
+    ~chatnpc_specific(nc_name(golem_fixed_golem), golem_fixed_golem, "<p,neutral>My instructions do not permit me to take part in the ritual.");
+    mes("The strange implement can open the golem's head.");
+} else {
+    ~chatnpc_specific(nc_name(golem_fixed_golem), golem_fixed_golem, "<p,neutral>The book was hidden in a broken kiln.");
+}
+
+[proc,agrith_golem_use](obj $used)(boolean)
+if ($used ! golem_golemkey | %agrith_quest ! 90) return(false);
+~chatnpc_specific(nc_name(golem_fixed_golem), golem_fixed_golem, "<p,neutral>New instructions... I will help with the ritual.");
+%agrith_convinced_golem = 1;
+return(true);

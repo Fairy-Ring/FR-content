@@ -1,0 +1,106 @@
+// VERIFIED: Tip.It q125, silver-cast sigil, mushroom dye and kiln-hidden tome.
+// UNKNOWN: functional messages. No unfired clay sigil exists in the 377 cache.
+[proc,agrith_dye](obj $used_with)(boolean)
+return(~agrith_apply_dye($used_with, golem_mushroom));
+
+[opheldu,silverlight]
+if (last_useitem = golem_mushroom | last_useitem = golem_ink) {
+    if (~agrith_apply_dye(silverlight, last_useitem) = true) return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,desert_shirt]
+if (last_useitem = golem_ink & ~agrith_apply_dye(desert_shirt, golem_ink) = true) return;
+~displaymessage(^dm_default);
+
+[opheldu,desert_robe]
+if (last_useitem = golem_ink & ~agrith_apply_dye(desert_robe, golem_ink) = true) return;
+~displaymessage(^dm_default);
+
+[proc,agrith_apply_dye](obj $target, obj $reagent)(boolean)
+def_namedobj $product;
+switch_obj($target) {
+    case silverlight : $product = agrith_silverlight_dyed;
+    case desert_shirt : $product = agrith_desert_shirt_dyed;
+    case desert_robe : $product = agrith_desert_robe_dyed;
+    case default : return(false);
+}
+if ($target ! silverlight & $reagent ! golem_ink) return(false);
+if (inv_total(inv, $target) = 0 | inv_total(inv, $reagent) = 0) return(true);
+inv_del(inv, $target, 1);
+inv_del(inv, $reagent, 1);
+inv_add(inv, $product, 1);
+if ($reagent = golem_ink) inv_add(inv, vial_empty, 1);
+mes("You stain it black with mushroom ink.");
+return(true);
+
+[if_button,silver_casting:com_138] @agrith_cast_sigil(1);
+[inv_button1,silver_casting:com_134] @agrith_cast_sigil(1);
+[inv_button2,silver_casting:com_134] @agrith_cast_sigil(5);
+[inv_button3,silver_casting:com_134] @agrith_cast_sigil(10);
+[label,agrith_cast_sigil](int $count)
+if (map_members = ^false) return;
+if (%agrith_quest < 40 | inv_total(inv, agrith_sigil_mould) = 0) {
+    mes("You need the demonic sigil mould.");
+    return;
+}
+if (stat(crafting) < 30) {
+    mes("You need level 30 Crafting to make a demonic sigil.");
+    return;
+}
+if (inv_total(inv, silver_bar) < 1) {
+    mes("You need a silver bar.");
+    return;
+}
+// The existing furnace dispatcher owns the interface and location validation.
+if_close;
+while ($count > 0 & inv_total(inv, silver_bar) > 0) {
+    anim(human_furnace, 0);
+    sound_synth(furnace, 1, 0);
+    p_delay(2);
+    if (inv_total(inv, silver_bar) = 0 | inv_total(inv, agrith_sigil_mould) = 0) return;
+    inv_del(inv, silver_bar, 1);
+    inv_add(inv, agrith_sigil, 1);
+    // UNKNOWN minor favourable XP default, named in agrith.constant.
+    stat_advance(crafting, ^agrith_sigil_crafting_xp);
+    mes("You make a demonic sigil.");
+    $count = sub($count, 1);
+}
+
+[oploc1,golem_kiln_smashed1_lookin] @agrith_search_kiln;
+[oploc1,golem_kiln_smashed2_lookin] @agrith_search_kiln;
+[oploc1,golem_kiln_smashed3_lookin] @agrith_search_kiln;
+[label,agrith_search_kiln]
+if (%agrith_quest ! 60) return;
+if (inv_total(inv, agrith_book) > 0 | inv_total(bank, agrith_book) > 0) {
+    mes("You already have the demonic tome.");
+    return;
+}
+// Original four multiloc placements distinguish identical visible kiln forms.
+def_int $kiln = ~agrith_kiln_index(loc_coord);
+if ($kiln < 0 | $kiln ! %agrith_kiln) {
+    mes("There is nothing in this kiln.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space for the book.");
+    return;
+}
+inv_add(inv, agrith_book, 1);
+~objbox(agrith_book, "You find a demonic tome hidden in the kiln.", 250, 0, ^objbox_height);
+
+[proc,agrith_kiln_index](coord $tile)(int)
+// UNKNOWN ordinal binding; original placements are asserted by the compiled test.
+switch_coord($tile) {
+    case 0_54_48_11_51 : return(0);
+    case 0_54_48_22_10 : return(1);
+    case 0_54_48_16_20 : return(2);
+    case 0_54_48_44_12 : return(3);
+}
+return(-1);
+
+[opheld1,agrith_book]
+// CANDIDATE names and reverse-order text: bounded OSRS transcript. Period q125
+// verifies the reversal, but does not retain the words or book prose.
+~mesbox("The tome describes a ritual for summoning Agrith-Naar.|Its incantation is the reverse of the one Denath taught you.");
+~mesbox("<~agrith_word(%agrith_incantation_5)> <~agrith_word(%agrith_incantation_4)> <~agrith_word(%agrith_incantation_3)> <~agrith_word(%agrith_incantation_2)> <~agrith_word(%agrith_incantation_1)>.");

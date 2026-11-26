@@ -1,0 +1,7 @@
+// UNKNOWN minor favourable default: exact sigil-crafting XP was not retained.
+// Source: bounded period guide and cache recipe search; engine XP uses tenths.
+^agrith_sigil_crafting_xp = 500
+// UNKNOWN engineering staging: short visible human death before scene cleanup.
+^agrith_story_death_delay = 3
+// CANDIDATE: bounded Old School Agrith-Naar NPC combat table.
+^agrith_magic_maxhit = 10

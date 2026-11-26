@@ -1,0 +1,3 @@
+// UNKNOWN engineering binding: immutable owner, separate from combat retaliation.
+[agrith_owner]
+type=player_uid

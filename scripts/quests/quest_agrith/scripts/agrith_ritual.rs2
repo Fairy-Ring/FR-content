@@ -1,0 +1,81 @@
+// VERIFIED: period Tip.It q125, random player incantation then its reverse.
+// CANDIDATE word vocabulary: bounded OSRS transcript, not period-verified prose.
+[proc,agrith_word](int $word)(string)
+switch_int($word) {
+    case 1 : return("Caldar");
+    case 2 : return("Nahudu");
+    case 3 : return("Agrith-Naar");
+    case 4 : return("Camerinthum");
+    case 5 : return("Tarren");
+}
+return("");
+
+[proc,agrith_choose_words]
+%agrith_incantation_1 = add(random(5), 1);
+%agrith_incantation_2 = add(random(5), 1);
+while (%agrith_incantation_2 = %agrith_incantation_1) %agrith_incantation_2 = add(random(5), 1);
+%agrith_incantation_3 = add(random(5), 1);
+while (%agrith_incantation_3 = %agrith_incantation_1 | %agrith_incantation_3 = %agrith_incantation_2) %agrith_incantation_3 = add(random(5), 1);
+%agrith_incantation_4 = add(random(5), 1);
+while (%agrith_incantation_4 = %agrith_incantation_1 | %agrith_incantation_4 = %agrith_incantation_2 | %agrith_incantation_4 = %agrith_incantation_3) %agrith_incantation_4 = add(random(5), 1);
+%agrith_incantation_5 = add(random(5), 1);
+while (%agrith_incantation_5 = %agrith_incantation_1 | %agrith_incantation_5 = %agrith_incantation_2 | %agrith_incantation_5 = %agrith_incantation_3 | %agrith_incantation_5 = %agrith_incantation_4) %agrith_incantation_5 = add(random(5), 1);
+
+[proc,agrith_expected_word](int $index)(int)
+switch_int($index) {
+    case 1 : return(%agrith_incantation_1);
+    case 2 : return(%agrith_incantation_2);
+    case 3 : return(%agrith_incantation_3);
+    case 4 : return(%agrith_incantation_4);
+    case 5 : return(%agrith_incantation_5);
+}
+return(0);
+
+[opheld1,agrith_sigil]
+if (%agrith_quest ! 70 & %agrith_quest ! 110) {
+    mes("The ritual is not ready.");
+    return;
+}
+if (~agrith_in_room = false) {
+    mes("You must chant in the throne room.");
+    return;
+}
+// UNKNOWN engineering staging: the empty southern place in the original room.
+if (coord ! 2_42_76_32_31) {
+    mes("Stand at the empty place at the southern end of the circle.");
+    return;
+}
+if (inv_total(inv, agrith_sigil) = 0) return;
+if (%agrith_quest = 110 & ~agrith_find_boss = true) {
+    mes("Agrith-Naar is already here!");
+    return;
+}
+def_int $step = 1;
+def_boolean $correct = true;
+while ($step <= 5) {
+    def_int $word = ~p_choice5("Caldar", 1, "Nahudu", 2, "Agrith-Naar", 3, "Camerinthum", 4, "Tarren", 5);
+    def_int $index = $step;
+    if (%agrith_quest = 110) $index = sub(6, $step);
+    if ($word ! ~agrith_expected_word($index)) $correct = false;
+    say("<~agrith_word($word)>!");
+    $step = add($step, 1);
+}
+if ($correct = false) {
+    mes("That was the wrong incantation. Try again.");
+    return;
+}
+if_close;
+if (%agrith_quest = 70) {
+    ~mesbox("A magic circle appears in the floor. Denath disappears!");
+    %agrith_quest = 80;
+    %agrith_convinced_dave = 1;
+    ~agrith_clear_cult;
+    ~agrith_room_enter;
+    // Private and untradeable: the fallen wizards' sigils cannot become public.
+    obj_add(2_42_76_35_37, agrith_sigil, 1, ^lootdrop_duration);
+    obj_add(2_42_76_32_42, agrith_sigil, 1, ^lootdrop_duration);
+    ~chatnpc_specific(nc_name(agrith_matthew), agrith_matthew, "<p,scared>Denath was Agrith-Naar! We sent him back. Take the fallen wizards' sigils and find people to help summon him again.");
+    return;
+}
+// The second ritual is replayable after death, logout or departure, not a stage seed.
+~agrith_spawn_boss;

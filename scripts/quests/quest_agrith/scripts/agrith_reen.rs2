@@ -1,19 +1,53 @@
-// Shadow of the Storm — Father Reen (Al Kharid) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:Shadow of the Storm minus overlay).
-// First write %agrith_quest 0 -> 10 (pack-safe: 1-9 hide Reen). Chat + write
-// only — no Uzer dest, no kiln, no RfD Dave.
-// Cite red-19-start-impl-377.md §11.
-
+// VERIFIED: retained Tip.It q125 (2 May 2006), prerequisites and monk recovery.
+// UNKNOWN: functional connecting text not present in the retained guide.
 [opnpc1,agrith_reen]
-~chatnpc("<p,neutral>Excuse me, I'm looking for <hn>. I have an urgent job for him.");
-def_int $go = ~p_choice2("That's me!", 1, "I'll let you know if I see him.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>I'll let you know if I see him.");
+if (%agrith_quest >= 120 & %agrith_quest < ^agrith_complete) {
+    ~agrith_reward;
     return;
 }
+if (%agrith_quest >= ^agrith_complete) {
+    ~chatnpc("<p,happy>Thank Saradomin!");
+    return;
+}
+if (%agrith_quest >= 80) {
+    if (%agrith_quest >= 90 & %agrith_reen_uzer < 2) {
+        ~chatnpc("<p,neutral>You need someone to help with the ritual?");
+        if (~p_choice2("Please help us.", 1, "Not yet.", 2) = 1) {
+            %agrith_reen_uzer = 2;
+            ~chatnpc("<p,neutral>I will meet you in the throne room.");
+        }
+    }
+    ~agrith_sword_recovery;
+    return;
+}
+if (%agrith_quest > 0) {
+    ~chatnpc("<p,neutral>Speak to Father Badden at Uzer.");
+    ~agrith_sword_recovery;
+    return;
+}
+if (%demonstart ! ^demon_complete | %golem_a ! ^golem_complete | stat_base(crafting) < 30) {
+    ~chatnpc("<p,neutral>You must complete Demon Slayer and The Golem, and have level 30 Crafting.");
+    return;
+}
+~chatnpc("<p,neutral>Excuse me, I'm looking for <hn>. I have an urgent job for him.");
+if (~p_choice2("That's me!", 1, "I'll let you know if I see him.", 2) ! 1) return;
 ~chatnpc("<p,happy>Thank Saradomin I found you!");
 ~chatnpc("<p,neutral>There is an urgent task that only you can do - and only with Silverlight!");
 %agrith_quest = 10;
-// Badden multi 2901 is hidden at 0 and only [opnpc1,agrith_badden] writes the
-// vis bit — flip here so the Uzer Talk-to can fire at stage 10.
 %agrith_badden_uzer = 1;
+~send_quest_progress(questlist:agrith, %agrith_quest, ^agrith_complete);
+~agrith_sword_recovery;
+
+[proc,agrith_has_sword]()(boolean)
+if (calc(inv_total(inv, silverlight) + inv_total(worn, silverlight) + inv_total(bank, silverlight)) > 0) return(true);
+if (calc(inv_total(inv, agrith_silverlight_dyed) + inv_total(worn, agrith_silverlight_dyed) + inv_total(bank, agrith_silverlight_dyed)) > 0) return(true);
+if (calc(inv_total(inv, darklight) + inv_total(worn, darklight) + inv_total(bank, darklight)) > 0) return(true);
+return(false);
+
+[proc,agrith_sword_recovery]
+if (%agrith_quest = 0 | %agrith_quest >= ^agrith_complete | ~agrith_has_sword = true) return;
+if (inv_freespace(inv) < 1) {
+    mes("You need a free inventory space for the sword.");
+    return;
+}
+inv_add(inv, silverlight, 1);
