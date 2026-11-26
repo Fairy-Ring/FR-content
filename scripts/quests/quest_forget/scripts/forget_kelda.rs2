@@ -459,6 +459,7 @@ inv_changeslot(inv, pot_empty, ale_yeast, 1);
 // UNKNOWN functional wording for vat ingredient feedback and success; recipe facts are sourced.
 [label,forget_kelda_vat_use]
 def_obj $used = last_useitem;
+if (~brewing_route_vat = true) return;
 p_arrivedelay;
 if (loc_type ! brewing_vat_1) {
     ~displaymessage(^dm_default);
@@ -557,6 +558,7 @@ return(%brewing_vat_varbit_1);
 [label,forget_kelda_valve]
 p_arrivedelay;
 ~forget_kelda_brew_update;
+if (%brewing_vat_varbit_1 < 68 & %brewing_barrel_varbit_1 ! 3) { ~brewing_turn_valve(1); return; }
 if (%brewing_vat_varbit_1 ! 71) {
     // UNKNOWN functional wording; do not lose a fermenting batch.
     mes("The Kelda stout is still fermenting.");

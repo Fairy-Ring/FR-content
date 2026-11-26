@@ -21,6 +21,7 @@ def_int $last = %farming_growth_minute;
 if ($now < $last) return;
 // Consume the shared range first so a script failure cannot replay writes.
 %farming_growth_minute = $now;
+~brewing_update_all;
 db_listall(farming_growth);
 def_dbrow $row = db_findnext;
 while ($row ! null) {

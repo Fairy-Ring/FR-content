@@ -1,5 +1,6 @@
 [opheldu,knife]
 switch_obj(last_useitem) {
+    case calquat_fruit : @brewing_hollow_calquat;
     case lemon, orange, lime, pineapple, tentipineapple : @slice_or_dice_interface(last_useitem);
     case achey_tree_logs : @make_ogre_shafts;
     case dramen_branch : @cut_dramenstaff;

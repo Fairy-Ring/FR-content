@@ -11,6 +11,7 @@ if(oc_param(last_useitem, unlit_arrow) = ^true) { // might not work on every fir
 
 
 [label,attempt_cook_item](obj $uncooked_item)
+if (~brewing_cook_ingredient($uncooked_item) = true) return;
 // TBWT specials (port origin/289) — before generic db lookup
 if ($uncooked_item = tbwt_jogre_bones_marinated_in_karambwanji | $uncooked_item = tbwt_burnt_jogre_bones_marinated_in_karambwanji) {
     ~mesbox("The jogre bones are already marinated!|They don't need any more cooking.");
