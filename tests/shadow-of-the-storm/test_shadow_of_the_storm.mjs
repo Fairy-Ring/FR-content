@@ -579,14 +579,12 @@ function ownedNpc(player, name) {
   assert(npc, `the product spawned owned ${name}`);
   return npc;
 }
-function mappedNpc(player, name, actors) {
-  const existing = actors.find(npc => npc.isActive && npc.type === id('NpcType', name));
-  if (existing) return existing;
-  const row = nativeNpcRows(name).find(candidate => candidate.level === 2);
-  assert(row, `the original throne-room map contains ${name}`);
-  const npc = spawnActor(player, name, actors, [row.level, row.x, row.z]);
-  npc.setVar(ownerVar, 0);
-  return npc;
+function mappedNpc(name) {
+  const npcType = id('NpcType', name);
+  for (const npc of World.npcs) {
+    if (npc.isActive && npc.type === npcType && npc.level === 2 && npc.getVar(ownerVar) === 0) return npc;
+  }
+  assert.fail(`the built original map contains an active, unowned ${name}`);
 }
 function roomWords(player) {
   return Array.from({ length: 5 }, (_, i) => playerVariable(player, `agrith_incantation_${i + 1}`));
@@ -729,7 +727,7 @@ check('original stairs and portals retain open landings and do not pre-empt The 
     nativeLocRow(player, portal, [], 'Dave blocks premature entry');
     assert.equal(player.level, 0);
     setPlayerVariable(player, 'agrith_quest', 30);
-    const denath = mappedNpc(player, 'agrith_denath', actors);
+    const denath = mappedNpc('agrith_denath');
     nativeLocRow(player, portal, [], 'accepted cult entry with lost quest items');
     openLanding(player, [2, 2720, 4884], 'cult portal');
     assert(denath.isActive, 'portal entry preserves the original mapped Denath');
@@ -767,7 +765,17 @@ check('original unowned cult actors serve each account without duplicate pre-rit
   const other = playerAt([2, 2720, 4895], 60);
   try {
     const names = ['agrith_denath', 'agrith_matthew', 'agrith_jennifer', 'agrith_eric', 'agrith_tanya', 'agrith_patrick'];
-    const originals = names.map(name => mappedNpc(player, name, actors));
+    const originals = names.map(name => mappedNpc(name));
+    for (let i = 0; i < names.length; i++) {
+      const rows = nativeNpcRows(names[i]);
+      assert.equal(rows.length, 1, `${names[i]} has exactly one checked-out map placement`);
+      assert.deepEqual([originals[i].level, originals[i].x, originals[i].z], [rows[0].level, rows[0].x, rows[0].z],
+        'the built native actor uses its actual source-map placement');
+      assert.equal(types.NpcType.get(originals[i].type).wanderrange, 0, 'the circle actor remains anchored');
+      walkable([originals[i].level, originals[i].x, originals[i].z], `${names[i]} circle spot`);
+    }
+    assert.equal(new Set(originals.map(npc => `${npc.level},${npc.x},${npc.z}`)).size, originals.length,
+      'all six mapped actors occupy different circle spots');
     const cultTypes = new Set(originals.map(npc => npc.type));
     const before = [...World.npcs].filter(npc => npc.isActive && cultTypes.has(npc.type)).map(npc => npc.nid);
     runPlayerScript(player, '[proc,agrith_room_enter]');
@@ -778,14 +786,19 @@ check('original unowned cult actors serve each account without duplicate pre-rit
     for (const account of [player, other]) {
       addItem(account, 'agrith_book');
       addItem(account, 'agrith_sigil');
-      nativeNpc(account, mappedNpc(player, 'agrith_matthew', actors), [], 'the original unowned Matthew prepares this account');
+      nativeNpc(account, mappedNpc('agrith_matthew'), [], 'the original unowned Matthew prepares this account');
       assert.equal(questStage(account), 70);
       if (account === player) assert.equal(questStage(other), 60, 'one account cannot advance the other');
     }
     setPlayerVariable(player, 'agrith_quest', 100);
     runPlayerScript(player, '[proc,agrith_room_enter]');
     for (const name of ['agrith_badden_sigil', 'agrith_reen_sigil', 'agrith_golem_sigil', 'agrith_dave_sigil']) {
-      assert(ownedNpc(player, name), 'genuinely temporary recruits retain their owner');
+      const recruit = ownedNpc(player, name);
+      for (const original of originals) {
+        assert(recruit.x + recruit.width <= original.x || original.x + original.width <= recruit.x ||
+          recruit.z + recruit.length <= original.z || original.z + original.length <= recruit.z,
+        'temporary recruits never overlap a permanent cult-circle actor');
+      }
     }
     runPlayerScript(player, '[proc,agrith_clear_cult]');
     assert(originals.every(npc => npc.isActive), 'temporary-actor cleanup never deletes original mapped cult actors');
@@ -801,18 +814,18 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
     addItem(player, 'agrith_silverlight_dyed');
     wearItem(player, 'agrith_silverlight_dyed');
     runPlayerScript(player, '[proc,agrith_room_enter]');
-    nativeNpc(player, mappedNpc(player, 'agrith_denath', actors), [], 'Denath teaches the incantation');
+    nativeNpc(player, mappedNpc('agrith_denath'), [], 'Denath teaches the incantation');
     assert.equal(questStage(player), 40);
     const words = roomWords(player);
     assert.deepEqual([...words].sort(), [1, 2, 3, 4, 5], 'Denath teaches a complete permutation');
-    nativeNpc(player, mappedNpc(player, 'agrith_denath', actors), [], 'Denath repeats the same incantation');
+    nativeNpc(player, mappedNpc('agrith_denath'), [], 'Denath repeats the same incantation');
     assert.deepEqual(roomWords(player), words);
-    nativeNpc(player, mappedNpc(player, 'agrith_jennifer', actors), [], 'Jennifer supplies the mould');
+    nativeNpc(player, mappedNpc('agrith_jennifer'), [], 'Jennifer supplies the mould');
     assert.equal(itemCount(player, 'agrith_sigil_mould'), 1);
     removeItem(player, 'agrith_sigil_mould');
-    nativeNpc(player, mappedNpc(player, 'agrith_jennifer', actors), [], 'Jennifer recovers a lost mould');
+    nativeNpc(player, mappedNpc('agrith_jennifer'), [], 'Jennifer recovers a lost mould');
     assert.equal(itemCount(player, 'agrith_sigil_mould'), 1);
-    nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [], 'Matthew sends the player to the golem');
+    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'Matthew sends the player to the golem');
     assert.equal(questStage(player), 50);
     const golem = spawnActor(player, 'golem_golem', actors, [0, 3481, 3097]);
     nativeNpc(player, golem, [], 'the original golem selects a kiln');
@@ -822,7 +835,7 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
     nativeLocRow(player, rowAt(kilnTiles[chosen]), [], 'retrieve the period kiln book');
     assert.equal(itemCount(player, 'agrith_book'), 1);
     placePlayer(player, [2, 2720, 4895]);
-    nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [], 'book without sigil is rejected');
+    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'book without sigil is rejected');
     assert.equal(questStage(player), 60);
     addItem(player, 'silver_bar');
     const craftingBefore = player.stats[PlayerStat.CRAFTING];
@@ -833,7 +846,7 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
     assert.equal(player.stats[PlayerStat.CRAFTING] - craftingBefore, 500, 'casting uses native tenths of XP');
     placePlayer(player, [2, 2720, 4895]);
     holdItem(player, 'agrith_book', 1, [], 'read the reversed tome');
-    nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [], 'Matthew accepts book and sigil');
+    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'Matthew accepts book and sigil');
     assert.equal(questStage(player), 70);
     const wrong = words.map(word => word % 5 + 1);
     placePlayer(player, [2, 2720, 4895]);
@@ -855,12 +868,12 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
     assert.equal(playerVariable(player, 'agrith_convinced_golem'), 1);
     removeItem(player, 'agrith_sigil');
     placePlayer(player, [2, 2720, 4895]);
-    nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [], 'recover lost sigils and distribute them to recruits');
+    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'recover lost sigils and distribute them to recruits');
     assert.equal(questStage(player), 100);
     assert.equal(itemCount(player, 'agrith_sigil'), 1, 'three recovered sigils are given to the recruits');
-    nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [2], 'not ready for the final ritual');
+    nativeNpc(player, mappedNpc('agrith_matthew'), [2], 'not ready for the final ritual');
     assert.equal(questStage(player), 100);
-    nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [1], 'ready for the final ritual');
+    nativeNpc(player, mappedNpc('agrith_matthew'), [1], 'ready for the final ritual');
     assert.equal(questStage(player), 110);
     placePlayer(player, [2, 2720, 4895]);
     holdItem(player, 'agrith_sigil', 1, wrong, 'wrong second chant');
@@ -890,7 +903,7 @@ check('each missing recruit blocks Matthew even though lost sigils remain recove
     const { player, actors } = questFixture(90, [2, 2720, 4895]);
     try {
       for (const [name, value] of flags) setPlayerVariable(player, name, name === missing ? 0 : value);
-      nativeNpc(player, mappedNpc(player, 'agrith_matthew', actors), [], `Matthew rejects missing ${missing}`);
+      nativeNpc(player, mappedNpc('agrith_matthew'), [], `Matthew rejects missing ${missing}`);
       assert.equal(questStage(player), 90);
       assert.equal(itemCount(player, 'agrith_sigil'), 4, 'lost ritual sigils are recoverable without bypassing recruitment');
     } finally { cleanupQuestRun(player, actors); }
@@ -901,7 +914,7 @@ check('lost mould and sigil remain craftable through the second-ritual phase', (
   for (const stage of [40, 70, 100, 110]) {
     const { player, actors } = questFixture(stage, [2, 2720, 4895]);
     try {
-      nativeNpc(player, mappedNpc(player, 'agrith_jennifer', actors), [], `recover mould at ${stage}`);
+      nativeNpc(player, mappedNpc('agrith_jennifer'), [], `recover mould at ${stage}`);
       addItem(player, 'silver_bar');
       castSigil(player);
       assert.equal(itemCount(player, 'agrith_sigil'), 1, `lost sigil can be remade at stage ${stage}`);
