@@ -7,18 +7,20 @@ import {
   World, PlayerStat, ScriptProvider, ScriptState, ServerTriggerType, contentRoot,
   engineModule, types, map, id, obj, inv, worn, invCom, player, count, slotOf,
   held, remove, use, execute, resumeDialogue, dialoguePage, tick, weakCount,
-  button, Packet, PlayerLoading
+  button, Packet, PlayerLoading, CollisionType
 } from '../swamp-caves/runtime.mjs';
 
 const load = async name => (await engineModule(name)).default;
 const [Npc, ScriptRunner, ScriptPointer, JavaRandom, resolveNpcType,
-  OpNpc, OpNpcU, OpLoc, OpLocU, OpNpcHandler, OpNpcUHandler, OpLocHandler, OpLocUHandler] = await Promise.all([
+  OpNpc, OpNpcU, OpLoc, OpLocU, OpNpcHandler, OpNpcUHandler, OpLocHandler, OpLocUHandler,
+  MoveClick, MoveClickHandler] = await Promise.all([
   'engine/entity/Npc.ts', 'engine/script/ScriptRunner.ts', 'engine/script/ScriptPointer.ts',
   'util/JavaRandom.ts', 'engine/entity/resolveNpcType.ts',
   'network/game/client/model/OpNpc.ts', 'network/game/client/model/OpNpcU.ts',
   'network/game/client/model/OpLoc.ts', 'network/game/client/model/OpLocU.ts',
   'network/game/client/handler/OpNpcHandler.ts', 'network/game/client/handler/OpNpcUHandler.ts',
-  'network/game/client/handler/OpLocHandler.ts', 'network/game/client/handler/OpLocUHandler.ts'
+  'network/game/client/handler/OpLocHandler.ts', 'network/game/client/handler/OpLocUHandler.ts',
+  'network/game/client/model/MoveClick.ts', 'network/game/client/handler/MoveClickHandler.ts'
 ].map(load));
 const { EntityLifeCycle } = await engineModule('engine/entity/EntityLifeCycle.ts');
 const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
@@ -26,6 +28,7 @@ const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const npcHandler = new OpNpcHandler(), npcUseHandler = new OpNpcUHandler();
 const locHandler = new OpLocHandler(), locUseHandler = new OpLocUHandler();
+const moveHandler = new MoveClickHandler();
 const bank = id('InvType', 'bank');
 const varp = name => id('VarPlayerType', name);
 const varnpc = name => id('VarNpcType', name);
@@ -58,7 +61,7 @@ function fixture(initialStage = 0, items = []) {
   p.setVar(varp('sheepherderquest'), constant('sheepherder_complete'));
   p.setVar(varp('roving_elves_quest'), constant('roving_complete', rovingConstants));
   p.setVar(varp('biohazard'), constant('biohazard_complete'));
-  p.setVarBit(bit('plaguecity_elena_at_home'), 1);
+  execute('[proc,quest_elena_set_progress]', p, [constant('elena_complete')]);
   p.setVar(varp('regicide_quest'), constant('regicide_complete'));
   p.setVar(varp('waterfall_quest'), constant('waterfall_complete'));
   for (const item of items) add(p, item);
@@ -249,6 +252,47 @@ function landing(p, counterpart, label) {
   }
   assert.fail(`${label}: no non-empty packed-map route out of the actual landing`);
 }
+function walkRoute(p, x, z, label) {
+  const before = tile(p), route = [...map.findPath(p.level, p.x, p.z, x, z)];
+  assert(route.length > 0, `${label}: native route is non-empty`);
+  assert.equal(route.at(-1), CoordGrid.packCoord(p.level, x, z), `${label}: route reaches the exact destination`);
+  let px = p.x, pz = p.z, steps = 0;
+  for (const packed of route) {
+    const next = CoordGrid.unpackCoord(packed);
+    while (px !== next.x || pz !== next.z) {
+      const dx = Math.sign(next.x - px), dz = Math.sign(next.z - pz);
+      assert(map.canTravel(p.level, px, pz, dx, dz, 1, 0, CollisionType.NORMAL), `${label}: every expanded step obeys original packed collision`);
+      px += dx; pz += dz; steps++;
+    }
+  }
+  assert(moveHandler.handle(new MoveClick(route.map(value => CoordGrid.unpackCoord(value)), 0, false), p), `${label}: native walking packet accepted`);
+  for (let step = 0; step <= steps && (p.x !== x || p.z !== z); step++) {
+    p.resetEntity(false); tick(p); p.processInteraction();
+  }
+  assert.deepEqual(tile(p), [before[0], x, z], `${label}: native movement reaches the route endpoint without fixture repositioning`);
+  console.log(`ROUTE ${label}: ${before.join(',')} -> ${tile(p).join(',')}; ${steps} checked walking step(s)`);
+}
+function originalLoc(name, x, z) {
+  const row = locRows.find(row => row.name === name && row.x === x && row.z === z);
+  assert(row, `${name}: original map placement at ${x},${z}`);
+  const target = World.getLoc(x, z, row.level, row.type);
+  assert(target, `${name}: original placement is present in the packed world`);
+  return target;
+}
+function currentLocNear(name, x, z) {
+  for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
+    const target = World.getLoc(x + dx, z + dz, 0, id('LocType', name));
+    if (target) return target;
+  }
+  assert.fail(`${name}: native operation produced its nearby open form`);
+}
+function operateHere(p, target, name) {
+  assert(p.inOperableDistance(target), `${name}: reached by the preceding continuous route`);
+  assert(locHandler.handle(new OpLoc(1, target.x, target.z, target.type), p));
+  packedTrigger(p, `[oploc1,${name}]`); p.processInteraction(); finish(p);
+}
+const textSince = (p, mark) => p.packets.slice(mark)
+  .filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ');
 function random(values, action) {
   const original = JavaRandom.nextDouble; let cursor = 0;
   JavaRandom.nextDouble = () => { assert(cursor < values.length, 'bounded native RNG input'); return values[cursor++]; };
@@ -358,6 +402,47 @@ try {
     landing(walk, counterpart, 'Eluned escort');
     talk(walk, 'mourning_arianwyn'); assert.equal(stage(walk), 2);
     talk(walk, 'mourning_arianwyn'); assert.equal(stage(walk), 2);
+  });
+
+  check('both Lletya tree placements connect the actual landing to the roving camp and back, with an unconditional exit', () => {
+    for (const z of [3191, 3195]) {
+      const p = fixture(1); place(p, { level: 0, x: 2353, z: 3172 });
+      walkRoute(p, 2306, z, 'Lletya landing to the inside of the tree gate');
+      operateHere(p, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
+      assert(p.x < 2306, 'native Pass exits Lletya');
+      walkRoute(p, 2289, 3145, 'tree gate exit to the original roving camp');
+      walkRoute(p, 2304, z, 'roving camp to the outside of the tree gate');
+      operateHere(p, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
+      assert(p.x >= 2306, 'eligible native Pass re-enters Lletya');
+      walkRoute(p, 2353, 3172, 'tree gate entry to the actual Lletya landing');
+      const q = fixture(0); place(q, { level: 0, x: 2306, z });
+      operateHere(q, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
+      assert(q.x < 2306, 'even an unstarted player can leave and cannot be stranded');
+      const outside = tile(q), mark = q.packets.length;
+      operateHere(q, originalLoc('elf_village_treegate', 2305, z), 'elf_village_treegate');
+      assert.deepEqual(tile(q), outside, 'outside entry is refused below stage one');
+      assert(textSince(q, mark).length > 0 || q.messages.length > 0, 'refused entry gives a visible explanation');
+    }
+  });
+
+  check('native orchard gates connect the outside fence to original apples and barrel and both halves close', () => {
+    const p = fixture(5); place(p, { level: 0, x: 2474, z: 3363 });
+    const closedRoute = [...map.findPath(0, p.x, p.z, 2487, 3373)];
+    assert.notEqual(closedRoute.at(-1), CoordGrid.packCoord(0, 2487, 3373), 'original closed fence blocks the apple approach');
+    operateHere(p, originalLoc('mourning_orchard_fencegate_l', 2474, 3364), 'mourning_orchard_fencegate_l');
+    walkRoute(p, 2487, 3373, 'outside orchard fence through the handled gate to the apple pile');
+    const pile = originalLoc('mourning_orchard_applepile', 2487, 3374);
+    operateHere(p, pile, 'mourning_orchard_applepile');
+    assert.equal(count(p, 'applebarrel_full'), 1, 'apple pile is operable after the continuous route');
+    walkRoute(p, 2484, 3373, 'apple pile to the original empty apple barrel');
+    assert(p.inOperableDistance(originalLoc('mourning_orchard_applebarrel_empty', 2484, 3374)), 'empty barrel is operable from the actual routed endpoint');
+    walkRoute(p, 2474, 3365, 'orchard barrel back to the inside of the gate');
+    operateHere(p, currentLocNear('mourning_orchard_fencegate_open_l', 2474, 3364), 'mourning_orchard_fencegate_open_l');
+    assert(originalLoc('mourning_orchard_fencegate_l', 2474, 3364), 'left Close restores its original form');
+    operateHere(p, originalLoc('mourning_orchard_fencegate_r', 2475, 3364), 'mourning_orchard_fencegate_r');
+    walkRoute(p, 2475, 3363, 'right gate opening provides the outward route');
+    operateHere(p, currentLocNear('mourning_orchard_fencegate_open_r', 2475, 3364), 'mourning_orchard_fencegate_open_r');
+    assert(originalLoc('mourning_orchard_fencegate_r', 2475, 3364), 'right Close restores its original form');
   });
 
   check('full inventory and refusal do not consume the first escort; banked crystals prevent duplicates', () => {
@@ -580,11 +665,52 @@ try {
     assert.match(q.messages.join(' '), /haven't any reason/); assert.equal(bits(q), 0);
   });
 
-  check('Elena preserves Biohazard dialogue and requires the rotten-apple sample before advancing', () => {
+  check('Plague City progress and real login resolve the native home Elena without a home-visibility seed', () => {
+    const base = types.NpcType.get(id('NpcType', 'elena2'));
+    const p = player(); actors.add(p); rsbuf.addPlayer(p.slot);
+    execute('[proc,quest_elena_set_progress]', p, [27]);
+    assert.notEqual(resolveNpcType(base, p).id, id('NpcType', 'elena2_vis'), 'home form is hidden before Elena is freed');
+    execute('[proc,quest_elena_set_progress]', p, [28]);
+    assert.equal(resolveNpcType(base, p).id, id('NpcType', 'elena2_vis'), 'native freeing-progress writer exposes home Elena');
+    for (const progress of [27, 28, constant('elena_complete')]) {
+      const q = player(); actors.add(q); rsbuf.addPlayer(q.slot);
+      q.setVar(varp('elenaquest'), progress); setStage(q, 5);
+      q.setVar(varp('biohazard'), constant('biohazard_complete'));
+      assert.equal(q.getVarBit(bit('plaguecity_elena_at_home')), 0, 'fresh login fixture never sets the home bit');
+      execute('[login,_]', q);
+      assert.equal(resolveNpcType(base, q).id === id('NpcType', 'elena2_vis'), progress >= 28, 'login derives the native child form from saved Plague City progress');
+      if (progress >= 28) {
+        const mark = q.packets.length, actor = talk(q, 'elena2_vis');
+        assert.equal(actor.type, base.id, 'visible Elena is the multi child of the real elena2 placement');
+        assert.match(textSince(q, mark), /rotten apples/i, 'native visible child dispatches to the MEP1 sample request');
+        assert.equal(stage(q), 5, 'asking for the sample does not seed or advance MEP1');
+      }
+    }
+  });
+
+  check('Elena preserves Biohazard dialogue and explains sample, full recipe and stage-six/seven sieve recovery', () => {
     const q = fixture(0); talk(q, 'elena2_vis'); assert.equal(stage(q), 0); assert.equal(count(q, 'mourning_sieve'), 0);
+    let mark = paint.packets.length;
     talk(paint, 'elena2_vis'); assert.equal(stage(paint), 5);
-    operateLoc(paint, 'mourning_orchard_applepile'); talk(paint, 'elena2_vis');
+    assert.match(textSince(paint, mark), /rotten apples/i);
+    assert.match(textSince(paint, mark), /orchard.*north.*Ardougne/i);
+    operateLoc(paint, 'mourning_orchard_applepile'); mark = paint.packets.length;
+    talk(paint, 'elena2_vis');
     assert.equal(stage(paint), 6); assert.equal(count(paint, 'mourning_sieve'), 1);
+    for (const required of [/mash/i, /barrel.*orchard/i, /naphtha/i, /siev/i, /range/i, /not.*open fire/i, /grain sacks.*West Ardougne/i]) {
+      assert.match(textSince(paint, mark), required, 'native sample handover explains each required toxin step');
+    }
+    for (const value of [6, 7]) {
+      const p = fixture(value); mark = p.packets.length;
+      talk(p, 'elena2_vis'); assert.equal(count(p, 'mourning_sieve'), 1); assert.equal(stage(p), value);
+      assert.match(textSince(p, mark), /range/i, 'stage reminder retains the correct heating source');
+      assert.match(textSince(p, mark), /grain sacks/i);
+      del(p, 'mourning_sieve'); fullInventory(p); mark = p.packets.length;
+      talk(p, 'elena2_vis'); assert.equal(count(p, 'mourning_sieve'), 0); assert.equal(stage(p), value);
+      assert.match(textSince(p, mark), /room|space/i, 'full bag gets an actionable sieve-recovery message');
+      p.getInventory(inv).set(27, null); talk(p, 'elena2_vis');
+      assert.equal(count(p, 'mourning_sieve'), 1); assert.equal(stage(p), value);
+    }
     del(paint, 'mourning_sieve'); talk(paint, 'elena2_vis'); assert.equal(count(paint, 'mourning_sieve'), 1);
   });
 
