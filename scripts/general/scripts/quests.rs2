@@ -381,7 +381,7 @@ if (%zogre >= ^zogre_complete) {
 if (%wanted_main = ^wanted_complete) {
     $questpoints = add($questpoints, ^wanted_questpoints);
 }
-if (%tog_juna_bowl = ^tog_quest_complete) {
+if (%tog_juna_bowl >= ^tog_quest_complete) {
     $questpoints = add($questpoints, ^tog_questpoints);
 }
 if (~rag_stage >= ^rag_complete) {

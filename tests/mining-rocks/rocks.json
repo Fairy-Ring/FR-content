@@ -1,5 +1,5 @@
 {
-  "scope": "67 parent-census Mine/Prospect types:58 ordinary bindings;7 quest-owned and2 sized-quarry types remain untouched.",
+  "scope": "Ordinary Mine/Prospect bindings from the 67-type parent census; specialised quest and sized-quarry forms are covered by their owning unit suites.",
   "depletionPolicy": "The21 mineral-vein counterparts are UNKNOWN engineering choices authorized by Main: unique exact-MODEL match among4994\u20134996, not a cache-authenticated pairing. Other existing ore rules are reused unchanged as CANDIDATE.",
   "veinEmpty": [
     "mineral_vein_4994",
@@ -607,9 +607,6 @@
     }
   ],
   "left": [
-    "tog_blue_stone_rocks1",
-    "tog_blue_stone_rocks2",
-    "tog_blue_stone_rocks3",
     "swamp_rock1"
   ]
 }
