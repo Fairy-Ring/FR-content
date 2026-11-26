@@ -1,6 +1,6 @@
 // Allotment interactions: permanent cache bytes, shared global growth and care.
-// Period Tip.It supplies levels and XP. The potato's three-item yield is unchanged.
-// The six other crops use farming_allotment's labelled harvest-life rule.
+// Period Tip.It supplies levels and XP. All seven crops share the labelled
+// farming_allotment harvest-life rule.
 
 // ---------------------------------------------------------------------------
 // Patch stage via parent multivarbit (farming_allotment_varp_1_0_7…715)
@@ -234,47 +234,13 @@ mes("You plant three <$name> seeds in the allotment.");
 
 // ---------------------------------------------------------------------------
 // Harvest — OPLOC1 Harvest on potato_fullygrown
-// Loc band 10, 11, 12 (same fullygrown type). Not OSRS StatRandom.
+// The original three mature bytes carry harvest lives, as for other allotments.
 // ---------------------------------------------------------------------------
 
 [oploc1,potato_fullygrown]
-@farming_potato_harvest(false);
-[oploc3,potato_fullygrown] @farming_potato_harvest(true);
+@farming_allotment_harvest(false);
+[oploc3,potato_fullygrown] @farming_allotment_harvest(true);
 
-[label,farming_potato_harvest](boolean $automatic)
-if (~farming_veg_is_parent = false) {
-    ~displaymessage(^dm_default);
-    return;
-}
-def_int $stage = ~farming_veg_stage;
-if ($stage < ^farming_potato_fullygrown | $stage > ^farming_potato_harvest_last) {
-    ~displaymessage(^dm_farming_patch_no_crops);
-    return;
-}
-// Existing potato harvest tool requirement is unchanged.
-if (inv_total(inv, spade) < 1) {
-    ~displaymessage(^dm_farming_spade);
-    return;
-}
-if (inv_freespace(inv) < 1) {
-    mes("You don't have enough inventory space.");
-    return;
-}
-if (~farming_harvest_ready($automatic) = false) return;
-// CANDIDATE: herb picking sequence chosen by its low-picking motion.
-// UNKNOWN allotment binding: human_dig is the open spade-animation alternative.
-anim(picking_low, 0);
-inv_add(inv, potato, 1);
-// VERIFIED period Tip.It harvest XP.
-stat_advance(farming, ^farming_potato_harvest_xp);
-if (~farming_soil_consume(~farming_soil_index) = false) {
-    $stage = add($stage, 1);
-    if ($stage > ^farming_potato_harvest_last) $stage = ^farming_veg_weeded;
-    ~farming_veg_set_stage($stage);
-}
-%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
-if ($stage >= ^farming_potato_fullygrown) p_oploc(3);
-mes("You harvest a potato from the allotment.");
 
 // ---------------------------------------------------------------------------
 // Fail paths — wrong tool on patch stages

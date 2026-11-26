@@ -197,10 +197,22 @@ try {
     assert.equal(stage(p), 10);
     for (let i = 0; i < 3; i++) {
       World.currentTick += 2; // CANDIDATE OSRS manual harvest interval.
+      // Force loss of a harvest life, rather than assuming a fixed potato yield.
+      JavaRandom.setSeed(0);
       assert(click(p, patch));
     }
     assert.equal(stage(p), 3); assert.equal(count(p, 'potato'), 3);
     assert.equal(p.stats[PlayerStat.FARMING], 350);
+    setStage(p, 10);
+    const random = Runner.HANDLERS[ScriptOpcode.RANDOM];
+    Runner.HANDLERS[ScriptOpcode.RANDOM] = state => { assert.equal(state.popInt(), 256); state.pushInt(255); };
+    try {
+      World.currentTick += 2;
+      assert(click(p, patch));
+      assert.equal(stage(p), 10, 'potato shares the allotment life-save contract');
+      assert.equal(count(p, 'potato'), 4);
+      assert.equal(p.stats[PlayerStat.FARMING], 440);
+    } finally { Runner.HANDLERS[ScriptOpcode.RANDOM] = random; }
   });
   test('all eight selector bytes advance independently; unsupported family and unrelated varps remain exact', () => {
     const p = fresh(605);

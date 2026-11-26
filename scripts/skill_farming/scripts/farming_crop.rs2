@@ -70,6 +70,11 @@ return($stage);
 [proc,farming_crop_life_loss](int $low, int $high)(int)
 def_int $level = min(99, stat(farming));
 def_int $save = calc(($low * (99 - $level) + $high * ($level - 1) + 49) / 98 + 1);
+// VERIFIED period reward: wielded magic secateurs affect allotments, herbs and hops.
+// UNKNOWN rounding order: multiply the integer save chance by 110/100, then truncate.
+if (inv_getobj(worn, ^wearpos_rhand) = fairy_enchanted_secateurs) {
+    $save = calc($save * 110 / 100);
+}
 return(sub(^farming_harvest_denominator, $save));
 
 // CANDIDATE OSRS history: automatic harvest takes three ticks, manual two.

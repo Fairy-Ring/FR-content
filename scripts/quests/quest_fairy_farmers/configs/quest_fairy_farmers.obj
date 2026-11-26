@@ -21,6 +21,8 @@ iop2=Wield
 iop5=Destroy
 wearpos=righthand
 weight=1lb
+// UNKNOWN default: quest rewards are untradeable unless a source says otherwise.
+tradeable=no
 // UNKNOWN engineering melee stance: use the existing slash-weapon style table.
 category=weapon_slash
 // CANDIDATE bonuses: OSRS Wiki Magic secateurs, revision 14965052 (2025-08-13).
