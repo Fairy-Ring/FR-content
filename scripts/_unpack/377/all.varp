@@ -867,9 +867,6 @@ transmit=yes
 [rd_rooms_tempvar2]
 transmit=yes
 
-[magic_carpet_var]
-transmit=yes
-
 [varp501_bits]
 transmit=yes
 

@@ -1,0 +1,5 @@
+// Original slot 499; the client uses zero to show carpet_rolledout_multi.
+// UNKNOWN engineering recovery: retain the paid destination across disconnection.
+[magic_carpet_var]
+transmit=yes
+scope=perm

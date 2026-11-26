@@ -102,12 +102,95 @@ if (inv_total(inv, coins) < $fare) {
 }
 inv_del(inv, coins, $fare);
 if_close;
-// LEFT SIMPLE / UNKNOWN flight: original 377 raise/land animations, plain teleport.
-// The retained 377 config/maps give stations and animation frames, not route waypoints.
-// Delay rounds the cache animation's 20ms frames up to server ticks, not a period flight time.
+def_coord $boarding = ~magic_carpet_rug(npc_type);
+p_stopaction;
+~magic_carpet_move($boarding, 1);
+facesquare($arrival);
+anim(carpet_sit_down, 0);
+p_delay(calc((seqlength(carpet_sit_down) + 29) / 30));
+// UNKNOWN engineering recovery: save the airborne destination when the rug lifts.
+%magic_carpet_var = ~magic_carpet_station($destination);
 anim(carpet_raise, 0);
 p_delay(calc((seqlength(carpet_raise) + 29) / 30));
-p_telejump($arrival);
+~bas_set_all(dragon_warhammer_sa_spotanim);
+// The client applies held-model overrides only to the primary animation, not BAS.
+// Keep the original flying loop primary as well, so the carpet model stays visible.
+anim(dragon_warhammer_sa_spotanim, 0);
+~magic_carpet_move($arrival, ^magic_carpet_tiles_per_tick);
+// Restore the destination rug and clear priority 10 before the priority-5 landing.
+anim(null, 0);
+%magic_carpet_var = 0;
+p_delay(0);
 anim(carpet_land, 0);
 p_delay(calc((seqlength(carpet_land) + 29) / 30));
 anim(null, 0);
+~update_bas;
+
+[proc,magic_carpet_move](coord $destination, int $speed)
+// UNKNOWN engineering route: straight overworld waypoints, at most two tiles/tick.
+// Player.exactMove teleports the SERVER to each endpoint immediately. Longer hops
+// set jump in validateDistanceWalked; a whole-route hop also rebuilds around its end.
+// Send fresh exact coordinates every tick, including the tick of a region rebuild.
+// The client shifts player/path coordinates on rebuild, but NOT old exact coordinates.
+def_coord $start = coord;
+def_int $dx = calc(coordx($destination) - coordx($start));
+def_int $dz = calc(coordz($destination) - coordz($start));
+def_int $steps = calc((distance($start, $destination) + $speed - 1) / $speed);
+def_int $step = 1;
+def_int $direction = ^exact_north;
+if (abs($dx) > abs($dz)) {
+    if ($dx > 0) { $direction = ^exact_east; } else { $direction = ^exact_west; }
+} else if ($dz < 0) { $direction = ^exact_south; }
+while ($step <= $steps) {
+    def_coord $next = movecoord($start, calc($dx * $step / $steps), 0, calc($dz * $step / $steps));
+    p_exactmove(coord, $next, 0, ^magic_carpet_client_cycles_per_tick, $direction);
+    // p_delay(0) resumes on the NEXT server tick (PlayerOps.P_DELAY adds one).
+    p_delay(0);
+    $step = calc($step + 1);
+}
+
+[proc,magic_carpet_station](npc $station)(int)
+switch_npc ($station) {
+    case magic_carpet_seller1 : return(1);
+    case magic_carpet_seller2 : return(2);
+    case magic_carpet_seller3 : return(3);
+    case magic_carpet_seller4 : return(4);
+    case magic_carpet_seller5 : return(5);
+    case magic_carpet_seller6 : return(6);
+    case magic_carpet_seller7 : return(7);
+    case magic_carpet_seller8 : return(8);
+}
+return(0);
+
+[proc,magic_carpet_rug](npc $station)(coord)
+// VERIFIED 377 carpet_rolledout_multi map anchors; select a tile on each rug.
+switch_npc ($station) {
+    case magic_carpet_seller1 : return(0_51_48_44_37);
+    case magic_carpet_seller2 : return(0_49_47_44_36);
+    case magic_carpet_seller3 : return(0_52_45_23_61);
+    case magic_carpet_seller4 : return(0_52_46_21_59);
+    case magic_carpet_seller5 : return(0_54_48_13_40);
+    case magic_carpet_seller6 : return(0_51_43_21_61);
+    case magic_carpet_seller7 : return(0_50_43_45_61);
+    case magic_carpet_seller8 : return(0_53_45_8_36);
+}
+return(coord);
+
+[proc,magic_carpet_recover]
+if (%magic_carpet_var = 0) { return; }
+// UNKNOWN engineering safety: a paid interrupted flight finishes at its station.
+def_coord $arrival = ^magic_carpet_shantay;
+switch_int (%magic_carpet_var) {
+    case 1 : $arrival = ^magic_carpet_shantay;
+    case 2 : $arrival = ^magic_carpet_bedabin;
+    case 3 : $arrival = ^magic_carpet_poll_south;
+    case 4 : $arrival = ^magic_carpet_poll_north;
+    case 5 : $arrival = ^magic_carpet_uzer;
+    case 6 : $arrival = ^magic_carpet_sophanem;
+    case 7 : $arrival = ^magic_carpet_menaphos;
+    case 8 : $arrival = ^magic_carpet_nardah;
+}
+if (coord ! $arrival) { p_telejump($arrival); }
+anim(null, 0);
+~update_bas;
+%magic_carpet_var = 0;

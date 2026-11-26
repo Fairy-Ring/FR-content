@@ -64,6 +64,11 @@ if(~inzone_coord_pair_table(desert_zones, coord) = false & %desert = ^true) {
 }
 
 [timer,desert_heat]
+// UNKNOWN engineering safety: airborne passengers neither drink nor take heat damage.
+if (%magic_carpet_var > 0) {
+    ~calculate_desertheat_timer;
+    return;
+}
 if(~inzone_coord_pair_table(desert_zones, coord) = false) { // shouldnt ever happen but failsafe
     %desert = ^false;
     cleartimer(desert_heat);
