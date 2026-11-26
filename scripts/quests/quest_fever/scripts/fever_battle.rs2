@@ -89,8 +89,12 @@ mes("The powder explodes, destroying the enemy cannon. Your own ship has taken d
 
 [oploc1,toms_fever_shiphull_leak] @fever_patch_hole;
 [oploc1,toms_fever_shiphull_twickle] @fever_patch_hole;
-[oplocu,toms_fever_shiphull_leak] @fever_patch_hole;
-[oplocu,toms_fever_shiphull_twickle] @fever_patch_hole;
+[oplocu,toms_fever_shiphull_leak]
+if (last_useitem ! fever_repair_plank & last_useitem ! hammer) { ~displaymessage(^dm_default); return; }
+@fever_patch_hole;
+[oplocu,toms_fever_shiphull_twickle]
+if (last_useitem ! swamppaste) { ~displaymessage(^dm_default); return; }
+@fever_patch_hole;
 [oploc1,fever_multi_hole_1] @fever_patch_hole;
 [oploc1,fever_multi_hole_2] @fever_patch_hole;
 [oploc1,fever_multi_hole_3] @fever_patch_hole;
