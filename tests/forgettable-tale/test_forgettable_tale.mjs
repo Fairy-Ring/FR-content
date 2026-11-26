@@ -749,3 +749,5 @@ if (originDescriptor) Object.defineProperty(performance, 'timeOrigin', originDes
 else delete performance.timeOrigin;
 if (nowDescriptor) Object.defineProperty(performance, 'now', nowDescriptor);
 else delete performance.now;
+// World owns maintenance timers; this offline test does not run a live server.
+process.exit(0);
