@@ -27,9 +27,9 @@ protect=no
 transmit=yes
 scope=perm
 
+// Server-only ore counts; no 377 client reader reads blast_furnace_4.
 [blast_furnace_4]
 protect=no
-transmit=yes
 scope=perm
 
 [blast_furnace_5]
