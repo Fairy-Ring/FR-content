@@ -118,6 +118,11 @@ const jiggigLinks = new Map([
   ['ogre_stairs_down:2_38_147_11_9:1', { destination: [0, 2443, 9416], counterpart: { name: 'ogre_stairs', coord: '0_38_147_11_9', angle: 1 } }],
   ['ogre_stairs:0_38_147_11_9:1', { destination: [2, 2443, 9420], counterpart: { name: 'ogre_stairs_down', coord: '2_38_147_11_9', angle: 1 } }]
 ]);
+// Original 377 walls and light block enclose this single-tile stair alcove.
+// Its immediate return climb must provide the non-empty escape upstairs.
+const returnOnlyAlcoves = new Set([
+  'mourning_temple_stairs_top@2_29_72_37_50:oploc1:0'
+]);
 const failures = [];
 const counts = { inherited: 0, new: 0, fallback: 0, roundTrips: 0 };
 for (const entry of manifest) {
@@ -168,7 +173,15 @@ for (const entry of manifest) {
         assert.equal(counterpart.level, result.destination[0]);
         const end = routeEnd(result.destination, t => reachable(t, counterpart));
         assert.ok(end, 'landing can reach its counterpart without crossing walls');
-        assert.ok(routeEnd(result.destination, t => Math.max(Math.abs(t[1] - result.destination[1]), Math.abs(t[2] - result.destination[2])) >= 2), 'landing is not enclosed');
+        const returnOnly = returnOnlyAlcoves.has(executionKey(entry));
+        if (returnOnly) {
+          assert.deepEqual(result.destination, [1, 1896, 4658], 'the original return-only alcove has its independently measured stand');
+          assert.equal(counterpart.name, 'mourning_temple_stairs_base');
+          assert.equal(counterpart.coord, '1_29_72_37_50');
+          assert.ok(reachable(result.destination, counterpart), 'the return-only alcove can immediately operate its native staircase');
+        } else {
+          assert.ok(routeEnd(result.destination, t => Math.max(Math.abs(t[1] - result.destination[1]), Math.abs(t[2] - result.destination[2])) >= 2), 'landing is not enclosed');
+        }
         const type = types.LocType.get(types.LocType.getId(counterpart.name));
         const returningDown = counterpart.level > source.level;
         const trigger = type.op[returningDown ? 2 : 1] ? `oploc${returningDown ? 3 : 2}` : 'oploc1';
@@ -177,6 +190,11 @@ for (const entry of manifest) {
         assert.equal(returned.destination[0], source.level, 'round trip returns to the original level');
         walkable(returned.destination);
         assert.ok(routeEnd(returned.destination, t => reachable(t, source)), 'round trip returns to a tile from which the original staircase is reachable');
+        if (returnOnly) {
+          assert.ok(reachable(returned.destination, source), 'the native return climb immediately reaches the original upper staircase');
+          assert.ok(routeEnd(returned.destination, t => Math.max(Math.abs(t[1] - returned.destination[1]), Math.abs(t[2] - returned.destination[2])) >= 2),
+            'the return-only alcove has a non-empty walkable escape on its returned floor');
+        }
         counts.roundTrips++;
       }
     }
