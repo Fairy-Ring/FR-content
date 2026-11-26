@@ -13,6 +13,7 @@ if (%darkness_level ! 0) ~swamp_cave_release;
 if (%deserttreasure >= ^dt_stage_hunts) ~dt_smoke_logout;
 ~farming_logout;
 ~feud_trial_release;
+~fightcaves_logout;
 %last_logout = map_clock;
 
 [if_button,logout:try_logout]
