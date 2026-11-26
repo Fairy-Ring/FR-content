@@ -1249,15 +1249,6 @@ scope=perm
 scope=perm
 transmit=no
 
-[fever_cannon_var]
-transmit=yes
-
-[fever_extra_var]
-transmit=yes
-
-[fever_storage_var]
-transmit=yes
-
 [barrows_generation]
 scope=perm
 transmit=no

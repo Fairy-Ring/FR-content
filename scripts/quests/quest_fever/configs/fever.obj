@@ -1,0 +1,182 @@
+// UNKNOWN: quest-specific inventory objects are untradeable by project default unless a source says otherwise.
+[fever_gunpowder]
+name=Gunpowder
+desc=Best keep this away from naked flames.
+recol1s=21140
+recol1d=2113
+model=obj_unicorn_horn_dust
+2dxof=-6
+2dzoom=1210
+2dyan=1892
+2dxan=264
+cost=52
+members=yes
+weight=1g
+tradeable=no
+
+[fever_fuse]
+name=Fuse
+desc=Burns very well.
+recol1s=11524
+recol1d=27448
+recol2s=9410
+recol2d=25334
+model=pileofrope_8
+2dxof=-2
+2dyof=-30
+2dzoom=1240
+2dyan=1976
+2dxan=188
+cost=52
+members=yes
+weight=7g
+tradeable=no
+
+[fever_cannister_load]
+name=Cannister
+desc=A cannister holding shrapnel.
+model=obj_fever_cannister_load
+2dxof=-1
+2dzoom=1080
+2dyan=280
+2dxan=84
+members=yes
+manwear=obj_fever_cannister_load_manwear,0
+womanwear=obj_fever_cannister_load_manwear,0
+weight=5g
+tradeable=no
+
+[fever_cannon_ball]
+name=Cannon ball
+desc=A heavy metal ball.
+model=obj_fever_cannon_ball
+members=yes
+manwear=obj_fever_cannon_ball_manwear,0
+womanwear=obj_fever_cannon_ball_manwear,0
+2dyof=3
+2dzoom=950
+2dyan=72
+2dxan=1425
+weight=20kg
+tradeable=no
+
+[fever_cannon_prod]
+name=Ramrod
+desc=For cleaning and packing the cannon.
+model=obj_fever_cannon_prod
+members=yes
+manwear=obj_fever_cannon_prod_manwear,0
+womanwear=obj_fever_cannon_prod_manwear,0
+2dzoom=950
+2dyan=72
+2dxan=1776
+weight=2kg
+tradeable=no
+
+[fever_plunder]
+name=Plunder
+desc=Looks valuable.
+model=obj_fever_plunder
+2dxof=2
+2dyof=-17
+2dzoom=930
+2dyan=296
+2dxan=220
+members=yes
+weight=5g
+tradeable=no
+
+[fever_piracy_book]
+name=Book o' piracy
+desc=By Cap'n Hook-Hand Morrisane.
+model=obj_fever_piracy_book
+2dxof=2
+2dyof=13
+2dzoom=1030
+2dyan=88
+2dxan=420
+members=yes
+iop1=Read
+weight=1g
+
+tradeable=no
+[fever_cannon]
+name=Cannon barrel
+desc=A working cannon barrel.
+model=obj_fever_cannon
+2dyan=168
+2dzan=24
+2dxan=220
+members=yes
+weight=32kg
+
+tradeable=no
+[fever_repair_plank]
+name=Repair plank
+desc=A plank of wood to repair the hull with.
+recol1s=9541
+recol1d=12549
+recol2s=7427
+recol2d=12549
+model=obj_fever_nail_plank
+2dxof=-3
+2dyof=1
+2dzoom=1590
+2dyan=52
+2dxan=376
+members=yes
+weight=5g
+
+tradeable=no
+[fever_tack]
+name=Tacks
+desc=Useful for pinning up paintings.
+recol1s=7399
+recol1d=7329
+model=obj_fever_tack
+stackable=yes
+count1=fever_tack_2_inv,2
+count2=fever_tack_3_inv,3
+count3=fever_tack_4_inv,4
+count4=fever_tack_5_inv,5
+stackable=yes
+2dxof=-9
+2dyof=5
+2dzoom=1030
+2dyan=52
+2dxan=660
+members=yes
+weight=5g
+
+tradeable=no
+[fever_rope]
+name=Rope
+desc=A coil of rope.
+recol1s=11524
+recol1d=7296
+cost=18
+model=pileofrope_8
+2dxof=-2
+2dyof=-30
+2dzoom=1240
+2dyan=1976
+2dxan=188
+members=yes
+weight=3lb
+
+tradeable=no
+[fever_tinderbox]
+name=Tinderbox
+desc=Useful for lighting a fire.
+recol1s=32767
+recol1d=21140
+model=obj_tinderbox
+2dxof=1
+2dyof=-10
+2dzoom=660
+2dyan=1968
+2dxan=196
+members=yes
+weight=35g
+tradeable=no
+
