@@ -11,15 +11,14 @@ const handler = new ((await load('network/game/client/handler/OpLocHandler.ts'))
 const Environment = (await load('util/Environment.ts')).default;
 const questConstants = fs.readFileSync(path.join(content, 'scripts/general/configs/quest.constant'), 'utf8');
 const treeConstants = fs.readFileSync(path.join(content, 'scripts/areas/area_gnome/configs/spirit_tree.constant'), 'utf8');
-const farmTreeConstants = fs.readFileSync(path.join(content, 'scripts/skill_farming/configs/farming_spirit_tree.constant'), 'utf8');
 
 function completion(name) {
   const value = questConstants.match(new RegExp(`^\\^${name} = (\\d+)$`, 'm'));
   assert(value, `current quest completion constant ${name}`);
   return Number(value[1]);
 }
-function destination(name, constants = treeConstants) {
-  const value = constants.match(new RegExp(`^\\^${name} = (\\d+)_(\\d+)_(\\d+)_(\\d+)_(\\d+)$`, 'm'));
+function destination(name) {
+  const value = treeConstants.match(new RegExp(`^\\^${name} = (\\d+)_(\\d+)_(\\d+)_(\\d+)_(\\d+)$`, 'm'));
   assert(value, `current spirit destination constant ${name}`);
   const [, level, mx, mz, x, z] = value.map(Number);
   return { level, x: mx * 64 + x, z: mz * 64 + z };
@@ -89,6 +88,38 @@ function interact(p, tree, choices) {
   return packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ').replace(/[|\s]+/g, ' ');
 }
 
+function assertPlantedLanding(p, { loc, config }, label) {
+  assert.equal(p.level, loc.level, `${label}: landing stays on the packed patch's floor`);
+  const distance = (x, z) => Math.max(loc.x - x, x - (loc.x + loc.width - 1),
+    loc.z - z, z - (loc.z + loc.length - 1));
+  assert.equal(distance(p.x, p.z), 1, `${label}: landing is adjacent to the packed patch footprint`);
+  assert(map.isZoneAllocated(p.level, p.x, p.z), `${label}: landing is in the packed map`);
+  assert.equal(map.isMapBlocked(p.x, p.z, p.level), false, `${label}: landing is walkable`);
+  assert(map.reachedLoc(p.level, p.x, p.z, loc.x, loc.z, loc.width, loc.length, 1,
+    loc.angle, loc.shape, config.forceapproach), `${label}: landing reaches the packed patch`);
+  let escape;
+  for (let x = loc.x - 8; x <= loc.x + loc.width + 8 && !escape; x++) {
+    for (let z = loc.z - 8; z <= loc.z + loc.length + 8; z++) {
+      if (distance(x, z) < 4) continue;
+      let open = true;
+      for (let dx = -1; dx <= 1 && open; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          if (!map.isZoneAllocated(p.level, x + dx, z + dz) || map.isMapBlocked(x + dx, z + dz, p.level)) {
+            open = false; break;
+          }
+        }
+      }
+      if (!open) continue;
+      const route = map.findPath(p.level, p.x, p.z, x, z), end = route.at(-1);
+      if (end !== undefined && ((end >>> 14) & 0x3fff) === x && (end & 0x3fff) === z) {
+        escape = { x, z, waypoints: route.length }; break;
+      }
+    }
+  }
+  assert(escape, `${label}: native pathfinder finds a non-empty route out to open ground`);
+  console.log(`PASS ${label}: landing ${p.x},${p.z}; packed patch ${loc.x},${loc.z}; route to open ground ${escape.x},${escape.z} (${escape.waypoints} waypoints)`);
+}
+
 export function runNativeNetworkCompatibility() {
   const trees = nativeTrees(), oldMembers = Environment.NODE_MEMBERS;
   Environment.NODE_MEMBERS = true;
@@ -130,10 +161,12 @@ export function runNativeNetworkCompatibility() {
           p.setVarBit(planted.multivarbit, healthy);
           const text = interact(p, trees.get(id('LocType', 'ent')), [choice]);
           assert.match(text, /planted spirit tree/i);
-          const expected = choice === 5
-            ? destination(`farming_spirit_tree_patch_${local + 1}`, farmTreeConstants)
-            : destination(['stronghold_tree', 'village_tree', 'varrock_tree', 'khazard_tree'][choice - 1]);
-          assert.deepEqual(position(p), expected, `planted patch ${local + 1}: network destination ${choice}`);
+          if (choice === 5) {
+            assertPlantedLanding(p, farmPatches.get(planted.id), `planted patch ${local + 1}`);
+          } else {
+            assert.deepEqual(position(p), destination(['stronghold_tree', 'village_tree', 'varrock_tree', 'khazard_tree'][choice - 1]),
+              `planted patch ${local + 1}: network destination ${choice}`);
+          }
         } finally { p.unlink(); }
       }
       const p = player(), tree = farmPatches.get(planted.id);
