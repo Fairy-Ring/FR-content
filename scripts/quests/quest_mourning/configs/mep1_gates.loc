@@ -11,4 +11,3 @@ name=Tree
 desc=An odd looking tree.
 model=elf_village_treegate
 length=4
-blockwalk=no
