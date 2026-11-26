@@ -1,0 +1,171 @@
+// Original revision-377 Swan Song object forms.
+[iron_sheet]
+name=Iron sheet
+desc=A sturdy sheet of iron.
+cost=30
+model=obj_iron_sheet
+2dxof=1
+2dyof=-3
+2dzoom=2098
+2dyan=1631
+2dxan=252
+members=yes
+weight=4lb
+tradeable=no
+
+[swan_raw_monkfish]
+name=Fresh monkfish
+desc=Freshly caught. Needs cooking.
+recol1s=8389
+recol1d=12485
+recol2s=10469
+recol2d=14565
+recol3s=11526
+recol3d=15622
+recol4s=12582
+recol4d=16678
+model=obj_swan_raw_monkfish
+cost=10
+2dxof=4
+2dyof=38
+2dzoom=1600
+2dyan=2033
+2dxan=327
+members=yes
+weight=450g
+tradeable=no
+
+[swan_monkfish]
+name=Fresh monkfish
+desc=Freshly caught and cooked - perfect for storing. Not so good for eating.
+model=obj_swan_raw_monkfish
+2dxof=4
+2dyof=38
+2dzoom=1600
+2dyan=2033
+2dxan=327
+cost=10
+iop1=Eat
+members=yes
+weight=400g
+tradeable=no
+
+[raw_monkfish]
+name=Raw monkfish
+desc=I should try cooking this.
+recol1s=8389
+recol1d=12485
+recol2s=10469
+recol2d=14565
+recol3s=11526
+recol3d=15622
+recol4s=12582
+recol4d=16678
+model=obj_swan_raw_monkfish
+2dxof=4
+2dyof=38
+2dzoom=1600
+2dyan=2033
+2dxan=327
+cost=230
+members=yes
+weight=450g
+
+[cert_raw_monkfish]
+certlink=raw_monkfish
+certtemplate=template_for_cert
+
+[monkfish]
+name=Monkfish
+desc=A tasty fish.
+recol1s=15855
+recol1d=18827
+recol2s=26425
+recol2d=22031
+model=obj_swan_raw_monkfish
+2dxof=4
+2dyof=38
+2dzoom=1600
+2dyan=2033
+2dxan=327
+cost=230
+iop1=Eat
+members=yes
+weight=400g
+
+[cert_monkfish]
+certlink=monkfish
+certtemplate=template_for_cert
+
+[burnt_monkfish]
+name=Burnt monkfish
+desc=Maybe a little less heat next time.
+recol1s=12582
+recol1d=5250
+recol2s=11526
+recol2d=4193
+recol3s=10469
+recol3d=3136
+recol4s=8389
+recol4d=2080
+recol5s=13543
+recol5d=7201
+recol6s=21933
+recol6d=14534
+model=obj_swan_raw_monkfish
+2dxof=4
+2dyof=38
+2dzoom=1600
+2dyan=2033
+2dxan=327
+cost=230
+members=yes
+weight=300g
+
+[cert_burnt_monkfish]
+certlink=burnt_monkfish
+certtemplate=template_for_cert
+
+[swan_army]
+name=Bone seeds
+desc=An highly portable army of skeletal magi.
+recol1s=16643
+recol1d=12613
+recol2s=14529
+recol2d=10499
+recol3s=12448
+recol3d=10464
+recol4s=10336
+recol4d=9408
+recol5s=8224
+recol5d=8352
+model=obj_favour_airtight_pot
+cost=30
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+iop4=Open
+members=yes
+weight=1g
+weight=4lb
+tradeable=no
+
+[swan_book]
+name=Herman's book
+desc=A book taken from the desk of Herman Caranos.
+recol1s=13472
+recol1d=12579
+model=obj_shamans_tome
+2dxof=1
+2dyof=22
+2dzoom=860
+2dyan=120
+2dxan=276
+members=yes
+iop1=Read
+weight=70g
+weight=4lb
+tradeable=no
+

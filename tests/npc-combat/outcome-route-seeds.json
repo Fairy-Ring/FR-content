@@ -2184,6 +2184,88 @@
         "miss": 2415085441,
         "zero": 683130215
       }
+    },
+    {
+      "script": "[ai_opplayer2,swan_troll_ambush]",
+      "npc": "swan_troll_ambush",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 30 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_applayer2,swan_troll_ambush]",
+      "npc": "swan_troll_ambush",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 30 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_opplayer2,swan_troll_fishing_1]",
+      "npc": "swan_troll_fishing_1",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 65, "swansong_arnold": 1 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_applayer2,swan_troll_fishing_1]",
+      "npc": "swan_troll_fishing_1",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 65, "swansong_arnold": 1 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_opplayer2,swan_troll_fishing_2]",
+      "npc": "swan_troll_fishing_2",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 65, "swansong_arnold": 1 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_applayer2,swan_troll_fishing_2]",
+      "npc": "swan_troll_fishing_2",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 65, "swansong_arnold": 1 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_opplayer2,swan_troll_fishing_3]",
+      "npc": "swan_troll_fishing_3",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 65, "swansong_arnold": 1 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_applayer2,swan_troll_fishing_3]",
+      "npc": "swan_troll_fishing_3",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 65, "swansong_arnold": 1 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_opplayer2,swan_seatroll_queen]",
+      "npc": "swan_seatroll_queen",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 150 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
+    },
+    {
+      "script": "[ai_applayer2,swan_seatroll_queen]",
+      "npc": "swan_seatroll_queen",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "swansong": 150 },
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "swansong_combat_uid"
     }
   ]
 }

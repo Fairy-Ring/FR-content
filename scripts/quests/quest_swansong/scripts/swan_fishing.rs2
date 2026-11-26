@@ -1,0 +1,306 @@
+// Swan Song monkfish at the Piscatoris colony.
+// Functional prompts are UNKNOWN wording, not reconstructed dialogue.
+
+[oploc1,fishing_spot_14938] @swan_fresh_fish_attempt;
+[oploc3,fishing_spot_14938] @swan_fresh_fish_catch;
+[oplocu,fishing_spot_14938]
+switch_obj(last_useitem) {
+    case net : @swan_fresh_fish_attempt;
+    case default : @fishing_wrong_spot_message(last_useitem);
+}
+
+[aploc1,fishing_spot_14938]
+if (distance(loc_coord, coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@swan_fresh_fish_attempt;
+
+[aploc3,fishing_spot_14938]
+if (distance(loc_coord, coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@swan_fresh_fish_catch;
+
+[label,swan_fresh_fish_attempt]
+if (%swansong ! 65 | %swansong_arnold < 1 | %swansong_arnold >= 6) return;
+if (~swan_fight_active = true) return;
+if (stat(fishing) < 62) {
+    anim(null, 0);
+    ~mesbox("You need a Fishing level of 62 to catch monkfish.");
+    return;
+}
+if (~check_fish_equipment(net) = false) return;
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    ~mesbox("You can't carry any more fish.");
+    return;
+}
+// The original parent multiloc has no primary op: continue through hidden op3.
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 5);
+    p_oploc(3);
+    return;
+} else if (%action_delay = calc(map_clock + 4)) {
+    anim(human_fishing_casting, 0);
+    mes("You cast out your net...");
+    sound_synth(net, 1, 0);
+    p_oploc(3);
+    return;
+} else if (%action_delay = calc(map_clock + 3)) {
+    mes("You attempt to catch a monkfish.");
+    p_oploc(3);
+} else {
+    p_oploc(3);
+}
+if (%action_delay = map_clock) @swan_fresh_fish_roll;
+
+[label,swan_fresh_fish_catch]
+if (%swansong ! 65 | %swansong_arnold < 1 | %swansong_arnold >= 6) return;
+if (~swan_fight_active = true) return;
+if (stat(fishing) < 62) {
+    anim(null, 0);
+    ~mesbox("You need a Fishing level of 62 to catch monkfish.");
+    return;
+}
+if (~check_fish_equipment(net) = false) return;
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    ~mesbox("You can't carry any more fish.");
+    return;
+}
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 4);
+    anim(human_fish_onspot, 0);
+} else if (%action_delay = calc(map_clock + 4)) {
+    anim(human_fishing_casting, 0);
+    mes("You cast out your net...");
+    sound_synth(net, 1, 0);
+} else if (%action_delay = calc(map_clock + 3)) {
+    mes("You attempt to catch a monkfish.");
+} else if (%action_delay = map_clock) {
+    @swan_fresh_fish_roll;
+}
+p_oploc(3);
+
+[label,swan_fresh_fish_roll]
+if (inv_freespace(inv) < 1) return;
+// UNKNOWN catch roll: bounded stat_random; the exact 377 monkfish curve is not retained.
+if (stat_random(fishing, 8, 64) = false) return;
+inv_add(inv, swan_raw_monkfish, 1);
+// CANDIDATE: 2007-base monkfish fishing XP, before later Fishing XP changes.
+stat_advance(fishing, 1200);
+mes("You catch a fresh monkfish.");
+// A successful fresh catch triggers one troll. The next catch waits for its kill.
+if (%swansong_trolls = 0) ~swan_spawn_fishing(swan_troll_fishing_1);
+else if (%swansong_trolls = 1) ~swan_spawn_fishing(swan_troll_fishing_2);
+else if (%swansong_trolls = 2) ~swan_spawn_fishing(swan_troll_fishing_3);
+
+[label,swan_arnold_talk]
+if (%swansong ! 65) return;
+if (%swansong_arnold = 6) {
+    mes("Arnold has enough monkfish for the colony.");
+    return;
+}
+if (%swansong_arnold = 0) %swansong_arnold = 1;
+if (%swansong_fish >= 5 & inv_total(inv, swan_monkfish) >= 5) {
+    def_int $choice = ~p_choice2("Hand over five cooked fresh monkfish?", 1, "Not yet.", 2);
+    if ($choice = 1) {
+        inv_del(inv, swan_monkfish, 5);
+        %swansong_arnold = 6;
+        mes("Arnold accepts the five monkfish.");
+    }
+    return;
+}
+if (inv_total(inv, net) < 1) {
+    if (inv_freespace(inv) < 1) {
+        mes("Make room for a small net and speak to Arnold again.");
+        return;
+    }
+    inv_add(inv, net, 1);
+    mes("Arnold gives you a small net.");
+}
+mes("Catch and cook five fresh monkfish for Arnold.");
+
+[oplocu,loc_14919]
+switch_obj(last_useitem) {
+    case swan_raw_monkfish : @swan_cook_monkfish(swan_raw_monkfish);
+    case default : @attempt_cook_item(last_useitem);
+}
+
+[label,swan_cook_monkfish](obj $uncooked_item)
+if ($uncooked_item ! swan_raw_monkfish) return;
+if (stat(cooking) < 62) {
+    mes("You need a Cooking level of 62 to cook monkfish.");
+    return;
+}
+if (inv_total(inv, swan_raw_monkfish) < 1) return;
+anim(human_potterywheel, 0);
+sound_synth(fry, 1, 0);
+// UNKNOWN burn roll: reuse the local level-60 cooking success range.
+def_boolean $success = stat_random(cooking, 38, 332);
+inv_del(inv, swan_raw_monkfish, 1);
+if ($success = true) {
+    inv_add(inv, swan_monkfish, 1);
+    if (%swansong = 65 & %swansong_arnold > 0 & %swansong_arnold < 6 & %swansong_fish < 5) {
+        %swansong_fish = calc(%swansong_fish + 1);
+    }
+    // CANDIDATE: 2007-base monkfish cooking XP.
+    stat_advance(cooking, 1500);
+    mes("You cook the monkfish.");
+} else {
+    inv_add(inv, burnt_monkfish, 1);
+    mes("You burn the monkfish.");
+}
+
+[opheld1,swan_monkfish] @player_consume_item(swan_consume_fresh_monkfish, 2, 3);
+[opheld1,monkfish] @player_consume_item(swan_consume_monkfish, 2, 3);
+
+[label,swan_consume_fresh_monkfish]
+inv_delslot(inv, last_slot);
+anim(human_eat, 0);
+stat_heal(hitpoints, 1, 0);
+mes("You eat the fresh monkfish.");
+
+[label,swan_consume_monkfish]
+inv_delslot(inv, last_slot);
+anim(human_eat, 0);
+stat_heal(hitpoints, 16, 0);
+mes("You eat the monkfish.");
+
+// Post-quest colony fishing. Preserve the NPC's original operation mapping:
+// Harpoon gives the generic tuna/swordfish flow; Net gives monkfish.
+[opnpc1,swan_fishingspot] @swan_post_harpoon_attempt;
+[opnpc4,swan_fishingspot] @swan_post_harpoon_catch;
+[opnpc3,swan_fishingspot] @swan_post_monkfish_attempt;
+[opnpc5,swan_fishingspot] @swan_post_monkfish_catch;
+[opnpcu,swan_fishingspot]
+switch_obj(last_useitem) {
+    case harpoon : @swan_post_harpoon_attempt;
+    case net : @swan_post_monkfish_attempt;
+    case default : @fishing_wrong_spot_message(last_useitem);
+}
+
+// Adapt the generic harpoon cycle to this NPC's op1/op4 pair, retaining the
+// shared tuna/swordfish fishing structs, level gates, XP and catch messages.
+[label,swan_post_harpoon_attempt]
+if (%swansong < 200) return;
+if (stat(fishing) < 35) {
+    anim(null, 0);
+    ~mesbox("You need at least 35 Fishing to harpoon these fish.");
+    return;
+}
+if (~check_fish_equipment(harpoon) = false) return;
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    ~mesbox("You can't carry any more fish.");
+    return;
+}
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 5);
+    p_opnpc(1);
+    return;
+} else if (%action_delay = calc(map_clock + 4)) {
+    mes("You start harpooning fish.");
+    anim(human_harpoon, 0);
+    sound_synth(fishing_cast, 1, 0);
+    p_opnpc(4);
+} else if (%action_delay = map_clock) {
+    anim(human_harpoon, 0);
+    if (stat(fishing) >= 50) {
+        ~fish_roll(raw_tuna, raw_swordfish, harpoon, null);
+    } else {
+        ~fish_roll(raw_tuna, null, harpoon, null);
+    }
+}
+if (afk_event = ^true & npc_param(is_whirlpool) = ^false) {
+    @macro_event_fishing(harpoon);
+}
+
+[label,swan_post_harpoon_catch]
+if (%swansong < 200) return;
+if (stat(fishing) < 35) {
+    anim(null, 0);
+    ~mesbox("You need at least 35 Fishing to harpoon these fish.");
+    return;
+}
+if (~check_fish_equipment(harpoon) = false) return;
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    ~mesbox("You can't carry any more fish.");
+    return;
+}
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 5);
+} else if (%action_delay = map_clock) {
+    anim(human_harpoon, 0);
+    if (stat(fishing) >= 50) {
+        ~fish_roll(raw_tuna, raw_swordfish, harpoon, null);
+    } else {
+        ~fish_roll(raw_tuna, null, harpoon, null);
+    }
+}
+p_opnpc(4);
+
+// Post-quest net fishing produces ordinary tradeable monkfish.
+[label,swan_post_monkfish_attempt]
+if (%swansong < 200) return;
+if (stat(fishing) < 62) {
+    anim(null, 0);
+    ~mesbox("You need a Fishing level of 62 to catch monkfish.");
+    return;
+}
+if (~check_fish_equipment(net) = false) return;
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    ~mesbox("You can't carry any more fish.");
+    return;
+}
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 5);
+    p_opnpc(3);
+    return;
+} else if (%action_delay = calc(map_clock + 4)) {
+    anim(human_smallnet, 0);
+    mes("You cast out your net...");
+    sound_synth(net, 1, 0);
+    p_opnpc(3);
+    return;
+} else if (%action_delay = calc(map_clock + 3)) {
+    mes("You attempt to catch a monkfish.");
+    p_opnpc(5);
+} else {
+    p_opnpc(3);
+}
+if (%action_delay = map_clock) @swan_post_monkfish_roll;
+
+[label,swan_post_monkfish_catch]
+if (%swansong < 200) return;
+if (stat(fishing) < 62) {
+    anim(null, 0);
+    ~mesbox("You need a Fishing level of 62 to catch monkfish.");
+    return;
+}
+if (~check_fish_equipment(net) = false) return;
+if (inv_freespace(inv) < 1) {
+    anim(null, 0);
+    ~mesbox("You can't carry any more fish.");
+    return;
+}
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + 4);
+    anim(human_fish_onspot, 0);
+} else if (%action_delay = map_clock) {
+    @swan_post_monkfish_roll;
+}
+p_opnpc(5);
+
+[label,swan_post_monkfish_roll]
+if (inv_freespace(inv) < 1) return;
+// UNKNOWN catch roll: bounded stat_random; the exact 377 monkfish curve is not retained.
+if (stat_random(fishing, 8, 64) = false) return;
+inv_add(inv, raw_monkfish, 1);
+// CANDIDATE: 2007-base monkfish fishing XP, before later Fishing XP changes.
+stat_advance(fishing, 1200);
+mes("You catch a monkfish.");

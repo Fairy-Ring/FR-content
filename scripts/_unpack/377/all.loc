@@ -87710,38 +87710,6 @@ multiloc=20,saradomin_staff
 multiloc=190,saradomin_staff
 multiloc=200,saradomin_staff
 
-[scenery_14909]
-blockwalk=no
-active=yes
-multivar=swansong_pickaxe
-multiloc=0,bronze_pickaxe_14910
-
-[bronze_pickaxe_14910]
-name=Bronze pickaxe
-desc=Handy for mining.
-model=loc_14910
-recol1s=15855
-recol1d=8354
-blockwalk=no
-active=yes
-op1=Take
-
-[scenery_14911]
-blockwalk=no
-active=yes
-multivar=swansong_hatchet
-multiloc=0,bronze_axe_14912
-
-[bronze_axe_14912]
-name=Bronze axe
-desc=Handy for woodcutting.
-model=loc_14912
-recol1s=15855
-recol1d=8354
-blockwalk=no
-active=yes
-op1=Take
-
 [sink_14917]
 name=Sink
 desc=There must be a source of fresh water somewhere nearby.
@@ -87757,14 +87725,6 @@ desc=Rough but adequate.
 model=dwarf_keldagrim_sink
 length=2
 
-[loc_14919]
-name=Range
-desc=Smells of fried fish.
-model=100_dave_stove
-length=2
-forceapproach=east
-
-category=cooking_oven
 [table_14920]
 name=Table
 desc=A basic wooden table, suitable for casual meals.
@@ -87791,24 +87751,6 @@ occlude=yes
 op1=Enter
 active=yes
 forceapproach=west
-
-[door_14923]
-name=Door
-desc=A simple door.
-model=zanarisdoor
-recol1s=8387
-recol1d=9445
-active=yes
-op1=Open
-
-[door_14924]
-name=Door
-desc=A simple door, now open.
-model=zanarisdoor
-recol1s=8387
-recol1d=9445
-active=yes
-op1=Close
 
 [scenery_14925]
 model=loc_14925
@@ -87867,53 +87809,6 @@ mirror=yes
 raiseobject=no
 active=no
 
-[scenery_14933]
-active=yes
-multivar=swansong_wall_1
-multiloc=0,broken_wall
-multiloc=1,patched_wall
-
-[scenery_14934]
-active=yes
-multivar=swansong_wall_2
-multiloc=0,broken_wall_14946
-multiloc=1,patched_wall_14949
-
-[scenery_14935]
-active=yes
-multivar=swansong_wall_3
-multiloc=0,broken_wall_14947
-multiloc=1,patched_wall_14950
-
-[scenery_14936]
-active=yes
-multivar=swansong_wall_4
-multiloc=0,broken_wall
-multiloc=1,patched_wall
-
-[scenery_14937]
-active=yes
-multivar=swansong_wall_5
-multiloc=0,broken_wall_14946
-multiloc=1,patched_wall_14949
-
-[fishing_spot_14938]
-name=Fishing spot
-desc=I can see fish swimming in the water.
-model=compofishspot
-op1=Net
-op3=hidden
-
-[scenery_14939]
-active=yes
-multivar=swansong_arnold
-multiloc=0,fishing_spot_14938
-multiloc=1,fishing_spot_14938
-multiloc=2,fishing_spot_14938
-multiloc=3,fishing_spot_14938
-multiloc=4,fishing_spot_14938
-multiloc=5,fishing_spot_14938
-
 [scenery_14940]
 model=loc_14940
 recol1s=13703
@@ -87969,84 +87864,6 @@ recol3d=10503
 hillskew=yes
 sharelight=yes
 
-[broken_wall]
-name=Broken wall
-desc=Something has damaged the wall here.
-model=loc_14945
-recol1s=13703
-recol1d=10535
-recol2s=11493
-recol2d=9479
-recol3s=11525
-recol3d=10503
-hillskew=yes
-active=yes
-
-[broken_wall_14946]
-name=Broken wall
-desc=Something has damaged the wall here.
-model=loc_14946
-recol1s=13703
-recol1d=10535
-recol2s=11493
-recol2d=9479
-recol3s=11525
-recol3d=10503
-hillskew=yes
-active=yes
-
-[broken_wall_14947]
-name=Broken wall
-desc=Something has damaged the wall here.
-model=loc_14947
-recol1s=13703
-recol1d=10535
-recol2s=11493
-recol2d=9479
-recol3s=11525
-recol3d=10503
-hillskew=yes
-active=yes
-
-[patched_wall]
-name=Patched wall
-desc=The wall here has been hastily patched.
-model=loc_14948
-recol1s=13703
-recol1d=10535
-recol2s=11493
-recol2d=9479
-recol3s=11525
-recol3d=10503
-hillskew=yes
-active=yes
-
-[patched_wall_14949]
-name=Patched wall
-desc=The wall here has been hastily patched.
-model=loc_14949
-recol1s=13703
-recol1d=10535
-recol2s=11493
-recol2d=9479
-recol3s=11525
-recol3d=10503
-hillskew=yes
-active=yes
-
-[patched_wall_14950]
-name=Patched wall
-desc=The wall here has been hastily patched.
-model=loc_14950
-recol1s=13703
-recol1d=10535
-recol2s=11493
-recol2d=9479
-recol3s=11525
-recol3d=10503
-hillskew=yes
-active=yes
-
 [cogs]
 name=Cogs
 desc=Big rusty cogs.
@@ -88061,68 +87878,6 @@ model=loc_14952
 name=Fishing weights
 desc=Some large fishing weights.
 model=loc_14953
-
-[scenery_14954]
-width=2
-length=2
-active=yes
-forceapproach=west
-multivar=swansong_franklin
-multiloc=0,metal_press_14957
-multiloc=1,metal_press_14957
-multiloc=2,metal_press_14957
-multiloc=3,metal_press
-multiloc=4,metal_press
-
-[scenery_14955]
-width=2
-length=2
-active=yes
-anim=swan_crush
-forceapproach=east
-multivar=swansong_franklin
-multiloc=0,firebox
-multiloc=1,firebox
-multiloc=2,firebox_14959
-multiloc=3,firebox_14960
-multiloc=4,firebox_14960
-
-[metal_press]
-name=Metal Press
-desc=The pressing section of a metal pressing machine.
-model=loc_14956
-width=2
-length=2
-
-[metal_press_14957]
-name=Metal Press
-desc=The pressing section of a metal pressing machine.
-model=loc_14957
-width=2
-length=2
-
-[firebox]
-name=Firebox
-desc=The firebox of a metal pressing machine.
-model=loc_14958
-width=2
-length=2
-
-[firebox_14959]
-name=Firebox
-desc=There are some logs in the firebox of the press.
-model=loc_14958
-model2=loc_14959
-width=2
-length=2
-
-[firebox_14960]
-name=Firebox
-desc=The firebox is heating the press.
-model=loc_14960
-anim=swan_crush
-width=2
-length=2
 
 [shelves_14961]
 name=Shelves

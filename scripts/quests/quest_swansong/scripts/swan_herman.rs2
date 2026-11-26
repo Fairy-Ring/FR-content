@@ -4,7 +4,17 @@
 // (pack-safe: 1-4 hide Herman). Chat + write only — no dest, no WOM file.
 // Cite red-19-start-impl-377.md §18 · swan-song-start-talk-377.md §4.
 
+[apnpc1,swan_herman]
+// UNKNOWN engineering reach: the original colony placement is behind a desk.
+if (%swansong < 60) { p_aprange(1); return; }
+if (npc_range(coord) > ^swan_herman_talk_range) {
+    p_aprange(^swan_herman_talk_range);
+    return;
+}
+@swan_herman_colony;
+
 [opnpc1,swan_herman]
+if (%swansong >= 60) { @swan_herman_colony; }
 if (%swansong >= 5) {
     ~chatnpc("<p,neutral>Please, the Colony needs that expert adventurer.");
     return;
@@ -44,13 +54,15 @@ if ($pick = 1) {
 ~chatplayer("<p,happy>I'm a brave adventurer! Can I try?");
 ~chatnpc("<p,confused>You? I hadn't thought of that... let's have a look at you...");
 ~update_questpoints;
-if (%qp < 101) {
+// VERIFIED Tip.It 20060609200331: 100 QP and the two prerequisite quests.
+if (%qp < 100 | %onesmallfavour ! ^onesmallfavour_complete | %garden_quest ! ^garden_complete) {
     ~chatnpc("<p,sad>No, I'm sorry, but you simply do not have enough experience. I've got a LOT at stake here, and I can't afford to have an amateur getting in the way.");
     return;
 }
 ~chatnpc("<p,neutral>Hmmm... You're not what I'm looking for, but... <tostring(%qp)> Quest Points is really rather a lot...");
 ~chatnpc("<p,happy>Ok, the Piscatoris Fishing Colony gratefully accepts your offer of help. When the Colony is safe you shall be handsomely rewarded.");
 %swansong = 5;
+~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
 ~chatplayer("<p,happy>Oh goody, I love rewards! Now, how can I help?");
 ~chatnpc("<p,neutral>Well, as qualified as you undoubtedly are, I believe we're going to need a truly expert adventurer if the Colony is to stand a chance.");
 if (%legendsquest = ^legends_complete) {
