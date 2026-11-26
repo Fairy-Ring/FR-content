@@ -28,6 +28,11 @@ if(testbit(%barcrawl, ^risingsun_index) = ^false & last_useitem = barcrawl_card)
 }
 
 [label,falador_bar_dialogue]
+if (%hundred_dwarf_quest = ^rfd_dwarf_father_spoken) {
+    @rfd_dwarf_barmaid;
+    return;
+}
+
 if(testbit(%barcrawl, ^risingsun_index) = ^false & inv_total(inv, barcrawl_card) > 0) {
     @risingsun_barmaid_barcrawl_dialogue;
 }
