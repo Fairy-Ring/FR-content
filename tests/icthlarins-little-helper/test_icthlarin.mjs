@@ -38,6 +38,7 @@ const [Environment, { getExpByLevel }, { PlayerStat }, { NpcStat }, { NpcMode },
   import(pathToFileURL(path.join(engine, 'src/engine/CoordGrid.ts')).href),
   import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href)
 ].map(value => typeof value === 'string' ? load(value) : value));
+const JavaRandom = await load('util/JavaRandom.ts');
 
 assert.equal(Environment.NODE_MEMBERS, true, 'compiled quest proof runs with members configs');
 assert.equal(Environment.NODE_XPRATE, 1, 'quest XP deltas use the unmultiplied tenths scale');
@@ -566,6 +567,37 @@ function talkNpc(p, key, expected, choices = [], option = 1) {
   assert.equal(p.getOpTrigger()?.name, expected, `${key} selects its visible-form handler`);
   return runInteraction(p, expected, choices, () => p.processInteraction());
 }
+function defeatOwnedEncounter(p, actor, defeatedQueue, expectedStage) {
+  positionAtEntityApproach(p, actor, 'owned encounter melee approach');
+  // Offline final-hit fixture only: native combat must create hero credit,
+  // damage, the NPC death trigger and the player handoff without seeding any.
+  actor.levels[NpcStat.HITPOINTS] = 1;
+  runProc(p, 'player_combat_stat');
+  World.currentTick = Math.max(World.currentTick + 1, p.getVar(varp('action_delay')));
+  showNpc(p, actor);
+  JavaRandom.setSeed(0);
+  assert(npcWalker.handle(new OpNpc(2, actor.nid), p), 'native Attack packet accepts the owned encounter');
+  assert.equal(p.target, actor, 'native Attack targets the product-spawned actor');
+  assert(p.validateTarget(), 'the owned encounter remains a valid native target');
+  assert(p.inOperableDistance(actor), 'the packed-map melee stand reaches the owned encounter');
+  assert.equal(p.getOpTrigger()?.name, '[opnpc2,_]', 'native Attack selects the ordinary combat dispatcher');
+  runInteraction(p, '[opnpc2,_]', [], () => p.processInteraction());
+  assert([...actor.queue.all()].some(request =>
+    request.queueId === ServerTriggerType.AI_QUEUE2 && request.lastInt > 0),
+  'ordinary melee queues positive damage through the native NPC damage trigger');
+  for (let turn = 0; turn < 8 && actor.isActive; turn++) {
+    World.currentTick++;
+    actor.turn();
+  }
+  assert.equal(actor.levels[NpcStat.HITPOINTS], 0, 'native queued damage kills the owned encounter');
+  const handoff = [...p.queue.all()].find(request => request.script.name === `[queue,${defeatedQueue}]`);
+  assert(handoff, 'native hero-attributed death queues the owner-specific quest handoff');
+  World.currentTick++;
+  p.processQueues();
+  assert(![...p.queue.all()].includes(handoff), 'the native player queue consumes the defeat handoff');
+  assert.equal(stage(p), expectedStage, 'native encounter defeat writes the next quest stage');
+  assert.equal(actor.isActive, false, 'the native NPC death lifecycle removes the defeated actor');
+}
 function useItemOnNpc(p, item, key, expected, choices = []) {
   positionAt(p, key);
   const actor = actors[key];
@@ -1029,7 +1061,9 @@ for (const jar of jarCases) {
     assert.equal(count(p, jar.item), 1, `${jar.pot} retry does not duplicate the restored jar`);
     activeGuardian = retried[0];
   }
-  World.removeNpc(activeGuardian, -1);
+  defeatOwnedEncounter(p, activeGuardian, 'ics_little_guardian_defeated', 7);
+  assert.equal(p.getVarBit(bit('ics_stateofmind')), 1, 'guardian defeat preserves the flashback state');
+  assert.equal(count(p, jar.item), 1, 'native guardian defeat preserves the selected canopic jar');
   World.removeNpc(cat, -1);
 }
 
@@ -1293,6 +1327,14 @@ assert.notEqual(possessed[0], originalPossessed, 'the retry creates a replacemen
 assertPackedArrival(possessed[0], 'possessed-priest retry spawn');
 assertIndependentPathOut(possessed[0], 'possessed-priest retry spawn');
 assert.equal(stage(supplies), 19, 'spawning or restoring the priest does not count as its defeat');
+defeatOwnedEncounter(supplies, possessed[0], 'ics_little_possessed_defeated', 24);
+assert.equal(supplies.getVarBit(bit('ics_stateofmind')), 0, 'native priest defeat clears the flashback state');
+assert.equal(possessedOwnedByPlayer().length, 0, 'native priest death leaves no active owner encounter');
+talkNpc(supplies, 'ceremonyHighPriest', '[opnpc1,ics_little_hipriest_vis]');
+assert.equal(stage(supplies), 25, 'the ceremony farewell follows the native defeated stage');
+assertPackedArrival(supplies, 'ceremony farewell surface landing');
+assertIndependentPathOut(supplies, 'ceremony farewell surface landing');
+assertNonemptyRouteTo(supplies, 'highPriest', 'ceremony farewell surface landing');
 
 const ordinaryMan = nativeTypeActor(supplies, 'man');
 assert.equal(runProcInt(supplies, 'ics_little_guardian', [], ordinaryMan), 0,
@@ -1343,8 +1385,8 @@ assert.equal(stage(unholyRecovery), 13, 'restoring the unholy symbol keeps the p
 assert.equal(count(unholyRecovery, 'ics_little_unholy_symbol'), 1, 'the unholy symbol can be recovered after being dropped');
 
 // Stage 25: full-inventory refusal is side-effect free; reward completion is one-shot.
-const rewards = newPlayer();
-fixtureStage(rewards, 25);
+const rewards = supplies;
+assert.equal(stage(rewards), 25, 'the reward proof continues from the actual ceremony farewell');
 assertQuestColour(rewards, 25);
 const xpBeforeReward = rewards.stats.slice();
 const qpBeforeReward = rewards.getVar(questpoints);
@@ -1357,6 +1399,7 @@ assert.deepEqual(rewards.stats, xpBeforeReward, 'a full inventory grants no expe
 assert.equal(rewards.getVar(questpoints), qpBeforeReward, 'a full inventory grants no quest points');
 assert(textSince(rewards, fullRewardStart).includes('Make room'), 'the High Priest explains the reward-space requirement');
 removeSlot(rewards, 0);
+const completionTextStart = rewards.packets.length;
 talkNpc(rewards, 'highPriest', '[opnpc1,ics_little_hipriest_vis]');
 assert.equal(stage(rewards), questComplete, 'the reward dialogue completes the quest');
 assert.equal(count(rewards, 'ics_little_amulet_of_catspeak'), 1, 'completion grants one Catspeak amulet');
@@ -1364,6 +1407,9 @@ assert.equal(rewards.stats[PlayerStat.THIEVING] - xpBeforeReward[PlayerStat.THIE
 assert.equal(rewards.stats[PlayerStat.AGILITY] - xpBeforeReward[PlayerStat.AGILITY], 40000);
 assert.equal(rewards.stats[PlayerStat.WOODCUTTING] - xpBeforeReward[PlayerStat.WOODCUTTING], 40000);
 assert.equal(rewards.getVar(questpoints) - qpBeforeReward, questPointsAward, 'completion grants exactly two quest points');
+assert.equal(rewards.modalMain, component('questscroll_death'), 'completion opens the original quest scroll');
+assert(textSince(rewards, completionTextStart).includes("You have completed Icthlarin's Little Helper!"),
+  'the completion scroll announces the completed quest');
 assertQuestColour(rewards, questComplete);
 const xpAfterReward = rewards.stats.slice();
 const qpAfterReward = rewards.getVar(questpoints);
@@ -1384,6 +1430,20 @@ assert.equal(count(rewards, 'ics_little_amulet_of_catspeak', bank), 1);
 removeItem(rewards, 'ics_little_amulet_of_catspeak', bank);
 talkNpc(rewards, 'sphinx', '[opnpc1,ics_little_sphinx]');
 assert.equal(count(rewards, 'ics_little_amulet_of_catspeak'), 1, 'the Sphinx replaces the amulet after it is no longer banked');
+const completedGateRoute = packedWalk(rewards.level, [rewards.x, rewards.z],
+  [gateCityStand[1], gateCityStand[2]], 96);
+assert(completedGateRoute?.length, 'the completed player has a packed route to the city-side gate stand');
+interactLoc(rewards, 'gate', 1, '[oploc1,clue_suggestion_list]', [], gateCityStand);
+assert.deepEqual(tileOf(rewards), [0, 3284, 2810], 'the completed gate exits to its exterior counterpart');
+assert.equal(stage(rewards), questComplete, 'post-quest gate exit preserves completion');
+assertPackedArrival(rewards, 'post-quest gate exterior landing');
+assertIndependentPathOut(rewards, 'post-quest gate exterior landing');
+interactLoc(rewards, 'gate', 1, '[oploc1,clue_suggestion_list]');
+assert.deepEqual(tileOf(rewards), [0, 3284, 2808], 'the completed gate re-enters at its Sophanem counterpart');
+assert.equal(stage(rewards), questComplete, 'post-quest gate re-entry preserves completion');
+assertPackedArrival(rewards, 'post-quest gate Sophanem landing');
+assertIndependentPathOut(rewards, 'post-quest gate Sophanem landing');
+assertNonemptyRouteTo(rewards, 'templeDoor', 'post-quest gate Sophanem landing');
 
-console.log('PASS Icthlarin compiled proofs: native cat prereqs and supplies, stage-3 Sphinx/token, stage-9 preparation/salt routes, symbol recovery, stage-25 rewards and item recovery, plus packed map approaches.');
+console.log('PASS Icthlarin compiled proofs: native cat prerequisites and supplies, owner-attributed guardian and priest defeats, pyramid puzzles and traps, preparation and recovery chains, ceremony farewell, completion scroll and once-only rewards, post-quest gate, and packed-map approaches.');
 process.exit(0);
