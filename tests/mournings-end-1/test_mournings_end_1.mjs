@@ -279,6 +279,22 @@ function originalLoc(name, x, z) {
   assert(target, `${name}: original placement is present in the packed world`);
   return target;
 }
+function walkToLoc(p, target, label) {
+  if (p.inOperableDistance(target)) return;
+  const type = types.LocType.get(target.type);
+  for (let x = target.x - 1; x <= target.x + target.width; x++) {
+    for (let z = target.z - 1; z <= target.z + target.length; z++) {
+      if (!map.reachedLoc(p.level, x, z, target.x, target.z, target.width, target.length, 1,
+        target.angle, target.shape, type.forceapproach)) continue;
+      const route = [...map.findPath(p.level, p.x, p.z, x, z)];
+      if (route.at(-1) !== CoordGrid.packCoord(p.level, x, z)) continue;
+      walkRoute(p, x, z, label);
+      assert(p.inOperableDistance(target), `${label}: native route reaches the current rotated gate`);
+      return;
+    }
+  }
+  assert.fail(`${label}: no packed-map route to the current gate form`);
+}
 function currentLocNear(name, x, z) {
   for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
     const target = World.getLoc(x + dx, z + dz, 0, id('LocType', name));
@@ -433,6 +449,7 @@ try {
     const p = fixture(5); place(p, { level: 0, x: 2474, z: 3363 });
     const closedRoute = [...map.findPath(0, p.x, p.z, 2487, 3373)];
     assert.notEqual(closedRoute.at(-1), CoordGrid.packCoord(0, 2487, 3373), 'original closed fence blocks the apple approach');
+    walkRoute(p, 2474, 3364, 'outside orchard fence to the original closed gate approach');
     operateHere(p, originalLoc('mourning_orchard_fencegate_l', 2474, 3364), 'mourning_orchard_fencegate_l');
     walkRoute(p, 2487, 3373, 'outside orchard fence through the handled gate to the apple pile');
     const pile = originalLoc('mourning_orchard_applepile', 2487, 3374);
@@ -443,9 +460,13 @@ try {
     walkRoute(p, 2474, 3365, 'orchard barrel back to the inside of the gate');
     operateHere(p, currentLocNear('mourning_orchard_fencegate_open_l', 2474, 3364), 'mourning_orchard_fencegate_open_l');
     assert(originalLoc('mourning_orchard_fencegate_l', 2474, 3364), 'left Close restores its original form');
-    operateHere(p, originalLoc('mourning_orchard_fencegate_r', 2475, 3364), 'mourning_orchard_fencegate_r');
+    const right = originalLoc('mourning_orchard_fencegate_r', 2475, 3364);
+    walkToLoc(p, right, 'walk inside the fence to the right gate');
+    operateHere(p, right, 'mourning_orchard_fencegate_r');
     walkRoute(p, 2475, 3363, 'right gate opening provides the outward route');
-    operateHere(p, currentLocNear('mourning_orchard_fencegate_open_r', 2475, 3364), 'mourning_orchard_fencegate_open_r');
+    const openRight = currentLocNear('mourning_orchard_fencegate_open_r', 2475, 3364);
+    walkToLoc(p, openRight, 'walk outside the fence to the rotated right gate');
+    operateHere(p, openRight, 'mourning_orchard_fencegate_open_r');
     assert(originalLoc('mourning_orchard_fencegate_r', 2475, 3364), 'right Close restores its original form');
   });
 
