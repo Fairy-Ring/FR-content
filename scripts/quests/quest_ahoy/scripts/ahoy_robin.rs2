@@ -20,6 +20,16 @@ if (inv_total(inv, ahoy_bedsheet) > 0 | inv_total(worn, ahoy_bedsheet) > 0) {
     return;
 }
 if (%ahoy_subquest_bow = 5) {
+    // UNKNOWN favourable recovery: replace a lost signed bow until the manual is obtained.
+    if (%ahoy_given_manual = 0 & inv_total(inv, oak_longbow_signed) = 0 & inv_total(bank, oak_longbow_signed) = 0 & inv_total(worn, oak_longbow_signed) = 0) {
+        if (inv_total(inv, oak_longbow) > 0) {
+            ~ahoy_robin_sign_bow();
+            mes("Robin signs the oak longbow for you.");
+        } else {
+            ~chatnpc("Bring an oak longbow and I will sign it.");
+        }
+        return;
+    }
     ~chatplayer("So, still here then?");
     ~chatnpc("Do you want another game of Runedraw?");
     ~chatplayer("No!");

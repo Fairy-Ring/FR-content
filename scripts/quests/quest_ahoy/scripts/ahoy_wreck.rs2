@@ -207,12 +207,12 @@ else ~displaymessage(^dm_default);
 if (stat(agility) < 25) return;
 // UNKNOWN endpoint motion: repeating the endpoint rock reaches its bank.
 if (coord = loc_coord & loc_coord = 0_56_55_20_30) {
-    healenergy(-5);
+    healenergy(-500);
     p_telejump(0_56_55_21_30);
     return;
 }
 if (coord = loc_coord & loc_coord = 0_56_55_17_44) {
-    healenergy(-5);
+    healenergy(-500);
     p_telejump(0_56_55_22_45);
     return;
 }
@@ -240,7 +240,7 @@ if ($valid = false) {
     ~displaymessage(^dm_default);
     return;
 }
-healenergy(-5);
+healenergy(-500);
 p_telejump(loc_coord);
 if (loc_coord = 0_56_55_20_30 | loc_coord = 0_56_55_17_44) mes("Jump from this rock again to reach the shore.");
 

@@ -305,6 +305,16 @@ for (let game = 0; stage(p, 'ahoy_subquest_bow') < 4 && game < 64; game++) {
 assert.equal(stage(p, 'ahoy_subquest_bow'), 5, 'four wins sign the carried oak longbow');
 assert.equal(count(p, 'oak_longbow_signed'), 1);
 assert.equal(count(p, 'oak_longbow'), 0);
+assert(held(p, 'oak_longbow_signed', 5), 'the native Drop action accepts the earned signed bow');
+finish(p);
+assert.equal(count(p, 'oak_longbow_signed'), 0, 'the signed bow is no longer carried after dropping it');
+talk(p, 'ahoy_robin');
+assert.equal(count(p, 'oak_longbow_signed'), 0, 'lost-bow recovery requires another carried oak longbow');
+seed(p, ['oak_longbow']);
+talk(p, 'ahoy_robin');
+assert.equal(count(p, 'oak_longbow_signed'), 1, 'Robin replaces a dropped signed bow after the four-win exchange');
+assert.equal(count(p, 'oak_longbow'), 0, 'replacement signing consumes the ordinary oak longbow');
+assert.equal(stage(p, 'ahoy_subquest_bow'), 5, 'replacement signing preserves the completed bow subquest');
 
 function useNpc(p, itemName, target, choices = []) {
   p.lastUseItem = obj(itemName);
@@ -320,7 +330,7 @@ function useNpc(p, itemName, target, choices = []) {
 const ak = actor(p, 'ahoy_akharanu_multi');
 const manualScript = useNpc(p, 'oak_longbow_signed', ak);
 assert.equal(manualScript.name, '[opnpcu,ahoy_akharanu]', 'Ak-Haranu root dispatches the visible stage-4 form');
-assert.equal(count(p, 'ahoy_translation_manual'), 1);
+assert.equal(count(p, 'ahoy_translation_manual'), 1, 'Ak-Haranu accepts the replacement signed bow for the manual');
 assert.equal(count(p, 'oak_longbow_signed'), 0);
 remove(p, 'ahoy_translation_manual');
 talk(p, 'ahoy_akharanu_multi');
@@ -396,6 +406,10 @@ const firstRock = locAt('ahoy_rock_invisible', 0, 3604, 3550);
 operate(travel, firstRock, 1, [], true);
 assert.deepEqual(tile(travel), [0, 3605, 3548], 'rock approach enforces 25 Agility');
 travel.baseLevels[PlayerStat.AGILITY] = travel.levels[PlayerStat.AGILITY] = 50;
+const energyBeforeJump = travel.runenergy;
+operate(travel, firstRock, 1, [], true);
+assert.equal(travel.runenergy, energyBeforeJump - 500, 'one rock jump consumes five percent in native energy units');
+move(travel, 0, 3605, 3548);
 const rocks = [[3604, 3550], [3602, 3550], [3599, 3552], [3597, 3552], [3595, 3554],
   [3595, 3556], [3597, 3559], [3597, 3561], [3599, 3564], [3601, 3564]];
 for (const [x, z] of rocks) {
