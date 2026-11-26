@@ -1,4 +1,4 @@
-// VERIFIED gauge role/bands: Tip.It 4 Nov 2005. Numeric scale and model angles UNKNOWN.
+// VERIFIED gauge models/poses: original 377 interface and sequences. Numeric scale UNKNOWN.
 [oploc1,blast_furnace_gauge]
 p_arrivedelay;
 ~bf_update_readings;
@@ -14,9 +14,9 @@ def_string $band = "White";
 if (%blast_furnace_temperature_reading >= ^bf_green_low) $band = "Green";
 if (%blast_furnace_temperature_reading > ^bf_green_high) $band = "Red";
 if_settext(blast_furnace_temp_gauge:com_0, "Heat: <tostring(%blast_furnace_temperature_reading)> (<$band>)");
-if (%blast_furnace_broken_pipe_reading = 0) if_sethide(blast_furnace_temp_gauge:com_2, true);
-else if_sethide(blast_furnace_temp_gauge:com_2, false);
-if (%blast_furnace_fuel_low_reading = 0) if_sethide(blast_furnace_temp_gauge:com_3, true);
-else if_sethide(blast_furnace_temp_gauge:com_3, false);
-// UNKNOWN needle geometry: map the live byte reading to a half-turn.
-if_setangle(blast_furnace_temp_gauge:com_4, 0, scale(%blast_furnace_temperature_reading, 255, 1024), 172);
+if (%blast_furnace_fuel_low_reading = 0) if_setanim(blast_furnace_temp_gauge:com_2, temp_gauge_flag_fuel_low_in);
+else if_setanim(blast_furnace_temp_gauge:com_2, temp_gauge_flag_fuel_low_out);
+if (%blast_furnace_broken_pipe_reading = 0) if_setanim(blast_furnace_temp_gauge:com_3, temp_gauge_flag_pipe_broken_in);
+else if_setanim(blast_furnace_temp_gauge:com_3, temp_gauge_flag_pipe_broken_out);
+// UNKNOWN byte-to-pose scale; animate the original needle, never rotate its dial case.
+if_setanim(blast_furnace_temp_gauge:com_4, enum(int, seq, bf_gauge_needle_seq, scale(%blast_furnace_temperature_reading, 255, 100)));

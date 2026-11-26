@@ -458,6 +458,31 @@ try {
   assert.equal(worker.getVarBit(varbit('blast_furnace_temperature_reading')), shared('bf_temperature'), 'gauge reading reflects shared heat');
   assert.equal(worker.getVarBit(varbit('blast_furnace_fuel_low_reading')), 0, 'fuel reading reports a fueled stove');
   assert(worker.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes('Heat:') && packet.text.includes('Green')), 'gauge sends its live green heat label');
+  // The original dial has 101 one-frame poses; their sequence names are not in frame order.
+  const gaugeComponents = [2, 3, 4].map(index => id('Component', `blast_furnace_temp_gauge:com_${index}`));
+  const firstNeedleFrame = types.SeqType.get(id('SeqType', 'blast_furnace_temp_gauge1')).frames[0];
+  const gaugeMachineBefore = ['bf_temperature', 'bf_fuel', 'bf_faults'].map(shared);
+  for (let reading = 0; reading <= 255; reading++) {
+    const fuelLow = (reading & 1) !== 0, broken = (reading & 2) !== 0;
+    setShared('bf_temperature', reading);
+    setShared('bf_fuel', fuelLow ? 99 : 100);
+    setShared('bf_faults', broken ? 1 : 0);
+    execute('[proc,bf_update_readings]', worker);
+    const packetStart = worker.packets.length;
+    execute('[proc,bf_gauge_refresh]', worker);
+    const packets = worker.packets.slice(packetStart);
+    const animations = gaugeComponents.map(component => packets.find(packet => packet.constructor.name === 'IfSetAnim' && packet.component === component));
+    assert(animations.every(Boolean), 'fuel, broken-part and needle models each receive a real IfSetAnim');
+    assert.equal(animations[0].seq, id('SeqType', `temp_gauge_flag_fuel_low_${fuelLow ? 'out' : 'in'}`), 'right-hand component 2 animates only the Fuel Low flag');
+    assert.equal(animations[1].seq, id('SeqType', `temp_gauge_flag_pipe_broken_${broken ? 'out' : 'in'}`), 'left-hand component 3 animates only the Broken Parts flag');
+    const needle = types.SeqType.get(animations[2].seq);
+    assert.equal(needle.frameCount, 1, 'the needle uses an original single-frame pose');
+    assert.equal(needle.frames[0], firstNeedleFrame + Math.floor(reading * 100 / 255), 'all byte readings select the original needle poses in frame order');
+    assert.equal(packets.some(packet => packet.constructor.name === 'IfSetAngle' && packet.component === gaugeComponents[2]), false, 'the whole dial case is never rotated');
+  }
+  ['bf_temperature', 'bf_fuel', 'bf_faults'].forEach((name, index) => setShared(name, gaugeMachineBefore[index]));
+  execute('[proc,bf_update_readings]', worker);
+  execute('[proc,bf_gauge_refresh]', worker);
   const pumper = player();
   enter(pumper, entrance);
   nativeLoc(pumper, pump, 1);
