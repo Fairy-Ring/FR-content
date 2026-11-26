@@ -23,8 +23,11 @@ switch_obj (last_useitem) {
 }
 
 [opheldu,redberries]
-switch_obj (last_useitem) {
-    case pie_shell : @make_uncooked_pie(last_slot);
+def_obj $used = last_useitem;
+def_int $slot = last_slot;
+if (~handsand_mix(redberries, $used) = ^true) return;
+switch_obj ($used) {
+    case pie_shell : @make_uncooked_pie($slot);
     case default : ~displaymessage(^dm_default);
 }
 
