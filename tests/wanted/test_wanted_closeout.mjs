@@ -19,7 +19,7 @@ const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/en
 const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
 const { ScriptOpcodeMap } = await import(pathToFileURL(path.join(engine, 'src/engine/script/ScriptOpcode.ts')).href);
 const Environment = await load('src/util/Environment.ts');
-const route = await load('src/engine/routefinder/index.ts');
+const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 assert.equal(Environment.NODE_XPRATE, 1, 'completion XP is measured without a rate multiplier');
 
 const types = {};
@@ -34,8 +34,8 @@ const DbTableIndex = await load('src/cache/config/DbTableIndex.ts');
 DbTableIndex.init();
 assert(ScriptProvider.load(pack) > 0, 'packed production scripts load');
 World.currentTick = 1;
-// The isolated fixture allocates the rescue zone so ordinary teleport validation runs.
-route.allocateIfAbsent(2985, 3345, 0);
+World.gameMap.init();
+assert(map.isZoneAllocated(0, 2986, 3345), 'Falador rescue collision comes from the packed map');
 
 const maps = new Map();
 function entries(kind) {
@@ -268,11 +268,23 @@ function attributedDeath(p, trigger, target, hero = p, randoms = []) {
     assert.match(text(full), /one free inventory space/i);
 }
 
+// Exhaust every random result, including a completed predecessor that advances into 11.
+for (const completedPredecessor of [false, true]) {
+    for (let draw = 0; draw < 17; draw++) {
+        const p = fieldPlayer();
+        if (completedPredecessor) set(p, 'wanted_mission10complete', 1);
+        const randoms = [chooseMission(draw + 2)];
+        if (draw + 2 === 14) randoms.push(0.25);
+        scan(p, randoms);
+        assert.notEqual(activeMission(p), 11, `draw ${draw} never selects the unbuilt Dorgeshuun route`);
+    }
+}
+
 // Every randomized field destination returns its own clue; Ardougne covers both source items.
 const expectedClues = new Map([
     [2, 'gnome_hat_cream'], [3, 'blue_cape'], [4, 'greenmans_ale'], [5, 'banana'],
     [6, 'eye_patch'], [7, 'blessedsnake'], [8, 'castlewars_ticket'], [9, 'giant_frog_legs'],
-    [10, 'goblin_armour'], [11, 'cave_goblin_bone_spear'], [12, 'feud_karidian_fakebeard'],
+    [10, 'goblin_armour'], [12, 'feud_karidian_fakebeard'],
     [13, 'viking_cloak_grey'], [15, 'red_vine_worm'], [16, 'bluewizhat'],
     [17, 'slayer_earmuffs'], [18, 'horsey_grey']
 ]);
@@ -288,13 +300,11 @@ for (const [mission, clue] of expectedClues) {
     assert.equal(get(p, 'wanted_mission1complete'), 1);
     assert.equal(count(p, clue), 1, `mission ${mission} clue`);
     if (hintFragments.has(mission)) assert(text(p).includes(hintFragments.get(mission)), `mission ${mission} retained item hint`);
-    if (mission !== 11) {
-        const next = mission === 2 ? 3 : 2;
-        [p.level, p.x, p.z] = tile(mission);
-        scan(p, [chooseMission(next)]);
-        assert.equal(get(p, `wanted_mission${mission}complete`), 1, `scan at mission ${mission} location is accepted`);
-        assert.equal(activeMission(p), next, `mission ${mission} advances after an in-range scan`);
-    }
+    const next = mission === 2 ? 3 : 2;
+    [p.level, p.x, p.z] = tile(mission);
+    scan(p, [chooseMission(next)]);
+    assert.equal(get(p, `wanted_mission${mission}complete`), 1, `scan at mission ${mission} location is accepted`);
+    assert.equal(activeMission(p), next, `mission ${mission} advances after an in-range scan`);
 }
 for (const [fraction, clue] of [[0.25, 'cake'], [0.75, 'fur']]) {
     const p = fieldPlayer();
@@ -314,6 +324,18 @@ for (const [fraction, clue] of [[0.25, 'cake'], [0.75, 'fur']]) {
     assert.equal(count(p, 'blue_cape'), 1);
 }
 
+// Flames must preserve life even when the player starts with very little current HP.
+for (const hp of [1, 2, 3, 4, 7, 99]) {
+    const p = fieldPlayer(tile(3));
+    set(p, 'wanted_mission1complete', 1);
+    set(p, 'wanted_mission2complete', 1);
+    set(p, 'wanted_mission3', 1);
+    p.levels[PlayerStat.HITPOINTS] = hp;
+    scan(p, [chooseMission(4)]);
+    assert(p.levels[PlayerStat.HITPOINTS] >= Math.max(1, Math.floor(hp / 4)),
+        `Flames preserves at least one quarter of ${hp} HP, rounded down, and never kills`);
+}
+
 // Main chase: two ordinary appearances, the third-scan rescue, then attributed fifth-scan knight.
 const p = player(8, tile(1));
 set(p, 'wanted_daquarius_hint', 2);
@@ -331,7 +353,11 @@ p.level = tile(3)[0]; p.x = tile(3)[1]; p.z = tile(3)[2];
 scan(p, [chooseMission(4)]);
 assert.equal(get(p, 'wanted_mission3complete'), 1, 'third scan completes after Solus flames');
 assert.equal(activeMission(p), 4);
-assert.deepEqual([p.level, p.x, p.z], [0, 2985, 3345], 'Savant returns the player to Falador');
+assert.deepEqual([p.level, p.x, p.z], [0, 2986, 3345], 'Savant returns the player to Falador');
+assert.equal(map.isMapBlocked(p.x, p.z, p.level), false, 'Flames rescue lands on a walkable packed-map tile');
+assert([[2985, 3345], [2987, 3345], [2986, 3344], [2986, 3346]].some(([x, z]) =>
+    !map.isMapBlocked(x, z, p.level) && map.findPath(p.level, p.x, p.z, x, z).length > 0),
+    'Flames rescue has a non-empty native path out on the packed map');
 p.level = tile(4)[0]; p.x = tile(4)[1]; p.z = tile(4)[2];
 scan(p, [chooseMission(5)]);
 assert.equal(get(p, 'wanted_mission4complete'), 1);

@@ -60,7 +60,7 @@ if ($count = ^wanted_flames_after_scans) {
     spotanim_pl(zamorak_flame, 0, 0);
     damage(uid, ^hitmark_damage, sub(stat(hitpoints), max(1, divide(stat(hitpoints), ^wanted_flames_hp_divisor))));
     npc_del;
-    p_teleport(0_46_52_41_17); // UNKNOWN reachable Falador castle courtyard staging.
+    p_teleport(0_46_52_42_17); // UNKNOWN reachable Falador castle courtyard staging.
     ~wanted_chase_next($mission);
     ~chatplayer("<p,neutral>Ow! What happened?");
     ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I managed to shield you from most of his attack, and bring you back to Falador Castle, but you are lucky I was monitoring, that could have killed you!");
@@ -93,7 +93,8 @@ if (inv_freespace(inv) = 0) return;
 def_int $next = 19;
 if (~wanted_chase_count < ^wanted_field_scan_count) {
     $next = add(2, random(17));
-    while (~wanted_chase_done($next) = 1) {
+    // UNKNOWN temporary exclusion while Q082 Dorgeshuun mine route is unbuilt; Tip.It 2 May 2006 allows chases without bone spear
+    while ($next = 11 | ~wanted_chase_done($next) = 1) {
         $next = add($next, 1);
         if ($next = 19) $next = 2;
     }
