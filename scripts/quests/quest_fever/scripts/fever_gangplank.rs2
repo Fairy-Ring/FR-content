@@ -1,15 +1,15 @@
-// UNKNOWN geometry landings. Original Cross operations and all client fields are unchanged.
+// UNKNOWN functional refusal and geometry landings. Original Cross operations and client fields are unchanged.
 
 [oploc1,fever_gangplank]
 if (%fever_quest < 1) {
-    mes("I don't think that whoever owns this ship will be happy with me wandering all over it.");
+    mes("Speak to Bill Teach before boarding.");
     return;
 }
 p_telejump(^fever_port_deck);
 
 [oploc1,fever_gangplank_exit]
 if (%fever_quest < 1) {
-    mes("I don't think that whoever owns this ship will be happy with me wandering all over it.");
+    mes("Speak to Bill Teach before boarding.");
     return;
 }
 ~fever_remove_supplies;

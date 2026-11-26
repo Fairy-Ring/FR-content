@@ -1,9 +1,19 @@
 // VERIFIED sequence: Tip.It guide captured 11 April 2006. UNKNOWN functional text and movement geometry.
 [oploc1,fever_ship_ladder]
+if (coordx(loc_coord) > 3000) {
+    if (loc_angle = 3) p_telejump(movecoord(loc_coord, 1, 1, 0));
+    else p_telejump(movecoord(loc_coord, 0, 1, -1));
+    return;
+}
 if (coordx(loc_coord) < 1820) p_telejump(^fever_own_deck);
 else p_telejump(^fever_enemy_deck);
 
 [oploc1,fever_ship_laddertop]
+if (coordx(loc_coord) > 3000) {
+    if (loc_angle = 3) p_telejump(movecoord(loc_coord, 1, -1, 0));
+    else p_telejump(movecoord(loc_coord, 0, -1, -1));
+    return;
+}
 if (coordx(loc_coord) < 1820) p_telejump(^fever_own_hold);
 else p_telejump(^fever_enemy_hold);
 
@@ -13,6 +23,7 @@ if (coordx(loc_coord) < 1820) p_telejump(^fever_own_mast);
 else p_telejump(^fever_enemy_mast);
 
 [oploc1,fever_climb_down_location]
+if (coordx(loc_coord) > 3000) { p_telejump(movecoord(loc_coord, -1, -1, 0)); return; }
 if (coordx(loc_coord) < 1820) p_telejump(^fever_own_deck);
 else p_telejump(^fever_enemy_deck);
 
@@ -26,8 +37,15 @@ if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
 if (last_useitem ! fever_rope & last_useitem ! rope) { ~displaymessage(^dm_default); return; }
 if (stat(agility) < 42) { mes("You need an Agility level of 42."); return; }
 inv_del(inv, last_useitem, 1);
-// Cache-backed Cabin Fever swing sequence; the landing geometry remains UNKNOWN.
+// Cache-backed player swing sequences; the two-tick crossing duration is UNKNOWN engineering timing.
 anim(fever_player_rope_swing_start, 0);
+p_delay(0);
+def_coord $landing = ^fever_own_deck;
+def_int $direction = ^exact_west;
+if (coordx(loc_coord) < 1820) { $landing = ^fever_enemy_deck; $direction = ^exact_east; }
+anim(fever_player_rope_swing_base_anim, 0);
+p_exactmove(coord, movecoord($landing, 0, 1, 0), 0, 60, $direction);
+p_delay(2);
 if (coordx(loc_coord) < 1820) {
     %fever_swing = 1;
     p_telejump(^fever_enemy_deck);
@@ -37,6 +55,7 @@ if (coordx(loc_coord) < 1820) {
     %fever_swing_2 = 1;
     p_telejump(^fever_own_deck);
 }
+anim(fever_player_rope_swing_land_success, 0);
 mes("You swing across to the other ship.");
 
 [oplocu,fever_gunpowder_barrel] @fever_sabotage_powder;

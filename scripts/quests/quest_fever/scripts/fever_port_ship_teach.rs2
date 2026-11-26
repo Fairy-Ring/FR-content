@@ -1,6 +1,6 @@
 // Cabin Fever east-dock Teach (fever_port_ship_teach 3157) @ 1, 3713, 3497.
-// CANDIDATE last-resort 2007-base: Eldevidian / pre-2022 ship block minus
-// Later Travel menu is not added; postquest travel remains inside Talk-to.
+// CANDIDATE ship dialogue: pre-2022 transcript. Later Travel menus are excluded.
+// Postquest travel remains inside the original Talk-to operation.
 // UNKNOWN landings are named constants checked on the packed collision map.
 
 [opnpc1,fever_port_ship_teach]
