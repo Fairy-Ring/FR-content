@@ -22,8 +22,10 @@ if (%agrith_quest = 80) {
 if (%agrith_quest = 90) {
     ~chatnpc("<p,scared>I don't want to go back in there!");
     if (~p_choice2("We need you to help summon Agrith-Naar back.", 1, "Not yet.", 2) = 1) {
+        def_string $speaker_name = npc_name;
+        def_npc $speaker = npc_type;
         %agrith_convinced_dave = 2;
-        ~chatnpc("<p,neutral>All right. I'll go back.");
+        ~chatnpc_specific($speaker_name, $speaker, "<p,neutral>All right. I'll go back.");
     }
     return;
 }

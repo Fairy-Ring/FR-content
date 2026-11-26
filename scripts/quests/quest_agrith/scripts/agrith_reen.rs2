@@ -13,8 +13,10 @@ if (%agrith_quest >= 80) {
     if (%agrith_quest >= 90 & %agrith_reen_uzer < 2) {
         ~chatnpc("<p,neutral>You need someone to help with the ritual?");
         if (~p_choice2("Please help us.", 1, "Not yet.", 2) = 1) {
+            def_string $speaker_name = npc_name;
+            def_npc $speaker = npc_type;
             %agrith_reen_uzer = 2;
-            ~chatnpc("<p,neutral>I will meet you in the throne room.");
+            ~chatnpc_specific($speaker_name, $speaker, "<p,neutral>I will meet you in the throne room.");
         }
     }
     ~agrith_sword_recovery;
