@@ -396,7 +396,7 @@
 [mapzone,0_29_72] @music_playbyregion(coord);
 [mapzone,0_30_68] @music_playbyregion(coord);
 [mapzone,0_30_72] @music_playbyregion(coord);
-[mapzone,0_30_73] @music_playbyregion(coord);
+[mapzone,0_30_73] if (~ratpits_venue(coord) ! 0) ~ratpits_enter; @music_playbyregion(coord);
 [mapzone,0_30_74] @music_playbyregion(coord);
 [mapzone,0_31_72] @music_playbyregion(coord);
 [mapzone,0_31_78] @music_playbyregion(coord);
@@ -457,11 +457,11 @@
 [mapzone,0_44_79] @music_playbyregion(coord);
 [mapzone,0_45_69] @music_playbyregion(coord);
 [mapzone,0_45_77] @music_playbyregion(coord);
-[mapzone,0_45_79] @music_playbyregion(coord);
+[mapzone,0_45_79] if (~ratpits_venue(coord) ! 0) ~ratpits_enter; @music_playbyregion(coord);
 [mapzone,0_45_155] @music_playbyregion(coord);
 [mapzone,0_46_81] @music_playbyregion(coord);
 [mapzone,0_46_148] @music_playbyregion(coord);
-[mapzone,0_46_150] @music_playbyregion(coord);
+[mapzone,0_46_150] if (~ratpits_venue(coord) ! 0) ~ratpits_enter; @music_playbyregion(coord);
 [mapzone,0_46_154] @music_playbyregion(coord);
 [mapzone,0_47_75] @music_playbyregion(coord);
 [mapzone,0_47_79] @music_playbyregion(coord);

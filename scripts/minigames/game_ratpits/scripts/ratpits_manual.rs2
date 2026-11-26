@@ -1,0 +1,20 @@
+// CANDIDATE book reconstruction: verbatim rules prose in the retained RuneHQ
+// Rat Pits guide captured 18 April 2006, not an authenticated book transcript.
+// The book identity is VERIFIED cache 377; pagination/title layout is UNKNOWN.
+[opheld1,ratpits_manual]
+%book_page = 0;
+%open_book = ratpits_manual;
+@book_flip_page(0, 0, ^ratpits_manual_last_page, ratpits_manual_page);
+
+[proc,ratpits_manual_page]
+switch_int (%book_page) {
+    case 0 : ~book("The book of Rats.", "Disclaimer/Warning||Rat Pit fighting is dangerous for the ill prepared. Lots of cats have died taking part in the past and many more will surely die in the future. This needless death can be avoided completely by adopting the correct precautions.");
+    case 1 : ~book("The book of Rats.", "Objective||The aim of rat pit fighting is to train your cat in a fun and profitable manner. Rules vary from pit to pit. Each pit allows a certain type of cat to fight there.");
+    case 2 : ~book("The book of Rats.", "How to challenge||To compete you must have the correct type of cat for the pit and have some spare change. If you have both of these, you can challenge another cat trainer. The player you challenge must also posses the correct type of cat and some money. Before you proceed to the bidding stage, tactics should be discussed with your cat.");
+    case 3 : ~book("The book of Rats.", "Tactics||A player should tell his cat what sort of strategy he should adopt. To do this competitors must wear an Amulet of Catspeak when initiating a fight and accepting a challenge. Cautious tactics should be adopted by those who are unwilling to part with their cat.");
+    case 4 : ~book("The book of Rats.", "Using these tactics will aid the cat in terms of increased defence bonuses but penalize them as their cats will get out of the pits rather than risking death. Using no tactics or aggressive tactics will result in your cat fighting to the death. Aggressive tactics increase your cat's attack levels.");
+    case 5 : ~book("The book of Rats.", "Bidding||Once a challenge has been accepted and both cats advised on tactics, the bidding takes place. Both owners can place a small wager on the outcome of the match. This wager must be the same for both sides.");
+    case 6 : ~book("The book of Rats.", "Winning and losing||Rules differ for each pit, in the kitten pits of Ardougne, the first cat to kill 5 rats is declared the winner. This number varies throughout the other pits. If your cat dies during a fight or runs away, your opponent is declared the winner.");
+    case 7 : ~book("The book of Rats.", "Cats tire quickly and after a certain period of time they become too exhausted to continue fighting. In this case, the cat with the highest number of kills is declared the winner. If both cats have killed the same number of rats, the match is declared a draw.");
+    case 8 : ~book("The book of Rats.", "Benefits||Winning a rat pit fight increases cats' happiness, matures them faster, improves their hunting skills and keeps them more active. Even losing in a fight will benefit your cat (provided he doesn't die). As with everything in life, it's the taking part that matters.");
+}

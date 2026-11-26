@@ -1,0 +1,9 @@
+// IF_SETNPCHEAD has no secondary-player form. Each participant initializes
+// the original HUD once on its own queue, not on every combat timer tick.
+[queue,ratpits_heads]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 2) return;
+if (.finduid(~ratpits_opponent) = false) return;
+if (%follower_obj = null | .%follower_obj = null) return;
+if_setnpchead(cat_defeated:com_2, oc_param(%follower_obj, follower_id));
+if_setnpchead(cat_defeated:com_3, oc_param(.%follower_obj, follower_id));

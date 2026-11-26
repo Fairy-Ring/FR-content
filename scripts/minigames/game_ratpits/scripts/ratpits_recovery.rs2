@@ -1,0 +1,25 @@
+// UNKNOWN favourable recovery: an absent trainer aborts rather than loses a
+// wager. Their saved purse and follower item remain claimable on next login.
+// Release the native venue controller even when no logout callback remains.
+[proc,ratpits_missing]
+def_npc_uid $host = npc_uid;
+if (%ratpits_player_a ! null) {
+    if (finduid(%ratpits_player_a) = false) {
+        %ratpits_result = 0;
+        %ratpits_phase = 3;
+        %ratpits_player_a = null;
+        def_npc_uid $cat_a = %ratpits_cat_a;
+        if (npc_finduid($cat_a) = true) npc_del;
+        if (npc_finduid($host) = false) return;
+    }
+}
+if (%ratpits_player_b ! null) {
+    if (finduid(%ratpits_player_b) = false) {
+        %ratpits_result = 0;
+        %ratpits_phase = 3;
+        %ratpits_player_b = null;
+        def_npc_uid $cat_b = %ratpits_cat_b;
+        if (npc_finduid($cat_b) = true) npc_del;
+        if (npc_finduid($host) = false) return;
+    }
+}

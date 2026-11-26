@@ -1,4 +1,5 @@
 [opplayer1,_]
+if (~ratpits_venue(coord) ! 0) { ~ratpits_challenge; return; }
 if (.busy = true) {
     mes("Other player is busy at the moment."); // https://youtu.be/YkJQDvB14-U?t=26
     return;

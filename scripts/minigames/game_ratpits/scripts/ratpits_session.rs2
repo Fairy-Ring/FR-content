@@ -1,0 +1,353 @@
+// Rat Pits research subject: rat-pits. All unsourced UI text below is minimal
+// UNKNOWN functional system wording, not reconstructed character dialogue.
+// UNKNOWN engineering phases: 0 idle, 1 mutual offer, 2 race, 3 settlement.
+// Original server-only slot 283 is solely the native host's active session UID.
+[proc,ratpits_session]()(boolean)
+if (%varp283_unused = null) return(false);
+if (npc_uid ! %varp283_unused) return(false);
+if (%ratpits_phase = 0) return(false);
+if (%ratpits_player_a ! uid & %ratpits_player_b ! uid) return(false);
+return(true);
+
+[proc,ratpits_challenge]
+def_int $venue = ~ratpits_venue(coord);
+if (.uid = uid | $venue = 0 | ~ratpits_venue(.coord) ! $venue) return;
+if (~ratpits_eligible($venue) = false) return;
+if (%varp283_unused ! null) {
+    if (npc_finduid(%varp283_unused) = true) {
+        if (~ratpits_session = true) {
+            if ((%ratpits_player_a = .uid | %ratpits_player_b = .uid) & %ratpits_phase = 1) ~ratpits_offer_open;
+            return;
+        }
+    }
+    %varp283_unused = null;
+}
+if (.%varp283_unused ! null | .busy = true) {
+    mes("Opponent unavailable.");
+    return;
+}
+~ratpits_claim;
+if (inv_total(ratpits_purse, coins) > 0) return;
+if (npc_find(~ratpits_lobby($venue), ~ratpits_host($venue), 30, 0) = false) return;
+if (%ratpits_phase ! 0) {
+    mes("Pit occupied.");
+    return;
+}
+%ratpits_phase = 1;
+%ratpits_venue = $venue;
+%ratpits_player_a = uid;
+%ratpits_player_b = .uid;
+%ratpits_stake = ~ratpits_min_stake($venue);
+%ratpits_accept_a = 0;
+%ratpits_accept_b = 0;
+%ratpits_cat_a = null;
+%ratpits_cat_b = null;
+%ratpits_rat_a = null;
+%ratpits_rat_b = null;
+%ratpits_score_a = 0;
+%ratpits_score_b = 0;
+%ratpits_style_a = -1;
+%ratpits_style_b = -1;
+%ratpits_result = 0;
+%ratpits_deadline = add(map_clock, ^ratpits_offer_ticks);
+%ratpits_dead_a = 0;
+%ratpits_dead_b = 0;
+%varp283_unused = npc_uid;
+.%varp283_unused = npc_uid;
+npc_settimer(1);
+.mes("Rat Pits challenge: <displayname>. Use Challenge to view the wager.");
+~ratpits_offer_open;
+
+[proc,ratpits_offer_open]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 1) return;
+def_int $style = %ratpits_style_a;
+if (%ratpits_player_b = uid) $style = %ratpits_style_b;
+if ($style = -1) {
+    $style = 0;
+    if (inv_total(worn, ics_little_amulet_of_catspeak) > 0) $style = ~ratpits_choose_tactic;
+    // The NPC may have timed out or the other trainer may have left while
+    // the player selected a tactic. Never use a pre-dialogue session pointer.
+    if (~ratpits_session = false | %ratpits_phase ! 1) return;
+    if (%ratpits_player_a = uid) %ratpits_style_a = $style;
+    else %ratpits_style_b = $style;
+}
+if_settext(players_cat:com_8, "<displayname>");
+if (.finduid(~ratpits_opponent) = true) {
+    .mes("Rat Pits wager: <tostring(%ratpits_stake)> coins each.");
+    if_settext(players_cat:com_9, "<.displayname>");
+    if (.%follower_obj ! null) if_setnpchead(players_cat:com_2, oc_param(.%follower_obj, follower_id));
+}
+if (%follower_obj ! null) if_setnpchead(players_cat:com_1, oc_param(%follower_obj, follower_id));
+if_settext(players_cat:com_15, tostring(%ratpits_stake));
+if_settext(players_cat:com_16, tostring(%ratpits_stake));
+if_openmain(players_cat);
+
+[proc,ratpits_opponent]()(player_uid)
+if (%ratpits_player_a = uid) return(%ratpits_player_b);
+return(%ratpits_player_a);
+
+[if_button,players_cat:com_19] ~ratpits_wager(-1);
+[if_button,players_cat:com_20] ~ratpits_wager(1);
+[if_button,players_cat:com_6] ~ratpits_accept;
+[if_button,players_cat:com_7] ~ratpits_cancel;
+
+[proc,ratpits_wager](int $direction)
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 1) return;
+if (%ratpits_accept_a = 1 | %ratpits_accept_b = 1) {
+    mes("Wager accepted. Decline to change it.");
+    return;
+}
+def_int $stake = add(%ratpits_stake, multiply($direction, ^ratpits_wager_step));
+if ($stake < ~ratpits_min_stake(%ratpits_venue) | $stake > ~ratpits_max_stake(%ratpits_venue)) return;
+%ratpits_stake = $stake;
+if_settext(players_cat:com_15, tostring($stake));
+if_settext(players_cat:com_16, tostring($stake));
+if (.finduid(~ratpits_opponent) = true) {
+    .if_settext(players_cat:com_15, tostring($stake));
+    .if_settext(players_cat:com_16, tostring($stake));
+}
+
+[proc,ratpits_accept]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 1) return;
+if (~ratpits_eligible(%ratpits_venue) = false) {
+    ~ratpits_cancel;
+    return;
+}
+if (inv_total(inv, coins) < %ratpits_stake) {
+    mes("Not enough coins.");
+    return;
+}
+if (inv_total(ratpits_purse, coins) > 0) {
+    ~ratpits_claim;
+    return;
+}
+if (%ratpits_player_a = uid) %ratpits_accept_a = 1;
+else %ratpits_accept_b = 1;
+if_close;
+mes("Wager accepted. Waiting for opponent.");
+
+[if_close,players_cat]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase ! 1) return;
+if (%ratpits_player_a = uid & %ratpits_accept_a = 1) return;
+if (%ratpits_player_b = uid & %ratpits_accept_b = 1) return;
+~ratpits_cancel;
+
+[proc,ratpits_cancel]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false) return;
+if (%ratpits_phase = 3) return;
+if (%ratpits_phase = 2) {
+    if (inv_total(worn, ics_little_amulet_of_catspeak) = 0) {
+        mes("A worn Catspeak amulet is required to call your cat back.");
+        return;
+    }
+    ~ratpits_forfeit;
+    return;
+} else {
+    %ratpits_result = 0;
+}
+%ratpits_phase = 3;
+if_close;
+
+// A deliberate departure settles its financial loss before another input can
+// turn it into a disconnect refund. Only the private escrow is unprotected.
+[proc,ratpits_forfeit]
+if (npc_finduid(%varp283_unused) = false) return;
+if (~ratpits_session = false | %ratpits_phase = 3) return;
+if (%ratpits_phase = 1) { ~ratpits_cancel; return; }
+if (.finduid(~ratpits_opponent) = false) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    return;
+}
+if (.%varp283_unused ! npc_uid) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    return;
+}
+def_int $stake = inv_total(ratpits_purse, coins);
+inv_del(ratpits_purse, coins, $stake);
+.inv_add(ratpits_purse, coins, $stake);
+if (%ratpits_player_a = uid) %ratpits_result = 2;
+else %ratpits_result = 1;
+%ratpits_phase = 3;
+if_close;
+
+// The host selects both protected players only after both accepted panels closed.
+// No yield occurs between the last validation, both debits, and phase transition.
+[proc,ratpits_start]
+if (%ratpits_phase ! 1 | %ratpits_accept_a ! 1 | %ratpits_accept_b ! 1) return;
+if (p_finduid(%ratpits_player_a) = false) return;
+if (.p_finduid(%ratpits_player_b) = false) return;
+if (~ratpits_pair_ready = false) {
+    %ratpits_result = 0;
+    %ratpits_phase = 3;
+    return;
+}
+inv_del(inv, coins, %ratpits_stake);
+inv_add(ratpits_purse, coins, %ratpits_stake);
+.inv_del(inv, coins, %ratpits_stake);
+.inv_add(ratpits_purse, coins, %ratpits_stake);
+%ratpits_phase = 2;
+%ratpits_deadline = add(map_clock, ^ratpits_match_ticks);
+%ratpits_fatigue_at = add(map_clock, ^ratpits_fatigue_ticks);
+%ratpits_cat_a = %follower_uid;
+%ratpits_cat_b = .%follower_uid;
+cleartimer(petcat_growth);
+.cleartimer(petcat_growth);
+~ratpits_place_cats;
+~ratpits_spawn_rat(1);
+~ratpits_spawn_rat(2);
+if_openoverlay(cat_defeated);
+.if_openoverlay(cat_defeated);
+if_sethide(cat_defeated:com_7, true);
+.if_sethide(cat_defeated:com_7, true);
+queue(ratpits_heads, 0, 0);
+.queue(ratpits_heads, 0, 0);
+~ratpits_progress;
+mes("Rat Pits match started.");
+.mes("Rat Pits match started.");
+npc_settimer(^ratpits_combat_interval);
+
+[proc,ratpits_pair_ready]()(boolean)
+if (.uid = uid | %varp283_unused ! npc_uid | .%varp283_unused ! npc_uid) return(false);
+if (~ratpits_venue(coord) ! %ratpits_venue | ~ratpits_venue(.coord) ! %ratpits_venue) return(false);
+if (~ratpits_eligible(%ratpits_venue) = false) return(false);
+if (.%ratcatch_var < ^ratcatch_complete | .%follower_obj = null) return(false);
+if (~ratpits_cat_stage(.%follower_obj) ! %ratpits_venue) return(false);
+if (.npc_finduid(.%follower_uid) = false) return(false);
+if (.%npc_attacking_uid ! .uid) return(false);
+if (.npc_type ! oc_param(.%follower_obj, follower_id)) return(false);
+if (~ratpits_cat_health(%follower_uid) <= 0 | ~ratpits_cat_health(.%follower_uid) <= 0) return(false);
+if (%ratpits_stake < ~ratpits_min_stake(%ratpits_venue) | %ratpits_stake > ~ratpits_max_stake(%ratpits_venue)) return(false);
+if (inv_total(inv, coins) < %ratpits_stake | .inv_total(inv, coins) < %ratpits_stake) return(false);
+if (inv_total(ratpits_purse, coins) ! 0 | .inv_total(ratpits_purse, coins) ! 0) return(false);
+return(true);
+
+[proc,ratpits_finish]
+if (%ratpits_phase ! 3) return;
+// A declined or expired offer can still have the other trainer's panel open.
+// Close it through the unprotected UI pointer before acquiring both players.
+if (finduid(%ratpits_player_a) = true) if_close;
+if (.finduid(%ratpits_player_b) = true) .if_close;
+if (%ratpits_result ! 0) {
+    if (p_finduid(%ratpits_player_a) = false) return;
+    if (.p_finduid(%ratpits_player_b) = false) return;
+    if (%ratpits_dead_a = 0 & %follower_uid = %ratpits_cat_a & ~ratpits_cat_health(%ratpits_cat_a) > 0) {
+        %cat_growth = ~ratpits_growth_reward(%cat_growth, %follower_obj, %ratpits_score_a);
+    }
+    if (%ratpits_dead_b = 0 & .%follower_uid = %ratpits_cat_b & ~ratpits_cat_health(%ratpits_cat_b) > 0) {
+        .%cat_growth = ~ratpits_growth_reward(.%cat_growth, .%follower_obj, %ratpits_score_b);
+    }
+    def_int $pot = add(inv_total(ratpits_purse, coins), .inv_total(ratpits_purse, coins));
+    inv_clear(ratpits_purse);
+    .inv_clear(ratpits_purse);
+    if (%ratpits_result = 1) {
+        inv_add(ratpits_purse, coins, $pot);
+        mes("Wager won.");
+        .mes("Wager lost.");
+    } else {
+        .inv_add(ratpits_purse, coins, $pot);
+        .mes("Wager won.");
+        mes("Wager lost.");
+    }
+    // Ledger transfer is atomic. Release separately without further transfers.
+    %ratpits_result = 0;
+}
+if (%ratpits_player_a ! null) {
+    if (p_finduid(%ratpits_player_a) = true) ~ratpits_release;
+}
+if (%ratpits_player_b ! null) {
+    if (p_finduid(%ratpits_player_b) = true) ~ratpits_release;
+}
+if (%ratpits_player_a = null & %ratpits_player_b = null) {
+    ~ratpits_remove_rats;
+    %ratpits_phase = 0;
+    npc_settimer(0);
+}
+
+[proc,ratpits_release]
+%varp283_unused = null;
+if_close;
+if_openoverlay(null);
+def_npc_uid $host = npc_uid;
+def_int $dead = %ratpits_dead_a;
+def_npc_uid $cat = %ratpits_cat_a;
+if (%ratpits_player_b = uid) { $dead = %ratpits_dead_b; $cat = %ratpits_cat_b; }
+if (~ratpits_cat_health($cat) = 0) $dead = 1;
+if ($dead = 1 & %follower_uid = $cat) {
+    if (npc_finduid($cat) = true) npc_del;
+    %follower_uid = null;
+    %follower_obj = null;
+    %cat_growth = setbit_range_toint(%cat_growth, 0, 0, 26);
+    cleartimer(petcat_growth);
+    if_openoverlay(cat_defeated);
+    if_sethide(cat_defeated:com_7, false);
+    softtimer(ratpits_result_close, ^ratpits_result_ticks);
+    mes("Cat defeated.");
+} else if (%follower_uid = $cat) {
+    if (npc_finduid($cat) = true) {
+        ~ratpits_cat_restore;
+        npc_setmode(none);
+        npc_telejump(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk));
+        npc_setmode(playerfollow);
+        npc_settimer(1);
+        settimer(petcat_growth, 150);
+    }
+}
+if (npc_finduid($host) = false) return;
+if (%ratpits_player_a = uid) %ratpits_player_a = null;
+if (%ratpits_player_b = uid) %ratpits_player_b = null;
+~ratpits_claim;
+mes("Rat Pits match ended.");
+
+[proc,ratpits_claim]
+if (%varp283_unused ! null) return;
+def_int $owed = inv_total(ratpits_purse, coins);
+if ($owed <= 0) return;
+if (inv_itemspace(inv, coins, $owed, inv_size(inv)) = true) {
+    inv_del(ratpits_purse, coins, $owed);
+    inv_add(inv, coins, $owed);
+} else if (inv_itemspace(bank, coins, $owed, inv_size(bank)) = true) {
+    inv_del(ratpits_purse, coins, $owed);
+    inv_add(bank, coins, $owed);
+} else {
+    mes("Wager credit retained. Make room for coins, then speak to the pit host.");
+}
+
+[proc,ratpits_logout]
+if (npc_finduid(%varp283_unused) = true) {
+    if (~ratpits_session = true) {
+        // UNKNOWN favourable disconnect policy: abort/refund rather than
+        // charge an absent owner. The permanent purse retains unpaid credit.
+        %ratpits_result = 0;
+        %ratpits_phase = 3;
+        ~ratpits_release;
+        // The host timer releases the opponent in its own context. Do not
+        // switch the caller of shared logout, ladder or mapzone handlers.
+        if (%ratpits_player_a = null & %ratpits_player_b = null) {
+            ~ratpits_remove_rats;
+            %ratpits_phase = 0;
+            npc_settimer(0);
+        }
+        return;
+    }
+}
+%varp283_unused = null;
+~ratpits_claim;
+
+[proc,ratpits_login]
+%varp283_unused = null;
+// Inventory reads materialize a container. Only venue login needs recovery;
+// retained credit outside a venue remains claimable from its pit host.
+if (~ratpits_venue(coord) = 0) return;
+~ratpits_claim;
+set_player_op("Challenge", 1, ^false);
+
+[softtimer,ratpits_result_close]
+clearsofttimer(ratpits_result_close);
+if (%varp283_unused = null) if_openoverlay(null);

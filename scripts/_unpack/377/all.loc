@@ -60950,23 +60950,6 @@ model=vc_mousetrap
 model2=vc_mousetrap_set
 anim=mousetrap_spring
 
-[vc_barrel_bar]
-name=Barrel
-desc=A wooden barrel full of beer.
-model=loc_7436
-recol1s=13605
-recol1d=9476
-recol2s=12548
-recol2d=8419
-recol3s=11491
-recol3d=6305
-recol4s=10434
-recol4d=7362
-recol5s=7297
-recol5d=5249
-blockrange=no
-ambient=25
-
 [vc_barrel_bar_tap]
 name=Barrel
 desc=A wooden barrel full of stale beer.
@@ -60984,24 +60967,6 @@ recol5s=7297
 recol5d=5249
 ambient=25
 blockrange=no
-
-[vc_bar]
-name=Bar pumps
-desc=Actually, I could do with a drink...
-model=ahoy_bar
-model2=ahoy_bari2
-recol1s=19912
-recol1d=9476
-recol2s=18854
-recol2d=8419
-recol3s=18821
-recol3d=6305
-recol4s=16741
-recol4d=7362
-recol5s=15684
-recol5d=7328
-recol6s=11490
-recol6d=8418
 
 [vc_bar_stool]
 name=Stool
@@ -61035,93 +61000,6 @@ recol6s=9410
 recol6d=4256
 ambient=20
 category=empty_crate
-
-[vc_rat_valve_dwarf]
-name=Rat lever
-desc=Opens the rat door.
-model=vc_rat_valve_dwarf
-active=yes
-anim=vc_rat_valve
-forceapproach=south
-
-[vc_rat_house_dwarf]
-name=Rat barn
-desc=Contains many rats.
-model=vc_rat_house_dwarf
-recol1s=10533
-recol1d=6343
-recol2s=9476
-recol2d=5318
-recol3s=8419
-recol3d=6341
-recol4s=7362
-recol4d=5284
-recol5s=6305
-recol5d=4227
-recol6s=5249
-recol6d=3170
-active=yes
-anim=vc_rat_wriggle
-width=3
-length=2
-
-[vc_rat_barrel_dwarf]
-name=Rat barrel
-desc=Contains rats.
-model=vc_rat_barrel_dwarf
-recol1s=9511
-recol1d=11726
-recol2s=8419
-recol2d=5318
-recol3s=8418
-recol3d=6341
-recol4s=8386
-recol4d=5284
-recol5s=7330
-recol5d=4227
-recol6s=7297
-recol6d=3170
-active=yes
-anim=vc_rats_in_barrel
-
-[vc_rat_barrel2_dwarf]
-name=Rat barrel
-desc=Empty.
-model=vc_rat_barrel_dwarf
-recol1s=9511
-recol1d=11726
-recol2s=8419
-recol2d=5318
-recol3s=8418
-recol3d=6341
-recol4s=8386
-recol4d=5284
-recol5s=7330
-recol5d=4227
-recol6s=7297
-recol6d=3170
-active=yes
-resizex=110
-resizey=140
-resizez=110
-
-[vc_rat_barrel3_dwarf]
-name=Rat barrel
-desc=Empty.
-model=vc_rat_barrel_dwarf
-recol1s=9511
-recol1d=11726
-recol2s=8419
-recol2d=5318
-recol3s=8418
-recol3d=6341
-recol4s=8386
-recol4d=5284
-recol5s=7330
-recol5d=4227
-recol6s=7297
-recol6d=3170
-active=yes
 
 [vc_sacks_dwarf]
 name=Sacks
@@ -61186,30 +61064,6 @@ active=yes
 op1=Climb-up
 mapscene=7
 forceapproach=north
-
-[vc_rat_barrel]
-name=Rat barrel
-desc=Contains rats.
-model=vc_rat_barrel_dwarf
-active=yes
-anim=vc_rats_in_barrel
-
-[vc_rat_valve]
-name=Rat lever
-desc=Opens the rat door.
-model=vc_rat_valve_dwarf
-active=yes
-anim=vc_rat_valve
-forceapproach=west
-
-[vc_rat_house]
-name=Rat barn
-desc=Contains many rats.
-model=vc_rat_house_dwarf
-active=yes
-anim=vc_rat_wriggle
-width=3
-length=2
 
 [vc_sacks]
 name=Sacks

@@ -125,6 +125,7 @@ if (~swamp_cave_inside(coord) = true) ~swamp_cave_start;
 ~giant_mole_environment_start;
 ~dt_pyramid_start;
 if (~dwarfrock_in_mine = true) settimer(dwarfrock_inside, 1);
+~ratpits_login;
 queue(follower_login, 0, 0);
 // CoF gardener: directions is packed perm; follower uid is temp. Restore courtyard multi.
 queue(fenk_on_login_cleanup, 0, 0);

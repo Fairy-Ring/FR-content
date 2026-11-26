@@ -37,6 +37,7 @@ mes("Enter by the ladder beside Jimmy's house, avoid the guards' sight, and use 
 mes("The west mansion door returns to Jimmy.");
 
 [oploc1,vc_ladder_down]
+if (loc_coord = ^ratcatch_mansion_town_ladder & %ratcatch_var >= ^ratcatch_complete) { ~ratpits_entrance(1); return; }
 if (loc_coord ! ^ratcatch_mansion_town_ladder | %ratcatch_var ! ^ratcatch_mansion_stage_active) return;
 if (inv_total(inv, ratcatchers_party_directions) = 0) {
     mes("Ask Jimmy for his directions."); // UNKNOWN functional message.
