@@ -19785,6 +19785,11 @@ resizev=40
 param=death_anim,cat_death
 
 [kittenpet1]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=4
+attack=1
+strength=1
+defence=0
 name=Kitten
 desc=A friendly little pet.
 model1=npc_lostkitten
@@ -19809,6 +19814,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [kittenpet_light]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=4
+attack=1
+strength=1
+defence=0
 name=Kitten
 desc=A friendly little pet.
 model1=npc_lostkitten
@@ -19839,6 +19849,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [kittenpet_brown]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=4
+attack=1
+strength=1
+defence=0
 name=Kitten
 desc=A friendly little pet.
 model1=npc_lostkitten
@@ -19869,6 +19884,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [kittenpet_black]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=4
+attack=1
+strength=1
+defence=0
 name=Kitten
 desc=A friendly little pet.
 model1=npc_lostkitten
@@ -19899,6 +19919,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [kittenpet_browngrey]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=4
+attack=1
+strength=1
+defence=0
 name=Kitten
 desc=A friendly little pet.
 model1=npc_lostkitten
@@ -19927,6 +19952,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [kittenpet_bluegrey]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=4
+attack=1
+strength=1
+defence=0
 name=Kitten
 desc=A friendly little pet.
 model1=npc_lostkitten
@@ -19966,6 +19996,11 @@ timer=25
 blockwalk=all
 members=yes
 [growncat]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=6
+attack=4
+strength=3
+defence=0
 name=Cat
 desc=A fully grown feline.
 model1=npc_gertrudescat
@@ -19989,6 +20024,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [growncat_light]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=6
+attack=4
+strength=3
+defence=0
 name=Cat
 desc=A fully grown feline.
 model1=npc_gertrudescat
@@ -20018,6 +20058,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [growncat_brown]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=6
+attack=4
+strength=3
+defence=0
 name=Cat
 desc=A fully grown feline.
 model1=npc_gertrudescat
@@ -20047,6 +20092,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [growncat_black]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=6
+attack=4
+strength=3
+defence=0
 name=Cat
 desc=A fully grown feline.
 model1=npc_gertrudescat
@@ -20076,6 +20126,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [growncat_browngrey]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=6
+attack=4
+strength=3
+defence=0
 name=Cat
 desc=A fully grown feline.
 model1=npc_gertrudescat
@@ -20103,6 +20158,11 @@ maxrange=30000
 timer=1
 blockwalk=none
 [growncat_bluegrey]
+// CANDIDATE combat profile: Mod Ash 2020 cat stats, retained by Wily_cat/Lazy_cat.
+hitpoints=6
+attack=4
+strength=3
+defence=0
 name=Cat
 desc=A fully grown feline.
 model1=npc_gertrudescat
