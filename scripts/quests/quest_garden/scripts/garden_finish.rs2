@@ -72,7 +72,7 @@ if (inv_total(inv, apple_tree_seed) = 0) { $spaces = add($spaces, 1); }
 if (inv_total(inv, acorn) = 0) { $spaces = add($spaces, 1); }
 if (inv_total(inv, guam_seed) = 0) { $spaces = add($spaces, 1); }
 if (inv_freespace(inv) < $spaces) {
-    ~chatnpc("<p,neutral>Make room in your inventory for your reward, peasant.");
+    mes("You don't have enough inventory space.");
     return;
 }
 ~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>This is murder on my hay fever you know...");

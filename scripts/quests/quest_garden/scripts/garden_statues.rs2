@@ -148,8 +148,8 @@ if (distance(npc_coord, $plinth) > 1) {
     return;
 }
 if (inv_freespace(inv) = 0) {
-    // UNKNOWN inventory retry message. Do not place or lose the trolley.
-    mes("You need room in your inventory for the trolley.");
+    // Use the ordinary Farming inventory-space message for this retry.
+    mes("You don't have enough inventory space.");
     return;
 }
 if (npc_type = garden_trolley_saradomin) {
