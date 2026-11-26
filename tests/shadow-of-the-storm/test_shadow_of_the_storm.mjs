@@ -1028,32 +1028,44 @@ check('Prysin keeps Demon Slayer recovery and hard-clue priority, then charges e
     addItem(player, 'coins', 500);
     nativeNpc(player, prysin, [2, 2, 2], 'the original 500-coin Silverlight recovery');
     assert.equal(itemCount(player, 'silverlight'), 1);
-    assert.equal(itemCount(player, 'coins'), 0);
-    assert.equal(itemCount(player, 'darklight'), 0);
+    assert.equal(itemCount(player, 'coins'), 0, 'ordinary Silverlight recovery spends all 500 coins');
+    assert.equal(itemCount(player, 'darklight'), 0, 'unfinished Agrith never supplies Darklight');
     removeItem(player, 'silverlight');
     setPlayerVariable(player, 'agrith_quest', 125);
     addItem(player, 'coins', 999);
     nativeNpc(player, prysin, [1], 'insufficient Darklight recovery coins');
-    assert.equal(itemCount(player, 'darklight'), 0);
+    assert.equal(itemCount(player, 'darklight'), 0, '999 coins cannot buy Darklight');
     assert.equal(itemCount(player, 'coins'), 999);
     addItem(player, 'coins');
     nativeNpc(player, prysin, [1], 'pay exactly 1000 for Darklight');
     assert.equal(itemCount(player, 'darklight'), 1);
-    assert.equal(itemCount(player, 'coins'), 0);
+    assert.equal(itemCount(player, 'coins'), 0, 'Darklight recovery spends exactly 1000 coins');
     addItem(player, 'coins', 1000);
     nativeNpc(player, prysin, [], 'no duplicate Darklight purchase');
     assert.equal(itemCount(player, 'darklight'), 1);
     assert.equal(itemCount(player, 'coins'), 1000);
     removeItem(player, 'darklight');
     addItem(player, 'trail_clue_hard_riddle015');
-    nativeNpc(player, prysin, [], 'hard clue takes precedence over Darklight purchase');
-    assert.equal(itemCount(player, 'trail_clue_hard_riddle015'), 0);
-    assert.equal(itemCount(player, 'darklight'), 0);
+    const clues = types.EnumType.getByName('trail_hard_enum');
+    assert(clues, 'the real packed hard-clue enum exists');
+    const alternative = [...clues.values].find(([key, value]) =>
+      key >= 0 && key < clues.values.size && value !== itemId('trail_clue_hard_riddle015'));
+    assert(alternative, 'the packed hard-clue enum contains a different next clue');
+    const realRandom = JavaRandom.nextDouble;
+    JavaRandom.nextDouble = () => (alternative[0] + 0.5) / clues.values.size;
+    try {
+      nativeNpc(player, prysin, [], 'hard clue takes precedence over Darklight purchase');
+    } finally {
+      JavaRandom.nextDouble = realRandom;
+    }
+    assert.equal(itemCount(player, 'trail_clue_hard_riddle015'), 0, 'the deterministic next clue differs from the supplied clue');
+    assert.equal(itemCount(player, types.ObjType.get(alternative[1]).debugname), 1, 'the real clue route supplies its native next clue');
+    assert.equal(itemCount(player, 'darklight'), 0, 'the hard-clue route never falls through to a Darklight sale');
     assert.equal(itemCount(player, 'coins'), 1000);
     setPlayerVariable(player, 'demonstart', 0);
     nativeNpc(player, prysin, [1], 'unfinished Demon Slayer is not pre-empted by Agrith completion');
-    assert.equal(playerVariable(player, 'demonstart'), 0);
-    assert.equal(itemCount(player, 'darklight'), 0);
+    assert.equal(playerVariable(player, 'demonstart'), 0, 'Prysin preserves the unstarted Demon Slayer stage');
+    assert.equal(itemCount(player, 'darklight'), 0, 'Agrith completion never pre-empts unfinished Demon Slayer');
   } finally { cleanupQuestRun(player, actors); }
 });
 
