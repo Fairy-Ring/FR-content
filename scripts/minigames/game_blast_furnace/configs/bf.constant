@@ -13,7 +13,7 @@
 ^bf_break_pulses = 40
 ^bf_work_smithing_xp = 10
 ^bf_overheat_damage = 5
-// CANDIDATE limits from the original 2007-base storage rules, not varbit widths.
+// UNKNOWN limits from the brief's defaults; the retained period source gives no capacity.
 ^bf_ore_capacity = 28
 ^bf_coal_capacity = 254
 // Original all.varbit uses bits0..23 of blast_furnace_5 only. Client readers
