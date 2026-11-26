@@ -154,7 +154,8 @@ if (p_finduid(uid) = true) {
         ~mesbox("This emote can be unlocked by doing an Easter seasonal event."); // TODO: confirm for 2005-2006
         return;
     }
-    // @controls_emote(bunny_hop);
+    // CANDIDATE name mapping: Rune-Server Helpful Stuff; original 377 frames.
+    @controls_emote(seq_3866);
 }
 
 [label,controls_emote](seq $anim)

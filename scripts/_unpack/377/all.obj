@@ -76183,17 +76183,6 @@ model=obj_win05_marionette_stage4_red
 2dxan=282
 weight=800g
 
-[peach]
-name=Peach
-desc=A tasty fruit.
-model=obj_peach
-iop1=Eat
-members=yes
-2dzoom=912
-2dyan=1876
-2dxan=174
-weight=10g
-
 [60_bones_peaches]
 model=obj_trail_clue_easy_simple001
 2dxof=1

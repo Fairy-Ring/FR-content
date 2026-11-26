@@ -1,0 +1,13 @@
+[peach]
+name=Peach
+desc=A tasty fruit.
+model=obj_peach
+iop1=Eat
+members=yes
+2dzoom=912
+2dyan=1876
+2dxan=174
+weight=10g
+// CANDIDATE server properties: OSRS Peach is untradeable and normal food.
+category=category_58
+tradeable=no

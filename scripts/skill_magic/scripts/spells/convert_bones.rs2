@@ -1,10 +1,18 @@
 [if_button,magic:bones_to_bananas] @magic_spell_convert_bones(^bones_to_bananas); //bones to bananas
+[if_button,magic:com_559] @magic_spell_convert_bones(^bones_to_peaches);
 
 
-// handles converting bones to bananas. will handle bones to peaches later on too.
+// Both spells use their own requirements and effects, including inside MTA.
 [label,magic_spell_convert_bones](int $spell)
 if (p_finduid(uid) = true) {
-    if (~mta_bones(false) = true) { return; }
+    if ($spell = ^bones_to_peaches & %magictraining_bonespeaches ! ^true) {
+        // UNKNOWN original refusal wording; inherited MTA functional message.
+        mes("You need to learn Bones to Peaches first.");
+        return;
+    }
+    def_boolean $peaches = false;
+    if ($spell = ^bones_to_peaches) $peaches = true;
+    if (~mta_bones($peaches) = true) { return; }
     // look for spell in db
     def_dbrow $spell_data = ~get_spell_data($spell);
     if (~check_spell_requirements($spell_data) = false) {

@@ -134,6 +134,8 @@ data=consumable,premade_toad_crunchies
 data=consumable,anchovie_pizza
 data=consumable,half_anchovie_pizza
 data=consumable,pike
+// CANDIDATE: Peach restores eight hitpoints (OSRS Peach, unchanged food value).
+data=consumable,peach
 data=stat_heal,hitpoints,8,0
 data=consume_sound,eat
 
