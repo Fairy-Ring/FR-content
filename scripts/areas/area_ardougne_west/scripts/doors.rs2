@@ -6,6 +6,7 @@ if(~check_axis(coord, loc_coord, loc_angle) = false & inv_total(worn, doctor_gow
 ~open_and_close_door2(mournerstewdoorupopen, ~check_axis(coord, loc_coord, loc_angle), door_open);
 
 [oploc1,mournerstewdoor] 
+if (~mep1_hq_entry = true) return;
 if(~check_axis(coord, loc_coord, loc_angle) = false) {
     ~open_and_close_door2(mournerstewdooropen, ~check_axis(coord, loc_coord, loc_angle), door_open);
 } else {
