@@ -1,0 +1,23 @@
+// CANDIDATE: retained Old School Rogue Trader success charts (r15327770).
+^roguetrader_force_low = 70
+^roguetrader_force_high = 170
+^roguetrader_force_agility_low = 120
+^roguetrader_force_agility_high = 255
+^roguetrader_pick_low = 70
+^roguetrader_pick_high = 170
+^roguetrader_lockpick_high = 240
+^roguetrader_blackjack_low = 100
+^roguetrader_blackjack_high = 255
+^roguetrader_blackjack_failure_damage = 3
+// VERIFIED: Tip.It, 15 April 2006, urchin payment and matching supply count.
+^roguetrader_urchin_price = 100
+^roguetrader_supply_count = 3
+// UNKNOWN engineering prices: ordinary Morrisane shop multipliers, no new currency.
+^roguetrader_shop_buy = 550
+^roguetrader_shop_sell = 1000
+^roguetrader_shop_delta = 10
+// UNKNOWN engineering casket bundles and discounts; no total offer survives in the guide.
+^roguetrader_small_bundle = 20
+^roguetrader_large_bundle = 25
+^roguetrader_unseen_percent = 90
+^roguetrader_inspect_sell = 950

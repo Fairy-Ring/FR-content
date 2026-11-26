@@ -1,0 +1,58 @@
+// VERIFIED offer shape: Tip.It Rogue Trader, capture 15 April 2006.
+// UNKNOWN bundle quantities and discount factors: favourable engineering values.
+// Every offer is private and can be declined without losing the permanent stock unlock.
+[proc,roguetrader_casket_opened](int $large)
+~roguetrader_completion;
+inv_clear(roguetrader_alim_runedump);
+if ($large = 0) {
+    inv_setslot(roguetrader_alim_runedump, 0, firerune, ^roguetrader_small_bundle);
+    inv_setslot(roguetrader_alim_runedump, 1, waterrune, ^roguetrader_small_bundle);
+    inv_setslot(roguetrader_alim_runedump, 2, airrune, ^roguetrader_small_bundle);
+    inv_setslot(roguetrader_alim_runedump, 3, earthrune, ^roguetrader_small_bundle);
+} else {
+    inv_setslot(roguetrader_alim_runedump, 0, naturerune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 1, lawrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 2, chaosrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 3, deathrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 4, mindrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 5, bodyrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 6, bloodrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 7, cosmicrune, ^roguetrader_large_bundle);
+    inv_setslot(roguetrader_alim_runedump, 8, soulrune, ^roguetrader_large_bundle);
+}
+def_int $slot = 0;
+def_int $price = 0;
+def_int $needed = 0;
+while ($slot < inv_size(roguetrader_alim_runedump)) {
+    def_obj $rune = inv_getobj(roguetrader_alim_runedump, $slot);
+    if ($rune ! null) {
+        $price = calc($price + oc_cost($rune) * inv_getnum(roguetrader_alim_runedump, $slot));
+        if (inv_total(inv, $rune) = 0) $needed = calc($needed + 1);
+    }
+    $slot = calc($slot + 1);
+}
+$price = max(1, calc($price * ^roguetrader_unseen_percent / 100));
+def_int $choice = ~p_choice3("Buy all the runes for <tostring($price)> coins.", 1, "Let me see the runes first.", 2, "Not now.", 3);
+if ($choice = 3) return;
+if ($choice = 2) {
+    ~openshop(roguetrader_alim_runedump, ^roguetrader_shop_buy, ^roguetrader_inspect_sell, 0, "Ali's Discount Wares.");
+    return;
+}
+if (inv_total(inv, coins) < $price) {
+    ~mesbox("You don't have enough coins.");
+    return;
+}
+def_int $space = inv_freespace(inv);
+if (inv_total(inv, coins) = $price) $space = calc($space + 1);
+if ($space < $needed) {
+    ~mesbox("You need more inventory space.");
+    return;
+}
+// Check the whole exchange before charging. There is no pause within the transfer.
+inv_del(inv, coins, $price);
+$slot = 0;
+while ($slot < inv_size(roguetrader_alim_runedump)) {
+    def_obj $rune = inv_getobj(roguetrader_alim_runedump, $slot);
+    if ($rune ! null) inv_moveitem(roguetrader_alim_runedump, inv, $rune, inv_getnum(roguetrader_alim_runedump, $slot));
+    $slot = calc($slot + 1);
+}

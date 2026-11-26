@@ -1,0 +1,373 @@
+// VERIFIED rules and native controls: Tip.It, 15 April 2006, and revision-377 interfaces.
+// UNKNOWN generator: a valid cyclic seed with rotating symbols and clue positions.
+// UNKNOWN selector interpretation: bind real rune models at runtime; never treat com_i model suffixes as object IDs.
+// Original rogue_suduku1 low bits 0..15 are untouched. Approved temporary high bits:
+// 16..19 selected rune, 20 large board, 21..28 generation (retained only during this login).
+[proc,roguetrader_sudoku_open](int $large)
+if (%feud_var < ^feud_complete | %runemysteries ! ^runemysteries_complete | %roguetrader_runes < 3) return;
+~roguetrader_sudoku_close;
+def_int $generation = calc((getbit_range(%rogue_suduku1, 21, 28) + 1) % 256);
+%rogue_suduku1 = setbit_range_toint(%rogue_suduku1, $generation, 21, 28);
+%rogue_suduku1 = setbit_range_toint(%rogue_suduku1, $large, 20, 20);
+%roguetrader_playing_sudoku = 1;
+def_int $side = 4;
+def_int $box = 2;
+if ($large = 1) { $side = 9; $box = 3; }
+def_int $slot = 0;
+while ($slot < calc($side * $side)) {
+    def_int $row = calc($slot / $side);
+    def_int $column = calc($slot % $side);
+    if (calc(($row + $column + $generation) % 3) = 0) {
+        def_int $value = calc(($row * $box + $row / $box + $column + $generation) % $side + 1);
+        def_namedobj $rune = ~roguetrader_sudoku_rune($large, $value);
+        inv_setslot(roguetrader_toughsudukuinv, $slot, $rune, 1);
+        inv_setslot(roguetrader_sudoku_clueinv, $slot, $rune, 1);
+    }
+    $slot = calc($slot + 1);
+}
+if ($large = 1) {
+    if_openmain(inter_295);
+    inv_transmit(roguetrader_toughsudukuinv, inter_295:com_132);
+    // UNKNOWN scale 72 follows the existing boardgames rune-preview convention.
+    if_setobject(inter_295:com_122, naturerune, 72);
+    if_setobject(inter_295:com_123, lawrune, 72);
+    if_setobject(inter_295:com_124, chaosrune, 72);
+    if_setobject(inter_295:com_125, deathrune, 72);
+    if_setobject(inter_295:com_126, mindrune, 72);
+    if_setobject(inter_295:com_127, bodyrune, 72);
+    if_setobject(inter_295:com_128, bloodrune, 72);
+    if_setobject(inter_295:com_129, cosmicrune, 72);
+    if_setobject(inter_295:com_130, soulrune, 72);
+    if_setobject(inter_295:com_131, null, 72);
+} else {
+    if_openmain(inter_296);
+    inv_transmit(roguetrader_toughsudukuinv, inter_296:com_63);
+    if_setobject(inter_296:com_58, firerune, 72);
+    if_setobject(inter_296:com_59, waterrune, 72);
+    if_setobject(inter_296:com_60, airrune, 72);
+    if_setobject(inter_296:com_61, earthrune, 72);
+    if_setobject(inter_296:com_62, null, 72);
+}
+
+[proc,roguetrader_sudoku_close]
+inv_stoptransmit(inter_295:com_132);
+inv_stoptransmit(inter_296:com_63);
+inv_clear(roguetrader_toughsudukuinv);
+inv_clear(roguetrader_sudoku_clueinv);
+%roguetrader_playing_sudoku = 0;
+%rogue_suduku1 = setbit_range_toint(%rogue_suduku1, 0, 16, 20);
+
+[proc,roguetrader_sudoku_rune](int $large, int $value)(namedobj)
+if ($large = 0) {
+    if ($value = 1) return (firerune);
+    if ($value = 2) return (waterrune);
+    if ($value = 3) return (airrune);
+    if ($value = 4) return (earthrune);
+} else {
+    if ($value = 1) return (naturerune);
+    if ($value = 2) return (lawrune);
+    if ($value = 3) return (chaosrune);
+    if ($value = 4) return (deathrune);
+    if ($value = 5) return (mindrune);
+    if ($value = 6) return (bodyrune);
+    if ($value = 7) return (bloodrune);
+    if ($value = 8) return (cosmicrune);
+    if ($value = 9) return (soulrune);
+}
+return (null);
+
+[proc,roguetrader_sudoku_select](int $large, int $value)
+if (%roguetrader_playing_sudoku = 0 | getbit_range(%rogue_suduku1, 20, 20) ! $large) return;
+%rogue_suduku1 = setbit_range_toint(%rogue_suduku1, $value, 16, 19);
+if ($large = 1) if_setobject(inter_295:com_131, ~roguetrader_sudoku_rune($large, $value), 72);
+else if_setobject(inter_296:com_62, ~roguetrader_sudoku_rune($large, $value), 72);
+
+[proc,roguetrader_sudoku_place](int $large, int $slot)
+if (%roguetrader_playing_sudoku = 0 | getbit_range(%rogue_suduku1, 20, 20) ! $large) return;
+if (inv_getobj(roguetrader_sudoku_clueinv, $slot) ! null) return;
+def_int $value = getbit_range(%rogue_suduku1, 16, 19);
+if ($value = 0) inv_delslot(roguetrader_toughsudukuinv, $slot);
+else inv_setslot(roguetrader_toughsudukuinv, $slot, ~roguetrader_sudoku_rune($large, $value), 1);
+
+[proc,roguetrader_sudoku_valid](int $large)(boolean)
+def_int $side = 4;
+def_int $box = 2;
+if ($large = 1) { $side = 9; $box = 3; }
+def_int $slot = 0;
+while ($slot < calc($side * $side)) {
+    def_obj $rune = inv_getobj(roguetrader_toughsudukuinv, $slot);
+    if ($rune = null) return (false);
+    def_int $row = calc($slot / $side);
+    def_int $column = calc($slot % $side);
+    def_int $previous = 0;
+    while ($previous < $slot) {
+        def_int $otherrow = calc($previous / $side);
+        def_int $othercolumn = calc($previous % $side);
+        if ($row = $otherrow | $column = $othercolumn | (calc($row / $box) = calc($otherrow / $box) & calc($column / $box) = calc($othercolumn / $box))) {
+            if (inv_getobj(roguetrader_toughsudukuinv, $previous) = $rune) return (false);
+        }
+        $previous = calc($previous + 1);
+    }
+    $slot = calc($slot + 1);
+}
+return (true);
+
+[proc,roguetrader_sudoku_submit](int $large)
+if (%roguetrader_playing_sudoku = 0 | getbit_range(%rogue_suduku1, 20, 20) ! $large) return;
+if (~roguetrader_sudoku_valid($large) = false) {
+    // UNKNOWN functional refusal; a mistake does not close or reset the board.
+    mes("The lock stays closed.");
+    return;
+}
+if ($large = 1) { %roguetrader_runes = 4; %roguetrader_stallvar = 4; }
+else { %roguetrader_justobt_runes = 1; %roguetrader_stallvar = 1; }
+~roguetrader_sudoku_close;
+if_close;
+~roguetrader_completion;
+mes("You hear the locking mechanism click open!");
+~roguetrader_casket_opened($large);
+
+[if_close,inter_295]
+if (p_finduid(uid) = false) return;
+~roguetrader_sudoku_close;
+[if_close,inter_296]
+if (p_finduid(uid) = false) return;
+~roguetrader_sudoku_close;
+[if_button,inter_295:com_10]
+~roguetrader_sudoku_close;
+if_close;
+[if_button,inter_296:com_42]
+~roguetrader_sudoku_close;
+if_close;
+[if_button,inter_295:com_9]
+~roguetrader_sudoku_submit(1);
+[if_button,inter_296:com_41]
+~roguetrader_sudoku_submit(0);
+
+[if_button,inter_296:com_58]
+~roguetrader_sudoku_select(0, 1);
+[if_button,inter_296:com_59]
+~roguetrader_sudoku_select(0, 2);
+[if_button,inter_296:com_60]
+~roguetrader_sudoku_select(0, 3);
+[if_button,inter_296:com_61]
+~roguetrader_sudoku_select(0, 4);
+[if_button,inter_296:com_62]
+~roguetrader_sudoku_select(0, 0);
+[if_button,inter_295:com_122]
+~roguetrader_sudoku_select(1, 1);
+[if_button,inter_295:com_123]
+~roguetrader_sudoku_select(1, 2);
+[if_button,inter_295:com_124]
+~roguetrader_sudoku_select(1, 3);
+[if_button,inter_295:com_125]
+~roguetrader_sudoku_select(1, 4);
+[if_button,inter_295:com_126]
+~roguetrader_sudoku_select(1, 5);
+[if_button,inter_295:com_127]
+~roguetrader_sudoku_select(1, 6);
+[if_button,inter_295:com_128]
+~roguetrader_sudoku_select(1, 7);
+[if_button,inter_295:com_129]
+~roguetrader_sudoku_select(1, 8);
+[if_button,inter_295:com_130]
+~roguetrader_sudoku_select(1, 9);
+[if_button,inter_295:com_131]
+~roguetrader_sudoku_select(1, 0);
+
+// The original inventory components have no item operation. Their native rectangular
+// Place-rune buttons are the input surface, including when an empty cell has no item.
+[if_button,inter_296:com_20]
+~roguetrader_sudoku_place(0, 0);
+[if_button,inter_296:com_21]
+~roguetrader_sudoku_place(0, 1);
+[if_button,inter_296:com_22]
+~roguetrader_sudoku_place(0, 2);
+[if_button,inter_296:com_23]
+~roguetrader_sudoku_place(0, 3);
+[if_button,inter_296:com_24]
+~roguetrader_sudoku_place(0, 4);
+[if_button,inter_296:com_25]
+~roguetrader_sudoku_place(0, 5);
+[if_button,inter_296:com_26]
+~roguetrader_sudoku_place(0, 6);
+[if_button,inter_296:com_27]
+~roguetrader_sudoku_place(0, 7);
+[if_button,inter_296:com_28]
+~roguetrader_sudoku_place(0, 8);
+[if_button,inter_296:com_29]
+~roguetrader_sudoku_place(0, 9);
+[if_button,inter_296:com_30]
+~roguetrader_sudoku_place(0, 10);
+[if_button,inter_296:com_31]
+~roguetrader_sudoku_place(0, 11);
+[if_button,inter_296:com_32]
+~roguetrader_sudoku_place(0, 12);
+[if_button,inter_296:com_33]
+~roguetrader_sudoku_place(0, 13);
+[if_button,inter_296:com_34]
+~roguetrader_sudoku_place(0, 14);
+[if_button,inter_296:com_35]
+~roguetrader_sudoku_place(0, 15);
+[if_button,inter_295:com_11]
+~roguetrader_sudoku_place(1, 0);
+[if_button,inter_295:com_12]
+~roguetrader_sudoku_place(1, 1);
+[if_button,inter_295:com_13]
+~roguetrader_sudoku_place(1, 2);
+[if_button,inter_295:com_14]
+~roguetrader_sudoku_place(1, 3);
+[if_button,inter_295:com_15]
+~roguetrader_sudoku_place(1, 4);
+[if_button,inter_295:com_16]
+~roguetrader_sudoku_place(1, 5);
+[if_button,inter_295:com_17]
+~roguetrader_sudoku_place(1, 6);
+[if_button,inter_295:com_18]
+~roguetrader_sudoku_place(1, 7);
+[if_button,inter_295:com_19]
+~roguetrader_sudoku_place(1, 8);
+[if_button,inter_295:com_20]
+~roguetrader_sudoku_place(1, 9);
+[if_button,inter_295:com_21]
+~roguetrader_sudoku_place(1, 10);
+[if_button,inter_295:com_22]
+~roguetrader_sudoku_place(1, 11);
+[if_button,inter_295:com_23]
+~roguetrader_sudoku_place(1, 12);
+[if_button,inter_295:com_24]
+~roguetrader_sudoku_place(1, 13);
+[if_button,inter_295:com_25]
+~roguetrader_sudoku_place(1, 14);
+[if_button,inter_295:com_26]
+~roguetrader_sudoku_place(1, 15);
+[if_button,inter_295:com_27]
+~roguetrader_sudoku_place(1, 16);
+[if_button,inter_295:com_28]
+~roguetrader_sudoku_place(1, 17);
+[if_button,inter_295:com_29]
+~roguetrader_sudoku_place(1, 18);
+[if_button,inter_295:com_30]
+~roguetrader_sudoku_place(1, 19);
+[if_button,inter_295:com_31]
+~roguetrader_sudoku_place(1, 20);
+[if_button,inter_295:com_32]
+~roguetrader_sudoku_place(1, 21);
+[if_button,inter_295:com_33]
+~roguetrader_sudoku_place(1, 22);
+[if_button,inter_295:com_34]
+~roguetrader_sudoku_place(1, 23);
+[if_button,inter_295:com_35]
+~roguetrader_sudoku_place(1, 24);
+[if_button,inter_295:com_36]
+~roguetrader_sudoku_place(1, 25);
+[if_button,inter_295:com_37]
+~roguetrader_sudoku_place(1, 26);
+[if_button,inter_295:com_38]
+~roguetrader_sudoku_place(1, 27);
+[if_button,inter_295:com_39]
+~roguetrader_sudoku_place(1, 28);
+[if_button,inter_295:com_40]
+~roguetrader_sudoku_place(1, 29);
+[if_button,inter_295:com_41]
+~roguetrader_sudoku_place(1, 30);
+[if_button,inter_295:com_42]
+~roguetrader_sudoku_place(1, 31);
+[if_button,inter_295:com_43]
+~roguetrader_sudoku_place(1, 32);
+[if_button,inter_295:com_44]
+~roguetrader_sudoku_place(1, 33);
+[if_button,inter_295:com_45]
+~roguetrader_sudoku_place(1, 34);
+[if_button,inter_295:com_46]
+~roguetrader_sudoku_place(1, 35);
+[if_button,inter_295:com_47]
+~roguetrader_sudoku_place(1, 36);
+[if_button,inter_295:com_48]
+~roguetrader_sudoku_place(1, 37);
+[if_button,inter_295:com_49]
+~roguetrader_sudoku_place(1, 38);
+[if_button,inter_295:com_50]
+~roguetrader_sudoku_place(1, 39);
+[if_button,inter_295:com_51]
+~roguetrader_sudoku_place(1, 40);
+[if_button,inter_295:com_52]
+~roguetrader_sudoku_place(1, 41);
+[if_button,inter_295:com_53]
+~roguetrader_sudoku_place(1, 42);
+[if_button,inter_295:com_54]
+~roguetrader_sudoku_place(1, 43);
+[if_button,inter_295:com_55]
+~roguetrader_sudoku_place(1, 44);
+[if_button,inter_295:com_56]
+~roguetrader_sudoku_place(1, 45);
+[if_button,inter_295:com_57]
+~roguetrader_sudoku_place(1, 46);
+[if_button,inter_295:com_58]
+~roguetrader_sudoku_place(1, 47);
+[if_button,inter_295:com_59]
+~roguetrader_sudoku_place(1, 48);
+[if_button,inter_295:com_60]
+~roguetrader_sudoku_place(1, 49);
+[if_button,inter_295:com_61]
+~roguetrader_sudoku_place(1, 50);
+[if_button,inter_295:com_62]
+~roguetrader_sudoku_place(1, 51);
+[if_button,inter_295:com_63]
+~roguetrader_sudoku_place(1, 52);
+[if_button,inter_295:com_64]
+~roguetrader_sudoku_place(1, 53);
+[if_button,inter_295:com_65]
+~roguetrader_sudoku_place(1, 54);
+[if_button,inter_295:com_66]
+~roguetrader_sudoku_place(1, 55);
+[if_button,inter_295:com_67]
+~roguetrader_sudoku_place(1, 56);
+[if_button,inter_295:com_68]
+~roguetrader_sudoku_place(1, 57);
+[if_button,inter_295:com_69]
+~roguetrader_sudoku_place(1, 58);
+[if_button,inter_295:com_70]
+~roguetrader_sudoku_place(1, 59);
+[if_button,inter_295:com_71]
+~roguetrader_sudoku_place(1, 60);
+[if_button,inter_295:com_72]
+~roguetrader_sudoku_place(1, 61);
+[if_button,inter_295:com_73]
+~roguetrader_sudoku_place(1, 62);
+[if_button,inter_295:com_74]
+~roguetrader_sudoku_place(1, 63);
+[if_button,inter_295:com_75]
+~roguetrader_sudoku_place(1, 64);
+[if_button,inter_295:com_76]
+~roguetrader_sudoku_place(1, 65);
+[if_button,inter_295:com_77]
+~roguetrader_sudoku_place(1, 66);
+[if_button,inter_295:com_78]
+~roguetrader_sudoku_place(1, 67);
+[if_button,inter_295:com_79]
+~roguetrader_sudoku_place(1, 68);
+[if_button,inter_295:com_80]
+~roguetrader_sudoku_place(1, 69);
+[if_button,inter_295:com_81]
+~roguetrader_sudoku_place(1, 70);
+[if_button,inter_295:com_82]
+~roguetrader_sudoku_place(1, 71);
+[if_button,inter_295:com_83]
+~roguetrader_sudoku_place(1, 72);
+[if_button,inter_295:com_84]
+~roguetrader_sudoku_place(1, 73);
+[if_button,inter_295:com_85]
+~roguetrader_sudoku_place(1, 74);
+[if_button,inter_295:com_86]
+~roguetrader_sudoku_place(1, 75);
+[if_button,inter_295:com_87]
+~roguetrader_sudoku_place(1, 76);
+[if_button,inter_295:com_88]
+~roguetrader_sudoku_place(1, 77);
+[if_button,inter_295:com_89]
+~roguetrader_sudoku_place(1, 78);
+[if_button,inter_295:com_90]
+~roguetrader_sudoku_place(1, 79);
+[if_button,inter_295:com_91]
+~roguetrader_sudoku_place(1, 80);

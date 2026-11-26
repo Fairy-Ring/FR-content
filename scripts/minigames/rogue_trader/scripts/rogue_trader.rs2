@@ -1,0 +1,177 @@
+// VERIFIED progression: Tip.It Rogue Trader, capture 15 April 2006.
+// UNKNOWN functional menu/refusal wording where the retained guide gives no speech.
+// No Feud report, junk-sale or ordinary willow Trade handler is replaced here.
+[proc,roguetrader_ali]
+if (%feud_var < ^feud_complete) return;
+~roguetrader_completion;
+def_int $topic = ~p_choice5("Let me see your wares.", 1, "Let's talk about business.", 2, "Let's talk about clothes.", 3, "Let's talk about blackjacks.", 4, "Let's talk about runes.", 5);
+if ($topic = 1) { ~openshop_activenpc; return; }
+if ($topic = 2) {
+    if (%roguetrader_started = 0) %roguetrader_started = 1;
+    ~chatnpc("<p,neutral>I need suppliers for runes, clothes and blackjacks.");
+    if (~p_choice2("What's in it for me?", 1, "I'll see what I can do.", 2) = 1) {
+        %roguetrader_cheapflights = 1;
+        ~chatnpc("<p,neutral>You can use my magic carpets for half the normal fare.");
+    }
+    return;
+}
+if (%roguetrader_started = 0) %roguetrader_started = 1;
+if ($topic = 3) { ~roguetrader_clothes; return; }
+if ($topic = 4) { ~roguetrader_blackjacks; return; }
+~roguetrader_runes;
+
+[proc,roguetrader_completion]
+// VERIFIED: solving caskets is optional; the supplier agreement finishes this errand.
+if (%roguetrader_blackjacks >= 3 & %roguetrader_clothes >= 3 & %roguetrader_runes >= 3) {
+    %roguetrader_started = 2;
+    %roguetrader_cheapflights = 1;
+}
+
+[proc,roguetrader_clothes]
+if (%roguetrader_clothes = 0) {
+    %roguetrader_clothes = 1;
+    ~chatnpc("<p,neutral>Speak to Siamun in Sophanem about supplying me with clothes.");
+    return;
+}
+if (%roguetrader_clothes < 3) {
+    ~chatnpc("<p,neutral>Speak to Siamun in Sophanem about supplying me with clothes.");
+    return;
+}
+%roguetrader_justchanged_garments = 0;
+def_int $choice = ~p_choice3("I'd like to buy some clothes.", 1, "Could you stock different clothes?", 2, "Not now.", 3);
+if ($choice = 2) {
+    ~chatnpc("<p,neutral>Ask Siamun to supply a different style.");
+    return;
+}
+if ($choice = 1) {
+    if (%roguetrader_clothes = 3) {
+        %roguetrader_stallvar = 3;
+        ~openshop(roguetrader_alim_carpetclothes_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, ^roguetrader_shop_delta, "Ali's Discount Wares.");
+    } else {
+        %roguetrader_stallvar = 5;
+        ~openshop(roguetrader_alim_meanpclothes_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, ^roguetrader_shop_delta, "Ali's Discount Wares.");
+    }
+}
+
+[proc,roguetrader_blackjacks]
+if (%roguetrader_blackjacks = 0) {
+    %roguetrader_blackjacks = 1;
+    ~chatnpc("<p,neutral>Ask the blackjack seller in Pollnivneach to supply my stall.");
+    return;
+}
+if (%roguetrader_justchanged_weapons > 0) {
+    %roguetrader_blackjacks = calc(2 + %roguetrader_justchanged_weapons);
+    %roguetrader_justchanged_weapons = 0;
+    %roguetrader_bjtold_ali = 0;
+    %roguetrader_bj_urchingloat = 0;
+    %roguetrader_stallvar = 2;
+    ~roguetrader_completion;
+}
+if (%roguetrader_blackjacks < 3) {
+    ~chatnpc("<p,neutral>Ask the blackjack seller in Pollnivneach to supply my stall.");
+    return;
+}
+def_int $choice = ~p_choice3("I'd like to buy some blackjacks.", 1, "Could you stock different blackjacks?", 2, "Not now.", 3);
+if ($choice = 2) {
+    ~chatnpc("<p,neutral>Ask the blackjack seller to change his designs.");
+    return;
+}
+if ($choice = 1) {
+    %roguetrader_stallvar = 2;
+    if (%roguetrader_blackjacks = 3) {
+        ~openshop(roguetrader_alim_assaultbj_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, ^roguetrader_shop_delta, "Ali's Discount Wares.");
+    } else {
+        ~openshop(roguetrader_alim_defendbj_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, ^roguetrader_shop_delta, "Ali's Discount Wares.");
+    }
+}
+
+[proc,roguetrader_runes]
+if (%runemysteries ! ^runemysteries_complete) {
+    ~chatnpc("<p,neutral>You must complete Rune Mysteries before arranging the rune trade.");
+    return;
+}
+if (%roguetrader_runes = 0) {
+    %roguetrader_runes = 1;
+    ~chatnpc("<p,neutral>Speak to Aubury in Varrock about supplying my stall with runes.");
+    return;
+}
+if (%roguetrader_runes = 1) {
+    ~chatnpc("<p,neutral>Speak to Aubury in Varrock about supplying my stall with runes.");
+    return;
+}
+if (%roguetrader_runes = 2) {
+    %roguetrader_runes = 3;
+    %roguetrader_stallvar = 1;
+    ~roguetrader_completion;
+    ~chatnpc("<p,neutral>The rune caskets have arrived, but I cannot open their locks.");
+}
+def_int $choice = ~p_choice3("I'd like to open a small casket.", 1, "I'd like to open a large casket.", 2, "I'd like to buy some runes.", 3);
+if ($choice = 3) {
+    def_int $stock = ~p_choice2("Elemental runes.", 0, "Other runes.", 1);
+    ~roguetrader_rune_shop($stock);
+    return;
+}
+~roguetrader_casket(calc($choice - 1));
+
+[proc,roguetrader_aubury]
+// The shared hook enters only after both quests and only while the order is pending.
+~chatplayer("<p,neutral>Ali Morrisane would like you to supply him with runes.");
+~chatnpc("<p,neutral>I will send him a shipment.");
+%roguetrader_runes = 2;
+
+[proc,roguetrader_casket](int $large)
+def_int $method = ~p_choice3("Force Box", 1, "Pick Lock", 2, "Examine Lock", 3);
+if ($method = 3) {
+    ~roguetrader_sudoku_open($large);
+    return;
+}
+if ($large = 1) {
+    // CANDIDATE: large boxes always fail and apply the same failed-attempt costs.
+    ~roguetrader_casket_fail($method);
+    return;
+}
+if ($method = 1) {
+    if (stat_random(strength, ^roguetrader_force_low, ^roguetrader_force_high) = false | stat_random(agility, ^roguetrader_force_agility_low, ^roguetrader_force_agility_high) = false) {
+        ~roguetrader_casket_fail($method);
+        return;
+    }
+    stat_advance(strength, 25);
+    stat_advance(agility, 25);
+} else {
+    def_int $high = ^roguetrader_pick_high;
+    if (inv_total(inv, lockpick) > 0) $high = ^roguetrader_lockpick_high;
+    if (stat_random(thieving, ^roguetrader_pick_low, $high) = false) {
+        ~roguetrader_casket_fail($method);
+        return;
+    }
+    stat_advance(thieving, 50);
+}
+%roguetrader_justobt_runes = 1;
+%roguetrader_stallvar = 1;
+~roguetrader_completion;
+mes("You hear the locking mechanism click open!");
+~roguetrader_casket_opened(0);
+
+[proc,roguetrader_rune_shop](int $large)
+if (%feud_var < ^feud_complete | %runemysteries ! ^runemysteries_complete | %roguetrader_runes < 3) return;
+if ($large = 0 & %roguetrader_justobt_runes = 1) {
+    %roguetrader_stallvar = 1;
+    ~openshop(roguetrader_alim_runeretail_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, 0, "Ali's Discount Wares.");
+}
+if ($large = 1 & %roguetrader_runes = 4) {
+    %roguetrader_stallvar = 4;
+    ~openshop(roguetrader_alim_runewholesale_inv, ^roguetrader_shop_buy, ^roguetrader_shop_sell, 0, "Ali's Discount Wares.");
+}
+
+[proc,roguetrader_casket_fail](int $method)
+if ($method = 1) {
+    def_int $drain = random(4);
+    stat_sub(strength, $drain, 0);
+    stat_sub(agility, $drain, 0);
+} else {
+    stat_sub(thieving, random(4), 0);
+    if (inv_total(inv, lockpick) > 0 & random(5) = 0) {
+        inv_del(inv, lockpick, 1);
+        stat_advance(thieving, 5);
+    }
+}
