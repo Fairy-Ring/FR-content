@@ -89,6 +89,15 @@ if (%forget_quest = 50 | %forget_quest = 60) {
     ~chatplayer("<p,neutral>Statistical data, salary structures, shopping lists... no, I don't think there's anything interesting here.");
 }
 
+[if_button,inter_179:com_34]
+if_close;
+
+[if_button,inter_180:com_50]
+if_close;
+
+[if_button,inter_288:com_78]
+if_close;
+
 [if_button,inter_179:com_35] ~forget_tracks_cycle(40, 1);
 [if_button,inter_179:com_36] ~forget_tracks_cycle(40, 2);
 [if_button,inter_179:com_37] ~forget_tracks_cycle(40, 3);

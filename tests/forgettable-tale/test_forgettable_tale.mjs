@@ -17,8 +17,6 @@ const OpNpc = (await engineModule('network/game/client/model/OpNpc.ts')).default
 const OpNpcHandler = (await engineModule('network/game/client/handler/OpNpcHandler.ts')).default;
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const OpLocHandler = (await engineModule('network/game/client/handler/OpLocHandler.ts')).default;
-const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
-const closeHandler = new (await engineModule('network/game/client/handler/CloseModalHandler.ts')).default();
 const npcHandler = new OpNpcHandler();
 const approaches = [];
 const locHandler = new OpLocHandler();
@@ -155,8 +153,13 @@ function configureTrack(p, board, selections) {
   assertSavedQuest(p, `${root}: inserted stones`);
   nativeClose(p, root);
 }
+// These original Close components send IF_BUTTON; CloseModal would bypass their content handlers.
 function nativeClose(p, label) {
-  assert(closeHandler.handle(new CloseModal(), p), `${label}: native modal-close packet accepted`);
+  const panel = puzzleInterfaces.find(({ root }) => root === label);
+  assert(panel, `${label}: original control panel`);
+  assert.equal(p.modalMain, id('Component', label), `${label}: control panel is open`);
+  assert(button(p, `${label}:com_${panel.first - 1}`), `${label}: visible native Close button`);
+  finish(p, [], `${label}: native Close`);
   tick(p);
   assert.equal(p.modalMain, -1, `${label}: the control panel closes before riding`);
 }
