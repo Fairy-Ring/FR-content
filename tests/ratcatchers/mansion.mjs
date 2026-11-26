@@ -173,7 +173,7 @@ useLoc(p2, townLadder, 'second player mansion entrance');
 
 function primeGuard() {
   [guard.level, guard.x, guard.z] = [guardSpec.level, guardSpec.x, guardSpec.z];
-  run(p2, '[ai_spawn,ratcatcher_guard_right_front]', [], guard);
+  run(p2, '[proc,ratcatch_mansion_guard_activate]', [], guard);
 }
 function triggerGuard(label) {
   run(p2, '[proc,ratcatch_mansion_watch_start]');

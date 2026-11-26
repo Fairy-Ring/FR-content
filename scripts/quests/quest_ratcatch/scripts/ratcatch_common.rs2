@@ -16,7 +16,7 @@ mes("Bring a kitten or cat with you."); // UNKNOWN functional refusal; period gu
 return(false);
 
 [proc,ratcatch_gertrude_hook]()(boolean)
-if (%fluffs < ^fluffs_complete | %ratcatch_var >= ^ratcatch_complete) return(false);
+if (%fluffs < ^fluffs_complete | %ratcatch_var > 2) return(false);
 // UNKNOWN functional menu. Opting out preserves every Gertrude service and Two Cats branch.
 if (~p_choice2("Ask about rat catching.", 1, "Talk about something else.", 2) = 2) return(false);
 if (%ics_little_var < ^ics_little_complete) {

@@ -225,6 +225,7 @@ if (~ratcatch_mansion_count = 6) {
 return(inzone(^ratcatch_mansion_min, ^ratcatch_mansion_max, $at));
 
 [proc,ratcatch_mansion_watch_start]
+~ratcatch_mansion_guards_activate;
 settimer(ratcatch_mansion_guard_watch, ^ratcatch_mansion_guard_poll);
 walktrigger(ratcatch_mansion_guard_watch);
 
@@ -232,20 +233,8 @@ walktrigger(ratcatch_mansion_guard_watch);
 cleartimer(ratcatch_mansion_guard_watch);
 walktrigger(null);
 
-// UNKNOWN engineering patrol: one-tile north/south steps on the four-cycle guard timer.
-[ai_spawn,ratcatcher_staticguard] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_chiefguard] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_left_front] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_left_mid] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_left_back] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_left_fullback] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_right_front] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_right_mid] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_right_back] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_right_fullback] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_left_inside] @ratcatch_mansion_guard_spawn;
-[ai_spawn,ratcatcher_guard_right_inside] @ratcatch_mansion_guard_spawn;
-
+// UNKNOWN engineering patrol runs only while the mansion has players.
+// Otherwise the guards retain their original wander mode and world RNG draws.
 [ai_timer,ratcatcher_staticguard] @ratcatch_mansion_guard_patrol;
 [ai_timer,ratcatcher_chiefguard] @ratcatch_mansion_guard_patrol;
 [ai_timer,ratcatcher_guard_left_front] @ratcatch_mansion_guard_patrol;
@@ -259,26 +248,66 @@ walktrigger(null);
 [ai_timer,ratcatcher_guard_left_inside] @ratcatch_mansion_guard_patrol;
 [ai_timer,ratcatcher_guard_right_inside] @ratcatch_mansion_guard_patrol;
 
-[label,ratcatch_mansion_guard_spawn]
+[proc,ratcatch_mansion_guards_activate]
+def_int $level = 0;
+while ($level < 2) {
+    npc_findallany(movecoord(0_44_79_32_32, 0, $level, 0), 32, 0);
+    while (npc_findnext = true) {
+        if (~ratcatch_mansion_is_guard(npc_type) = true & %npc_int2 = 0) ~ratcatch_mansion_guard_activate;
+    }
+    $level = add($level, 1);
+}
+
+[proc,ratcatch_mansion_guard_activate]
+def_coord $origin = ~ratcatch_mansion_guard_origin(npc_type);
+npc_setmode(none);
+npc_tele($origin);
+npc_walk($origin);
 %npc_int = ^ratcatch_mansion_face_north;
-%npc_int2 = 0;
-npc_facesquare(movecoord(npc_coord, 0, 0, 1));
+%npc_int2 = 1;
+npc_facesquare(movecoord($origin, 0, 0, 1));
 npc_settimer(^ratcatch_mansion_guard_poll);
 
+// VERIFIED original guard placements in native map m44_79, independent of pre-entry wandering.
+[proc,ratcatch_mansion_guard_origin](npc $type)(coord)
+switch_npc($type) {
+    case ratcatcher_staticguard : return(0_44_79_33_31);
+    case ratcatcher_chiefguard : return(0_44_79_30_31);
+    case ratcatcher_guard_left_front : return(0_44_79_24_11);
+    case ratcatcher_guard_left_mid : return(0_44_79_24_20);
+    case ratcatcher_guard_left_back : return(0_44_79_10_44);
+    case ratcatcher_guard_left_fullback : return(0_44_79_20_49);
+    case ratcatcher_guard_right_front : return(0_44_79_40_11);
+    case ratcatcher_guard_right_mid : return(0_44_79_39_20);
+    case ratcatcher_guard_right_back : return(0_44_79_53_44);
+    case ratcatcher_guard_right_fullback : return(0_44_79_43_49);
+    case ratcatcher_guard_left_inside : return(1_44_79_31_46);
+    case ratcatcher_guard_right_inside : return(1_44_79_32_40);
+}
+return(null);
+
+[proc,ratcatch_mansion_player_count]()(int)
+return(calc(map_playercount(^ratcatch_mansion_min, movecoord(^ratcatch_mansion_max, 0, -1, 0)) + map_playercount(movecoord(^ratcatch_mansion_min, 0, 1, 0), ^ratcatch_mansion_max)));
+
 [label,ratcatch_mansion_guard_patrol]
+if (~ratcatch_mansion_player_count = 0) {
+    npc_settimer(0);
+    %npc_int2 = 0;
+    npc_setmode(wander);
+    return;
+}
 def_coord $destination = npc_destination();
 if ($destination ! null & $destination ! npc_coord) return;
-def_int $dz = 1;
-if (%npc_int2 = 1) {
-    $dz = -1;
-    %npc_int = ^ratcatch_mansion_face_south;
-    %npc_int2 = 0;
-} else {
+def_coord $next = ~ratcatch_mansion_guard_origin(npc_type);
+def_int $dz = -1;
+if (%npc_int = ^ratcatch_mansion_face_south) {
+    $next = movecoord($next, 0, 0, 1);
+    $dz = 1;
     %npc_int = ^ratcatch_mansion_face_north;
-    %npc_int2 = 1;
+} else {
+    %npc_int = ^ratcatch_mansion_face_south;
 }
-def_coord $next = movecoord(npc_coord, 0, 0, $dz);
-npc_facesquare($next);
+npc_facesquare(movecoord($next, 0, 0, $dz));
 npc_walk($next);
 
 [timer,ratcatch_mansion_guard_watch] @ratcatch_mansion_guard_watch;
@@ -290,6 +319,7 @@ if (%ratcatch_var ! ^ratcatch_mansion_stage_active | ~ratcatch_mansion_in_area(c
     walktrigger(null);
     return;
 }
+~ratcatch_mansion_guards_activate;
 if (~ratcatch_mansion_guard_detected = true) {
     def_int $caught = ~ratcatch_mansion_count;
     def_coord $checkpoint = ~ratcatch_mansion_checkpoint($caught);

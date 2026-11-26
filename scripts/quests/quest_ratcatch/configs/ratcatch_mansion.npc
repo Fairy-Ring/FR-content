@@ -1,8 +1,5 @@
 // Original 377 mansion guard and rat appearances, with unchanged client fields.
 [ratcatcher_staticguard]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -25,9 +22,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_chiefguard]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -50,9 +44,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_left_front]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -75,9 +66,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_left_mid]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -100,9 +88,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_left_back]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -125,9 +110,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_left_fullback]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -150,9 +132,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_right_front]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -175,9 +154,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_right_mid]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -200,9 +176,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_right_back]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -225,9 +198,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_right_fullback]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -250,9 +220,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_left_inside]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1
@@ -275,9 +242,6 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
 [ratcatcher_guard_right_inside]
-// UNKNOWN script-controlled patrol bounds; original appearance is unchanged.
-wanderrange=0
-defaultmode=none
 name=Guard
 desc=He tries to keep order around here.
 model1=npc_guard1

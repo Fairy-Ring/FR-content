@@ -8,8 +8,6 @@ transmit=yes
 
 [ratcatch_var_temp1]
 scope=perm
-transmit=yes
 
 [ratcatch_var_temp2]
 scope=perm
-transmit=yes

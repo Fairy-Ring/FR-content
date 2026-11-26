@@ -8,6 +8,7 @@ import {
 } from './runtime.mjs';
 const { PlayerStat } = await load('engine/entity/PlayerStat.ts');
 const { default: ScriptRunner } = await load('engine/script/ScriptRunner.ts');
+const { NpcMode } = await load('engine/entity/NpcMode.ts');
 assert.equal((await load('util/Environment.ts')).default.NODE_XPRATE, 1);
 const names = ['gertrude', 'vc_phingspet', 'vc_grimesquit', 'vc_smokin_joe', 'vc_face',
   'vc_felkrash_the_bard', 'feud_snakecharmer'];
@@ -29,6 +30,104 @@ for (const name of ['ratcatchers_cat_antipoison', 'ratpits_manual', 'ratcatchers
 for (const name of ['main_ratcatch_var', 'ratcatch_var_multi', 'ratcatch_var_temp1', 'ratcatch_var_temp2']) {
   assert.equal(types.VarPlayerType.get(v(name)).scope, types.VarPlayerType.SCOPE_PERM, `${name} survives logout`);
 }
+
+// Tick the real native guards before entry; controlled patrol must not inherit wander drift.
+{
+  const guardNames = ['ratcatcher_staticguard', 'ratcatcher_chiefguard',
+    'ratcatcher_guard_left_front', 'ratcatcher_guard_left_mid', 'ratcatcher_guard_left_back',
+    'ratcatcher_guard_left_fullback', 'ratcatcher_guard_right_front', 'ratcatcher_guard_right_mid',
+    'ratcatcher_guard_right_back', 'ratcatcher_guard_right_fullback',
+    'ratcatcher_guard_left_inside', 'ratcatcher_guard_right_inside'];
+  const origins = new Map(guardNames.map(name => {
+    const rows = nativeNpcRows(name);
+    assert.equal(rows.length, 1, `${name} has one original map placement`);
+    return [rows[0].id, [rows[0].level, rows[0].x, rows[0].z]];
+  }));
+  const guards = [...World.npcs].filter(npc => origins.has(npc.type));
+  assert.equal(guards.length, 12, 'all twelve guards are native world NPCs');
+  const active = id('VarNpcType', 'npc_int2'), facing = id('VarNpcType', 'npc_int');
+  const actor = player(), keeper = player({ cat: null });
+  for (const p of [actor, keeper]) World.gameMap.getZone(p.x, p.z, p.level).enter(p);
+  const place = (p, at) => {
+    p.teleport(at[1], at[2], at[0]);
+    assert.deepEqual(tile(p), at, 'fixture uses native teleport and zone membership');
+  };
+  const advance = (ticks, wander = false) => {
+    const previous = Math.random;
+    let draws = 0;
+    if (wander) Math.random = () => { draws++; return 0; };
+    try {
+      for (let tick = 0; tick < ticks; tick++) {
+        World.currentTick++;
+        for (const guard of guards) {
+          guard.resetEntity(false);
+          guard.turn();
+        }
+      }
+    } finally { Math.random = previous; }
+    return draws;
+  };
+  const townLadder = target('loc', 'vc_ladder_down', rows => rows.find(row => row.coord === '0_40_51_1_56'));
+  const ratStands = [[0, 2856, 5091], [0, 2863, 5087], [0, 2863, 5100],
+    [1, 2833, 5098], [1, 2858, 5088], [1, 2860, 5093]];
+  const checkpoints = [[0, 2861, 5092], [1, 2833, 5098], [1, 2858, 5088]];
+  const outside = [0, 3150, 3412];
+  atStage(actor, 4); add(actor, 'ratcatchers_party_directions');
+  for (const ticks of [1, 7, 31, 137]) {
+    for (const guard of guards) {
+      assert.equal(types.NpcType.get(guard.type).defaultmode, NpcMode.WANDER, 'original wander config');
+      assert(guard.timerInterval <= 0, 'no patrol timer before entry');
+    }
+    assert(advance(ticks, true) > 0, 'unoccupied guards consume their real wander RNG draws');
+    assert(guards.some(guard => tile(guard).join() !== origins.get(guard.type).join()), 'pre-entry ticks really move guards');
+    place(actor, townLadder.stand);
+    assert.equal(interact(actor, townLadder, T.OPLOC1), '[oploc1,vc_ladder_down]');
+    assert.deepEqual(tile(actor), checkpoints[0], 'native mansion entry starts the watch');
+    for (const guard of guards) {
+      assert.deepEqual(tile(guard), origins.get(guard.type), 'entry restores each original spawn anchor');
+      assert.equal(guard.targetOp, NpcMode.NONE);
+      assert.equal(guard.getVar(active), 1);
+      assert.equal(guard.timerInterval, 4);
+    }
+    place(actor, [0, 2856, 5068]);
+    assert.equal(run(actor, '[proc,ratcatch_mansion_guard_detected]').popInt(), 1, 'native guard sees its forward tile');
+    run(actor, '[walktrigger,ratcatch_mansion_guard_watch]');
+    assert.deepEqual(tile(actor), checkpoints[0], 'guard detection still resets to the safe checkpoint');
+    const phases = new Set();
+    for (let tick = 0; tick <= 12; tick++) {
+      if (tick) advance(1);
+      for (const stand of [...ratStands, ...checkpoints]) {
+        place(actor, stand);
+        assert.equal(run(actor, '[proc,ratcatch_mansion_guard_detected]').popInt(), 0,
+          `pre-entry ${ticks}, patrol tick ${tick}: rat stand/checkpoint ${stand} is safe`);
+      }
+      for (const guard of guards) {
+        phases.add(guard.getVar(facing));
+        const origin = origins.get(guard.type);
+        assert.equal(guard.level, origin[0]); assert.equal(guard.x, origin[1]);
+        assert(guard.z === origin[2] || guard.z === origin[2] + 1, 'patrol stays on its two anchored tiles');
+      }
+    }
+    assert.deepEqual([...phases].sort(), [0, 2], 'both north and south patrol phases were checked');
+    place(keeper, checkpoints[1]);
+    place(actor, outside);
+    run(actor, '[walktrigger,ratcatch_mansion_guard_watch]');
+    advance(4);
+    for (const guard of guards) {
+      assert.equal(guard.targetOp, NpcMode.NONE, 'an upper-floor player keeps both floors active');
+      assert.equal(guard.timerInterval, 4);
+    }
+    place(keeper, outside);
+    advance(4);
+    for (const guard of guards) {
+      assert.equal(guard.targetOp, NpcMode.WANDER, 'last departure restores original wander');
+      assert.equal(guard.timerInterval, 0, 'empty mansion has no continuous patrol timers');
+      assert.equal(guard.getVar(active), 0, 'next entry can reactivate the guard');
+    }
+  }
+  for (const p of [actor, keeper]) World.gameMap.getZone(p.x, p.z, p.level).leave(p);
+  console.log('Mansion guard regression: 12 native guards, pre-entry ticks 1/7/31/137, 468 safe stand/checkpoint checks, cone reset and two-plane lifecycle passed');
+}
 for (const options of [{ qualified: false }, { cat: null }, { cat: 'overgrowncat' }]) {
   const p = player(options); talk(p, 'gertrude', [1]); assert.equal(stage(p), 0, 'missing requirement refuses start');
 }
@@ -47,6 +146,16 @@ for (const catType of ['kittenpet1', 'growncat']) {
 }
 {
   const p = player(); talk(p, 'gertrude', [2]); assert.equal(stage(p), 0, 'opt-out retains ordinary Gertrude dialogue');
+}
+for (const value of [1, 2]) {
+  const p = player(); atStage(p, value);
+  assert.equal(run(p, '[proc,ratcatch_gertrude_hook]', [], null, [1]).popInt(), 1, 'sewer handoff reminder remains available');
+  assert.equal(stage(p), value);
+}
+for (const value of [3, 10, 20, 127]) {
+  const p = player(); atStage(p, value);
+  assert.equal(run(p, '[proc,ratcatch_gertrude_hook]').popInt(), 0, 'Gertrude falls through after the sewer handoff');
+  assert.equal(stage(p), value);
 }
 {
   const p = player({ cat: null }); add(p, 'coins', 100);
@@ -188,6 +297,12 @@ assert.equal(p.modalMain, id('Component', 'questscroll_death'), 'real completion
 assert.equal(count(p, 'felinemedal'), 0, 'there is no invented medal reward');
 p.closeModal(); talk(p, 'vc_felkrash_the_bard', [2]);
 assert.equal(points(p) - qp, 2); assert.equal(p.stats[PlayerStat.THIEVING] - xp, 45000, 'repeated hand-in cannot repay XP');
+assert.equal(run(p, '[proc,ratcatch_joe_hook]').popInt(), 0, 'completed players bypass Joe’s quest referral');
+const joePackets = p.packets.length;
+talk(p, 'vc_smokin_joe');
+assert(p.packets.slice(joePackets).some(packet => packet.text?.includes('Despite your wild articulations and gesticulations')),
+  'post-completion Talk-to executes Joe’s ordinary dialogue');
+assert.equal(stage(p), 127);
 for (const value of [0, 7, 127]) {
   const cook = player({ cat: null }); atStage(cook, value);
   add(cook, 'cheese'); add(cook, 'rat_poison'); add(cook, 'pizza_base');

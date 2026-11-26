@@ -1,7 +1,7 @@
 // VERIFIED recipe and cat ambush: Tip.It q127, 27 April 2006, line197.
 // Messages are UNKNOWN plain functional wording, not reconstructed dialogue.
 [proc,ratcatch_joe_hook]()(boolean)
-if (%ratcatch_var < 12) return(false);
+if (%ratcatch_var < 12 | %ratcatch_var >= ^ratcatch_complete) return(false);
 if (%ratcatch_var >= 15) {
     mes("Speak to The Face in Port Sarim.");
     return(true);
