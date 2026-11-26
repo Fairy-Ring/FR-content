@@ -123,7 +123,7 @@ npc_settimer(4);
 
 [timer,fightcaves_tick]
 if (~fightcaves_owned = false) {
-    settimer(fightcaves_tick, 0);
+    cleartimer(fightcaves_tick);
     return;
 }
 // Death owns the safe recovery branch, never advance while the player dies.
@@ -163,7 +163,7 @@ if (inv_itemspace(inv, $item, $amount, inv_size(inv)) = true) {
 }
 
 [proc,fightcaves_clear]
-settimer(fightcaves_tick, 0);
+cleartimer(fightcaves_tick);
 clearqueue(fightcaves_jad_impact);
 ~combat_clearqueue;
 %fightcaves_state = 0;
@@ -196,11 +196,10 @@ if (%fightcaves_state = 0) return;
 // Also handles an abrupt disconnect or server restart before the logout hook.
 %fightcaves_state = ~fightcaves_current_wave;
 
-[proc,fightcaves_teleport_check](coord $destination)(boolean)
+[proc,fightcaves_teleport_check](coord $departure)(boolean)
+// Shared teleport eligibility supplies the departure tile, not the destination.
+// Current ownership is authoritative; every spell/jewellery departure is refused.
 if (~fightcaves_owned = false) return(true);
-if (region_findbycoord($destination) = true) {
-    if (add(region_uid, 1) = getbit_range(%fightcaves_state, 7, 30)) return(true);
-}
 // UNKNOWN functional wording until a period rejection line survives.
 mes("You cannot teleport out of the Fight Caves. Use the exit to leave.");
 return(false);

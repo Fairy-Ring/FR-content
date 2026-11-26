@@ -18,7 +18,7 @@ def_int $ticks;
 def_int $defence_style = npc_param(damagetype);
 // CANDIDATE Old School melee styles: Tok-Xil crush; Ket-Zek and Jad stab.
 if ($defence_style = ^ranged_style) $defence_style = ^crush_style;
-if ($defence_style = ^magic_style) $defence_style = ^stab_style;
+if ($defence_style = ^magic_style | npc_type = tzhaar_fightcave_swarm_boss) $defence_style = ^stab_style;
 $attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_meleeattack_resolve(~npc_melee_attack_roll, ~player_defence_roll_specific($defence_style), npc_param(fightcaves_maxhit), 0);
 return($attempted, $delivered);
 

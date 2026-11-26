@@ -4,10 +4,10 @@ fightcaves_source=0_37_79_0_0
 // Outside is next to the original city entrance; inside is south of its copied exit.
 fightcaves_outside=0_38_80_5_49
 fightcaves_entry=0_37_79_44_56
-// Each stand admits a full 5x5 footprint and a nonempty native route to the exit.
+// Each stand admits a full 5x5 footprint and native contact or a route to the exit.
 fightcaves_spawn0=0_37_79_38_56
-fightcaves_spawn1=0_37_79_53_51
-fightcaves_spawn2=0_37_79_48_43
+fightcaves_spawn1=0_37_79_50_51
+fightcaves_spawn2=0_37_79_48_44
 fightcaves_spawn3=0_37_79_45_56
 fightcaves_spawn4=0_37_79_50_56
 fightcaves_spawn5=0_37_79_48_51
