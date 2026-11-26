@@ -159,3 +159,6 @@
 // VERIFIED period rewards. Native experience helpers take tenths of XP.
 ^soulbane_reward_xp_tenths = 5000
 ^soulbane_reward_coins = 500
+
+// UNKNOWN entry landing adjacent to the original training dungeon's rope.
+^soulbane_post_lobby=0_51_153_32_31

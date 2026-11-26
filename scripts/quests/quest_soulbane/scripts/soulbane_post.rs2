@@ -1,0 +1,21 @@
+// VERIFIED period RuneHQ: completion unlocks combat training, with no drops.
+// VERIFIED original 377 map: shared training monsters and open room passages.
+[proc,soulbane_post_enter]
+if (%soulbane_prog < ^soulbane_complete) return;
+// Normal map loading owns the original NPCs and their ordinary respawns.
+p_teleport(^soulbane_post_lobby);
+~music_playbyrow(music_Wrath_and_Ruin);
+
+[proc,soulbane_post_inside]()(boolean)
+if (%soulbane_prog < ^soulbane_complete) return(false);
+return(inzone(0_51_153_0_0, 0_51_153_63_63, coord));
+
+[oploc1,soulbane_rope_up]
+if (~soulbane_post_inside = false) return;
+p_arrivedelay;
+p_teleport(^soulbane_surface);
+
+// VERIFIED period guide returns a logged-out player to the rift entrance.
+// Ordinary death remains ordinary death, with no private-region item deletion.
+[proc,soulbane_post_logout]
+if (~soulbane_post_inside = true) p_teleport(^soulbane_surface);
