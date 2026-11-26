@@ -1,0 +1,276 @@
+// VERIFIED mechanics/rewards: Tip.It q97, capture 15 April 2006, lines 53-124.
+// UNKNOWN: functional dialogue and intermediate stage numbers. No modern rewritten lore.
+[opnpc1,ics_little_sphinx]
+if (%ics_little_var >= ^ics_little_complete) {
+    if (inv_total(inv, ics_little_amulet_of_catspeak) = 0 & inv_total(worn, ics_little_amulet_of_catspeak) = 0 & inv_total(bank, ics_little_amulet_of_catspeak) = 0) {
+        if (inv_freespace(inv) = 0) {
+            ~chatnpc("<p,neutral>Make room for your Catspeak amulet.");
+            return;
+        }
+        inv_add(inv, ics_little_amulet_of_catspeak, 1);
+        ~chatnpc("<p,neutral>Here is a replacement Catspeak amulet.");
+    } else {
+        ~chatnpc("<p,neutral>You already have your Catspeak amulet.");
+    }
+    return;
+}
+if (%ics_little_var < 3) {
+    ~chatnpc("<p,neutral>Explore the pyramid before seeking my help.");
+    return;
+}
+if (~ics_little_has_cat = false) {
+    ~chatnpc("<p,neutral>Bring your cat with you.");
+    return;
+}
+if (%ics_little_var = 3) {
+    // UNKNOWN functional paraphrase, not the dialogue rewritten in 2022.
+    // VERIFIED period guide: a family/sons riddle with the answer nine.
+    ~chatnpc("<p,neutral>There are two parents and six brothers. Each brother has one sister. How many family members are there?");
+    def_int $answer = ~p_choice3("Seven.", 1, "Nine.", 2, "Twelve.", 3);
+    if ($answer ! 2) {
+        ~chatnpc("<p,neutral>That is not the answer. Try again.");
+        return;
+    }
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Make room for my token.");
+        return;
+    }
+    inv_add(inv, ics_little_sphinxstatue, 1);
+    %ics_metsphinx = 1;
+    %ics_little_var = 4;
+    ~chatnpc("<p,neutral>Take my token to the High Priest.");
+    return;
+}
+if (%ics_little_var = 4 & inv_total(inv, ics_little_sphinxstatue) = 0 & inv_total(bank, ics_little_sphinxstatue) = 0) {
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Make room for my token.");
+        return;
+    }
+    inv_add(inv, ics_little_sphinxstatue, 1);
+}
+~chatnpc("<p,neutral>Speak to the High Priest.");
+
+[opnpc1,ics_little_hipriest_vis]
+if (%ics_little_var = 4) {
+    if (inv_total(inv, ics_little_sphinxstatue) = 0) {
+        ~chatnpc("<p,neutral>Bring the Sphinx's token.");
+        return;
+    }
+    ~chatnpc("<p,neutral>Return the canopic jar to the pyramid.");
+    inv_del(inv, ics_little_sphinxstatue, 1);
+    %ics_little_var = 5;
+    return;
+}
+if (%ics_little_var = 9) {
+    ~chatnpc("<p,neutral>Help the Embalmer and Carpenter prepare for the ceremony.");
+    %ics_little_var = 10;
+    return;
+}
+if (%ics_little_var = 10) {
+    ~ics_little_supplies_ready;
+}
+if (%ics_little_var = 11) {
+    ~chatnpc("<p,neutral>The Carpenter should have finished the holy symbol.");
+    return;
+}
+if (%ics_little_var = 24 & coordz(coord) > 9000) {
+    ~chatnpc("<p,neutral>Thank you. Meet me at the temple in Sophanem.");
+    %ics_little_var = 25;
+    %ics_little_priestvis = 0;
+    p_telejump(0_51_43_31_28);
+    return;
+}
+if (%ics_little_var = 25 & coordz(coord) < 9000) {
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Make room for your reward, then speak to me again.");
+        return;
+    }
+    ~chatnpc("<p,neutral>Thank you for saving the ceremony.");
+    // VERIFIED: retained q97 lines116-119: 4500 Thieving, 4000 Agility,
+    // 4000 Woodcutting, Catspeak amulet and 2 quest points. XP uses tenths.
+    // Commit completion before every reward, including the derived quest points.
+    %ics_little_var = ^ics_little_complete;
+    inv_add(inv, ics_little_amulet_of_catspeak, 1);
+    stat_advance(thieving, 45000);
+    stat_advance(agility, 40000);
+    stat_advance(woodcutting, 40000);
+    ~send_quest_complete(questlist:ics_little, ics_little_amulet_of_catspeak, 200, ^ics_little_questpoints, "You have completed Icthlarin's Little Helper!", "4,500 Thieving XP|4,000 Agility XP|4,000 Woodcutting XP|Catspeak amulet|Access to Sophanem");
+    return;
+}
+if (%ics_little_var >= ^ics_little_complete) {
+    ~chatnpc("<p,neutral>Thank you for helping Sophanem.");
+    return;
+}
+if (%ics_little_var < 4) {
+    ~chatnpc("<p,neutral>Speak to the Sphinx.");
+} else {
+    ~chatnpc("<p,neutral>Finish your work in the pyramid.");
+}
+
+[opnpc1,ics_little_embalmer]
+~ics_little_embalmer;
+[opnpcu,ics_little_embalmer]
+~ics_little_embalmer;
+
+[proc,ics_little_embalmer]
+if (%ics_little_var < 10) {
+    ~chatnpc("<p,neutral>The High Priest will tell you when to help me.");
+    return;
+}
+if (%ics_little_var > 11) {
+    ~chatnpc("<p,neutral>The preparations are complete.");
+    return;
+}
+%ics_metembalmer = 1;
+if (%ics_gotsap = 0 & inv_total(inv, ics_little_sap_bucket) > 0) {
+    inv_del(inv, ics_little_sap_bucket, 1);
+    inv_add(inv, bucket_empty, 1);
+    %ics_gotsap = 1;
+}
+if (%ics_gotsalt = 0) {
+    if (inv_total(inv, ics_little_pileofsalt) > 0) {
+        inv_del(inv, ics_little_pileofsalt, 1);
+        %ics_gotsalt = 1;
+    } else if (inv_total(inv, slayer_bag_of_salt) > 0) {
+        inv_del(inv, slayer_bag_of_salt, 1);
+        %ics_gotsalt = 1;
+    }
+}
+if (%ics_gotlinen = 0 & inv_total(inv, ics_little_linen) > 0) {
+    inv_del(inv, ics_little_linen, 1);
+    %ics_gotlinen = 1;
+}
+if (%ics_gotsalt = 1 & %ics_gotsap = 1 & %ics_gotlinen = 1) {
+    ~chatnpc("<p,neutral>I have the sap, salt and linen. Speak to the High Priest.");
+} else {
+    ~chatnpc("<p,neutral>I need a bucket of sap, salt and linen for the ceremony.");
+    if (inv_total(inv, ics_little_bookofembalming) = 0 & inv_total(bank, ics_little_bookofembalming) = 0 & inv_freespace(inv) > 0) {
+        inv_add(inv, ics_little_bookofembalming, 1);
+    }
+}
+~ics_little_supplies_ready;
+
+[opnpc1,ics_little_carpenter]
+~ics_little_carpenter;
+[opnpcu,ics_little_carpenter]
+~ics_little_carpenter;
+
+[proc,ics_little_carpenter]
+if (%ics_little_var < 10) {
+    ~chatnpc("<p,neutral>The High Priest will tell you when to help me.");
+    return;
+}
+%ics_metcarpenter = 1;
+if (%ics_little_carpenter_multi = 0) {
+    if (inv_total(inv, willow_logs) = 0) {
+        ~chatnpc("<p,neutral>Bring me a willow log to make the holy symbol.");
+        return;
+    }
+    inv_del(inv, willow_logs, 1);
+    %ics_little_carpenter_multi = 1;
+    ~chatnpc("<p,neutral>I will make the holy symbol from this willow log.");
+}
+~ics_little_supplies_ready;
+if (%ics_little_var = 11 | %ics_little_var = 12) {
+    if (inv_total(inv, ics_little_holy_symbol) = 0 & inv_total(bank, ics_little_holy_symbol) = 0) {
+        if (inv_freespace(inv) = 0) {
+            ~chatnpc("<p,neutral>Make room for the holy symbol.");
+            return;
+        }
+        inv_add(inv, ics_little_holy_symbol, 1);
+    }
+    %ics_little_var = 12;
+    ~chatnpc("<p,neutral>Take the holy symbol to the eastern burial chamber.");
+} else if (%ics_little_var = 13) {
+    // UNKNOWN favourable recovery: replace the transformed symbol without a new log.
+    if (inv_total(inv, ics_little_unholy_symbol) = 0 & inv_total(bank, ics_little_unholy_symbol) = 0 & inv_freespace(inv) > 0) {
+        inv_add(inv, ics_little_unholy_symbol, 1);
+    }
+} else {
+    ~chatnpc("<p,neutral>Help the Embalmer prepare for the ceremony.");
+}
+
+[proc,ics_little_supplies_ready]
+if (%ics_little_var = 10 & %ics_little_carpenter_multi = 1 & %ics_gotsalt = 1 & %ics_gotsap = 1 & %ics_gotlinen = 1) {
+    %ics_little_var = 11;
+}
+
+[opnpc1,ics_little_linen1]
+if (%ics_little_var < 10) {
+    ~chatnpc("<p,neutral>I sell linen for 30 coins.");
+    return;
+}
+if (inv_total(inv, coins) < 30) {
+    ~chatnpc("<p,neutral>A sheet of linen costs 30 coins.");
+    return;
+}
+if (inv_freespace(inv) = 0 & inv_total(inv, coins) ! 30) {
+    ~chatnpc("<p,neutral>Make room for the linen.");
+    return;
+}
+inv_del(inv, coins, 30);
+inv_add(inv, ics_little_linen, 1);
+~chatnpc("<p,neutral>Here is your linen.");
+
+[proc,ics_little_collect_sap]()(boolean)
+if (last_useitem ! knife) {
+    return(false);
+}
+if (loc_type ! evergreen & loc_type ! evergreen_large & loc_type ! evergreen_snowy_large & loc_type ! evergreen_vsnowy_large) {
+    return(false);
+}
+if (inv_total(inv, bucket_empty) = 0) {
+    mes("You need an empty bucket to collect the sap.");
+    return(true);
+}
+anim(human_pickupfloor, 0);
+inv_del(inv, bucket_empty, 1);
+inv_add(inv, ics_little_sap_bucket, 1);
+mes("You collect a bucket of sap.");
+return(true);
+
+[oplocu,icthalarins_waters_edge]
+if (last_useitem ! bucket_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, bucket_empty, 1);
+inv_add(inv, ics_little_saltwaterbucket, 1);
+mes("You fill your bucket with salty water.");
+
+[oplocu,icthalarins_suntrap_centre]
+if (last_useitem ! ics_little_saltwaterbucket) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%ics_suntrapgotsalt = 1) {
+    mes("There is already salt on the pillar. Search it first.");
+    return;
+}
+inv_del(inv, ics_little_saltwaterbucket, 1);
+inv_add(inv, bucket_empty, 1);
+%ics_suntrapgotsalt = 1;
+mes("The water evaporates, leaving salt on the pillar.");
+
+[oploc1,icthalarins_suntrap_centre]
+if (%ics_suntrapgotsalt = 0) {
+    mes("There is no salt on the pillar.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need room to collect the salt.");
+    return;
+}
+%ics_suntrapgotsalt = 0;
+inv_add(inv, ics_little_pileofsalt, 1);
+mes("You collect the salt.");
+
+[opheld4,ics_little_sap_bucket]
+inv_del(inv, ics_little_sap_bucket, 1);
+inv_add(inv, bucket_empty, 1);
+[opheld4,ics_little_saltwaterbucket]
+inv_del(inv, ics_little_saltwaterbucket, 1);
+inv_add(inv, bucket_empty, 1);
+
+[opheld1,ics_little_bookofembalming]
+~mesbox("Collect sap by using a knife on an evergreen with an empty bucket.|Collect salt water from the lake and evaporate it on the suntrap.|Buy linen from the linen worker for 30 coins.");
