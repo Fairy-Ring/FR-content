@@ -1,0 +1,299 @@
+# Quest-owned original 377 location definitions.
+[icthalarins_waters_edge]
+name=Water
+desc=Wet and salty.
+model=regicide_tar_collection
+sharelight=yes
+active=yes
+shadow=no
+
+[icthalarins_suntrap_centre]
+name=Centre piece
+desc=The focus of the suntrap.
+model=egypt_font
+active=yes
+op1=Search
+
+[icthalarins_suntrap1]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap1
+sharelight=yes
+hillskew=yes
+
+[icthalarins_suntrap2]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap2
+sharelight=yes
+hillskew=yes
+
+[icthalarins_suntrap3]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap3
+sharelight=yes
+hillskew=yes
+
+[icthalarins_suntrap4]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap4
+sharelight=yes
+hillskew=yes
+
+[icthalarins_suntrap5]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap2
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[icthalarins_suntrap6]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap3
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[icthalarins_suntrap7]
+name=Mirror
+desc=A shiny mirror.
+model=icthalarins_suntrap4
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[icthalarins_temple_door]
+name=Door
+desc=A large door with a hieroglyph of a cat.
+model=icthalarins_temple_door
+length=3
+width=2
+offsety=178
+ambient=20
+contrast=10
+op1=Touch
+op3=Open
+
+[clue_suggestion_list]
+name=City gate
+desc=Gate like?
+model=ornaterailing
+hillskew=yes
+active=yes
+op1=Open
+
+[ics_pyramid_wall_flatskew]
+model=ics_pyramid_wall_flatskew
+hillskew=yes
+sharelight=yes
+active=no
+forcedecor=yes
+contrast=20
+
+[ics_pyramid_wall_flatskew_corn]
+model=ics_pyramid_wall_flatskew_corn
+hillskew=yes
+sharelight=yes
+active=no
+forcedecor=yes
+contrast=20
+
+[ics_pyramid_back_door_skew]
+model=desert_trasure_back_door_skew
+length=2
+hillskew=yes
+active=no
+
+[ics_wall_crack]
+name=Hole
+desc=It looks like a hole in the wall.
+model=ics_wall_crack
+hillskew=yes
+active=yes
+op1=Climb-through
+
+[ics_little_entrance_multi]
+sharelight=yes
+active=yes
+length=3
+width=3
+multivar=ics_ent_open
+multiloc=0,icthal_entrance
+multiloc=1,icthal_entrance_open
+
+[icthal_entrance]
+name=Rock
+desc=Rocky.
+model=icthal_entrance
+length=3
+width=3
+
+[icthal_entrance_open]
+name=Rock
+desc=An entrance into a tunnel. I wonder where it leads to.
+model=icthal_entrance_open
+op1=Enter
+length=3
+width=3
+
+[icthalarins_door]
+name=Door
+desc=It looks like a door.
+model=loc_4487
+hillskew=yes
+op1=Open
+
+[icthalarins_door_mirror]
+name=Door
+desc=Hmm. A door.
+model=loc_4487
+hillskew=yes
+mirror=yes
+op1=Open
+
+[icthalarins_door_open]
+name=Door
+desc=A big wooden door.
+model=loc_4487
+hillskew=yes
+op1=Close
+
+[icthalarins_door_open_mirror]
+name=Door
+desc=A big wooden door.
+model=loc_4487
+hillskew=yes
+mirror=yes
+op1=Close
+
+[ics_little_pit_to]
+name=Pit
+desc=I can't see the bottom.
+model=regicide_tar_collection
+blockrange=no
+active=yes
+forcedecor=yes
+shadow=no
+hillskew=yes
+blockwalk=no
+sharelight=yes
+op2=Jump-Across
+
+[ics_little_pit_from]
+name=Pit
+desc=I can't see the bottom.
+model=regicide_tar_collection
+blockrange=no
+active=yes
+forcedecor=yes
+shadow=no
+hillskew=yes
+blockwalk=no
+sharelight=yes
+
+[ics_little_pot_liver_multi]
+active=yes
+blockwalk=no
+multivar=ics_liverpot_vis
+multiloc=0,ics_little_pot_liver
+
+[ics_little_pot_liver]
+name=Canopic Jar
+desc=Has a lid shaped like a man. I think it contains someone's liver. Yuck.
+model=ics_little_pot_liver
+op1=Take
+blockwalk=no
+
+[ics_little_pot_lungs_multi]
+active=yes
+blockwalk=no
+multivar=ics_lungpot_vis
+multiloc=0,ics_little_pot_lungs
+
+[ics_little_pot_lungs]
+name=Canopic Jar
+desc=Has a lid shaped like a crocodile. Yuck, I think there are lungs inside.
+model=ics_little_pot_lungs
+op1=Take
+blockwalk=no
+
+[ics_little_pot_stomach_multi]
+active=yes
+blockwalk=no
+multivar=ics_stomachpot_vis
+multiloc=0,ics_little_pot_stomach
+
+[ics_little_pot_stomach]
+name=Canopic Jar
+desc=Has a lid shaped like a bug. Disgusting! I think there's a stomach inside.
+model=ics_little_pot_stomach
+op1=Take
+blockwalk=no
+
+[ics_little_pot_intestines_multi]
+active=yes
+blockwalk=no
+multivar=ics_intestinespot_vis
+multiloc=0,ics_little_pot_intestines
+
+[ics_little_pot_intestines]
+name=Canopic Jar
+desc=Has a lid shaped like an ape. Eeew! I think it contains someone's intestines.
+model=ics_little_pot_intestines
+op1=Take
+blockwalk=no
+
+[icthalarins_tomb_secretdoor]
+name=
+desc=Holds the ceiling up.
+model=icthalarins_tomb_secretdoor
+anim=ics_secret_door
+hillskew=yes
+active=yes
+
+[ics_ceremtable]
+name=Ceremonial table
+desc=Useful for putting things on.
+model=egypt_table2
+length=2
+blockrange=no
+
+[ics_ladder]
+name=Ladder
+desc=A ladder!! Never seen one of those before.
+model=desert_ladder01
+active=yes
+op1=Climb-up
+mapscene=7
+
+[ics_chestclosed]
+name=Closed chest
+desc=I wonder what's inside.
+model=arena_guard_chest_shut
+op1=Open
+forceapproach=north
+
+[ics_chestopen]
+name=Open chest
+desc=Perhaps I should search it.
+model=arena_guard_chest_open
+op2=Search
+op3=Shut
+forceapproach=north
+
+[ics_brokenlogs]
+name=Broken logs
+desc=Oops.
+model=lograft_broken
+width=2
+length=2
+
+[ics_floor_cloth]
+name=Cloth
+desc=Rolls of colourful cloth.
+model=draynor_floor_cloth
+
