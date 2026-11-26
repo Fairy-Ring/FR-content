@@ -40,13 +40,6 @@ function integerConstant(name, relative = 'scripts/general/configs/quest.constan
   assert(match, `existing quest constant ${name} is defined`);
   return Number(match[1]);
 }
-function gardenCoordinate(name) {
-  const source = fs.readFileSync(path.join(content, 'scripts/quests/quest_garden/configs/garden.constant'), 'utf8');
-  const match = new RegExp(`^\\^${name}\\s*=\\s*([0-3])_(\\d+)_(\\d+)_(\\d+)_(\\d+)\\s*$`, 'm').exec(source);
-  assert(match, `existing Garden coordinate ${name} is defined`);
-  const [, level, mapX, mapZ, localX, localZ] = match.map(Number);
-  return { level, x: mapX * 64 + localX, z: mapZ * 64 + localZ };
-}
 
 const completeStage = integerConstant('garden_complete');
 const fenkComplete = integerConstant('fenk_complete',
@@ -271,10 +264,25 @@ const allotmentPatches = new Map(allotmentSelectorNames.map(name => {
   assert(loc, `${name} resolves to an original accessible allotment patch`);
   return [name, loc];
 }));
-const saraDropoff = gardenCoordinate('garden_saradomin_dropoff');
-const kingDropoff = gardenCoordinate('garden_king_dropoff');
-const saraPlinth = gardenCoordinate('garden_saradomin_plinth');
-const kingPlinth = gardenCoordinate('garden_king_plinth');
+// Independent fixture landings beside the original palace garden, not values
+// read back from the product's route constants.
+const saraDropoff = { level: 0, x: 3228, z: 3489 };
+const kingDropoff = { level: 0, x: 3232, z: 3489 };
+const saraPlinth = packedLoc('garden_saradomin_statue_plinth');
+const kingPlinth = packedLoc('garden_king_statue_plinth');
+for (const [name, landing, plinth] of [
+  ['Saradomin', saraDropoff, saraPlinth], ['king', kingDropoff, kingPlinth]
+]) {
+  const exit = findApproachTile(plinth);
+  assert(Math.max(Math.abs(landing.x - plinth.x), Math.abs(landing.z - plinth.z)) <= 12,
+    `${name} arrival is beside its original palace garden plinth`);
+  for (const tile of [landing, { ...landing, z: landing.z + 1 }]) {
+    assert(floorTiles.has(`${tile.level},${tile.x},${tile.z}`), `${name} landing has packed floor`);
+    assert.equal(map.isMapBlocked(tile.x, tile.z, tile.level), false, `${name} landing is walkable`);
+    assert(map.findPath(tile.level, tile.x, tile.z, exit.x, exit.z).length > 0,
+      `${name} player and trolley landings have a native path out to the garden`);
+  }
+}
 const trolleyRoot = types.NpcType.get(id('NpcType', 'garden_trolley'));
 assert.equal(trolleyRoot.multivarbit, id('VarBitType', 'garden_trolley_varbit'),
   'the original Garden trolley selector exposes its visible NPC forms');
@@ -714,6 +722,9 @@ try {
     talk(p, 'queen_ellamaria', [1]);
     assert.equal(stage(p), 1);
     assert.equal(count(p, 'garden_list'), 1);
+    remove(p, 'garden_list');
+    talk(p, 'queen_ellamaria', [1]);
+    assert.equal(count(p, 'garden_list'), 1, 'the Queen replaces a lost list during the active quest');
     talk(p, 'queen_ellamaria', [5]);
     assert.equal(stage(p), 1, 'an unfinished garden cannot enter the reveal');
     add(p, 'ring_of_charos');
@@ -763,9 +774,11 @@ try {
     assert.equal(bit(p, 'garden_elstan_varbit'), 4);
     assert.equal(count(p, 'garden_delphinium_seed'), 4);
     assert.equal(count(p, 'marigold'), 0, 'the local marigold is consumed exactly once');
-    remove(p, 'garden_delphinium_seed', 1);
-    donor(p, 'elstan');
-    assert.equal(count(p, 'garden_delphinium_seed'), 4, 'a partially lost delphinium bundle is restored');
+    for (const lost of [1, 4]) {
+      remove(p, 'garden_delphinium_seed', lost);
+      donor(p, 'elstan');
+      assert.equal(count(p, 'garden_delphinium_seed'), 4, 'partial and complete delphinium losses recover');
+    }
 
     donor(p, 'lyra', [2, 2, 3, 2, 2, 1]);
     donor(p, 'kragen', [2, 2, 2, 2, 2, 1]);
@@ -793,12 +806,17 @@ try {
     assert.equal(count(p, 'garden_snowdrop_seed'), 4);
     assert.equal(p.getVarBit(types.LocType.get(onionLoc.type).multivarbit), onionsBefore, 'Lyra inspects without harvesting');
     assert.equal(p.getVarBit(types.LocType.get(cabbageLoc.type).multivarbit), cabbagesBefore, 'Kragen inspects without harvesting');
-    for (const seed of ['garden_orchid_pink_seed', 'garden_orchid_yellow_seed']) remove(p, seed, 1);
-    remove(p, 'garden_snowdrop_seed', 1);
-    donor(p, 'lyra'); donor(p, 'kragen');
-    assert.equal(count(p, 'garden_orchid_pink_seed'), 3);
-    assert.equal(count(p, 'garden_orchid_yellow_seed'), 3);
-    assert.equal(count(p, 'garden_snowdrop_seed'), 4);
+    for (const lost of [1, 3]) {
+      for (const seed of ['garden_orchid_pink_seed', 'garden_orchid_yellow_seed']) remove(p, seed, lost);
+      donor(p, 'lyra');
+      assert.equal(count(p, 'garden_orchid_pink_seed'), 3, 'pink orchids recover partial and complete loss');
+      assert.equal(count(p, 'garden_orchid_yellow_seed'), 3, 'yellow orchids recover partial and complete loss');
+    }
+    for (const lost of [1, 4]) {
+      remove(p, 'garden_snowdrop_seed', lost);
+      donor(p, 'kragen');
+      assert.equal(count(p, 'garden_snowdrop_seed'), 4, 'snowdrops recover partial and complete loss');
+    }
 
     talk(p, 'bernald', [2]);
     const vines = packedLoc('garden_burthorpe_vines_diseased');
@@ -812,6 +830,21 @@ try {
     assert.equal(count(p, 'plant_cure_strong'), 0, 'attempting to charm Alain grants no cure');
     donor(p, 'farming_gardener_tree_1', [1]);
     add(p, 'blankrune'); add(p, 'hammer'); add(p, 'pestle_and_mortar');
+    for (const lostForm of ['rune_shards', 'rune_dust', 'plant_cure_strong']) {
+      const q = nativePlayer(p.save());
+      heldUse(q, 'blankrune', 'hammer');
+      if (lostForm !== 'rune_shards') heldUse(q, 'rune_shards', 'pestle_and_mortar');
+      if (lostForm === 'plant_cure_strong') heldUse(q, 'plant_cure', 'rune_dust');
+      remove(q, lostForm);
+      add(q, 'blankrune'); add(q, 'plant_cure');
+      heldUse(q, 'blankrune', 'hammer');
+      heldUse(q, 'rune_shards', 'pestle_and_mortar');
+      heldUse(q, 'plant_cure', 'rune_dust');
+      assert.equal(count(q, 'plant_cure_strong'), 1, `${lostForm} loss permits recrafting from ordinary materials`);
+      useItemOnLocNative(q, 'plant_cure_strong', vines, '[oplocu,garden_burthorpe_vines_diseased]');
+      talk(q, 'bernald');
+      assert.equal(count(q, 'garden_vine_seed'), 4, `${lostForm} loss does not strand Bernald's trade`);
+    }
     heldUse(p, 'blankrune', 'hammer');
     heldUse(p, 'rune_shards', 'pestle_and_mortar');
     heldUse(p, 'plant_cure', 'rune_dust');
@@ -820,9 +853,11 @@ try {
     assert.equal(bit(p, 'garden_bernald_varbit'), 4);
     talk(p, 'bernald');
     assert.equal(count(p, 'garden_vine_seed'), 4);
-    remove(p, 'garden_vine_seed', 1);
-    talk(p, 'bernald');
-    assert.equal(count(p, 'garden_vine_seed'), 4);
+    for (const lost of [1, 4]) {
+      remove(p, 'garden_vine_seed', lost);
+      talk(p, 'bernald');
+      assert.equal(count(p, 'garden_vine_seed'), 4, 'vine seeds recover partial and complete loss');
+    }
     remove(p, 'hammer'); remove(p, 'pestle_and_mortar');
 
     donor(p, 'dantaera', [2, 2, 2]);
@@ -834,15 +869,25 @@ try {
     donor(p, 'dantaera');
     useItemOnLocNative(p, 'secateurs', deadTree, '[oplocu,garden_white_tree_dead]');
     assert.equal(count(p, 'garden_white_tree_shoot'), 1, 'a lost White Tree shoot is recoverable');
-    remove(p, 'secateurs');
+    const cuttingRecovers = form => {
+      const q = nativePlayer(p.save());
+      remove(q, form);
+      donor(q, 'dantaera');
+      useItemOnLocNative(q, 'secateurs', deadTree, '[oplocu,garden_white_tree_dead]');
+      assert.equal(count(q, 'garden_white_tree_shoot'), 1, `${form} loss permits a new White Tree cutting`);
+    };
     add(p, 'plantpot_empty');
     heldUse(p, 'plantpot_empty', 'garden_white_tree_shoot');
+    cuttingRecovers('garden_white_tree_plantpot_shoot');
     add(p, 'watering_can_8');
     heldUse(p, 'garden_white_tree_plantpot_shoot', 'watering_can_8');
     assert.equal(count(p, 'garden_white_tree_plantpot_shoot_watered'), 1);
+    cuttingRecovers('garden_white_tree_plantpot_shoot_watered');
     growthWindow(p);
     assert.equal(count(p, 'garden_white_tree_plantpot_sapling'), 1, 'the shared timer grows the watered shoot');
+    cuttingRecovers('garden_white_tree_plantpot_sapling');
     remove(p, 'watering_can_7');
+    remove(p, 'secateurs');
 
     talk(p, 'brother_althric', [2]);
     ringToInventory(p);
@@ -857,9 +902,11 @@ try {
     ]) {
       clickLocNative(p, packedLoc(rose), 1, `[oploc1,${rose}]`);
       assert.equal(count(p, seed), 3);
-      remove(p, seed, 1);
-      clickLocNative(p, packedLoc(rose), 1, `[oploc1,${rose}]`);
-      assert.equal(count(p, seed), 3, 'a partially lost rose bundle is restored');
+      for (const lost of [1, 3]) {
+        remove(p, seed, lost);
+        clickLocNative(p, packedLoc(rose), 1, `[oploc1,${rose}]`);
+        assert.equal(count(p, seed), 3, 'rose seeds recover partial and complete loss');
+      }
     }
     add(p, 'fishing_rod');
     useItemOnLocNative(p, 'fishing_rod', well, '[oplocu,well]');
@@ -917,6 +964,9 @@ try {
     assert.equal(stage(p), 1, 'grown plants do not replace the two statue requirements');
 
     talk(p, 'queen_ellamaria', [4]);
+    remove(p, 'garden_trolley_obj');
+    talk(p, 'queen_ellamaria', [4]);
+    assert.equal(count(p, 'garden_trolley_obj'), 1, 'the Queen replaces a lost empty trolley');
     const saraSource = packedLoc('garden_saradomin_statue');
     useItemOnLocNative(p, 'garden_trolley_obj', saraSource, '[oplocu,garden_saradomin_statue]');
     let actor = ownedTrolley(p);
