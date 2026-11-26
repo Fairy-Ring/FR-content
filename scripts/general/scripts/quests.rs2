@@ -398,6 +398,7 @@ return ($questpoints);
 [proc,update_questlist]
 ~update_questpoints;
 ~send_quest_progress_colour(questlist:runemysteries, %runemysteries, ^runemysteries_complete);
+~send_quest_progress_colour(questlist:forget, %forget_quest, ^forget_complete);
 ~send_quest_progress_colour(questlist:doric, %doricquest, ^doric_complete);
 ~send_quest_progress_colour(questlist:cook, %cookquest, ^cook_complete);
 ~send_quest_progress_colour(questlist:romeojuliet, %rjquest, ^romeojuliet_complete);
