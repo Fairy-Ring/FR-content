@@ -17,7 +17,7 @@ while (loc_findnext = true) {
 [oploc1,elf_village_treegate]
 def_boolean $from_outside = coordx(coord) < 2306;
 if ($from_outside = true & %mourning_quest < ^mep1_escorted) {
-    mes("The mourners must reach Lletya before I can enter.");
+    mes("I must speak to Eluned before I can enter Lletya.");
     return;
 }
 def_coord $gate_coord = loc_coord;
