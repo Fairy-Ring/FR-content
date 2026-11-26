@@ -151,6 +151,7 @@ if (calc(inv_total(inv, twocats_doctors_hat) + inv_total(worn, twocats_doctors_h
 if (%twocats_quest = 55) ~twocats_stage(60);
 return(true);
 
+// CANDIDATE white-clothes alternatives: retained Old School walkthrough, excluding later outfits.
 [proc,twocats_disguised]()(boolean)
 if (inv_total(worn, twocats_doctors_hat) = 0 & inv_total(worn, twocats_nurses_hat) = 0) return(false);
 if (inv_total(worn, desert_shirt) = 0 & inv_total(worn, druidrobetop) = 0) return(false);
