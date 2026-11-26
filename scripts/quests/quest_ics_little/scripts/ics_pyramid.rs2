@@ -237,9 +237,9 @@ if (runenergy < ^ics_little_pit_min_runenergy) {
     p_telejump(^ics_little_pit_fail_landing);
     return;
 }
-def_coord $landing = coord_move(loc_coord, 0, 0, ^ics_little_pit_landing_distance);
+def_coord $landing = movecoord(loc_coord, 0, 0, ^ics_little_pit_landing_distance);
 if (coordz(loc_coord) = 9196) {
-    $landing = coord_move(loc_coord, 0, 0, calc(0 - ^ics_little_pit_landing_distance));
+    $landing = movecoord(loc_coord, 0, 0, calc(0 - ^ics_little_pit_landing_distance));
 }
 if (%ics_little_var = 7) {
     %ics_little_var = 8;
