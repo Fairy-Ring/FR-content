@@ -55,6 +55,10 @@ const inside = p => execute('[proc,bf_inside]', p).popInt() === 1;
 function resetMachine() {
   for (const name of ['bf_temperature', 'bf_fuel', 'bf_conveyor_until', 'bf_faults', 'bf_wear', 'bf_next_fault']) setShared(name, 0);
 }
+function roomTick(foreman) {
+  World.currentTick++;
+  foreman.turn();
+}
 function typeId(kind, name) {
   const value = id(kind, name);
   assert.notEqual(value, -1, `packed ${kind} ${name} exists`);
@@ -210,6 +214,7 @@ function nativeNpc(p, npc, choices = []) {
   assert(script, 'production NPC dispatch selects a packed script');
   p.processInteraction();
   finishInteraction(p, choices, script.name);
+  assert.equal(npc.timerInterval, 1, 'Talk-to preserves the Foreman room timer through the real NPC default reset');
   return script;
 }
 function nativeItemOnLoc(p, item, loc) {
@@ -281,6 +286,11 @@ try {
   const entrance = locAt('dwarf_keldagrim_factory_stairs');
   const exitStairs = locAt('blast_furnace_stairs_up');
   const foreman = npcOf('blast_furnace_instructor');
+  assert.equal(foreman.timerInterval, 1, 'the natural Foreman config starts the recurring room timer');
+  setShared('bf_fuel', 2);
+  roomTick(foreman);
+  assert.equal(shared('bf_fuel'), 1, 'the autonomous NPC turn advances the room without a player script context');
+  resetMachine();
   const belt = locAt('blast_furnace_conveyer_belt_clickable');
   const coke = locAt('blast_furnace_coke');
   const stove = locAt('blast_furnace_stove_low');
@@ -452,7 +462,7 @@ try {
   enter(pumper, entrance);
   nativeLoc(pumper, pump, 1);
   const gaugePacketStart = worker.packets.length;
-  execute('[ai_timer,blast_furnace_instructor]', worker, [], { target: foreman });
+  roomTick(foreman);
   assert.equal(worker.modalMain, id('Component', 'blast_furnace_temp_gauge'), 'another player can pump while the reader keeps the gauge open');
   assert.equal(worker.getVarBit(varbit('blast_furnace_temperature_reading')), shared('bf_temperature'), 'the room timer refreshes the open gauge');
   assert(worker.packets.slice(gaugePacketStart).some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes(`Heat: ${shared('bf_temperature')}`)), 'the open gauge receives a refreshed heat packet');
@@ -476,7 +486,7 @@ try {
   assert(shared('bf_conveyor_until') > 0, 'pedalling starts the shared conveyor');
   assert.equal(worker.stats[stat('agility')] - agilityBefore, 10, 'one pedal pulse awards exactly 1 Agility XP');
   assert.equal(energyBefore - worker.runenergy, 100, 'one pedal pulse consumes exactly 1% run energy');
-  execute('[ai_timer,blast_furnace_instructor]', worker, [], { target: foreman });
+  roomTick(foreman);
   assert.equal(stored(worker, 'iron_bar'), 2, 'iron smelts with no coal and succeeds for every deposited ore');
   assert.equal(stored(secondary, 'iron_bar'), 1, 'the shared conveyor processes another worker’s ore');
   assert.equal(stored(worker, 'iron_ore'), 0, 'smelting removes the worker’s deposited ore');
@@ -514,8 +524,7 @@ try {
   assert.equal(stored(worker, 'iron_bar'), 1, 'claiming removes only the delivered bar from stock');
   assert.equal(worker.stats[stat('smithing')] - smithingBeforeClaim, barXp('iron_bar'), 'claiming iron grants exactly the ordinary recipe XP');
   for (let tick = 0; tick < 50; tick++) {
-    World.currentTick++;
-    execute('[ai_timer,blast_furnace_instructor]', worker, [], { target: foreman });
+    roomTick(foreman);
   }
   assert.equal(secondary.getVarBit(varbit('blast_furnace_bars_hot')), 3, 'waiting cools the second account’s bars without water');
   assert.equal(stored(secondary, 'iron_bar'), 1, 'passive cooling preserves the second account’s stock');
@@ -536,7 +545,7 @@ try {
   const coalBeforeSmelt = stored(worker, 'coal');
   assert.equal(coalBeforeSmelt, 10, 'one steel, two mithril, three adamantite and four rune ores need ten coal');
   nativeLoc(worker, pedals, 1);
-  execute('[ai_timer,blast_furnace_instructor]', worker, [], { target: foreman });
+  roomTick(foreman);
   for (const [bar, amount] of [
     ['bronze_bar', 2], ['steel_bar', 1], ['silver_bar', 1], ['gold_bar', 2],
     ['mithril_bar', 1], ['adamantite_bar', 1], ['runite_bar', 1]

@@ -20,6 +20,8 @@ vislevel=hide
 op1=Talk-to
 head1=npc_lawgof2_head
 head2=npc_2109_head
+// UNKNOWN engineering tick; also restored after a normal Foreman conversation.
+timer=1
 
 [blast_furnace_tin_ore]
 name=Tin ore

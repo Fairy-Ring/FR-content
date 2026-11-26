@@ -1,7 +1,4 @@
 // VERIFIED manual work/gates: retained Tip.It 4 Nov 2005. Timings in bf.constant are UNKNOWN.
-[ai_spawn,blast_furnace_instructor]
-npc_settimer(1);
-
 [ai_timer,blast_furnace_instructor]
 ~bf_tick;
 
