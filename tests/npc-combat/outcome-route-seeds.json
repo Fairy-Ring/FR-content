@@ -12,6 +12,18 @@
       }
     },
     {
+      "script": "[ai_opplayer2,mourning_dark_beast]",
+      "npc": "mourning_dark_beast",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,mourning_dark_beast]",
+      "npc": "mourning_dark_beast",
+      "distance": 4,
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
       "script": "[ai_opplayer2,zogre_1]",
       "npc": "zogre_1",
       "seeds": {

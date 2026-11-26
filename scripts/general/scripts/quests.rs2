@@ -513,6 +513,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:mourning, %mourning_quest, ^mourning_complete);
 ~send_quest_progress_colour(questlist:swansong, %swansong, ^swansong_complete);
 ~send_quest_progress_colour(questlist:twocats, %twocats_quest, ^twocats_complete);
+~send_quest_progress_colour(questlist:mourning2, %mourning_quest_main, ^mourning2_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

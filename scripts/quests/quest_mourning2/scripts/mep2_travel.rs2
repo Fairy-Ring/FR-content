@@ -1,0 +1,126 @@
+// Mourning's Ends Part II travel and shared Temple state.
+// Original placements and collision determine each opposing operation side.
+// UNKNOWN exact landing choice: use a fixed clear stand, never a blocked loc footprint.
+
+// QuestFlow owns the item consumption and stage-50 write.
+[proc,mep2_mark_black_crystal_restored]
+%mourning_light_temple_safe_guards = 1;
+
+[proc,mep2_temple_circle_stairs_up]
+switch_coord (loc_coord) {
+    case 0_29_72_31_30 : p_telejump(1_29_72_34_30);
+    case 0_29_72_46_30 : p_telejump(1_29_72_45_30);
+    case 1_29_72_34_27 : p_telejump(2_29_72_34_26);
+    case 1_29_72_34_33 : p_telejump(2_29_72_34_36);
+}
+
+[proc,mep2_temple_circle_stairs_down]
+switch_coord (loc_coord) {
+    case 1_29_72_31_30 : p_telejump(0_29_72_30_30);
+    case 1_29_72_46_30 : p_telejump(0_29_72_49_30);
+    case 2_29_72_34_27 : p_telejump(1_29_72_34_30);
+    case 2_29_72_34_33 : p_telejump(1_29_72_34_32);
+}
+
+[proc,mep2_temple_stairs_up]
+switch_coord (loc_coord) {
+    case 1_29_72_37_12 : p_telejump(2_29_72_36_12);
+    case 1_29_72_37_50 : p_telejump(2_29_72_36_50);
+}
+
+[proc,mep2_temple_stairs_down]
+switch_coord (loc_coord) {
+    case 2_29_72_37_12 : p_telejump(1_29_72_40_12);
+    case 2_29_72_37_50 : p_telejump(1_29_72_40_50);
+}
+
+[oploc1,mourning_temple_ladder_wall]
+switch_coord (loc_coord) {
+    case 1_29_72_42_2 : p_telejump(2_29_72_41_3);
+    case 1_29_72_42_60 : p_telejump(2_29_72_41_59);
+}
+
+[oploc1,mourning_temple_ladder_wall_top]
+switch_coord (loc_coord) {
+    case 2_29_72_42_2 : p_telejump(1_29_72_42_3);
+    case 2_29_72_42_59 : p_telejump(1_29_72_42_59);
+}
+
+[oploc1,mourning_temple_way_rope]
+if (%mourning_temple_rope = 0) return;
+p_telejump(1_29_72_20_11);
+
+[oploc1,mourning_temple_way_down]
+if (%mourning_temple_rope = 0) return;
+p_telejump(0_29_72_21_12);
+
+[oplocu,mourning_temple_way_down]
+if (last_useitem ! rope) return;
+if (%mourning_temple_rope = 1) return;
+if (%mourning_quest_main < ^mep2_sample_requested) return;
+if (inv_total(inv, rope) = 0) return;
+inv_del(inv, rope, 1);
+%mourning_temple_rope = 1;
+
+[oploc1,mourning_temple_wall_jump]
+if (coordx(coord) < coordx(loc_coord)) {
+    p_telejump(movecoord(loc_coord, 1, 0, 0));
+} else {
+    p_telejump(movecoord(loc_coord, -1, 0, 0));
+}
+
+// Tip.It 12 March 2006: a failed handhold crossing returns to the first floor
+// and deals 5 damage. The stat_random bounds are an UNKNOWN engineering default.
+[oploc1,mourning_temple_agility_hanging]
+if (%mourning_quest_main < ^mep2_sample_requested) return;
+def_coord $end = 1_29_72_55_4;
+if (coordx(coord) > coordx(loc_coord)) $end = 1_29_72_45_4;
+p_delay(0);
+if (stat_random(agility, ^mep2_handhold_roll_min, ^mep2_handhold_roll_max) = false) {
+    p_telejump(0_29_72_30_30);
+    ~damage_self(5);
+    return;
+}
+p_telejump($end);
+// UNKNOWN server-only enforcement: the original front-barrier loc is unplaced.
+// A carried trinket is required after completion; bank storage does not count.
+[proc,mep2_front_door_gate](coord $previous, coord $outside)
+if (%mourning_quest_main < ^mep2_complete) return;
+if (inv_total(inv, mourning_crystal_trinket) > 0) return;
+if (coordx($previous) <= 1917 | coordx(coord) >= coordx($previous)) return;
+if (coordz(coord) < 4638 | coordz(coord) > 4640) return;
+p_telejump($outside);
+
+// Zone entry alone misses players who turn towards the arch inside its zone.
+// Keep the previous tile in the existing softtimer, including a two-step run.
+[softtimer,mep2_front_door_watch](coord $previous, coord $outside)
+if (coordy(coord) ! 0 | coordx(coord) < 1912 | coordx(coord) > 1919 | coordz(coord) < 4632 | coordz(coord) > 4647) {
+    clearsofttimer(mep2_front_door_watch);
+    return;
+}
+if (p_finduid(uid) = false) return;
+~mep2_front_door_gate($previous, $outside);
+if (coordx(coord) > 1919) {
+    clearsofttimer(mep2_front_door_watch);
+    return;
+}
+softtimer(mep2_front_door_watch, 1, coord, $outside);
+
+[zone,0_29_72_56_24]
+if (coordx(coord) > 1917) ~mep2_front_door_gate(movecoord(coord, 1, 0, 0), 0_30_72_0_24);
+if (coordx(coord) <= 1919) softtimer(mep2_front_door_watch, 1, coord, 0_30_72_0_24);
+
+[zone,0_29_72_56_32]
+if (coordx(coord) > 1917) ~mep2_front_door_gate(movecoord(coord, 1, 0, 0), 0_30_72_0_32);
+if (coordx(coord) <= 1919) softtimer(mep2_front_door_watch, 1, coord, 0_30_72_0_32);
+
+// VERIFIED 2 May 2006 Tip.It: the Death chamber has an Underground Pass shortcut.
+// UNKNOWN exact landings: original clear floor immediately beside each tunnel.
+[oploc1,mourning_temple_light_wall_with_hole]
+if (%mourning_light_door_1_c_first_time = 0 & %mourning_quest_main < ^mourning2_complete) return;
+if (%mourning_quest_main >= ^mourning2_complete) %mourning_light_door_1_c_first_time = 1;
+p_telejump(0_36_153_7_1);
+
+[proc,mep2_tunnel_to_death_chamber]
+if (%mourning_light_door_1_c_first_time = 0) return;
+p_telejump(0_29_72_1_30);

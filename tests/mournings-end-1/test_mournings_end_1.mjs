@@ -613,7 +613,13 @@ try {
 
   check('every other new basement door and the shared HQ entry crosses to a walkable packed-map landing', () => {
     for (const name of ['mourner_hideout_door1', 'mourner_hideout_door2', 'mourner_hideout_door4', 'mournerstewdoor']) {
-      const p = fixture(3); disguise(p);
+      const p = fixture(name === 'mourner_hideout_door4' ? constant('mourning_complete') : 3);
+      if (name === 'mourner_hideout_door4') {
+        const mep2Constants = fs.readFileSync(path.join(contentRoot, 'scripts/quests/quest_mourning2/configs/mep2_quest.constant'), 'utf8');
+        p.setVarBit(bit('mourning_quest_main'), constant('mep2_access', mep2Constants));
+        add(p, 'mourning_excavation_key');
+      }
+      disguise(p);
       const target = loc(p, name), before = tile(p);
       const counterpart = locRows.find(row => row.type === target.type && row.x === target.x && row.z === target.z); assert(counterpart);
       operateLoc(p, name); assert.notDeepEqual(tile(p), before, `${name}: actual crossing`);

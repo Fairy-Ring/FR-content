@@ -163,5 +163,5 @@ data=rune,deathrune
 data=name,Death
 data=talisman,death_talisman
 data=multiplier,131
-data=enter_coord,0_34_75_32_29,0,0,0
+data=enter_coord,0_34_75_32_30,0,0,0
 data=exit_coord,0_29_72_6_31,0,0,0

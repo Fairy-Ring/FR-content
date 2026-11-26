@@ -1,0 +1,71 @@
+// MEP2 NPC cache definitions relocated from revision 377.
+[mourning_shadow_beast]
+name=Shadow
+desc=A shadow.
+model1=npc_2782
+walkanim=shadow_walk
+readyanim=shadow_ready
+op2=Attack
+vislevel=73
+hitpoints=15
+attack=90
+strength=120
+defence=5
+// Native aggression also survives target loss/reset.
+huntmode=aggressive_melee
+huntrange=^mep2_aggression_range
+
+[mourning_dark_beast]
+name=Dark Beast
+desc=From a darker dimension.
+model1=obj_slayerguide_dark_beast
+recol1s=32765
+recol1d=5251
+recol2s=32767
+recol2d=5251
+recol3s=15648
+recol3d=11488
+recol4s=8192
+recol4d=20513
+size=3
+walkanim=dark_beast_update_attack
+readyanim=dark_beast_update_walk
+op2=Attack
+resizeh=165
+resizev=165
+vislevel=182
+hitpoints=220
+attack=140
+strength=160
+defence=120
+// CANDIDATE: retained Old School Dark Beast table supplies Magic 160; q120 2006 is silent.
+magic=160
+huntmode=aggressive_melee
+huntrange=^mep2_aggression_range
+attackrange=^mep2_magic_range
+// UNKNOWN engineering default: one native death_drop entry, 100 coins; no period table is known.
+param=death_drop,coins
+param=slayer_category,^slayer_darkbeast
+[mourning_deathalter_dwarf]
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+alwaysontop=yes
+vislevel=1
+multivar=mourning_light_door_1_c_first_time
+multinpc=1,mourning_deathalter_dwarf_vis
+
+[mourning_deathalter_dwarf_vis]
+name=Thorgel
+desc=A short angry guy.
+model1=npc_dwarf_normal
+model2=npc_dwarf_normali2
+model3=npc_dwarf_normali3
+model4=npc_dwarf_normali4
+model5=npc_dwarf_normali5
+model6=npc_dwarf_normali6
+vislevel=hide
+op1=Talk-to
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+alwaysontop=yes
+head1=npc_lawgof2_head

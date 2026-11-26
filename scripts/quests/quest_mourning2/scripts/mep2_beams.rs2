@@ -1,0 +1,298 @@
+// UNKNOWN server routing/orientation encodings over the original 377 beam graph.
+// Directions: north0, east1, south2, west3, up4, down5. No new saved state.
+// Nodes1..31 use the puzzle slots;32 is the fixed magenta filter;33..38 are
+// the three upper drop mirrors and their ground counterparts;39 is the final prism.
+
+[proc,mep2_puzzle_colour_mask](int $colour)(int)
+switch_int($colour) {
+    case 1 : return(1);
+    case 2 : return(3);
+    case 3 : return(2);
+    case 4 : return(6);
+    case 5 : return(4);
+    case 6 : return(5);
+    case 7 : return(7);
+}
+return(0);
+
+[proc,mep2_puzzle_colour_index](int $mask)(int)
+switch_int($mask) {
+    case 1 : return(1);
+    case 2 : return(3);
+    case 3 : return(2);
+    case 4 : return(5);
+    case 5 : return(6);
+    case 6 : return(4);
+    case 7 : return(7);
+}
+return(0);
+
+[proc,mep2_puzzle_colour_merge](int $first, int $second)(int)
+return(~mep2_puzzle_colour_index(or(~mep2_puzzle_colour_mask($first), ~mep2_puzzle_colour_mask($second))));
+
+[proc,mep2_puzzle_filter_colour](int $piece, int $input)(int)
+if ($piece < ^mep2_puzzle_crystal_red | $piece > ^mep2_puzzle_crystal_magenta) return(0);
+def_int $filter = add(sub($piece, ^mep2_puzzle_crystal_red), 1);
+return(~mep2_puzzle_colour_index(and(~mep2_puzzle_colour_mask($input), ~mep2_puzzle_colour_mask($filter))));
+
+[proc,mep2_puzzle_vertical_route](int $node, int $direction, int $colour)(int)
+// A vertical span crosses every original intermediate beam field, even where
+// that floor has no controllable pillar. Fixed filters remain real intervening nodes.
+if ($direction = 4) {
+    switch_int($node) {
+        case 1 : %mourning_light_temple_1_1_up = $colour; %mourning_light_temple_2_1_up = $colour; return(21);
+        case 2 : %mourning_light_temple_1_3_up = $colour; return(12);
+        case 3 : %mourning_light_temple_1_6_up = $colour; return(14);
+        case 4 : %mourning_light_temple_1_7_up = $colour; return(15);
+        case 5 : %mourning_light_temple_1_10_up = $colour; return(17);
+        case 6 : %mourning_light_temple_1_11_up = $colour; return(18);
+        case 7 : %mourning_light_temple_1_12_up = $colour; %mourning_light_temple_2_12_up = $colour; return(28);
+        case 8 : %mourning_light_temple_1_13_up = $colour; %mourning_light_temple_2_13_up = $colour; return(29);
+        case 9 : %mourning_light_temple_1_14_up = $colour; %mourning_light_temple_2_14_up = $colour; %mourning_light_temple_3_14_up = $colour; return(0);
+        case 10 : %mourning_light_temple_1_16_up = $colour; return(20);
+        case 11 : %mourning_light_temple_2_2_up = $colour; return(32);
+        case 12 : %mourning_light_temple_2_3_up = $colour; return(22);
+        case 13 : %mourning_light_temple_2_5_up = $colour; return(23);
+        case 14 : %mourning_light_temple_2_6_up = $colour; return(24);
+        case 15 : %mourning_light_temple_2_7_up = $colour; %mourning_light_temple_3_7_up = $colour; return(0);
+        case 16 : %mourning_light_temple_2_9_up = $colour; %mourning_light_temple_3_9_up = $colour; return(0);
+        case 17 : %mourning_light_temple_2_10_up = $colour; return(26);
+        case 18 : %mourning_light_temple_2_11_up = $colour; return(27);
+        case 19 : %mourning_light_temple_2_15_up = $colour; return(30);
+        case 20 : %mourning_light_temple_2_16_up = $colour; return(31);
+        case 21 : %mourning_light_temple_3_1_up = $colour; return(0);
+        case 22 : %mourning_light_temple_3_3_up = $colour; return(0);
+        case 23 : %mourning_light_temple_3_5_up = $colour; return(0);
+        case 24 : %mourning_light_temple_3_6_up = $colour; return(0);
+        case 25 : %mourning_light_temple_3_8_up = $colour; return(0);
+        case 26 : %mourning_light_temple_3_10_up = $colour; return(0);
+        case 27 : %mourning_light_temple_3_11_up = $colour; return(0);
+        case 28 : %mourning_light_temple_3_12_up = $colour; return(0);
+        case 29 : %mourning_light_temple_3_13_up = $colour; return(0);
+        case 30 : %mourning_light_temple_3_15_up = $colour; return(0);
+        case 31 : %mourning_light_temple_3_16_up = $colour; return(0);
+        case 32 : %mourning_light_temple_3_2_up = $colour; return(0);
+    }
+} else {
+    switch_int($node) {
+        case 11 : %mourning_light_temple_1_2_up = $colour; return(0);
+        case 12 : %mourning_light_temple_1_3_up = $colour; return(2);
+        case 13 : %mourning_light_temple_1_5_up = $colour; return(0);
+        case 14 : %mourning_light_temple_1_6_up = $colour; return(3);
+        case 15 : %mourning_light_temple_1_7_up = $colour; return(4);
+        case 17 : %mourning_light_temple_1_10_up = $colour; return(5);
+        case 18 : %mourning_light_temple_1_11_up = $colour; return(6);
+        case 19 : %mourning_light_temple_1_15_up = $colour; return(0);
+        case 20 : %mourning_light_temple_1_16_up = $colour; return(10);
+        case 21 : %mourning_light_temple_2_1_up = $colour; %mourning_light_temple_1_1_up = $colour; return(1);
+        case 22 : %mourning_light_temple_2_3_up = $colour; return(12);
+        case 23 : %mourning_light_temple_2_5_up = $colour; return(13);
+        case 24 : %mourning_light_temple_2_6_up = $colour; return(14);
+        case 25 : %mourning_light_temple_2_8_up = $colour; return(0);
+        case 26 : %mourning_light_temple_2_10_up = $colour; return(17);
+        case 27 : %mourning_light_temple_2_11_up = $colour; return(18);
+        case 28 : %mourning_light_temple_2_12_up = $colour; %mourning_light_temple_1_12_up = $colour; return(7);
+        case 29 : %mourning_light_temple_2_13_up = $colour; %mourning_light_temple_1_13_up = $colour; return(8);
+        case 30 : %mourning_light_temple_2_15_up = $colour; return(19);
+        case 31 : %mourning_light_temple_2_16_up = $colour; return(20);
+        case 32 : %mourning_light_temple_2_2_up = $colour; return(11);
+        case 33 : return(36);
+        case 34 : return(37);
+        case 35 : return(38);
+    }
+}
+return(0);
+
+[proc,mep2_puzzle_route](int $node, int $direction, int $colour)(int)
+if ($direction >= 4) return(~mep2_puzzle_vertical_route($node, $direction, $colour));
+// Only named original spans connect pillars. Collinear pillars separated by a
+// wall do not acquire an invented edge merely because their coordinates line up.
+switch_int(add(multiply($node, 10), $direction)) {
+    case 11 : %mourning_light_temple_1_1_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_1_east, $colour); return(0);
+    case 12 : %mourning_light_temple_1_1_south = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_1_south, $colour); return(0);
+    case 21 : %mourning_light_temple_1_3_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_3_east, $colour); return(0);
+    case 22 : %mourning_light_temple_1_3_6 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_3_6, $colour); return(3);
+    case 23 : %mourning_light_temple_1_3_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_3_west, $colour); return(0);
+    case 30 : %mourning_light_temple_1_3_6 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_3_6, $colour); return(2);
+    case 31 : %mourning_light_temple_1_6_7 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_6_7, $colour); return(4);
+    case 32 : %mourning_light_temple_1_6_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_6_11, $colour); return(6);
+    case 33 : %mourning_light_temple_1_6_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_6_west, $colour); return(0);
+    case 43 : %mourning_light_temple_1_6_7 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_6_7, $colour); return(3);
+    case 51 : %mourning_light_temple_1_10_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_10_11, $colour); return(6);
+    case 52 : %mourning_light_temple_1_10_14 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_10_14, $colour); return(9);
+    case 60 : %mourning_light_temple_1_6_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_6_11, $colour); return(3);
+    case 61 : %mourning_light_temple_1_11_12 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_11_12, $colour); return(7);
+    case 62 : %mourning_light_temple_1_11_south = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_11_south, $colour); return(0);
+    case 63 : %mourning_light_temple_1_10_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_10_11, $colour); return(5);
+    case 73 : %mourning_light_temple_1_11_12 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_11_12, $colour); return(6);
+    case 80 : %mourning_light_temple_1_13_north = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_13_north, $colour); return(0);
+    case 81 : %mourning_light_temple_1_13_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_13_east, $colour); return(0);
+    case 90 : %mourning_light_temple_1_10_14 = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_10_14, $colour); return(5);
+    case 91 : %mourning_light_temple_1_14_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_14_east, $colour); return(0);
+    case 93 : %mourning_light_temple_1_14_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_14_west, $colour); return(0);
+    case 100 : %mourning_light_temple_1_16_north = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_16_north, $colour); return(0);
+    case 103 : %mourning_light_temple_1_16_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_16_west, $colour); return(0);
+    case 111 : %mourning_light_temple_2_2_3 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_2_3, $colour); return(12);
+    case 112 : %mourning_light_temple_2_2_5 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_2_5, $colour); return(13);
+    case 113 : %mourning_light_temple_2_2_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_2_west, $colour); return(0);
+    case 121 : %mourning_light_temple_2_3_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_3_east, $colour); return(0);
+    case 122 : %mourning_light_temple_2_3_south = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_3_south, $colour); return(0);
+    case 123 : %mourning_light_temple_2_2_3 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_2_3, $colour); return(11);
+    case 130 : %mourning_light_temple_2_2_5 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_2_5, $colour); return(11);
+    case 131 : %mourning_light_temple_2_5_6 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_5_6, $colour); return(14);
+    case 140 : %mourning_light_temple_2_6_north = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_6_north, $colour); return(0);
+    case 141 : %mourning_light_temple_2_6_7 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_6_7, $colour); return(15);
+    case 142 : %mourning_light_temple_2_6_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_6_11, $colour); return(18);
+    case 143 : %mourning_light_temple_2_5_6 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_5_6, $colour); return(13);
+    case 152 : %mourning_light_temple_2_7_9 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_7_9, $colour); return(16);
+    case 153 : %mourning_light_temple_2_6_7 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_6_7, $colour); return(14);
+    case 160 : %mourning_light_temple_2_7_9 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_7_9, $colour); return(15);
+    case 162 : %mourning_light_temple_2_9_south = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_9_south, $colour); return(0);
+    case 171 : %mourning_light_temple_2_10_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_10_11, $colour); return(18);
+    case 180 : %mourning_light_temple_2_6_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_6_11, $colour); return(14);
+    case 181 : %mourning_light_temple_2_11_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_11_east, $colour); return(0);
+    case 182 : %mourning_light_temple_2_11_15 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_11_15, $colour); return(19);
+    case 183 : %mourning_light_temple_2_10_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_10_11, $colour); %mourning_light_temple_2_11_west = $colour; return(17);
+    case 190 : %mourning_light_temple_2_11_15 = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_11_15, $colour); return(18);
+    case 191 : %mourning_light_temple_2_15_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_15_east, $colour); return(20);
+    case 193 : %mourning_light_temple_2_15_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_15_west, $colour); return(0);
+    case 200 : %mourning_light_temple_2_16_north = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_16_north, $colour); return(0);
+    case 203 : %mourning_light_temple_2_16_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_2_16_west, $colour); return(19);
+    case 211 : %mourning_light_temple_3_1_2 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_1_2, $colour); return(32);
+    case 212 : %mourning_light_temple_3_1_8 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_1_8, $colour); return(25);
+    case 221 : %mourning_light_temple_3_3_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_3_east, $colour); return(0);
+    case 222 : %mourning_light_temple_3_3_south = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_3_south, $colour); return(0);
+    case 223 : %mourning_light_temple_3_2_3 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_2_3, $colour); return(32);
+    case 230 : %mourning_light_temple_3_2_5 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_2_5, $colour); return(32);
+    case 231 : %mourning_light_temple_3_5_6 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_5_6, $colour); return(24);
+    case 233 : %mourning_light_temple_3_5_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_5_west, $colour); return(33);
+    case 240 : %mourning_light_temple_3_6_north = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_6_north, $colour); return(0);
+    case 241 : %mourning_light_temple_3_6_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_6_east, $colour); return(0);
+    case 242 : %mourning_light_temple_3_6_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_6_11, $colour); return(27);
+    case 243 : %mourning_light_temple_3_5_6 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_5_6, $colour); return(23);
+    case 250 : %mourning_light_temple_3_1_8 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_1_8, $colour); return(21);
+    case 251 : %mourning_light_temple_3_8_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_8_east, $colour); return(34);
+    case 252 : %mourning_light_temple_3_8_13 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_8_13, $colour); return(29);
+    case 261 : %mourning_light_temple_3_10_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_10_11, $colour); return(27);
+    case 262 : %mourning_light_temple_3_10_south = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_10_south, $colour); return(0);
+    case 263 : %mourning_light_temple_3_10_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_10_west, $colour); return(35);
+    case 270 : %mourning_light_temple_3_6_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_6_11, $colour); return(24);
+    case 271 : %mourning_light_temple_3_11_12 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_11_12, $colour); return(28);
+    case 272 : %mourning_light_temple_3_11_15 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_11_15, $colour); return(30);
+    case 273 : %mourning_light_temple_3_10_11 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_10_11, $colour); return(26);
+    case 283 : %mourning_light_temple_3_11_12 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_11_12, $colour); return(27);
+    case 290 : %mourning_light_temple_3_8_13 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_8_13, $colour); return(25);
+    case 291 : %mourning_light_temple_3_13_15 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_13_15, $colour); return(30);
+    case 300 : %mourning_light_temple_3_11_15 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_11_15, $colour); return(27);
+    case 301 : %mourning_light_temple_3_15_16 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_15_16, $colour); return(31);
+    case 303 : %mourning_light_temple_3_13_15 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_13_15, $colour); return(29);
+    case 310 : %mourning_light_temple_3_16_north = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_16_north, $colour); return(0);
+    case 313 : %mourning_light_temple_3_15_16 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_15_16, $colour); return(30);
+    case 321 : %mourning_light_temple_3_2_3 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_2_3, $colour); return(22);
+    case 322 : %mourning_light_temple_3_2_5 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_2_5, $colour); return(23);
+    case 323 : %mourning_light_temple_3_1_2 = ~mep2_puzzle_colour_merge(%mourning_light_temple_3_1_2, $colour); return(21);
+    case 362 : return(39);
+    case 371 : %mourning_light_temple_1_b_east = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_b_east, $colour); return(0);
+    case 373 : %mourning_light_temple_1_b_west = ~mep2_puzzle_colour_merge(%mourning_light_temple_1_b_west, $colour); return(39);
+    case 380 : return(39);
+}
+return(0);
+
+[proc,mep2_puzzle_emit](int $node, int $direction, int $colour, int $seen_low, int $seen_high)
+def_int $next = ~mep2_puzzle_route($node, $direction, $colour);
+if ($next > 0) ~mep2_puzzle_trace($next, $direction, $colour, $seen_low, $seen_high);
+
+[proc,mep2_puzzle_trace](int $node, int $incoming, int $colour, int $seen_low, int $seen_high)
+if ($colour = 0) return;
+if ($node = 39) return;
+def_int $piece = 0;
+if ($node <= 31) $piece = ~mep2_puzzle_slot_get($node);
+
+// A filter/empty pillar preserves the ray's direction. Mirrors and splitters
+// determine their exits, so revisiting one on a single ray is a closed cycle.
+// Each split copies the path mask, not another branch's progress.
+def_int $turn = 0;
+if (~mep2_puzzle_is_mirror($piece) = true | ~mep2_puzzle_is_fracture($piece) = true) $turn = 1;
+if ($node = 1 | $node = 8 | $node = 10 | $node >= 33) $turn = 1;
+if ($turn = 1) {
+    def_int $bit = sub($node, 1);
+    if ($node <= 32) {
+        if (getbit_range($seen_low, $bit, $bit) = 1) return;
+        $seen_low = setbit_range_toint($seen_low, 1, $bit, $bit);
+    } else {
+        $bit = sub($node, 33);
+        if (getbit_range($seen_high, $bit, $bit) = 1) return;
+        $seen_high = setbit_range_toint($seen_high, 1, $bit, $bit);
+    }
+}
+
+def_int $direction = $incoming;
+if ($node = 17) {
+    $colour = ~mep2_puzzle_filter_colour(^mep2_puzzle_crystal_green, $colour);
+} else if ($node = 32) {
+    $colour = ~mep2_puzzle_filter_colour(^mep2_puzzle_crystal_magenta, $colour);
+} else if ($node >= 33 & $node <= 35) {
+    $direction = 5;
+} else if ($node = 36) {
+    $direction = 2;
+} else if ($node = 37) {
+    $direction = 1;
+    if (%mourning_temple_mirror = 1) $direction = 3;
+} else if ($node = 38) {
+    $direction = 0;
+} else if ($node = 1 | $node = 8 | $node = 10) {
+    $direction = $piece;
+    if ($node = 1) {
+        if ($piece = 0) $direction = 2;
+        else if ($piece = 2) $direction = 0;
+    } else if ($node = 10) {
+        if ($piece = 0) $direction = 3;
+        else if ($piece = 1) $direction = 0;
+        else if ($piece = 2) $direction = 1;
+        else if ($piece = 3) $direction = 2;
+    }
+} else if (~mep2_puzzle_is_mirror($piece) = true) {
+    $direction = sub($piece, ^mep2_puzzle_mirror_0);
+} else if (~mep2_puzzle_is_fracture($piece) = true) {
+    if ($incoming > 3) return;
+    def_int $pose = getbit_range(%mourning_part2_basevar2, 27, 28);
+    if ($piece = ^mep2_puzzle_fracture_2) $pose = getbit_range(%mourning_part2_basevar2, 29, 30);
+    def_int $entry = add($incoming, 2);
+    if ($entry > 3) $entry = sub($entry, 4);
+    if ($pose ! $entry) return;
+    def_int $exit = 0;
+    while ($exit < 4) {
+        if ($exit ! $entry) ~mep2_puzzle_emit($node, $exit, $colour, $seen_low, $seen_high);
+        $exit = add($exit, 1);
+    }
+    return;
+} else if ($piece >= ^mep2_puzzle_crystal_red & $piece <= ^mep2_puzzle_crystal_magenta) {
+    $colour = ~mep2_puzzle_filter_colour($piece, $colour);
+}
+if ($colour > 0) ~mep2_puzzle_emit($node, $direction, $colour, $seen_low, $seen_high);
+
+[proc,mep2_puzzle_recalculate]
+~mep2_puzzle_clear_beams;
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+%mourning_light_temple_2_9_south = 7;
+~mep2_puzzle_trace(^mep2_slot_2_9, 0, 7, 0, 0);
+~mep2_puzzle_render_crossings;
+// The period final-prism route requires all three actual directional inputs.
+if (%mourning_light_temple_1_b_west = 1 & %mourning_light_temple_3_10_west = 3 & %mourning_light_temple_3_5_west = 5) {
+    %mourning_light_temple_1_d_west = 7;
+}
+~mep2_puzzle_open_doors;
+
+[proc,mep2_puzzle_open_doors]
+if (%mourning_light_temple_1_1_south = 5) %mourning_door_1_1_south = 1;
+if (%mourning_light_temple_1_1_east = 5) %mourning_door_1_1_east = 1;
+if (%mourning_light_temple_2_3_east = 3) %mourning_door_2_4_west = 1;
+if (%mourning_light_temple_2_3_south = 3) %mourning_door_2_4_south = 1;
+if (%mourning_light_temple_1_13_north = 1) %mourning_door_1_13_north = 1;
+if (%mourning_light_temple_1_13_east = 1) %mourning_door_1_13_east = 1;
+if (%mourning_light_temple_1_16_north = 5) %mourning_door_1_16_north = 1;
+if (%mourning_light_temple_1_16_west = 3 | %mourning_light_temple_1_14_east = 3) %mourning_door_1_16_west = 1;
+if (%mourning_light_temple_2_15_east = 2) %mourning_door_2_16_west = 1;
+if (%mourning_light_temple_2_16_north = 2) %mourning_door_2_16_north = 1;
+if (%mourning_light_temple_1_b_east = 1) %mourning_door_1_b = 1;
+if (%mourning_light_temple_1_d_west = 7) %mourning_door_1_c = 1;

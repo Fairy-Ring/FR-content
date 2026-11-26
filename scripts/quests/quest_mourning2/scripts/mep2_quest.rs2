@@ -1,0 +1,152 @@
+// Mourning's Ends Part II quest-item flow. Stage is the native
+// mourning_quest_main varbit; never write the enclosing varp as a whole.
+
+[proc,mep2_head_mourner]
+if (%mourning_quest_main = ^mep2_unstarted) {
+    ~chatnpc("<p,neutral>That will be all for now.");
+    return;
+}
+if (%mourning_quest_main = ^mep2_started) {
+    if (calc(inv_total(inv, mourning_excavation_key) + inv_total(bank, mourning_excavation_key)) = 0) {
+        if (inv_freespace(inv) = 0) {
+            ~chatnpc("<p,neutral>Make room in your inventory for a key.");
+            return;
+        }
+        inv_add(inv, mourning_excavation_key, 1);
+    }
+    %mourning_quest_main = ^mep2_access;
+    ~update_questlist;
+    return;
+}
+if (%mourning_quest_main >= ^mep2_access & calc(inv_total(inv, mourning_excavation_key) + inv_total(bank, mourning_excavation_key)) = 0) {
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Make room in your inventory for a key.");
+        return;
+    }
+    inv_add(inv, mourning_excavation_key, 1);
+}
+return;
+
+[proc,mep2_hq_access]()(boolean)
+if (%mourning_quest_main < ^mep2_access) return(false);
+if (~mep1_disguised = false) return(false);
+if (inv_total(inv, mourning_excavation_key) = 0) return(false);
+return(true);
+
+[proc,mep2_arianwyn_interact]
+if (%mourning_quest_main = ^mep2_sample_requested) {
+    // UNKNOWN functional wording required by the shared stage contract.
+    ~chatnpc("<p,neutral>Bring me a sample of the black crystal.");
+    return;
+}
+if (%mourning_quest_main = ^mep2_crystal_created | %mourning_quest_main = ^mep2_death_chamber | %mourning_quest_main = ^mep2_crystal_powered) {
+    ~mep2_recover_new_crystal;
+    return;
+}
+if (%mourning_quest_main = ^mep2_black_crystal_restored) {
+    ~mep2_award_completion;
+    return;
+}
+if (%mourning_quest_main = ^mep2_complete) {
+    ~mep2_recover_trinket;
+}
+
+[proc,mep2_recover_new_crystal]
+if (calc(inv_total(inv, mourning_crystal_new_sample) + inv_total(bank, mourning_crystal_new_sample) + inv_total(inv, mourning_crystal_new_powered) + inv_total(bank, mourning_crystal_new_powered)) > 0) return;
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, mourning_crystal_new_sample, 1);
+
+[proc,mep2_recover_trinket]
+if (calc(inv_total(inv, mourning_crystal_trinket) + inv_total(bank, mourning_crystal_trinket)) > 0) return;
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, mourning_crystal_trinket, 1);
+
+[proc,mep2_award_completion]
+if (%mourning_quest_main ! ^mep2_black_crystal_restored) return;
+def_int $owned = calc(inv_total(inv, mourning_crystal_trinket) + inv_total(bank, mourning_crystal_trinket));
+if ($owned = 0 & inv_freespace(inv) = 0) return;
+%mourning_quest_main = ^mep2_complete;
+if ($owned = 0) inv_add(inv, mourning_crystal_trinket, 1);
+~update_questlist;
+stat_advance(agility, ^mep2_agility_xp);
+// Period guide heading only; no unsourced completion sentence.
+~send_quest_complete(questlist:mourning2, mourning_crystal_trinket, ^mep2_reward_model_scale, ^mourning2_questpoints, "Mourning's Ends - Part 2", "20,000 Agility XP");
+
+[opheld1,mourning_ederns_journal]
+if (%mourning_quest_main = ^mep2_journal_obtained) {
+    %mourning_quest_main = ^mep2_sample_requested;
+    ~update_questlist;
+    return;
+}
+if (%mourning_quest_main < ^mep2_journal_obtained) ~displaymessage(^dm_default);
+
+[opnpcu,mourning_arianwyn] @mep2_arianwyn_item;
+[apnpcu,mourning_arianwyn] @mep2_arianwyn_item;
+
+[label,mep2_arianwyn_item]
+if (last_useitem ! mourning_crystal_sample | %mourning_quest_main ! ^mep2_sample_requested | inv_total(inv, mourning_crystal_sample) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, mourning_crystal_sample, 1);
+if (calc(inv_total(inv, mourning_crystal_new_sample) + inv_total(bank, mourning_crystal_new_sample)) = 0) inv_add(inv, mourning_crystal_new_sample, 1);
+%mourning_quest_main = ^mep2_crystal_created;
+~update_questlist;
+
+[oplocu,mourning_temple_obsidian_crystal_dead]
+if (last_useitem = chisel) {
+    if (%mourning_quest_main ! ^mep2_sample_requested | inv_total(inv, chisel) = 0) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (calc(inv_total(inv, mourning_crystal_sample) + inv_total(bank, mourning_crystal_sample)) > 0) return;
+    if (inv_freespace(inv) = 0) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_add(inv, mourning_crystal_sample, 1);
+    return;
+}
+if (last_useitem = mourning_crystal_new_powered) {
+    if (%mourning_quest_main ! ^mep2_crystal_powered | inv_total(inv, mourning_crystal_new_powered) = 0) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, mourning_crystal_new_powered, 1);
+    %mourning_quest_main = ^mep2_black_crystal_restored;
+    ~mep2_mark_black_crystal_restored;
+    ~update_questlist;
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,mep2_charge_crystal]
+if ((%mourning_quest_main ! ^mep2_death_chamber) & (%mourning_quest_main ! ^mep2_crystal_powered)) return;
+if (inv_total(inv, mourning_crystal_new_sample) = 0) return;
+if (calc(inv_total(inv, mourning_crystal_new_powered) + inv_total(bank, mourning_crystal_new_powered)) > 0) return;
+inv_del(inv, mourning_crystal_new_sample, 1);
+inv_add(inv, mourning_crystal_new_powered, 1);
+if (%mourning_quest_main = ^mep2_death_chamber) {
+    %mourning_quest_main = ^mep2_crystal_powered;
+    ~update_questlist;
+}
+
+[oploc1,mourning_dead_guard1] ~mep2_search_guard;
+[oploc1,mourning_dead_guard2] ~mep2_search_guard;
+[oploc1,mourning_dead_guard3] ~mep2_search_guard;
+
+[proc,mep2_search_guard]
+if (%mourning_quest_main < ^mep2_access) return;
+// UNKNOWN recovery default: every searchable guard can replace missing notes.
+def_int $journal = calc(inv_total(inv, mourning_ederns_journal) + inv_total(bank, mourning_ederns_journal));
+def_int $wheel = calc(inv_total(inv, mourning_colour_wheel) + inv_total(bank, mourning_colour_wheel));
+def_int $needed = 0;
+if ($journal = 0) $needed = add($needed, 1);
+if ($wheel = 0) $needed = add($needed, 1);
+if (inv_freespace(inv) < $needed) return;
+if ($journal = 0) inv_add(inv, mourning_ederns_journal, 1);
+if ($wheel = 0) inv_add(inv, mourning_colour_wheel, 1);
+if (%mourning_quest_main = ^mep2_access) {
+    %mourning_quest_main = ^mep2_journal_obtained;
+    ~update_questlist;
+}

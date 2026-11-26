@@ -1,0 +1,62 @@
+// UNKNOWN engineering encodings over the original cache-owned MEP2 puzzle state.
+^mep2_puzzle_empty = 0
+^mep2_puzzle_pose_0 = 0
+^mep2_puzzle_pose_1 = 1
+^mep2_puzzle_pose_2 = 2
+^mep2_puzzle_pose_3 = 3
+^mep2_puzzle_pose_4 = 4
+^mep2_puzzle_pose_5 = 5
+
+^mep2_puzzle_mirror_0 = 1
+^mep2_puzzle_mirror_1 = 2
+^mep2_puzzle_mirror_2 = 3
+^mep2_puzzle_mirror_3 = 4
+^mep2_puzzle_mirror_4 = 5
+^mep2_puzzle_mirror_5 = 6
+^mep2_puzzle_crystal_red = 7
+^mep2_puzzle_crystal_yellow = 8
+^mep2_puzzle_crystal_green = 9
+^mep2_puzzle_crystal_cyan = 10
+^mep2_puzzle_crystal_blue = 11
+^mep2_puzzle_crystal_magenta = 12
+// Code 13 is unused; white is a recombined beam, not an item or filter.
+^mep2_puzzle_fracture_1 = 14
+^mep2_puzzle_fracture_2 = 15
+
+// UNKNOWN two-bit fractured-crystal orientation values.
+
+// UNKNOWN node-to-original-nibble association, taken from the bounded solver note.
+^mep2_slot_1_1 = 1
+^mep2_slot_1_3 = 2
+^mep2_slot_1_6 = 3
+^mep2_slot_1_7 = 4
+^mep2_slot_1_10 = 5
+^mep2_slot_1_11 = 6
+^mep2_slot_1_12 = 7
+^mep2_slot_1_13 = 8
+^mep2_slot_1_14 = 9
+^mep2_slot_1_16 = 10
+^mep2_slot_2_2 = 11
+^mep2_slot_2_3 = 12
+^mep2_slot_2_5 = 13
+^mep2_slot_2_6 = 14
+^mep2_slot_2_7 = 15
+^mep2_slot_2_9 = 16
+^mep2_slot_2_10 = 17
+^mep2_slot_2_11 = 18
+^mep2_slot_2_15 = 19
+^mep2_slot_2_16 = 20
+^mep2_slot_3_1 = 21
+^mep2_slot_3_3 = 22
+^mep2_slot_3_5 = 23
+^mep2_slot_3_6 = 24
+^mep2_slot_3_8 = 25
+^mep2_slot_3_10 = 26
+^mep2_slot_3_11 = 27
+^mep2_slot_3_12 = 28
+^mep2_slot_3_13 = 29
+^mep2_slot_3_15 = 30
+^mep2_slot_3_16 = 31
+
+// UNKNOWN recovery stock from the later walkthrough, explicitly tested as engineering behavior.
+^mep2_initial_mirror_stock = 4

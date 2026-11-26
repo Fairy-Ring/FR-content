@@ -23,7 +23,7 @@ for (const file of ['stairs.rs2', 'ladders.rs2']) {
   const headers = [...text.matchAll(/^\[(oploc[1-5]),([^\]]+)\].*$/gm)];
   for (const [index, header] of headers.entries()) {
     const block = text.slice(header.index + header[0].length, headers[index + 1]?.index ?? text.length);
-    if ((block.includes('switch_coord') && (block.includes('@unhandled_stairs') || block.includes('unhandled ladder'))) || /if \(\$coord = [0-3]_\d+_\d+_\d+_\d+\) \{[\s\S]*?\} else \{\s*mes\("unhandled ladder/.test(block) || /^\s*~deal_stairs\((?:true|false)\);/m.test(block) || /^\s*~zogre_stairs;/m.test(block)) {
+    if ((block.includes('switch_coord') && (block.includes('@unhandled_stairs') || block.includes('unhandled ladder'))) || /if \(\$coord = [0-3]_\d+_\d+_\d+_\d+\) \{[\s\S]*?\} else \{\s*mes\("unhandled ladder/.test(block) || /^\s*~deal_stairs\((?:true|false)\);/m.test(block) || /^\s*~zogre_stairs;/m.test(block) || /^\s*~mep2_temple_(?:circle_)?stairs_(?:up|down);/m.test(block)) {
       handlers.push({ name: header[2], trigger: header[1] });
     }
   }
@@ -123,6 +123,11 @@ const blastFurnaceLinks = new Map([
   ['blast_furnace_stairs_up:0_30_77_19_28:2', { destination: [0, 2931, 10195], counterpart: { name: 'dwarf_keldagrim_factory_stairs', coord: '0_45_159_50_20', angle: 1 } }],
   ['dwarf_keldagrim_factory_stairs:0_45_159_50_20:1', { destination: [0, 1939, 4958], counterpart: { name: 'blast_furnace_stairs_up', coord: '0_30_77_19_28', angle: 2 } }]
 ]);
+// Original 377 walls and light block enclose this single-tile stair alcove.
+// Its immediate return climb must provide the non-empty escape upstairs.
+const returnOnlyAlcoves = new Set([
+  'mourning_temple_stairs_top@2_29_72_37_50:oploc1:0'
+]);
 const failures = [];
 const counts = { inherited: 0, new: 0, fallback: 0, roundTrips: 0 };
 for (const entry of manifest) {
@@ -178,7 +183,15 @@ for (const entry of manifest) {
         assert.equal(counterpart.level, result.destination[0]);
         const end = routeEnd(result.destination, t => reachable(t, counterpart));
         assert.ok(end, 'landing can reach its counterpart without crossing walls');
-        assert.ok(routeEnd(result.destination, t => Math.max(Math.abs(t[1] - result.destination[1]), Math.abs(t[2] - result.destination[2])) >= 2), 'landing is not enclosed');
+        const returnOnly = returnOnlyAlcoves.has(executionKey(entry));
+        if (returnOnly) {
+          assert.deepEqual(result.destination, [1, 1896, 4658], 'the original return-only alcove has its independently measured stand');
+          assert.equal(counterpart.name, 'mourning_temple_stairs_base');
+          assert.equal(counterpart.coord, '1_29_72_37_50');
+          assert.ok(reachable(result.destination, counterpart), 'the return-only alcove can immediately operate its native staircase');
+        } else {
+          assert.ok(routeEnd(result.destination, t => Math.max(Math.abs(t[1] - result.destination[1]), Math.abs(t[2] - result.destination[2])) >= 2), 'landing is not enclosed');
+        }
         const type = types.LocType.get(types.LocType.getId(counterpart.name));
         const returningDown = counterpart.level > source.level;
         const trigger = type.op[returningDown ? 2 : 1] ? `oploc${returningDown ? 3 : 2}` : 'oploc1';
@@ -187,6 +200,11 @@ for (const entry of manifest) {
         assert.equal(returned.destination[0], source.level, 'round trip returns to the original level');
         walkable(returned.destination);
         assert.ok(routeEnd(returned.destination, t => reachable(t, source)), 'round trip returns to a tile from which the original staircase is reachable');
+        if (returnOnly) {
+          assert.ok(reachable(returned.destination, source), 'the native return climb immediately reaches the original upper staircase');
+          assert.ok(routeEnd(returned.destination, t => Math.max(Math.abs(t[1] - returned.destination[1]), Math.abs(t[2] - returned.destination[2])) >= 2),
+            'the return-only alcove has a non-empty walkable escape on its returned floor');
+        }
         counts.roundTrips++;
       }
     }

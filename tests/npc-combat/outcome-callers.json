@@ -4,6 +4,7 @@
   "externalCallers": {
     "npc_default_attack": [
       "[ai_applayer2,_macro_event_rock_golem]",
+      "[ai_applayer2,mourning_dark_beast]",
       "[ai_applayer2,regicide_darkelf2]",
       "[ai_applayer2,regicide_old_camp_guard]",
       "[ai_applayer2,regicide_tyras_camp_guard]",
@@ -34,6 +35,7 @@
       "[ai_opplayer2,melzar_the_mad]",
       "[ai_opplayer2,monk]",
       "[ai_opplayer2,mourner_hideout_guard]",
+      "[ai_opplayer2,mourning_dark_beast]",
       "[ai_opplayer2,ranalph_devere]",
       "[ai_opplayer2,san_tojalon]",
       "[ai_opplayer2,skeletonmage]",
@@ -104,6 +106,7 @@
       "[ai_applayer2,kologre]",
       "[ai_applayer2,kolspider]",
       "[ai_applayer2,melzar_the_mad]",
+      "[ai_applayer2,mourning_dark_beast]",
       "[ai_applayer2,nezikchened]",
       "[ai_applayer2,trail_hard2]",
       "[ai_applayer2,trail_hard]",

@@ -125,6 +125,8 @@ return (false);
 return (false);
 
 [proc,slayer_mourning2_unlocked]()(boolean)
+// CANDIDATE cavern access: new key after Arianwyn's MEP1-gated briefing.
+if (%mourning_quest_main >= ^mep2_access) return (true);
 return (false);
 
 [proc,slayer_skippy_unlocked]()(boolean)

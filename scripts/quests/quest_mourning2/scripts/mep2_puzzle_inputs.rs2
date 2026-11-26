@@ -1,0 +1,156 @@
+// Original shared visible models dispatch by their retained map coordinate.
+// Do not bind only a multiloc base: the native operation uses the visible form.
+[proc,mep2_puzzle_slot_at](coord $anchor)(int)
+switch_coord($anchor) {
+    case 0_29_72_4_57 : return(^mep2_slot_1_1);
+    case 0_29_72_42_57 : return(^mep2_slot_1_3);
+    case 0_29_72_42_42 : return(^mep2_slot_1_6);
+    case 0_29_72_53_42 : return(^mep2_slot_1_7);
+    case 0_29_72_31_20 : return(^mep2_slot_1_10);
+    case 0_29_72_42_20 : return(^mep2_slot_1_11);
+    case 0_29_72_53_20 : return(^mep2_slot_1_12);
+    case 0_29_72_4_5 : return(^mep2_slot_1_13);
+    case 0_29_72_31_5 : return(^mep2_slot_1_14);
+    case 0_29_72_59_5 : return(^mep2_slot_1_16);
+    case 1_29_72_31_57 : return(^mep2_slot_2_2);
+    case 1_29_72_42_57 : return(^mep2_slot_2_3);
+    case 1_29_72_31_42 : return(^mep2_slot_2_5);
+    case 1_29_72_42_42 : return(^mep2_slot_2_6);
+    case 1_29_72_53_42 : return(^mep2_slot_2_7);
+    case 1_29_72_53_31 : return(^mep2_slot_2_9);
+    case 1_29_72_31_20 : return(^mep2_slot_2_10);
+    case 1_29_72_42_20 : return(^mep2_slot_2_11);
+    case 1_29_72_42_5 : return(^mep2_slot_2_15);
+    case 1_29_72_59_5 : return(^mep2_slot_2_16);
+    case 2_29_72_4_57 : return(^mep2_slot_3_1);
+    case 2_29_72_42_57 : return(^mep2_slot_3_3);
+    case 2_29_72_31_42 : return(^mep2_slot_3_5);
+    case 2_29_72_42_42 : return(^mep2_slot_3_6);
+    case 2_29_72_4_31 : return(^mep2_slot_3_8);
+    case 2_29_72_31_20 : return(^mep2_slot_3_10);
+    case 2_29_72_42_20 : return(^mep2_slot_3_11);
+    case 2_29_72_53_20 : return(^mep2_slot_3_12);
+    case 2_29_72_4_5 : return(^mep2_slot_3_13);
+    case 2_29_72_42_5 : return(^mep2_slot_3_15);
+    case 2_29_72_59_5 : return(^mep2_slot_3_16);
+    case 0_29_72_25_31 : return(32);
+}
+return(0);
+
+[proc,mep2_puzzle_search_here]
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+def_int $slot = ~mep2_puzzle_slot_at(loc_coord);
+if ($slot = 32) {
+    // UNKNOWN plain functional submenu; the original orientation is one bit.
+    def_int $choice = ~p_choice2("Rotate", 1, "Leave", 2);
+    if ($choice = 1) {
+        if (%mourning_temple_mirror = 0) %mourning_temple_mirror = 1;
+        else %mourning_temple_mirror = 0;
+        ~mep2_puzzle_recalculate;
+    }
+    return;
+}
+if ($slot > 0) ~mep2_puzzle_search($slot, loc_coord);
+
+[proc,mep2_puzzle_insert_here]
+def_int $slot = ~mep2_puzzle_slot_at(loc_coord);
+if ($slot > 0 & $slot <= 31) ~mep2_puzzle_insert($slot);
+
+[oploc1,mourning_temple_pillar_light] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_white] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_white] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_white_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_white_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_white_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_white_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_white_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_white_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_white_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_white_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_red] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_red] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_red_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_red_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_red_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_red_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_red_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_red_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_red_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_red_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_yellow] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_yellow] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_yellow_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_yellow_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_yellow_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_yellow_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_yellow_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_yellow_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_yellow_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_yellow_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_green] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_green] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_green_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_green_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_green_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_green_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_green_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_green_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_green_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_green_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_cyan] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_cyan] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_cyan_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_cyan_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_cyan_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_cyan_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_cyan_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_cyan_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_cyan_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_cyan_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_blue] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_blue] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_blue_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_blue_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_blue_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_blue_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_blue_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_blue_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_blue_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_blue_4] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_magenta] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_magenta] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_magenta_1] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_magenta_1] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_magenta_2] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_magenta_2] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_magenta_3] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_magenta_3] ~mep2_puzzle_insert_here;
+[oploc1,mourning_temple_pillar_light_up_magenta_4] ~mep2_puzzle_search_here;
+[oplocu,mourning_temple_pillar_light_up_magenta_4] ~mep2_puzzle_insert_here;
+
+[oploc1,mourning_door_of_light_white]
+switch_coord(loc_coord) {
+    case 0_29_72_4_54 : ~mep2_puzzle_door_use(0);
+    case 0_29_72_7_57 : ~mep2_puzzle_door_use(1);
+    case 0_29_72_4_8 : ~mep2_puzzle_door_use(2);
+    case 0_29_72_7_5 : ~mep2_puzzle_door_use(3);
+    case 0_29_72_59_8 : ~mep2_puzzle_door_use(4);
+    case 0_29_72_56_5 : ~mep2_puzzle_door_use(5);
+    case 1_29_72_56_57 : ~mep2_puzzle_door_use(6);
+    case 1_29_72_59_54 : ~mep2_puzzle_door_use(7);
+    case 1_29_72_59_8 : ~mep2_puzzle_door_use(8);
+    case 1_29_72_56_5 : ~mep2_puzzle_door_use(9);
+    case 0_29_72_29_31 : ~mep2_puzzle_door_use(10);
+    case 0_29_72_9_30 : ~mep2_puzzle_door_use(11);
+    case 0_29_72_9_31 : ~mep2_puzzle_door_use(11);
+    case 0_29_72_9_32 : ~mep2_puzzle_door_use(11);
+}
