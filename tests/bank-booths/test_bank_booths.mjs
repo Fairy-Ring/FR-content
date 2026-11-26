@@ -16,8 +16,6 @@ const built = [
   ['pest_bankbooth', 4, [0, -1], false]
 ];
 const left = [
-  ['burgh_bank_booth_multiloc', 'burgh_bankbooth_repaired', 1, [1, 2]],
-  ['burgh_bank_booth_multiloc', 'burgh_bankbooth_damaged', 0, [1]],
   ['hundred_goodchest', 'hundred_goodchest_base', 3, [1, 2, 3]],
   ['mausoleum', 'mausoleum', null, [1]]
 ];
@@ -188,6 +186,42 @@ for (const [root, visible, state, options] of builtFever) {
   }
   console.log(`PASS built Cabin Fever: ${root} -> ${visible}, options ${options.join(',')}`);
 }
+const burghBooths = natural('burgh_bank_booth_multiloc');
+assert(burghBooths.length, 'Burgh de Rott booths have original placements');
+for (const [visible, state, options] of [
+  ['burgh_bankbooth_repaired', 1, [1, 2]],
+  ['burgh_bankbooth_damaged', 0, [1]]
+]) {
+  const gates = state === 0 ? [[50, 0, false]] : [[50, 0, false], [50, 1, false], [70, 1, true], [421, 1, true]];
+  for (const placement of burghBooths) {
+    for (const [stage, teller, opens] of gates) {
+      for (const option of options) {
+        const loc = locAt(placement), p = fixture(placement);
+        p.setVarBit(id('VarBitType', 'myreque_2_quest'), stage);
+        p.setVarBit(id('VarBitType', 'burgh_bank_teller'), teller);
+        setForm(p, loc, state);
+        assert.equal(p.resolveLocTypeForTrigger(types.LocType.get(loc.type)).id, id('LocType', visible),
+          'the original Burgh booth resolves to the intended visible form');
+        arm(p, loc, option);
+        assert.equal(p.getApTrigger(), null, `${visible} option ${option} uses its built OP handler`);
+        const script = p.getOpTrigger();
+        assert(script, `${visible} option ${option} resolves through production dispatch`);
+        assert.equal(script.info.sourceFilePath, 'scripts/quests/quest_myreque_2/scripts/myreque2_repairs.rs2',
+          'Burgh booth operations reach their owning quest');
+        finish(p, script, loc);
+        assert.equal(p.getVarBit(id('VarBitType', 'myreque_2_quest')), stage, 'using the booth does not write quest progress');
+        if (opens) bank(p);
+        else {
+          assert.notEqual(p.modalMain, component('bank_main'), 'the damaged or unstaffed booth does not open a bank');
+          assert(!p.invListeners.some(listener => listener.type === id('InvType', 'bank')),
+            'a refused booth operation creates no bank listener');
+        }
+      }
+    }
+  }
+  console.log(`PASS built Myreque 2: original Burgh booths -> ${visible}, native options ${options.join(',')}, repair and teller gates`);
+}
+
 for (const [root, visible, state, options] of left) {
   const all = natural(root);
   assert(all.length, `${root} has an original placement`);

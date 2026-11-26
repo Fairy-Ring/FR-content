@@ -95,6 +95,13 @@ const pvpHandler = {
     abyssal_whip: 'pvp_abyssal_whip_sa', granite_maul: 'pvp_granite_maul_sa',
     dragon_scimitar: 'pvp_dragon_scimitar_sa'
 };
+const rodCharges = new Map(Array.from({ length: 10 }, (_, index) =>
+    [`burgh_rod_command_final_${index + 1}`, index + 1]));
+for (const name of rodCharges.keys()) {
+    expectedCost.set(name, 100);
+    pvmHandler[name] = 'myreque2_rod_capture';
+    pvpHandler[name] = 'pvp_melee_attack';
+}
 const stunWeapons = new Set(['dragon_spear', 'dragon_spear_p', 'tbwt_dragon_spear_kp']);
 const doubleHitWeapons = new Set(['dragon_dagger', 'dragon_dagger_p', 'magic_shortbow']);
 const prayerLockId = Provider.getByName('[timer,dragon_scimitar_prayer_lock]')?.id;
@@ -407,7 +414,39 @@ for (const item of specialWeapons) {
                 let executions;
                 let target;
                 const tick = World.currentTick;
-                if (directEffects.has(name)) {
+                if (rodCharges.has(name)) {
+                    f.p.setVarBit(id('VarBitType', 'myreque_2_quest'), 421);
+                    pressSpecial(f.p);
+                    assert.equal(variable(f.p, 'sa_attack'), 1, `${name} native combat-tab button enables capture`);
+                    if (mode === 'pvm') {
+                        target = npc(f, types.NpcType.get(id('NpcType', 'burgh_vampire_juvenile_1')));
+                        target.levels[PlayerStat.HITPOINTS] = Math.floor(target.baseLevels[PlayerStat.HITPOINTS] / 4);
+                        executions = attackNpc(f, target);
+                        assertHandler(executions, pvmHandler[name]);
+                        assertCostAndConsumed(f, item);
+                        assert.equal(target.type, id('NpcType', 'burgh_vampire_juvenile_held'),
+                            `${name} captures the eligible quarter-health juvenile`);
+                        assert.equal(npcHits(target).length, 0, `${name} capture queues no ordinary damage`);
+                        const charges = rodCharges.get(name);
+                        if (charges === 1) {
+                            assert.equal(f.p.getInventory(worn).get(rightHand), null, 'the last charge leaves no worn dust');
+                            assert.equal(f.p.invTotal(inventory, id('ObjType', 'burgh_rod_command_dust')), 1,
+                                'the last charge gives recoverable dust');
+                        } else {
+                            assert.equal(f.p.getInventory(worn).get(rightHand)?.id,
+                                id('ObjType', `burgh_rod_command_final_${charges - 1}`), 'capture spends exactly one rod charge');
+                        }
+                    } else {
+                        target = player(f, f.p.x + 1, f.p.z);
+                        executions = attackPlayer(f, target);
+                        assertHandler(executions, pvpHandler[name]);
+                        assert.equal(variable(f.p, 'sa_energy'), 1000, `${name} ordinary PvP fallback spends no special energy`);
+                        assert.equal(variable(f.p, 'sa_attack'), 0, `${name} ordinary PvP fallback clears the toggle`);
+                        assert.equal(f.p.getInventory(worn).get(rightHand)?.id, item.id, 'PvP spends no rod charge');
+                        assert.equal(playerHits(target).length, 1, `${name} PvP fallback queues exactly one ordinary hit`);
+                        assert(playerHits(target)[0].args[0] > 0, `${name} ordinary PvP hit deals damage`);
+                    }
+                } else if (directEffects.has(name)) {
                     const oldAttack = f.p.levels[PlayerStat.ATTACK];
                     const oldDefence = f.p.levels[PlayerStat.DEFENCE];
                     const oldStrength = f.p.levels[PlayerStat.STRENGTH];
@@ -470,6 +509,31 @@ for (const item of specialWeapons) {
             } finally { dispose(f); }
         });
     }
+}
+
+for (const item of specialWeapons) {
+    const name = itemName(item);
+    if (!rodCharges.has(name)) continue;
+    test(`${name} native capture refuses incomplete quests and unsupported creatures without spending`, () => {
+        for (const [stage, targetName] of [[400, 'burgh_vampire_juvenile_1'], [421, 'goblin']]) {
+            const f = fixture(item);
+            try {
+                f.p.setVarBit(id('VarBitType', 'myreque_2_quest'), stage);
+                const target = npc(f, types.NpcType.get(id('NpcType', targetName)));
+                const original = target.type;
+                target.levels[PlayerStat.HITPOINTS] = Math.floor(target.baseLevels[PlayerStat.HITPOINTS] / 4);
+                pressSpecial(f.p);
+                assert.equal(variable(f.p, 'sa_attack'), 1, 'native special button enables the attempted capture');
+                const executions = attackNpc(f, target);
+                assertHandler(executions, pvmHandler[name]);
+                assert.equal(target.type, original, 'refused capture does not transform the creature');
+                assert.equal(variable(f.p, 'sa_energy'), 1000, 'refused capture spends no special energy');
+                assert.equal(variable(f.p, 'sa_attack'), 0, 'refused capture clears the toggle');
+                assert.equal(f.p.getInventory(worn).get(rightHand)?.id, item.id, 'refused capture spends no rod charge');
+                assert.equal(npcHits(target).length, 0, 'refused capture queues no ordinary damage');
+            } finally { dispose(f); }
+        }
+    });
 }
 
 test('unmatched special-enabled melee weapon falls through to one ordinary hit in both modes', () => {
