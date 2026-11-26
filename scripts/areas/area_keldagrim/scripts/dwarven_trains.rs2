@@ -12,6 +12,7 @@
 ~dwarven_train_station;
 
 [opnpc1,dwarf_city_train_conductor3]
+if (~forget_conductor_talk = true) return;
 ~chatnpc("<p,neutral>Out of the way human!");
 ~chatplayer("<p,neutral>Why, what's happening?");
 ~chatnpc("<p,neutral>There's important traffic coming through here and I don't want any stray humans distracting me.");
@@ -218,6 +219,7 @@ if (loc_find(^dwarven_train_track4, keldagrim_train_cart) = false) {
 }
 
 [oploc1,keldagrim_train_cart]
+if (~forget_cart = true) return;
 // CANDIDATE: click the front cart on the track named by the ticket seller.
 if (loc_coord = ^dwarven_train_track1) {
     ~dwarven_train_ride(dwarf_minecart_ticket_kelda_ice, ^dwarven_train_ice, false);

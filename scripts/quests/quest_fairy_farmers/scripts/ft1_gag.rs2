@@ -6,7 +6,9 @@
 // UNKNOWN engineering storage: a permanent, per-player visited-gardener bit mask.
 // No NPC-local state: another player or an NPC respawn must not change the chase.
 
-[opnpc1,elstan] @ft1_gag_talk;
+[opnpc1,elstan]
+if (~forget_elstan_letter = true) return;
+@ft1_gag_talk;
 [opnpc1,dantaera] @ft1_gag_talk;
 [opnpc1,kragen] @ft1_gag_talk;
 [opnpc1,lyra] @ft1_gag_talk;

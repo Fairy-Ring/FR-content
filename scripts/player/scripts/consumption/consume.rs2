@@ -138,6 +138,7 @@ if ($skill_delay ! null) {
 }
 
 ~soulbane_hope_food($obj);
+if (~forget_consume($obj) = true) return;
 // consume effect
 jump($consume_effect);
 

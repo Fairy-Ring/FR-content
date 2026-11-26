@@ -1,0 +1,528 @@
+// Forgettable Tale track machinery and records.
+// CANDIDATE route layouts: retained current guide checked against original 377 interface meshes.
+
+[ai_spawn,dwarf_city_train_conductor3]
+// UNKNOWN quest-cart placement on the separate boarded-tunnel rail.
+if (loc_find(^forget_tracks_station_cart, keldagrim_train_cart) = false) {
+    loc_add(^forget_tracks_station_cart, keldagrim_train_cart, 0, centrepiece_straight, ^max_32bit_int);
+}
+
+// Shared train dispatch calls this only for keldagrim_train_cart; leave normal track1/4 rides untouched.
+[proc,forget_cart]()(boolean)
+if (loc_coord ! ^forget_tracks_station_cart) return(false);
+if (%forget_quest ! 40 & %forget_quest ! 50 & %forget_quest ! 60) return(true);
+~forget_tracks_close_box;
+~dwarven_transport_fade(^forget_tracks_puzzle_start);
+return(true);
+
+[oploc1,keldagrim_track_junction_control_box]
+p_arrivedelay;
+~forget_tracks_close_box;
+~forget_tracks_sync_counts;
+if (%forget_quest = 40) {
+    if_openmain(inter_179);
+} else if (%forget_quest = 50) {
+    if_openmain(inter_180);
+} else if (%forget_quest = 60) {
+    if_openmain(inter_288);
+}
+
+[oploc1,keldagrim_track_junction_card_box]
+p_arrivedelay;
+~forget_tracks_recover_stock;
+
+[oploc1,forget_train_cart]
+p_arrivedelay;
+~forget_tracks_ride;
+
+[oploc2,forget_train_cart]
+p_arrivedelay;
+~forget_tracks_return_station;
+
+[oploc1,forget_train_return_cart]
+p_arrivedelay;
+~forget_tracks_return_start;
+
+[oploc1,forget_puzzle_entrance]
+p_arrivedelay;
+~forget_tracks_return_station;
+
+[oploc1,forget_story_exit_prev]
+p_arrivedelay;
+~forget_tracks_return_start;
+
+[oploc1,forget_story_exit_next]
+p_arrivedelay;
+~forget_tracks_return_start;
+
+[oploc1,dwarf_keldagrim_metal_bookcase]
+p_arrivedelay;
+if (loc_coord ! 2_29_77_47_32) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%forget_quest ! 50 & %forget_quest ! 60) return;
+// CANDIDATE wording: retained transcript; every page precedes the investigation flag.
+~mesbox("You find an interesting book that seems to contain a lot of data about Red Axe employees. You should read it fully before continuing.");
+~mesbox("Red Axe Employee Records");
+~mesbox("Hreidmar, director of the Red Axe (employee #1)");
+~mesbox("Information classified.");
+~mesbox("Grimsson, the butcher of Barendir (employee #4297)");
+~mesbox("Grimsson was once a soldier in the dwarven army and quickly made his way up the ranks, up to colonel. He served with the Black Guard at Ice Mountain and in Kandarin. He was present at the battle of Barendir when he fought against an army of trolls. It was here that he got his nickname, the Butcher of Barendir, as he mercilessly killed the trolls even as they retreated in defeat. Here, also, he got his distinctive scar running across his forehead in a hand-to-hand battle with a particularly ferocious troll.");
+~mesbox("After this battle Grimsson became more and more aggressive, even to his fellow dwarves. Following a particularly vicious attack on a comrade, he was dismissed from the Black Guard. Soon after, he was recruited by the Red Axe. Here he's learned to control his rage and become even stronger. By now, he has become the right hand dwarf of the director. While he holds no official rank, he is still often affectionately referred to as 'The Colonel'.");
+~mesbox("Grunsh, Ogre Shaman (employee #38262)");
+~mesbox("Found lost and near death in the ice cold mountains above Keldagrim, Grunsh was nearly mistaken for a troll at first. Taken in by the Red Axe and nursed back to health, it turned out that he was in fact a powerful ogre shaman. Intelligent by ogre standards, and steadfastly loyal to his rescuers, he has taken up a prominent position in the ranks of the Red Axe. This is primarily due to the fact that since dwarves cannot use magic, they must rely on other races as spellcasters. Grunsh fits the bill perfectly.");
+%forget_room2_bookcase = 1;
+~forget_tracks_check_documents;
+
+[oploc1,forget_metal_crate_withpapers1]
+p_arrivedelay;
+~forget_tracks_read_paper(1);
+
+[oploc1,forget_metal_crate_withpapers2]
+p_arrivedelay;
+~forget_tracks_read_paper(2);
+
+[oploc1,forget_metal_crate_withpapers3]
+p_arrivedelay;
+if (%forget_quest = 50 | %forget_quest = 60) {
+    ~chatplayer("<p,neutral>Statistical data, salary structures, shopping lists... no, I don't think there's anything interesting here.");
+}
+
+[if_button,inter_179:com_34]
+if_close;
+
+[if_button,inter_180:com_50]
+if_close;
+
+[if_button,inter_288:com_78]
+if_close;
+
+[if_button,inter_179:com_35] ~forget_tracks_cycle(40, 1);
+[if_button,inter_179:com_36] ~forget_tracks_cycle(40, 2);
+[if_button,inter_179:com_37] ~forget_tracks_cycle(40, 3);
+[if_button,inter_179:com_38] ~forget_tracks_cycle(40, 4);
+[if_button,inter_179:com_39] ~forget_tracks_cycle(40, 5);
+[if_button,inter_179:com_40] ~forget_tracks_cycle(40, 6);
+[if_button,inter_179:com_41] ~forget_tracks_cycle(40, 7);
+[if_button,inter_179:com_42] ~forget_tracks_cycle(40, 8);
+
+[if_button,inter_180:com_51] ~forget_tracks_cycle(50, 1);
+[if_button,inter_180:com_52] ~forget_tracks_cycle(50, 2);
+[if_button,inter_180:com_53] ~forget_tracks_cycle(50, 3);
+[if_button,inter_180:com_54] ~forget_tracks_cycle(50, 4);
+[if_button,inter_180:com_55] ~forget_tracks_cycle(50, 5);
+[if_button,inter_180:com_56] ~forget_tracks_cycle(50, 6);
+[if_button,inter_180:com_57] ~forget_tracks_cycle(50, 7);
+[if_button,inter_180:com_58] ~forget_tracks_cycle(50, 8);
+[if_button,inter_180:com_59] ~forget_tracks_cycle(50, 9);
+[if_button,inter_180:com_60] ~forget_tracks_cycle(50, 10);
+[if_button,inter_180:com_61] ~forget_tracks_cycle(50, 11);
+[if_button,inter_180:com_62] ~forget_tracks_cycle(50, 12);
+
+[if_button,inter_288:com_79] ~forget_tracks_cycle(60, 1);
+[if_button,inter_288:com_80] ~forget_tracks_cycle(60, 2);
+[if_button,inter_288:com_81] ~forget_tracks_cycle(60, 3);
+[if_button,inter_288:com_82] ~forget_tracks_cycle(60, 4);
+[if_button,inter_288:com_83] ~forget_tracks_cycle(60, 5);
+[if_button,inter_288:com_84] ~forget_tracks_cycle(60, 6);
+[if_button,inter_288:com_85] ~forget_tracks_cycle(60, 7);
+[if_button,inter_288:com_86] ~forget_tracks_cycle(60, 8);
+[if_button,inter_288:com_87] ~forget_tracks_cycle(60, 9);
+[if_button,inter_288:com_88] ~forget_tracks_cycle(60, 10);
+[if_button,inter_288:com_89] ~forget_tracks_cycle(60, 11);
+[if_button,inter_288:com_90] ~forget_tracks_cycle(60, 12);
+[if_button,inter_288:com_91] ~forget_tracks_cycle(60, 13);
+[if_button,inter_288:com_92] ~forget_tracks_cycle(60, 14);
+[if_button,inter_288:com_93] ~forget_tracks_cycle(60, 15);
+[if_button,inter_288:com_94] ~forget_tracks_cycle(60, 16);
+[if_button,inter_288:com_95] ~forget_tracks_cycle(60, 17);
+[if_button,inter_288:com_96] ~forget_tracks_cycle(60, 18);
+[if_button,inter_288:com_97] ~forget_tracks_cycle(60, 19);
+
+[proc,forget_tracks_sync_counts]
+%forget_num_left = inv_total(inv, turnleft_trackjunction_control_card);
+%forget_num_right = inv_total(inv, turnright_trackjunction_control_card);
+
+[proc,forget_tracks_close_box]
+// loc_find selects the remote open box as active_loc so loc_change can restore its original closed form.
+if (loc_find(^forget_tracks_card_box_coord, keldagrim_track_junction_card_box_open) = true) {
+    loc_change(keldagrim_track_junction_card_box, ^max_32bit_int);
+}
+%forget_start_emptied = 0;
+
+[proc,forget_tracks_return_start]
+~forget_tracks_close_box;
+~dwarven_transport_fade(^forget_tracks_puzzle_start);
+
+[proc,forget_tracks_return_station]
+~forget_tracks_close_box;
+~dwarven_transport_fade(^forget_tracks_station_landing);
+
+[proc,forget_tracks_selector_limit](int $stage)(int)
+if ($stage = 40) return(8);
+if ($stage = 50) return(12);
+if ($stage = 60) return(19);
+return(0);
+
+[proc,forget_tracks_selector_value](int $index)(int)
+if ($index < 1 | $index > 19) return(0);
+if ($index <= 16) {
+    def_int $start = calc(($index - 1) * 2);
+    return(getbit_range(%forget_puzzle_var, $start, calc($start + 1)));
+}
+def_int $start2 = calc(($index - 17) * 2);
+return(getbit_range(%forget_puzzle_var2, $start2, calc($start2 + 1)));
+
+[proc,forget_tracks_set_selector](int $index, int $value)
+if ($index < 1 | $index > 19 | $value < 0 | $value > 2) return;
+if ($index <= 16) {
+    def_int $start = calc(($index - 1) * 2);
+    %forget_puzzle_var = setbit_range_toint(%forget_puzzle_var, $value, $start, calc($start + 1));
+} else {
+    def_int $start2 = calc(($index - 17) * 2);
+    %forget_puzzle_var2 = setbit_range_toint(%forget_puzzle_var2, $value, $start2, calc($start2 + 1));
+}
+
+[proc,forget_tracks_inserted](int $value)(int)
+def_int $count = 0;
+def_int $index = 1;
+while ($index <= 19) {
+    if (~forget_tracks_selector_value($index) = $value) $count = calc($count + 1);
+    $index = calc($index + 1);
+}
+return($count);
+
+[proc,forget_tracks_clear_if_space]()(boolean)
+def_int $green = ~forget_tracks_inserted(1);
+def_int $yellow = ~forget_tracks_inserted(2);
+def_int $need_slots = 0;
+if ($green > 0 & inv_total(inv, turnleft_trackjunction_control_card) = 0) $need_slots = calc($need_slots + 1);
+if ($yellow > 0 & inv_total(inv, turnright_trackjunction_control_card) = 0) $need_slots = calc($need_slots + 1);
+if (inv_freespace(inv) < $need_slots) return(false);
+if ($green > 0) inv_add(inv, turnleft_trackjunction_control_card, $green);
+if ($yellow > 0) inv_add(inv, turnright_trackjunction_control_card, $yellow);
+%forget_puzzle_var = 0;
+%forget_puzzle_var2 = setbit_range_toint(%forget_puzzle_var2, 0, 0, 5);
+~forget_tracks_sync_counts;
+return(true);
+
+[proc,forget_tracks_current_trip]()(int)
+if (%forget_quest ! 40 & %forget_quest ! 50 & %forget_quest ! 60) return(0);
+if (%forget_tunnel_cutscene1 = 0) return(1);
+if (%forget_tunnel_cutscene2 = 0) return(2);
+if (%forget_tunnel_cutscene3 = 0) return(3);
+return(0);
+
+[proc,forget_tracks_expected_selector](int $stage, int $trip, int $index, int $branch)(int)
+if ($stage = 40) {
+    if ($trip = 1) {
+        if ($index = 1) return(2);
+        if ($index = 3) return(1);
+    } else if ($trip = 2 & $branch = 1) {
+        if ($index = 1) return(1);
+        if ($index = 2) return(2);
+        if ($index = 5) return(1);
+    } else if ($trip = 2 & $branch = 2) {
+        if ($index = 1) return(1);
+        if ($index = 2) return(1);
+        if ($index = 4) return(2);
+    } else if ($trip = 3) {
+        if ($index = 1) return(2);
+        if ($index = 3) return(2);
+        if ($index = 6) return(1);
+        if ($index = 7) return(1);
+    }
+} else if ($stage = 50) {
+    if ($trip = 1) {
+        if ($index = 1) return(1);
+        if ($index = 2) return(2);
+        if ($index = 5) return(2);
+    } else if ($trip = 2) {
+        if ($index = 1) return(2);
+        if ($index = 3) return(2);
+        if ($index = 6) return(1);
+        if ($index = 11) return(1);
+    } else if ($trip = 3) {
+        if ($index = 1) return(1);
+        if ($index = 2) return(1);
+        if ($index = 4) return(2);
+        if ($index = 10) return(1);
+        if ($index = 12) return(2);
+    }
+} else if ($stage = 60) {
+    if ($trip = 1) {
+        if ($index = 1) return(1);
+        if ($index = 2) return(1);
+        if ($index = 4) return(2);
+        if ($index = 6) return(2);
+    } else if ($trip = 2) {
+        if ($index = 1) return(2);
+        if ($index = 3) return(2);
+        if ($index = 5) return(2);
+        if ($index = 7) return(1);
+        if ($index = 9) return(1);
+        if ($index = 12) return(1);
+    } else if ($trip = 3) {
+        if ($index = 1) return(1);
+        if ($index = 2) return(1);
+        if ($index = 4) return(2);
+        if ($index = 6) return(1);
+        if ($index = 8) return(2);
+        if ($index = 11) return(1);
+        if ($index = 14) return(2);
+        if ($index = 17) return(2);
+    }
+}
+return(0);
+
+[proc,forget_tracks_matches_branch](int $stage, int $trip, int $branch)(boolean)
+def_int $limit = ~forget_tracks_selector_limit($stage);
+def_int $index = 1;
+while ($index <= $limit) {
+    def_int $actual = ~forget_tracks_selector_value($index);
+    def_int $expected = ~forget_tracks_expected_selector($stage, $trip, $index, $branch);
+    if ($expected ! 0 & $actual ! $expected) return(false);
+    $index = calc($index + 1);
+}
+return(true);
+
+[proc,forget_tracks_route_matches](int $stage, int $trip)(boolean)
+if ($stage = 40 & $trip = 2) {
+    if (~forget_tracks_matches_branch($stage, $trip, 1) = true) return(true);
+    return(~forget_tracks_matches_branch($stage, $trip, 2));
+}
+return(~forget_tracks_matches_branch($stage, $trip, 1));
+
+[proc,forget_tracks_cycle](int $stage, int $index)
+if (%forget_quest ! $stage) return;
+def_int $limit = ~forget_tracks_selector_limit($stage);
+if ($index < 1 | $index > $limit) return;
+def_int $current = ~forget_tracks_selector_value($index);
+def_int $next = 0;
+if ($current = 0) {
+    if (inv_total(inv, turnleft_trackjunction_control_card) = 0) {
+        // UNKNOWN plain functional wording; the source gives the stone action, not this refusal text.
+        mes("You need a green-marked stone to set this junction.");
+        return;
+    }
+    inv_del(inv, turnleft_trackjunction_control_card, 1);
+    $next = 1;
+} else if ($current = 1) {
+    if (inv_total(inv, turnright_trackjunction_control_card) = 0) {
+        // UNKNOWN plain functional wording; the source gives the stone action, not this refusal text.
+        mes("You need a yellow-marked stone to set this junction.");
+        return;
+    }
+    inv_del(inv, turnright_trackjunction_control_card, 1);
+    if (inv_total(inv, turnleft_trackjunction_control_card) = 0 & inv_freespace(inv) = 0) {
+        inv_add(inv, turnright_trackjunction_control_card, 1);
+        // UNKNOWN plain functional wording; the source gives the inventory constraint, not this refusal text.
+        mes("You need inventory space to change this junction.");
+        return;
+    }
+    inv_add(inv, turnleft_trackjunction_control_card, 1);
+    $next = 2;
+} else if ($current = 2) {
+    if (inv_total(inv, turnright_trackjunction_control_card) = 0 & inv_freespace(inv) = 0) {
+        // UNKNOWN plain functional wording; the source gives the inventory constraint, not this refusal text.
+        mes("You need inventory space to remove this stone.");
+        return;
+    }
+    inv_add(inv, turnright_trackjunction_control_card, 1);
+    $next = 0;
+} else {
+    return;
+}
+~forget_tracks_set_selector($index, $next);
+~forget_tracks_sync_counts;
+
+[proc,forget_tracks_recover_stock]
+if (%forget_quest ! 40 & %forget_quest ! 50 & %forget_quest ! 60) return;
+def_int $trip = ~forget_tracks_current_trip;
+if ($trip = 0) return;
+def_int $target_green = 0;
+def_int $target_yellow = 0;
+if (%forget_quest = 40) {
+    if ($trip = 1) {
+        $target_green = ^forget_tracks_r1_trip1_green;
+        $target_yellow = ^forget_tracks_r1_trip1_yellow;
+    } else if ($trip = 2) {
+        $target_green = ^forget_tracks_r1_trip2_green;
+        $target_yellow = ^forget_tracks_r1_trip2_yellow;
+    } else {
+        $target_green = ^forget_tracks_r1_trip3_green;
+        $target_yellow = ^forget_tracks_r1_trip3_yellow;
+    }
+} else if (%forget_quest = 50) {
+    if ($trip = 1) {
+        $target_green = ^forget_tracks_r3_trip1_green;
+        $target_yellow = ^forget_tracks_r3_trip1_yellow;
+    } else if ($trip = 2) {
+        $target_green = ^forget_tracks_r3_trip2_green;
+        $target_yellow = ^forget_tracks_r3_trip2_yellow;
+    } else {
+        $target_green = ^forget_tracks_r3_trip3_green;
+        $target_yellow = ^forget_tracks_r3_trip3_yellow;
+    }
+} else {
+    if ($trip = 1) {
+        $target_green = ^forget_tracks_r5_trip1_green;
+        $target_yellow = ^forget_tracks_r5_trip1_yellow;
+    } else if ($trip = 2) {
+        $target_green = ^forget_tracks_r5_trip2_green;
+        $target_yellow = ^forget_tracks_r5_trip2_yellow;
+    } else {
+        $target_green = ^forget_tracks_r5_trip3_green;
+        $target_yellow = ^forget_tracks_r5_trip3_yellow;
+    }
+}
+def_int $owned_green = calc(inv_total(inv, turnleft_trackjunction_control_card) + inv_total(bank, turnleft_trackjunction_control_card) + ~forget_tracks_inserted(1));
+def_int $owned_yellow = calc(inv_total(inv, turnright_trackjunction_control_card) + inv_total(bank, turnright_trackjunction_control_card) + ~forget_tracks_inserted(2));
+def_int $give_green = 0;
+def_int $give_yellow = 0;
+if ($owned_green < $target_green) $give_green = calc($target_green - $owned_green);
+if ($owned_yellow < $target_yellow) $give_yellow = calc($target_yellow - $owned_yellow);
+if ($give_green = 0 & $give_yellow = 0) return;
+def_int $need_slots = 0;
+if ($give_green > 0 & inv_total(inv, turnleft_trackjunction_control_card) = 0) $need_slots = calc($need_slots + 1);
+if ($give_yellow > 0 & inv_total(inv, turnright_trackjunction_control_card) = 0) $need_slots = calc($need_slots + 1);
+if (inv_freespace(inv) < $need_slots) {
+    // UNKNOWN plain functional wording; the retained guide asks for two free spaces.
+    mes("You need more inventory space for the missing track stones.");
+    return;
+}
+if ($give_green > 0) inv_add(inv, turnleft_trackjunction_control_card, $give_green);
+if ($give_yellow > 0) inv_add(inv, turnright_trackjunction_control_card, $give_yellow);
+%forget_start_emptied = 1;
+~forget_tracks_sync_counts;
+loc_change(keldagrim_track_junction_card_box_open, ^max_32bit_int);
+
+[proc,forget_tracks_ride]
+if (%forget_quest ! 40 & %forget_quest ! 50 & %forget_quest ! 60) return;
+def_int $trip = ~forget_tracks_current_trip;
+if ($trip = 0) return;
+if (~forget_tracks_route_matches(%forget_quest, $trip) = false) {
+    ~chatplayer("<p,neutral>This junction is blocked. I'd better go back to the start and find some way to make it go left or right.");
+    return;
+}
+if (~forget_tracks_clear_if_space = false) {
+    // UNKNOWN functional refusal: preserve every inserted stone and earned trip.
+    mes("You need inventory space for the track stones before riding.");
+    return;
+}
+if_close;
+if ($trip = 1) %forget_tunnel_cutscene1 = 1;
+if ($trip = 2) %forget_tunnel_cutscene2 = 1;
+// The final route stays repeatable until its scene or all archive records finish.
+~forget_tracks_close_box;
+if ($trip < 3) {
+    // UNKNOWN physical endpoint presentation; the source confirms the cart returns to the machinery.
+    ~dwarven_transport_fade(^forget_tracks_puzzle_start);
+    return;
+}
+if (%forget_quest = 40) {
+    ~dwarven_transport_fade(^forget_tracks_witness_landing);
+    ~forget_tracks_show_witness;
+    %forget_quest = 50;
+    ~forget_tracks_reset_trip_bits;
+    return;
+}
+if (%forget_quest = 50) {
+    ~dwarven_transport_fade(^forget_tracks_archive_landing);
+    return;
+}
+~dwarven_transport_fade(^forget_tracks_final_landing);
+~forget_tracks_show_final;
+~forget_tracks_reset_trip_bits;
+
+[proc,forget_tracks_reset_trip_bits]
+%forget_tunnel_cutscene1 = 0;
+%forget_tunnel_cutscene2 = 0;
+%forget_tunnel_cutscene3 = 0;
+
+[proc,forget_tracks_show_witness]
+// UNKNOWN placement/lifetime; CANDIDATE full conversation from the retained transcript.
+npc_add(^forget_tracks_witness_director, forget_redaxe_director_cutscene, ^forget_tracks_scene_lifetime);
+def_npc_uid $director = npc_uid;
+npc_add(^forget_tracks_witness_henchman, forget_redaxe_henchman_cutscene, ^forget_tracks_scene_lifetime);
+def_npc_uid $henchman = npc_uid;
+npc_add(^forget_tracks_witness_shaman, forget_redaxe_shaman_cutscene, ^forget_tracks_scene_lifetime);
+def_npc_uid $shaman = npc_uid;
+~chatnpc_specific("Red Axe Henchman", forget_redaxe_henchman_cutscene, "<p,neutral>What's the new plan?");
+~chatnpc_specific("Ogre shaman", forget_redaxe_shaman_cutscene, "<p,angry>Me dead human!");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,neutral>No, not yet. He may still prove useful to us.");
+~chatnpc_specific("Red Axe Henchman", forget_redaxe_henchman_cutscene, "<p,angry>My axe on his head would be more useful!");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,neutral>Forget about the human and the statue for now. Our experiments are more important.");
+~chatnpc_specific("Red Axe Henchman", forget_redaxe_henchman_cutscene, "<p,neutral>We are nearly ready with our next test.");
+~chatnpc_specific("Ogre shaman", forget_redaxe_shaman_cutscene, "<p,neutral>More little fire lookers?");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,neutral>This time they'll survive, I hope.");
+~chatnpc_specific("Red Axe Henchman", forget_redaxe_henchman_cutscene, "<p,neutral>Our slaves are too weak, it will never work.");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,neutral>Yes, things would have been so much easier with the statue.");
+~chatnpc_specific("Red Axe Henchman", forget_redaxe_henchman_cutscene, "<p,neutral>It was a great plan! Sabotaging the base of the statue and bribing that boatman to crash into it!");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,angry>And we would have gotten away with it too, if it wasn't for that pesky human.");
+~chatplayer("<p,neutral>Pesky human, huh? Well, I think I have enough info now. I'd better explore the rest of these mines.");
+if (npc_finduid($director) = true) npc_del;
+if (npc_finduid($henchman) = true) npc_del;
+if (npc_finduid($shaman) = true) npc_del;
+
+[proc,forget_tracks_show_final]
+// UNKNOWN actor placement and spell presentation in the original final chamber.
+npc_add(^forget_tracks_final_director, forget_redaxe_director_cutscene, ^forget_tracks_scene_lifetime);
+def_npc_uid $director = npc_uid;
+npc_add(^forget_tracks_final_henchman, forget_redaxe_henchman3_cutscene, ^forget_tracks_scene_lifetime);
+def_npc_uid $henchman = npc_uid;
+npc_add(^forget_tracks_final_gnome, forget_cutscene_gnome_emissary, ^forget_tracks_scene_lifetime);
+def_npc_uid $gnome = npc_uid;
+~chatplayer("<p,neutral>There's the Red Axe director again!");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,neutral>How did the experiment go?");
+~chatnpc_specific("Colonel Grimsson", forget_redaxe_henchman3_cutscene, "<p,neutral>The test subjects are still alive, director. They will suffice as soldiers.");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,happy>Excellent! We are improving. Laneel!");
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,neutral>Return to Arposandra and tell your superiors we've had a partial success.");
+~chatnpc_specific("Gnome emissary", forget_cutscene_gnome_emissary, "<p,neutral>I will tell them, but I'd like to see some of your test subjects first, if I may.");
+~chatnpc_specific("Colonel Grimsson", forget_redaxe_henchman3_cutscene, "<p,neutral>Look, here comes the first group!");
+npc_add(^forget_tracks_final_chaos, forget_cutscene_chaos_dwarf, ^forget_tracks_scene_lifetime);
+def_npc_uid $chaos = npc_uid;
+~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,angry>Behold the power of Zamorak!");
+~chatplayer("<p,surprised>Chaos dwarves!!!");
+~chatplayer("<p,surprised>I must tell Veldaban!!!");
+npc_add(^forget_tracks_final_shaman, forget_redaxe_shaman2_cutscene, ^forget_tracks_scene_lifetime);
+def_npc_uid $shaman = npc_uid;
+~chatnpc_specific("Grunsh", forget_redaxe_shaman2_cutscene, "<p,neutral>Lookings likes we's finding da spying creatures'ies!");
+// UNKNOWN spell effect; the source establishes memory loss and a fade to the station.
+if (npc_finduid($shaman) = true) npc_anim(giant_casting, 0);
+~chatplayer("<p,surprised>Nooooooo!");
+if (npc_finduid($director) = true) npc_del;
+if (npc_finduid($henchman) = true) npc_del;
+if (npc_finduid($gnome) = true) npc_del;
+if (npc_finduid($chaos) = true) npc_del;
+if (npc_finduid($shaman) = true) npc_del;
+~dwarven_transport_fade(^forget_tracks_station_landing);
+// Persist the earned spell before the interruptible post-spell dialogue.
+%forget_quest = 70;
+~chatplayer("<p,confused>Er, what? Where am I? Errrrr... I must tell Veldaban... something. Yes... ehm. I don't remember what though. Errr...");
+
+[proc,forget_tracks_read_paper](int $paper)
+if (%forget_quest ! 50 & %forget_quest ! 60) return;
+// CANDIDATE wording; UNKNOWN mapping of the two original paper crates to records.
+if ($paper = 1) {
+    if (loc_coord ! 2_29_77_50_37) return;
+    ~mesbox("You find a copy of a letter, addressed to the boatman that brought you to Keldagrim a while back.");
+    ~mesbox("I am writing to advise you that our secret preparations to the statue have been completed. All you need to do now is hit it with your boat. Take some gullible human along when you do, the mines are crawling with them these days. The human will surely get the major blame.");
+    ~mesbox("After this, the statue is going to be rebuilt in the image of our great director. You need not concern yourself with the how and why, but rest assured you will be compensated greatly.");
+    ~mesbox("Regards, Colonel Grimsson of the Red Axe");
+    %forget_room2_paper1 = 1;
+} else if ($paper = 2) {
+    if (loc_coord ! 2_29_77_54_38) return;
+    ~mesbox("You find something that seems to shed some light on what happened to the drunken dwarf in Keldagrim. You should read it carefully before moving on.");
+    ~mesbox("Report on Intruder");
+    ~mesbox("We found a dwarf wandering in our mines. We weren't sure if he was a spy or simply an explorer, but we couldn't take any risks. We decided to send him back with his memory wiped, rather than put him to use as one of our test subjects. We can't afford having to explain another mysterious disappearance at this point. Additionally, we added something to the spell that would make him hungry for kebabs and thirsty for beer, so that whatever he can remember will be dismissed as the ravings of a drunken fool. Grunsh did a good job, he seems to be fitting in well. Nevertheless, the spell seems to have been a little bit too strong, the subject is unlikely to recover from his condition. His obsession with kebabs is a bit too extreme. Will tell Grunsh to adjust his spell next time.");
+    %forget_room2_paper2 = 1;
+}
+~forget_tracks_check_documents;
+
+[proc,forget_tracks_check_documents]
+if (%forget_quest = 50 & %forget_room2_bookcase = 1 & %forget_room2_paper1 = 1 & %forget_room2_paper2 = 1) {
+    %forget_quest = 60;
+    ~forget_tracks_reset_trip_bits;
+}

@@ -1,0 +1,216 @@
+// VERIFIED sequence: period Tip.It guide, 27 April 2006.
+// CANDIDATE dialogue and Rowdy item list: retained quest transcript/article.
+[proc,forget_veldaban_progress]
+if (%forget_quest >= ^forget_complete) {
+    ~chatnpc("<p,neutral>What happened, <displayname>, did you finish your assignment?");
+    ~chatplayer("<p,neutral>I think... I think I must have. It's so hard to remember.");
+    ~chatnpc("<p,neutral>Don't worry, <displayname>, I believe you. You must have been put under a spell of some sort to make you forget.");
+    ~chatnpc("<p,neutral>I suppose we'll just have to wait and see what happens.");
+    return;
+}
+if (%forget_quest >= 70) {
+    ~chatplayer("<p,neutral>Veldaban, I must tell you something incredibly important!");
+    ~chatnpc("<p,neutral>What is it, <displayname>?");
+    ~chatplayer("<p,neutral>I must tell you about... about...");
+    ~chatplayer("<p,neutral>...about my incredible craving for a kebab. Mmm, kebabs. A kebab and a beer, that sounds great right now.");
+    ~chatnpc("<p,neutral>Errr, are you alright? Don't you have any important information about the Red Axe?");
+    ~chatplayer("<p,neutral>Mmm, yes, I'll be perfectly alright... just after I've had my beer and a kebab. Yes. I'll have a beer and a kebab in the Laughing Miner. Yum!");
+    %forget_quest = 80;
+    return;
+}
+~chatnpc("<p,neutral>How goes the search for the Red Axe?");
+if (%forget_quest >= 30) {
+    ~chatplayer("<p,neutral>But I need some boarding removed, I need to go through some disused mine cart tunnels.");
+    ~chatnpc("<p,neutral>I see... I cannot make that decision, I'm afraid. Speak to the director of <~giantdwarf_company_name(%giantdwarf_current_company)>, he may be able to help you.");
+} else if (%forget_quest >= 20) {
+    ~chatplayer("<p,neutral>I think I'm on to something! Something about a disused mine tunnel southeast of town.");
+    ~chatnpc("<p,neutral>Happy to hear that, <displayname>! Please go and check it out!");
+} else {
+    // UNKNOWN functional reminder.
+    ~mesbox("I should ask the drunken dwarf in northeast Keldagrim about the Red Axe.");
+}
+
+[proc,forget_drunken_talk]()(boolean)
+if (%forget_quest = 0 | %forget_quest >= ^forget_complete) return(false);
+if (~p_choice2("I need to know about the Red Axe...", 1, "Hello there! Are you alright?", 2) = 2) return(false);
+~chatplayer("<p,neutral>I need to know about the Red Axe...");
+if (%forget_quest >= 20) {
+    ~chatnpc("<p,neutral>I don't know anyshing about the Red Kebabs.");
+    return(true);
+}
+if (%forget_quest = 1) {
+    ~chatnpc("<p,neutral>Did you get me shome of the good stuff yet?");
+    if (inv_total(inv, beer) = 0) {
+        ~chatnpc("<p,neutral>Jusht pop down to the Laughing Miner and get some, will you?");
+        return(true);
+    }
+    inv_del(inv, beer, 1);
+    inv_add(inv, beer_glass, 1);
+    ~chatnpc("<p,neutral>What wash that? *hic* No no no, this ish noooooo good! I want some of the REALLY good stuff.");
+    ~chatnpc("<p,neutral>Some of them original Kelda Stout! Ash blue ash the river! Ash strong ash ole Dondakan's rock. Ash foul tasting ash ash.");
+    ~chatnpc("<p,neutral>You silly human! Silly shilly silly *hic* hman. You need FOUR seeds, and grow them into hops.");
+    ~chatnpc("<p,neutral>Some of me drinking buddies might have 'em. They're quite rare, you shee. Oh yesh, quite rare.");
+    %forget_quest = 10;
+    ~forget_replace_seeds;
+    return(true);
+}
+if (inv_total(inv, kelda_stout) = 0) {
+    ~chatnpc("<p,neutral>Got me my Kelda stout?");
+    ~forget_replace_seeds;
+    return(true);
+}
+~chatplayer("<p,neutral>I've got some Kelda stout right here. I just brewed it in the Laughing Miner!");
+~chatnpc("<p,neutral>Now there'sh a good human, gimme that!");
+inv_del(inv, kelda_stout, 1);
+inv_add(inv, beer_glass, 1);
+%forget_beer_given = 1;
+%forget_quest = 20;
+~chatnpc("<p,neutral>The Red Axe? You want to know about them, do you? Then let me tell you my tale. It is long and quite unforgettable...");
+~chatnpc("<p,neutral>I explored this old mine, you know, just south of Keldagrim. I think it's boarded up now. Some amazing things I saw there.");
+if_openoverlay(fade_to_black);
+p_delay(2);
+~chatnpc("<p,neutral>...and then I nearly fell into the Abyss! But I...");
+if_openoverlay(null);
+~chatnpc("<p,neutral>...pink dragons...");
+~chatplayer("<p,neutral>But I shall investigate that tunnel immediately! South of the cart station, just south of the carts to White Wolf mountain?");
+return(true);
+
+[proc,forget_replace_seeds]
+if (%forget_quest ! 10 | %forget_farming >= 4 | %forget_seed2_told = 1) return;
+def_int $earned = calc(1 + %forget_seed2_given + %forget_seed3_given + %forget_seed4_given);
+def_int $held = calc(inv_total(inv, kelda_hop_seed) + inv_total(bank, kelda_hop_seed));
+if ($held >= $earned) return;
+if (inv_freespace(inv) = 0 & inv_total(inv, kelda_hop_seed) = 0) return;
+inv_add(inv, kelda_hop_seed, calc($earned - $held));
+
+[proc,forget_rowdy_item](int $kind)(obj)
+switch_int($kind) {
+    case 1 : return(acne_potion);
+    case 2 : return(amulet_mould);
+    case 3 : return(anchovie_pizza);
+    case 4 : return(ashes);
+    case 5 : return(banana);
+    case 6 : return(bat_bones);
+    case 7 : return(broken_glass);
+    case 8 : return(feud_camel_pooh_bucket);
+    case 9 : return(burnt_chicken);
+    case 10 : return(cabbage);
+    case 11 : return(eye_patch);
+    case 12 : return(feud_karidian_fakebeard);
+    case 13 : return(flier);
+    case 14 : return(king_worm);
+    case 15 : return(pink_skirt);
+    case 16 : return(potato);
+    case 17 : return(red_cape);
+    case 18 : return(spinning_plate);
+    case 19 : return(studded_chaps);
+    case 20 : return(steel_dart);
+    case 21 : return(swamp_tar);
+    case 22 : return(horsey_black);
+    case 23 : return(vampire_dust);
+    case 24 : return(white_apron);
+}
+return(null);
+
+[proc,forget_rowdy_talk]()(boolean)
+if (%forget_quest ! 10 | %forget_seed2_given = 1) return(false);
+// UNKNOWN engineering default approved by Main: uniform among the retained
+// 24 requests. The period guide confirms a new assignment after logout.
+def_int $kind = getbit_range(%forget_clock, 27, 31);
+if ($kind = 0) {
+    $kind = calc(random(24) + 1);
+    %forget_clock = setbit_range_toint(%forget_clock, $kind, 27, 31);
+    ~chatplayer("<p,neutral>Hold on a second there, I need your help!");
+    ~chatnpc("<p,neutral>I might... oh yeah, I jusht might have a sheed like that.");
+    ~chatnpc("<p,neutral>Lemme think... oh yesh. Get me... <oc_name(~forget_rowdy_item($kind))>.");
+    return(true);
+}
+def_obj $item = ~forget_rowdy_item($kind);
+if (inv_total(inv, $item) = 0) {
+    ~chatnpc("<p,neutral>Where's my ehm... What wash it again? Oh yesh... <oc_name($item)>.");
+    return(true);
+}
+~chatnpc("<p,neutral>Shplendid! Give that to me please!");
+inv_del(inv, $item, 1);
+%forget_seed2_given = 1;
+~forget_replace_seeds;
+~chatnpc("<p,neutral>Nah, I'm just kidding! Here, have the seed, you won't catch me farming in shome dirt patch anyway!");
+return(true);
+
+[proc,forget_login]
+// Login clears the session assignment, never the permanent Kelda clock.
+%forget_clock = setbit_range_toint(%forget_clock, 0, 27, 31);
+
+[proc,forget_khorvak_talk]()(boolean)
+if (%forget_quest ! 10 | %forget_seed3_given = 1) return(false);
+if (%dwarfrock_quest >= 40 & %dwarfrock_quest < 50) {
+    if (~p_choice2("Talk about Kelda hop seeds.", 1, "Talk about multicannon schematics.", 2) = 2) return(false);
+}
+~chatplayer("<p,neutral>Hello there. I'm looking for some Kelda hop seeds.");
+~chatnpc("<p,neutral>Oh, I've got a sheed you might like to borrow!");
+if (~p_choice2("No wait, I want to borrow it after all.", 1, "What if I offer you a drink?", 2) = 2) {
+    if (inv_total(inv, dwarven_stout) = 0) {
+        ~chatnpc("<p,neutral>Haha, you make me laugh human!");
+        return(true);
+    }
+    inv_del(inv, dwarven_stout, 1);
+    inv_add(inv, beer_glass, 1);
+} else {
+    ~chatplayer("<p,neutral>Of course, of course! After I've grown my Kelda seeds into hops, then harvested the hops and brewed my Kelda stout... sure, I'll give you back your seed!");
+}
+%forget_seed3_given = 1;
+~forget_replace_seeds;
+~chatnpc("<p,neutral>That'sh alright then, here you go.");
+return(true);
+
+[proc,forget_gauss_talk]()(boolean)
+if (%forget_quest ! 10 | %forget_seed4_given = 1) return(false);
+~chatplayer("<p,neutral>Do you know anything about Kelda stout?");
+~chatnpc("<p,neutral>Have a toast to our good health with me and I'll tell you!");
+if (inv_total(inv, beer) = 0 & inv_total(inv, beer_glass) = 0) {
+    ~chatnpc("<p,neutral>Then go get something from the bar!");
+    return(true);
+}
+~chatplayer("<p,happy>Cheers!");
+~chatnpc("<p,happy>Cheers!");
+anim(human_clink_beerglass, 0);
+npc_anim(dwarf_clink_beerglass, 0);
+// CANDIDATE: quest toast accepts glass and does not consume the beer.
+%forget_seed4_given = 1;
+~forget_replace_seeds;
+~chatnpc("<p,neutral>That was fun! Here, I've got one Kelda seed left. A sociable chap like you is more than welcome to it.");
+return(true);
+
+[proc,forget_conductor_talk]()(boolean)
+if (%forget_quest < 20 | %forget_quest >= 40) return(false);
+if (~p_choice2("Ask about closed off tunnel.", 1, "Ask any other question.", 2) = 2) return(false);
+~chatplayer("<p,neutral>Excuse me, can you tell me what's behind that boarded up tunnel to the south?");
+~chatnpc("<p,neutral>Why, that part of the mines hasn't been used in a long time. I don't rightly know what you would find behind there.");
+~chatnpc("<p,neutral>I don't have the authority to do that kind of thing.");
+~chatnpc("<p,neutral>I don't know. Perhaps you have an influential friend?");
+%forget_quest = 30;
+return(true);
+
+[proc,forget_director_talk](int $company)(boolean)
+if (%giantdwarf_quest < ^giantdwarf_complete | %forget_quest ! 30 | %giantdwarf_current_company ! $company) return(false);
+if (~p_choice2("Can you help me with a boarded up tunnel?", 1, "Do you have any more tasks for me?", 2) = 2) return(false);
+~chatplayer("<p,neutral>I think it leads to something that might be related to the Red Axe.");
+~chatnpc("<p,neutral>Forthwith, <displayname>, forthwith! I'll order the removal at once!");
+%forget_boarding_removed = 1;
+%forget_quest = 40;
+return(true);
+
+[opheld1,kelda_stout]
+~chatplayer("<p,neutral>This stout seems absolutely vile and disgusting. Besides, I'm supposed to bring it to my drunken, kebab obsessed friend.");
+
+[if_button,questlist:forget]
+// UNKNOWN functional journal, not original journal wording.
+def_string $text = "I should speak to Commander Veldaban in Keldagrim. I need The Giant Dwarf, Fishing Contest, 17 Farming and 22 Cooking.";
+if (%forget_quest >= 1) $text = "I should ask the drunken dwarf in northeast Keldagrim about the Red Axe. He wants a beer.";
+if (%forget_quest >= 10) $text = "I need four Kelda seeds from the drunken dwarf, the Rowdy dwarf, Khorvak and Gauss. Rind can explain the palace garden patch. I must brew the hops upstairs at the Laughing Miner with two buckets of water, two barley malt and ale yeast.";
+if (%forget_quest >= 20) $text = "I should ask the cart conductor about the boarded tunnel south of the station, then ask the director of my mining company to open it.";
+if (%forget_quest >= 40) $text = "I should explore the abandoned mine using the square stones and dwarven machinery. I must listen to the Red Axe and read their records.";
+if (%forget_quest >= 70) $text = "I must tell Veldaban something important.";
+if (%forget_quest >= 80) $text = "I want a beer and kebab at the Laughing Miner. I should take both there and drink the beer or eat the kebab.";
+if (%forget_quest >= ^forget_complete) $text = "<col=000080>QUEST COMPLETE!|I think something terrible happened, but I cannot remember it.";
+~quest_journal("Forgettable Tale...", $text);

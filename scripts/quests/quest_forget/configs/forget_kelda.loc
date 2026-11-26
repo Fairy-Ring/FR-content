@@ -1,0 +1,69 @@
+// Original 377 Kelda forms copied without changing client fields.
+[barrel_kelda_stout]
+name=Kelda Stout
+desc=A barrel of Kelda Stout.
+model=loc_7407
+ambient=15
+blockrange=no
+op1=Level
+
+[vat_kelda_stout_hops]
+name=Fermenting Vat
+desc=This vat contains Kelda hops.
+model=loc_7437
+model2=loc_7438
+model3=loc_7437i2
+recol1s=21169
+recol1d=18068
+ambient=15
+blockrange=no
+
+[vat_kelda_stout_brewing_1]
+name=Fermenting Vat
+desc=Kelda Stout is fermenting in this vat.
+model=loc_7437
+model2=loc_7438
+model3=loc_7437i2
+recol1s=21169
+recol1d=16947
+ambient=15
+blockrange=no
+
+[vat_kelda_stout_brewing_2]
+name=Fermenting Vat
+desc=Kelda Stout is fermenting in this vat.
+model=loc_7437
+model2=loc_7446
+model3=loc_7437i2
+recol1s=21169
+recol1d=14835
+ambient=15
+blockrange=no
+
+[vat_kelda_stout]
+name=Fermenting Vat
+desc=This vat contains Kelda Stout.
+model=loc_7437
+model2=loc_7447
+model3=loc_7437i2
+recol1s=23282
+recol1d=14835
+recol2s=21168
+recol2d=14833
+recol3s=19054
+recol3d=12719
+ambient=15
+blockrange=no
+
+[farming_hops_patch_keldagrim]
+active=yes
+multivar=forget_farming
+multiloc=0,kelda_hop_patch_weeds_3
+multiloc=1,kelda_hop_patch_weeds_2
+multiloc=2,kelda_hop_patch_weeds_1
+multiloc=3,kelda_hop_patch_weeded
+multiloc=4,kelda_hops_seed
+multiloc=5,kelda_hops_1
+multiloc=6,kelda_hops_2
+multiloc=7,kelda_hops_3
+multiloc=8,kelda_hops_fullygrown

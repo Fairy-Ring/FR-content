@@ -54,6 +54,7 @@ if (%giantdwarf_quest = 3) {
 ~chatplayer("<p,neutral>Alright, alright, I was just leaving!");
 
 [opnpc1,dwarf_city_gardener_dwarf]
+if (~forget_rind_talk = true) return;
 ~chatnpc("<p,neutral>Come to visit my garden then, have you, human?");
 def_int $garden = ~p_choice2("This is your garden?", 1, "Not really, no.", 2);
 if ($garden = 1) {
@@ -119,6 +120,7 @@ if ($garden = 1) {
 ~chatplayer("<p,neutral>I think this is my cue to leave...");
 
 [opnpc1,dwarf_city_dwarf_man6]
+if (~forget_gauss_talk = true) return;
 ~chatnpc("<p,neutral>I say, I say, a toast to this fine human!");
 ~chatplayer("<p,neutral>What? I mean, err... why?");
 ~chatnpc("<p,neutral>Why not!");

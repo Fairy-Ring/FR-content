@@ -2,6 +2,7 @@
 // Keldagrim tasks, later-quest branches, overhead chores, and non-Talk services are excluded.
 
 [opnpc1,dwarf_city_rowdy_dwarf]
+if (~forget_rowdy_talk = true) return;
 ~chatnpc("<p,neutral>Get OUT of my WAY!");
 
 [opnpc1,dwarf_city_old_dwarf3]
@@ -89,6 +90,7 @@ if ($choice = 2) {
 ~keldagrim_drunken_dwarf_talk();
 
 [proc,keldagrim_drunken_dwarf_talk]
+if (~forget_drunken_talk = true) return;
 if (testbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked) = ^false) {
     ~chatplayer("<p,neutral>Hello there! Are you alright?");
     ~chatnpc("<p,neutral>Of courshe! Why why why *hic* why shouldn't I be?");

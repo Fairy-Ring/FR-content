@@ -1,0 +1,588 @@
+// Forgettable Tale: Kelda hops patch, brewery and Rind's optional letter.
+// VERIFIED: retained Tip.It QP114 (27 Apr 2006) gives four seeds, rake/dibber,
+// no water or compost, about 20 minutes, one harvest, the Kelda recipe, and
+// two Marrentill herb seeds for delivering Rind's letter.
+// UNKNOWN: five-minute crop bands, a six-minute fermentation midpoint, and
+// a 12-minute completion time; the guide does not give these exact rules or wording.
+
+// Bind the map parent and every original visible patch form.
+[oplocu,farming_hops_patch_keldagrim] @forget_kelda_patch_use;
+[oplocu,kelda_hop_patch_weeds_3] @forget_kelda_patch_use;
+[oplocu,kelda_hop_patch_weeds_2] @forget_kelda_patch_use;
+[oplocu,kelda_hop_patch_weeds_1] @forget_kelda_patch_use;
+[oplocu,kelda_hop_patch_weeded] @forget_kelda_patch_use;
+[oplocu,kelda_hops_seed] @forget_kelda_patch_use;
+[oplocu,kelda_hops_1] @forget_kelda_patch_use;
+[oplocu,kelda_hops_2] @forget_kelda_patch_use;
+[oplocu,kelda_hops_3] @forget_kelda_patch_use;
+[oplocu,kelda_hops_fullygrown] @forget_kelda_patch_use;
+
+// The original weed forms have no Rake op; use the rake item on each form.
+[oploc2,kelda_hops_seed] @forget_kelda_patch_inspect;
+[oploc2,kelda_hops_1] @forget_kelda_patch_inspect;
+[oploc2,kelda_hops_2] @forget_kelda_patch_inspect;
+[oploc2,kelda_hops_3] @forget_kelda_patch_inspect;
+[oploc2,kelda_hops_fullygrown] @forget_kelda_patch_inspect;
+[oploc1,kelda_hops_fullygrown] @forget_kelda_harvest;
+
+// Only the first vat's original forms are handled; no new vat Inspect op.
+[oplocu,brewing_vat_1] @forget_kelda_vat_use;
+[oplocu,vat_empty] @forget_kelda_vat_use;
+[oplocu,vat_water] @forget_kelda_vat_use;
+[oplocu,vat_barley] @forget_kelda_vat_use;
+[oplocu,vat_kelda_stout_hops] @forget_kelda_vat_use;
+[oplocu,vat_kelda_stout_brewing_1] @forget_kelda_vat_use;
+[oplocu,vat_kelda_stout_brewing_2] @forget_kelda_vat_use;
+[oplocu,vat_kelda_stout] @forget_kelda_vat_use;
+[oploc1,vat_valve_1] @forget_kelda_valve;
+[oploc1,barrel_kelda_stout] @forget_kelda_barrel_level;
+[oplocu,barrel_kelda_stout] @forget_kelda_barrel_use;
+
+[opnpc1,blandebir]
+~forget_kelda_buy_yeast;
+
+[opobj1,forget_gardener_letter]
+// UNKNOWN functional wording; Tip.It identifies Elstan as the addressee but does not preserve the letter text.
+mes("This letter is addressed to Elstan of Falador.");
+
+[label,forget_kelda_rake]
+p_arrivedelay;
+~forget_kelda_rake_step;
+
+// UNKNOWN functional wording for the rake interaction below.
+[proc,forget_kelda_rake_step]
+def_int $stage = %forget_farming;
+if ($stage < 0 | $stage > 2) return;
+if (inv_total(inv, rake) < 1) {
+    // UNKNOWN functional text; the original action is item-use of a rake.
+    mes("You need a rake to clear this patch.");
+    return;
+}
+%forget_farming = add($stage, 1);
+mes("You rake the weeds from the Kelda hops patch.");
+
+// UNKNOWN functional wording for seed and patch feedback below.
+[label,forget_kelda_patch_use]
+def_obj $used = last_useitem;
+if ($used = rake) {
+    @forget_kelda_rake;
+    return;
+}
+p_arrivedelay;
+~forget_kelda_update_crop;
+def_int $stage = %forget_farming;
+if ($used ! kelda_hop_seed) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if ($stage ! 3) {
+    // UNKNOWN functional text.
+    mes("The Kelda hops patch must be cleared before planting.");
+    return;
+}
+if (%forget_seed3_told = 0) {
+    // UNKNOWN functional text; the Rind talk is the sourced instruction step.
+    mes("Speak to Rind before planting the Kelda hop seeds.");
+    return;
+}
+if (%forget_seed2_told = 1) {
+    mes("You have already harvested the Kelda hops from this seed batch.");
+    return;
+}
+if (stat(farming) < 17) {
+    // UNKNOWN functional wording; the required level is given by Tip.It.
+    mes("You need a Farming level of 17 to plant Kelda hop seeds.");
+    return;
+}
+if (inv_total(inv, dibber) < 1) {
+    ~displaymessage(^dm_farming_dibber);
+    return;
+}
+if (inv_total(inv, kelda_hop_seed) < 4) {
+    // UNKNOWN functional wording; the required count is given by Tip.It.
+    mes("You need all four Kelda hop seeds to plant this patch.");
+    return;
+}
+// UNKNOWN engineering subdivision of the source's approximately 20 minutes.
+anim(farming_seed_dibbing, 0);
+inv_del(inv, kelda_hop_seed, 4);
+%forget_farming = 4;
+%forget_clock = setbit_range_toint(%forget_clock, date_minutes, 0, 26);
+mes("You plant the Kelda hop seeds.");
+
+// UNKNOWN wording for the empty and growing patch inspection states.
+[label,forget_kelda_patch_inspect]
+p_arrivedelay;
+def_int $stage = ~forget_kelda_update_crop;
+if ($stage = 8) {
+    // The retained guide quotes this in-game completion message.
+    mes("Perhaps I should take a look and see if my Kelda hops have grown ...");
+} else if ($stage >= 4) {
+    // UNKNOWN functional wording.
+    mes("The Kelda hops are still growing.");
+} else {
+    mes("This is a Kelda hops patch.");
+}
+
+// UNKNOWN wording for harvest validation, inventory space, and success below.
+[label,forget_kelda_harvest]
+p_arrivedelay;
+def_int $stage = ~forget_kelda_update_crop;
+if ($stage ! 8 | %forget_seed2_told = 1) {
+    // UNKNOWN functional wording.
+    mes("The Kelda hops are not ready to harvest.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, kelda_hops, 1);
+%forget_farming = 0;
+%forget_seed2_told = 1;
+%forget_clock = setbit_range_toint(%forget_clock, 0, 0, 26);
+// One harvested receipt is durable for repeatable lost-hop recovery.
+mes("You harvest one handful of Kelda hops.");
+
+[proc,forget_kelda_update_crop]()(int)
+def_int $stage = %forget_farming;
+if ($stage < 4 | $stage > 7) return($stage);
+def_int $started = getbit_range(%forget_clock, 0, 26);
+def_int $elapsed = sub(date_minutes, $started);
+if ($elapsed < 0) return($stage);
+// UNKNOWN five-minute bands; maturity remains the source's ~20-minute total.
+if ($elapsed >= 20) {
+    %forget_farming = 8;
+} else if ($elapsed >= 15) {
+    %forget_farming = 7;
+} else if ($elapsed >= 10) {
+    %forget_farming = 6;
+} else if ($elapsed >= 5) {
+    %forget_farming = 5;
+}
+return(%forget_farming);
+
+[proc,forget_kelda_letter_state]()(int)
+return(getbit_range(%forget_gardener_task, 0, 1));
+
+[proc,forget_kelda_set_letter_state](int $state)
+%forget_gardener_task = setbit_range_toint(%forget_gardener_task, $state, 0, 1);
+
+[proc,forget_kelda_hops_recoverable]()(boolean)
+if (%forget_quest ! 10 | %forget_seed2_told = 0) return(false);
+if (inv_total(inv, kelda_hops) > 0 | inv_total(bank, kelda_hops) > 0) return(false);
+def_int $vat = %brewing_vat_varbit_1;
+if ($vat >= 68 & $vat <= 71) return(false);
+if (%brewing_barrel_varbit_1 ! 0) return(false);
+if (getbit_range(%forget_gardener_task, 2, 2) = 1) return(false);
+return(true);
+
+[proc,forget_kelda_hops_replace]()(boolean)
+if (~forget_kelda_hops_recoverable = false) {
+    mes("There are no lost Kelda hops to replace.");
+    return(true);
+}
+// UNKNOWN feedback wording for hop-recovery failure and inventory space.
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return(true);
+}
+inv_add(inv, kelda_hops, 1);
+// UNKNOWN functional wording; recovery itself is a retained quest behavior.
+~chatnpc("<p,neutral>Here is another handful of Kelda hops.");
+return(true);
+
+// UNKNOWN: new seed, lost-hop, and optional-letter dialogue/menu wording is not sourced; existing greeting and garden-history text are CANDIDATE.
+[proc,forget_rind_talk]()(boolean)
+if (%forget_quest < 10) return(false);
+def_int $status = ~forget_kelda_letter_state;
+// UNKNOWN favourable recovery rule: an accepted optional errand never expires.
+if (%forget_quest ! 10 & $status ! 1 & $status ! 2) return(false);
+def_boolean $recoverable = ~forget_kelda_hops_recoverable;
+if (%forget_seed3_told = 0) {
+    // CANDIDATE greeting retained from the existing Rind handler.
+    ~chatnpc("<p,neutral>Come to visit my garden then, have you, human?");
+    def_int $choice = ~p_choice3("This is your garden?", 1, "I have four Kelda hop seeds.", 2, "Not really, no.", 3);
+    if ($choice = 1) {
+        ~forget_kelda_garden_history;
+        return(true);
+    }
+    if ($choice = 3) {
+        ~chatplayer("<p,neutral>Not really, no.");
+        ~chatnpc("<p,neutral>Oh, alright then.");
+        return(true);
+    }
+    ~chatplayer("<p,neutral>I have four Kelda hop seeds.");
+    if (inv_total(inv, kelda_hop_seed) < 4) {
+        // UNKNOWN functional wording.
+        ~chatnpc("<p,neutral>Bring me all four Kelda hop seeds before planting.");
+        return(true);
+    }
+    // UNKNOWN dialogue; the retained guide establishes these instructions.
+    ~chatnpc("<p,neutral>Rake the patch beside the brewery and plant all four seeds. They need no water or compost and grow in about 20 minutes.");
+%forget_seed3_told = 1;
+    return(true);
+}
+if ($status = 0 & (inv_total(inv, forget_gardener_letter) > 0 | inv_total(bank, forget_gardener_letter) > 0)) {
+    ~forget_kelda_set_letter_state(1);
+    $status = 1;
+}
+if ($status = 2) {
+    ~chatnpc("<p,neutral>Thank you for delivering my letter.");
+    if (inv_itemspace(inv, marrentill_seed, 2, inv_size(inv)) = false) {
+        // UNKNOWN inventory-space feedback wording.
+        mes("Make room for two Marrentill herb seeds.");
+        return(true);
+    }
+    inv_add(inv, marrentill_seed, 2);
+    ~forget_kelda_set_letter_state(3);
+    ~chatnpc("<p,neutral>Please take these two Marrentill herb seeds.");
+    return(true);
+}
+if ($status = 1 & inv_total(inv, forget_gardener_letter) = 0 & inv_total(bank, forget_gardener_letter) = 0) {
+    ~chatnpc("<p,neutral>You seem to have lost my letter. Here is another copy.");
+    if (inv_freespace(inv) < 1) {
+        mes("Make room for the letter.");
+        return(true);
+    }
+    inv_add(inv, forget_gardener_letter, 1);
+    return(true);
+}
+if ($status = 3 & $recoverable = false) return(false);
+if ($status = 1 & $recoverable = false) return(false);
+
+~chatnpc("<p,neutral>Come to visit my garden then, have you, human?");
+if ($status = 0 & $recoverable = true) {
+    def_int $choice = ~p_choice4("This is your garden?", 1, "I can deliver a letter to Elstan.", 2, "I lost my Kelda hops.", 3, "Not really, no.", 4);
+    if ($choice = 1) {
+        ~forget_kelda_garden_history;
+        return(true);
+    }
+    if ($choice = 2) {
+        ~chatplayer("<p,neutral>I can deliver a letter to Elstan.");
+        if (inv_freespace(inv) < 1) {
+            mes("Make room for the letter.");
+            return(true);
+        }
+        if (inv_total(inv, forget_gardener_letter) > 0 | inv_total(bank, forget_gardener_letter) > 0) {
+            ~forget_kelda_set_letter_state(1);
+            ~chatnpc("<p,neutral>You already have my letter. Please take it to Elstan.");
+            return(true);
+        }
+        inv_add(inv, forget_gardener_letter, 1);
+        ~forget_kelda_set_letter_state(1);
+        ~chatnpc("<p,neutral>Please take my letter to Elstan, the gardener south of Falador.");
+        return(true);
+    }
+    if ($choice = 3) {
+        ~chatplayer("<p,neutral>I lost my Kelda hops.");
+        ~forget_kelda_hops_replace;
+        return(true);
+    }
+    ~chatplayer("<p,neutral>Not really, no.");
+    ~chatnpc("<p,neutral>Oh, alright then.");
+    return(true);
+}
+if ($status = 0) {
+    def_int $choice = ~p_choice3("This is your garden?", 1, "I can deliver a letter to Elstan.", 2, "Not really, no.", 3);
+    if ($choice = 1) {
+        ~forget_kelda_garden_history;
+        return(true);
+    }
+    if ($choice = 2) {
+        ~chatplayer("<p,neutral>I can deliver a letter to Elstan.");
+        if (inv_freespace(inv) < 1) {
+            mes("Make room for the letter.");
+            return(true);
+        }
+        if (inv_total(inv, forget_gardener_letter) > 0 | inv_total(bank, forget_gardener_letter) > 0) {
+            ~forget_kelda_set_letter_state(1);
+            ~chatnpc("<p,neutral>You already have my letter. Please take it to Elstan.");
+            return(true);
+        }
+        inv_add(inv, forget_gardener_letter, 1);
+        ~forget_kelda_set_letter_state(1);
+        ~chatnpc("<p,neutral>Please take my letter to Elstan, the gardener south of Falador.");
+        return(true);
+    }
+    ~chatplayer("<p,neutral>Not really, no.");
+    ~chatnpc("<p,neutral>Oh, alright then.");
+    return(true);
+}
+if ($status = 1 & $recoverable = true) {
+    def_int $choice = ~p_choice4("This is your garden?", 1, "I have your letter.", 2, "I lost my Kelda hops.", 3, "Not really, no.", 4);
+    if ($choice = 1) {
+        ~forget_kelda_garden_history;
+        return(true);
+    }
+    if ($choice = 2) {
+        ~chatplayer("<p,neutral>I have your letter.");
+        ~chatnpc("<p,neutral>Please take it to Elstan when you can.");
+        return(true);
+    }
+    if ($choice = 3) {
+        ~chatplayer("<p,neutral>I lost my Kelda hops.");
+        ~forget_kelda_hops_replace;
+        return(true);
+    }
+    ~chatplayer("<p,neutral>Not really, no.");
+    ~chatnpc("<p,neutral>Oh, alright then.");
+    return(true);
+}
+if ($status = 3 & $recoverable = true) {
+    def_int $choice = ~p_choice3("This is your garden?", 1, "I lost my Kelda hops.", 2, "Not really, no.", 3);
+    if ($choice = 1) {
+        ~forget_kelda_garden_history;
+        return(true);
+    }
+    if ($choice = 2) {
+        ~chatplayer("<p,neutral>I lost my Kelda hops.");
+        ~forget_kelda_hops_replace;
+        return(true);
+    }
+    ~chatplayer("<p,neutral>Not really, no.");
+    ~chatnpc("<p,neutral>Oh, alright then.");
+    return(true);
+}
+return(false);
+
+// CANDIDATE: copied verbatim from existing keldagrim_west_townsfolk.rs2 dialogue, lines 59–84.
+[proc,forget_kelda_garden_history]
+~chatplayer("<p,neutral>This is your garden?");
+~chatnpc("<p,neutral>No no, not quite. But I do look after it. It's the palace garden, you see. I keep it tidy, keep it living.");
+~chatnpc("<p,neutral>It's hard to grow much on these hard rocks deep beneath these mountains, you know.");
+~chatplayer("<p,neutral>I can imagine. Where do you get all your food from? Or even the soil for this garden?");
+~chatnpc("<p,neutral>We can grow a little food underground, but most of it comes from the extensive steamcart network that runs beneath the earth.");
+~chatnpc("<p,neutral>Oh, I'm not boring you, am I?");
+def_int $interest = ~p_choice2("Not at all!", 1, "A little, yes.", 2);
+if ($interest = 1) {
+    ~chatplayer("<p,neutral>Not at all! Please, go on!");
+    ~chatnpc("<p,neutral>Oh yes, as I was saying, it was difficult to make a decent living here. I'm afraid this garden was rather neglected during that time.");
+    ~chatplayer("<p,neutral>Why did you dwarves stay so deep under ground, then? Why not simply go above ground?");
+    ~chatnpc("<p,neutral>What, with the wars raging up there?");
+    ~chatnpc("<p,neutral>We dwarves went underground a long time ago, see. For a while the city of Keldagrim was completely cut off from the rest of Gielinor simply waiting out the wars of the humans and the gods.");
+    ~chatnpc("<p,neutral>This made it hard, though, to determine when the wars above the ground were over. Perhaps Keldagrim had remained hidden for far too long.");
+    ~chatnpc("<p,neutral>Only when King Alvis heroically defended the city against an invasion of trolls did we dare to venture out and see how much the world had changed.");
+    ~chatnpc("<p,neutral>Of course, after that...");
+    ~chatnpc("<p,neutral>Ah well, enough history lessons I should say. I must really get back to my gardening.");
+    ~chatplayer("<p,neutral>Thanks for the info!");
+    return;
+}
+~chatplayer("<p,neutral>A little, yes. I don't really know what all this has to do with anything.");
+~chatnpc("<p,neutral>I suppose it doesn't, really, it's just the mumblings of an old dwarf.");
+// UNKNOWN dialogue/menu wording; the retained guide gives the letter handoff and reward, not exact lines.
+[proc,forget_elstan_letter]()(boolean)
+if (~forget_kelda_letter_state ! 1 | inv_total(inv, forget_gardener_letter) < 1) return(false);
+~chatnpc("<p,neutral>Hello there. What brings you to the garden?");
+def_int $choice = ~p_choice2("Give him Rind's letter.", 1, "Keep it for now.", 2);
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>Keep it for now.");
+    return(true);
+}
+~chatplayer("<p,neutral>I have a letter from Rind.");
+inv_del(inv, forget_gardener_letter, 1);
+~forget_kelda_set_letter_state(2);
+// UNKNOWN functional wording; the source gives the delivery and reward, not Elstan's words.
+~chatnpc("<p,neutral>Thank you. Please give Rind my reply.");
+return(true);
+
+
+[proc,forget_kelda_barmaid]()(boolean)
+if (%forget_quest ! 10) return(false);
+if (getbit_range(%forget_gardener_task, 2, 2) ! 1) return(false);
+if (%brewing_barrel_varbit_1 ! 0) return(false);
+if (inv_total(inv, kelda_stout) > 0 | inv_total(bank, kelda_stout) > 0) return(false);
+// CANDIDATE ordinary pub conversation retained; the new Kelda stout option is UNKNOWN.
+~chatnpc("<p,neutral>Welcome to the Laughing Miner pub, human traveller.");
+def_int $choice = ~p_choice5("Who is that man walking around outside?", 1, "I'd like a beer please.", 2, "I'd like some food please.", 3, "I'd like a Kelda stout please.", 4, "I have to go.", 5);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Who is that man walking around outside?");
+    ~chatnpc("<p,neutral>What man?");
+    ~chatplayer("<p,neutral>I mean the dwarf, the one with the sign.");
+    ~chatnpc("<p,neutral>Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.");
+    ~chatplayer("<p,neutral>But what's wrong with him?");
+    ~chatnpc("<p,neutral>Well, he's drunk isn't he?");
+    ~chatnpc("<p,neutral>I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.");
+    ~chatplayer("<p,neutral>How did that happen?");
+    ~chatnpc("<p,neutral>I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.");
+    ~chatplayer("<p,neutral>They fired him for that??");
+    ~chatnpc("<p,neutral>The Red Axe will fire you for just about anything if they want to.");
+} else if ($choice = 2) {
+    ~chatplayer("<p,neutral>I'd like a beer please.");
+    ~chatnpc("<p,neutral>That'll be 2 gold coins.");
+    ~keldagrim_barmaid_buy(beer, ^keldagrim_barmaid_beer_price, "<p,neutral>Sorry, I don't have 2 coins on me.");
+} else if ($choice = 3) {
+    ~chatplayer("<p,neutral>I'd like some food please.");
+    ~chatnpc("<p,neutral>I can make you a stew for 20 gold coins.");
+    ~keldagrim_barmaid_buy(stew, ^keldagrim_barmaid_stew_price, "<p,neutral>Sorry, I don't have 20 coins on me.");
+} else if ($choice = 4) {
+// UNKNOWN wording for the added Kelda stout request and empty-glass response.
+    ~chatplayer("<p,neutral>I'd like a Kelda stout please.");
+    if (inv_total(inv, beer_glass) < 1) {
+        ~chatnpc("<p,neutral>Bring me an empty beer glass and I can fill it.");
+        return(true);
+    }
+    // UNKNOWN replacement prose; CANDIDATE lost-stout replacement from the retained OSRS transcript.
+    inv_changeslot(inv, beer_glass, kelda_stout, 1);
+    ~chatnpc("<p,neutral>Here is your replacement Kelda stout.");
+} else {
+    ~chatplayer("<p,neutral>I have to go.");
+}
+return(true);
+
+[proc,forget_kelda_buy_yeast]
+// UNKNOWN functional dialogue; Tip.It supplies the empty-pot and 25gp facts.
+~chatnpc("<p,neutral>Hello. Would you like to buy ale yeast?");
+def_int $choice = ~p_choice2("I'd like to buy some ale yeast.", 1, "Nothing, thanks.", 2);
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>Nothing, thanks.");
+    return;
+}
+~chatplayer("<p,neutral>I'd like to buy some ale yeast.");
+if (inv_total(inv, pot_empty) < 1) {
+    ~chatnpc("<p,neutral>Please bring an empty pot.");
+    return;
+}
+if (inv_total(inv, coins) < 25) {
+    ~chatnpc("<p,neutral>Ale yeast costs 25 coins.");
+    return;
+}
+~chatnpc("<p,neutral>A pot of ale yeast costs 25 coins.");
+if (~p_choice2("Pay 25 coins.", 1, "No thanks.", 2) = 2) {
+    ~chatplayer("<p,neutral>No thanks.");
+    return;
+}
+inv_del(inv, coins, 25);
+inv_changeslot(inv, pot_empty, ale_yeast, 1);
+~chatnpc("<p,neutral>Here you are.");
+
+// UNKNOWN functional wording for vat ingredient feedback and success; recipe facts are sourced.
+[label,forget_kelda_vat_use]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if (loc_type ! brewing_vat_1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~forget_kelda_brew_update;
+def_int $stage = %brewing_vat_varbit_1;
+if ($used = bucket_water) {
+    if ($stage ! 0 | %brewing_barrel_varbit_1 ! 0) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, bucket_water) < 2) {
+        mes("You need two buckets of water.");
+        return;
+    }
+    if (stat(cooking) < 22) {
+        mes("You need a Cooking level of 22 to brew this stout.");
+        return;
+    }
+    inv_del(inv, bucket_water, 2);
+    inv_add(inv, bucket_empty, 2);
+    %brewing_vat_varbit_1 = 1;
+    mes("You add two buckets of water to the vat.");
+    return;
+}
+if ($used = barley_malt) {
+    if ($stage ! 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, barley_malt) < 2) {
+        mes("You need two barley malt.");
+        return;
+    }
+    if (stat(cooking) < 22) {
+        mes("You need a Cooking level of 22 to brew this stout.");
+        return;
+    }
+    inv_del(inv, barley_malt, 2);
+    %brewing_vat_varbit_1 = 2;
+    mes("You add two barley malt to the vat.");
+    return;
+}
+if ($used = kelda_hops) {
+    if ($stage ! 2) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (stat(cooking) < 22) {
+        mes("You need a Cooking level of 22 to brew this stout.");
+        return;
+    }
+    inv_del(inv, kelda_hops, 1);
+    %brewing_vat_varbit_1 = 68;
+    mes("You add the Kelda hops to the vat.");
+    return;
+}
+if ($used = ale_yeast) {
+    if ($stage ! 68) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, ale_yeast) < 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    // UNKNOWN favourable container default: return the empty pot after use.
+    if (stat(cooking) < 22) {
+        mes("You need a Cooking level of 22 to brew this stout.");
+        return;
+    }
+    inv_changeslot(inv, ale_yeast, pot_empty, 1);
+    %brewing_vat_varbit_1 = 69;
+    %forget_clock = setbit_range_toint(%forget_clock, date_minutes, 0, 26);
+    mes("You add the ale yeast and leave the stout to ferment.");
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,forget_kelda_brew_update]()(int)
+def_int $stage = %brewing_vat_varbit_1;
+if ($stage ! 69 & $stage ! 70) return($stage);
+def_int $started = getbit_range(%forget_clock, 0, 26);
+def_int $elapsed = sub(date_minutes, $started);
+if ($elapsed < 0) return($stage);
+// UNKNOWN 12-minute completion threshold within TipIt's 10–15 minute range.
+if ($elapsed >= 12) {
+    %brewing_vat_varbit_1 = 71;
+} else if ($elapsed >= 6) {
+    // UNKNOWN visual halfway point for the original second fermenting morph.
+    %brewing_vat_varbit_1 = 70;
+}
+return(%brewing_vat_varbit_1);
+
+[label,forget_kelda_valve]
+p_arrivedelay;
+~forget_kelda_brew_update;
+if (%brewing_vat_varbit_1 ! 71) {
+    // UNKNOWN functional wording; do not lose a fermenting batch.
+    mes("The Kelda stout is still fermenting.");
+    return;
+}
+%brewing_vat_varbit_1 = 0;
+%brewing_barrel_varbit_1 = 3;
+%forget_clock = setbit_range_toint(%forget_clock, 0, 0, 26);
+// UNKNOWN functional wording for successful valve transfer.
+mes("You turn the valve and fill the barrel with Kelda stout.");
+
+[label,forget_kelda_barrel_level]
+// UNKNOWN functional wording for the barrel Level action.
+mes("There is one pint of Kelda stout in the barrel.");
+
+[label,forget_kelda_barrel_use]
+def_obj $used = last_useitem;
+def_int $slot = last_useslot;
+p_arrivedelay;
+if ($used ! beer_glass | %brewing_barrel_varbit_1 ! 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_setslot(inv, $slot, kelda_stout, 1);
+%brewing_barrel_varbit_1 = 0;
+%forget_gardener_task = setbit_range_toint(%forget_gardener_task, 1, 2, 2);
+%forget_clock = setbit_range_toint(%forget_clock, 0, 0, 26);
+// UNKNOWN functional wording for filling a glass from the barrel.
+mes("You fill the empty glass with Kelda stout.");

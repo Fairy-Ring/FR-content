@@ -1,9 +1,5 @@
-// Forgettable Tale... — Commander Veldaban (Black Guard HQ) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:Forgettable Tale... minus cutscene chrome).
-// First write %forget_quest 0 -> 1. Chat + write only — no cutscene dest /
-// drunk-house land, no Rohak bind, no Alvis leftover.
-// Review: <hn> is not a name token here — use <displayname>.
-// Cite red-19-start-impl-377.md §8.
+// VERIFIED requirements: retained Tip.It guide, 27 April 2006.
+// CANDIDATE wording: retained Transcript:Forgettable Tale..., no modern overlay.
 
 [opnpc1,dwarf_city_black_guard_leader]
 // CANDIDATE: unfinished GD briefing takes precedence after an interrupted trip.
@@ -14,6 +10,22 @@ if (%giantdwarf_quest = 1 & %giantdwarf_veldaban_introduced = 0) {
 }
 if (%giantdwarf_quest >= 2 & %giantdwarf_quest < ^giantdwarf_complete) {
     ~giantdwarf_veldaban_progress;
+    return;
+}
+if (%forget_quest > 0) { ~forget_veldaban_progress; return; }
+if (%giantdwarf_quest < ^giantdwarf_complete) {
+    // UNKNOWN functional prerequisite refusal.
+    ~mesbox("You must complete The Giant Dwarf before starting this quest.");
+    return;
+}
+if (%fishingcompo ! ^fishingcompo_complete) {
+    ~chatnpc("<p,neutral>Then perhaps you should try your hand at the Hemenster Fishing Contest.");
+    return;
+}
+// CANDIDATE boostability: current skill levels, not base levels.
+if (stat(farming) < 17 | stat(cooking) < 22) {
+    // UNKNOWN functional prerequisite refusal.
+    ~mesbox("You need 17 Farming and 22 Cooking for this quest.");
     return;
 }
 ~chatnpc("<p,neutral><displayname>! Have you heard?");
@@ -28,3 +40,5 @@ if ($go = 2) {
 ~chatplayer("<p,happy>Sounds like just the job for me!");
 ~chatnpc("<p,neutral>Excellent, good luck to you in your quest! May Guthix protect you!");
 %forget_quest = 1;
+~send_quest_progress(questlist:forget, %forget_quest, ^forget_complete);
+~dwarven_transport_fade(0_45_159_31_46);

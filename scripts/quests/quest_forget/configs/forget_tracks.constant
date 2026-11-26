@@ -1,0 +1,42 @@
+// UNKNOWN quest-cart placement on the separate boarded-tunnel rail.
+^forget_tracks_station_cart = 0_45_158_37_52
+// UNKNOWN arrival immediately south of the separate quest cart.
+^forget_tracks_station_landing = 0_45_158_37_51
+// Original puzzle cart and box coordinates; safe player tile is UNKNOWN.
+^forget_tracks_puzzle_cart = 1_29_77_8_29
+^forget_tracks_puzzle_start = 1_29_77_8_28
+^forget_tracks_card_box_coord = 1_29_77_6_26
+// UNKNOWN scene/reading-room coordinates; original room identity and packed collision are tested.
+^forget_tracks_witness_landing = 2_29_77_12_55
+^forget_tracks_archive_landing = 2_29_77_47_36
+^forget_tracks_final_landing = 2_29_77_6_11
+// UNKNOWN cutscene positions on the original rooms' walkable floors.
+^forget_tracks_witness_director = 2_29_77_14_55
+^forget_tracks_witness_henchman = 2_29_77_15_54
+^forget_tracks_witness_shaman = 2_29_77_14_51
+^forget_tracks_final_director = 2_29_77_9_8
+^forget_tracks_final_henchman = 2_29_77_10_8
+^forget_tracks_final_gnome = 2_29_77_10_7
+^forget_tracks_final_chaos = 2_29_77_8_7
+^forget_tracks_final_shaman = 2_29_77_6_9
+// UNKNOWN 30-minute expiry bounds actors abandoned by logout; normal scenes delete their own UIDs.
+^forget_tracks_scene_lifetime = 3000
+// CANDIDATE required bank-aware stone stock by room and trip, from the retained guide.
+^forget_tracks_r1_trip1_green = 1
+^forget_tracks_r1_trip1_yellow = 1
+^forget_tracks_r1_trip2_green = 2
+^forget_tracks_r1_trip2_yellow = 1
+^forget_tracks_r1_trip3_green = 2
+^forget_tracks_r1_trip3_yellow = 2
+^forget_tracks_r3_trip1_green = 1
+^forget_tracks_r3_trip1_yellow = 2
+^forget_tracks_r3_trip2_green = 2
+^forget_tracks_r3_trip2_yellow = 2
+^forget_tracks_r3_trip3_green = 3
+^forget_tracks_r3_trip3_yellow = 2
+^forget_tracks_r5_trip1_green = 2
+^forget_tracks_r5_trip1_yellow = 2
+^forget_tracks_r5_trip2_green = 3
+^forget_tracks_r5_trip2_yellow = 3
+^forget_tracks_r5_trip3_green = 4
+^forget_tracks_r5_trip3_yellow = 4

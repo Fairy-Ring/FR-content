@@ -529,8 +529,8 @@ function sharedQuestRegressionFixtures() {
     'selecting Giant Dwarf at Hugi leaves Between a Rock unchanged');
   const forgetting = player();
   set(forgetting, 'forget_quest', 1);
-  const normal = talk(forgetting, 'dwarf_city_black_guard_leader', [2]);
-  assert.match(normal.text, /Red Axe/, 'normal Veldaban conversation still starts Forgettable Tale');
+  const normal = talk(forgetting, 'dwarf_city_black_guard_leader');
+  assert.match(normal.text, /Red Axe/, 'active Forgettable Tale retains its Red Axe reminder');
   assert.equal(get(forgetting, 'forget_quest'), 1);
   assert.equal(stage(forgetting), 0);
   const progress = companyFixture(2);

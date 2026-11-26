@@ -298,6 +298,7 @@ for (const file of [
   'scripts/_unpack/377/all.obj',
   'scripts/quests/quest_deal/configs/quest_deal.obj',
   'scripts/quests/quest_garden/configs/garden.obj',
+  'scripts/quests/quest_forget/configs/forget_items.obj',
   'scripts/quests/quest_roving_elves/configs/roving_crystals.obj',
   'scripts/quests/quest_roving_elves/configs/roving_seeds.obj'
 ]) {

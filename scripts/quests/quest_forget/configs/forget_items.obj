@@ -1,0 +1,179 @@
+// Original 377 quest blocks. Client fields and IDs are unchanged.
+// UNKNOWN default: quest-only items are untradeable.
+[kelda_hop_seed]
+tradeable=no
+name=Kelda seed
+desc=Kelda hop seeds can only be grown underground!
+recol1s=13767
+recol1d=13710
+model=obj_hammerstone_hop_seed
+2dxof=1
+2dyof=-31
+2dzoom=1150
+2dyan=8
+2dxan=220
+members=yes
+stackable=yes
+count1=kelda_hop_seed_2,2
+count2=kelda_hop_seed_3,3
+count3=kelda_hop_seed_4,4
+count4=kelda_hop_seed_5,5
+cost=2
+iop5=Destroy
+weight=1g
+
+[kelda_hops]
+tradeable=no
+name=Kelda hops
+desc=A handful of Kelda Hops.
+recol1s=11680
+recol1d=11694
+recol2s=12768
+recol2d=13808
+recol3s=8515
+recol3d=8521
+recol4s=6401
+recol4d=6407
+recol5s=14882
+recol5d=15922
+model=obj_hammerstone_hops
+2dxof=1
+2dyof=10
+2dzoom=750
+2dyan=120
+2dxan=404
+ambient=20
+members=yes
+cost=4
+iop5=Destroy
+weight=1oz
+
+[kelda_hop_seed_2]
+tradeable=no
+recol1s=13767
+recol1d=13710
+model=obj_hammerstone_hop_seed_2
+2dxof=1
+2dyof=-31
+2dzoom=1150
+2dyan=8
+2dxan=220
+stackable=yes
+
+[kelda_hop_seed_3]
+tradeable=no
+recol1s=13767
+recol1d=13710
+model=obj_hammerstone_hop_seed_3
+2dxof=1
+2dyof=-31
+2dzoom=1150
+2dyan=8
+2dxan=220
+stackable=yes
+
+[kelda_hop_seed_4]
+tradeable=no
+recol1s=13767
+recol1d=13710
+model=obj_hammerstone_hop_seed_4
+2dxof=1
+2dyof=-31
+2dzoom=1150
+2dyan=8
+2dxan=220
+stackable=yes
+
+[kelda_hop_seed_5]
+tradeable=no
+recol1s=13767
+recol1d=13710
+model=obj_hammerstone_hop_seed_5
+2dxof=1
+2dyof=-31
+2dzoom=1150
+2dyan=8
+2dxan=220
+stackable=yes
+
+[kelda_stout]
+tradeable=no
+name=Kelda stout
+desc=A pint of bluish beer.
+recol1s=25025
+recol1d=12719
+recol2s=31367
+recol2d=14835
+cost=2
+model=obj_asgarnian_ale
+2dxof=-3
+2dyof=2
+2dzoom=660
+2dyan=1904
+2dxan=140
+members=yes
+iop1=Drink
+iop5=Destroy
+weight=550g
+
+[turnright_trackjunction_control_card]
+tradeable=no
+name=Square stone
+desc=There is a strange yellow marking on this stone.
+model=obj_turnright_trackjunction_control_card
+2dyof=3
+2dzoom=500
+2dyan=1768
+2dxan=348
+stackable=yes
+members=yes
+weight=300g
+
+[turnleft_trackjunction_control_card]
+tradeable=no
+name=Square stone
+desc=There is a strange green marking on this stone.
+model=obj_turnleft_trackjunction_control_card
+2dyof=3
+2dzoom=500
+2dyan=1768
+2dxan=348
+stackable=yes
+members=yes
+weight=300g
+
+[forget_gardener_letter]
+tradeable=no
+name=Letter
+desc=A letter addressed to Elstan of Falador.
+model=obj_scrawled_note1
+2dxof=-3
+2dyof=5
+2dzoom=700
+2dyan=20
+2dxan=328
+members=yes
+iop1=Read
+weight=1g
+
+[forget_cutscene_chair]
+tradeable=no
+name=A chair
+desc=For sitting on.
+model=obj_forget_cutscene_chair
+manwear=obj_forget_cutscene_chair,0
+womanwear=obj_forget_cutscene_chair,6
+members=yes
+wearpos=lefthand
+weight=1g
+
+[forget_cutscene_beer]
+tradeable=no
+name=Beer glass
+desc=For drinking... if it were filled.
+model=obj_beer_glass_manwear
+manwear=obj_beer_glass_manwear,0
+womanwear=obj_beer_glass_manwear,6
+members=yes
+wearpos=righthand
+weight=1g

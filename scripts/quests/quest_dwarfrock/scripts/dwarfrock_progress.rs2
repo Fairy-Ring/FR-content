@@ -74,6 +74,7 @@ else obj_add(coord, rune_pickaxe, 1, ^lootdrop_duration);
 if (inv_total(inv, dwarf_rock_schematic_assembled) = 0 & inv_total(bank, dwarf_rock_schematic_assembled) = 0 & inv_total(inv, dwarf_rock_base_schematic) = 0 & inv_total(bank, dwarf_rock_base_schematic) = 0) ~dwarfrock_give_item(dwarf_rock_book);
 
 [opnpc1,dwarfrock_engineer2]
+if (~forget_khorvak_talk = true) return;
 if (%dwarfrock_quest < 40 | %dwarfrock_quest >= 50) { ~displaymessage(^dm_default); return; }
 ~chatplayer("<p,quiz>I'm looking for schematics to modify the dwarven multicannon to fire a human. Can you help?");
 ~chatnpc("<p,laugh>Haha, yesh, I have jusht the shing!");
