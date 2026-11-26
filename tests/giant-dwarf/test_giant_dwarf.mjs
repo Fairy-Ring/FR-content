@@ -866,3 +866,4 @@ sapphiresBeforeRepairFixture();
 bootMethodFixtures();
 bookWeightFixture();
 fullQuestPath(p);
+process.exit(0); // World imports own maintenance timers; this offline process owns no live server.
