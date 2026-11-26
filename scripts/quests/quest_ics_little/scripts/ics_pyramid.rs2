@@ -14,7 +14,8 @@ return(true);
 
 [proc,ics_little_teleport_check](coord $at)(boolean)
 // `$at` is the player's current tile in the native magic precheck.
-if (%ics_stateofmind = 1 & ~ics_little_in_pyramid($at) = true) return(false);
+// VERIFIED q97:65,123: while in Klenter's Pyramid you cannot teleport out (ladder exit always walkable).
+if (~ics_little_in_pyramid($at) = true) return(false);
 if (%ics_stateofmind = 1) %ics_stateofmind = 0;
 return(true);
 
@@ -206,7 +207,10 @@ if (%ics_tilechecker = ^ics_little_puzzle_goal) ~ics_little_finish_puzzle;
 
 [proc,ics_little_finish_puzzle]()(boolean)
 if (%ics_little_var ! 2 | %ics_tilechecker ! ^ics_little_puzzle_goal) return(false);
-if (inv_freespace(inv) = 0) return(false);
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space to take the canopic jar.");
+    return(false);
+}
 if (%ics_little_jar_multi = 0) %ics_little_jar_multi = add(random(4), 1);
 switch_int (%ics_little_jar_multi) {
     case 1 : inv_add(inv, ics_little_canopic_jar_liver, 1);

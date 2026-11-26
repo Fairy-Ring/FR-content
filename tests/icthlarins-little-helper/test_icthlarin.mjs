@@ -211,6 +211,7 @@ const targetSpecs = {
   suntrap: nativeTarget('loc', 'icthalarins_suntrap_centre', sphinxAnchor),
   evergreen: nativeTarget('loc', 'evergreen', sphinxAnchor),
   evergreenLarge: nativeTarget('loc', 'evergreen_large', sphinxAnchor),
+  normalTree: nativeTarget('loc', 'tree', sphinxAnchor),
   pyramidDoor: nativeTarget('loc', 'icthalarins_door', sphinxAnchor),
   puzzleDoor: nativeTarget('loc', 'doorway', jarRoomAnchor),
   secretDoor: nativeTarget('loc', 'icthalarins_tomb_secretdoor', jarRoomAnchor),
@@ -1444,6 +1445,51 @@ assert.equal(stage(rewards), questComplete, 'post-quest gate re-entry preserves 
 assertPackedArrival(rewards, 'post-quest gate Sophanem landing');
 assertIndependentPathOut(rewards, 'post-quest gate Sophanem landing');
 assertNonemptyRouteTo(rewards, 'templeDoor', 'post-quest gate Sophanem landing');
+
+// Shared-hook non-regression tests required by Rulings 1 and 2.
+const stateOfMindBit = bit('ics_stateofmind');
+const teleTester = newPlayer();
+const pyramidInsideCoord = CoordGrid.packCoord(0, targetSpecs.ladder.approach.stand[1], targetSpecs.ladder.approach.stand[2]);
+const outsideCoord = CoordGrid.packCoord(0, targetSpecs.sphinx.approach.stand[1], targetSpecs.sphinx.approach.stand[2]);
+positionAt(teleTester, 'ladder');
+fixtureStage(teleTester, 2);
+teleTester.setVarBit(stateOfMindBit, 1);
+assert.equal(runProcInt(teleTester, 'pre_tele_checks_no_ana', [pyramidInsideCoord]), 0,
+  'native pre_tele_checks_no_ana refuses teleport inside Klenter Pyramid while hypnotized');
+fixtureStage(teleTester, 19);
+teleTester.setVarBit(stateOfMindBit, 0);
+assert.equal(runProcInt(teleTester, 'pre_tele_checks_no_ana', [pyramidInsideCoord]), 0,
+  'native pre_tele_checks_no_ana refuses teleport anywhere inside Klenter Pyramid even when not hypnotized');
+positionAt(teleTester, 'sphinx');
+teleTester.setVarBit(stateOfMindBit, 1);
+assert.equal(runProcInt(teleTester, 'pre_tele_checks_no_ana', [outsideCoord]), 1,
+  'native pre_tele_checks_no_ana allows ordinary teleport outside Klenter Pyramid');
+assert.equal(teleTester.getVarBit(stateOfMindBit), 0,
+  'outside teleport check clears any stale hypnosis flag');
+fixtureStage(teleTester, 0);
+assert.equal(runProcInt(teleTester, 'pre_tele_checks_no_ana', [outsideCoord]), 1,
+  'ordinary pre-quest player teleport outside pyramid remains allowed');
+
+const woodcutTester = newPlayer();
+fixtureStage(woodcutTester, 10);
+give(woodcutTester, 'bronze_axe');
+give(woodcutTester, 'raw_herring');
+give(woodcutTester, 'knife');
+give(woodcutTester, 'bucket_empty');
+const axeMsgStart = woodcutTester.messages.length;
+useItemOnLoc(woodcutTester, 'bronze_axe', 'normalTree', '[oplocu,_tree]');
+assert(!woodcutTester.messages.slice(axeMsgStart).some(m => m.includes('Nothing interesting happens')),
+  'using an axe on a normal tree preserves woodcutting dispatch with no default refusal');
+const herringMsgStart = woodcutTester.messages.length;
+useItemOnLoc(woodcutTester, 'raw_herring', 'normalTree', '[oplocu,_tree]');
+assert(woodcutTester.messages.slice(herringMsgStart).some(m => m.includes('mightiest tree in the forest')),
+  'using a raw herring on a tree preserves the Monty Python easter-egg message');
+const knifeMsgStart = woodcutTester.messages.length;
+useItemOnLoc(woodcutTester, 'knife', 'normalTree', '[oplocu,_tree]');
+assert(woodcutTester.messages.slice(knifeMsgStart).some(m => m.includes('Nothing interesting happens')),
+  'using a knife on a non-evergreen tree falls through to the default message');
+assert.equal(count(woodcutTester, 'ics_little_sap_bucket'), 0,
+  'using a knife on a non-evergreen tree collects no tree sap');
 
 console.log('PASS Icthlarin compiled proofs: native cat prerequisites and supplies, owner-attributed guardian and priest defeats, pyramid puzzles and traps, preparation and recovery chains, ceremony farewell, completion scroll and once-only rewards, post-quest gate, and packed-map approaches.');
 process.exit(0);
