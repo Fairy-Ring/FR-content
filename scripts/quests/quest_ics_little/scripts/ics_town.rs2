@@ -82,7 +82,7 @@ if (%ics_little_var = 24 & coordz(coord) > 9000) {
     ~chatnpc("<p,neutral>Thank you. Meet me at the temple in Sophanem.");
     %ics_little_var = 25;
     %ics_little_priestvis = 0;
-    p_telejump(0_51_43_31_28);
+    p_telejump(^ics_little_pyramid_surface);
     return;
 }
 if (%ics_little_var = 25 & coordz(coord) < 9000) {

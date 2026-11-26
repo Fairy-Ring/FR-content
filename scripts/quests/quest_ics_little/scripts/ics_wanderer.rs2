@@ -52,7 +52,7 @@ inv_del(inv, water_skin4, 1);
 inv_del(inv, tinderbox, 1);
 %ics_ent_open = 1;
 %ics_little_var = 2;
-p_telejump(0_51_43_31_28);
+p_telejump(^ics_little_pyramid_surface);
 ~mesbox("You wake in Sophanem, with no memory of your journey.");
 
 [proc,ics_little_has_cat]()(boolean)
@@ -75,7 +75,7 @@ return(true);
 if (%ics_little_var < 2) {
     return;
 }
-p_telejump(0_51_43_31_28);
+p_telejump(^ics_little_pyramid_surface);
 
 [oploc1,ics_wall_crack]
 // An unconditional way out prevents a lost cat or jar from stranding the player.

@@ -1,6 +1,6 @@
 // Coordinates observed in the original JM2 rows. Landing/spawn choices are UNKNOWN engineering selections.
 ^ics_little_pyramid_entry = 0_51_143_14_20
-^ics_little_pyramid_surface = 0_51_43_31_28
+^ics_little_pyramid_surface = 0_51_43_31_29
 ^ics_little_west_door = 0_51_143_16_47
 ^ics_little_east_door = 0_51_143_42_47
 ^ics_little_west_door_inside = 0_51_143_16_46
@@ -12,11 +12,9 @@
 ^ics_little_pit_min_runenergy = 2000
 // UNKNOWN low-energy fall recovery destination.
 ^ics_little_pit_fail_landing = 0_51_143_14_20
-^ics_little_possessed_spawn = 0_51_143_42_43
-^ics_little_pit_west_land_9194 = 0_51_143_26_42
-^ics_little_pit_west_land_9196 = 0_51_143_26_44
-^ics_little_pit_east_land_9194 = 0_51_143_33_42
-^ics_little_pit_east_land_9196 = 0_51_143_33_44
+^ics_little_possessed_spawn = 0_51_143_42_44
+// Original pit rows face north/south; the opposite safe row is three tiles away.
+^ics_little_pit_landing_distance = 3
 // UNKNOWN: generous encounter expiry; owner logout/exit also removes the NPC.
 ^ics_little_encounter_lifetime = 3000
 ^ics_little_encounter_search_radius = 64

@@ -38,7 +38,7 @@
       "script": "[ai_applayer2,ics_little_possessedpriest]",
       "npc": "ics_little_possessedpriest",
       "style": "magic",
-      "position": { "x": 3305, "z": 9195, "level": 0 },
+      "position": { "x": 3305, "z": 9196, "level": 0 },
       "playerVars": { "ics_little_var": 19 },
       "npcVars": { "npc_attacking_uid": "target" },
       "seeds": { "hit": 3668340011, "miss": 2415085441, "zero": 1992887715 }

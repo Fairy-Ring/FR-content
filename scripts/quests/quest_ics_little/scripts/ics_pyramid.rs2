@@ -237,19 +237,10 @@ if (runenergy < ^ics_little_pit_min_runenergy) {
     p_telejump(^ics_little_pit_fail_landing);
     return;
 }
-def_coord $landing = null;
-if (coordx(loc_coord) <= 3292) {
-    switch_int (coordz(loc_coord)) {
-        case 9194 : $landing = ^ics_little_pit_east_land_9194;
-        case 9196 : $landing = ^ics_little_pit_east_land_9196;
-    }
-} else if (coordx(loc_coord) >= 3295 & coordx(loc_coord) <= 3296) {
-    switch_int (coordz(loc_coord)) {
-        case 9194 : $landing = ^ics_little_pit_west_land_9194;
-        case 9196 : $landing = ^ics_little_pit_west_land_9196;
-    }
+def_coord $landing = coord_move(loc_coord, 0, 0, ^ics_little_pit_landing_distance);
+if (coordz(loc_coord) = 9196) {
+    $landing = coord_move(loc_coord, 0, 0, calc(0 - ^ics_little_pit_landing_distance));
 }
-if ($landing = null) return;
 if (%ics_little_var = 7) {
     %ics_little_var = 8;
     %ics_stateofmind = 0;
