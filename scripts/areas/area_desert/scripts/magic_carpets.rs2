@@ -117,6 +117,9 @@ p_delay(calc((seqlength(carpet_raise) + 29) / 30));
 // Keep the original flying loop primary as well, so the carpet model stays visible.
 anim(dragon_warhammer_sa_spotanim, 0);
 ~magic_carpet_move($arrival, ^magic_carpet_tiles_per_tick);
+// The flying loop has priority 10; clear it before the priority-5 landing sequence.
+anim(null, 0);
+p_delay(0);
 anim(carpet_land, 0);
 p_delay(calc((seqlength(carpet_land) + 29) / 30));
 ~magic_carpet_recover;

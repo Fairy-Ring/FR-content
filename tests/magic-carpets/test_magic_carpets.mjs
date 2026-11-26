@@ -21,6 +21,7 @@ const MoveClick = await load('network/game/client/model/MoveClick.ts');
 const MoveClickHandler = await load('network/game/client/handler/MoveClickHandler.ts');
 const OpNpc = await load('network/game/client/model/OpNpc.ts');
 const OpNpcHandler = await load('network/game/client/handler/OpNpcHandler.ts');
+const { PlayerInfoProt } = await import(pathToFileURL(path.join(engine, 'src/network/rsbuf/prot.ts')).href);
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType', 'SpotanimType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType', 'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType']) {
     types[name] = await load(`cache/config/${name}.ts`);
@@ -89,7 +90,7 @@ function run(p, id, choices, interrupt = false) {
     assert.equal(script?.name, `[opnpc1,${name}]`, 'dispatch from mapped base to visible form');
     const state = ScriptRunner.init(script, p, n);
     p.executeScript(state, true, true);
-    const samples = [], animations = [];
+    const samples = [], animations = [], animationUpdates = [];
     let rebuilds = 0;
     for (let step = 0; state.execution !== ScriptState.FINISHED && step < 250; step++) {
         if (state.execution === ScriptState.PAUSEBUTTON) {
@@ -101,6 +102,7 @@ function run(p, id, choices, interrupt = false) {
             }
         } else if (state.execution === ScriptState.SUSPENDED) {
             animations.push(p.animId);
+            if (p.masks & PlayerInfoProt.ANIM) animationUpdates.push(p.animId);
             assert.ok(p.delayed && p.protect && !p.canAccess(), 'flight owns protected access across ticks');
             assert.equal(new MoveClickHandler().handle(new MoveClick([{ x: p.x + 10, z: p.z }], 0, false), p), false, 'random walk rejected');
             assert.equal(new OpNpcHandler().handle(new OpNpc(1, n.nid), p), false, 'random operation rejected');
@@ -132,7 +134,7 @@ function run(p, id, choices, interrupt = false) {
     }
     assert.equal(state.execution, ScriptState.FINISHED, 'journey completes');
     assert.equal(choices.length, 0, `all intended choices consumed from ${name}: ${text(p)}`);
-    return { samples, animations, rebuilds };
+    return { samples, animations, animationUpdates, rebuilds };
 }
 function trip(from, to, route, setup = () => {}, fare = 200) {
     const p = fixture(fare);
@@ -140,7 +142,7 @@ function trip(from, to, route, setup = () => {}, fare = 200) {
     p.buildArea.rebuild(true); p.resetPathingEntity();
     setup(p);
     const vars = [...p.vars], originalBas = bas(p);
-    const { samples, animations, rebuilds } = run(p, from, [1, route, 1]);
+    const { samples, animations, animationUpdates, rebuilds } = run(p, from, [1, route, 1]);
     assert.equal(count(p), 0, 'exact fare consumed');
     assert.deepEqual(tile(p), station(to).arrival, 'independent mapped-station arrival, not a read of product constants');
     if (station(from).morph === undefined) assert.deepEqual([...p.vars], vars);
@@ -151,6 +153,9 @@ function trip(from, to, route, setup = () => {}, fare = 200) {
     assert.ok(animations.includes(types.SeqType.getId('carpet_raise')));
     assert.ok(animations.includes(types.SeqType.getId('carpet_land')));
     assert.ok(animations.includes(flying), 'primary loop carries visible carpet model');
+    const landingIndex = animationUpdates.indexOf(types.SeqType.getId('carpet_land'));
+    assert.ok(landingIndex > 0);
+    assert.equal(animationUpdates[landingIndex - 1], -1, 'clear priority-10 primary before priority-5 landing');
     const airborne = samples.filter(x => x.bas[0] === flying);
     assert.ok(airborne.length > 10, 'journey has many distinct flight ticks, not a single teleport');
     assert.ok(airborne.every(x => x.bas.every(seq => seq === flying) && x.destination === to));
