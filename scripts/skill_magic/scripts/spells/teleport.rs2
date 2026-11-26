@@ -128,6 +128,7 @@ return(true);
 // Eligibility without Ana's departure page: offers and scenes do not teleport.
 [proc,pre_tele_checks_no_ana](coord $coord)(boolean)
 if (~champions_teleport_check($coord) = false) return(false);
+if (~ics_little_teleport_check($coord) = false) return(false);
 if (~inzone_coord_pair_table(trawler_wreck_zones, $coord) = true) {
     ~mesbox("Water and magic don't mix!|You can't teleport whilst swimming."); // osrs
     return(false);
