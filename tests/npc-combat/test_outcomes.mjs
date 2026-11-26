@@ -74,9 +74,9 @@ try {
     }
     for (const name of ['npc_meleeattack_outcome', 'npc_default_attack_outcome', 'npc_rangeattack_outcome', 'npc_cast_spell_outcome']) assert(namedProcs.has(`[proc,${name}]`), name);
   });
-  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type, trackObserved = true, lateVariant = false) {
+  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type, trackObserved = true, lateVariant = false, position = null) {
     rt.select(directory);
-    const f = rt.fixture(fixtureType, lateVariant ? 'hit' : variant, style, distance);
+    const f = rt.fixture(fixtureType, lateVariant ? 'hit' : variant, style, distance, position);
     let cleanup;
     try {
       if (configure) {
@@ -637,7 +637,7 @@ try {
       const probe = seed => {
         const result = execute(pack, route.npc, route.script, [], 'seeded', style,
           f => configureRoute(f, route), route.distance ?? 1, { seed },
-          nativeTolna ? 'cow' : route.npc, false);
+          nativeTolna ? 'cow' : route.npc, false, false, route.position ?? null);
         attempts++;
         assert.deepEqual(result.errors, [], `${route.script} seed=${seed}: script diagnostics`);
         assert.equal(result.snapshot.error, null, `${route.script} seed=${seed}: script execution error`);
