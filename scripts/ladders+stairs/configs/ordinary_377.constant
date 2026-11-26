@@ -1,3 +1,6 @@
 // UNKNOWN engineering landing beside wild_ladder_broken at L0 3022,3638, angle 2.
 // Like the northeast base, angle 2 gives z-1; return through doors to the northeast ascent.
 ^ordinary_wild_northwest_ground = 0_47_56_14_53
+
+// UNKNOWN internal Ratcatchers stage after helping Smokin' Joe; admission rule is CANDIDATE.
+^keldagrim_rat_pits_unlocked = 15

@@ -249,6 +249,14 @@ switch_coord (loc_coord) {
     case 2_51_61_16_32 : @stair_options(3_51_61_17_32, 1_51_61_18_32); // Rogues Castle - level 2
     case 1_50_54_58_31 : @stair_options(2_50_54_58_30, 0_50_54_58_30); // Varrock church
     case 2_50_54_58_31 : @stair_options(3_50_54_58_30, 1_50_54_58_30); // Varrock church
+    // Original 377 upper pair; no ground counterpart exists for this tutorial flight.
+    case 1_48_48_20_32 :
+        def_int $option = ~p_choice2_header("Climb up the stairs.", 1, "Climb down the stairs.", 2, "Climb up or down the stairs?");
+        if ($option = 1) {
+            p_telejump(2_48_48_21_34);
+        } else if ($option = 2) {
+            @unhandled_stairs(loc_coord);
+        }
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -264,6 +272,7 @@ switch_coord (loc_coord) {
     case 2_51_61_16_32 : p_telejump(3_51_61_17_32); // Rogues Castle - level 2
     case 1_50_54_58_31 : p_telejump(2_50_54_58_30); // Varrock church
     case 2_50_54_58_31 : p_telejump(3_50_54_58_30); // Varrock church
+    case 1_48_48_20_32 : p_telejump(2_48_48_21_34);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -338,6 +347,7 @@ switch_coord (loc_coord) {
     case 1_53_54_25_29 : p_telejump(0_53_54_25_30); // Paterdomus Temple - Level 1 (South)
     case 1_54_54_45_20 : p_telejump(0_54_54_45_21); // Canifis Hair of the Dog Tavern
     case 1_40_60_54_27 : p_telejump(0_40_60_55_27);
+    case 2_48_48_21_33 : p_telejump(1_48_48_20_34);
     case 3_50_54_3_16 : p_telejump(2_50_54_4_16);
     case default : @unhandled_stairs(loc_coord);
 }
@@ -690,12 +700,17 @@ switch_coord (loc_coord) {
 [oploc1,mm_stairs_top]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED native pairs; UNKNOWN engineering landings at their walkable approaches.
+    case 1_43_43_43_43 : p_telejump(0_43_43_43_41);
+    case 1_43_43_47_43 : p_telejump(0_43_43_47_41);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,mm_stairs_base]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 0_43_43_43_42 : p_telejump(1_43_43_43_45);
+    case 0_43_43_47_42 : p_telejump(1_43_43_47_45);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -753,11 +768,11 @@ switch_coord (loc_coord) {
 
 [oploc1,fenk_stairs_lv1]
 // Creature of Fenkenstrain castle stairs L0→L1 (VERIFIED pair 3537/3559,3551 ↔ L1 3552).
-// Destinations CANDIDATE stand tiles adjacent north of top (forceapproach south on bottom).
+// UNKNOWN engineering landings beyond the native top footprints, on original 377 floors.
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_55_55_17_31 : p_telejump(1_55_55_17_33); // west stairs up 3537,3551 → 3537,3553 L1
-    case 0_55_55_39_31 : p_telejump(1_55_55_39_33); // east stairs up 3559,3551 → 3559,3553 L1
+    case 0_55_55_17_31 : p_telejump(1_55_55_17_34);
+    case 0_55_55_39_31 : p_telejump(1_55_55_39_34);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -819,6 +834,8 @@ switch_coord (loc_coord) {
     case 0_45_159_35_20 : p_telejump(1_45_159_34_20);
     case 1_44_158_57_62 : p_telejump(2_44_158_57_61);
     case 1_44_159_19_48 : p_telejump(2_44_159_19_47);
+    // Original Rat Pits internal flight; its outside admission is separate.
+    case 0_30_73_22_32 : p_telejump(1_30_73_22_34);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -837,6 +854,7 @@ switch_coord (loc_coord) {
     case 1_45_159_35_20 : p_telejump(0_45_159_37_20);
     case 2_44_158_57_62 : p_telejump(1_44_159_57_0);
     case 2_44_159_19_48 : p_telejump(1_44_159_19_50);
+    case 1_30_73_22_33 : p_telejump(0_30_73_22_31);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -937,6 +955,7 @@ switch_coord (loc_coord) {
     // VERIFIED 377 placements: Wise Old Man house, with matching adjacent-floor stair locs.
     // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
     case 1_48_50_19_51 : p_telejump(0_48_50_17_51);
+    case 1_33_76_19_51 : p_telejump(0_33_76_17_51);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -944,6 +963,7 @@ switch_coord (loc_coord) {
 // arrive delay?
 switch_coord (loc_coord) {
     case 0_48_50_18_51 : p_telejump(1_48_50_21_51);
+    case 0_33_76_18_51 : p_telejump(1_33_76_21_51);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1026,24 +1046,36 @@ switch_coord (loc_coord) {
 [oploc1,vc_keldagrim_stairs_lower]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_30_73_23_31 : p_telejump(0_45_159_34_11);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,vc_keldagrim_stairs_upper]
 // arrive delay?
 switch_coord (loc_coord) {
+    // CANDIDATE: Rat Pits unlock after helping Smokin' Joe (Old School Rat Pits).
+    // UNKNOWN: internal stage threshold and functional refusal wording.
+    case 0_45_159_34_12 :
+        if (%ratcatch_var < ^keldagrim_rat_pits_unlocked) {
+            mes("You need to help Smokin' Joe before you can enter these Rat Pits.");
+            return;
+        }
+        p_telejump(1_30_73_23_33);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,elid_mayor_stairs]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED native pair; UNKNOWN engineering landings beyond the stair footprints.
+    case 0_53_45_54_31 : p_telejump(1_53_45_57_31);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,elid_mayor_stairstop]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_53_45_55_31 : p_telejump(0_53_45_53_31);
     case default : @unhandled_stairs(loc_coord);
 }
 
