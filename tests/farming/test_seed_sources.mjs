@@ -294,7 +294,8 @@ const questAndContainers = [
 ];
 const cacheObjects = new Map();
 let currentObject;
-for (const line of fs.readFileSync(path.join(content, 'scripts/_unpack/377/all.obj'), 'utf8').split(/\r?\n/)) {
+for (const source of ['scripts/_unpack/377/all.obj', 'scripts/quests/quest_garden/configs/garden.obj']) {
+for (const line of fs.readFileSync(path.join(content, source), 'utf8').split(/\r?\n/)) {
   const header = /^\[([^\]]+)\]$/.exec(line);
   if (header) {
     currentObject = {};
@@ -303,6 +304,7 @@ for (const line of fs.readFileSync(path.join(content, 'scripts/_unpack/377/all.o
     const equals = line.indexOf('=');
     currentObject[line.slice(0, equals)] = line.slice(equals + 1);
   }
+}
 }
 const countAliases = new Set(Array.from(cacheObjects.values()).flatMap(config =>
   Object.entries(config).filter(([key]) => /^count\d+$/.test(key)).map(([, value]) => value.split(',')[0])));
