@@ -158,7 +158,6 @@ if (%boardgames_ingame ! 1 | %boardgames_gameended = 1 | .finduid(%duel2accept) 
 if (%boardgames_drawrequested = 1) {
     ~runesquares_finish(^boardgames_draw, ^runesquares_end_draw_agreed, false);
 } else {
-    %boardgames_drawrequested = 1;
     .%boardgames_drawrequested = 1;
     // UNKNOWN functional wording: no period RuneSquares draw-offer text was recovered.
     if_settext(boardgames_runesquares:com_110, "Draw offer sent.");

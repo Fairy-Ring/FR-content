@@ -387,8 +387,18 @@ check('Runeversi scores a full-board tie and ends with empty cells when neither 
 
 check('Runeversi agreed draw preserves ranks and closing the board resigns exactly once', () => {
   let [a, b] = challenge(3);
-  button(a, 'inter_349:com_95'); button(b, 'inter_349:com_95');
-  assert.equal(get(a, 'boardgames_gameended'), 1);
+  for (let offer = 0; offer < 2; offer++) {
+    button(a, 'inter_349:com_95');
+    for (const p of [a, b]) {
+      assert.equal(get(p, 'boardgames_ingame'), 1, 'a repeated offer cannot end Runeversi');
+      assert.equal(get(p, 'boardgames_gameended'), 0, 'the Runeversi offerer cannot accept their own draw');
+    }
+  }
+  button(b, 'inter_349:com_95');
+  for (const p of [a, b]) {
+    assert.equal(get(p, 'boardgames_ingame'), 0, 'opponent acceptance ends Runeversi');
+    assert.equal(get(p, 'boardgames_gameended'), 1, 'both players see the agreed Runeversi draw');
+  }
   assert.equal(get(a, 'boardgames_runeversi_rank'), 1600);
   assert.equal(get(b, 'boardgames_runeversi_rank'), 1600);
   closePair(a, b);
@@ -585,8 +595,18 @@ check('both new games release the actual table when the opponent is no longer in
 
 check('RuneSquares agreed draw and early resignation preserve the existing rank threshold', () => {
   let [a, b] = challenge(2);
-  button(a, 'boardgames_runesquares:com_95'); button(b, 'boardgames_runesquares:com_95');
-  assert.equal(get(a, 'boardgames_gameended'), 1);
+  for (let offer = 0; offer < 2; offer++) {
+    button(a, 'boardgames_runesquares:com_95');
+    for (const p of [a, b]) {
+      assert.equal(get(p, 'boardgames_ingame'), 1, 'a repeated offer cannot end RuneSquares');
+      assert.equal(get(p, 'boardgames_gameended'), 0, 'the RuneSquares offerer cannot accept their own draw');
+    }
+  }
+  button(b, 'boardgames_runesquares:com_95');
+  for (const p of [a, b]) {
+    assert.equal(get(p, 'boardgames_ingame'), 0, 'opponent acceptance ends RuneSquares');
+    assert.equal(get(p, 'boardgames_gameended'), 1, 'both players see the agreed RuneSquares draw');
+  }
   assert.equal(get(a, 'boardgames_runesquares_rank'), 1600);
   assert.equal(get(b, 'boardgames_runesquares_rank'), 1600);
   closePair(a, b);

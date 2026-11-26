@@ -1,6 +1,7 @@
-// CANDIDATE: Reversi uses an 8x8 board; a legal placement brackets and flips
-// opponent pieces in any of the eight directions. The early-OSRS rules support
-// majority scoring and passing when the next player has no legal placement.
+// CANDIDATE: a legal Reversi placement brackets and flips opponent pieces
+// along rows, columns or diagonals; the player with the most pieces wins.
+// UNKNOWN engineering rules required by the assignment: automatic passes
+// and game end when neither player has a legal placement.
 
 // Each original selection component has an independent button event.
 [if_button,boardgames_runeversi_options:com_81]
@@ -264,11 +265,10 @@ if (.finduid(%duel2accept) = false) {
     ~runeversi_disconnect;
     return;
 }
-if (%boardgames_drawrequested = 1 | .%boardgames_drawrequested = 1) {
+if (%boardgames_drawrequested = 1) {
     ~runeversi_finish_game(0, 2, false);
     return;
 }
-%boardgames_drawrequested = 1;
 .%boardgames_drawrequested = 1;
 // Existing boardgames draw-request wording reused from RuneLink/Draughts.
 if_settext(inter_349:com_147, "Asking opponent for a draw...");
@@ -315,7 +315,7 @@ if_settext(inter_349:com_99, "");
 inv_clear(boardgames_boardinv);
 def_namedobj $own = ~get_boardgames_player_rune(%boardgames_piece);
 def_namedobj $opponent = ~get_boardgames_player_rune(.%boardgames_piece);
-// CANDIDATE: standard four-disc Reversi opening; the second player's display is rotated 180 degrees.
+// UNKNOWN engineering opening: four discs, with the second player's display rotated 180 degrees.
 if (%boardgames_control = 1) {
     inv_setslot(boardgames_boardinv, 27, $own, 1);
     inv_setslot(boardgames_boardinv, 36, $own, 1);
@@ -759,7 +759,8 @@ if ($opponent_present = true) {
     $other_rank = .%boardgames_runeversi_rank;
 }
 
-// CANDIDATE: follow the established boardgames ranked-game eligibility and capped rank-change convention.
+// UNKNOWN engineering eligibility: require four valid moves, matching Draughts.
+// CANDIDATE: retain the established capped rank-change convention.
 if ($opponent_present = true & %boardgames_rankedgame = 1 & %boardgames_numturns > 3 & $local_result ! 0) {
     if ($local_result = 1) {
         $rank_change = ~calculate_rank_change($other_rank, $own_rank);

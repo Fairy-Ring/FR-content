@@ -7,7 +7,7 @@
 // VERIFIED: shared challenge selection assigns RuneSquares game id 2.
 ^runesquares_game_id = 2
 
-// CANDIDATE: existing boardgame ranking requires more than three valid moves.
+// UNKNOWN engineering eligibility: require four valid moves, matching Draughts.
 ^runesquares_ranked_move_threshold = 4
 
 // UNKNOWN internal close-reason values; these are not shown to players.
