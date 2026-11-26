@@ -287,6 +287,7 @@ function currentLocNear(name, x, z) {
   assert.fail(`${name}: native operation produced its nearby open form`);
 }
 function operateHere(p, target, name) {
+  p.resetEntity(false); tick(p); World.processZones();
   assert(p.inOperableDistance(target), `${name}: reached by the preceding continuous route`);
   assert(locHandler.handle(new OpLoc(1, target.x, target.z, target.type), p));
   packedTrigger(p, `[oploc1,${name}]`); p.processInteraction(); finish(p);
