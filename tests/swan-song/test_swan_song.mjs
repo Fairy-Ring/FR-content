@@ -442,6 +442,7 @@ routeOut(p, p => p.z >= 3664 && p.z < 3712, { x: 2344, z: 3670 });
 
 // Post-quest banking uses native OP dispatch and actual interface packets.
 talk(p, 'swan_arnold', [], 4);
+assert(map.findPath(p.level, p.x, p.z, 2344, 3670).length > 0, 'the native bank approach connects to the colony interior');
 assert.equal(p.modalMain, id('Component', 'bank_main'));
 add(p, 'bronze_dagger'); const daggerSlot = slotOf(p, 'bronze_dagger');
 assert(invButton(p, 'bank_side:inv', 'bronze_dagger', 1, daggerSlot));
