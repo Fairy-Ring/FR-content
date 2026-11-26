@@ -369,7 +369,7 @@ assert.equal(peteStage(p), 10);
 assert.equal(bit(p, '100piratevisible'), 0);
 assert.equal(count(p, 'hundred_pirate_fishcake'), 0);
 rewardDelta(p, beforeReward, ['COOKING', 'CRAFTING', 'FISHING', 'SMITHING']);
-assert.equal(visibleLoc(p, pete), -1, 'rescued Pete vanishes for this player');
+assert.equal(visibleLoc(p, pete), id('LocType', 'empty_chair'), 'rescued Pete leaves the original empty chair for this player');
 const other = player();
 setBit(other, 'hundred_main_quest_var', 3);
 setBit(other, '100piratevisible', 1);

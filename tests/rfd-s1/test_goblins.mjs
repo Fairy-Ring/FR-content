@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   World, PlayerStat, ScriptState, types, map, floorTiles, CollisionType, nativeLocRows, nativeLoc, nativeNpc,
   player, position, tile, id, obj, inv, com, bit, setBit, setVar, count, give, run, talk, operate,
-  useLoc, useItems, remove, text, capture, load, walkable, stand
+  useLoc, useItems, remove, text, capture, load, walkable, stand, showNpc
 } from './runtime.mjs';
 
 const OpNpcU = await load('network/game/client/model/OpNpcU.ts');
@@ -73,6 +73,7 @@ function assertNativeRoute(p, at, target, label) {
 
 function useOnNpc(p, item, actor, expected, { defer = false } = {}) {
   stand(p, actor);
+  showNpc(p, actor);
   p.clearPendingAction();
   const itemId = obj(item);
   const slot = p.getInventory(inv).getItemIndex(itemId);

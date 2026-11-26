@@ -12,6 +12,8 @@ export { nativeLocInventory } from '../regicide-travel/runtime.mjs';
 export const load = async file => (await import(pathToFileURL(path.join(engine, 'src', file)).href)).default;
 export const { getExpByLevel } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/Player.ts')).href);
 export const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
+const { NpcStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcStat.ts')).href);
+const rsbuf = await import(pathToFileURL(path.join(engine, 'src/network/rsbuf/index.ts')).href);
 const { Interaction } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/Interaction.ts')).href);
 export const { CollisionType } = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href);
 const OpHeld = await load('network/game/client/model/OpHeld.ts');
@@ -107,6 +109,7 @@ export function player() {
   setVar(p, 'follower_obj', -1);
   World.players[p.slot] = p;
   World.playerLoop.add(p.hash64, p);
+  rsbuf.addPlayer(p.slot);
   position(p, [0, 3207, 3216]);
   run(p, '[proc,initalltabs]');
   return p;
@@ -219,4 +222,24 @@ export function equip(p, name) {
   assert.notEqual(slot, -1, `${name} held for equipment action`);
   capture(p, () => assert.equal(new OpHeldHandler().handle(new OpHeld(2, item, slot, com('inventory:inv')), p), true));
   assert.equal(count(p, name, worn), 1, `${name} is really equipped`);
+}
+
+export function showNpc(p, actor) {
+  p.buildArea.rebuild();
+  const appearance = p.generateAppearance();
+  rsbuf.computePlayer(p.x, p.level, p.z, p.originX, p.originZ, p.slot, p.tele, p.jump,
+    p.runDir, p.walkDir, p.visibility, p.isActive, p.masks, appearance, p.lastAppearance,
+    p.faceEntity, p.faceSquareX, p.faceSquareZ, p.faceAngleX, p.faceAngleZ,
+    p.hitmarkDamage, p.hitmarkType, p.hitmark2Damage, p.hitmark2Type,
+    p.levels[PlayerStat.HITPOINTS], p.baseLevels[PlayerStat.HITPOINTS], p.animId, p.animDelay,
+    p.sayMessage, p.chatMessage, p.chatColour ?? -1, p.chatEffect ?? -1, p.chatRights ?? 0,
+    p.spotanimId, p.spotanimHeight, p.spotanimTime);
+  rsbuf.computeNpc(actor.x, actor.level, actor.z, actor.nid, actor.type, actor.tele, actor.jump,
+    actor.runDir, actor.walkDir, actor.isActive, actor.masks, actor.faceEntity,
+    actor.faceSquareX, actor.faceSquareZ, actor.faceAngleX, actor.faceAngleZ,
+    actor.hitmarkDamage, actor.hitmarkType, actor.hitmark2Damage, actor.hitmark2Type,
+    actor.levels[NpcStat.HITPOINTS], actor.baseLevels[NpcStat.HITPOINTS], actor.animId,
+    actor.animDelay, actor.sayMessage, actor.spotanimId, actor.spotanimHeight, actor.spotanimTime);
+  rsbuf.npcInfo(0, p.slot, 0, 0, true);
+  assert(rsbuf.hasNpc(p.slot, actor.nid), 'real mapped NPC is visible to the native packet path');
 }
