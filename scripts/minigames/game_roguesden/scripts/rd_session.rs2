@@ -1,0 +1,163 @@
+// VERIFIED period rule: the 29 April 2006 Sals guide requires 50 Agility and
+// 50 Thieving, and says only the Mystic Jewel may be taken into the maze.
+// UNKNOWN favourable-player duration: the session clock lasts 1000 server ticks.
+// varp319_unused layout: ticks 0-9, Agility levels drained 10-16,
+// Thieving levels drained 17-23. All are temporary session state.
+
+[opheld1,roguesden_gem]
+if (~roguesden_active = true | ~roguesden_maze_inside(coord) = true) {
+    ~roguesden_leave(0);
+    return;
+}
+// UNKNOWN functional wording for an inactive jewel.
+mes("The jewel does not react.");
+
+[oploc1,roguesden_mazeentrance]
+if (~roguesden_enter = true) {
+    // CANDIDATE: the map places this doorway at plane 1, 3056,4991;
+    // its maze-side threshold is the adjacent tile 3056,4992.
+    p_teleport(1_47_78_48_0);
+}
+
+[proc,roguesden_active]()(boolean)
+if (getbit_range(%varp319_unused, 0, 9) > 0) return(true);
+return(false);
+
+[proc,roguesden_enter]()(boolean)
+if (~roguesden_active = true) {
+    // UNKNOWN functional refusal wording.
+    mes("You are already in the maze.");
+    return(false);
+}
+if (~roguesden_maze_inside(coord) = true) {
+    // Recover a stale login before allowing another entry.
+    ~roguesden_leave(0);
+    return(false);
+}
+if (stat_base(agility) < 50 | stat_base(thieving) < 50) {
+    // VERIFIED requirements; wording is functional, not a recovered quotation.
+    mes("You need at least level 50 Agility and Thieving to enter.");
+    return(false);
+}
+// UNKNOWN task-specified gate: worn items must also be absent before entry.
+if (inv_total(inv, roguesden_gem) ! 1 | inv_freespace(inv) ! sub(inv_size(inv), 1) | inv_freespace(worn) ! inv_size(worn)) {
+    // VERIFIED period rule: the Mystic Jewel is the only permitted inventory item.
+    // UNKNOWN functional refusal wording.
+    mes("You need only the Mystic Jewel in your inventory and no worn items.");
+    return(false);
+}
+%varp319_unused = 0;
+%varp319_unused = setbit_range_toint(%varp319_unused, ^roguesden_session_ticks, 0, 9);
+%roguesden_puzzle = 0;
+~roguesden_maze_start;
+settimer(roguesden_session_tick, 1);
+return(true);
+
+[timer,roguesden_session_tick]
+if (~roguesden_active = false) return;
+def_int $remaining = getbit_range(%varp319_unused, 0, 9);
+if ($remaining <= 1) {
+    // UNKNOWN timeout outcome wording; the session ends safely in the lobby.
+    ~roguesden_leave(0);
+    return;
+}
+%varp319_unused = setbit_range_toint(%varp319_unused, sub($remaining, 1), 0, 9);
+settimer(roguesden_session_tick, 1);
+
+[proc,roguesden_maze_drain_agility](int $actual_levels)(int)
+if (~roguesden_active = false | $actual_levels <= 0) return(0);
+def_int $saved = getbit_range(%varp319_unused, 10, 16);
+def_int $recorded = min($actual_levels, max(0, sub(127, $saved)));
+if ($recorded > 0) {
+    %varp319_unused = setbit_range_toint(%varp319_unused, add($saved, $recorded), 10, 16);
+}
+return($recorded);
+
+[proc,roguesden_maze_drain_thieving](int $actual_levels)(int)
+if (~roguesden_active = false | $actual_levels <= 0) return(0);
+def_int $saved = getbit_range(%varp319_unused, 17, 23);
+def_int $recorded = min($actual_levels, max(0, sub(127, $saved)));
+if ($recorded > 0) {
+    %varp319_unused = setbit_range_toint(%varp319_unused, add($saved, $recorded), 17, 23);
+}
+return($recorded);
+
+[proc,roguesden_leave](int $complete)
+def_boolean $active = ~roguesden_active;
+def_boolean $inside = ~roguesden_maze_inside(coord);
+if ($active = false & $inside = false) return;
+
+def_int $agility_drained = 0;
+def_int $thieving_drained = 0;
+if ($active = true) {
+    $agility_drained = getbit_range(%varp319_unused, 10, 16);
+    $thieving_drained = getbit_range(%varp319_unused, 17, 23);
+}
+def_boolean $award = false;
+if ($complete = 1 & $active = true) $award = true;
+
+// Clear the session before any presentation or reward can suspend and repeat.
+cleartimer(roguesden_session_tick);
+%varp319_unused = 0;
+%roguesden_puzzle = 0;
+~roguesden_maze_stop;
+~roguesden_strip_item(roguesden_gem);
+~roguesden_strip_item(roguesden_flash_powder);
+~roguesden_strip_item(roguesden_gear1);
+~roguesden_strip_item(roguesden_gear2);
+~roguesden_strip_item(roguesden_gear3);
+~roguesden_strip_item(roguesden_gear4);
+~roguesden_strip_item(roguesden_gear5);
+~roguesden_strip_item(roguesden_gear6);
+~roguesden_strip_item(roguesden_puzzle_mosaic_tile1);
+~roguesden_strip_item(roguesden_puzzle_mosaic_tile2);
+~roguesden_strip_item(roguesden_puzzle_mosaic_tile3);
+~roguesden_strip_item(roguesden_puzzle_mosaic_tile4);
+~roguesden_strip_item(roguesden_puzzle_rotation);
+if ($award = false) ~roguesden_strip_item(roguesden_kit);
+
+// Reset all current-level drains, not only those recorded for XP.
+~stat_reset_all;
+if ($active = true) {
+    // CANDIDATE: completion pays 12 XP per drained level; early exit pays a fraction.
+    // UNKNOWN: use the named half-rate until the original progress formula is sourced.
+    def_int $xp_per_drain = ^roguesden_incomplete_xp_per_drain;
+    if ($award = true) $xp_per_drain = 120;
+    if ($agility_drained > 0) stat_advance(agility, multiply($agility_drained, $xp_per_drain));
+    if ($thieving_drained > 0) stat_advance(thieving, multiply($thieving_drained, $xp_per_drain));
+}
+stat_heal(hitpoints, 99, 0);
+healenergy(10000);
+~prayer_deactivate_all;
+~clear_pk_skull;
+~clear_poison;
+~player_end_poison;
+anim(null, 0);
+p_stopaction;
+// CANDIDATE static-map landing: plane 1, map 47_77, local 39,47.
+p_teleport(1_47_77_39_47);
+buildappearance(worn);
+~update_all(null);
+~initalltabs;
+
+[proc,roguesden_strip_item](obj $item)
+def_int $count = inv_total(inv, $item);
+if ($count > 0) inv_del(inv, $item, $count);
+$count = inv_total(worn, $item);
+if ($count > 0) inv_del(worn, $item, $count);
+
+[proc,roguesden_login]
+if (~roguesden_active = true | ~roguesden_maze_inside(coord) = true) ~roguesden_leave(0);
+
+[proc,roguesden_logout]
+if (~roguesden_active = true | ~roguesden_maze_inside(coord) = true) ~roguesden_leave(0);
+
+[proc,roguesden_death]
+if (~roguesden_active = false) return;
+~player_death;
+// UNKNOWN functional death wording; this bypasses ordinary item-drop allocation.
+mes("Oh dear, you are dead!");
+midi_jingle(death2);
+~combat_clearqueue;
+clearqueue(player_death_default);
+~roguesden_leave(0);

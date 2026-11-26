@@ -12,6 +12,7 @@ p_delay(3);
 
 [queue,player_death_default]
 if (~champions_current > 0) ~champions_player_death;
+if (~roguesden_active = true) { ~roguesden_death; return; }
 // Only Lost and Found receives this death cleanup; followers keep their published logic.
 if (%macro_event = ^macro_lost_and_found) {
     ~macro_event_cleanup(%macro_event, %macro_event_uid);

@@ -1,0 +1,38 @@
+// VERIFIED period rule: the 2006 Sals guide records the 50/50 entry gate and
+// Brian's Mystic Jewel handover before the maze. Dialogue below is functional,
+// not a recovered quotation; the later automatic jewel replacement is omitted.
+
+[opnpc1,roguesden_mazemaster]
+~roguesden_brian_handover;
+
+[proc,roguesden_brian_handover]
+if (~roguesden_active = true) {
+    // UNKNOWN functional refusal wording.
+    mes("You are already taking part in the maze.");
+    return;
+}
+if (stat_base(agility) < 50 | stat_base(thieving) < 50) {
+    // VERIFIED requirements; wording is functional, not a recovered quotation.
+    mes("You need at least level 50 Agility and Thieving to enter.");
+    return;
+}
+// UNKNOWN task-specified gate: no worn items are accepted before handover.
+if (inv_freespace(inv) ! inv_size(inv) | inv_freespace(worn) ! inv_size(worn)) {
+    // VERIFIED period rule: the Mystic Jewel is the only permitted item.
+    // UNKNOWN functional refusal wording.
+    mes("Deposit your inventory and worn items before asking for the jewel.");
+    return;
+}
+// CANDIDATE legacy behavior: never exchange or replace an existing jewel.
+inv_add(inv, roguesden_gem, 1);
+// UNKNOWN functional handover wording.
+mes("Brian hands you a Mystic jewel.");
+
+[opnpc3,roguesden_trader]
+if (stat_base(agility) < 50 | stat_base(thieving) < 50) {
+    // CANDIDATE 50/50 Lost and Found gate; wording is functional.
+    mes("You need level 50 Agility and Thieving to use Lost and Found.");
+    return;
+}
+// Keep the existing shop-category handler and its inventory/pricing behavior.
+~openshop_activenpc;

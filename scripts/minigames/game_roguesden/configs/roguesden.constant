@@ -1,0 +1,9 @@
+// UNKNOWN engineering value: an active run lasts 1,000 session timer ticks.
+^roguesden_session_ticks = 1000
+// UNKNOWN favourable-to-player substitute for the unsourced partial-run fraction:
+// half the completion rate, in tenths of XP, per recorded drained level.
+^roguesden_incomplete_xp_per_drain = 60
+// UNKNOWN engineering range: a native powder throw reaches up to three tiles.
+^roguesden_powder_range = 3
+// UNKNOWN engineering range: an unstunned guard catches within two tiles.
+^roguesden_guard_catch_range = 2

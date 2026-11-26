@@ -7,6 +7,7 @@ if (%darkness_level ! 0) ~swamp_cave_release;
 // CoF gardener: restore courtyard multi directions bit after player logout.
 ~fenk_on_player_cleanup;
 ~duel_arena_logout;
+~roguesden_logout;
 ~macro_event_logout;
 ~castlewars_logout;
 ~pest_logout;

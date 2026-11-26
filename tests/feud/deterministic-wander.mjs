@@ -2,7 +2,7 @@ import { after } from 'node:test';
 
 // UNKNOWN test-fixture seed, not a gameplay value. Use the existing actor-seed
 // xorshift32 convention, but seed the whole native timeline before runtime loads.
-const nativeWanderFixtureSeed = 0x0751117;
+const nativeWanderFixtureSeed = 0x0751119;
 
 export function seededWander(seed) {
   let state = seed;
