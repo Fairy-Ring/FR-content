@@ -100,8 +100,6 @@ if (inv_total(inv, coins) < $fare) {
     ~chatnpc("<p,neutral>You don't have enough coins.");
     return;
 }
-// UNKNOWN engineering recovery: save the paid destination before the first movement.
-%magic_carpet_var = ~magic_carpet_station($destination);
 inv_del(inv, coins, $fare);
 if_close;
 def_coord $boarding = ~magic_carpet_rug(npc_type);
@@ -110,6 +108,8 @@ p_stopaction;
 facesquare($arrival);
 anim(carpet_sit_down, 0);
 p_delay(calc((seqlength(carpet_sit_down) + 29) / 30));
+// UNKNOWN engineering recovery: save the airborne destination when the rug lifts.
+%magic_carpet_var = ~magic_carpet_station($destination);
 anim(carpet_raise, 0);
 p_delay(calc((seqlength(carpet_raise) + 29) / 30));
 ~bas_set_all(dragon_warhammer_sa_spotanim);
@@ -117,12 +117,14 @@ p_delay(calc((seqlength(carpet_raise) + 29) / 30));
 // Keep the original flying loop primary as well, so the carpet model stays visible.
 anim(dragon_warhammer_sa_spotanim, 0);
 ~magic_carpet_move($arrival, ^magic_carpet_tiles_per_tick);
-// The flying loop has priority 10; clear it before the priority-5 landing sequence.
+// Restore the destination rug and clear priority 10 before the priority-5 landing.
 anim(null, 0);
+%magic_carpet_var = 0;
 p_delay(0);
 anim(carpet_land, 0);
 p_delay(calc((seqlength(carpet_land) + 29) / 30));
-~magic_carpet_recover;
+anim(null, 0);
+~update_bas;
 
 [proc,magic_carpet_move](coord $destination, int $speed)
 // UNKNOWN engineering route: straight overworld waypoints, at most two tiles/tick.

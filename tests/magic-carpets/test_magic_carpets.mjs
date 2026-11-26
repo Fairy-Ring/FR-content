@@ -35,6 +35,9 @@ const worn = types.InvType.getId('worn');
 const coins = types.ObjType.getId('coins');
 const carpetVar = types.VarPlayerType.getId('magic_carpet_var');
 const flying = types.SeqType.getId('dragon_warhammer_sa_spotanim');
+const sit = types.SeqType.getId('carpet_sit_down');
+const raise = types.SeqType.getId('carpet_raise');
+const land = types.SeqType.getId('carpet_land');
 const bas = p => [p.readyanim, p.turnanim, p.walkanim, p.walkanim_b, p.walkanim_l, p.walkanim_r, p.runanim];
 function proc(p, name) {
     const script = ScriptProvider.getByName(`[proc,${name}]`);
@@ -103,10 +106,16 @@ function run(p, id, choices, interrupt = false) {
         } else if (state.execution === ScriptState.SUSPENDED) {
             animations.push(p.animId);
             if (p.masks & PlayerInfoProt.ANIM) animationUpdates.push(p.animId);
+            const destination = p.getVar(carpetVar);
+            if (p.animId === sit) assert.equal(destination, 0, 'origin ground rug stays visible during sit-down');
+            if (p.animId === raise) assert.ok(destination > 0, 'ground rug hides during raise and airborne recovery is armed');
+            if (p.animId === land) assert.equal(destination, 0, 'destination ground rug is visible during landing/dismount');
+            if ((p.masks & PlayerInfoProt.ANIM) && p.animId === -1 && p.readyanim === flying) assert.equal(destination, 0, 'destination rug returns together with clearing the flying loop');
             assert.ok(p.delayed && p.protect && !p.canAccess(), 'flight owns protected access across ticks');
             assert.equal(new MoveClickHandler().handle(new MoveClick([{ x: p.x + 10, z: p.z }], 0, false), p), false, 'random walk rejected');
             assert.equal(new OpNpcHandler().handle(new OpNpc(1, n.nid), p), false, 'random operation rejected');
             if (p.exactStartX !== -1) {
+                if (p.readyanim !== flying) assert.equal(destination, 0, 'origin ground rug stays visible throughout protected boarding');
                 const start = [p.exactStartX, p.exactStartZ], end = tile(p);
                 assert.deepEqual([p.exactEndX, p.exactEndZ], end);
                 assert.ok(Math.max(...end.map((v, i) => Math.abs(v - start[i]))) <= 2, 'every server hop stays below forced-jump threshold');
@@ -123,7 +132,7 @@ function run(p, id, choices, interrupt = false) {
                     assert.ok(local >= 12 && local < 92, 'both exact endpoints stay in client safe area after rebuild');
                     assert.ok(local >= 0 && local <= 255, 'unsigned-byte exact coordinates cannot wrap');
                 }
-                samples.push({ start, end, bas: bas(p), destination: p.getVar(carpetVar) });
+                samples.push({ start, end, bas: bas(p), destination });
                 if (interrupt && samples.filter(x => x.bas[0] === flying).length === 5) return { samples, animations, rebuilds };
             }
             World.currentTick = p.delayedUntil;
@@ -149,11 +158,11 @@ function trip(from, to, route, setup = () => {}, fare = 200) {
     assert.equal(p.getVar(carpetVar), 0, 'station rug restored');
     assert.deepEqual(bas(p), originalBas, 'normal appearance restored');
     assert.equal(p.animId, -1, 'primary flying animation stopped');
-    assert.ok(animations.includes(types.SeqType.getId('carpet_sit_down')));
-    assert.ok(animations.includes(types.SeqType.getId('carpet_raise')));
-    assert.ok(animations.includes(types.SeqType.getId('carpet_land')));
+    assert.ok(animations.includes(sit));
+    assert.ok(animations.includes(raise));
+    assert.ok(animations.includes(land));
     assert.ok(animations.includes(flying), 'primary loop carries visible carpet model');
-    const landingIndex = animationUpdates.indexOf(types.SeqType.getId('carpet_land'));
+    const landingIndex = animationUpdates.indexOf(land);
     assert.ok(landingIndex > 0);
     assert.equal(animationUpdates[landingIndex - 1], -1, 'clear priority-10 primary before priority-5 landing');
     const airborne = samples.filter(x => x.bas[0] === flying);
