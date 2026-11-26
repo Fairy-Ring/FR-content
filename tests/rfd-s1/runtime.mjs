@@ -108,6 +108,7 @@ export function player() {
   World.playerLoop.add(p.hash64, p);
   position(p, [0, 3207, 3216]);
   run(p, '[proc,initalltabs]');
+  p.invListenOnCom(inv, com('inventory:inv'), p.uid);
   return p;
 }
 export function text(p) {
