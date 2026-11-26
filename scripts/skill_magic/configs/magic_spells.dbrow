@@ -237,6 +237,17 @@ data=runesrequired,earthrune,2,waterrune,2,naturerune,1,null,null
 data=experience,250
 data=convertobj,null,banana,human_castbonestobananas,bonestobananas_casting,bones_to_bananas_all
 
+// VERIFIED 377 level/runes; CANDIDATE 65 XP from KB 1938, 22 June 2006.
+// UNKNOWN audiovisual default: reuse the existing bone-conversion effects.
+[magic_spell_bones_to_peaches]
+table=magic_spell_table
+data=spell,^bones_to_peaches
+data=members,true
+data=levelrequired,60
+data=runesrequired,earthrune,4,waterrune,4,naturerune,2,null,null
+data=experience,650
+data=convertobj,null,peach,human_castbonestobananas,bonestobananas_casting,bones_to_bananas_all
+
 [magic_spell_telegrab]
 table=magic_spell_table
 data=spell,^telekinetic_grab

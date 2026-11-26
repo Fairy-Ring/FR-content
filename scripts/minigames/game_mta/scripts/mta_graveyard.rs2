@@ -6,10 +6,6 @@
 [oploc1,magictraining_bones_pile4] ~mta_graveyard_pick(4);
 [oploc1,magictraining_grave_foodshute] ~mta_graveyard_deposit;
 
-// The spellbook contains the Bones to Peaches button, but 377 has no server row.
-[if_button,magic:com_559]
-if (p_finduid(uid) = true) ~mta_bones(true);
-
 [proc,mta_graveyard_enter]
 if (~mta_room ! 4) return;
 cleartimer(mta_graveyard_fall);
@@ -113,17 +109,6 @@ if ($pile = 1) {
 [proc,mta_bones](boolean $peaches)(boolean)
 // The shared spell hook must leave all non-Graveyard casts to normal magic.
 if (~mta_room ! 4) return(false);
-if ($peaches = true) {
-    if (%magictraining_bonespeaches ! 1) {
-        // UNKNOWN functional refusal wording; the purchase unlock is VERIFIED.
-        mes("You need to learn Bones to Peaches first.");
-        return(true);
-    }
-    if (stat(magic) < 60) {
-        mes("You need a Magic level of 60 to cast Bones to Peaches.");
-        return(true);
-    }
-}
 def_int $bones1 = inv_total(inv, magictraining_bones1);
 def_int $bones2 = inv_total(inv, magictraining_bones2);
 def_int $bones3 = inv_total(inv, magictraining_bones3);
@@ -135,12 +120,8 @@ if ($total_bones < 1) {
     return(true);
 }
 def_dbrow $spell_data = ~get_spell_data(^bones_to_bananas);
-if ($peaches = false & ~check_spell_requirements($spell_data) = false) return(true);
-if ($peaches = true & ~mta_bone_peach_runes(false) = false) {
-    // UNKNOWN functional refusal wording.
-    mes("You don't have the runes required for Bones to Peaches.");
-    return(true);
-}
+if ($peaches = true) $spell_data = ~get_spell_data(^bones_to_peaches);
+if (~check_spell_requirements($spell_data) = false) return(true);
 if (afk_event = ^true) {
     ~macro_event_general_spawn(~macro_event_set_random);
     return(true);
@@ -167,15 +148,8 @@ if (inv_itemspace(inv, $fruit, $fruit_count, inv_size(inv)) = false) {
     mes("You don't have enough inventory space for the fruit.");
     return(true);
 }
-if ($peaches = true & ~mta_bone_peach_runes(true) = false) {
-    if ($bones1 > 0) inv_add(inv, magictraining_bones1, $bones1);
-    if ($bones2 > 0) inv_add(inv, magictraining_bones2, $bones2);
-    if ($bones3 > 0) inv_add(inv, magictraining_bones3, $bones3);
-    if ($bones4 > 0) inv_add(inv, magictraining_bones4, $bones4);
-    return(true);
-}
 inv_add(inv, $fruit, $fruit_count);
-if ($peaches = false) ~delete_spell_runes($spell_data);
+~delete_spell_runes($spell_data);
 ~give_spell_xp($spell_data);
 def_namedobj $visual_product;
 def_seq $anim;
@@ -185,39 +159,8 @@ $visual_product, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spel
 if ($anim ! null) anim($anim, 0);
 if ($spotanim ! null) spotanim_pl($spotanim, 92, 0);
 if ($sound ! null) sound_synth($sound, 0, 0);
-// UNKNOWN favourable-player default: Bones to Peaches reuses the compiled
-// Bones to Bananas XP because revision 377 has no Bones to Peaches spell row.
 if ($peaches = true) mes("The bones turn into peaches."); else mes("The bones turn into bananas.");
 p_delay(2);
-return(true);
-
-[proc,mta_bone_peach_runes](boolean $apply)(boolean)
-def_dbrow $spell_data = ~get_spell_data(^bones_to_bananas);
-def_namedobj $earth_rune;
-def_int $base_earth;
-def_namedobj $water_rune;
-def_int $base_water;
-def_namedobj $nature_rune;
-def_int $base_nature;
-def_namedobj $rune4;
-def_int $base_count4;
-$earth_rune, $base_earth, $water_rune, $base_water, $nature_rune, $base_nature, $rune4, $base_count4 = ~staff_runes($spell_data);
-def_int $earth_count = 4;
-def_int $water_count = 4;
-def_int $nature_count = 2;
-if ($base_earth = null) $earth_count = 0;
-if ($base_water = null) $water_count = 0;
-if ($base_nature = null) $nature_count = 0;
-def_int $cost;
-def_int $combos;
-def_int $steam;
-def_int $smoke;
-def_int $mist;
-def_int $dust;
-def_int $lava;
-def_int $mud;
-$cost, $combos, $steam, $smoke, $mist, $dust, $lava, $mud = ~spell_rune_plan($earth_rune, $earth_count, $water_rune, $water_count, $nature_rune, $nature_count, null, 0, null, 0, $apply);
-if ($cost < 0) return(false);
 return(true);
 
 [proc,mta_graveyard_deposit]

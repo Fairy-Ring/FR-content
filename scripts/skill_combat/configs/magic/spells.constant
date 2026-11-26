@@ -55,6 +55,8 @@
 ^charge = 40
 ^ardougne_teleport = 49
 ^lumbridge_teleport = 50
+// UNKNOWN server-only dispatch key; not a historical client spell ID.
+^bones_to_peaches = 64
 
 // npc spells
 ^skeleton_mage_attack = 100
