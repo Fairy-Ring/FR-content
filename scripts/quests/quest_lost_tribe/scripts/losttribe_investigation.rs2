@@ -33,6 +33,7 @@ if (%lost_tribe_quest = 1) {
     } else {
         ~chatnpc("<p,neutral>Reldo in Varrock's library may know about the symbol on this brooch.");
         %lost_tribe_quest = 5;
+        %lost_tribe_contact = 0;
         ~losttribe_progress;
     }
 } else if (%lost_tribe_quest < 8) {
