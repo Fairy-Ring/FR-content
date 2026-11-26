@@ -4,6 +4,7 @@
 // Hunt 289? no. Research: subject one-small-favour.
 
 [opnpc1,gnormadium_avlafrim]
+if (%onesmallfavour >= ^onesmallfavour_complete & %grandtree >= ^grandtree_complete) { @gnome_pilot_glider; }
 if (%onesmallfavour < 20) {
     ~displaymessage(^dm_default);
     return;
