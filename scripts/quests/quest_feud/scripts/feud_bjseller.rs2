@@ -3,6 +3,7 @@
 // revision 36382238. Its Trade wording is unchanged in revision 36399950.
 
 [opnpc1,feud_bjseller]
+if (%feud_var = ^feud_complete & %roguetrader_blackjacks = 1) { ~roguetrader_blackjack_supplier; return; }
 if (%feud_var ! ^feud_complete) { return; }
 ~chatnpc("<p,neutral>Hello. Could I interest you in a Blackjack?");
 return;
