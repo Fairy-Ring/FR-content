@@ -11,7 +11,6 @@
 ^mep2_complete = 60
 
 // VERIFIED target-day reward: 2 Quest Points and 20,000 Agility XP.
-^mep2_questpoints = 2
 ^mep2_agility_xp = 200000
 // UNKNOWN inventory-model scale for the native completion scroll.
 ^mep2_reward_model_scale = 450

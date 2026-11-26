@@ -70,7 +70,7 @@ if ($owned = 0) inv_add(inv, mourning_crystal_trinket, 1);
 ~update_questlist;
 stat_advance(agility, ^mep2_agility_xp);
 // Period guide heading only; no unsourced completion sentence.
-~send_quest_complete(questlist:mourning2, mourning_crystal_trinket, ^mep2_reward_model_scale, ^mep2_questpoints, "Mourning's Ends - Part 2", "20,000 Agility XP");
+~send_quest_complete(questlist:mourning2, mourning_crystal_trinket, ^mep2_reward_model_scale, ^mourning2_questpoints, "Mourning's Ends - Part 2", "20,000 Agility XP");
 
 [opheld1,mourning_ederns_journal]
 if (%mourning_quest_main = ^mep2_journal_obtained) {
