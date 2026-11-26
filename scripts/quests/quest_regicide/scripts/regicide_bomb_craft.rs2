@@ -96,6 +96,7 @@ if(last_useitem = pestle_and_mortar) {
 mes("I don't want to contaminate the coal tar."); // no item check
 
 [opheldu,regicide_barrel_naphtha]
+if (%mourning_quest = ^mep1_toxin_recipe & last_useitem = mourning_applebarrel_mush) @mep1_mix_naphtha;
 if(last_useitem = regicide_quicklime | last_useitem = regicide_sulphar) {
     mes("I think I should powder this first.");
     return;
