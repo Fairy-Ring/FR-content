@@ -88,7 +88,9 @@ if (%100_ogre_prog = ^rfd_skrach_tree_kicked) {
 }
 
 // First Karamja return is available only after the successful Chompy roast.
-[opnpc1,100_jubbly_ogre_boat_full]
+[apnpc1,100_jubbly_ogre_boat_full] @rfd_skrach_board_karamja;
+[opnpc1,100_jubbly_ogre_boat_full] @rfd_skrach_board_karamja;
+[label,rfd_skrach_board_karamja]
 if (%100_ogre_prog = ^rfd_skrach_chompy_roasted & %100_ogre_boat_free_ride = 1) {
     %100_ogre_boat_free_ride = 0;
     p_telejump(^rfd_skrach_feldip_landing);

@@ -372,11 +372,20 @@ for (const [balloonCount, option] of [[1, 5], [2, 4]]) {
   const boat = nativeNpc('100_jubbly_multi_boat_karamja', rows => rows.find(row => row.x === 2753 && row.z === 3081));
   const { p } = fixture(stage('chompy_skewered'));
   setBit(p, '100_ogre_jubbly_boat_visible', 1);
-  const before = npcOption(p, boat, 1);
+  const before = npcOption(p, boat, 1, [], true);
   assert.deepEqual([p.level, p.x, p.z], before, 'the first return is unavailable before roasting');
   setBit(p, '100_ogre_prog', stage('chompy_roasted'));
   setBit(p, '100_ogre_boat_free_ride', 1);
-  npcOption(p, boat, 1);
+  const shore = [0, 2759, 3081];
+  walkable(shore, 'observed Karamja boat shoreline');
+  position(p, shore);
+  showNpc(p, boat);
+  p.clearPendingAction();
+  assert.equal(p.inOperableDistance(boat), false, 'the real shore does not require walking into the boat water');
+  assert(p.inApproachDistance(p.apRange, boat), 'the real shore lies inside the unchanged engine approach range');
+  assert(npcHandler.handle(new OpNpc(1, boat.nid), p), 'native Board packet accepted from shore');
+  assert.equal(p.getApTrigger().name, '[apnpc1,100_jubbly_ogre_boat_full]', 'the visible Karamja boat selects its real approach trigger');
+  capture(p, () => p.processInteraction());
   assert.deepEqual([p.level, p.x, p.z], coordinate('rfd_skrach_feldip_landing'));
   assert.equal(bit(p, '100_ogre_boat_free_ride'), 0);
   assert.equal(bit(p, '100_ogre_prog'), stage('returned'));
@@ -404,13 +413,13 @@ for (const [balloonCount, option] of [[1, 5], [2, 4]]) {
 
   const reverse = postQuestFixture();
   give(reverse, 'snake_weed'); give(reverse, 'rogues_purse'); give(reverse, 'karamja_rum');
-  const reverseOrigin = npcOption(reverse, karanjaBoat, 1);
+  const reverseOrigin = npcOption(reverse, karanjaBoat, 1, [], true);
   assert.deepEqual([reverse.level, reverse.x, reverse.z], reverseOrigin, 'carrying rum prevents the westward ride');
   assert.equal(count(reverse, 'snake_weed') + count(reverse, 'rogues_purse'), 2, 'rum refusal consumes no herb fare');
   assert.equal(count(reverse, 'karamja_rum'), 1);
   reverse.invDel(inv, obj('karamja_rum'), 1);
   assert.equal(count(reverse, 'karamja_rum'), 0, 'fixture removes the refused rum before a valid ride');
-  npcOption(reverse, karanjaBoat, 1);
+  npcOption(reverse, karanjaBoat, 1, [], true);
   assert.deepEqual([reverse.level, reverse.x, reverse.z], coordinate('rfd_skrach_feldip_landing'));
   assert.equal(count(reverse, 'snake_weed') + count(reverse, 'rogues_purse'), 0, 'mixed herb species pay the aggregate fare');
 }
