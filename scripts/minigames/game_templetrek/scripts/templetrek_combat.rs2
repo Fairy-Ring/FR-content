@@ -421,7 +421,6 @@ if (~templetrek_combat_attackable = false) return;
 [apnpc2,templetrek_zombie] @templetrek_player_magic_attack;
 [label,templetrek_player_magic_attack]
 if (~templetrek_combat_attackable = false) return;
-if (npc_type = templetrek_vampire_1 | npc_type = templetrek_vampire_2 | npc_type = templetrek_vampire_3) return;
 @player_combat_start_ap;
 
 // Native NPC-to-NPC melee follows myreque2_escort's owner-checked pattern.

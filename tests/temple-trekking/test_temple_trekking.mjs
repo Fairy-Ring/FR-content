@@ -13,6 +13,7 @@ const locHandler = new ((await engineModule('network/game/client/handler/OpLocHa
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const moveHandler = new ((await engineModule('network/game/client/handler/MoveClickHandler.ts')).default)();
 const resolveNpcType = (await engineModule('engine/entity/resolveNpcType.ts')).default;
+const { Interaction } = await engineModule('engine/entity/Interaction.ts');
 const shown = (p, n) => resolveNpcType(types.NpcType.get(n.type), p);
 const vp = name => id('VarPlayerType', name);
 const vb = name => id('VarBitType', name);
@@ -285,6 +286,35 @@ for (let event = 1; event <= 6; event++) {
 }
 clear(combat);
 console.log('PASS all six authentic combat events, native damage/death credit, head/arm gate and owned spawn reachability');
+
+for (let route = 1; route <= 3; route++) {
+    const p = fixture();
+    choose(p, 0, route);
+    proc(p, 'templetrek_enter_event', [2]);
+    const target = hostile(p)[0];
+    seed(p, ['burgh_rod_command_final_10']);
+    assert(held(p, 'burgh_rod_command_final_10', 2));
+    settle(p);
+    assert(Math.max(Math.abs(p.x - target.x), Math.abs(p.z - target.z)) > 1, 'Juvinate Attack starts outside melee range');
+    const path = [...map.findPathToLoc(p.level, p.x, p.z, target.x, target.z, p.width, target.width, target.length, 0, -1, 0)]
+        .map(coord => {
+            const { x, z } = CoordGrid.unpackCoord(coord);
+            return { x, z };
+        });
+    assert(path.length, 'Juvinate Attack has an ordinary walking route');
+    p.originX = p.x;
+    p.originZ = p.z;
+    assert(moveHandler.handle(new MoveClick(path, 0, true), p), 'native Juvinate MOVE_OPCLICK accepted');
+    // Native OpNpcHandler handoff after packet visibility and option validation.
+    p.clearPendingAction();
+    p.setInteraction(Interaction.ENGINE, target, T.APNPC2);
+    p.opcalled = true;
+    for (let tick = 0; tick < 80 && p.hasInteraction() && !p.inOperableDistance(target); tick++) interactionTick(p);
+    assert(p.inOperableDistance(target), 'distant native Juvinate Attack preserves walking to melee range');
+    assert.equal(ai(target, '[proc,npc_max_dealt]', p, [100, 1]).popInt(), 0, 'native melee approach does not admit vampire spell damage');
+    clear(p);
+}
+console.log('PASS distant native melee Attack approaches all three Juvinate forms without admitting spell damage');
 
 // Completion is reached through three product Continue transitions after clears.
 const finish = fixture();
