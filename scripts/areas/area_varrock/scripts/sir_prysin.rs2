@@ -4,6 +4,10 @@ if(map_members = ^true & inv_total(inv, trail_clue_hard_riddle015) > 0) {
     ~progress_clue_hard(trail_clue_hard_riddle015, "Sir Prysin has given you another clue scroll!");
     return;
 }
+if (%demonstart = ^demon_complete & %agrith_quest >= ^agrith_complete) {
+    ~agrith_prysin_recovery;
+    return;
+}
 if (%demonstart = ^demon_not_started | %demonstart = ^demon_talked_aris) {
     @demon_slayer_sir_prysin_pre_silverlight;
 } else if (%demonstart >= ^demon_key_hunt & %demonstart < ^demon_silverlight) {

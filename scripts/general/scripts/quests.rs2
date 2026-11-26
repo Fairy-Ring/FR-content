@@ -406,6 +406,7 @@ return ($questpoints);
 ~send_quest_progress_colour(questlist:sheep, %sheep, ^sheep_complete);
 ~send_quest_progress_colour(questlist:fluffs, %fluffs, ^fluffs_complete);
 ~send_quest_progress_colour(questlist:demon, %demonstart, ^demon_complete);
+~send_quest_progress_colour(questlist:agrith, %agrith_quest, ^agrith_complete);
 ~send_quest_progress_colour(questlist:prince, %princequest, ^prince_complete);
 ~send_quest_progress_colour(questlist:fortress, %spy, ^blackknight_complete);
 ~send_quest_progress_colour(questlist:haunted, %haunted, ^haunted_complete);

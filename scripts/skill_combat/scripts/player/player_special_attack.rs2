@@ -37,6 +37,7 @@ p_opnpc(2);
     case abyssal_whip : @pvm_abyssal_whip_sa;
     case rune_claws : @pvm_rune_claws_sa;
     case dragon_scimitar : @pvm_dragon_scimitar_sa;
+    case darklight : @agrith_darklight_special;
     case default :
         // UNKNOWN engineering safeguard: a weapon with a special bar and no special handler attacks normally with the special turned off.
         %sa_attack = ^false;
