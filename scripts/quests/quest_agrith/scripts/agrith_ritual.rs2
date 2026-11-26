@@ -1,4 +1,4 @@
-// VERIFIED: period Tip.It q125, random player incantation then its reverse.
+// VERIFIED: period Tip.It q125, player-specific incantation; its reverse is CANDIDATE.
 // CANDIDATE word vocabulary: bounded OSRS transcript, not period-verified prose.
 [proc,agrith_word](int $word)(string)
 switch_int($word) {

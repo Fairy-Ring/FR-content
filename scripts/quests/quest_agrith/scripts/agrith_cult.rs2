@@ -44,7 +44,7 @@ if (%agrith_quest = 20) {
 
 [proc,agrith_black_clothing]()(int)
 // VERIFIED count: blackened sword plus two clothing items (period guide).
-// UNKNOWN favourable whitelist beyond the guide's listed original cache items.
+// VERIFIED listed clothing: period guide; additional favourable whitelist items are UNKNOWN.
 def_int $count = 0;
 def_int $slot = 0;
 while ($slot < inv_size(worn)) {
@@ -52,6 +52,10 @@ while ($slot < inv_size(worn)) {
         case agrith_silverlight_dyed, agrith_desert_shirt_dyed, agrith_desert_robe_dyed,
              priest_gown, priest_robe, blackwizhat, blackrobetop, blackrobebottom,
              black_dragonhide_body, black_dragonhide_chaps, mystic_hat_dark,
+             mystic_robe_top_dark, mystic_robe_bottom_dark, mystic_gloves_dark, mystic_boots_dark,
+             headband_black, macro_mime_boots, viking_helmet_magic,
+             secret_ghost_boots, secret_ghost_top, secret_ghost_bottom,
+             secret_ghost_hat, secret_ghost_gloves, secret_ghost_cloak,
              black_robe, black_skirt, black_cape, black_platebody, black_chainbody,
              black_platelegs, black_plateskirt, black_med_helm, black_full_helm,
              black_platebody_trim, black_platelegs_trim, black_full_helm_trim,
@@ -190,6 +194,14 @@ if (%agrith_quest = 80 | %agrith_quest = 90) {
         ~chatnpc("<p,neutral>We sent Denath back. He was Agrith-Naar! Bring Dave, the two monks and the golem back, with the fallen wizards' sigils.");
     }
     return;
+}
+if (%agrith_quest >= 100 & %agrith_quest < 120 & calc(inv_total(inv, agrith_sigil) + inv_total(bank, agrith_sigil)) = 0) {
+    // UNKNOWN favourable recovery after losing the last sigil and its mould.
+    if (inv_freespace(inv) < 1) {
+        mes("You need a free inventory space for the sigil.");
+        return;
+    }
+    inv_add(inv, agrith_sigil, 1);
 }
 if (%agrith_quest = 100) {
     ~chatnpc("<p,neutral>Are you ready to fight Agrith-Naar?");

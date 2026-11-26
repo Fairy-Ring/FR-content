@@ -518,6 +518,18 @@ check('published client/config remains byte-identical and quest items are config
   }
 });
 
+check('packed Darklight bonuses match the retained CANDIDATE table and improve on Silverlight', () => {
+  const darklight = types.ObjType.get(itemId('darklight'));
+  const silverlight = types.ObjType.get(itemId('silverlight'));
+  for (const [name, expected] of [
+    ['stabattack', 10], ['slashattack', 16], ['crushattack', -2],
+    ['slashdefence', 3], ['crushdefence', 2], ['magicdefence', 2],
+    ['strengthbonus', 13], ['attackrate', 5]
+  ]) assert.equal(param(darklight, name), expected, `Darklight ${name} matches its cited table`);
+  assert(param(darklight, 'slashattack') > param(silverlight, 'slashattack'), 'Darklight improves slash accuracy');
+  assert(param(darklight, 'strengthbonus') > param(silverlight, 'strengthbonus'), 'Darklight improves strength');
+});
+
 check('native account copies preserve the original room and stage-specific actors without shared cultists', () => {
   assertNoSharedCultists();
   for (const stage of [30, 40, 50, 60, 70, 80, 90, 100, 110, 120]) {
@@ -951,7 +963,10 @@ function summonNativeBoss(player, label = 'native reverse chant') {
   assert.equal(questStage(player), 110, `${label} begins at the final ritual stage`);
   assertRoomActorCast(player, 110);
   if (roomWords(player).some(word => word < 1 || word > 5)) setWords(player);
-  if (itemCount(player, 'agrith_sigil') === 0) addItem(player, 'agrith_sigil');
+  if (itemCount(player, 'agrith_sigil') === 0) {
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [], `${label}: recover the lost sigil through Matthew`);
+    assert.equal(itemCount(player, 'agrith_sigil'), 1, `${label} obtains its sigil from the actual recovery`);
+  }
   positionPlayer(player, roomCoord(player, 32, 31));
   const matthew = roomNpc(player, 'agrith_matthew');
   const humanDeath = id('SeqType', 'human_death');
@@ -1096,6 +1111,28 @@ check('Badden starts the infiltration; actual dye and worn three-piece disguise 
     assert.equal(itemCount(player, 'silverlight'), 0);
     assert.equal(itemCount(player, 'agrith_silverlight_dyed', wornId), before);
   } finally { cleanupQuestRun(player, actors); }
+});
+
+check('Dave accepts every guide-listed original dark-mystic, headwear, mime and ghostly item', () => {
+  for (const clothing of [
+    'mystic_robe_top_dark', 'mystic_robe_bottom_dark', 'mystic_gloves_dark', 'mystic_boots_dark',
+    'headband_black', 'macro_mime_boots', 'viking_helmet_magic',
+    'secret_ghost_boots', 'secret_ghost_top', 'secret_ghost_bottom',
+    'secret_ghost_hat', 'secret_ghost_gloves', 'secret_ghost_cloak'
+  ]) {
+    const { player, actors } = questFixture(20);
+    try {
+      const dave = spawnActor(player, 'agrith_dave_at_portal', actors);
+      const companion = types.ObjType.get(itemId(clothing)).wearpos === types.ObjType.get(itemId('black_cape')).wearpos
+        ? 'black_full_helm' : 'black_cape';
+      for (const name of ['agrith_silverlight_dyed', clothing, companion]) {
+        addItem(player, name);
+        wearItem(player, name);
+      }
+      nativeNpc(player, dave, [1], `Dave accepts ${clothing} with the dyed sword and another black item`);
+      assert.equal(questStage(player), 30, `${clothing} counts as a period-listed evil garment`);
+    } finally { cleanupQuestRun(player, actors); }
+  }
 });
 
 check('mushroom ink and desert-clothing dye preserve the Golem ink and pen routes', () => {
@@ -1307,25 +1344,68 @@ check('each missing recruit blocks Matthew even though lost sigils remain recove
     } finally { cleanupQuestRun(player, actors); }
   }
 });
-check('lost mould and sigil remain craftable when the player is inside and outside the cult stages', () => {
-  for (const stage of [40, 70, 100, 110]) {
+check('Jennifer replaces the lost mould so the sigil remains craftable before the first ritual', () => {
+  for (const stage of [40, 70]) {
     const { player, actors } = questFixture(stage);
     try {
-      if (stage < 80) {
-        const jennifer = roomNpc(player, 'agrith_jennifer');
-        if (stage === 40) nativeNpc(player, jennifer, [], 'acquire Jennifer mould before losing it');
-        else addItem(player, 'agrith_sigil_mould');
-        removeItem(player, 'agrith_sigil_mould');
-        nativeNpc(player, jennifer, [], `Jennifer recovers mould at ${stage}`);
-      } else {
-        assert.equal(roomNpcOrNull(player, 'agrith_jennifer'), null, `stage ${stage} leaves Jennifer absent`);
-        addItem(player, 'agrith_sigil_mould');
-      }
+      const jennifer = roomNpc(player, 'agrith_jennifer');
+      nativeNpc(player, jennifer, [], `acquire Jennifer mould before losing it at ${stage}`);
+      removeItem(player, 'agrith_sigil_mould');
+      nativeNpc(player, jennifer, [], `Jennifer recovers mould at ${stage}`);
       exitPrivateRoom(player, `leave stage ${stage} copy for sigil casting`);
       addItem(player, 'silver_bar');
       castSigil(player);
       assert.equal(itemCount(player, 'agrith_sigil'), 1, `lost sigil can be remade at stage ${stage}`);
       assert.equal(questStage(player), stage);
+    } finally { cleanupQuestRun(player, actors); }
+  }
+});
+
+check('Matthew recovers the last sigil without a mould at stages 100 and 110 and the real reverse chant summons Agrith-Naar', () => {
+  for (const stage of [100, 110]) {
+    const { player, actors } = questFixture(stage);
+    try {
+      assert.equal(roomNpcOrNull(player, 'agrith_jennifer'), null, `Jennifer is gone at stage ${stage}`);
+      for (const inventory of [invId, bankId]) {
+        assert.equal(itemCount(player, 'agrith_sigil', inventory), 0, 'the lost sigil is not seeded');
+        assert.equal(itemCount(player, 'agrith_sigil_mould', inventory), 0, 'the lost mould is not seeded');
+      }
+      const matthew = roomNpc(player, 'agrith_matthew');
+      const choices = stage === 100 ? [2] : [];
+      nativeNpc(player, matthew, choices, `recover the last sigil by real Talk-to at ${stage}`);
+      assert.equal(itemCount(player, 'agrith_sigil'), 1, 'Matthew supplies exactly one replacement');
+      assert.equal(itemCount(player, 'agrith_sigil_mould'), 0, 'recovery does not require or manufacture a mould');
+      assert.equal(questStage(player), stage, 'sigil recovery does not advance the quest');
+      nativeNpc(player, matthew, choices, `repeat Talk-to does not duplicate the carried sigil at ${stage}`);
+      assert.equal(itemCount(player, 'agrith_sigil'), 1, 'an existing carried sigil prevents another replacement');
+      if (stage === 100) nativeNpc(player, matthew, [1], 'confirm readiness after recovering the lost sigil');
+      const boss = summonNativeBoss(player, `reverse chant using the sigil actually recovered from stage ${stage}`);
+      assert.equal(roomNpc(player, 'agrith_naar'), boss, 'the recovered sigil summons the actual owned boss');
+      assert.equal(questStage(player), 110, 'the encounter retains its real retry stage');
+      assert.equal(itemCount(player, 'agrith_sigil'), 1, 'the reverse chant retains the recovered sigil');
+      assert.equal(itemCount(player, 'agrith_sigil_mould'), 0, 'the entire recovery and summon need no mould');
+    } finally { cleanupQuestRun(player, actors); }
+  }
+});
+
+check('late Matthew recovery respects banked sigils and requires a free inventory space', () => {
+  for (const stage of [100, 110]) {
+    const { player, actors } = questFixture(stage);
+    try {
+      const matthew = roomNpc(player, 'agrith_matthew');
+      addItem(player, 'agrith_sigil', 1, bankId);
+      nativeNpc(player, matthew, stage === 100 ? [2] : [], `banked sigil prevents replacement at ${stage}`);
+      assert.equal(itemCount(player, 'agrith_sigil'), 0, 'a banked sigil is not duplicated into inventory');
+      assert.equal(itemCount(player, 'agrith_sigil', bankId), 1, 'the banked sigil remains untouched');
+      removeItem(player, 'agrith_sigil', 1, bankId);
+      addItem(player, 'bronze_dagger', 28);
+      nativeNpc(player, matthew, [], `full inventory refuses sigil recovery at ${stage}`);
+      assert.equal(itemCount(player, 'agrith_sigil'), 0, 'a full inventory produces no replacement');
+      assert.equal(questStage(player), stage, 'the full-inventory refusal preserves the quest');
+      player.invDel(invId, itemId('bronze_dagger'), 1);
+      nativeNpc(player, matthew, stage === 100 ? [2] : [], `one free slot permits sigil recovery at ${stage}`);
+      assert.equal(itemCount(player, 'agrith_sigil'), 1, 'one free slot receives exactly one sigil');
+      assert.equal(itemCount(player, 'agrith_sigil_mould'), 0, 'inventory-space recovery also needs no mould');
     } finally { cleanupQuestRun(player, actors); }
   }
 });
@@ -1339,7 +1419,7 @@ check('boss ownership, duplicate prevention, native departure and death leave a 
     const outsiderInstance = currentInstance(outsider.player);
     assert.notEqual(instance.uid, outsiderInstance.uid, 'each account receives a distinct native copy');
     assert.equal(boss.getVar(ownerVar), player.uid, 'the compiled boss is owned by the summoning account');
-    if (itemCount(player, 'agrith_sigil') === 0) addItem(player, 'agrith_sigil');
+    assert.equal(itemCount(player, 'agrith_sigil'), 1, 'the first chant keeps its genuinely recovered sigil');
     holdItem(player, 'agrith_sigil', 1, [], 'a second sigil operation cannot duplicate the boss');
     assert.equal([...World.npcs].filter(npc => npc.isActive && npc.type === bossType.id &&
       npc.getVar(ownerVar) === player.uid &&

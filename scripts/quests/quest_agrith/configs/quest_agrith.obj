@@ -62,13 +62,13 @@ wearpos=righthand
 weight=4lb
 // CANDIDATE: current OSRS Darklight table; the 377 row supplies client fields only.
 category=weapon_slash
-param=stabattack,12
-param=slashattack,11
+param=stabattack,10
+param=slashattack,16
 param=crushattack,-2
 param=slashdefence,3
 param=crushdefence,2
-param=magicdefence,1
-param=strengthbonus,9
+param=magicdefence,2
+param=strengthbonus,13
 param=attackrate,5
 param=slashattack_anim,human_sword_slash
 param=stabattack_anim,human_sword_stab
@@ -78,7 +78,7 @@ param=stab_sound,hacksword_stab
 param=levelrequire,1
 param=specwep,^true
 param=sa_energy,500
-// UNKNOWN: quest reward; untradeable default where no period source establishes tradeability.
+// CANDIDATE: the retained current OSRS Darklight infobox says untradeable.
 tradeable=no
 
 [agrith_sigil_mould]

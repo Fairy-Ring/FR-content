@@ -1,4 +1,4 @@
-// VERIFIED: Tip.It q125, silver-cast sigil, mushroom dye and kiln-hidden tome.
+// VERIFIED: Tip.It q125, mushroom dye and kiln-hidden tome; exact sigil recipe is UNKNOWN.
 // UNKNOWN: functional messages. No unfired clay sigil exists in the 377 cache.
 [proc,agrith_dye](obj $used_with)(boolean)
 return(~agrith_apply_dye($used_with, golem_mushroom));
@@ -101,6 +101,6 @@ return(-1);
 
 [opheld1,agrith_book]
 // CANDIDATE names and reverse-order text: bounded OSRS transcript. Period q125
-// verifies the reversal, but does not retain the words or book prose.
+// says "another way around", without retaining the order, words or book prose.
 ~mesbox("The tome describes a ritual for summoning Agrith-Naar.|Its incantation is the reverse of the one Denath taught you.");
 ~mesbox("<~agrith_word(%agrith_incantation_5)> <~agrith_word(%agrith_incantation_4)> <~agrith_word(%agrith_incantation_3)> <~agrith_word(%agrith_incantation_2)> <~agrith_word(%agrith_incantation_1)>.");
