@@ -774,9 +774,8 @@ try {
           assert(clickPatch(p, patchName), `${group.family} ${cropLabel[group.family](crop)} native harvest`);
           assert.equal(itemCount(p, itemName(crop.produce)), group.family === 'flower' ? crop.yield : 1);
           assert.equal(farmingXp(p), crop.harvest_xp);
-          // The published potato path spends a base life deterministically.
-          const expectedStage = group.family === 'flower' ? 3
-            : crop.produce === id('ObjType', 'potato') ? crop.mature + 1 : crop.mature;
+          // A forced maximum draw saves a life for every variable-yield crop.
+          const expectedStage = group.family === 'flower' ? 3 : crop.mature;
           assert.equal(getStage(p, patchName), expectedStage);
           assert.equal(treatment(p, stageIndex(patchName)), 0);
           assert.equal(extra(p, stageIndex(patchName)), 0);

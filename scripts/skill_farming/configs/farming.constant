@@ -61,9 +61,9 @@
 ^farming_allotment_disease_watered = 10
 
 // CANDIDATE OSRS: three harvest lives, one item per pick, level-interpolated
-// life-saving chance. Potato keeps its inherited fixed three-item harvest.
+// life-saving chance shared by every allotment crop.
 ^farming_harvest_denominator = 256
-// UNKNOWN engineering endpoints shared by the six new allotment crops.
+// UNKNOWN engineering endpoints shared by all seven allotment crops.
 // Retained OSRS revision 15402033 gives the formula but not these crop CTS.
 ^farming_allotment_save_low = 64
 ^farming_allotment_save_high = 128
