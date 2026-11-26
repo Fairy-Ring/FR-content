@@ -350,6 +350,7 @@ jobs:
           run_test tests/icthlarins-little-helper/test_icthlarin.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/icthlarins-little-helper/test_icthlarin.mjs
           run_test tests/tail-of-two-cats/test_tail_of_two_cats.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/tail-of-two-cats/test_tail_of_two_cats.mjs
           run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
+          run_test tests/feldip-glider/test_feldip_glider.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/feldip-glider/test_feldip_glider.mjs
           run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
           run_test tests/making-history/test_making_history.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/making-history/test_making_history.mjs
           run_test tests/ghosts-ahoy/test_ghosts_ahoy.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ghosts-ahoy/test_ghosts_ahoy.mjs
