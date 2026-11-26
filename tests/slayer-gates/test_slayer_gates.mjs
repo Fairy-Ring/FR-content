@@ -313,3 +313,5 @@ for (const stage of [0, 1, 10, 15]) {
     routeResults.push({ route: 'Smoke well (existing access discrepancy)', stage, destination: tile(p) });
 }
 console.log(JSON.stringify({ status: 'PASS', assignments, stageResults, routeResults }, null, 2));
+// World imports background workers. This is a standalone offline runner.
+process.exit(0);
