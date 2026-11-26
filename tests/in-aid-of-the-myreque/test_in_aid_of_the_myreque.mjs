@@ -821,12 +821,33 @@ check('tithe dialogue creates real owned actors; both native deaths and Gadderan
   const messagesBefore = stranger.messages.length;
   assert.equal(result(stranger, '[proc,npc_is_attackable_opt_quiet]', [], first), 0);
   assert.equal(stranger.messages.length, messagesBefore, 'quiet owner rejection must be silent');
-  killNpc(p, first);
+  // Native melee uses a naive approach: enter the shop rather than attack through its south wall.
+  place(p, 3512, 3241);
+  const attack = npc => {
+    const originalType = npc.type;
+    const hp = npc.levels[NpcStat.HITPOINTS];
+    showNpc(p, npc);
+    assert(handlers.OpNpc.handle(new messages.OpNpc(2, npc.nid), p));
+    for (let cycle = 0; cycle < 200 && npc.isActive && npc.type === originalType; cycle++) {
+      tick(p);
+      turnNpcs(first, second, gadderanks);
+      p.resetEntity(false);
+    }
+    assert(npc.levels[NpcStat.HITPOINTS] < hp,
+      `the native shop encounter must damage ${originalType}: ${JSON.stringify({
+        player: [p.x, p.z], target: p.target?.nid,
+        actors: [first, second, gadderanks].map(actor => ({ type: actor.type, x: actor.x, z: actor.z })),
+        messages: p.messages.slice(-5)
+      })}`);
+    assert(!npc.isActive || npc.type !== originalType, 'native combat must defeat the selected tithe actor');
+  };
+  JavaRandom.setSeed(0);
+  attack(first);
   assert.equal(p.getVarBit(id('VarBitType', 'juvinate_deaths')), 1);
-  killNpc(p, second);
+  attack(second);
   assert.equal(p.getVarBit(id('VarBitType', 'juvinate_deaths')), 3);
   assert(result(p, '[proc,npc_max_dealt]', [20, 0], gadderanks) > 0);
-  killNpc(p, gadderanks);
+  attack(gadderanks);
   assert.equal(gadderanks.type, id('NpcType', 'burgh_gadderanks_wounded'));
   adjacent(p, gadderanks);
   talk(p, gadderanks);
