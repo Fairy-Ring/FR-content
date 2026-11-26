@@ -1,2 +1,6 @@
 [mourning_quest]
 scope=perm
+
+[mourning_quest_bits]
+transmit=yes
+scope=perm
