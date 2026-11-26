@@ -1,0 +1,122 @@
+// VERIFIED: period guides describe a level-95 poisoned-dagger ambush of diamond carriers.
+// CANDIDATE overhead: desert-treasure.dlg.stranger. No quest stage, item or reward is written.
+[proc,dt_stranger_login]
+if (%deserttreasure < ^dt_stage_hunts | %deserttreasure >= ^dt_stage_complete) return;
+settimer(dt_stranger, ^dt_stranger_check_ticks);
+
+[proc,dt_stranger_diamond]()(obj)
+if (inv_total(inv, fd_blood_diamond) > 0) return(fd_blood_diamond);
+if (inv_total(inv, fd_dark_diamond) > 0) return(fd_dark_diamond);
+if (inv_total(inv, fd_diamond_fire) > 0) return(fd_diamond_fire);
+if (inv_total(inv, fd_icediamond) > 0) return(fd_icediamond);
+return(null);
+
+// UNKNOWN favourable-to-player eligibility envelope, not recovered server boundaries.
+[proc,dt_stranger_area](coord $position)(boolean)
+if (inzone(^dt_stranger_surface_sw, ^dt_stranger_surface_ne, $position) = false) return(false);
+if (map_indoors($position) = true | map_blocked($position) = true) return(false);
+if (region_findbycoord($position) = true) return(false);
+if (~inzone_coord_pair_table(bank_zones, $position) = true | ~inzone_coord_pair_table(duel_arena_zones, $position) = true) return(false);
+if (~macro_event_area($position) = false) return(false);
+if (~in_castlewars_game($position) = true | ~in_castlewars_waitingroom($position) = true) return(false);
+if (inzone(^dt_stranger_entrana_sw, ^dt_stranger_entrana_ne, $position) = true) return(false);
+if (~pest_waiting($position) = true) return(false);
+return(true);
+
+[proc,dt_stranger_eligible]()(boolean)
+if (map_members = ^false | %death = ^true | %tutorial < ^tutorial_complete) return(false);
+if (%deserttreasure < ^dt_stage_hunts | %deserttreasure >= ^dt_stage_complete) return(false);
+if (~dt_stranger_diamond = null) return(false);
+if (~dt_stranger_area(coord) = false | %pest_instance ! 0) return(false);
+return(true);
+
+[timer,dt_stranger]
+if (%deserttreasure < ^dt_stage_hunts | %deserttreasure >= ^dt_stage_complete) {
+    ~dt_stranger_logout;
+    cleartimer(dt_stranger);
+    return;
+}
+// An exact live identity prevents a second actor even across a teleport or modal.
+if (npc_finduid(%dt_stranger_uid) = true) {
+    if (npc_type = fourdiamonds_assasin & %npc_attacking_uid = uid) return;
+}
+%dt_stranger_uid = null;
+if (~dt_stranger_eligible = false | busy = true) return;
+if (add(%lastcombat, 8) > map_clock | add(%lastcombat_pvp, 8) > map_clock) return;
+if (random(^dt_stranger_spawn_rolls) ! 0) return;
+def_coord $spawn = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($spawn = null | $spawn = coord) return;
+if (~dt_stranger_area($spawn) = false) return;
+npc_add($spawn, fourdiamonds_assasin, ^dt_stranger_lifetime);
+%dt_stranger_uid = npc_uid;
+%npc_attacking_uid = uid; // immutable encounter owner; never borrow the mutable retaliation target
+%npc_aggressive_player = uid;
+%npc_action_delay = add(map_clock, 1);
+%npc_owned_timer_interval = 1;
+npc_settimer(1);
+def_string $diamond = "Blood";
+switch_obj (~dt_stranger_diamond) {
+    case fd_dark_diamond : $diamond = "Shadow";
+    case fd_diamond_fire : $diamond = "Smoke";
+    case fd_icediamond : $diamond = "Ice";
+}
+npc_say("You are not worthy of holding that Diamond of <$diamond>!");
+npc_setmode(opplayer2);
+
+// Pure guard shared by melee, ranged, manual/area magic and cannon attack admission.
+[proc,dt_stranger_attackable]()(boolean)
+if (%npc_attacking_uid = uid & %dt_stranger_uid = npc_uid) return(true);
+return(false);
+
+[opnpc2,fourdiamonds_assasin]
+if (~dt_stranger_attackable = false) return;
+@player_combat_start;
+[apnpc2,fourdiamonds_assasin]
+if (~dt_stranger_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,fourdiamonds_assasin]
+// Never let retaliation replace the immutable owner with another player.
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+~npc_default_retaliate;
+
+[ai_opplayer2,fourdiamonds_assasin] ~dt_stranger_attack;
+[proc,dt_stranger_attack]
+if (~dt_stranger_attackable = false) return;
+def_int $before = %npc_action_delay;
+~npc_default_attack;
+if (%npc_action_delay <= $before | npc_stat(hitpoints) = 0) return;
+// UNKNOWN engineering: use the inherited four-tick melee resolver and dagger animation.
+npc_anim(human_ddagger_lunge, 0);
+// Period guides report frequent specials. UNKNOWN cadence; native double melee roll.
+if (random(^dt_stranger_special_rolls) = 0) {
+    %npc_action_delay = map_clock;
+    ~npc_default_attack;
+    npc_anim(puncture, 0);
+}
+// UNKNOWN engineering per-attack poison chance and severity; no modern player-max formula.
+if (random(^dt_stranger_poison_rolls) = 0) queue(poison_player, 0, ^dt_stranger_poison_severity);
+
+[ai_timer,fourdiamonds_assasin]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (~dt_stranger_attackable = false | ~dt_stranger_eligible = false | distance(npc_coord, coord) > ^dt_stranger_leash) {
+    npc_del;
+    return;
+}
+// Keep poison damage and lifecycle cleanup on the same one-tick actor timer.
+// UNKNOWN favourable default: poisonable; no period immunity is established.
+~npc_poison_counted_timer(1);
+
+[ai_queue3,fourdiamonds_assasin]
+// No diamond is consumed or awarded and no quest bit is changed by this incidental fight.
+// UNKNOWN favourable default: no loot rather than an invented reward table.
+~npc_death;
+
+[proc,dt_stranger_logout]
+if (npc_finduid(%dt_stranger_uid) = true) {
+    if (npc_type = fourdiamonds_assasin & %npc_attacking_uid = uid) npc_del;
+}
+%dt_stranger_uid = null;

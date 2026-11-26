@@ -279,6 +279,7 @@
     }
   },
   "deliberatelyTemporary": {
+    "dt_stranger_uid": "Original server-only slot 420 holds only the active owned Stranger NPC UID. Logout removes that actor and discards this session token, without changing any diamond or quest progress.",
     "rogue_suduku1": "Original server-only slot 541: temporary Rune Sudoku selector, board size and per-session generation counter in uncovered high bits; board and clue inventories are temporary, and closing or reopening resets interaction state.",
     "fightpits_state": "UNKNOWN engineering session participation and admission combat level in reserved original server-only slot 410; logout removes the participant and login recovers arena coordinates.",
     "tzhaar_fightpit_remaining": "Original transmitted Fight Pits HUD foes count; recomputed during each round.",
@@ -1067,7 +1068,7 @@
     "varp412_bits": "temp",
     "varp413_bits": "temp",
     "brewing_clock": "perm",
-    "varp420_unused": "temp",
+    "dt_stranger_uid": "temp",
     "varp422_unused": "temp",
     "varp424_unused": "temp",
     "varp426_unused": "temp",

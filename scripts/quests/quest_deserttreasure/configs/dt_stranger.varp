@@ -1,0 +1,5 @@
+// UNKNOWN engineering session identity in original unused revision-377 slot 420.
+// No quest progress or diamond entitlement is stored here.
+[dt_stranger_uid]
+type=npc_uid
+scope=temp

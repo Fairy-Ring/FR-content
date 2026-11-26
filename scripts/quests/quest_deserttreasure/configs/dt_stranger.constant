@@ -1,0 +1,16 @@
+// UNKNOWN engineering defaults, not recovered revision-377 timings or odds.
+// The inherited NPC's 80 HP / 90 Attack / 80 Strength / 80 Defence stay unchanged.
+^dt_stranger_check_ticks = 20
+^dt_stranger_spawn_rolls = 4
+^dt_stranger_lifetime = 300
+^dt_stranger_leash = 16
+^dt_stranger_special_rolls = 4
+^dt_stranger_poison_rolls = 8
+// Shared poison units: severity 20 starts at four hitpoints, not twenty.
+^dt_stranger_poison_severity = 20
+// Conservative overworld envelope. Banks, roofs, instances and activities are excluded separately.
+^dt_stranger_surface_sw = 0_32_36_0_0
+^dt_stranger_surface_ne = 0_60_63_63_63
+// UNKNOWN engineering safe-island envelope, enclosing Entrana's original surface maps.
+^dt_stranger_entrana_sw = 0_43_52_0_0
+^dt_stranger_entrana_ne = 0_44_54_63_63

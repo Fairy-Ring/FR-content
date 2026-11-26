@@ -3,6 +3,13 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_opplayer2,fourdiamonds_assasin]",
+      "npc": "fourdiamonds_assasin",
+      "npcVars": { "npc_attacking_uid": "target" },
+      "activeNpcVar": "dt_stranger_uid",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
       "script": "[ai_applayer2,chaoselemental]",
       "npc": "chaoselemental",
       "seeds": {
