@@ -548,7 +548,7 @@ check('native account copies preserve the original room and stage-specific actor
     assertFirstChantOutcome(first.player);
     assert.equal(questStage(second.player), 70, 'first account chant leaves second account stage unchanged');
     assert.deepEqual(roomActorCast(second.player),
-      originalCultNames.map(name => [name, ...originalCultSpots[name]]).sort((left, right) => left[0].localeCompare(right[0])),
+      originalCultNames.map(name => [id('NpcType', name), ...originalCultSpots[name]]).sort((left, right) => left[0] - right[0]),
       'first account chant leaves the other account actor cast unchanged');
     assert(secondActors.every(npc => npc.isActive), 'the other account keeps all six native cultists');
     assert(firstActors.filter((_, index) => originalCultNames[index] !== 'agrith_matthew').every(npc => !npc.isActive),
@@ -744,10 +744,11 @@ function roomLocRow(player, name, localX, localZ) {
 function nativeRoomLocRow(player, name, localX, localZ, choices = [], label = `private loc ${name}`, option = 1) {
   return nativeLocRow(player, roomLocRow(player, name, localX, localZ), choices, label, option);
 }
-function locSignature(zone) {
-  return (zone?.getAllLocsSafe() ?? []).map(loc => [
-    loc.baseType, loc.x & 7, loc.z & 7, loc.level, loc.baseShape, loc.baseAngle
-  ]).sort((left, right) => left.join(',').localeCompare(right.join(',')));
+function locSignature(zone, level) {
+  return Array.from(zone?.getAllLocsSafe() ?? [], loc => {
+    assert.equal(loc.level, level, 'native scenery stays on its source or destination plane');
+    return [loc.baseType, loc.x & 7, loc.z & 7, loc.baseShape, loc.baseAngle];
+  }).sort((left, right) => left.join(',').localeCompare(right.join(',')));
 }
 function assertRoomCopy(player) {
   const instance = currentInstance(player);
@@ -770,7 +771,8 @@ function assertRoomCopy(player) {
     assert.equal(target.rotation, 0, `source zone ${east},${north} is unrotated`);
     assert.deepEqual(target.source, { level: roomSourceLevel, x: sourceX, z: sourceZ },
       `destination zone ${east},${north} maps to the corresponding original source`);
-    assert.deepEqual(locSignature(target), locSignature(source), `destination zone ${east},${north} copies original scenery`);
+    assert.deepEqual(locSignature(target, instance.sw.level), locSignature(source, roomSourceLevel),
+      `destination zone ${east},${north} copies original scenery`);
     const sourceFlags = routefinder.default.collisionFlags.getZone(sourceX << 3, sourceZ << 3, roomSourceLevel);
     const targetFlags = routefinder.default.collisionFlags.getZone(targetX, targetZ, instance.sw.level);
     assert(targetFlags, `destination zone ${east},${north} has native collision storage`);
@@ -825,15 +827,15 @@ function roomActorCast(player) {
   return [...World.npcs]
     .filter(npc => npc.isActive && roomActorTypes.has(npc.type) && npc.getVar(ownerVar) === player.uid &&
       World.instances.findInstanceByCoord({ level: npc.level, x: npc.x, z: npc.z })?.uid === instance.uid)
-    .map(npc => [types.NpcType.get(npc.type).name, npc.x - instance.sw.x, npc.z - instance.sw.z])
-    .sort((left, right) => left[0].localeCompare(right[0]));
+    .map(npc => [npc.type, npc.x - instance.sw.x, npc.z - instance.sw.z])
+    .sort((left, right) => left[0] - right[0]);
 }
 function assertRoomActorCast(player, stage) {
   const names = stage < 80 ? originalCultNames :
     stage < 100 ? ['agrith_matthew'] :
       stage < 120 ? ['agrith_matthew', ...helperNames] : helperNames;
   const spots = { ...originalCultSpots, ...helperSpots };
-  const expected = names.map(name => [name, ...spots[name]]).sort((left, right) => left[0].localeCompare(right[0]));
+  const expected = names.map(name => [id('NpcType', name), ...spots[name]]).sort((left, right) => left[0] - right[0]);
   assert.deepEqual(roomActorCast(player), expected, `native stage ${stage} actor cast is exact and account-owned`);
   assert.equal(roomNpcOrNull(player, 'agrith_matthew') !== null, stage < 120,
     `native stage ${stage} has Matthew only before stage 120`);
@@ -1381,6 +1383,7 @@ check('all six combat rewards grant exactly 100000 tenths, one QP, Darklight and
       wearItem(player, 'silverlight');
       const xpBefore = [...player.stats];
       const qpBefore = questPoints(player);
+      const replayMonkSlot = roomNpc(player, 'agrith_badden_sigil').nid;
       nativeNpc(player, roomNpc(player, 'agrith_reen_sigil'), choices, `completion skill ${skill}`);
       assert.equal(questStage(player), 125);
       for (let i = 0; i < xpBefore.length; i++) assert.equal(player.stats[i] - xpBefore[i], i === skill ? 100000 : 0);
@@ -1389,7 +1392,13 @@ check('all six combat rewards grant exactly 100000 tenths, one QP, Darklight and
       assert.equal(itemCount(player, 'silverlight', wornId), 0);
       assert.equal(types.Component.get(player.modalMain)?.comName, 'questscroll_death');
       const xpAfter = [...player.stats];
-      nativeNpc(player, roomNpc(player, 'agrith_badden_sigil'), [], 'completion cannot be replayed');
+      assert.deepEqual(roomActorCast(player), [], 'completion removes the actual private helper cast');
+      assert.equal(World.getNpc(replayMonkSlot), undefined, 'completion removes the other monk from native NPC lookup');
+      player.closeModal();
+      assert.equal(npcHandler.handle(new OpNpc(1, replayMonkSlot), player), false,
+        'a stale native Talk-to packet cannot replay completion through the removed monk');
+      runPlayerScript(player, '[proc,agrith_reward]');
+      assert.equal(questStage(player), 125, 're-entering the compiled reward procedure cannot recommit completion');
       assert.deepEqual([...player.stats], xpAfter);
       assert.equal(questPoints(player) - qpBefore, 1);
       assert.equal(itemCount(player, 'darklight', wornId), 1);
