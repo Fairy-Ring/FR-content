@@ -39,7 +39,9 @@ switch_int($option) {
 }
 
 [opnpcu,dragon_bartender]
-if(testbit(%barcrawl, ^dragoninn_index) = ^false & last_useitem = barcrawl_card) {
+def_obj $used = last_useitem;
+if (~zogre_bartender = true) return;
+if(testbit(%barcrawl, ^dragoninn_index) = ^false & $used = barcrawl_card) {
     @dragoninn_barcrawl;
 }
 

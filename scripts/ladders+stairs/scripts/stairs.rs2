@@ -926,16 +926,10 @@ switch_coord (loc_coord) {
 ~barrows_stair_exit(loc_type);
 
 [oploc1,ogre_stairs_down]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~zogre_stairs;
 
 [oploc1,ogre_stairs]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~zogre_stairs;
 
 [oploc1,scenery_7056]
 // arrive delay?

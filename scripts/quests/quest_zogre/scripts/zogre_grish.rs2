@@ -1,26 +1,86 @@
-// Zogre Flesh Eaters — Grish (ogre shaman) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:Zogre Flesh Eaters minus overlay toast).
-// First write %zogre 0 -> 1. Chat + write only — no inv_add food/pots
-// (later unit), no dungeon dest / Relicym / quest_zombiequeen.
-// Review: Yes is two choices (plan: Ok, I'll check things out →
-// Yes, I'm really sure!). Clone wrote 1 after the first pick only.
-// Cite red-19-start-impl-377.md §5.
+// VERIFIED mechanics/rewards: Tip.It guide 100, captured 2 May 2006.
+// CANDIDATE retained start wording. Other functional wording is UNKNOWN.
+// UNKNOWN stage encoding, apart from the registry's completion value 13.
+[opnpc1,zogre_ogre_shaman] @zogre_grish;
+[opnpcu,zogre_ogre_shaman]
+if (last_useitem = zogre_artifacts) @zogre_grish;
 
-[opnpc1,zogre_ogre_shaman]
+[label,zogre_grish]
+if (%zogre >= ^zogre_complete) {
+    ~chatnpc("<p,happy>Thank you for returning the ogre artefact.");
+    ~zogre_give(zogre_tomb_artefact_key);
+    return;
+}
+if (%zogre = 12 & inv_total(inv, zogre_artifacts) > 0) {
+    ~chatplayer("<p,happy>I have the ogre artefact.");
+    ~chatnpc("<p,happy>Now we can move our ceremonial grounds.");
+    ~zogre_complete;
+    return;
+}
+if (%zogre >= 10) {
+    ~chatnpc("<p,neutral>Bring the ogre artefact from the burial chamber.");
+    ~zogre_give(zogre_tomb_artefact_key);
+    return;
+}
+if (%zogre >= 7) {
+    ~chatplayer("<p,neutral>The summoning spell cannot be reversed.");
+    ~chatnpc("<p,neutral>We must move our ceremonial grounds. Bring the artefact from the locked burial chamber.");
+    if (~zogre_give(zogre_tomb_artefact_key) = false) return;
+    %thzfe_makecompozogrebow = 1;
+    %zogre = 10;
+    ~chatnpc("<p,neutral>For a faster bow, use a knife with achey logs and wolf bones, then add a bowstring.");
+    return;
+}
+if (%zogre > 0) {
+    ~chatnpc("<p,neutral>Speak to the guard and investigate the tomb. Find what caused the dead ogres to rise.");
+    return;
+}
+// UNKNOWN favourable-to-player: current levels count, so boosts are allowed.
+// Strength and Fletching are requirements for making the optional composite bow,
+// not extra start gates: the period guide does not identify them as start gates.
+if (%chompybird < ^chompybird_complete | %junglepotion < ^junglepotion_complete | stat(smithing) < 4 | stat(herblore) < 8 | stat(ranged) < 30) {
+    ~chatnpc("<p,neutral>You need to complete Big Chompy Bird Hunting and Jungle Potion, with 4 Smithing, 8 Herblore and 30 Ranged.");
+    return;
+}
+if (inv_freespace(inv) < 5) {
+    mes("You need five free inventory spaces.");
+    return;
+}
 ~chatplayer("<p,neutral>Hello there, what's going on here?");
 ~chatnpc("<p,confused>Hey yous creature...wha's you's doing here?");
 ~chatnpc("<p,neutral>Da zogries comin wiv da sickies...");
 ~chatplayer("<p,quiz>Can I help in any way?");
-def_int $go = ~p_choice2("Ok, I'll check things out.", 1, "Hmm, sorry, it sounds a bit too dangerous.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>Hmm, sorry, it sounds a bit too dangerous.");
-    return;
-}
+if (~p_choice2("Ok, I'll check things out.", 1, "Hmm, sorry, it sounds a bit too dangerous.", 2) = 2) return;
 ~chatplayer("<p,neutral>Ok, I'll check things out.");
-def_int $sure = ~p_choice2("Yes, I'm really sure!", 1, "Hmm, sorry, it sounds a bit too dangerous.", 2);
-if ($sure = 2) {
-    ~chatplayer("<p,neutral>Hmm, sorry, it sounds a bit too dangerous.");
-    return;
-}
+if (~p_choice2("Yes, I'm really sure!", 1, "Hmm, sorry, it sounds a bit too dangerous.", 2) = 2) return;
 ~chatplayer("<p,happy>Yes, I'm really sure!");
 %zogre = 1;
+// VERIFIED quantities; UNKNOWN dose size (the guide says 'super restore potions').
+inv_add(inv, 4dose2restore, 2);
+inv_add(inv, cooked_chompy, 3);
+~update_questlist;
+
+[proc,zogre_give](namedobj $item)(boolean)
+if (inv_total(inv, $item) > 0) return(true);
+if (inv_total(bank, $item) > 0) {
+    mes("You already have this item in your bank.");
+    return(false);
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return(false);
+}
+inv_add(inv, $item, 1);
+return(true);
+
+[proc,zogre_complete]
+if (%zogre ! 12 | inv_total(inv, zogre_artifacts) = 0) return;
+// Commit first. Repeated Talk-to or Use cannot duplicate XP or quest points.
+%zogre = ^zogre_complete;
+inv_del(inv, zogre_artifacts, 1);
+stat_advance(fletching, ^zogre_reward_xp);
+stat_advance(ranged, ^zogre_reward_xp);
+stat_advance(herblore, ^zogre_reward_xp);
+session_log(^log_adventure, "Quest complete: Zogre Flesh Eaters");
+~send_quest_complete(questlist:zogre, zogre_artifacts, 250, ^zogre_questpoints, "You have completed Zogre Flesh Eaters!", "2000 Fletching XP|2000 Ranged XP|2000 Herblore XP|Brutal arrows and Relicym's balm");
+~update_questlist;

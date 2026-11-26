@@ -1,0 +1,188 @@
+// VERIFIED locations and quest sequence: Tip.It guide 100 and the revision-377 cache.
+// UNKNOWN functional guard and traversal wording is deliberately plain.
+[opnpc1,zogre_ogre_guard]
+if (%zogre = 0) {
+    mes("The ogre guard blocks the way.");
+    return;
+}
+%thzfe_blocking_barricade = 1;
+mes("The guard lets you climb over the collapsed barricade.");
+
+// Dispatch on the visible collapsed forms; the blocking multiloc has no climb option.
+[oploc1,ogre_barricade_collapsedl] ~zogre_climb_barricade;
+[oploc1,ogre_barricade_collapsedr] ~zogre_climb_barricade;
+[proc,zogre_climb_barricade]
+if (%zogre = 0 | %thzfe_blocking_barricade = 0) return;
+// Both native r377 barricades run north-south at x=2456; cross their east/west faces.
+def_coord $barrier = loc_coord;
+def_int $x = 1;
+if (coordx(coord) > coordx($barrier)) $x = -1;
+p_telejump(movecoord($barrier, $x, 0, 0));
+
+[oploc1,ogre_cavedoorr] ~zogre_open_tomb_gate;
+[oploc1,ogre_cavedoorl] ~zogre_open_tomb_gate;
+[proc,zogre_open_tomb_gate]
+def_coord $gate = loc_coord;
+def_coord $other;
+if ($gate = 2_38_147_8_18) {
+    $other = 2_38_147_9_18;
+} else if ($gate = 2_38_147_9_18) {
+    $other = 2_38_147_8_18;
+} else if ($gate = 2_38_147_9_25) {
+    $other = 2_38_147_10_25;
+} else if ($gate = 2_38_147_10_25) {
+    $other = 2_38_147_9_25;
+} else {
+    return;
+}
+
+def_int $step;
+if (coordz(coord) >= coordz($gate)) {
+    if (inv_total(inv, zogre_tomb_artefact_key) = 0) {
+        mes("The gate is locked. You need the tomb key to enter.");
+        return;
+    }
+    $step = -1;
+} else {
+    // The return route is always open, even if the key has been lost.
+    $step = 1;
+}
+// UNKNOWN favourable open lease: three cycles; the crossing itself is immediate.
+loc_del(^zogre_gate_open_lifetime);
+if (loc_find($other, ogre_cavedoorr) = true) loc_del(^zogre_gate_open_lifetime);
+if (loc_find($other, ogre_cavedoorl) = true) loc_del(^zogre_gate_open_lifetime);
+p_teleport(movecoord($gate, 0, 0, $step));
+
+[proc,zogre_stairs]
+if (loc_type = ogre_stairs_down) {
+    if (loc_coord = 0_38_47_53_34) {
+        p_arrivedelay;
+        p_telejump(2_38_147_46_28);
+        return;
+    }
+    if (loc_coord = 2_38_147_11_9) {
+        p_arrivedelay;
+        p_telejump(0_38_147_11_8);
+        return;
+    }
+}
+if (loc_type = ogre_stairs) {
+    if (loc_coord = 2_38_147_46_29) {
+        p_arrivedelay;
+        p_telejump(0_38_47_53_37);
+        return;
+    }
+    if (loc_coord = 0_38_147_11_9) {
+        p_arrivedelay;
+        p_telejump(2_38_147_11_12);
+        return;
+    }
+}
+mes("These stairs are blocked.");
+
+[oploc1,zogre_stand] ~zogre_stand;
+[proc,zogre_stand]
+if (%zogre = 12) {
+    if (inv_total(inv, zogre_artifacts) > 0) {
+        mes("You already have the ogre artefact.");
+        return;
+    }
+    if (~zogre_give(zogre_artifacts) = true) mes("You recover the ogre artefact from the stand.");
+    return;
+}
+if (%zogre ! 10 & %zogre ! 11) return;
+if (~zogre_slash_find = true) {
+    if (%zogre = 10) %zogre = 11;
+    mes("Slash Bash is already here.");
+    return;
+}
+if (%zogre = 10) %zogre = 11;
+// UNKNOWN local lease: six minutes; the owner leash/death checks below remove it sooner.
+npc_add(0_38_147_51_37, zogre_slash_bash, ^zogre_encounter_lifetime);
+%npc_attacking_uid = uid;
+%npc_macro_event_target = uid;
+%npc_action_delay = map_clock;
+npc_setmode(opplayer2);
+npc_settimer(1);
+mes("Slash Bash emerges from the stand.");
+
+[proc,zogre_slash_find]()(boolean)
+npc_findall(0_38_147_51_37, zogre_slash_bash, ^zogre_slash_leash, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & npc_stat(hitpoints) > 0) return(true);
+}
+return(false);
+
+[ai_timer,zogre_slash_bash]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | %zogre ! 11 | distance(0_38_147_51_37, coord) > ^zogre_slash_leash) npc_del;
+
+[ai_queue1,zogre_slash_bash]
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+~npc_default_retaliate;
+
+[ai_queue3,zogre_slash_bash]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid & %zogre = 11) {
+        if (inv_total(inv, zogre_artifacts) = 0 & inv_total(bank, zogre_artifacts) = 0) {
+            obj_add(npc_coord, zogre_artifacts, 1, ^lootdrop_duration);
+        }
+        obj_add(npc_coord, zogre_ancestral_bones_ourg, 3, ^lootdrop_duration);
+        obj_add(npc_coord, zogre_bones, 1, ^lootdrop_duration);
+        queue(zogre_slash_bash_defeated, 0, 0);
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,zogre_slash_bash_defeated]
+if (%zogre = 11) {
+    %zogre = 12;
+    mes("Slash Bash is defeated.");
+}
+
+[proc,zogre_brentle_summon]
+if (%zogre = 0 | %thzfe_brentle_skele >= 2) return;
+npc_findall(2_38_147_10_51, zogre_human_brentle_vahn, ^zogre_brentle_leash, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & npc_stat(hitpoints) > 0) {
+        mes("The zombie is already awake.");
+        return;
+    }
+}
+// UNKNOWN local lease: six minutes; owner death/logout/leave removes it sooner.
+npc_add(2_38_147_10_51, zogre_human_brentle_vahn, ^zogre_encounter_lifetime);
+%npc_attacking_uid = uid;
+%npc_macro_event_target = uid;
+%npc_action_delay = map_clock;
+%thzfe_brentle_skele = 1;
+npc_setmode(opplayer2);
+npc_settimer(1);
+mes("A zombie rises from the skeleton.");
+
+[ai_timer,zogre_human_brentle_vahn]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | %zogre = 0 | %thzfe_brentle_skele >= 2 | distance(2_38_147_10_51, coord) > ^zogre_brentle_leash) npc_del;
+
+[ai_queue1,zogre_human_brentle_vahn]
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+~npc_default_retaliate;
+
+[ai_queue3,zogre_human_brentle_vahn]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid & %zogre > 0 & %thzfe_brentle_skele = 1) {
+        queue(zogre_brentle_defeated, 0, 0);
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,zogre_brentle_defeated]
+if (%thzfe_brentle_skele = 1) {
+    %thzfe_brentle_skele = 2;
+    mes("The zombie collapses. You can search the skeleton again.");
+}

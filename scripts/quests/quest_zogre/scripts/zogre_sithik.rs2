@@ -1,0 +1,144 @@
+// VERIFIED investigation chain: Tip.It guide 100, captured 2 May 2006.
+// UNKNOWN functional wording and intermediate stage encoding.
+[oploc1,zogre_outdoor_bell]
+// The original wizard is inside the guild. The bell brings him outside.
+npc_findall(0_40_48_38_14, zogre_human_zavistic_rarve, 3, 0);
+if (npc_findnext = false) {
+    // UNKNOWN engineering lease: one minute, on mapped floor beside the bell.
+    npc_add(0_40_48_38_14, zogre_human_zavistic_rarve, ^zogre_wizard_lifetime);
+}
+mes("Zavistic Rarve comes to answer the bell.");
+
+[opnpc1,zogre_human_zavistic_rarve] ~zogre_zavistic;
+[opnpcu,zogre_human_zavistic_rarve] ~zogre_zavistic;
+[proc,zogre_zavistic]
+if (%zogre = 0) {
+    ~chatnpc("<p,neutral>Speak to Grish at Jiggig about the undead ogres.");
+    return;
+}
+if (%zogre >= ^zogre_complete) {
+    if (inv_total(inv, zogre_black_prism) > 0 & %thzfe_prismsold = 0) {
+        if (~p_choice2("Sell the black prism for 2000 coins.", 1, "Keep the black prism.", 2) = 1) {
+            inv_del(inv, zogre_black_prism, 1);
+            %thzfe_prismsold = 1;
+            inv_add(inv, coins, 2000);
+        }
+    }
+    return;
+}
+if (%zogre = 1) {
+    if (inv_total(inv, zogre_black_prism) = 0 | inv_total(inv, zogre_necromantic_page) = 0 | %thzfe_innkeepermugshown = 0) {
+        ~chatnpc("<p,neutral>Bring the prism and torn page from the tomb. Ask the Dragon Inn bartender about the tankard.");
+        return;
+    }
+    ~chatnpc("<p,neutral>These items are connected with necromancy. Speak to Sithik Ints upstairs in the house north of the guild.");
+    %zogre = 2;
+    return;
+}
+if (%zogre >= 5 & %zogre < 7) {
+    if (%zogre = 5) ~zogre_give(zogre_ogre_trans_potion);
+    ~chatnpc("<p,neutral>Put the strange potion into Sithik's tea, then speak to him.");
+    return;
+}
+if (%zogre = 4) {
+    if (inv_total(inv, zogre_sithik_portrait_signed) = 0 | inv_total(inv, zogre_necrobook) = 0 | inv_total(inv, zogre_necromantic_page) = 0 | %thzfe_shownnecrobook = 0 | %thzfe_shownhambook = 0) {
+        ~chatnpc("<p,neutral>Bring the signed portrait and the necromancy book. Check the torn page against the book and read the books you found.");
+        return;
+    }
+    if (~zogre_give(zogre_ogre_trans_potion) = false) return;
+    %thzfe_shownsignedportrait = 1;
+    %zogre = 5;
+    ~chatnpc("<p,neutral>The evidence points to Sithik. Put this strange potion into his tea.");
+    return;
+}
+~chatnpc("<p,neutral>Investigate Sithik's room and have the bartender identify his portrait.");
+
+// Sithik is a multiloc, not the similarly named chat-head NPC.
+[oploc1,ogre_bedman_loc] ~zogre_sithik;
+[oploc1,ogre_bedogre_loc] ~zogre_sithik;
+[proc,zogre_sithik]
+if (%zogre < 2) {
+    ~mesbox("Sithik Ints is resting. Zavistic Rarve may know more about the trouble at Jiggig.");
+    return;
+}
+if (%zogre = 2) {
+    ~mesbox("Sithik Ints protests, but he cannot stop you searching his room.");
+    %zogre = 3;
+    return;
+}
+if (%zogre = 6) {
+    ~mesbox("Sithik admits his part in the trouble at Jiggig. The summoning spell cannot be reversed.");
+    ~mesbox("For brutal arrows, add nails to flighted ogre arrows with a hammer. For Relicym's balm, mix rogue's purse and snake weed in a vial of water.");
+    %thzfe_makecuredisease = 1;
+    %thzfe_makebrutalarrow = 1;
+    %zogre = 7;
+    return;
+}
+if (%zogre >= 7) {
+    ~mesbox("Sithik repeats that the spell cannot be reversed. Return to Grish. You can make brutal arrows and Relicym's balm.");
+    return;
+}
+~mesbox("Search Sithik's furniture. Read the books and use papyrus with him to draw a portrait.");
+
+[oploc1,sithiks_drawers]
+if (%zogre < 3) return;
+~zogre_give(zogre_portrait_book);
+~zogre_give(papyrus);
+~zogre_give(charcoal);
+[oploc1,sithiks_cupboard]
+if (%zogre >= 3) ~zogre_give(zogre_necrobook);
+[oploc1,sithiks_wardrobe]
+if (%zogre >= 3) ~zogre_give(zogre_hambook);
+
+[opheld1,zogre_portrait_book]
+if (%zogre < 3) return;
+%thzfe_zogre_thief = ^zogre_portrait_read;
+~mesbox("The book explains how to draw a realistic portrait with papyrus and charcoal.");
+[opheld1,zogre_hambook]
+if (%zogre < 3) return;
+%thzfe_shownhambook = 1;
+~mesbox("The book supports H.A.M. and shows its hostility towards ogres.");
+[opheld1,zogre_necrobook]
+~mesbox("This book describes necromancy. One of its pages is missing.");
+[opheldu,zogre_necrobook] ~zogre_compare_page;
+[opheldu,zogre_necromantic_page] ~zogre_compare_page;
+[proc,zogre_compare_page]
+if ((last_item = zogre_necrobook & last_useitem = zogre_necromantic_page) | (last_item = zogre_necromantic_page & last_useitem = zogre_necrobook)) {
+    if (%zogre < 3) return;
+    %thzfe_shownnecrobook = 1;
+    mes("The torn page matches the missing page in the necromancy book.");
+}
+
+[oplocu,ogre_bedman_loc] ~zogre_sithik_use;
+[oplocu,ogre_bedogre_loc] ~zogre_sithik_use;
+[proc,zogre_sithik_use]
+if (last_useitem = papyrus & %zogre >= 3) {
+    if (inv_total(inv, charcoal) = 0) {
+        mes("You need charcoal to draw a portrait.");
+        return;
+    }
+    inv_del(inv, papyrus, 1);
+    if (%thzfe_zogre_thief = ^zogre_portrait_read) {
+        inv_add(inv, zogre_sithik_portrait_good, 1);
+        mes("You draw a realistic portrait of Sithik Ints.");
+    } else {
+        inv_add(inv, zogre_sithik_portrait_bad, 1);
+        mes("You draw a poor portrait. The book of portraiture may help.");
+    }
+}
+
+[opobju,zogre_cup_of_tea_sithix]
+if (last_useitem = zogre_ogre_trans_potion) ~zogre_dose_tea;
+[opheldu,zogre_cup_of_tea_sithix] ~zogre_held_tea;
+[opheldu,zogre_ogre_trans_potion] ~zogre_held_tea;
+[proc,zogre_held_tea]
+if ((last_item = zogre_cup_of_tea_sithix & last_useitem = zogre_ogre_trans_potion) | (last_item = zogre_ogre_trans_potion & last_useitem = zogre_cup_of_tea_sithix)) ~zogre_dose_tea;
+[proc,zogre_dose_tea]
+if (%zogre ! 5 | inv_total(inv, zogre_ogre_trans_potion) = 0) return;
+// Only Sithik's own room accepts his tea, not a cup carried elsewhere.
+if (coordy(coord) ! 1 | coordx(coord) < 2588 | coordx(coord) > 2595 | coordz(coord) < 3100 | coordz(coord) > 3106) return;
+inv_del(inv, zogre_ogre_trans_potion, 1);
+%zogre = 6;
+// UNKNOWN favourable timing: the transformation is immediate, without a floor-change wait.
+%thzfe_sithik_transformed = 1;
+mes("You add the strange potion to Sithik's tea. Sithik transforms into an ogre.");

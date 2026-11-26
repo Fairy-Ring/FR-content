@@ -343,6 +343,7 @@ jobs:
           run_test tests/enchanted-key/test_enchanted_key.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/enchanted-key/test_enchanted_key.mjs
           run_test tests/fairytale-1/test_fairytale1.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/fairytale-1/test_fairytale1.mjs
           run_test tests/rum-deal/test_rum_deal.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/rum-deal/test_rum_deal.mjs
+          run_test tests/zogre-flesh-eaters/test_zogre_flesh_eaters.mjs node --import tsx ../content/tests/zogre-flesh-eaters/test_zogre_flesh_eaters.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/lumbridge-advisers/test_advisers.mjs node --import tsx ../content/tests/lumbridge-advisers/test_advisers.mjs
           run_test tests/n619-old-towns/test_old_towns.mjs node --import tsx ../content/tests/n619-old-towns/test_old_towns.mjs

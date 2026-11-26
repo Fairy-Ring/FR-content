@@ -3,6 +3,87 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_opplayer2,zogre_1]",
+      "npc": "zogre_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_2]",
+      "npc": "zogre_2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_3]",
+      "npc": "zogre_3",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_4]",
+      "npc": "zogre_4",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_5]",
+      "npc": "zogre_5",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_6]",
+      "npc": "zogre_6",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_skele]",
+      "npc": "zogre_skele",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_slash_bash]",
+      "npc": "zogre_slash_bash",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zogre_human_brentle_vahn]",
+      "npc": "zogre_human_brentle_vahn",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
       "script": "[ai_opplayer2,deal_evil_spirit]",
       "npc": "deal_evil_spirit",
       "seeds": {

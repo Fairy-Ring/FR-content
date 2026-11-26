@@ -1,0 +1,33 @@
+// VERIFIED undead identities: revision-377 Zogre, Skogre and Slash Bash records.
+[ai_opplayer2,zogre_1] ~zogre_infect_attack;
+[ai_opplayer2,zogre_2] ~zogre_infect_attack;
+[ai_opplayer2,zogre_3] ~zogre_infect_attack;
+[ai_opplayer2,zogre_4] ~zogre_infect_attack;
+[ai_opplayer2,zogre_5] ~zogre_infect_attack;
+[ai_opplayer2,zogre_6] ~zogre_infect_attack;
+[ai_opplayer2,zogre_skele] ~zogre_infect_attack;
+[ai_opplayer2,zogre_slash_bash] ~zogre_infect_attack;
+[ai_opplayer2,zogre_human_brentle_vahn] ~zogre_infect_attack;
+
+[proc,zogre_infect_attack]
+def_boolean $ready;
+def_int $hit;
+def_int $rolled;
+def_int $delivered;
+def_int $delay;
+$ready, $hit, $rolled, $delivered, $delay = ~npc_default_attack_outcome(~npc_melee_maxhit, 0, false);
+if ($ready = true & $hit = 1 & npc_stat(hitpoints) > 0) queue(deal_disease_apply, 0, 0);
+
+[proc,zogre_undead]()(boolean)
+if (npc_type = zogre_1 | npc_type = zogre_2 | npc_type = zogre_3 | npc_type = zogre_4 | npc_type = zogre_5 | npc_type = zogre_6 | npc_type = zogre_skele | npc_type = zogre_slash_bash) return(true);
+return(false);
+
+[proc,zogre_damage_max](int $maxhit, int $spell)(int)
+def_int $max = min($maxhit, npc_param(max_dealt));
+if ($max <= 0) return(0);
+if ($spell = ^crumble_undead) return(max(1, divide($max, 2)));
+if ($spell = 0 & inv_total(worn, zogre_bow) > 0) {
+    if (inv_total(worn, zogre_brutal_bronze) > 0 | inv_total(worn, zogre_brutal_iron) > 0 | inv_total(worn, zogre_brutal_steel) > 0 | inv_total(worn, zogre_brutal_black) > 0 | inv_total(worn, zogre_brutal_mithril) > 0 | inv_total(worn, zogre_brutal_adamant) > 0 | inv_total(worn, zogre_brutal_rune) > 0) return($max);
+}
+// UNKNOWN favourable integer floor: a non-zero reduced hit retains at least one damage.
+return(max(1, divide($max, 4)));

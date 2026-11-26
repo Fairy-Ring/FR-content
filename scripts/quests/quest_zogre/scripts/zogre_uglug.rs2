@@ -1,13 +1,23 @@
-// Zogre Flesh Eaters — Uglug Nar Talk-to (zogre_uglug_nar 2039 @ 2442,3049
-// L0, size-2 camp ogre). CANDIDATE last-resort 2007-base minus Changes:
-// OSRS Transcript:Zogre Flesh Eaters "Talking to Uglug Nar (before using
-// Relicym's balm on him)". Dump then return. Prefer 0 write: %zogre stays
-// 1. No dest / dungeon m38_147, no Trade op3 (uglug_nar_shop 260 has 0
-// 377 unpack stock — no shop IF), no [opnpcu] Relicym's balm, no Relicym
-// NPC invent, no fake complete. No && / ||. Cite
-// docs/research/zogre-first-slice-377.md (Uglug 2039 op1 silent rung) ·
-// Transcript:Zogre Flesh Eaters §4.1.
-
+// VERIFIED sale/unlock: Tip.It guide 100, captured 2 May 2006.
+// UNKNOWN functional wording. This is a balm sale, not a disease-cure step.
 [opnpc1,zogre_uglug_nar]
+if (%thzfe_sold_balm = 1) {
+    ~openshop_activenpc;
+    return;
+}
 ~chatnpc("<p,neutral>Me's not got no glug-glugs to sell, yous bring me da sickies glug-glug den me's open da stufsies for ya.");
-return;
+
+[opnpc3,zogre_uglug_nar]
+if (%thzfe_sold_balm = 1 & %zogre >= ^zogre_complete) ~openshop_activenpc;
+else mes("Bring Uglug Nar a four-dose Relicym's balm after helping Grish.");
+
+[opnpcu,zogre_uglug_nar]
+if (%zogre < ^zogre_complete | %thzfe_sold_balm = 1) return;
+if (last_useitem ! relicyms_balm4) {
+    mes("Uglug Nar wants a four-dose Relicym's balm.");
+    return;
+}
+inv_del(inv, relicyms_balm4, 1);
+%thzfe_sold_balm = 1;
+inv_add(inv, coins, 1000);
+mes("Uglug Nar pays you 1000 coins and opens his shop.");
