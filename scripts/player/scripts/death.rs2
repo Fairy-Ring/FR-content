@@ -30,6 +30,10 @@ if (~in_castlewars_game(coord) = true) {
 if (~in_castlewars_waitingroom(coord) = true) {
     @player_death_castlewars_waitingroom;
 }
+if (~pest_owned = true) {
+    ~pest_player_death;
+    return;
+}
 
 ~player_death;
 midi_jingle(death2);

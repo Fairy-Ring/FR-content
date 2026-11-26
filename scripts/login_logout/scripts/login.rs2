@@ -99,6 +99,7 @@ if (%tutorial < ^tutorial_complete & ~in_tutorial_island(coord) = true) {
 %bankpin_session = 0;
 ~bankpin_tick_pending;
 ~castlewars_login;
+~pest_login;
 // MM hangar reinit: finish cutscene if logout mid-viewing platform
 ~mm_hangar_login;
 // MM ch2: force atoll if logout mid shipyard cutscene map
