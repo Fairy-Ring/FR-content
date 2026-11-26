@@ -49,8 +49,6 @@ p_delay(2);
 if (coordx(loc_coord) < 1820) {
     %fever_swing = 1;
     p_telejump(^fever_enemy_deck);
-    // VERIFIED rope availability on the enemy ship; UNKNOWN respawn timing, refreshed on crossing.
-    obj_add(1_28_75_32_27, fever_rope, 1, 200);
 } else {
     %fever_swing_2 = 1;
     p_telejump(^fever_own_deck);

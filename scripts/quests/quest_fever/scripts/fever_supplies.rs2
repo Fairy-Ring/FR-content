@@ -43,6 +43,15 @@ if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
 ~fever_supply(fever_gunpowder, 1);
 
 [proc,fever_supply](namedobj $item, int $amount)
+// UNKNOWN handout bounds implement the guide's three repairs without exporting tradeable supplies.
+if ($item = hammer & (inv_total(inv, hammer) > 0 | %fever_holes_patched >= 3)) {
+    mes("You already have the supplies needed for the remaining repairs.");
+    return;
+}
+if ($item = swamppaste & inv_total(inv, swamppaste) >= calc(3 - %fever_holes_proofed)) {
+    mes("You already have the supplies needed for the remaining repairs.");
+    return;
+}
 if (inv_itemspace(inv, $item, $amount, inv_size(inv)) = false) {
     mes("You need more inventory space.");
     return;
@@ -51,8 +60,12 @@ inv_add(inv, $item, $amount);
 mes("You take <oc_name($item)>.");
 
 // VERIFIED: the period guide says ship supplies are removed on leaving the ship.
-// Normal hammer and swamp paste are not removed: they can also belong to the player.
+// Remove ordinary repair items on battle departure, not unrelated harbour or post-quest travel.
 [proc,fever_remove_supplies]
+if (coordx(coord) >= 1792 & coordx(coord) < 1856 & coordz(coord) >= 4800 & coordz(coord) < 4864) {
+    ~del_all_if_exists(inv, hammer);
+    ~del_all_if_exists(inv, swamppaste);
+}
 ~del_all_if_exists(inv, fever_rope);
 ~del_all_if_exists(inv, fever_tinderbox);
 ~del_all_if_exists(inv, fever_gunpowder);

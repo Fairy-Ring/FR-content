@@ -165,6 +165,8 @@ members=yes
 weight=3lb
 
 tradeable=no
+// VERIFIED enemy-deck rope respawn; UNKNOWN two-cycle base scales to one with players online.
+respawnrate=2
 [fever_tinderbox]
 name=Tinderbox
 desc=Useful for lighting a fire.

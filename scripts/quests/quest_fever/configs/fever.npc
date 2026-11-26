@@ -1,6 +1,6 @@
 // Cabin Fever Bill Teach forms and battle pirates; cache ids and original client fields are retained.
 // CANDIDATE: combat stats on mapped enemy ids 3188-3196 from cabin-fever.pirate-combat-stats.
-// UNKNOWN favourable default: pirates wander and use ordinary reactive combat, without unsourced aggression or quest kill writes.
+// VERIFIED: period Tip.It calls the level-57 pirates aggressive. UNKNOWN huntrange=4 uses the standard melee hunt mode.
 [fever_teach]
 name=Bill Teach
 desc=Bill Teach the pirate.
@@ -235,6 +235,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_03]
 name=Pirate
@@ -270,6 +272,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_04]
 name=Pirate
@@ -309,6 +313,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_05]
 name=Pirate
@@ -348,6 +354,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_06]
 name=Pirate
@@ -385,6 +393,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_07]
 name=Pirate
@@ -422,6 +432,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_08]
 name=Pirate
@@ -461,6 +473,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_09]
 name=Pirate
@@ -498,6 +512,8 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 
 [fever_pirate_enemy_10]
 name=Pirate
@@ -539,4 +555,6 @@ strength=50
 defence=50
 category=pirate
 defaultmode=wander
+huntmode=aggressive_melee
+huntrange=4
 

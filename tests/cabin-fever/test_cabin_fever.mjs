@@ -22,7 +22,7 @@ for (let index = 2; index < process.argv.length; index++) {
 
 const runtime = await import('../swamp-caves/runtime.mjs');
 const {
-  World, PlayerStat, ScriptProvider, ScriptState, contentRoot: loadedContent,
+  World, Packet, PlayerLoading, PlayerStat, ScriptProvider, ScriptState, contentRoot: loadedContent,
   engineModule, id, obj, inv, invCom, player, seed, inventory, slotOf,
   resumeDialogue, interactionTick, weakCount, types
 } = runtime;
@@ -31,11 +31,14 @@ const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).defau
 const OpNpc = (await engineModule('network/game/client/model/OpNpc.ts')).default;
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const OpLocU = (await engineModule('network/game/client/model/OpLocU.ts')).default;
+const OpObj = (await engineModule('network/game/client/model/OpObj.ts')).default;
 const npcHandler = new (await engineModule('network/game/client/handler/OpNpcHandler.ts')).default();
 const locHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
 const locUseHandler = new (await engineModule('network/game/client/handler/OpLocUHandler.ts')).default();
+const objHandler = new (await engineModule('network/game/client/handler/OpObjHandler.ts')).default();
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
+const { EntityLifeCycle } = await engineModule('engine/entity/EntityLifeCycle.ts');
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const resolveNpcType = (await engineModule('engine/entity/resolveNpcType.ts')).default;
 const map = await engineModule('engine/GameMap.ts');
@@ -78,8 +81,7 @@ function writeVar(p, name, value) {
   else p.setVar(requiredId('VarPlayerType', name), value);
 }
 function setSkill(p, stat, level) {
-  p.baseLevels[stat] = level;
-  p.levels[stat] = level;
+  p.setLevel(stat, level);
 }
 const stage = p => readVar(p, 'fever_quest');
 const itemCount = (p, name, inventory = inv) => p.invTotal(inventory, obj(name));
@@ -352,6 +354,85 @@ function nativeUseLoc(p, record, item, label = `use ${item} on loc`) {
   finishInteraction(p, [], label);
   return trigger;
 }
+function nativeTakeEnemyRope(p, label) {
+  const deck = coordConstant('fever_enemy_deck');
+  const square = `${deck.x >> 6}_${deck.z >> 6}`;
+  const source = fs.readFileSync(path.join(contentRoot, 'maps', `m${square}.jm2`), 'utf8');
+  const section = source.split('==== OBJ ====')[1]?.split('====')[0] ?? '';
+  const rows = [...section.matchAll(/^(\d+) (\d+) (\d+): (\d+) (\d+)$/gm)]
+    .filter(([, level, , , type]) => Number(level) === deck.level && Number(type) === obj('fever_rope'));
+  assert.equal(rows.length, 1, `${label}: the checked-out enemy deck defines one real rope spawn`);
+  const [, level, x, z, , count] = rows[0].map(Number);
+  const point = { level, x: (deck.x >> 6) * 64 + x, z: (deck.z >> 6) * 64 + z };
+  assert.equal(count, 1, `${label}: the map spawns one rope, not a stack`);
+  assert(hasPackedPath(deck, point), `${label}: the packed deck reaches the rope tile`);
+  const ground = World.getObj(point.x, point.z, point.level, obj('fever_rope'), p.hash64);
+  assert(ground, `${label}: a real rope remains available in the production world`);
+  assert.equal(ground.lifecycle, EntityLifeCycle.RESPAWN, `${label}: the map object uses native respawn lifecycle`);
+  assert.equal(itemCount(p, 'fever_rope'), 0, `${label}: no inventory rope bypasses the pickup`);
+  setAt(p, point);
+  assert(objHandler.handle(new OpObj(3, point.x, point.z, ground.type), p),
+    `${label}: production Take accepts the real ground object`);
+  const trigger = p.getOpTrigger();
+  assert.equal(trigger?.name, '[opobj3,_]', `${label}: native dispatch resolves ordinary ground-item pickup`);
+  assert(ScriptProvider.getByName(trigger.name), `${label}: ordinary pickup is compiled`);
+  p.processInteraction();
+  finishInteraction(p, [], label);
+  assert.equal(itemCount(p, 'fever_rope'), 1, `${label}: real pickup gives the return rope`);
+  assert.equal(World.getObj(point.x, point.z, point.level, ground.type, p.hash64), null,
+    `${label}: pickup removes the world object until its native respawn`);
+}
+function nativeLogoutAndReload(p) {
+  const pid = p.pid, slot = p.slot, username = p.username;
+  const savedTile = tile(p), savedStage = stage(p);
+  p.clearInteraction();
+  assert(World.currentTick >= p.preventLogoutUntil, 'enemy-deck logout respects the ordinary combat cooldown');
+  p.requestLogout = true;
+  // Run the real player phase as well: teleports can leave MAP_ENTER callbacks
+  // queued, and production logout correctly waits for that engine work.
+  for (let tick = 0; tick < 128 && [...World.playerLoop.all()].includes(p); tick++) {
+    for (const online of World.playerLoop.all()) {
+      online.lastResponse = World.currentTick;
+      online.lastConnected = World.currentTick;
+      online.resetEntity(false);
+    }
+    World.processPlayers();
+    World.processLogouts();
+    World.processZones();
+    World.currentTick++;
+  }
+  assert(![...World.playerLoop.all()].includes(p), 'production logout removes the old enemy-deck session');
+  const request = World.logoutRequests.get(username);
+  assert(request?.save, 'production logout serializes a genuine player save');
+  // Acknowledge the login-server save, then load those bytes as a new session.
+  World.logoutRequests.delete(username);
+  const loaded = PlayerLoading.load(username, new Packet(request.save), null);
+  loaded.pid = pid; loaded.slot = slot;
+  loaded.uid = ((Number(loaded.username37 & 0x1fffffn) << 11) | slot) >>> 0;
+  loaded.isActive = true;
+  loaded.packets = []; loaded.messages = [];
+  loaded.write = packet => loaded.packets.push(packet);
+  loaded.messageGame = text => loaded.messages.push(String(text));
+  loaded.wrappedMessageGame = loaded.messageGame;
+  loaded.lastResponse = World.currentTick; loaded.lastConnected = World.currentTick;
+  World.players[pid] = loaded;
+  World.playerLoop.add(loaded.hash64, loaded);
+  rsbuf.addPlayer(slot);
+  World.gameMap.getZone(loaded.x, loaded.z, loaded.level).enter(loaded);
+  loaded.onLogin();
+  for (let tick = 0; tick < 128 && loaded.engineQueue.head() !== null; tick++) {
+    World.currentTick++;
+    loaded.resetEntity(false);
+    loaded.processEngineQueue();
+    finishInteraction(loaded, [], 'enemy-deck login');
+    World.processZones();
+  }
+  assert.equal(loaded.engineQueue.head(), null, 'native login completes its queued engine work');
+  assert.deepEqual(tile(loaded), savedTile, 'logout/login keeps the player on the real enemy deck');
+  assert.equal(stage(loaded), savedStage, 'logout/login preserves earned battle progress');
+  assert.equal(itemCount(loaded, 'fever_rope'), 0, 'logout/login does not fabricate an inventory rope');
+  return loaded;
+}
 function coordConstant(name) {
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const match = new RegExp(`^\\^${escaped}\\s*=\\s*(\\d+)_(\\d+)_(\\d+)_(\\d+)_(\\d+)\\s*$`, 'm').exec(constantsText);
@@ -436,6 +517,11 @@ function assertMapIntegration() {
     assert.equal(map.isMapBlocked(stand.x, stand.z, stand.level), false, `${name} stand is not collision blocked`);
     assertReachableFromLanding(stand, `${name} at ${stand.level}_${stand.x}_${stand.z}`);
   }
+  for (let pirate = 2; pirate <= 10; pirate++) {
+    const type = types.NpcType.get(requiredId('NpcType', `fever_pirate_enemy_${String(pirate).padStart(2, '0')}`));
+    assert.equal(type.huntmode, requiredId('HuntType', 'aggressive_melee'), 'every mapped battle pirate uses standard aggressive melee');
+    assert(type.huntrange > 0, 'every mapped battle pirate has a positive, UNKNOWN engineering hunt range');
+  }
   console.log(`PASS packed geometry and placements (${landingPoints.size} named landings, ${requiredLocs.length} actionable loc types, ${visualLocs.length} visual loc types, five NPC forms)`);
 }
 
@@ -450,7 +536,8 @@ function requirements(p, overrides = {}) {
 function assertNoShipSupplies(p, label) {
   for (const item of [
     'fever_rope', 'fever_tinderbox', 'fever_gunpowder', 'fever_fuse', 'fever_cannister_load',
-    'fever_cannon_ball', 'fever_cannon_prod', 'fever_cannon', 'fever_repair_plank', 'fever_tack', 'fever_plunder'
+    'fever_cannon_ball', 'fever_cannon_prod', 'fever_cannon', 'fever_repair_plank', 'fever_tack', 'fever_plunder',
+    'hammer', 'swamppaste'
   ]) assert.equal(itemCount(p, item), 0, `${label}: ${item} is stripped from the ship`);
 }
 function currentLocFor(record, ...names) {
@@ -591,7 +678,7 @@ function testPrerequisites() {
 }
 
 function fullQuest() {
-  const p = player();
+  let p = player();
   requirements(p);
   const inn = npcByName('fever_teach');
   const portTeach = npcByName('fever_port_ship_teach');
@@ -631,7 +718,9 @@ function fullQuest() {
   collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 3, 'fever_tack', 10);
   collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste');
   collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 5, 'hammer');
-  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 1, 'fever_rope');
+  for (let n = 0; n < 2; n++) collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste');
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste', 0);
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 5, 'hammer', 0);
   collectLocker(p, 'fever_weapons_locker', 'fever_weapons_locker_open', 1, 'fever_fuse');
   collectLocker(p, 'fever_weapons_locker', 'fever_weapons_locker_open', 2, 'fever_cannon_prod');
   collectLocker(p, 'fever_weapons_locker', 'fever_weapons_locker_open', 3, 'fever_cannon');
@@ -650,9 +739,22 @@ function fullQuest() {
   nativeUseLoc(p, ownSail, 'fever_rope', 'use rope on own hoisted sail');
   assertLanding(p, coordConstant('fever_enemy_deck'), 'rope swing to enemy deck');
   assertVar(p, 'fever_swing', 1, 'first rope crossing records its product-written state');
+  assert.equal(itemCount(p, 'fever_rope'), 0, 'outbound crossing consumes the only carried rope');
+  for (let tick = 0; tick < 251; tick++) advanceInteraction(p);
+  nativeTakeEnemyRope(p, 'enemy-deck pickup after more than 250 native zone ticks');
   nativeUseLoc(p, enemySail, 'fever_rope', 'use rope on enemy hoisted sail');
   assertLanding(p, coordConstant('fever_own_deck'), 'rope swing back to own deck');
   assertVar(p, 'fever_swing_2', 1, 'return rope crossing records its product-written state');
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 1, 'fever_rope');
+  nativeUseLoc(p, ownSail, 'fever_rope', 'second outbound crossing before enemy-deck logout');
+  assertLanding(p, coordConstant('fever_enemy_deck'), 'enemy-deck logout fixture');
+  assert.equal(itemCount(p, 'fever_rope'), 0, 'enemy-deck logout starts without a carried rope');
+  p = nativeLogoutAndReload(p);
+  for (let tick = 0; tick < 251; tick++) advanceInteraction(p);
+  nativeTakeEnemyRope(p, 'enemy-deck pickup after logout/login and more than 250 native zone ticks');
+  nativeUseLoc(p, enemySail, 'fever_rope', 'return on the respawned rope after enemy-deck logout/login');
+  assertLanding(p, coordConstant('fever_own_deck'), 'return after enemy-deck logout/login');
+  console.log('PASS native rope respawn after 251 ticks, repeat pickup, enemy-deck logout/login and both return swings');
 
   // Return-Home and gangplank exit strip ship supplies, but preserve progress.
   nativeNpc(p, battleTeach, 3, [1], 'battle Return-Home');
@@ -671,7 +773,6 @@ function fullQuest() {
   assertLanding(p, coordConstant('fever_port_pier'), 'battle gangplank exit');
   assert.equal(stage(p), constant('fever_sabotage'), 'gangplank exit preserves battle progress');
   assertNoShipSupplies(p, 'gangplank exit');
-  assert.equal(itemCount(p, 'hammer'), 1, 'ordinary hammer is not stripped from the player');
   nativeNpc(p, portTeach, 1, [1], 're-enter at the current battle phase');
   assert.equal(stage(p), constant('fever_sabotage'), 'gangplank re-entry resumes the same phase');
   assertNoShipSupplies(p, 're-entry before collecting new supplies');
@@ -705,7 +806,6 @@ function fullQuest() {
   assertLanding(p, coordConstant('fever_port_pier'), 'stage-20 gangplank exit');
   assert.equal(stage(p), constant('fever_repairs'), 'stage-20 exit does not strand or reset the quest');
   assertNoShipSupplies(p, 'stage-20 exit');
-  assert.equal(itemCount(p, 'hammer'), 1, 'hammer remains player-owned during a stage-20 exit');
   nativeNpc(p, portTeach, 1, [1], 'resume hull repairs after return');
   assert.equal(stage(p), constant('fever_repairs'), 'stage-20 re-entry resumes hull repairs');
 
@@ -726,9 +826,8 @@ function fullQuest() {
   nativeLoc(p, firstHole, 1, [], 'hole repair refuses without supplies');
   assertVar(p, 'fever_hole_1', 0, 'repair option does not progress without planks, tacks and hammer');
 
-  // Retained from the locker as the player's own normal item, then deliberately
-  // removed so the missing-paste branch is tested before a fresh supply.
-  if (itemCount(p, 'swamppaste') > 0) p.invDel(inv, obj('swamppaste'), itemCount(p, 'swamppaste'));
+  assert.equal(itemCount(p, 'swamppaste'), 0, 'battle departure removed the previously issued paste');
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 5, 'hammer');
   for (let n = 0; n < 6; n++) collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 2, 'fever_repair_plank');
   for (let n = 0; n < 3; n++) collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 3, 'fever_tack', 10);
   assert.equal(itemCount(p, 'fever_repair_plank'), 6, 'six planks cover three hull holes');
@@ -749,6 +848,7 @@ function fullQuest() {
   currentForm(firstHole, p, holeZNames[2], 'first hole visible waterproofed form');
 
   for (let n = 0; n < 2; n++) collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste');
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste', 0);
   for (let index = 1; index < holes.length; index++) {
     const beforePlanks = itemCount(p, 'fever_repair_plank');
     const beforeTacks = itemCount(p, 'fever_tack');
@@ -759,11 +859,16 @@ function fullQuest() {
     currentForm(holes[index], p, holeZNames[1], `hole ${index + 1} visible patched form`);
     nativeUseLoc(p, holes[index], 'swamppaste', `proof visible hole ${index + 1}`);
     assertVar(p, holeNames[index], 2, `hole ${index + 1} becomes proofed`);
+    collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste', 0);
     currentForm(holes[index], p, holeZNames[2], `hole ${index + 1} visible waterproofed form`);
   }
   assert.equal(itemCount(p, 'swamppaste'), 0, 'exactly three paste units waterproof the three holes');
   assertVar(p, 'fever_holes_patched', 3, 'all three hull holes have received planks');
   assertVar(p, 'fever_holes_proofed', 3, 'all three hull holes are waterproofed');
+  assert.equal(p.invDel(inv, obj('hammer'), 1), 1, 'fixture discards the now-unneeded hammer after all three real repairs');
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 5, 'hammer', 0);
+  collectLocker(p, 'fever_repair_locker', 'fever_repair_locker_open', 4, 'swamppaste', 0);
+  console.log('PASS repair locker caps at one hammer and the remaining paste, refuses supplies after repairs, and strips battle handouts');
   nativeNpc(p, battleTeach, 1, [], 'advance after all three repairs');
   assert.equal(stage(p), constant('fever_plunder_stage'), 'Bill advances repaired hull to plunder stage 30');
 
@@ -900,11 +1005,15 @@ function fullQuest() {
   loadAndFireBall('second clean cannonball', 2);
   assert.equal(stage(p), constant('fever_sink_ship'), 'second cannonball leaves one hull hole remaining');
   nativeUseLoc(p, ownCannon, 'fever_cannon_prod', 'clean after second successful cannonball');
+  // Disclosed ordinary-item fixture: sinking must strip both repair supplies,
+  // even when the final handout cap no longer permits collecting them.
+  for (const item of ['hammer', 'swamppaste']) {
+    assert.equal(p.invAdd(inv, obj(item), 1), 1, `arrival fixture actually carries one ${item}`);
+  }
   loadAndFireBall('third clean cannonball', 3);
   assert.equal(stage(p), constant('fever_arrived'), 'third successful cannonball writes arrival stage 100');
   assertLanding(p, coordConstant('fever_mos_deck'), 'enemy ship sinking arrival');
   assertNoShipSupplies(p, 'Mos Le\'Harmless arrival');
-  assert.equal(itemCount(p, 'hammer'), 1, 'arrival preserves ordinary player tools');
 
   // Inventory-full completion refuses before stage, QP, XP, book, or scroll writes.
   const xpBeforeFullAttempt = [PlayerStat.SMITHING, PlayerStat.CRAFTING, PlayerStat.AGILITY].map(stat => currentSkillXp(p, stat));
@@ -987,6 +1096,12 @@ function fullQuest() {
   nativeLoc(p, mosGangplank, 1, [], 'Mos Le\'Harmless ship gangplank boarding');
   assertLanding(p, coordConstant('fever_mos_deck'), 'Mos gangplank boarding');
 
+  for (let n = 0; n < 2; n++) {
+    removeOneFiller(p, postFillers, new Set([obj('fever_piracy_book'), obj('coins'), obj('hammer'), obj('swamppaste')]));
+  }
+  for (const item of ['hammer', 'swamppaste']) {
+    assert.equal(p.invAdd(inv, obj(item), 1), 1, `ordinary travel fixture actually carries one ${item}`);
+  }
   // Repeatable post-quest Port <-> Mos travel uses actual NPC Talk dispatch.
   nativeNpc(p, mosShipTeach, 1, [1], 'sail Mos to Port Phasmatys');
   assertLanding(p, coordConstant('fever_port_deck'), 'Mos-to-Port postquest travel');
@@ -999,6 +1114,8 @@ function fullQuest() {
   assert.equal(stage(p), completeStage, 'repeatable travel never changes the completed quest stage');
   assert.equal(readVar(p, 'fever_gold'), 1, 'repeatable travel does not reset the once-only coin flag');
   assert.equal(itemCount(p, 'fever_piracy_book'), 1, 'travel preserves the recovered book');
+  assert.equal(itemCount(p, 'hammer'), 1, 'ordinary postquest travel does not confiscate a player-owned hammer');
+  assert.equal(itemCount(p, 'swamppaste'), 1, 'ordinary postquest travel does not confiscate player-owned paste');
   console.log('PASS complete Cabin Fever sequence, item/action gates, dirty-cannon failure, reward safety, recovery and repeat travel');
 }
 
