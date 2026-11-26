@@ -1,0 +1,37 @@
+// CANDIDATE Dark Beast combat: melee aggression, an opening spell on retaliation, and a spell out of melee reach.
+// UNKNOWN presentation fallback: existing Fire Strike supplies the sourced max hit 8 without a debuff.
+// UNKNOWN loot default: one ordinary death_drop entry of 100 coins, not a historical loot table.
+
+[ai_queue1,mourning_shadow_beast]
+~npc_default_retaliate;
+
+[ai_queue1,mourning_dark_beast]
+if (finduid(%npc_aggressive_player) = false | ~npc_retal_ready = false) return;
+%npc_action_delay = add(map_clock, divide(npc_param(attackrate), 2));
+// Defer npc_attacking_uid until the actual attack, so native target state identifies the opening spell.
+if (npc_stat(hitpoints) <= npc_param(retreat)) {
+    npc_setmode(playerescape);
+} else {
+    npc_setmode(applayer2);
+    if (npc_inrange = false) npc_setmode(playerescape);
+}
+
+[ai_opplayer2,mourning_dark_beast]
+npc_setmode(applayer2);
+~npc_default_attack;
+
+[ai_applayer2,mourning_dark_beast]
+if (%npc_attacking_uid ! uid | npc_range(coord) > 1) {
+    ~npc_cast_spell(^fire_strike, npc_param(attackrate));
+} else {
+    ~npc_default_attack;
+}
+
+[ai_queue3,mourning_dark_beast] @mep2_darkbeast_death;
+
+[label,mep2_darkbeast_death]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+def_namedobj $drop = npc_param(death_drop);
+if ($drop = null) return;
+obj_add(npc_coord, $drop, ^mep2_default_darkbeast_coins, ^lootdrop_duration);

@@ -1,0 +1,38 @@
+// UNKNOWN engineering stage integers from the shared MEP2 contract.
+^mep2_unstarted = 0
+^mep2_started = 1
+^mep2_access = 5
+^mep2_journal_obtained = 10
+^mep2_sample_requested = 15
+^mep2_crystal_created = 20
+^mep2_death_chamber = 40
+^mep2_crystal_powered = 45
+^mep2_black_crystal_restored = 50
+^mep2_complete = 60
+
+// VERIFIED target-day reward: 2 Quest Points and 20,000 Agility XP.
+^mep2_questpoints = 2
+^mep2_agility_xp = 200000
+// UNKNOWN inventory-model scale for the native completion scroll.
+^mep2_reward_model_scale = 450
+
+// VERIFIED target-day list size: 47 fixed items and 3 variable choices.
+^mep2_list_slots = 50
+^mep2_fixed_list_items = 47
+^mep2_variable_list_items = 3
+// UNKNOWN encoding: all three supplied alternatives are recorded as paid with value three.
+^mep2_paid_choice = 3
+
+// UNKNOWN engineering encoding in the original two-bit dwarf task varbit.
+^mep2_task_not_started = 0
+^mep2_task_active = 1
+^mep2_task_reward_pending = 2
+^mep2_task_reward_complete = 3
+// UNKNOWN mep2 default: one ordinary Dark Beast death_drop row of coins.
+^mep2_default_darkbeast_coins = 100
+// UNKNOWN engineering ranges: modest aggression and a working native magic approach.
+^mep2_aggression_range = 4
+^mep2_magic_range = 8
+// UNKNOWN handhold success-roll bounds; the five-damage fall is period-backed.
+^mep2_handhold_roll_min = 90
+^mep2_handhold_roll_max = 250

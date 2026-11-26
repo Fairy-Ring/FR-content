@@ -1016,60 +1016,8 @@ transmit=yes
 
 [varp573_unused]
 
-[varp575_bits]
 
-[varp576_bits]
 
-[varp577_bits]
-
-[varp578_bits]
-
-[mourning_quest_light_doors]
-transmit=yes
-
-[mourning_quest_beams1]
-transmit=yes
-
-[mourning_quest_beams2]
-transmit=yes
-
-[mourning_quest_beams3]
-transmit=yes
-
-[mourning_quest_beams4]
-transmit=yes
-
-[mourning_quest_beams5]
-transmit=yes
-
-[mourning_quest_beams6]
-transmit=yes
-
-[mourning_quest_vert_beams1]
-transmit=yes
-
-[mourning_quest_vert_beams2]
-transmit=yes
-
-[mourning_quest_vert_beams3]
-transmit=yes
-
-[mourning_quest_vert_beams4]
-transmit=yes
-
-[mourning_quest_vert_beams5]
-transmit=yes
-
-[mourning_quest_beam_cross1]
-transmit=yes
-
-[mourning_quest_beam_cross2]
-transmit=yes
-
-[varp593_bits]
-
-[mourning_part2_basevar2]
-transmit=yes
 
 [varp595_unused]
 

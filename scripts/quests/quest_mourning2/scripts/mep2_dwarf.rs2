@@ -1,0 +1,293 @@
+// VERIFIED Thorgel list from retained 2 May 2006 Tip.It Q120; original cache bit layout is preserved.
+// UNKNOWN engineering default: call random(3) once for each variable row when the quest starts.
+
+[proc,mep2_dwarf_seed_choices]
+%varp593_bits = setbit_range_toint(%varp593_bits, random(3), 0, 1);
+%varp593_bits = setbit_range_toint(%varp593_bits, random(3), 2, 3);
+%varp593_bits = setbit_range_toint(%varp593_bits, random(3), 4, 5);
+
+[proc,mep2_dwarf_item](int $index)(obj)
+if ($index < 0 | $index >= ^mep2_list_slots) return(null);
+if ($index < ^mep2_variable_list_items) {
+    def_int $bit = multiply($index, 2);
+    def_int $choice = getbit_range(%varp593_bits, $bit, add($bit, 1));
+    if ($choice = ^mep2_paid_choice) return(null);
+    if ($index = 0) {
+        if ($choice = 0) return(archery_ticket);
+        if ($choice = 1) return(agilityarena_ticket);
+        if ($choice = 2) return(castlewars_ticket);
+    } else if ($index = 1) {
+        if ($choice = 0) return(barrows_book_history);
+        if ($choice = 1) return(mourning_book1);
+        if ($choice = 2) return(elemental_workshop_shield_book);
+    } else {
+        if ($choice = 0) return(jail_key);
+        if ($choice = 1) return(dusty_key);
+        if ($choice = 2) return(witches_doorkey);
+    }
+    return(null);
+}
+switch_int($index) {
+    case 3 : return(rope);
+    case 4 : return(spade);
+    case 5 : return(iron_pickaxe);
+    case 6 : return(iron_axe);
+    case 7 : return(knife);
+    case 8 : return(woodplank);
+    case 9 : return(piedish);
+    case 10 : return(sack_potato_10);
+    case 11 : return(pot_flour);
+    case 12 : return(bucket_milk);
+    case 13 : return(ball_of_wool);
+    case 14 : return(oak_logs);
+    case 15 : return(chisel);
+    case 16 : return(shears);
+    case 17 : return(needle);
+    case 18 : return(thread);
+    case 19 : return(cooked_meat);
+    case 20 : return(nails_iron);
+    case 21 : return(unicorn_horn_dust);
+    case 22 : return(bronze_bar);
+    case 23 : return(white_berries);
+    case 24 : return(hammer);
+    case 25 : return(cactus_potato);
+    case 26 : return(skull);
+    case 27 : return(babydragon_bones);
+    case 28 : return(slayer_facemask);
+    case 29 : return(blankrune);
+    case 30 : return(lobster_pot);
+    case 31 : return(fishing_rod);
+    case 32 : return(tinderbox);
+    case 33 : return(lockpick);
+    case 34 : return(bronze_med_helm);
+    case 35 : return(white_apron);
+    case 36 : return(jug_wine);
+    case 37 : return(kebab);
+    case 38 : return(leather_boots);
+    case 39 : return(swamppaste);
+    case 40 : return(redberries);
+    case 41 : return(cheese);
+    case 42 : return(vial_water);
+    case 43 : return(flax);
+    case 44 : return(gold_ring);
+    case 45 : return(egg);
+    case 46 : return(leather_gloves);
+    case 47 : return(cake_tin);
+    case 48 : return(necklace_mould);
+    case 49 : return(rotten_tomato);
+    case default : return(null);
+}
+
+[proc,mep2_dwarf_paid](int $index)(boolean)
+if ($index < 0 | $index >= ^mep2_list_slots) return(false);
+if ($index < ^mep2_variable_list_items) {
+    def_int $bit = multiply($index, 2);
+    if (getbit_range(%varp593_bits, $bit, add($bit, 1)) = ^mep2_paid_choice) {
+        return(true);
+    }
+    return(false);
+}
+if ($index < 29) {
+    if (testbit(%varp593_bits, add($index, 3)) = 1) return(true);
+    return(false);
+}
+if (testbit(%mourning_part2_basevar2, sub($index, 29)) = 1) return(true);
+return(false);
+
+[proc,mep2_dwarf_mark_paid](int $index)
+if ($index < 0 | $index >= ^mep2_list_slots) return;
+if ($index < ^mep2_variable_list_items) {
+    def_int $bit = multiply($index, 2);
+    %varp593_bits = setbit_range_toint(%varp593_bits, ^mep2_paid_choice, $bit, add($bit, 1));
+    return;
+}
+if ($index < 29) {
+    %varp593_bits = setbit(%varp593_bits, add($index, 3));
+    return;
+}
+%mourning_part2_basevar2 = setbit(%mourning_part2_basevar2, sub($index, 29));
+
+[proc,mep2_dwarf_all_paid]()(boolean)
+def_int $index = 0;
+while ($index < ^mep2_list_slots) {
+    if (~mep2_dwarf_paid($index) = false) return(false);
+    $index = add($index, 1);
+}
+return(true);
+
+[proc,mep2_death_list_set_row](int $index, string $text)
+switch_int($index) {
+    case 0 : if_settext(mourning_deathalter:com_4, $text); return;
+    case 1 : if_settext(mourning_deathalter:com_6, $text); return;
+    case 2 : if_settext(mourning_deathalter:com_7, $text); return;
+    case 3 : if_settext(mourning_deathalter:com_8, $text); return;
+    case 4 : if_settext(mourning_deathalter:com_9, $text); return;
+    case 5 : if_settext(mourning_deathalter:com_10, $text); return;
+    case 6 : if_settext(mourning_deathalter:com_11, $text); return;
+    case 7 : if_settext(mourning_deathalter:com_12, $text); return;
+    case 8 : if_settext(mourning_deathalter:com_13, $text); return;
+    case 9 : if_settext(mourning_deathalter:com_14, $text); return;
+    case 10 : if_settext(mourning_deathalter:com_15, $text); return;
+    case 11 : if_settext(mourning_deathalter:com_16, $text); return;
+    case 12 : if_settext(mourning_deathalter:com_17, $text); return;
+    case 13 : if_settext(mourning_deathalter:com_18, $text); return;
+    case 14 : if_settext(mourning_deathalter:com_19, $text); return;
+    case 15 : if_settext(mourning_deathalter:com_20, $text); return;
+    case 16 : if_settext(mourning_deathalter:com_21, $text); return;
+    case 17 : if_settext(mourning_deathalter:com_22, $text); return;
+    case 18 : if_settext(mourning_deathalter:com_23, $text); return;
+    case 19 : if_settext(mourning_deathalter:com_24, $text); return;
+    case 20 : if_settext(mourning_deathalter:com_25, $text); return;
+    case 21 : if_settext(mourning_deathalter:com_26, $text); return;
+    case 22 : if_settext(mourning_deathalter:com_27, $text); return;
+    case 23 : if_settext(mourning_deathalter:com_28, $text); return;
+    case 24 : if_settext(mourning_deathalter:com_29, $text); return;
+    case 25 : if_settext(mourning_deathalter:com_30, $text); return;
+    case 26 : if_settext(mourning_deathalter:com_31, $text); return;
+    case 27 : if_settext(mourning_deathalter:com_32, $text); return;
+    case 28 : if_settext(mourning_deathalter:com_33, $text); return;
+    case 29 : if_settext(mourning_deathalter:com_34, $text); return;
+    case 30 : if_settext(mourning_deathalter:com_35, $text); return;
+    case 31 : if_settext(mourning_deathalter:com_36, $text); return;
+    case 32 : if_settext(mourning_deathalter:com_37, $text); return;
+    case 33 : if_settext(mourning_deathalter:com_38, $text); return;
+    case 34 : if_settext(mourning_deathalter:com_39, $text); return;
+    case 35 : if_settext(mourning_deathalter:com_40, $text); return;
+    case 36 : if_settext(mourning_deathalter:com_41, $text); return;
+    case 37 : if_settext(mourning_deathalter:com_42, $text); return;
+    case 38 : if_settext(mourning_deathalter:com_43, $text); return;
+    case 39 : if_settext(mourning_deathalter:com_44, $text); return;
+    case 40 : if_settext(mourning_deathalter:com_45, $text); return;
+    case 41 : if_settext(mourning_deathalter:com_46, $text); return;
+    case 42 : if_settext(mourning_deathalter:com_47, $text); return;
+    case 43 : if_settext(mourning_deathalter:com_48, $text); return;
+    case 44 : if_settext(mourning_deathalter:com_49, $text); return;
+    case 45 : if_settext(mourning_deathalter:com_50, $text); return;
+    case 46 : if_settext(mourning_deathalter:com_51, $text); return;
+    case 47 : if_settext(mourning_deathalter:com_52, $text); return;
+    case 48 : if_settext(mourning_deathalter:com_53, $text); return;
+    case 49 : if_settext(mourning_deathalter:com_54, $text); return;
+}
+
+[proc,mep2_death_list_open]
+if (%mourning_quest_main < ^mep2_death_chamber | inv_total(inv, mourning_deathalter_list) = 0) return;
+def_int $index = 0;
+while ($index < ^mep2_list_slots) {
+    def_obj $item = ~mep2_dwarf_item($index);
+    def_string $text;
+    if (~mep2_dwarf_paid($index) = true) {
+        if ($index = 0) $text = "Ticket (received)";
+        else if ($index = 1) $text = "Book (received)";
+        else if ($index = 2) $text = "Key (received)";
+        else $text = oc_name($item);
+        $text = append("@gre@", $text);
+    } else {
+        $text = append("@red@", oc_name($item));
+    }
+    ~mep2_death_list_set_row($index, $text);
+    $index = add($index, 1);
+}
+if_openmain(mourning_deathalter);
+
+[proc,mep2_dwarf_has_talisman]()(boolean)
+if (calc(inv_total(inv, death_talisman) + inv_total(bank, death_talisman) + inv_total(worn, death_talisman)) > 0) return(true);
+return(false);
+
+[proc,mep2_dwarf_try_reward]
+if (%mourning_dwarf_startedtask ! ^mep2_task_reward_pending) return;
+if (~mep2_dwarf_has_talisman = true) {
+    %mourning_dwarf_startedtask = ^mep2_task_reward_complete;
+    return;
+}
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, death_talisman, 1);
+%mourning_dwarf_startedtask = ^mep2_task_reward_complete;
+
+[proc,mep2_dwarf_collect_available]
+def_int $index = 0;
+while ($index < ^mep2_list_slots) {
+    if (~mep2_dwarf_paid($index) = false) {
+        def_obj $item = ~mep2_dwarf_item($index);
+        if ($item ! null & inv_total(inv, $item) > 0) {
+            inv_del(inv, $item, 1);
+            ~mep2_dwarf_mark_paid($index);
+        }
+    }
+    $index = add($index, 1);
+}
+
+[opnpc1,mourning_deathalter_dwarf_vis] ~mep2_dwarf_talk;
+
+[proc,mep2_dwarf_talk]
+if (%mourning_quest_main < ^mep2_death_chamber) return;
+if (~mep2_dwarf_has_talisman = true) {
+    %mourning_dwarf_startedtask = ^mep2_task_reward_complete;
+    return;
+}
+// UNKNOWN favourable recovery: a previously satisfied task remains entitled after loss.
+if (%mourning_dwarf_startedtask = ^mep2_task_reward_complete) {
+    %mourning_dwarf_startedtask = ^mep2_task_reward_pending;
+    ~mep2_dwarf_try_reward;
+    return;
+}
+if (%mourning_dwarf_startedtask = ^mep2_task_not_started) {
+    if (calc(inv_total(inv, mourning_deathalter_list) + inv_total(bank, mourning_deathalter_list)) = 0) {
+        if (inv_freespace(inv) = 0) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        inv_add(inv, mourning_deathalter_list, 1);
+    }
+    %mourning_dwarf_startedtask = ^mep2_task_active;
+}
+if (%mourning_dwarf_startedtask = ^mep2_task_active) {
+    ~mep2_dwarf_collect_available;
+    if (~mep2_dwarf_all_paid = true) {
+        %mourning_dwarf_startedtask = ^mep2_task_reward_pending;
+        ~mep2_dwarf_try_reward;
+        return;
+    }
+    if (calc(inv_total(inv, mourning_deathalter_list) + inv_total(bank, mourning_deathalter_list)) = 0 & inv_freespace(inv) > 0) {
+        inv_add(inv, mourning_deathalter_list, 1);
+    }
+    return;
+}
+if (%mourning_dwarf_startedtask = ^mep2_task_reward_pending) ~mep2_dwarf_try_reward;
+
+[opnpcu,mourning_deathalter_dwarf_vis] @mep2_dwarf_item_used;
+[apnpcu,mourning_deathalter_dwarf_vis] @mep2_dwarf_item_used;
+
+[label,mep2_dwarf_item_used]
+if (%mourning_quest_main < ^mep2_death_chamber | %mourning_dwarf_startedtask ! ^mep2_task_active) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~mep2_dwarf_has_talisman = true) {
+    %mourning_dwarf_startedtask = ^mep2_task_reward_complete;
+    return;
+}
+def_int $index = 0;
+def_int $found = 0;
+while ($index < ^mep2_list_slots) {
+    if (($found = 0) & (~mep2_dwarf_paid($index) = false)) {
+        def_obj $required = ~mep2_dwarf_item($index);
+        if (($required ! null) & ($required = last_useitem) & (inv_total(inv, last_useitem) > 0)) {
+            inv_del(inv, last_useitem, 1);
+            ~mep2_dwarf_mark_paid($index);
+            $found = 1;
+        }
+    }
+    $index = add($index, 1);
+}
+if ($found = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~mep2_dwarf_all_paid = true) {
+    %mourning_dwarf_startedtask = ^mep2_task_reward_pending;
+    ~mep2_dwarf_try_reward;
+    return;
+}
+if (calc(inv_total(inv, mourning_deathalter_list) + inv_total(bank, mourning_deathalter_list)) = 0 & inv_freespace(inv) > 0) {
+    inv_add(inv, mourning_deathalter_list, 1);
+}

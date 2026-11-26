@@ -1,0 +1,321 @@
+[mourning_book1]
+name=Prifddinas' history
+desc=A book on the history of Prifddinas.
+recol1s=13472
+recol1d=7456
+cost=2
+model=obj_mcannonbook
+2dzoom=840
+2dyan=152
+2dxan=256
+members=yes
+tradeable=no
+iop1=Read
+weight=18oz
+
+[cert_mourning_book1]
+certlink=mourning_book1
+certtemplate=template_for_cert
+tradeable=no
+
+[mourning_book2]
+name=Eastern discovery
+desc=A book on the exploration of the eastern realm.
+recol1s=13472
+recol1d=7456
+cost=2
+model=obj_mcannonbook
+2dzoom=840
+2dyan=152
+2dxan=256
+members=yes
+tradeable=no
+iop1=Read
+weight=18oz
+
+[cert_mourning_book2]
+certlink=mourning_book2
+certtemplate=template_for_cert
+tradeable=no
+
+[mourning_book3]
+name=Eastern settlement
+desc=A book on the settlement of the eastern realm.
+recol1s=13472
+recol1d=7456
+cost=2
+model=obj_mcannonbook
+2dzoom=840
+2dyan=152
+2dxan=256
+members=yes
+tradeable=no
+iop1=Read
+weight=18oz
+
+[cert_mourning_book3]
+certlink=mourning_book3
+certtemplate=template_for_cert
+tradeable=no
+
+[mourning_book4]
+name=The great divide
+desc=A book about the great divide.
+recol1s=13472
+recol1d=7456
+cost=2
+model=obj_mcannonbook
+2dzoom=840
+2dyan=152
+2dxan=256
+members=yes
+tradeable=no
+iop1=Read
+weight=18oz
+
+[cert_mourning_book4]
+certlink=mourning_book4
+certtemplate=template_for_cert
+tradeable=no
+
+[mourning_excavation_key]
+name=New key
+desc=This key is newly cut.
+model=obj_ikov_shinykey
+cost=1
+members=yes
+tradeable=no
+2dxof=-3
+2dyof=9
+2dzoom=840
+2dyan=32
+2dxan=344
+iop5=Drop
+weight=10g
+
+[mourning_colour_wheel]
+name=Colour wheel
+desc=A key to the nature of light itself.
+model=obj_mourning_colour_wheel
+members=yes
+tradeable=no
+2dzoom=380
+2dxan=496
+contrast=33
+ambient=33
+weight=1g
+
+[mourning_mirror]
+name=Hand mirror
+desc=A small hand mirror.
+model=obj_mourning_mirror
+2dzoom=770
+2dyan=252
+2dxan=376
+members=yes
+tradeable=no
+iop5=Destroy
+weight=10g
+
+[mourning_crystal_red]
+name=Red crystal
+desc=A red crystal.
+recol1s=32767
+recol1d=25633
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_crystal_yellow]
+name=Yellow crystal
+desc=A yellow crystal.
+recol1s=32767
+recol1d=31649
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_crystal_green]
+name=Green crystal
+desc=A green crystal.
+recol1s=32767
+recol1d=992
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_crystal_cyan]
+name=Cyan crystal
+desc=A cyan crystal.
+recol1s=32767
+recol1d=959
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_crystal_blue]
+name=Blue crystal
+desc=A blue crystal.
+recol1s=32767
+recol1d=31
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_crystal_magenta]
+name=Magenta crystal
+desc=A magenta crystal.
+recol1s=32767
+recol1d=30781
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_fractured_crystal_1]
+name=Fractured crystal
+desc=A fractured crystal, one of the edges is clear.
+model=obj_mourning_fractured_crystal_1
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_fractured_crystal_2]
+name=Fractured crystal
+desc=A fractured crystal, one of the edges is clear.
+model=obj_mourning_fractured_crystal_2
+ambient=40
+contrast=40
+2dzoom=340
+2dxan=120
+members=yes
+tradeable=no
+iop5=Destroy
+weight=15g
+
+[mourning_deathalter_list]
+name=Item list
+desc=It's a list of items I need to collect.
+iop1=Read
+iop5=Destroy
+model=obj_nulodions_notes
+2dyof=49
+2dzoom=750
+2dyan=1380
+2dxan=304
+members=yes
+tradeable=no
+weight=1oz
+
+[mourning_ederns_journal]
+name=Edern's journal
+desc=The journal of Nissyen Edern.
+recol1s=12504
+recol1d=8584
+recol2s=29594
+recol2d=22226
+cost=1
+model=obj_digsitebook
+2dzoom=840
+2dyan=152
+2dxan=256
+members=yes
+tradeable=no
+iop1=Read
+weight=8oz
+
+[mourning_crystal_sample]
+name=Blackened crystal
+desc=A blackened crystal sample.
+recol1s=32767
+recol1d=6342
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dxof=1
+2dyof=1
+2dzoom=360
+2dyan=1948
+2dxan=104
+members=yes
+tradeable=no
+weight=15g
+
+[mourning_crystal_new_sample]
+name=Newly made crystal
+desc=A newly formed crystal.
+model=obj_mourning_crystal_red
+ambient=40
+contrast=40
+2dxof=1
+2dyof=1
+2dzoom=360
+2dyan=1948
+2dxan=104
+members=yes
+tradeable=no
+weight=15g
+
+[mourning_crystal_new_powered]
+name=Newly made crystal
+desc=A warm energy radiates from this crystal.
+model=obj_mourning_crystal_new_powered
+ambient=40
+contrast=40
+2dzoom=450
+2dxan=120
+members=yes
+tradeable=no
+weight=15g
+
+[mourning_crystal_trinket]
+name=Crystal trinket
+desc=A small crystal trinket.
+model=obj_mourning_crystal_new_powered
+ambient=40
+contrast=40
+2dzoom=450
+2dxan=120
+members=yes
+tradeable=no
+weight=10g

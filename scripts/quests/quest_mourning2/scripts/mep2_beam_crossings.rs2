@@ -1,0 +1,35 @@
+// VERIFIED cache variants: NS1..7, EW8..14, vertical15..21, crossed22..28.
+// UNKNOWN server-side colour aggregation where more than one ray crosses.
+[proc,mep2_puzzle_cross_colour](int $north_south, int $east_west, int $vertical)(int)
+def_int $axes = 0;
+if ($north_south > 0) $axes = add($axes, 1);
+if ($east_west > 0) $axes = add($axes, 1);
+if ($vertical > 0) $axes = add($axes, 1);
+if ($axes = 0) return(0);
+def_int $colour = ~mep2_puzzle_colour_merge(~mep2_puzzle_colour_merge($north_south, $east_west), $vertical);
+if ($axes > 1) return(add(21, $colour));
+if ($vertical > 0) return(add(14, $colour));
+if ($east_west > 0) return(add(7, $colour));
+return($colour);
+
+[proc,mep2_puzzle_render_crossings]
+%mourning_pillar_light_cross_1_2 = ~mep2_puzzle_cross_colour(0,
+    ~mep2_puzzle_colour_merge(%mourning_light_temple_1_1_east, %mourning_light_temple_1_3_west), %mourning_light_temple_1_2_up);
+%mourning_pillar_light_cross_1_5 = ~mep2_puzzle_cross_colour(0,
+    %mourning_light_temple_1_6_west, %mourning_light_temple_1_5_up);
+%mourning_pillar_light_cross_1_15 = ~mep2_puzzle_cross_colour(%mourning_light_temple_1_11_south,
+    ~mep2_puzzle_colour_merge(%mourning_light_temple_1_14_east, %mourning_light_temple_1_16_west), %mourning_light_temple_1_15_up);
+%mourning_pillar_light_cross_2_1 = ~mep2_puzzle_cross_colour(0,
+    %mourning_light_temple_2_2_west, %mourning_light_temple_2_1_up);
+%mourning_pillar_light_cross_2_12 = ~mep2_puzzle_cross_colour(0,
+    %mourning_light_temple_2_11_east, %mourning_light_temple_2_12_up);
+%mourning_pillar_light_cross_2_13 = ~mep2_puzzle_cross_colour(0,
+    %mourning_light_temple_2_15_west, %mourning_light_temple_2_13_up);
+%mourning_pillar_light_cross_2_14 = ~mep2_puzzle_cross_colour(0,
+    %mourning_light_temple_2_15_west, %mourning_light_temple_2_14_up);
+%mourning_pillar_light_cross_3_4 = ~mep2_puzzle_cross_colour(%mourning_light_temple_3_16_north,
+    %mourning_light_temple_3_3_east, 0);
+%mourning_pillar_light_cross_3_7 = ~mep2_puzzle_cross_colour(0,
+    %mourning_light_temple_3_6_east, %mourning_light_temple_3_7_up);
+%mourning_pillar_light_cross_3_14 = ~mep2_puzzle_cross_colour(%mourning_light_temple_3_10_south,
+    %mourning_light_temple_3_13_15, %mourning_light_temple_3_14_up);

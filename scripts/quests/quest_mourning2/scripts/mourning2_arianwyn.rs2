@@ -1,12 +1,11 @@
-// Mourning's End Part II — Arianwyn (Lletya) start later-case label.
-// Jumped from the existing [opnpc1,mourning_arianwyn] once MEP1 complete
-// (%mourning_quest >= 9, cited varp 517). CANDIDATE lines (OSRS
-// Transcript:Mourning's End Part II minus overlay / SoE).
-// First write %mourning_quest_main 0 -> 1. No %mourning_quest rewrite.
-// Chat + write only — no light-puzzle, no Thorgel dest, no death-altar list.
-// Cite red-19-start-impl-377.md §19 · mep2-start-complete-gate-377.md.
+// Part II enters through Part I's existing Arianwyn handler.
+// CANDIDATE start wording: retained OSRS transcript, excluding later overlay / Song of the Elves.
 
 [label,mourning2_arianwyn_start]
+if (%mourning_quest_main > ^mep2_unstarted) {
+    ~mep2_arianwyn_interact;
+    return;
+}
 ~chatplayer("<p,neutral>Hello Arianwyn. What are we going to do about the Temple of Light?");
 ~chatnpc("<p,neutral>First of all, we need to know how close the Iorwerth elves are to finding it.");
 ~chatnpc("<p,neutral>Return to the Mourner Headquarters and gain access to their mine.");
@@ -18,4 +17,6 @@ if ($go = 2) {
 }
 ~chatplayer("<p,neutral>I'll head over there right away.");
 ~chatnpc("<p,neutral>Thank you friend. Don't forget your disguise.");
-%mourning_quest_main = 1;
+~mep2_dwarf_seed_choices;
+%mourning_quest_main = ^mep2_started;
+~update_questlist;

@@ -57946,43 +57946,6 @@ readyanim=midget_ready
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
 
-[mourning_shadow_beast]
-name=Shadow
-desc=A shadow.
-model1=npc_2782
-walkanim=shadow_walk
-readyanim=shadow_ready
-op2=Attack
-vislevel=73
-hitpoints=15
-attack=90
-strength=120
-defence=5
-
-[mourning_dark_beast]
-name=Dark Beast
-desc=From a darker dimension.
-model1=obj_slayerguide_dark_beast
-recol1s=32765
-recol1d=5251
-recol2s=32767
-recol2d=5251
-recol3s=15648
-recol3d=11488
-recol4s=8192
-recol4d=20513
-size=3
-walkanim=dark_beast_update_attack
-readyanim=dark_beast_update_walk
-op2=Attack
-resizeh=165
-resizev=165
-vislevel=182
-hitpoints=220
-attack=140
-strength=160
-defence=120
-param=slayer_category,^slayer_darkbeast
 
 [mourner_hideout_slave_guard]
 name=Mourner
@@ -58068,29 +58031,6 @@ resizev=100
 readyanim=human_ready
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 
-[mourning_deathalter_dwarf]
-walkanim=dwarf_walk
-readyanim=dwarf_ready
-alwaysontop=yes
-vislevel=1
-multivar=mourning_light_door_1_c_first_time
-multinpc=1,mourning_deathalter_dwarf_vis
-
-[mourning_deathalter_dwarf_vis]
-name=Thorgel
-desc=A short angry guy.
-model1=npc_dwarf_normal
-model2=npc_dwarf_normali2
-model3=npc_dwarf_normali3
-model4=npc_dwarf_normali4
-model5=npc_dwarf_normali5
-model6=npc_dwarf_normali6
-vislevel=hide
-op1=Talk-to
-walkanim=dwarf_walk
-readyanim=dwarf_ready
-alwaysontop=yes
-head1=npc_lawgof2_head
 
 [pillory_tramp_thrower_varrock]
 name=Tramp

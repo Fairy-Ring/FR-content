@@ -1,0 +1,377 @@
+// MEP2 Temple puzzle. Slot and orientation numbers are UNKNOWN engineering encodings
+// over original cache varps; beam and door varbits retain their revision-377 identities.
+
+[proc,mep2_puzzle_slot_get](int $slot)(int)
+if ($slot < 1 | $slot > 31) return(0);
+def_int $index = sub($slot, 1);
+def_int $group = divide($index, 8);
+def_int $offset = sub($index, multiply($group, 8));
+def_int $start = multiply($offset, 4);
+switch_int($group) {
+    case 0 : return(getbit_range(%varp575_bits, $start, add($start, 3)));
+    case 1 : return(getbit_range(%varp576_bits, $start, add($start, 3)));
+    case 2 : return(getbit_range(%varp577_bits, $start, add($start, 3)));
+    case 3 :
+        if ($slot = 31) return(getbit_range(%varp578_bits, 25, 28));
+        return(getbit_range(%varp578_bits, $start, add($start, 3)));
+}
+return(0);
+
+[proc,mep2_puzzle_slot_set](int $slot, int $state)
+if ($slot < 1 | $slot > 31) return;
+def_int $index = sub($slot, 1);
+def_int $group = divide($index, 8);
+def_int $offset = sub($index, multiply($group, 8));
+def_int $start = multiply($offset, 4);
+switch_int($group) {
+    case 0 : %varp575_bits = setbit_range_toint(%varp575_bits, $state, $start, add($start, 3)); return;
+    case 1 : %varp576_bits = setbit_range_toint(%varp576_bits, $state, $start, add($start, 3)); return;
+    case 2 : %varp577_bits = setbit_range_toint(%varp577_bits, $state, $start, add($start, 3)); return;
+    case 3 :
+        if ($slot = 31) {
+            %varp578_bits = setbit_range_toint(%varp578_bits, $state, 25, 28);
+            return;
+        }
+        %varp578_bits = setbit_range_toint(%varp578_bits, $state, $start, add($start, 3));
+        return;
+}
+
+[proc,mep2_puzzle_is_fixed_slot](int $slot)(boolean)
+if ($slot = ^mep2_slot_1_1 | $slot = ^mep2_slot_1_13 | $slot = ^mep2_slot_1_16 | $slot = ^mep2_slot_2_10) return(true);
+return(false);
+
+[proc,mep2_puzzle_is_mirror](int $state)(boolean)
+if ($state >= ^mep2_puzzle_mirror_0 & $state <= ^mep2_puzzle_mirror_5) return(true);
+return(false);
+
+[proc,mep2_puzzle_is_fracture](int $state)(boolean)
+if ($state = ^mep2_puzzle_fracture_1 | $state = ^mep2_puzzle_fracture_2) return(true);
+return(false);
+
+[proc,mep2_puzzle_piece_from_item](obj $item)(int)
+if ($item = mourning_mirror) return(^mep2_puzzle_mirror_0);
+if ($item = mourning_crystal_red) return(^mep2_puzzle_crystal_red);
+if ($item = mourning_crystal_yellow) return(^mep2_puzzle_crystal_yellow);
+if ($item = mourning_crystal_green) return(^mep2_puzzle_crystal_green);
+if ($item = mourning_crystal_cyan) return(^mep2_puzzle_crystal_cyan);
+if ($item = mourning_crystal_blue) return(^mep2_puzzle_crystal_blue);
+if ($item = mourning_crystal_magenta) return(^mep2_puzzle_crystal_magenta);
+if ($item = mourning_fractured_crystal_1) return(^mep2_puzzle_fracture_1);
+if ($item = mourning_fractured_crystal_2) return(^mep2_puzzle_fracture_2);
+return(0);
+
+[proc,mep2_puzzle_item_from_piece](int $state)(namedobj)
+if (~mep2_puzzle_is_mirror($state) = true) return(mourning_mirror);
+if ($state = ^mep2_puzzle_crystal_red) return(mourning_crystal_red);
+if ($state = ^mep2_puzzle_crystal_yellow) return(mourning_crystal_yellow);
+if ($state = ^mep2_puzzle_crystal_green) return(mourning_crystal_green);
+if ($state = ^mep2_puzzle_crystal_cyan) return(mourning_crystal_cyan);
+if ($state = ^mep2_puzzle_crystal_blue) return(mourning_crystal_blue);
+if ($state = ^mep2_puzzle_crystal_magenta) return(mourning_crystal_magenta);
+if ($state = ^mep2_puzzle_fracture_1) return(mourning_fractured_crystal_1);
+if ($state = ^mep2_puzzle_fracture_2) return(mourning_fractured_crystal_2);
+return(null);
+
+[proc,mep2_puzzle_installed_count](obj $item)(int)
+def_int $count = 0;
+def_int $slot = 1;
+while ($slot <= 31) {
+    if (~mep2_puzzle_is_fixed_slot($slot) = false) {
+        def_int $state = ~mep2_puzzle_slot_get($slot);
+        def_obj $installed = ~mep2_puzzle_item_from_piece($state);
+        if ($installed = $item) $count = add($count, 1);
+    }
+    $slot = add($slot, 1);
+}
+return($count);
+
+[proc,mep2_puzzle_stock_count](obj $item)(int)
+def_int $count = ~mep2_puzzle_installed_count($item);
+$count = add($count, inv_total(inv, $item));
+$count = add($count, inv_total(bank, $item));
+return($count);
+
+[proc,mep2_puzzle_mirror_target]()(int)
+def_int $target = ^mep2_initial_mirror_stock;
+if (%mourning_temple_parts_2 = 1) $target = add($target, 2);
+if (%mourning_temple_parts_3 = 1) $target = add($target, 2);
+if (%mourning_temple_parts_5 = 1) $target = add($target, 2);
+if (%mourning_temple_parts_6 = 1) $target = add($target, 3);
+return($target);
+
+[proc,mep2_puzzle_grant_to_target](namedobj $item, int $target)
+def_int $owned = ~mep2_puzzle_stock_count($item);
+while ($owned < $target & inv_freespace(inv) > 0) {
+    inv_add(inv, $item, 1);
+    $owned = add($owned, 1);
+}
+
+[proc,mep2_puzzle_collect]
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+%mourning_temple_parts_1 = 1;
+~mep2_puzzle_grant_to_target(mourning_mirror, ~mep2_puzzle_mirror_target);
+~mep2_puzzle_grant_to_target(mourning_crystal_yellow, 1);
+if (%mourning_temple_parts_2 = 1) ~mep2_puzzle_grant_to_target(mourning_crystal_cyan, 1);
+if (%mourning_temple_parts_4 = 1) ~mep2_puzzle_grant_to_target(mourning_crystal_blue, 1);
+if (%mourning_temple_parts_5 = 1) ~mep2_puzzle_grant_to_target(mourning_fractured_crystal_1, 1);
+if (%mourning_temple_parts_6 = 1) ~mep2_puzzle_grant_to_target(mourning_fractured_crystal_2, 1);
+~mep2_puzzle_recalculate;
+
+[proc,mep2_puzzle_clear_beams]
+%mourning_quest_beams1 = setbit_range_toint(%mourning_quest_beams1, 0, 0, 29);
+%mourning_quest_beams2 = setbit_range_toint(%mourning_quest_beams2, 0, 0, 29);
+%mourning_quest_beams3 = setbit_range_toint(%mourning_quest_beams3, 0, 0, 29);
+%mourning_quest_beams4 = setbit_range_toint(%mourning_quest_beams4, 0, 0, 29);
+%mourning_quest_beams5 = setbit_range_toint(%mourning_quest_beams5, 0, 0, 29);
+%mourning_quest_beams6 = setbit_range_toint(%mourning_quest_beams6, 0, 0, 29);
+%mourning_quest_vert_beams1 = setbit_range_toint(%mourning_quest_vert_beams1, 0, 0, 29);
+%mourning_quest_vert_beams2 = setbit_range_toint(%mourning_quest_vert_beams2, 0, 0, 29);
+%mourning_quest_vert_beams3 = setbit_range_toint(%mourning_quest_vert_beams3, 0, 0, 29);
+%mourning_quest_vert_beams4 = setbit_range_toint(%mourning_quest_vert_beams4, 0, 0, 29);
+%mourning_quest_vert_beams5 = setbit_range_toint(%mourning_quest_vert_beams5, 0, 0, 8);
+%mourning_quest_beam_cross1 = setbit_range_toint(%mourning_quest_beam_cross1, 0, 0, 30);
+%mourning_quest_beam_cross2 = setbit_range_toint(%mourning_quest_beam_cross2, 0, 0, 23);
+%mourning_quest_light_doors = setbit_range_toint(%mourning_quest_light_doors, 0, 0, 13);
+
+[proc,mep2_puzzle_reset]
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+def_int $slot = 1;
+while ($slot <= 31) {
+    ~mep2_puzzle_slot_set($slot, 0);
+    $slot = add($slot, 1);
+}
+%mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, 0, 27, 30);
+%mourning_temple_mirror = 0;
+~mep2_puzzle_clear_beams;
+
+[proc,mep2_puzzle_rotate_piece](int $slot)
+def_int $state = ~mep2_puzzle_slot_get($slot);
+if ($slot = ^mep2_slot_2_10) return;
+if (~mep2_puzzle_is_fixed_slot($slot) = true) {
+    if ($state = sub(^mep2_puzzle_mirror_5, 1)) ~mep2_puzzle_slot_set($slot, 0);
+    else ~mep2_puzzle_slot_set($slot, add($state, 1));
+    return;
+}
+if (~mep2_puzzle_is_mirror($state) = true) {
+    if ($state = ^mep2_puzzle_mirror_5) ~mep2_puzzle_slot_set($slot, ^mep2_puzzle_mirror_0);
+    else ~mep2_puzzle_slot_set($slot, add($state, 1));
+    return;
+}
+if ($state = ^mep2_puzzle_fracture_1) {
+    def_int $pose = getbit_range(%mourning_part2_basevar2, 27, 28);
+    if ($pose = ^mep2_puzzle_pose_3) $pose = ^mep2_puzzle_pose_0;
+    else $pose = add($pose, 1);
+    %mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, $pose, 27, 28);
+    return;
+}
+if ($state = ^mep2_puzzle_fracture_2) {
+    def_int $pose = getbit_range(%mourning_part2_basevar2, 29, 30);
+    if ($pose = ^mep2_puzzle_pose_3) $pose = ^mep2_puzzle_pose_0;
+    else $pose = add($pose, 1);
+    %mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, $pose, 29, 30);
+}
+
+[proc,mep2_puzzle_rotation_preview](int $slot)
+def_int $state = ~mep2_puzzle_slot_get($slot);
+def_int $pose = $state;
+if (~mep2_puzzle_is_fixed_slot($slot) = false & ~mep2_puzzle_is_mirror($state) = true) $pose = sub($state, ^mep2_puzzle_mirror_0);
+if ($state = ^mep2_puzzle_fracture_1) $pose = getbit_range(%mourning_part2_basevar2, 27, 28);
+if ($state = ^mep2_puzzle_fracture_2) $pose = getbit_range(%mourning_part2_basevar2, 29, 30);
+if_sethide(rotate_mirror:com_8, true);
+if_sethide(rotate_mirror:com_9, true);
+if_sethide(rotate_mirror:com_10, true);
+if_sethide(rotate_mirror:com_11, true);
+if_sethide(rotate_mirror:com_12, true);
+if_sethide(rotate_mirror:com_13, true);
+switch_int($pose) {
+    case 0 : if_sethide(rotate_mirror:com_8, false);
+    case 1 : if_sethide(rotate_mirror:com_9, false);
+    case 2 : if_sethide(rotate_mirror:com_10, false);
+    case 3 : if_sethide(rotate_mirror:com_11, false);
+    case 4 : if_sethide(rotate_mirror:com_12, false);
+    case 5 : if_sethide(rotate_mirror:com_13, false);
+}
+
+[proc,mep2_puzzle_rotate_interface](int $slot, coord $anchor)
+if_openmain(rotate_mirror);
+~mep2_puzzle_rotation_preview($slot);
+while (%mourning_quest_main >= ^mep2_crystal_created) {
+    if_addresumebutton(rotate_mirror:com_16);
+    p_pausebutton;
+    if (last_com ! rotate_mirror:com_16) return;
+    if (distance(coord, $anchor) > 1 | %mourning_quest_main < ^mep2_crystal_created) {
+        if_close;
+        return;
+    }
+    def_int $state = ~mep2_puzzle_slot_get($slot);
+    if (~mep2_puzzle_is_mirror($state) = false & ~mep2_puzzle_is_fracture($state) = false & ~mep2_puzzle_is_fixed_slot($slot) = false) {
+        if_close;
+        return;
+    }
+    ~mep2_puzzle_rotate_piece($slot);
+    ~mep2_puzzle_recalculate;
+    ~mep2_puzzle_rotation_preview($slot);
+}
+
+[proc,mep2_puzzle_search](int $slot, coord $anchor)
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+if ($slot = ^mep2_slot_2_10) return;
+if (~mep2_puzzle_is_fixed_slot($slot) = true) {
+    // UNKNOWN short functional choices; exact period search sub-menu wording is not retained.
+    def_int $choice = ~p_choice2("Rotate", 1, "Leave", 2);
+    if ($choice = 1) ~mep2_puzzle_rotate_interface($slot, $anchor);
+    return;
+}
+def_int $state = ~mep2_puzzle_slot_get($slot);
+if ($state = 0) return;
+if (~mep2_puzzle_is_mirror($state) = true | ~mep2_puzzle_is_fracture($state) = true) {
+    // UNKNOWN short functional choices; exact period search sub-menu wording is not retained.
+    def_int $choice = ~p_choice2("Rotate", 1, "Remove", 2);
+    if ($choice = 1) {
+        ~mep2_puzzle_rotate_interface($slot, $anchor);
+        return;
+    }
+    if ($choice = 2) {
+        if (inv_freespace(inv) = 0) return;
+        def_namedobj $item = ~mep2_puzzle_item_from_piece($state);
+        if ($item = null) return;
+        ~mep2_puzzle_slot_set($slot, 0);
+        if ($state = ^mep2_puzzle_fracture_1) %mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, 0, 27, 28);
+        if ($state = ^mep2_puzzle_fracture_2) %mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, 0, 29, 30);
+        inv_add(inv, $item, 1);
+        ~mep2_puzzle_recalculate;
+    }
+    return;
+}
+// Crystal item choice1 removes; choice2 leaves the installed crystal in place.
+def_int $choice = ~p_choice2("Remove", 1, "Leave", 2);
+if ($choice = 1) {
+    if (inv_freespace(inv) = 0) return;
+    def_namedobj $item = ~mep2_puzzle_item_from_piece($state);
+    if ($item = null) return;
+    ~mep2_puzzle_slot_set($slot, 0);
+    inv_add(inv, $item, 1);
+    ~mep2_puzzle_recalculate;
+}
+
+[proc,mep2_puzzle_insert](int $slot)
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+if (~mep2_puzzle_is_fixed_slot($slot) = true) return;
+if (~mep2_puzzle_slot_get($slot) ! 0) return;
+def_int $piece = ~mep2_puzzle_piece_from_item(last_useitem);
+if ($piece = 0 | inv_total(inv, last_useitem) = 0) return;
+inv_del(inv, last_useitem, 1);
+~mep2_puzzle_slot_set($slot, $piece);
+if ($piece = ^mep2_puzzle_fracture_1) %mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, 0, 27, 28);
+if ($piece = ^mep2_puzzle_fracture_2) %mourning_part2_basevar2 = setbit_range_toint(%mourning_part2_basevar2, 0, 29, 30);
+~mep2_puzzle_recalculate;
+
+[proc,mep2_puzzle_chest_flag](int $chest)(boolean)
+switch_int($chest) {
+    case 2 : if (%mourning_temple_parts_2 = 1) return(true); return(false);
+    case 3 : if (%mourning_temple_parts_3 = 1) return(true); return(false);
+    case 4 : if (%mourning_temple_parts_4 = 1) return(true); return(false);
+    case 5 : if (%mourning_temple_parts_5 = 1) return(true); return(false);
+    case 6 : if (%mourning_temple_parts_6 = 1) return(true); return(false);
+}
+return(false);
+
+[proc,mep2_puzzle_set_chest_flag](int $chest)
+switch_int($chest) {
+    case 2 : %mourning_temple_parts_2 = 1; return;
+    case 3 : %mourning_temple_parts_3 = 1; return;
+    case 4 : %mourning_temple_parts_4 = 1; return;
+    case 5 : %mourning_temple_parts_5 = 1; return;
+    case 6 : %mourning_temple_parts_6 = 1; return;
+}
+
+[proc,mep2_puzzle_chest_search](int $chest)
+if (%mourning_quest_main < ^mep2_crystal_created) return;
+if ($chest < 2 | $chest > 6) return;
+def_int $mirror_target = ~mep2_puzzle_mirror_target;
+if (~mep2_puzzle_chest_flag($chest) = false) {
+    if ($chest = 2 | $chest = 3 | $chest = 5) $mirror_target = add($mirror_target, 2);
+    if ($chest = 6) $mirror_target = add($mirror_target, 3);
+}
+def_namedobj $special = null;
+switch_int($chest) {
+    case 2 : $special = mourning_crystal_cyan;
+    case 4 : $special = mourning_crystal_blue;
+    case 5 : $special = mourning_fractured_crystal_1;
+    case 6 : $special = mourning_fractured_crystal_2;
+}
+def_int $mirror_owned = ~mep2_puzzle_stock_count(mourning_mirror);
+def_int $mirror_missing = 0;
+if ($mirror_owned < $mirror_target) $mirror_missing = sub($mirror_target, $mirror_owned);
+def_int $special_missing = 0;
+if ($special ! null & ~mep2_puzzle_stock_count($special) = 0) $special_missing = 1;
+def_int $needed = add($mirror_missing, $special_missing);
+if (inv_freespace(inv) < $needed) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~mep2_puzzle_chest_flag($chest) = false) ~mep2_puzzle_set_chest_flag($chest);
+~mep2_puzzle_grant_to_target(mourning_mirror, $mirror_target);
+if ($special ! null) ~mep2_puzzle_grant_to_target($special, 1);
+switch_int($chest) {
+    case 2 : loc_change(mourning_temple_light_parts_2_open, 500);
+    case 3 : loc_change(mourning_temple_light_parts_3_open, 500);
+    case 4 : loc_change(mourning_temple_light_parts_4_open, 500);
+    case 5 : loc_change(mourning_temple_light_parts_5_open, 500);
+    case 6 : loc_change(mourning_temple_light_parts_6_open, 500);
+}
+
+[proc,mep2_puzzle_door_is_open](int $door)(boolean)
+switch_int($door) {
+    case 0 : if (%mourning_door_1_1_south = 1) return(true);
+    case 1 : if (%mourning_door_1_1_east = 1) return(true);
+    case 2 : if (%mourning_door_1_13_north = 1) return(true);
+    case 3 : if (%mourning_door_1_13_east = 1) return(true);
+    case 4 : if (%mourning_door_1_16_north = 1) return(true);
+    case 5 : if (%mourning_door_1_16_west = 1) return(true);
+    case 6 : if (%mourning_door_2_4_west = 1) return(true);
+    case 7 : if (%mourning_door_2_4_south = 1) return(true);
+    case 8 : if (%mourning_door_2_16_north = 1) return(true);
+    case 9 : if (%mourning_door_2_16_west = 1) return(true);
+    case 10 : if (%mourning_door_1_b = 1) return(true);
+    case 11 : if (%mourning_door_1_c = 1) return(true);
+}
+return(false);
+
+[proc,mep2_puzzle_door_use](int $door)
+if (~mep2_puzzle_door_is_open($door) = false) return;
+def_int $entering = 0;
+if (coordx(coord) > coordx(loc_coord)) $entering = 1;
+def_int $axis = 0;
+if ($door = 0 | $door = 2 | $door = 4 | $door = 7 | $door = 8) $axis = 1;
+// UNKNOWN crossing mechanism: the original one-tile barrier has clear adjacent floors.
+def_int $delta = 1;
+if ($axis = 0) {
+    if (coordx(coord) > coordx(loc_coord)) $delta = -1;
+    p_telejump(movecoord(loc_coord, $delta, 0, 0));
+} else {
+    if (coordz(coord) > coordz(loc_coord)) $delta = -1;
+    p_telejump(movecoord(loc_coord, 0, 0, $delta));
+}
+if ($door = 11 & $entering = 1) {
+    if (%mourning_light_door_1_c_first_time = 0) %mourning_light_door_1_c_first_time = 1;
+    if (%mourning_quest_main < ^mep2_death_chamber) {
+        %mourning_quest_main = ^mep2_death_chamber;
+        ~update_questlist;
+    }
+}
+
+[oploc1,mourning_temple_light_wall_collector] ~mep2_puzzle_collect;
+[oploc1,mourning_temple_light_wall_lever] ~mep2_puzzle_reset;
+
+[oploc1,mourning_temple_light_parts_2_closed] ~mep2_puzzle_chest_search(2);
+[oploc1,mourning_temple_light_parts_2_open] ~mep2_puzzle_chest_search(2);
+[oploc1,mourning_temple_light_parts_3_closed] ~mep2_puzzle_chest_search(3);
+[oploc1,mourning_temple_light_parts_3_open] ~mep2_puzzle_chest_search(3);
+[oploc1,mourning_temple_light_parts_4_closed] ~mep2_puzzle_chest_search(4);
+[oploc1,mourning_temple_light_parts_4_open] ~mep2_puzzle_chest_search(4);
+[oploc1,mourning_temple_light_parts_5_closed] ~mep2_puzzle_chest_search(5);
+[oploc1,mourning_temple_light_parts_5_open] ~mep2_puzzle_chest_search(5);
+[oploc1,mourning_temple_light_parts_6_closed] ~mep2_puzzle_chest_search(6);
+[oploc1,mourning_temple_light_parts_6_open] ~mep2_puzzle_chest_search(6);
+

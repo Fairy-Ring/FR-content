@@ -159,6 +159,7 @@ jobs:
           run_test tests/enakhras-lament/test_enakhras_lament.mjs node --import tsx ../content/tests/enakhras-lament/test_enakhras_lament.mjs
           run_test tests/roving-elves/test_roving_elves.mjs node --import tsx ../content/tests/roving-elves/test_roving_elves.mjs
           run_test tests/mournings-end-1/test_mournings_end_1.mjs node --import tsx ../content/tests/mournings-end-1/test_mournings_end_1.mjs
+          run_test tests/mournings-end-2/test_mournings_end_2.mjs node --import tsx ../content/tests/mournings-end-2/test_mournings_end_2.mjs
           run_test tests/mountain-daughter/test_mountain_daughter.mjs node --import tsx ../content/tests/mountain-daughter/test_mountain_daughter.mjs
           run_test tests/between-a-rock/test_between_a_rock.mjs node --import tsx ../content/tests/between-a-rock/test_between_a_rock.mjs
           run_test tests/tog/test_tog.mjs node --import tsx ../content/tests/tog/test_tog.mjs
