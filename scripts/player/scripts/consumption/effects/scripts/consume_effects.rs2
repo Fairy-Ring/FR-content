@@ -67,6 +67,7 @@ while ($i < db_getfieldcount($effect_data, consume_table:stat_change)) {
     $i = calc($i + 1);
 }
 // stat heal
+~deal_wrench_restore($consumable);
 $i = 0;
 while ($i < db_getfieldcount($effect_data, consume_table:stat_heal)) {
     stat_heal(db_getfield($effect_data, consume_table:stat_heal, $i));

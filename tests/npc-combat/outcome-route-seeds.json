@@ -3,6 +3,24 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_opplayer2,deal_evil_spirit]",
+      "npc": "deal_evil_spirit",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,deal_fever_spiders1]",
+      "npc": "deal_fever_spiders1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
       "script": "[ai_applayer2,barrows_karil]",
       "npc": "barrows_karil",
       "style": "ranged",

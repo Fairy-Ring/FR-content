@@ -1,0 +1,607 @@
+// Rum Deal 377 location records migrated unchanged from all.loc.
+[deal_blindweed]
+width=2
+length=2
+active=yes
+multivar=deal_farming
+multiloc=0,deal_blindweed_weeds3
+multiloc=1,deal_blindweed_weeds2
+multiloc=2,deal_blindweed_weeds1
+multiloc=3,deal_blindweed_empty
+multiloc=4,deal_blindweed_seed
+multiloc=5,deal_blindweed_fullygrown
+
+[deal_blindweed_weeds3]
+name=Blindweed Patch
+desc=Weedy.
+model=belladonna_patch_weeds3
+model2=flower_patch_weeds1
+op2=Inspect
+
+[deal_blindweed_weeds2]
+name=Blindweed Patch
+desc=Less weedy.
+model=belladonna_patch_weeds2
+model2=flower_patch_weeds1
+op2=Inspect
+
+[deal_blindweed_weeds1]
+name=Blindweed Patch
+desc=Almost clear.
+model=belladonna_patch_weeds1
+model2=flower_patch_weeds1
+op2=Inspect
+
+[deal_blindweed_empty]
+name=Blindweed Patch
+desc=Free from weeds.
+model=belladonna_patch_weeded
+op2=Inspect
+
+[deal_blindweed_seed]
+name=Blindweed Patch
+desc=Something is growing here.
+model=deal_blindweed_seed
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[deal_blindweed_fullygrown]
+name=Blindweed Patch
+desc=Fully grown Blindweed.
+model=deal_blindweed_fullygrown
+model2=flower_patch_weeds1
+op1=Pick
+op2=Inspect
+
+[deal_overgrown_patch]
+name=Trashed Patch
+desc=Weedy, wrecked and infertile.
+model=belladonna_patch_weeds3
+model2=flower_patch_weeds1
+op2=Inspect
+width=2
+length=2
+active=yes
+
+[deal_multicontrol]
+active=yes
+hillskew=yes
+length=2
+width=2
+anim=brew_control
+forceapproach=south
+multivar=deal_multi_hopper
+multiloc=0,deal_brew_control
+multiloc=1,deal_brew_control_spin
+multiloc=2,deal_brew_control_work
+
+[deal_stagnant]
+name=Stagnant Lake
+desc=A stagnant lake.
+model=regicide_tar_collection
+active=yes
+blockwalk=no
+
+[deal_support_wall]
+model=deal_support_wall
+active=no
+sharelight=yes
+hillskew=yes
+ambient=-25
+
+[deal_support_ladder]
+model=deal_support_ladder
+active=no
+sharelight=yes
+hillskew=yes
+ambient=-25
+
+[deal_wall_window]
+model=deal_wall_window
+active=no
+sharelight=yes
+hillskew=yes
+ambient=-40
+
+[deal_wall]
+model=viking_longhall_wall
+active=no
+sharelight=yes
+hillskew=yes
+ambient=-40
+
+[deal_low_wall]
+model=deal_low_wall
+active=no
+sharelight=yes
+hillskew=yes
+ambient=-10
+
+[deal_roof1]
+model=viking_longhall_roof1
+sharelight=yes
+hillskew=yes
+
+[deal_roof2]
+model=viking_longhall_roof2
+sharelight=yes
+hillskew=yes
+
+[deal_roof3]
+model=viking_longhall_roof3
+sharelight=yes
+hillskew=yes
+
+[deal_roof4]
+model=viking_longhall_roof4
+sharelight=yes
+hillskew=yes
+
+[deal_roof1_mirror]
+model=viking_longhall_roof1
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[deal_roof2_mirror]
+model=viking_longhall_roof2
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[deal_roof3_mirror]
+model=viking_longhall_roof3
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[deal_roof4_mirror]
+model=viking_longhall_roof4
+sharelight=yes
+hillskew=yes
+mirror=yes
+
+[deal_roofedge1]
+model=deal_roofedge1
+sharelight=yes
+hillskew=yes
+forcedecor=yes
+
+[deal_roofedge2]
+model=deal_roofedge2
+sharelight=yes
+hillskew=yes
+forcedecor=yes
+
+[deal_roofedge3]
+model=deal_roofedge3
+sharelight=yes
+hillskew=yes
+forcedecor=yes
+
+[deal_roofedge4]
+model=deal_roofedge4
+sharelight=yes
+hillskew=yes
+forcedecor=yes
+
+[deal_roofedge1_mirr]
+model=deal_roofedge1
+sharelight=yes
+hillskew=yes
+mirror=yes
+forcedecor=yes
+
+[deal_roofedge2_mirr]
+model=deal_roofedge2
+sharelight=yes
+hillskew=yes
+mirror=yes
+forcedecor=yes
+
+[deal_roofedge3_mirr]
+model=deal_roofedge3
+sharelight=yes
+hillskew=yes
+mirror=yes
+forcedecor=yes
+
+[deal_roofedge4_mirr]
+model=deal_roofedge4
+sharelight=yes
+hillskew=yes
+mirror=yes
+forcedecor=yes
+
+[deal_roofedge5]
+model=viking_longhall_wall
+active=no
+sharelight=yes
+hillskew=yes
+resizex=128
+resizey=151
+resizez=128
+forcedecor=yes
+
+[deal_roofedge1_chimney]
+model=deal_roofedge1_chimney
+sharelight=yes
+hillskew=yes
+
+[deal_chimney_pipe]
+name=Chimney Pipe
+desc=A very large pipe.
+model=deal_chimney_pipe
+sharelight=yes
+hillskew=yes
+
+[deal_window_board1]
+model=deal_window_board1
+hillskew=yes
+ambient=15
+
+[deal_window_board2]
+model=deal_window_board2
+hillskew=yes
+ambient=15
+
+[deal_window_board3]
+model=deal_window_board3
+hillskew=yes
+ambient=15
+
+[deal_window_board4]
+model=deal_window_board1
+hillskew=yes
+mirror=yes
+ambient=15
+
+[deal_window_board5]
+model=deal_window_board2
+hillskew=yes
+mirror=yes
+ambient=15
+
+[deal_window_board6]
+model=deal_window_board3
+hillskew=yes
+mirror=yes
+ambient=15
+
+[deal_boat]
+name=Row boat
+desc=I hope it doesn't sink.
+model=serim_rowboat
+width=3
+length=3
+
+[deal_palm_1]
+name=Palm tree
+desc=It's a palm tree.
+model=palm_tree_fullygrown
+model2=palm_tree_fruit_6
+recol1s=11552
+recol1d=7360
+recol2s=15715
+recol2d=10466
+recol3s=9801
+recol3d=227
+recol4s=12908
+recol4d=162
+width=2
+length=2
+mapscene=5
+
+[deal_palm_2]
+name=Palm tree
+desc=It's a palm tree.
+model=palm_tree_fullygrown
+recol1s=11552
+recol1d=7360
+recol2s=15715
+recol2d=10466
+recol3s=9801
+recol3d=227
+recol4s=12908
+recol4d=162
+width=2
+length=2
+mapscene=5
+
+[deal_palm_3]
+name=Palm tree
+desc=It's a palm tree.
+model=palm_tree5
+recol1s=11552
+recol1d=7360
+recol2s=15715
+recol2d=10466
+recol3s=9801
+recol3d=227
+recol4s=12908
+recol4d=162
+width=2
+length=2
+mapscene=5
+
+[deal_brew_control]
+name=Brewing control
+desc=This controls the entire brewery.
+model=deal_brew_control
+hillskew=yes
+length=2
+width=2
+anim=brew_control
+
+[deal_brew_control_spin]
+name=Brewing control
+desc=A frothing, spinning, possessed control panel.
+model=deal_brew_control_spin
+hillskew=yes
+length=2
+width=2
+anim=brew_control
+
+[deal_brew_control_work]
+name=Brewing control
+desc=Chugging away nicely.
+model=deal_brew_control_work
+hillskew=yes
+length=2
+width=2
+anim=brew_control
+
+[deal_brewvat1]
+name=Brewing vat
+desc=A large brass brewing vat.
+model=deal_brewvat1
+sharelight=yes
+hillskew=yes
+resizey=115
+
+[deal_brewvat_hopper]
+name=Brewing vat
+desc=A large brass brewing vat.
+model=deal_brewvat_hopper
+sharelight=yes
+hillskew=yes
+resizey=115
+
+[deal_brewvat_hopper_end]
+name=Brewing vat
+desc=A large brass brewing vat.
+model=deal_brewvat_hopper_end
+sharelight=yes
+hillskew=yes
+resizey=115
+
+[deal_brewvat_tap]
+name=Output Tap
+desc=The brass seems to be eaten away around the edge...
+model=deal_brewvat_tap
+sharelight=yes
+hillskew=yes
+resizey=115
+op1=Turn
+
+[deal_brewvat_pipes]
+model=blast_furnace_pipes
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+width=2
+active=no
+
+[deal_brewvat_pipes2]
+model=blast_furnace_pipes2
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+active=no
+
+[deal_brewvat_pipes3]
+model=blast_furnace_pipes3
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+sharelight=yes
+active=no
+
+[deal_brewvat_pipes5]
+model=blast_furnace_pipes5
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+active=no
+
+[deal_brewvat_pipes6]
+model=blast_furnace_pipes6
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+active=no
+
+[deal_brewvat_pipes7]
+model=blast_furnace_pipes7
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+active=no
+
+[deal_brewvat_pipes8]
+model=blast_furnace_pipes8
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+sharelight=yes
+active=no
+
+[deal_brewvat_pipes9]
+model=blast_furnace_pipes9
+recol1s=8456
+recol1d=18785
+recol2s=12684
+recol2d=27137
+recol3s=6342
+recol3d=14528
+sharelight=yes
+active=no
+
+[deal_barrel_rack]
+name=Barrels
+desc=Racks of barrels.
+model=deal_barrel_rack
+
+[deal_barrel]
+name=Brewer's Barrel
+desc=Round, oaken, barrel-shaped.
+model=loc_7407
+
+[deal_crate2]
+name=Crate
+desc=A wooden crate.
+model=rd_large_crate
+blockrange=no
+
+[deal_crate3]
+name=Crates
+desc=Some wooden crates.
+model=rd_large_crates
+
+[deal_boxes]
+name=Boxes
+desc=Some wooden boxes.
+model=ahoy_boxes1
+
+[deal_broomcupboard]
+name=Cupboard
+desc=Probably where the farming kit is stored.
+model=spookywardrobe
+length=2
+forceapproach=east
+op1=Open
+
+[deal_broomcupboard_open]
+name=Open Cupboard
+desc=Ah! Definitely where the farming kit is stored.
+model=spookywardrobe_open
+length=2
+op2=Search
+op3=Shut
+forceapproach=east
+
+[deal_multi_lever]
+active=yes
+op1=Pull
+multivar=deal_barrel
+multiloc=0,deal_lever_down
+multiloc=1,deal_lever_down
+multiloc=2,deal_lever_down
+multiloc=3,deal_lever_down
+multiloc=4,deal_lever_down
+multiloc=5,deal_lever_up
+
+[deal_lever_up]
+name=Pressure Lever
+desc=Throw the lever! Mwuhahahaha!
+model=floorlever_off
+op1=Pull
+active=yes
+
+[deal_lever_down]
+name=Pressure Lever
+desc=This lever can't be operated right now.
+model=floorlever_on
+op1=Pull
+active=yes
+
+[deal_ladder_up]
+name=Ladder
+desc=It leads up.
+model=puzzle_ladder
+sharelight=yes
+op1=Climb-up
+forceapproach=north
+resizex=128
+resizey=151
+resizez=128
+mapscene=7
+
+[deal_laddertop]
+name=Ladder
+desc=I can climb down this.
+model=prison_laddertop
+active=yes
+op1=Climb-down
+mapscene=7
+sharelight=yes
+forceapproach=north
+resizex=128
+resizey=151
+resizez=128
+
+[deal_swamp_bubbles]
+model=swampbubbles
+anim=swampbubs
+active=no
+
+[deal_hopper]
+name=Hopper
+desc=This is where the brewing ingredients go.
+model=regicide_tar_collection
+
+[deal_pressure]
+name=Pressure Barrel
+desc=An ominously stained barrel.
+model=deal_pressure
+length=2
+op2=Count
+forceapproach=north
+
+[deal_gate_closed]
+name=Gate
+desc=This gate is closed.
+model=deal_gate_closed
+op1=Open
+hillskew=yes
+
+[deal_gate_open]
+model=deal_gate_closed
+hillskew=yes
+
+[deal_pirate_sign]
+name=Pirate Sign
+desc=The blood-chilling flag of the Inebriated.
+model=deal_pirate_sign
+ambient=20
+contrast=10
+
+[deal_sink]
+name=Sink
+desc='Please remember te wash yer hook'. Sound advice for the hygienic pirate.
+model=farm_sink
+length=2
+blockrange=no
+

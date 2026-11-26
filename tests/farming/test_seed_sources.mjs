@@ -294,7 +294,8 @@ const questAndContainers = [
 ];
 const cacheObjects = new Map();
 let currentObject;
-for (const line of fs.readFileSync(path.join(content, 'scripts/_unpack/377/all.obj'), 'utf8').split(/\r?\n/)) {
+for (const line of ['scripts/_unpack/377/all.obj', 'scripts/quests/quest_deal/configs/quest_deal.obj']
+  .flatMap(file => fs.readFileSync(path.join(content, file), 'utf8').split(/\r?\n/))) {
   const header = /^\[([^\]]+)\]$/.exec(line);
   if (header) {
     currentObject = {};

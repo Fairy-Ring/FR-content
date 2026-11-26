@@ -1,0 +1,175 @@
+// VERIFIED chain/rewards: Tip.It 30 April 2006 (guide updated December 2005).
+// CANDIDATE wording: retained Transcript:Rum Deal r15359833, unrelated later content excluded.
+// UNKNOWN intermediate stage integers are a local encoding; completion remains ^deal_complete.
+[opnpc1,deal_captian_braindeath]
+switch_int (%deal_quest) {
+    case 1 : @deal_captain_first;
+    case 2 : @deal_captain_blindweed;
+    case 3 :
+        ~chatnpc("<p,neutral>Well, now ye've shoved the Blindweed into the mix, what we need is a bucket of stagnant water.");
+        ~chatnpc("<p,neutral>It's up the mountain to the north.");
+        %deal_quest = 4;
+        ~deal_give_bucket;
+    case 4 :
+        ~chatnpc("<p,neutral>To get off yer lazy behind and head out to the stagnant lake on top of the volcano.");
+        ~deal_give_bucket;
+    case 5 :
+        ~chatnpc("<p,neutral>No, <text_gender("lad", "lass")>, next ye'll need to go outside and catch five loads of Sluglings fer the brew.");
+        ~chatnpc("<p,neutral>Well, Ye shove them in the Pressure Barrel in the attic.");
+        ~chatnpc("<p,neutral>Pressurise 'em.");
+        if (~deal_give_tool(fishbowl_net) = true) %deal_quest = 6;
+    case 6 :
+        ~chatnpc("<p,neutral>I want ye to go outside and catch five sea creatures from the squid fishin' spot.");
+        ~chatnpc("<p,neutral>When ye've grabbed them, jam 'em in the barrel in the attic and pressurise 'em.");
+        ~deal_give_tool(fishbowl_net);
+    case 7 :
+        ~chatnpc("<p,neutral>To put it in terms ye'll understand: the brewin' equipment is possessed.");
+        ~chatnpc("<p,neutral>Give the controls a couple of belts with this wrench.");
+        ~chatnpc("<p,neutral>One of the lads did a little priestin' on the side before he came here. Get him to bless it and ye'll do fine.");
+        if (~deal_give_tool(deal_wrench) = true) {
+            %deal_multi_hopper = 1;
+            %deal_quest = 8;
+        }
+    case 8, 9 :
+        ~chatnpc("<p,neutral>I want ye to go clear the Evil Spirit out of the brewin' controls. Use the wrench I gave ye, but get it blessed first.");
+        if (~deal_has_wrench = false) {
+            if (%deal_quest = 9) ~deal_give_tool(deal_wrench_blessed);
+            else ~deal_give_tool(deal_wrench);
+        }
+    case 10 :
+        ~chatnpc("<p,neutral>Well, now that ye've got that spirit out of there ye can dump in the final ingredient.");
+        ~chatnpc("<p,neutral>We need the body of a diseased Fever Spider!");
+        ~chatnpc("<p,neutral>When yer quite done flappin' yer lips, go down into the basement and whack spiders until ye find a fever spider body.");
+        ~chatnpc("<p,neutral>Shove it in the hopper, and then we're in business.");
+        ~chatnpc("<p,neutral>These Fever Spiders carry a nasty disease, and ye'll need a pair of Slayer Gloves on to not catch it!");
+        %deal_quest = 11;
+    case 11 : ~chatnpc("<p,neutral>I want ye to go kill a Fever Spider and jam its body in the hopper.");
+    case 12 :
+        ~chatnpc("<p,neutral>Now ye stand well back and watch the glory of brewin' at its best!");
+        %deal_multi_hopper = 2;
+        %deal_quest = 13;
+        ~chatnpc("<p,neutral>Try givin' it to the Captain, he's in charge. Get him bladdered and the rest will fall!");
+        ~deal_give_bucket;
+    case 13, 14 :
+        ~chatnpc("<p,neutral>Well, get a move on!");
+        ~chatnpc("<p,neutral>And don't ferget the 'rum'!");
+        ~deal_give_bucket;
+    case 15 :
+        ~chatnpc("<p,quiz>So, what did he say?");
+        ~chatplayer("<p,neutral>Not much that was coherent.");
+        ~chatplayer("<p,quiz>Who is Rabid Jack?");
+        ~chatnpc("<p,shock>Rabid Jack!");
+        ~chatnpc("<p,shock>THE Rabid Jack!");
+        ~chatnpc("<p,neutral>Egad...I haven't heard that name...");
+        ~chatnpc("<p,neutral>...before.");
+        ~chatnpc("<p,neutral>With those rottin' dogs legless they'll never keep fighting us now, so we've decided to stay here and keep the 'rum' flowin!");
+        ~chatnpc("<p,happy>Thanks, <text_gender("lad", "lass")>. We'd never have managed without ye!");
+        ~deal_complete;
+    case default :
+        if (%deal_quest >= ^deal_complete) {
+            ~chatnpc("<p,happy>Thanks, <text_gender("lad", "lass")>. We'd never have managed without ye!");
+        }
+}
+
+[label,deal_captain_first]
+~chatnpc("<p,quiz>Are ye alright, <text_gender("lad", "lass")>?");
+~chatplayer("<p,sad>Ohhhh... My head...");
+~chatplayer("<p,sad>It feels like someone has smacked me one with a bottle...");
+~chatnpc("<p,neutral>Yer on Braindeath Island!");
+~chatnpc("<p,neutral>Well, me and the lads got our heads together and decided that if we can get their Cap'n drunk enough, perhaps they'll stop protestin'.");
+~chatnpc("<p,neutral>Well, first of all, we need someone to go out the front and grow us some Blindweed.");
+~chatnpc("<p,neutral>Here, <text_gender("lad", "lass")>. I'll give ye the seed you'll need fer growin' the herb. Help yerself to the gardenin' equipment in the basement.");
+if (~deal_give_tool(deal_blindweed_seed) = true) %deal_quest = 2;
+
+[label,deal_captain_blindweed]
+if (inv_total(inv, deal_blindweed) > 0) {
+    ~chatnpc("<p,happy>Splendid, <text_gender("lad", "lass")>! Go shove it in the Intake Hopper upstairs.");
+    return;
+}
+if (%deal_farming = 3 & %deal_growth_at > 0) {
+    // CANDIDATE: transcript's lost-grown-herb recovery, not free initial Blindweed.
+    ~chatnpc("<p,neutral>Here, I've been savin' some fer an emergency.");
+    ~deal_give_tool(deal_blindweed);
+    return;
+}
+~chatnpc("<p,neutral>Arr, well I want ye to get outside and grow some Blindweed.");
+if (%deal_farming < 4) ~deal_give_tool(deal_blindweed_seed);
+
+[proc,deal_give_tool](namedobj $item)(boolean)
+if (inv_total(inv, $item) > 0) return(true);
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return(false);
+}
+inv_add(inv, $item, 1);
+return(true);
+
+[proc,deal_give_bucket]
+if (inv_total(inv, deal_stagnant_bucket) = 0 & inv_total(inv, deal_bucket_swill) = 0) ~deal_give_tool(bucket_empty);
+
+[proc,deal_has_wrench]()(boolean)
+if (inv_total(inv, deal_wrench_blessed) > 0 | inv_total(bank, deal_wrench_blessed) > 0 | inv_total(inv, deal_wrench) > 0 | inv_total(bank, deal_wrench) > 0) return(true);
+return(false);
+
+[opnpc1,deal_davey]
+if (%deal_quest >= ^deal_complete) {
+    // CANDIDATE Old School recovery from Davey. No second copy from banked wrench.
+    if (~deal_has_wrench = false) ~deal_give_tool(deal_wrench_blessed);
+    return;
+}
+if (%deal_quest ! 8) return;
+if (inv_total(inv, deal_wrench) = 0) {
+    ~chatnpc("<p,neutral>Well, I'll bless something for you if you need it, but just don't spread it around that I'm giving out freebies.");
+    return;
+}
+if (stat(prayer) < 47) {
+    ~chatnpc("<p,neutral>You need a Prayer level of 47.");
+    return;
+}
+~chatnpc("<p,neutral>Dominoes Ad Nauseum, Romanes Eunt Domus.");
+~chatnpc("<p,neutral>Sorted.");
+inv_del(inv, deal_wrench, 1);
+inv_add(inv, deal_wrench_blessed, 1);
+%deal_quest = 9;
+~chatnpc("<p,neutral>Well, it may not look much, but you'll find that you might need a few less prayer potions if you have it in your pack, if you know what I mean.");
+
+[opnpc1,deal_captian_donnie] @deal_donnie;
+[opnpcu,deal_captian_donnie] @deal_donnie;
+
+[label,deal_donnie]
+if (%deal_quest ! 14 | inv_total(inv, deal_bucket_swill) = 0) {
+    ~chatnpc("<p,neutral>Whadda we want? 'Rum'! When do we want it? Now!");
+    return;
+}
+~chatnpc("<p,quiz>Be that the finest, most abrasive 'rum' I've ever smelled?");
+~chatplayer("<p,happy>Yes! That it be!");
+~chatnpc("<p,angry>Hand it over or I'll run ye through!");
+inv_del(inv, deal_bucket_swill, 1);
+inv_add(inv, bucket_empty, 1);
+~chatnpc("<p,neutral>Besides, Rabid Jack would have my hide if I told ye it were him that sent me!");
+%deal_quest = 15;
+
+[proc,deal_complete]
+if (%deal_quest ! 15) return;
+%deal_quest = ^deal_complete;
+// VERIFIED: 7000 XP each; stat_advance takes tenths of XP.
+stat_advance(prayer, 70000);
+stat_advance(fishing, 70000);
+stat_advance(farming, 70000);
+// The blessed wrench already obtained from Davey is retained, never duplicated.
+if (~deal_has_wrench = false) {
+    if (inv_freespace(inv) > 0) inv_add(inv, deal_wrench_blessed, 1);
+    else obj_add(coord, deal_wrench_blessed, 1, ^lootdrop_duration);
+}
+session_log(^log_adventure, "Quest complete: Rum Deal");
+~send_quest_complete(questlist:deal, deal_wrench_blessed, 250, ^deal_questpoints, "You have completed Rum Deal!", "7000 Prayer XP|7000 Fishing XP|7000 Farming XP|Holy Wrench");
+~update_questlist;
+
+// CANDIDATE: Old School holy wrench increases 25% to 27%, before rounding.
+// Excludes later mixes, Sanfew serum, sharing, capes and imbued rings.
+[proc,deal_wrench_restore](obj $potion)
+if (inv_total(inv, deal_wrench_blessed) = 0) return;
+switch_obj ($potion) {
+    case 1doseprayerrestore, 2doseprayerrestore, 3doseprayerrestore, 4doseprayerrestore, 1dose2restore, 2dose2restore, 3dose2restore, 4dose2restore :
+        stat_heal(prayer, sub(scale(27, 100, stat_base(prayer)), scale(25, 100, stat_base(prayer))), 0);
+}

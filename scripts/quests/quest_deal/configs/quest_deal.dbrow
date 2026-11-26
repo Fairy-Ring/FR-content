@@ -1,0 +1,7 @@
+// Use the existing shared potion messages without adding wording or delay values.
+[deal_relicym_consume_messages]
+table=consume_messages_table
+data=consumable,relicyms_balm4
+data=consumable,relicyms_balm3
+data=consumable,relicyms_balm2
+data=consumable,relicyms_balm1

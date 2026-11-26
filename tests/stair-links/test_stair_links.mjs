@@ -23,7 +23,7 @@ for (const file of ['stairs.rs2', 'ladders.rs2']) {
   const headers = [...text.matchAll(/^\[(oploc[1-5]),([^\]]+)\].*$/gm)];
   for (const [index, header] of headers.entries()) {
     const block = text.slice(header.index + header[0].length, headers[index + 1]?.index ?? text.length);
-    if ((block.includes('switch_coord') && (block.includes('@unhandled_stairs') || block.includes('unhandled ladder'))) || /if \(\$coord = [0-3]_\d+_\d+_\d+_\d+\) \{[\s\S]*?\} else \{\s*mes\("unhandled ladder/.test(block)) {
+    if ((block.includes('switch_coord') && (block.includes('@unhandled_stairs') || block.includes('unhandled ladder'))) || /if \(\$coord = [0-3]_\d+_\d+_\d+_\d+\) \{[\s\S]*?\} else \{\s*mes\("unhandled ladder/.test(block) || /^\s*~deal_stairs\((?:true|false)\);/m.test(block)) {
       handlers.push({ name: header[2], trigger: header[1] });
     }
   }

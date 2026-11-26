@@ -1,2 +1,14 @@
 [deal_quest]
 scope=perm
+
+[deal_var]
+scope=perm
+transmit=yes
+
+[deal_growth_at]
+scope=perm
+
+[disease]
+scope=perm
+transmit=no
+

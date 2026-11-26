@@ -1,0 +1,57 @@
+// UNKNOWN destination tiles: clear adjacent brewery/dock terrain selected from the 377 map.
+// The period guide proves Pete's knockout travel, not an exact landing coordinate.
+[proc,deal_arrive]
+if_close;
+p_telejump(1_33_79_31_53);
+if (%deal_quest = 1) {
+    ~chatnpc_specific("Captain Braindeath", deal_captian_braindeath, "<p,happy>Bring 'em here and wake 'em up.");
+}
+
+[opnpc1,deal_island_pete]
+// UNKNOWN engineering return operation: the existing Talk-to face returns directly.
+if_close;
+p_telejump(0_57_55_32_16);
+
+[oploc1,deal_ladder_up]
+p_arrivedelay;
+~climb_ladder(movecoord(loc_coord, -1, 1, 0), true);
+
+[oploc1,deal_laddertop]
+p_arrivedelay;
+~climb_ladder(movecoord(loc_coord, -1, -1, 0), false);
+
+// Hooks from the shared stair dispatcher, restricted to this unit's existing locs.
+[proc,deal_stairs](boolean $up)
+p_arrivedelay;
+if ($up = true) {
+    switch_coord (loc_coord) {
+        case 0_33_79_17_38 : p_telejump(1_33_79_18_40);
+        case 0_33_79_25_32 : p_telejump(1_33_79_25_33);
+        case 0_33_79_37_32 : p_telejump(1_33_79_37_33);
+        case 0_33_79_39_53 : p_telejump(1_33_79_41_52);
+        case 0_33_79_51_32 : p_telejump(1_33_79_51_33);
+    }
+} else {
+    switch_coord (loc_coord) {
+        case 1_33_79_17_39 : p_telejump(0_33_79_17_37);
+        case 1_33_79_25_32 : p_telejump(0_33_79_28_32);
+        case 1_33_79_37_32 : p_telejump(0_33_79_40_32);
+        case 1_33_79_40_53 : p_telejump(0_33_79_38_53);
+        case 1_33_79_51_32 : p_telejump(0_33_79_54_32);
+    }
+}
+
+[oploc1,deal_gate_closed]
+p_arrivedelay;
+if (coordz(coord) > coordz(loc_coord)) {
+    p_telejump(movecoord(loc_coord, 0, 0, -1));
+    return;
+}
+if (%deal_quest < 4) {
+    ~chatnpc_specific("50% Luke", deal_50luke, "<p,angry>Ye'll have te do better than that, landlubber!");
+    return;
+}
+~chatplayer("<p,quiz>Err...look...an astonishing...thing. There. Behind you.");
+~chatnpc_specific("50% Luke", deal_50luke, "<p,quiz>Where?");
+%deal_diversion = 1;
+p_telejump(movecoord(loc_coord, 0, 0, 1));

@@ -56212,85 +56212,17 @@ category=potion
 certlink=rogues_purse_sol
 certtemplate=template_for_cert
 
-[relicyms_balm4]
-name=Relicym's balm(4)
-desc=4 doses of Relicym's balm, which helps cure disease.
-recol1s=15855
-recol1d=24075
-cost=225
-model=obj_strength4
-2dyof=-1
-2dzoom=550
-2dyan=1996
-2dxan=84
-members=yes
-iop1=Drink
-iop4=Empty
-weight=35g
-category=potion
-
 [cert_relicyms_balm4]
 certlink=relicyms_balm4
 certtemplate=template_for_cert
-
-[relicyms_balm3]
-name=Relicym's balm(3)
-desc=3 doses of Relicym's balm, which helps cure disease.
-recol1s=15855
-recol1d=24075
-cost=200
-model=obj_guamvial
-2dyof=-1
-2dzoom=550
-2dyan=1996
-2dxan=84
-members=yes
-iop1=Drink
-iop4=Empty
-weight=30g
-category=potion
 
 [cert_relicyms_balm3]
 certlink=relicyms_balm3
 certtemplate=template_for_cert
 
-[relicyms_balm2]
-name=Relicym's balm(2)
-desc=2 doses of Relicym's balm, which helps cure disease.
-recol1s=15855
-recol1d=24075
-cost=150
-model=obj_2dose1strength
-2dyof=-1
-2dzoom=550
-2dyan=1996
-2dxan=84
-members=yes
-iop1=Drink
-iop4=Empty
-weight=25g
-category=potion
-
 [cert_relicyms_balm2]
 certlink=relicyms_balm2
 certtemplate=template_for_cert
-
-[relicyms_balm1]
-name=Relicym's balm(1)
-desc=1 dose of Relicym's balm, which helps cure disease.
-recol1s=15855
-recol1d=24075
-cost=75
-model=obj_1dose1strength
-2dyof=-1
-2dzoom=550
-2dyan=1996
-2dxan=84
-members=yes
-iop1=Drink
-iop4=Empty
-weight=20g
-category=potion
 
 [cert_relicyms_balm1]
 certlink=relicyms_balm1
@@ -77767,24 +77699,6 @@ womanwear=obj_fishbowl_bluefish_manwear,6
 weight=5lb
 wearpos=righthand
 
-[fishbowl_net]
-name=Fishbowl and net
-desc=An empty fishbowl in a net.
-model=obj_fishbowl_net
-manwear=obj_fishbowl_net_manwear,0
-womanwear=obj_fishbowl_net_manwear,6
-2dxof=1
-2dyof=27
-2dzoom=1200
-2dyan=1800
-2dxan=284
-cost=0
-members=yes
-iop2=Untangle
-ambient=40
-contrast=20
-weight=5lb
-
 [tiny_net]
 name=Tiny net
 desc=A tiny net for grabbing tiny fish.
@@ -78139,107 +78053,6 @@ model=obj_slayerguide_fever_spider
 2dyan=1852
 2dxan=336
 
-[deal_blindweed_seed]
-name=Blindweed seed
-desc=A Blindweed seed - plant in a Blindweed patch.
-recol1s=16615
-recol1d=23254
-model=obj_redberry_bush_seed
-2dxof=-1
-2dyof=-20
-2dzoom=1040
-2dyan=2036
-2dxan=240
-members=yes
-stackable=yes
-count1=whiteberry_seed_2,2
-count2=whiteberry_seed_3,3
-count3=whiteberry_seed_4,4
-count4=whiteberry_seed_5,5
-cost=166
-weight=1g
-
-[deal_blindweed]
-name=Blindweed
-desc=An inedible, foul smelling herb.
-model=obj_deal_blindweed
-members=yes
-cost=1
-2dyof=4
-2dzoom=1490
-2dyan=1596
-2dxan=408
-weight=7g
-
-[deal_stagnant_bucket]
-name=Bucket of water
-desc=It's a bucket of... water?
-recol1s=173
-recol1d=5513
-members=yes
-model=obj_bucket_wax
-iop4=Empty
-2dyof=-18
-2dzoom=1020
-2dyan=1660
-2dxan=204
-weight=3kg
-
-[deal_wrench]
-name=Wrench
-desc=A heavy metal wrench.
-cost=5
-model=obj_deal_wrench
-members=yes
-manwear=obj_deal_wrench_manwear,0
-womanwear=obj_deal_wrench_manwear,6
-2dxof=9
-2dyof=2
-2dzoom=1210
-2dyan=2032
-2dxan=588
-weight=5g
-
-[deal_wrench_blessed]
-name=Holy wrench
-desc=A shining paragon of wrenchly virtue.
-cost=5
-model=obj_deal_wrench_blessed
-members=yes
-manwear=obj_deal_wrench_manwear,0
-womanwear=obj_deal_wrench_manwear,6
-manwear2=obj_deal_wrench_blessed_manwear2
-womanwear2=obj_deal_wrench_blessed_manwear2
-2dxof=6
-2dyof=7
-2dzoom=1210
-2dxan=328
-weight=5g
-
-[deal_slugling]
-name=Sluglings
-desc=They look at you balefully. 'Feed us...'
-members=yes
-model=obj_deal_slugling
-2dxof=-12
-2dyof=20
-2dzoom=1850
-2dyan=604
-2dxan=356
-weight=3kg
-
-[deal_karamthulhu]
-name=Karamthulhu
-desc=A sinister looking squid.
-model=obj_deal_karamthulhu
-members=yes
-2dxof=-9
-2dyof=2
-2dzoom=1740
-2dyan=1964
-2dxan=512
-weight=1g
-
 [inactivepet_squid]
 name=Karamthulhu
 desc=My pet sinister squid.
@@ -78251,62 +78064,6 @@ members=yes
 2dyan=60
 2dxan=132
 weight=1g
-
-[deal_spider_body]
-name=Fever spider body
-desc=A diseased deceased Fever Spider. Handle with care.
-recol1s=31393
-recol1d=20801
-members=yes
-model=obj_deal_spider_body
-2dyof=30
-2dzoom=1850
-2dyan=92
-2dxan=264
-weight=800g
-
-[deal_bucket_swill]
-name=Unsanitary swill
-desc=Sorry, I mean a bucket of 'rum'.
-recol1s=173
-recol1d=16773
-model=obj_bucket_wax
-members=yes
-cost=1
-2dyof=-18
-2dzoom=1020
-2dyan=1660
-2dxan=204
-weight=7g
-
-[deal_slayer_gloves]
-name=Slayer gloves
-desc=Especially good against diseased arachnids.
-cost=200
-model=obj_slayerguide_slayer_gloves
-iop2=Wear
-manwear=obj_gauntlets_of_cooking_manwear,0
-womanwear=obj_gauntlets_of_cooking_womanwear,0
-2dzoom=730
-2dyan=4
-2dxan=328
-members=yes
-wearpos=hands
-weight=8oz
-
-[deal_rusty_scimitar]
-name=Rusty scimitar
-desc=A decent enough weapon gone rusty.
-model=obj_deal_rusty_scimitar
-manwear=obj_deal_rusty_scimitar_manwear,0
-womanwear=obj_deal_rusty_scimitar_manwear,6
-2dxof=3
-2dyof=-3
-2dzoom=1310
-2dyan=696
-2dxan=560
-members=yes
-weight=5lb
 
 [trick_or_treat_head]
 name=Zombie head

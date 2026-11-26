@@ -1,0 +1,11 @@
+// UNKNOWN favourable-to-player engineering defaults, not historical values.
+^deal_growth_minutes = 1
+^deal_growth_check_ticks = 10
+^deal_fishing_delay_ticks = 2
+^deal_cupboard_open_ticks = 100
+^deal_disease_severity = 10
+^deal_disease_pulse_ticks = 30
+^deal_disease_drain = 1
+^deal_spirit_spawn = 1_33_79_31_42
+^deal_spirit_lease_ticks = 500
+^deal_spirit_leash_tiles = 25

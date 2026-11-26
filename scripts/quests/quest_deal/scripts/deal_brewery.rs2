@@ -1,0 +1,84 @@
+// VERIFIED order: period Tip.It guide; CANDIDATE messages: retained OSRS transcript.
+[oplocu,deal_hopper]
+def_obj $used = last_useitem;
+def_int $slot = last_useslot;
+p_arrivedelay;
+switch_obj ($used) {
+    case deal_blindweed :
+        if (%deal_quest ! 2) return;
+        inv_del(inv, deal_blindweed, 1);
+        %deal_quest = 3;
+        sound_synth(rumdeal_hopper_1, 1, 0);
+        mes("You stuff the Blindweed into the Hopper.");
+    case deal_stagnant_bucket :
+        if (%deal_quest ! 4) return;
+        inv_setslot(inv, $slot, bucket_empty, 1);
+        %deal_quest = 5;
+        mes("You dump the water into the hopper.");
+    case deal_spider_body :
+        if (%deal_quest ! 11) return;
+        inv_del(inv, deal_spider_body, 1);
+        %deal_quest = 12;
+        sound_synth(rumdeal_stuff_other, 1, 0);
+        mes("You cram the diseased Fever Spider body into the hopper.");
+    case default : ~displaymessage(^dm_default);
+}
+
+[oplocu,deal_pressure]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if (%deal_quest ! 6) return;
+if ($used ! deal_slugling & $used ! deal_karamthulhu) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%deal_barrel >= 5) {
+    mes("You don't think you can stuff any more Sluglings in there.");
+    return;
+}
+inv_del(inv, $used, 1);
+%deal_barrel = add(%deal_barrel, 1);
+if ($used = deal_slugling) {
+    %deal_slug = add(%deal_slug, 1);
+    mes("You stuff the squirming Sluglings into the barrel.");
+} else {
+    %deal_thulhu = add(%deal_thulhu, 1);
+    mes("You stuff the squirming Karamthultu into the barrel.");
+}
+sound_synth(rumdeal_stuff_slugling, 1, 0);
+
+[oploc2,deal_pressure]
+// UNKNOWN original count wording: show only the count, without invented prose.
+mes("<tostring(%deal_barrel)>");
+
+// A multiloc dispatches on the concrete form received by the client.
+[oploc1,deal_lever_down] ~deal_pressurise;
+[oploc1,deal_lever_up] ~deal_pressurise;
+
+[proc,deal_pressurise]
+p_arrivedelay;
+if (%deal_quest ! 6) return;
+if (%deal_barrel ! 5) {
+    mes("You do not yet have five sea creatures in the barrel!");
+    return;
+}
+%deal_quest = 7;
+sound_synth(rumdeal_pressurize, 1, 0);
+mes("You pressurise the asserted sea creatures.");
+
+[oploc1,deal_brewvat_tap] ~deal_fill_rum;
+[oplocu,deal_brewvat_tap]
+if (last_useitem = bucket_empty) ~deal_fill_rum;
+else ~displaymessage(^dm_default);
+
+[proc,deal_fill_rum]
+p_arrivedelay;
+if (%deal_quest >= 15) {
+    mes("You thankfully have no need to do that any more.");
+    return;
+}
+if (%deal_quest < 13 | inv_total(inv, bucket_empty) = 0 | inv_total(inv, deal_bucket_swill) > 0) return;
+inv_del(inv, bucket_empty, 1);
+inv_add(inv, deal_bucket_swill, 1);
+%deal_quest = 14;
+mes("You carefully fill the bucket with the foul-smelling swill.");

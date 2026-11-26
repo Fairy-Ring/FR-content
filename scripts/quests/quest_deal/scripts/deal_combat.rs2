@@ -1,0 +1,146 @@
+// VERIFIED encounter identities and chain: period Tip.It and 377 cache.
+[oplocu,deal_brew_control] ~deal_summon_spirit;
+[oplocu,deal_brew_control_spin] ~deal_summon_spirit;
+[oplocu,deal_brew_control_work] ~deal_summon_spirit;
+
+[proc,deal_summon_spirit]
+if (%deal_quest < 8 | %deal_quest > 9) return;
+if (last_useitem = deal_wrench) {
+    mes("Well, it seems that this wrench is just not holy enough to work. You should go and get it blessed.");
+    return;
+}
+if (last_useitem ! deal_wrench_blessed | %deal_quest ! 9) return;
+if (~deal_spirit_find = true) {
+    mes("The Evil Spirit has already manifested!");
+    return;
+}
+anim(deal_smite_control, 0);
+mes("You raise your wrench on high and smite the controls mightily!");
+// UNKNOWN engineering spawn/lease: mapped clear brewery floor, 300 seconds.
+// Size-2 footprint and approach are checked against the packed collision map.
+npc_add(^deal_spirit_spawn, deal_evil_spirit, ^deal_spirit_lease_ticks);
+%npc_attacking_uid = uid;
+%npc_macro_event_target = uid; // Existing shared combat owner gate, including magic.
+%npc_action_delay = map_clock;
+npc_setmode(opplayer2);
+npc_settimer(1);
+mes("The Evil Spirit is forced from the controls!");
+
+[proc,deal_spirit_find]()(boolean)
+npc_findall(^deal_spirit_spawn, deal_evil_spirit, ^deal_spirit_leash_tiles, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(true);
+}
+return(false);
+
+[ai_timer,deal_evil_spirit]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | %deal_quest ! 9 | distance(^deal_spirit_spawn, coord) > ^deal_spirit_leash_tiles) npc_del;
+[ai_queue1,deal_evil_spirit]
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+if (finduid(%npc_attacking_uid) = false | ~npc_retal_ready = false) return;
+%npc_action_delay = add(map_clock, divide(npc_param(attackrate), 2));
+npc_setmode(opplayer2);
+
+[ai_opplayer2,deal_evil_spirit] ~npc_default_attack;
+[ai_queue2,deal_evil_spirit] ~npc_default_damage(last_int);
+[ai_queue3,deal_evil_spirit]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid & %deal_quest = 9) queue(deal_spirit_defeated, 0, 0);
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,deal_spirit_defeated]
+if (%deal_quest ! 9) return;
+%deal_quest = 10;
+%deal_multi_hopper = 0;
+mes("You have banished the Evil Spirit!");
+
+[ai_opplayer2,deal_fever_spiders1] ~deal_spider_attack;
+[ai_queue1,deal_fever_spiders1] ~npc_default_retaliate;
+
+[proc,deal_spider_attack]
+def_boolean $ready;
+def_int $hit;
+def_int $rolled;
+def_int $delivered;
+def_int $delay;
+$ready, $hit, $rolled, $delivered, $delay = ~npc_default_attack_outcome(~npc_melee_maxhit, 0, false);
+if ($ready = true & $hit = 1 & npc_stat(hitpoints) > 0 & inv_total(worn, deal_slayer_gloves) = 0) {
+    queue(deal_disease_apply, 0, 0);
+}
+
+[ai_queue3,deal_fever_spiders1]
+// Ordinary shared death credits Slayer, removes the NPC and schedules its respawn.
+~npc_death;
+if (npc_findhero = ^false) return;
+if (%deal_quest = 11) obj_add(npc_coord, deal_spider_body, 1, ^lootdrop_duration);
+
+// VERIFIED disease and gloves protection, cure by Relicym: period guide.
+// UNKNOWN favourable engineering severity10, 30-tick pulses and 1-point skill drain.
+// Engine supports hitmarks0..2 only. Do not substitute HP/poison damage for disease.
+[queue,deal_disease_apply]
+%disease = max(%disease, ^deal_disease_severity);
+if (gettimer(deal_disease) < 1) settimer(deal_disease, ^deal_disease_pulse_ticks);
+
+[timer,deal_disease]
+if (%disease <= 0) {
+    cleartimer(deal_disease);
+    return;
+}
+queue(deal_disease_pulse, 0, 0);
+
+[queue,deal_disease_pulse]
+if (%disease <= 0 | %death = ^true) return;
+def_stat $skill = attack;
+switch_int (random(20)) {
+    case 1 : $skill = defence;
+    case 2 : $skill = strength;
+    case 3 : $skill = ranged;
+    case 4 : $skill = prayer;
+    case 5 : $skill = magic;
+    case 6 : $skill = cooking;
+    case 7 : $skill = woodcutting;
+    case 8 : $skill = fletching;
+    case 9 : $skill = fishing;
+    case 10 : $skill = firemaking;
+    case 11 : $skill = crafting;
+    case 12 : $skill = smithing;
+    case 13 : $skill = mining;
+    case 14 : $skill = herblore;
+    case 15 : $skill = agility;
+    case 16 : $skill = thieving;
+    case 17 : $skill = slayer;
+    case 18 : $skill = farming;
+    case 19 : $skill = runecraft;
+}
+stat_drain($skill, ^deal_disease_drain, 0);
+sound_synth(disease_hitsplat, 1, 0);
+%disease = sub(%disease, 1);
+if (%disease = 0) cleartimer(deal_disease);
+
+[proc,deal_disease_clear]
+%disease = 0;
+cleartimer(deal_disease);
+
+[proc,deal_status_login]
+if (%disease > 0) settimer(deal_disease, ^deal_disease_pulse_ticks);
+~deal_growth_check;
+if (%deal_farming = 4) settimer(deal_growth, ^deal_growth_check_ticks);
+
+[opheld1,relicyms_balm4] @player_consume_item(consume_effect_relicym, null, null);
+[opheld1,relicyms_balm3] @player_consume_item(consume_effect_relicym, null, null);
+[opheld1,relicyms_balm2] @player_consume_item(consume_effect_relicym, null, null);
+[opheld1,relicyms_balm1] @player_consume_item(consume_effect_relicym, null, null);
+
+[label,consume_effect_relicym]
+def_obj $potion = last_item;
+sound_synth(liquid, 1, 0);
+anim(human_eat, 0);
+// UNKNOWN favourable-to-player cure: one dose clears this reconstruction's disease.
+~deal_disease_clear;
+inv_setslot(inv, last_slot, oc_param($potion, next_obj_stage), 1);
+~consume_effect_messages($potion, stat(hitpoints), false);

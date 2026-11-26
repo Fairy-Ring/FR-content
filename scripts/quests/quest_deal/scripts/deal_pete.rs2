@@ -1,9 +1,5 @@
-// Rum Deal start-gate — Pirate Pete (deal_pete 2825) @ 3680,3537.
-// CANDIDATE last-resort 2007-base: OSRS Transcript:Rum Deal + Pirate Pete
-// minus later chrome (skill-warning toast, RS3 Overview, RfD, Mos Le’ lift, TB).
-// Hunt 289? no. New quest_deal/ — never write into quest_fever.
-// This slice: Talk-to + refuse + keep-money accept %deal_quest 0→1.
-// STOP after "What diversion?" — no knock-out tele, no island.
+// CANDIDATE dialogue: retained OSRS Rum Deal and Pirate Pete transcripts.
+// VERIFIED requirements and diversion: Tip.It capture 30 April 2006.
 
 [opnpc1,deal_pete]
 if (%deal_quest > 0) {
@@ -16,8 +12,8 @@ if (%deal_quest > 0) {
 ~chatnpc("<p,neutral>Mornin'.");
 // Period kbase 13 Feb 2006 lists Farming 40 / Fishing 50 / Prayer 47 /
 // Crafting 42 / Slayer 42. Same spoken refuse for all (NPC transcript).
-// Zogre is listed on the kbase box — no Zogre-specific sentence this slice.
-if (stat(farming) < 40 | stat(fishing) < 50 | stat(prayer) < 47 | stat(crafting) < 42 | stat(slayer) < 42) {
+// Zogre is the listed prerequisite. Priest in Peril is not a separate gate.
+if (%zogre < ^zogre_complete | stat(farming) < 40 | stat(fishing) < 50 | stat(prayer) < 47 | stat(crafting) < 42 | stat(slayer) < 42) {
     @deal_pete_lacking;
 }
 @deal_pete_pitch;
@@ -77,8 +73,10 @@ if ($cash = 2) {
 ~chatplayer("<p,happy>Nonsense! Keep the money! I will dispose of this evil half-brother of yours and leave you what little money is left to feed your family.");
 ~chatnpc("<p,happy>Wonderful! Just pick up your diversion and we'll leave!");
 ~chatplayer("<p,quiz>What diversion?");
-%deal_quest = 1;
-return;
+%deal_quest = 1; // UNKNOWN stage encoding, not a recovered historical integer.
+~update_questlist;
+~chatplayer("<p,shock>Ow!");
+~deal_arrive;
 
 [label,deal_pete_heroic_refuse]
 ~chatplayer("<p,neutral>No, I don't think I'll help you out this time.");
@@ -95,7 +93,4 @@ return;
 @deal_pete_heroic_refuse_body;
 
 [label,deal_pete_started]
-// Slice stop: no knock-out / island tele. Repeat the cap line only.
-~chatnpc("<p,happy>Wonderful! Just pick up your diversion and we'll leave!");
-~chatplayer("<p,quiz>What diversion?");
-return;
+~deal_arrive;
