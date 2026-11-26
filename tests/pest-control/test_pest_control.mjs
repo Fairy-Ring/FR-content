@@ -304,18 +304,51 @@ walkable(2657, 2584, 0, 2657, 2583, 'original south gate open/close approach');
     assert.equal(read(p, 'pest_activity'), 0, 'activity cannot carry into another match');
   } finally { cleanup(p); cleanup(q); }
 }
+// Native queued damage and Npc.turn(), not a manually invoked death/timer label.
+// Hold player turns until both the death handler and the next timer have run,
+// proving they queue one result each even when loss overlaps the final deadline.
+for (let phase = 0; phase < 5; phase++) {
+  const players = [player(), player()];
+  try {
+    for (const p of players) board(p);
+    const knight = depart(...players);
+    const instance = read(players[0], 'pest_instance');
+    const coins = players.map(p => count(p, 'coins'));
+    knight.timerClock = phase;
+    const hp = knight.levels[PlayerStat.HITPOINTS];
+    assert(hp > 0, 'product spawns a living Knight before the lethal hit');
+    knight.enqueueScript(Trigger.AI_QUEUE2, 0, hp);
+    for (let turn = 0; turn < 6; turn++) {
+      World.currentTick++;
+      knight.turn();
+      if (turn === 0) {
+        assert.equal(knight.levels[PlayerStat.HITPOINTS], 0, `phase${phase}: native queued hit kills the Knight`);
+        // Controlled deadline only: the real damage queue produced HP zero.
+        knight.setVar(nv('pest_end_clock'), World.currentTick);
+      }
+    }
+    assert.equal(knight.getVar(nv('pest_result')), 2, `phase${phase}: natural Knight death loses even at expiry`);
+    assert(knight.isActive, `phase${phase}: controller survives until participants consume their result`);
+    for (const p of players) {
+      const finishes = [...p.queue.all()].filter(request => request.script.name === '[queue,pest_finish]');
+      assert.equal(finishes.length, 1, `phase${phase}: native death/timer race queues each participant exactly once`);
+      assert.equal(finishes[0].args[2], 2, `phase${phase}: queued result is a loss`);
+    }
+    drain(...players);
+    for (const [index, p] of players.entries()) {
+      assert.equal(read(p, 'pest_instance'), 0, `phase${phase}: natural loss releases every participant`);
+      assert.equal(read(p, 'pest_points'), 0, `phase${phase}: natural loss awards no commendation`);
+      assert.equal(count(p, 'coins'), coins[index], `phase${phase}: natural loss awards no coins`);
+      assert.deepEqual(tile(p), [0, 2657, 2639], `phase${phase}: natural loss returns every participant to the dock`);
+    }
+    assert.equal(World.instances.findInstanceByUid(instance - 1), null, `phase${phase}: natural loss reclaims the empty match`);
+    assert.equal(knight.isActive, false, `phase${phase}: region cleanup removes the dead controller`);
+  } finally { for (const p of players) cleanup(p); }
+}
+console.log('PASS natural Void Knight death: native damage queue and NPC turns, all5timer alignments, one loss per participant');
 {
   const p = player();
   try {
-    board(p); const knight = depart(p);
-    const instance = read(p, 'pest_instance');
-    knight.levels[PlayerStat.HITPOINTS] = 0; // Offline lethal-hit fixture, not a live seed.
-    knight.setVar(nv('pest_end_clock'), World.currentTick);
-    runNpc(knight, '[ai_timer,pest_voidknight_control1]');
-    drain(p);
-    assert.equal(read(p, 'pest_points'), 0, 'knight death loses even on final timer tick');
-    assert.equal(read(p, 'pest_instance'), 0, 'loss releases participation');
-    assert.equal(World.instances.findInstanceByUid(instance - 1), null, 'loss destroys empty match');
     board(p); depart(p);
     const old = read(p, 'pest_instance');
     execute('[logout,_]', p);

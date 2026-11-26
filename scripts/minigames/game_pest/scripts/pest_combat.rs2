@@ -17,9 +17,9 @@ while ($portal < 4) {
     $portal = add($portal, 1);
 }
 
-npc_finduid($controller);
+def_boolean $controller_restored = npc_finduid($controller);
 ~pest_fort_spawn;
-npc_finduid($controller);
+$controller_restored = npc_finduid($controller);
 
 def_int $family = 0;
 while ($family < 7) {
@@ -27,7 +27,7 @@ while ($family < 7) {
     $family = add($family, 1);
 }
 // The caller adds the Squire immediately afterwards; leave the Knight selected.
-npc_finduid($controller);
+$controller_restored = npc_finduid($controller);
 
 [proc,pest_portal_coord](int $portal)(coord)
 if ($portal = 0) return(~pest_match_coord(^pest_combat_portal_west_coord));
@@ -93,7 +93,7 @@ if ($family = 0) {
     npc_add($where, pest_brawler_1, ^max_32bit_int);
 }
 npc_settimer(^pest_combat_ai_ticks);
-npc_finduid($controller);
+def_boolean $controller_restored = npc_finduid($controller);
 
 [proc,pest_match_player_count](npc_uid $controller)(int)
 def_int $instance = add(region_uid, 1);
@@ -105,7 +105,7 @@ while (huntnext = true) {
         $players = add($players, 1);
     }
 }
-npc_finduid($controller);
+def_boolean $controller_restored = npc_finduid($controller);
 return($players);
 
 [proc,pest_live_pest_count](coord $center)(int)
@@ -122,7 +122,7 @@ return($count);
 [proc,pest_combat_tick]
 def_npc_uid $controller = npc_uid;
 if (~pest_portals_alive = 0) {
-    npc_finduid($controller);
+    def_boolean $victory_controller_restored = npc_finduid($controller);
     ~pest_match_finish(1);
     return;
 }
@@ -131,7 +131,7 @@ if ($players <= 0 | modulo(map_clock, ^pest_combat_spawn_interval) >= ^pest_comb
 
 def_coord $center = ~pest_match_coord(^pest_knight_coord);
 def_int $current = ~pest_live_pest_count($center);
-npc_finduid($controller);
+def_boolean $controller_restored = npc_finduid($controller);
 def_int $maximum = multiply($players, ^pest_combat_live_pests_per_player);
 if ($maximum < ^pest_combat_min_live_pests) $maximum = ^pest_combat_min_live_pests;
 def_int $to_spawn = min($players, sub($maximum, $current));
@@ -148,7 +148,7 @@ while ($spawned < $to_spawn) {
         $spawned = $to_spawn;
     }
 }
-npc_finduid($controller);
+$controller_restored = npc_finduid($controller);
 
 // The NPC queue receives a hit amount but no active player; preserve native damage.
 [proc,pest_apply_damage]
@@ -168,7 +168,7 @@ if (npc_stat(hitpoints) = 0) {
 }
 npc_statheal(hitpoints, ^pest_combat_portal_knight_heal, 0);
 def_int $alive = ~pest_portals_alive;
-npc_finduid($controller);
+def_boolean $controller_restored = npc_finduid($controller);
 if ($alive = 0) ~pest_match_finish(1);
 [proc,pest_spinner_heal](npc_uid $spinner)
 def_coord $center = npc_coord;
@@ -181,7 +181,7 @@ npc_statheal(hitpoints, ^pest_combat_spinner_heal, 0);
 } else if (npc_find($center, pest_portal_4_active, 6, 0) = true & npc_stat(hitpoints) > 0) {
 npc_statheal(hitpoints, ^pest_combat_spinner_heal, 0);
 }
-npc_finduid($spinner);
+def_boolean $spinner_restored = npc_finduid($spinner);
 
 [proc,pest_ravager_tick]()(boolean)
 def_coord $target = ~pest_match_coord(^pest_fort_ravager_gate_coord);
@@ -202,7 +202,7 @@ return(false);
 
 [proc,pest_shifter_jump](npc_uid $shifter)
 def_coord $target = movecoord(~pest_match_coord(^pest_knight_coord), 1, 0, 0);
-npc_finduid($shifter);
+def_boolean $shifter_restored = npc_finduid($shifter);
 npc_telejump($target);
 
 [proc,pest_pest_tick]
@@ -223,15 +223,15 @@ if ($family = 3) {
     ~pest_spinner_heal($pest);
     return;
 }
-npc_finduid($pest);
+def_boolean $pest_restored = npc_finduid($pest);
 if ($family = 2 & ~pest_ravager_tick = true) {
-    npc_finduid($pest);
+    $pest_restored = npc_finduid($pest);
     return;
 }
 if ($family = 1 & modulo(map_clock, ^pest_combat_shifter_interval) < ^pest_combat_ai_ticks) {
     ~pest_shifter_jump($pest);
 }
-npc_finduid($pest);
+$pest_restored = npc_finduid($pest);
 
 def_coord $knight = ~pest_match_coord(^pest_knight_coord);
 def_coord $from = npc_coord;
@@ -243,18 +243,18 @@ while (huntnext = true) {
     if (%pest_instance = $instance & ~pest_owned = true & stat(hitpoints) > 0) {
         npc_walk($from);
         queue*(pest_player_attack, 0)($pest, $family);
-        npc_finduid($pest);
+        $pest_restored = npc_finduid($pest);
         return;
     }
 }
-npc_finduid($pest);
+$pest_restored = npc_finduid($pest);
 if (npc_find($from, pest_voidknight_control1, $reach, 1) = true) {
     if (npc_stat(hitpoints) > 0) {
         def_npc_uid $knight_uid = npc_uid;
-        npc_finduid($pest);
+        $pest_restored = npc_finduid($pest);
         npc_walk($from);
         def_spotanim $projectile = ~pest_attack_presentation($family);
-        npc_finduid($knight_uid);
+        def_boolean $knight_restored = npc_finduid($knight_uid);
         def_int $delay = 0;
         if ($projectile ! null) {
             def_int $duration = ~npc_projectile($from, $knight_uid, $projectile, 40, 36, 32, 15, 0, 11, 5);
@@ -262,10 +262,10 @@ if (npc_find($from, pest_voidknight_control1, $reach, 1) = true) {
         }
         npc_queue(2, ^pest_combat_pest_damage, $delay);
     }
-    npc_finduid($pest);
+    $pest_restored = npc_finduid($pest);
     return;
 }
-npc_finduid($pest);
+$pest_restored = npc_finduid($pest);
 npc_walk($knight);
 
 // Original 377 Torcher/Defiler assets; numeric combat behavior remains UNKNOWN.

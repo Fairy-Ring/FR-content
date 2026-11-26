@@ -3,7 +3,7 @@
 ^pest_reward_activity = 50
 // UNKNOWN favourable beta default approved for solo and small groups.
 ^pest_min_players = 1
-// CANDIDATE: original single lander capacity. 24 April mentions 25 players.
+// VERIFIED: 24 April lander priority applies beyond the 25-player capacity.
 ^pest_max_players = 25
 // UNKNOWN engineering countdown; no authentic waiting HUD exists before June.
 ^pest_wait_ticks = 100

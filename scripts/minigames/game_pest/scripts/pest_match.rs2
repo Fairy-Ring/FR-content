@@ -92,6 +92,11 @@ if (npc_type = pest_splatter_1 | npc_type = pest_shifter_1a | npc_type = pest_ra
     ~pest_activity($damage);
 }
 
+// Keep the controller until queued participants read its result; region cleanup
+// removes it after their return. Default NPC death deletes it before most timers.
+[ai_queue3,pest_voidknight_control1]
+~pest_match_finish(2);
+
 [ai_timer,pest_voidknight_control1]
 if (%pest_result ! 0) return;
 if (region_findbycoord(npc_coord) = false) return;
