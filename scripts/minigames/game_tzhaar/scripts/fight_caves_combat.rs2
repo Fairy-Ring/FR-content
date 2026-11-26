@@ -16,8 +16,9 @@ def_int $rolled;
 def_int $delivered;
 def_int $ticks;
 def_int $defence_style = npc_param(damagetype);
-// UNKNOWN melee defence binding for hybrid actors: crush, not their distant style.
-if ($defence_style = ^ranged_style | $defence_style = ^magic_style) $defence_style = ^crush_style;
+// CANDIDATE Old School melee styles: Tok-Xil crush; Ket-Zek and Jad stab.
+if ($defence_style = ^ranged_style) $defence_style = ^crush_style;
+if ($defence_style = ^magic_style) $defence_style = ^stab_style;
 $attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_meleeattack_resolve(~npc_melee_attack_roll, ~player_defence_roll_specific($defence_style), npc_param(fightcaves_maxhit), 0);
 return($attempted, $delivered);
 
@@ -34,8 +35,8 @@ if ($attempted = true) stat_sub(prayer, 1, 0);
 [ai_queue2,tzhaar_fightcave_swarm_2b] ~fightcaves_kek_damage(last_int);
 [proc,fightcaves_kek_damage](int $damage)
 ~npc_default_damage($damage);
-// CANDIDATE: the large Tz-Kek recoils one on a damaging melee hit only.
-if ($damage > 0 & finduid(%npc_aggressive_player) = true) {
+// CANDIDATE: a large Tz-Kek recoils one for melee, including zero damage.
+if (finduid(%npc_aggressive_player) = true) {
     if (%damagetype <= ^crush_style) queue(combat_damage_player, 0, 1);
 }
 
