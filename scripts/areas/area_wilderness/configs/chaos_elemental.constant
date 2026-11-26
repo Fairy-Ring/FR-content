@@ -1,0 +1,22 @@
+// UNKNOWN engineering cadence, probabilities, reach and presentation timing.
+// The period guides report no exact values for these fields.
+^chaoselem_attack_ticks = 5
+^chaoselem_attack_slots = 10
+^chaoselem_primary_slots = 8
+^chaoselem_primary_styles = 3
+^chaoselem_maxhit = 35 // UNKNOWN engineering cap; period RuneHQ reports hits over 30.
+^chaoselem_attack_range = 10
+^chaoselem_hunt_radius = 10
+^chaoselem_wander_radius = 5
+^chaoselem_pursuit_radius = 20
+^chaoselem_cast_height = 100
+^chaoselem_impact_height = 31
+^chaoselem_projectile_delay = 41
+^chaoselem_projectile_angle = 16
+^chaoselem_projectile_offset = 64
+^chaoselem_projectile_step = 10
+^chaoselem_sound_radius = 10
+// VERIFIED RuneHQ monster 571, 9 April 2006: about 5–10 spaces, 5 minutes.
+^chaoselem_teleport_min = 5
+^chaoselem_teleport_max = 10
+^chaoselem_respawn_ticks = 500

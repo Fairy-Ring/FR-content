@@ -150,6 +150,7 @@
     "playerhit_n_ranged": [
       "[ai_applayer2,_snail]",
       "[ai_applayer2,_troll_thrower]",
+      "[proc,chaoselemental_primary]",
       "[proc,soulbane_hope_ranged]",
       "[proc,wyvern_breath]",
       "[proc,wyvern_ranged]",
@@ -158,6 +159,7 @@
     "npc_player_hit_roll": [
       "[proc,aberrant_attack]",
       "[proc,chaos_druid_spell]",
+      "[proc,chaoselemental_primary]",
       "[proc,dt_fareed_cast]",
       "[proc,dt_kamil_attack]",
       "[proc,fightcaves_zek_attack]",

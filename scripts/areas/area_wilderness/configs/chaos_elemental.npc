@@ -1,0 +1,32 @@
+// Original 377 client fields moved unchanged from all.npc.
+[chaoselemental]
+name=Chaos Elemental
+desc=pUre A cHaOs of crEatuRe!
+model1=npc_3200
+model2=npc_3200i2
+size=3
+walkanim=chaoselemental_walk
+readyanim=chaoselemental_ready
+op2=Attack
+vislevel=305
+// VERIFIED: matching April 2006 Tip.It and RuneHQ bestiaries, not the old stub250.
+hitpoints=350
+attack=270
+strength=270
+defence=270
+// UNKNOWN inherited server skills pending stronger historical evidence.
+magic=270
+ranged=270
+huntmode=aggressive_ranged
+huntrange=^chaoselem_hunt_radius
+attackrange=^chaoselem_attack_range
+wanderrange=^chaoselem_wander_radius
+maxrange=^chaoselem_pursuit_radius
+respawnrate=^chaoselem_respawn_ticks
+param=attackrate,^chaoselem_attack_ticks
+// CANDIDATE own original 377 animation/sound family, not recovered server binds.
+param=attack_anim,chaoselemental_discord
+param=defend_anim,null
+param=death_anim,chaoselemental_death
+param=defend_sound,chaos_elemental_hit
+param=death_sound,chaos_elemental_death

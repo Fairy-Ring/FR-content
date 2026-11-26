@@ -1,0 +1,97 @@
+// N146. Historical limits and engineering defaults: monster-combat-data.n146-*.
+// Use the native ranged approach for aggression and retaliation at every distance.
+[ai_queue1,chaoselemental] ~npc_default_retaliate_ap;
+[ai_opplayer2,chaoselemental] npc_setmode(applayer2);
+[ai_applayer2,chaoselemental] ~chaoselemental_attack;
+
+[proc,chaoselemental_attack]
+if (%death = ^true) {
+    npc_setmode(null);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+// UNKNOWN engineering selection weights. No period numerical chances recovered.
+def_int $attack = random(^chaoselem_attack_slots);
+if ($attack < ^chaoselem_primary_slots) {
+    ~chaoselemental_primary;
+} else if ($attack = ^chaoselem_primary_slots) {
+    npc_anim(chaoselemental_casting, 0);
+    spotanim_npc(chaoselemental_spotanim_confusion_casting, ^chaoselem_cast_height, 0);
+    ~sound_area(chaos_elemental_confusion_cast, 0, npc_coord, ^chaoselem_sound_radius);
+    def_int $duration = ~chaoselemental_projectile(chaoselemental_spotanim_confusion_travel);
+    spotanim_pl(chaoselemental_spotanim_confusion_impact, ^chaoselem_impact_height, $duration);
+    sound_synth(chaos_elemental_confusion_impact, 0, $duration);
+    queue*(chaoselemental_teleport, calc($duration / 30))();
+} else {
+    npc_anim(chaoselemental_casting, 0);
+    spotanim_npc(chaoselemental_spotanim_madness_casting, ^chaoselem_cast_height, 0);
+    ~sound_area(chaos_elemental_madness_cast, 0, npc_coord, ^chaoselem_sound_radius);
+    def_int $duration = ~chaoselemental_projectile(chaoselemental_spotanim_madness_travel);
+    spotanim_pl(chaoselemental_spotanim_madness_impact, ^chaoselem_impact_height, $duration);
+    sound_synth(chaos_elemental_madness_impact, 0, $duration);
+    queue*(chaoselemental_disarm, calc($duration / 30))();
+}
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~npc_set_attack_vars;
+npc_setmode(applayer2);
+
+[proc,chaoselemental_primary]
+// CANDIDATE tri-style projectile. Even melee damage can arrive from a distance.
+// UNKNOWN engineering: equal selection of the three styles.
+def_int $style = random(^chaoselem_primary_styles);
+if ($style = 0) $style = ^crush_style;
+else if ($style = 1) $style = ^ranged_style;
+else $style = ^magic_style;
+npc_anim(chaoselemental_discord, 0);
+spotanim_npc(chaoselemental_spotanim_discord_casting, ^chaoselem_cast_height, 0);
+~sound_area(chaos_elemental_discord_cast, 0, npc_coord, ^chaoselem_sound_radius);
+def_int $duration = ~chaoselemental_projectile(chaoselemental_spotanim_discord_travel);
+def_int $damage = 0;
+if (~npc_player_hit_roll($style) = true) $damage = randominc(^chaoselem_maxhit);
+spotanim_pl(chaoselemental_spotanim_discord_impact, ^chaoselem_impact_height, $duration);
+sound_synth(chaos_elemental_discord_impact, 0, $duration);
+anim(%com_defendanim, $duration);
+def_int $ticks = ~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
+
+[proc,chaoselemental_projectile](spotanim $projectile)(int)
+return(~player_projectile(npc_coord, coord, uid, $projectile,
+    ^chaoselem_cast_height, ^chaoselem_impact_height, ^chaoselem_projectile_delay,
+    ^chaoselem_projectile_angle, 0, ^chaoselem_projectile_offset, ^chaoselem_projectile_step));
+
+[queue,chaoselemental_teleport]
+if (%death = ^true) return;
+// Native LINEOFWALK filters standability and requires a walking route back to
+// the player's current open ground. Failure leaves the player where they are.
+def_coord $destination = map_findsquare(coord, ^chaoselem_teleport_min, ^chaoselem_teleport_max, ^map_findsquare_lineofwalk);
+if ($destination ! coord) p_teleport($destination);
+
+[queue,chaoselemental_disarm]
+if (%death = ^true | inv_freespace(inv) = 0) return;
+// UNKNOWN engineering: choose one occupied slot uniformly, preserving complete
+// ammunition stacks. Full inventory counterplay applies even to existing stacks.
+def_int $occupied = 0;
+def_int $slot = 0;
+while ($slot < inv_size(worn)) {
+    if (inv_getobj(worn, $slot) ! null) $occupied = add($occupied, 1);
+    $slot = add($slot, 1);
+}
+if ($occupied = 0) return;
+def_int $choice = random($occupied);
+$slot = 0;
+while ($slot < inv_size(worn)) {
+    def_obj $obj = inv_getobj(worn, $slot);
+    if ($obj ! null) {
+        if ($choice = 0) {
+            ~try_unequip($slot);
+            ~on_unequip($obj);
+            return;
+        }
+        $choice = sub($choice, 1);
+    }
+    $slot = add($slot, 1);
+}
