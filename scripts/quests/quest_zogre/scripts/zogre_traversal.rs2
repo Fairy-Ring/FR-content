@@ -13,14 +13,11 @@ mes("The guard lets you climb over the collapsed barricade.");
 [oploc1,ogre_barricade_collapsedr] ~zogre_climb_barricade;
 [proc,zogre_climb_barricade]
 if (%zogre = 0 | %thzfe_blocking_barricade = 0) return;
-def_coord $player = coord;
+// Both native r377 barricades run north-south at x=2456; cross their east/west faces.
 def_coord $barrier = loc_coord;
-def_int $x;
-def_int $z;
-$x, $z = ~door_open(loc_angle, loc_shape);
-def_int $side = add(multiply(sub(coordx($player), coordx($barrier)), $x), multiply(sub(coordz($player), coordz($barrier)), $z));
-if ($side > 0) $x, $z = ~multiply2($x, $z, -1);
-p_telejump(movecoord($barrier, $x, 0, $z));
+def_int $x = 1;
+if (coordx(coord) > coordx($barrier)) $x = -1;
+p_telejump(movecoord($barrier, $x, 0, 0));
 
 [oploc1,ogre_cavedoorr] ~zogre_open_tomb_gate;
 [oploc1,ogre_cavedoorl] ~zogre_open_tomb_gate;
