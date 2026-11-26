@@ -20,6 +20,7 @@ if (inv_freespace(inv) < 1) {
     mes("You need a free inventory space before cracking the safe.");
     return;
 }
+~roguesden_safe_crack;
 def_int $low = 8;
 def_int $high = 160;
 def_int $level = min(99, max(1, stat(thieving)));
@@ -68,6 +69,7 @@ if (inv_freespace(inv) < 1) {
     mes("You need a free inventory space before cracking the safe.");
     return;
 }
+~roguesden_safe_crack;
 // CANDIDATE: pass on 0..current Thieving, inclusive, from the 0..199 roll.
 if (random(200) <= stat(thieving)) {
     ~roguesden_vault_reward;
@@ -109,3 +111,18 @@ if (random(8) >= 3) {
 inv_add(inv, $reward, 1);
 // UNKNOWN functional success wording; the later crate choice is omitted.
 mes("You crack the safe and receive a Rogue's reward.");
+
+[proc,roguesden_safe_crack]
+p_stopaction;
+// UNKNOWN presentation pacing: round each original sequence up to whole ticks.
+// p_delay adds one tick; the subtraction keeps that tick inside the duration.
+anim(null, 0);
+anim(rogue_player_crack_safe_start, 0);
+p_delay(max(0, calc((seqlength(rogue_player_crack_safe_start) + 29) / 30 - 1)));
+anim(rogue_player_crack_safe_mid, 0);
+p_delay(max(0, calc((seqlength(rogue_player_crack_safe_mid) + 29) / 30 - 1)));
+// The original end sequence has lower priority, so clear the middle phase.
+anim(null, 0);
+anim(rogue_player_crack_safe_end, 0);
+p_delay(max(0, calc((seqlength(rogue_player_crack_safe_end) + 29) / 30 - 1)));
+anim(null, 0);

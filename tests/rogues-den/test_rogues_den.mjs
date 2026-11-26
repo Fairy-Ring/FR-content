@@ -109,6 +109,15 @@ function operation(p, target, option, kind = 'loc', choices = []) {
   if (action) action.landing = tile(p);
   return state;
 }
+function recordPlayerAnimations(p, action) {
+  const phases = [], original = p.playAnimation;
+  p.playAnimation = function(seq, delay) {
+    original.call(this, seq, delay);
+    if (seq >= 0) phases.push({ seq, tick: World.currentTick, tile: tile(this), applied: this.animId === seq });
+  };
+  try { action(); } finally { p.playAnimation = original; }
+  return phases;
+}
 function withRolls(values, callback) {
   const original = JavaRandom.nextDouble;
   let index = 0;
@@ -549,6 +558,22 @@ function vaultFixture() {
   safeLanding({ x: p.x, z: p.z, level: p.level }, 'central safe operation tile');
   return { p, target };
 }
+for (const maze of [false, true]) {
+  const { p, target } = maze ? vaultFixture() : safeFixture();
+  const start = tile(p);
+  const expected = ['rogue_player_crack_safe_start', 'rogue_player_crack_safe_mid', 'rogue_player_crack_safe_end'].map(name => id('SeqType', name));
+  const phases = recordPlayerAnimations(p, () => withRolls([0, 0], () => operation(p, target, 'Crack')));
+  assert.deepEqual(phases.map(phase => phase.seq), expected, `${maze ? 'vault' : 'lobby'} safe plays every original cracking phase`);
+  for (let index = 0; index < phases.length; index++) {
+    const phase = phases[index], end = phases[index + 1]?.tick ?? World.currentTick;
+    assert(phase.applied, 'each safe phase reaches the native player animation field, including the lower-priority end');
+    assert.deepEqual(phase.tile, start, 'safe animation plays beside the safe, before the lobby return');
+    assert.equal(end - phase.tick, Math.max(1, Math.ceil(types.SeqType.get(phase.seq).duration / 30)), 'each original safe phase has its full rounded duration');
+  }
+  assert.equal(p.animId, -1, 'safe presentation clears its animation afterward');
+  if (maze) clean(p);
+}
+console.log('PASS native lobby/vault safe start, middle and end animation phases before return');
 const pieces = new Set();
 for (let index = 0; index < 6; index++) {
   const { p, target } = vaultFixture();
@@ -696,7 +721,8 @@ for (const row of placements.filter(row => row.name === 'roguesden_gallery_door'
   const p = enter(fixture());
   p.teleport(2994, 5005, 1); // Independent optional-ledge branch, not route travel.
   const before = p.levels[PlayerStat.AGILITY];
-  operation(p, location('roguesden_obstacle_wall_hanging_ledge', 2993, 5005), 'Climb');
+  const phases = recordPlayerAnimations(p, () => operation(p, location('roguesden_obstacle_wall_hanging_ledge', 2993, 5005), 'Climb'));
+  assert.deepEqual(phases.map(phase => [phase.seq, phase.applied]), [[id('SeqType', 'human_ledge_walk_left'), true]], 'reverse hanging-ledge crossing plays the original leftward sequence');
   sameTile(p, { x: 2988, z: 5005, level: 1 });
   safeLanding({ x: p.x, z: p.z, level: p.level }, 'optional southern hanging ledge');
   assert(p.levels[PlayerStat.AGILITY] < before, 'the optional ledge consumes real Agility');
@@ -890,7 +916,9 @@ function fullMazeRoute() {
     for (const trap of traps) {
       if (!inside(trap, next) || inside(trap, subject)) continue;
       const before = subject.levels[PlayerStat.THIEVING];
-      operation(subject, location(trap.name, trap.x, trap.z), 'Search');
+      const phases = recordPlayerAnimations(subject, () => operation(subject, location(trap.name, trap.x, trap.z), 'Search'));
+      const animation = trap.name.startsWith('roguesden_trap_wall_') ? 'roguesden_player_disarm_wall_infront' : 'roguesden_player_disarm_floor';
+      assert.deepEqual(phases.map(phase => [phase.seq, phase.applied]), [[id('SeqType', animation), true]], 'native route Search plays its original floor or wall disarm sequence');
       for (let tick = 0; tick < 2; tick++) environmentTick(subject);
       assert.equal(subject.levels[PlayerStat.THIEVING], before - 1, 'a genuinely searched route trap consumes one current Thieving level');
       assert(active(subject), 'the disarmed trap leaves the original run active');
@@ -898,7 +926,15 @@ function fullMazeRoute() {
   };
   const cross = (name, x, z, from, to, choices = []) => {
     walk(p, point(...from));
-    operation(p, location(name, x, z), 1, 'loc', choices);
+    const phases = recordPlayerAnimations(p, () => operation(p, location(name, x, z), 1, 'loc', choices));
+    const animation = {
+      roguesden_obstacle_contortion_bars: 'roguesden_contortion',
+      roguesden_obstacle_floor_balancing_ledge: 'human_walk_logbalance',
+      roguesden_obstacle_wall_hanging_ledge: 'human_ledge_walk_right',
+      roguesden_passage_across: 'human_crawling',
+      roguesden_obstacle_blocking_door_enter: 'human_pipesqueeze'
+    }[name];
+    if (animation) assert.deepEqual(phases.map(phase => [phase.seq, phase.applied]), [[id('SeqType', animation), true]], `${name} plays its real 377 crossing sequence`);
     sameTile(p, point(...to));
     if (name === 'roguesden_passage_across' && x === 3044 && z === 5037 && to[0] === 3047 && to[1] === 5037) {
       assert.equal(map.isMapBlocked(p.x, p.z, p.level), false, 'the original airlock remains walkable; all three exits are proven separately');

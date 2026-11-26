@@ -124,6 +124,12 @@ if (stat(thieving) < 1) {
     ~roguesden_leave(0);
     return;
 }
+anim(null, 0);
+switch_loc(loc_type) {
+    case roguesden_trap_wall_spikes, roguesden_trap_wall_poison_gas,
+        roguesden_trap_wall_crusher : anim(roguesden_player_disarm_wall_infront, 0);
+    case default : anim(roguesden_player_disarm_floor, 0);
+}
 def_int $occupied = ~roguesden_maze_trap_key;
 if (~roguesden_maze_trap_occupied($occupied) = true) {
     // A Search-trap footprint is no longer the last moving obstacle.
@@ -279,6 +285,23 @@ if (abs($dx) > abs($dz)) {
     else $direction = ^exact_west;
 } else if ($dz < 0) $direction = ^exact_south;
 p_stopaction;
+def_seq $animation = null;
+switch_loc(loc_type) {
+    case roguesden_obstacle_contortion_bars : $animation = roguesden_contortion;
+    // UNKNOWN agility-sequence choices; the sequences themselves are original.
+    case roguesden_obstacle_floor_balancing_ledge : $animation = human_walk_logbalance;
+    case roguesden_obstacle_wall_hanging_ledge :
+        // UNKNOWN handedness: positive-axis travel uses the rightward sequence.
+        if ($dx > 0 | $dz > 0) $animation = human_ledge_walk_right;
+        else $animation = human_ledge_walk_left;
+    case roguesden_passage_across, roguesden_passage_up, roguesden_passage_down :
+        $animation = human_crawling;
+    case roguesden_obstacle_blocking_door_enter, roguesden_gallery_door :
+        $animation = human_pipesqueeze;
+    case roguesden_obstacle_magic_door : $animation = roguesden_player_enchant_door;
+}
+anim(null, 0);
+anim($animation, 0);
 p_exactmove(coord, $landing, 0, 30, $direction);
 if ($agility_drain > 0) {
     // CANDIDATE drains: balance 4, hanging 7, bars 5, moving blades 3.
