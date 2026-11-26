@@ -1,0 +1,51 @@
+// VERIFIED finale trigger and rewards: Tip.It, 27 April 2006.
+// CANDIDATE scene wording and original 377 sequences: retained quest transcript.
+[proc,forget_consume](obj $food)(boolean)
+if (%forget_quest ! 80) return(false);
+if ($food ! beer & $food ! kebab) return(false);
+if (inv_total(inv, beer) = 0 | inv_total(inv, kebab) = 0) return(false);
+// Original Laughing Miner ground-floor interior, surrounding the natural
+// barmaid at map m45_159 local36,19. Excludes upstairs and surrounding streets.
+if (coordy(coord) ! 0 | coordx(coord) < 2908 | coordx(coord) > 2918 | coordz(coord) < 10188 | coordz(coord) > 10196) return(false);
+inv_del(inv, beer, 1);
+inv_del(inv, kebab, 1);
+inv_add(inv, beer_glass, 1);
+if_openoverlay(fade_to_black);
+p_delay(2);
+cam_moveto(0_45_159_36_16, 700, 0, 100);
+cam_lookat(coord, 100, 0, 100);
+if_openoverlay(null);
+anim(human_clink_beerglass, 0);
+~chatplayer("<p,drunk>I knew it were you matey! 'Ere, have some of the good stuff!");
+~chatnpc_specific("Drunken Dwarf", forget_cutscene_drunken_dwarf, "<p,drunk>Very kind ob you, <displayname>!");
+~chatnpc_specific("Nolar", forget_cutscene_patron2, "<p,happy>Tell us another tale, <displayname>!");
+~chatnpc_specific("Factory Worker", forget_cutscene_patron3, "<p,happy>Tell us more about your kebabs!");
+~chatnpc_specific("Gauss", forget_cutscene_patron5, "<p,laugh>Haha, kebabs!");
+~chatplayer("<p,drunk>Right, these kebabsh, right? *hic* A whole g-g-group of kebabs came marching in! I'm telling you! Marching in line!");
+~chatplayer("<p,drunk>And then, I'll tell you... Then! Ehm...");
+~chatplayer("<p,drunk>Then I'll have another drink!");
+anim(human_sitting_drunk_fall, 0);
+p_delay(3);
+~chatnpc_specific("Colonel Grimsson", forget_redaxe_henchman4_cutscene, "<p,laugh>Ha, the spell has worked its magic again.");
+~chatnpc_specific("Colonel Grimsson", forget_redaxe_henchman3_cutscene, "<p,laugh>No one will believe that drunken fool now!");
+cam_reset();
+anim(null, 0);
+~forget_complete;
+return(true);
+
+[proc,forget_complete]
+if (%forget_quest ! 80) return;
+// Tip.It exact reward lines: "5,000 Farming xp", "5,000 Cooking xp",
+// "2 mature Dwarven stouts (+2 to mining and smithing)", "Quest points ...: 2".
+// Commit terminal state before any award or interruptible completion scroll.
+%forget_quest = ^forget_complete;
+stat_advance(farming, 50000);
+stat_advance(cooking, 50000);
+// Real rewards remain ordinary tradeable mature stout, not quest-only Kelda.
+def_int $remaining = 2;
+while ($remaining > 0) {
+    if (inv_freespace(inv) > 0) inv_add(inv, mature_dwarven_stout, 1);
+    else obj_add(coord, mature_dwarven_stout, 1, ^lootdrop_duration);
+    $remaining = calc($remaining - 1);
+}
+~send_quest_complete(questlist:forget, kelda_stout, 200, ^forget_questpoints, "You have completed Forgettable Tale...!", "5,000 Farming XP|5,000 Cooking XP|2 mature Dwarven stouts");

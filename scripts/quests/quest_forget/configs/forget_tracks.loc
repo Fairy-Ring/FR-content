@@ -1,0 +1,153 @@
+[keldagrim_track_junction_control_box]
+name=Dwarven machinery
+desc=Some bizarre mixture between rocks and machinery. Definitely dwarven.
+model=keldagrim_track_junction_control_box
+forceapproach=south
+op1=Control
+
+[keldagrim_track_junction_card_box]
+name=Box
+desc=A strange box of some kind.
+model=keldagrim_track_junction_card_box
+forceapproach=south
+op1=Search
+
+[keldagrim_track_junction_card_box_open]
+name=Box
+desc=A strange box of some kind. It's open.
+model=keldagrim_track_junction_card_box_open
+forceapproach=south
+
+[forget_puzzle_entrance]
+name=Cave entrance
+desc=A small cave entrance.
+model=dwarf_cave_entrance
+recol1s=8455
+recol1d=7398
+hillskew=yes
+sharelight=yes
+active=yes
+op1=Go-through
+
+[forget_puzzle_exit]
+name=Cave entrance
+desc=A small cave entrance.
+model=dwarf_cave_entrance
+recol1s=8455
+recol1d=7398
+hillskew=yes
+sharelight=yes
+active=yes
+
+[forget_story_exit_prev]
+name=Cave entrance
+desc=A small cave entrance.
+model=dwarf_cave_entrance
+recol1s=8455
+recol1d=7398
+hillskew=yes
+sharelight=yes
+active=yes
+op1=Enter
+
+[forget_story_exit_next]
+name=Cave entrance
+desc=A small cave entrance.
+model=dwarf_cave_entrance
+recol1s=8455
+recol1d=7398
+hillskew=yes
+sharelight=yes
+active=yes
+op1=Enter
+
+[dwarf_keldagrim_metal_bookcase]
+name=Bookcase
+desc=These books contain all sorts of data on the Red Axe.
+model=dwarf_keldagrim_bookcase
+recol1s=6336
+recol1d=6342
+recol2s=8449
+recol2d=10571
+recol3s=6337
+recol3d=10571
+active=yes
+op1=Search
+
+[forget_metal_crate_withpapers1]
+name=Crate
+desc=Big mysterious crates. There are some papers on top.
+model=dwarf_keldagrim_metal_crate_withpapers
+recol1s=8354
+recol1d=9445
+recol2s=9411
+recol2d=8388
+recol3s=10468
+recol3d=9444
+recol4s=11525
+recol4d=9477
+recol5s=12582
+recol5d=10534
+recol6s=13639
+recol6d=8388
+resizex=100
+resizey=100
+resizez=100
+op1=Search
+
+[forget_metal_crate_withpapers2]
+name=Crate
+desc=Big mysterious crates. There are some papers on top.
+model=dwarf_keldagrim_metal_crate_withpapers
+recol1s=8354
+recol1d=9445
+recol2s=9411
+recol2d=8388
+recol3s=10468
+recol3d=9444
+recol4s=11525
+recol4d=9477
+recol5s=12582
+recol5d=10534
+recol6s=13639
+recol6d=8388
+resizex=100
+resizey=100
+resizez=100
+op1=Search
+
+[forget_metal_crate_withpapers3]
+name=Crate
+desc=Big mysterious crates. There are some papers on top.
+model=dwarf_keldagrim_metal_crate_withpapers
+recol1s=8354
+recol1d=9445
+recol2s=9411
+recol2d=8388
+recol3s=10468
+recol3d=9444
+recol4s=11525
+recol4d=9477
+recol5s=12582
+recol5d=10534
+recol6s=13639
+recol6d=8388
+resizex=100
+resizey=100
+resizez=100
+op1=Search
+
+[forget_train_cart]
+name=Train cart
+desc=A steam powered cart.
+model=minecart
+active=yes
+op1=Ride
+op2=Return
+
+[forget_train_return_cart]
+name=Train cart
+desc=A steam powered cart.
+model=minecart
+active=yes
+op1=Ride
