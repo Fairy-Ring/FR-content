@@ -258,7 +258,7 @@
 [mapzone,0_55_54] @music_playbyregion(coord);
 [mapzone,0_55_55] @music_playbyregion(coord);
 [mapzone,0_56_54] @music_playbyregion(coord);
-[mapzone,0_56_55] @music_playbyregion(coord);
+[mapzone,0_56_55] ~ahoy_wind_start; @music_playbyregion(coord);
 [mapzone,0_57_46] @music_playbyregion(coord);
 [mapzone,0_57_54] @music_playbyregion(coord);
 [mapzone,0_57_55] @music_playbyregion(coord);

@@ -13,6 +13,16 @@
       }
     },
     {
+      "script": "[ai_opplayer2,giant_lobster]",
+      "npc": "giant_lobster",
+      "npcVars": { "npc_aggressive_player": "target" },
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 2710938699
+      }
+    },
+    {
       "script": "[ai_opplayer2,barrows_dharok]",
       "npc": "barrows_dharok",
       "seeds": {

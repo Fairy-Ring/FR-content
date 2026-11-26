@@ -50494,6 +50494,7 @@ members=yes
 wearpos=righthand
 wearpos2=lefthand
 weight=5lb
+tradeable=no
 
 [bowl_nettlewater]
 name=Nettle-water
@@ -50608,6 +50609,7 @@ members=yes
 2dyan=84
 2dxan=156
 weight=50g
+tradeable=no
 
 [chinacup_of_nettletea]
 name=Cup of tea
@@ -50624,6 +50626,7 @@ model=obj_chinacup_of_nettletea
 2dxan=156
 members=yes
 weight=150g
+tradeable=no
 
 [chinacup_of_nettletea_milky]
 name=Cup of tea
@@ -50640,6 +50643,7 @@ model=obj_chinacup_of_nettletea
 2dxan=156
 members=yes
 weight=150g
+tradeable=no
 
 [ahoy_robes_of_necrovarus]
 name=Mystical robes
@@ -50654,6 +50658,7 @@ model=obj_eadgar_dirty_druid_robe
 2dxan=408
 members=yes
 weight=2lb
+tradeable=no
 
 [ahoy_book_of_haricanto]
 name=Book of haricanto
@@ -50666,6 +50671,7 @@ model=obj_ahoy_book_of_haricanto
 2dxan=244
 members=yes
 weight=4lb
+tradeable=no
 
 [ahoy_translation_manual]
 name=Translation manual
@@ -50686,6 +50692,7 @@ model=obj_digsitebook
 2dyan=116
 2dxan=244
 weight=18oz
+tradeable=no
 
 [amulet_of_ghostspeak_enchanted]
 name=Ghostspeak amulet
@@ -50707,6 +50714,7 @@ manwear=obj_amulet_of_ghostspeak_manwear,0
 womanwear=obj_amulet_of_ghostspeak_womanwear,0
 wearpos=front
 weight=10g
+tradeable=no
 
 [ectophial]
 name=Ectophial
@@ -50721,6 +50729,7 @@ womanwear=obj_ectophial_manwear,0
 2dyan=24
 2dxan=156
 weight=35g
+tradeable=no
 
 [ectophial_empty]
 name=Ectophial
@@ -50733,6 +50742,7 @@ model=obj_ectophial_empty
 2dxan=156
 weight=35g
 category=potion
+tradeable=no
 
 [ahoy_toy_boat]
 name=Model ship
@@ -50746,6 +50756,7 @@ model=obj_ahoy_toy_boat
 iop1=Repair
 members=yes
 weight=10g
+tradeable=no
 
 [ahoy_toy_boat_repaired]
 name=Model ship
@@ -50759,6 +50770,7 @@ model=obj_ahoy_toy_boat
 iop1=Inspect
 members=yes
 weight=10g
+tradeable=no
 
 [pot_bonemeal]
 name=Bonemeal
@@ -51028,6 +51040,7 @@ model=obj_ikov_shinykey
 2dxan=328
 members=yes
 weight=10g
+tradeable=no
 
 [ahoy_chest_key]
 name=Chest key
@@ -51040,6 +51053,7 @@ model=obj_ikov_shinykey
 2dxan=328
 members=yes
 weight=10g
+tradeable=no
 
 [ahoy_map_scrap_1]
 name=Map scrap
@@ -51051,6 +51065,7 @@ model=obj_ahoy_map_scrap_1
 2dxan=348
 members=yes
 weight=10g
+tradeable=no
 
 [ahoy_map_scrap_2]
 name=Map scrap
@@ -51062,6 +51077,7 @@ model=obj_ahoy_map_scrap_2
 2dxan=348
 members=yes
 weight=10g
+tradeable=no
 
 [ahoy_map_scrap_3]
 name=Map scrap
@@ -51073,6 +51089,7 @@ model=obj_ahoy_map_scrap_3
 2dxan=348
 members=yes
 weight=10g
+tradeable=no
 
 [ahoy_map_complete]
 name=Treasure map
@@ -51086,6 +51103,7 @@ iop1=Read
 iop2=Follow
 members=yes
 weight=10g
+tradeable=no
 
 [ectotoken]
 name=Ecto-token
@@ -51153,6 +51171,7 @@ iop1=Count
 2dyan=20
 2dxan=328
 weight=1g
+tradeable=no
 
 [ahoy_bedsheet]
 name=Bedsheet
@@ -51167,6 +51186,7 @@ model=obj_childs_blanket
 iop2=Wear
 weight=1kg
 wearpos=hat
+tradeable=no
 
 [ahoy_bedsheetgreen]
 name=Bedsheet
@@ -51181,6 +51201,7 @@ model=obj_childs_blanket
 iop2=Wear
 weight=1kg
 wearpos=hat
+tradeable=no
 
 [bucket_ectoplasm]
 name=Bucket of slime

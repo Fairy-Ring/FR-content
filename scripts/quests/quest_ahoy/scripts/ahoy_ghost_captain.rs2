@@ -14,9 +14,14 @@
 // Cite ahoy-ghost-captain-first-slice-377.md + dest-uncited-pass-next-377.md.
 
 [opnpc1,ahoy_ghost_captain_1]
-if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+if (~ahoy_can_speak = false) {
     ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
+    return;
+}
+// UNKNOWN reconstructed return landing: free return is included in the fare.
+if (coordx(npc_coord) > 3750) {
+    p_telejump(0_57_54_54_31);
     return;
 }
 def_int $fare = 25;

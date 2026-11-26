@@ -1,10 +1,22 @@
-// Ghosts Ahoy — Ectofuntus Worship (ahoy_ectofunctus 5282 @ 3658,3518).
-// CANDIDATE 2007-base mes (OSRS Ectofuntus Worship minus Changes — no pot,
-// no bonemeal, no slime, no prayer XP, no invent %). Loc 4x4 — stand
-// next-to, never on 3658,3518. No dest, no ectophial Empty / refill touch.
-// ahoy_ectofuntus_small NOT bound (unpack has no op1=Worship). No quest var.
-// Cite docs/research/ahoy-ectophial-dest-hole-377.md.
-
+// VERIFIED period ritual: slime + bonemeal, collect five tokens per worship.
+// UNKNOWN engineering Prayer multiplier: four times the existing burial value.
 [oploc1,ahoy_ectofunctus]
+if (getbit_range(%ahoy_puzzle_state, 24, 27) >= 12) return;
+if (inv_total(inv, bucket_ectoplasm) = 0) return;
+def_obj $meal = null;
+def_int $exp = 0;
+if (inv_total(inv, pot_bonemeal) > 0) { $meal = pot_bonemeal; $exp = 180; }
+else if (inv_total(inv, pot_bonemeal_bat) > 0) { $meal = pot_bonemeal_bat; $exp = 180; }
+else if (inv_total(inv, pot_bonemeal_burnt) > 0) { $meal = pot_bonemeal_burnt; $exp = 180; }
+else if (inv_total(inv, pot_bonemeal_big) > 0) { $meal = pot_bonemeal_big; $exp = 600; }
+else if (inv_total(inv, pot_bonemeal_babydragon) > 0) { $meal = pot_bonemeal_babydragon; $exp = 1200; }
+else if (inv_total(inv, pot_bonemeal_dragon) > 0) { $meal = pot_bonemeal_dragon; $exp = 2880; }
+if ($meal = null) return;
+inv_del(inv, $meal, 1);
+inv_del(inv, bucket_ectoplasm, 1);
+inv_add(inv, pot_empty, 1);
+inv_add(inv, bucket_empty, 1);
+%ahoy_puzzle_state = setbit_range_toint(%ahoy_puzzle_state, add(getbit_range(%ahoy_puzzle_state, 24, 27), 1), 24, 27);
+stat_advance(prayer, $exp);
+anim(ahoy_prayer, 0);
 mes("You worship the Ectofuntus.");
-return;

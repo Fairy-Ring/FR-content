@@ -1,18 +1,28 @@
-// Ghosts Ahoy mid — Necrovarus refuse after licensed Velorina.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Necrovarus
-// minus Overview / robes / petition later. Hunt 289? no.
-// Prerequisite: %ahoy_questvar >= 1. First refuse writes 1→2 CANDIDATE
-// (room 0–15; Ak-Haranu multi is 4–8). Never 15. No dest / ectophial /
-// Velorina return / crone / tea. Cite ghosts-ahoy-nettle-tea-first-slice-377.md.
+// CANDIDATE dialogue: retained Ghosts Ahoy transcript. Stage integers UNKNOWN.
 
 [opnpc1,ahoy_necrovarus]
 if (%ahoy_questvar < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+if (~ahoy_can_speak = false) {
     ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
+    return;
+}
+if (%ahoy_questvar >= 7) {
+    ~chatnpc("<p,angry>I should fry you for what you have done...");
+    return;
+}
+if (%ahoy_questvar = 6 & inv_total(worn, amulet_of_ghostspeak_enchanted) > 0) {
+    @ahoy_necro_command;
+}
+if (%ahoy_questvar >= 4 & inv_total(inv, ahoy_petition) > 0) {
+    @ahoy_necro_petition;
+}
+if (%ahoy_questvar >= 5 & inv_total(inv, ahoy_bone_key) = 0 & %ahoy_templedoor_unlocked = 0) {
+    // UNKNOWN favourable recovery: a lost dropped key never blocks the quest.
+    obj_add(npc_coord, ahoy_bone_key, 1, 200);
     return;
 }
 if (%ahoy_questvar >= 2) {

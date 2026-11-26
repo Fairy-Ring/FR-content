@@ -1,0 +1,178 @@
+// Dialogue CANDIDATE: retained Ghosts Ahoy transcript records.
+// UNKNOWN engineering stages follow the existing registry completion value 8.
+[proc,ahoy_can_speak]()(boolean)
+if (inv_total(worn, amulet_of_ghostspeak) > 0 | inv_total(worn, amulet_of_ghostspeak_enchanted) > 0 | %ahoy_questvar >= ^ahoy_complete) return (true);
+return (false);
+
+[label,ahoy_crone_enlightenment]
+~chatplayer("<p,happy>Here's a lovely cup of milky tea for you, in your own special cup.");
+~mesbox("As the old woman drinks the cup of milky tea, enlightenment glows from within her eyes.");
+~chatnpc("<p,happy>Ah, that's better. Now, let me see... Yes, I was once a disciple of Necrovarus.");
+~chatplayer("<p,neutral>I have come from Velorina. She needs your help.");
+~chatnpc("<p,neutral>There is an enchantment that I can perform on such an amulet that will give it the power of command over ghosts. It will work only once, but it will enable you to command Necrovarus to let the ghosts pass on.");
+~chatnpc("<p,neutral>Necrovarus had a magical robe for which he must have no more use. Only these robes hold the power needed to perform the enchantment.");
+~chatnpc("<p,neutral>All his rituals came from a book written by an ancient sorcerer from the East called Haricanto. Bring me this strange book.");
+~chatnpc("<p,neutral>I cannot read the strange letters of the eastern lands. I will need something to help me translate the book.");
+inv_del(inv, chinacup_of_nettletea_milky, 1);
+%ahoy_questvar = 4;
+@ahoy_crone_boat;
+
+[label,ahoy_crone_boat]
+if (%ahoy_subquest_toyboat < 2 & inv_total(inv, ahoy_toy_boat) = 0 & inv_total(inv, ahoy_toy_boat_repaired) = 0 & inv_total(bank, ahoy_toy_boat) = 0 & inv_total(bank, ahoy_toy_boat_repaired) = 0) {
+    if (inv_freespace(inv) < 1) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    ~chatnpc("<p,sad>He was about twelve years old when he ran away with some pirates to be a cabin boy. I never saw him again.");
+    ~chatnpc("<p,neutral>If you ever see him, please give him this...and tell him that his mother still loves him.");
+    inv_add(inv, ahoy_toy_boat, 1);
+    %ahoy_subquest_toyboat = 1;
+    mes("The old woman gives you a toy boat.");
+}
+return;
+
+[label,ahoy_crone_materials]
+if (%ahoy_questvar >= 7) {
+    ~chatnpc("<p,happy>So Necrovarus has let the ghosts go free.... You have achieved many wonderful things, my young friend.");
+    return;
+}
+if (inv_total(inv, ahoy_book_of_haricanto) > 0 & %ahoy_given_book = 0) {
+    ~chatnpc("<p,happy>The Book of Haricanto! I have no idea how you came by this, but well done!!");
+    inv_del(inv, ahoy_book_of_haricanto, 1);
+    %ahoy_given_book = 1;
+}
+if (inv_total(inv, ahoy_robes_of_necrovarus) > 0 & %ahoy_given_robes = 0) {
+    ~chatnpc("<p,happy>Good - the robes of Necrovarus.");
+    inv_del(inv, ahoy_robes_of_necrovarus, 1);
+    %ahoy_given_robes = 1;
+}
+// The original given_manual flag records Ak-Haranu's grant. Bit 28 records hand-in.
+if (inv_total(inv, ahoy_translation_manual) > 0 & getbit_range(%ahoy_puzzle_state, 28, 28) = 0) {
+    ~chatnpc("<p,happy>A translation manual - yes, this should do the job.");
+    inv_del(inv, ahoy_translation_manual, 1);
+    %ahoy_puzzle_state = setbit_range_toint(%ahoy_puzzle_state, 1, 28, 28);
+}
+if (%ahoy_given_book = 1 & %ahoy_given_robes = 1 & getbit_range(%ahoy_puzzle_state, 28, 28) = 1) {
+    if (inv_total(inv, amulet_of_ghostspeak_enchanted) > 0 | inv_total(worn, amulet_of_ghostspeak_enchanted) > 0) {
+        ~chatnpc("<p,quiz>Did it work?");
+        ~chatplayer("<p,neutral>Actually, I haven't tried it yet.");
+        return;
+    }
+    if (inv_total(inv, amulet_of_ghostspeak) = 0 & inv_total(worn, amulet_of_ghostspeak) = 0) {
+        ~chatnpc("<p,sad>Oh dear, that's unfortunate. You'll have to go and find another one, then.");
+        return;
+    }
+    ~chatnpc("<p,happy>Wonderful; that's everything I need.");
+    ~chatnpc("<p,neutral>I will now perform the ritual of enchantment.");
+    if (inv_total(worn, amulet_of_ghostspeak) > 0) {
+        inv_setslot(worn, ^wearpos_front, amulet_of_ghostspeak_enchanted, 1);
+    } else {
+        inv_del(inv, amulet_of_ghostspeak, 1);
+        inv_add(inv, amulet_of_ghostspeak_enchanted, 1);
+    }
+    %ahoy_questvar = 6;
+    mes("The ghostspeak amulet emits a green glow from its gem.");
+    return;
+}
+~chatnpc("<p,neutral>Necrovarus had a magical robe for which he must have no more use. Only these robes hold the power needed to perform the enchantment.");
+~chatnpc("<p,neutral>All his rituals came from a book written by an ancient sorcerer from the East called Haricanto. Bring me this strange book.");
+~chatnpc("<p,neutral>I cannot read the strange letters of the eastern lands. I will need something to help me translate the book.");
+@ahoy_crone_boat;
+
+[label,ahoy_necro_petition]
+if (%ahoy_signaturecounter < 10) {
+    ~chatnpc("<p,neutral>Oh, I do admire an activist. Do let me know when you're finished, and I'll give it my fullest consideration.");
+    return;
+}
+~chatplayer("<p,neutral>Necrovarus, I am presenting you with a petition form that has been signed by 10 citizens of Port Phasmatys.");
+~chatnpc("<p,neutral>A petition you say? Continue, mortal.");
+~chatplayer("<p,quiz>So you will let them pass over if they wish?");
+~chatnpc("<p,angry>NO!!!!! Get out of my sight before I burn every ounce of flesh from your bones!!!!!");
+inv_del(inv, ahoy_petition, 1);
+mes("The petition form turns to ashes in your hand.");
+mes("In his rage, Necrovarus drops a key on the floor.");
+obj_add(npc_coord, ahoy_bone_key, 1, 200);
+if (%ahoy_questvar < 5) %ahoy_questvar = 5;
+return;
+
+[label,ahoy_necro_command]
+~chatnpc("<p,angry>You dare to face me again - you must be truly insane!!!!");
+~chatplayer("<p,neutral>No, Necrovarus, I am not insane. With this enchanted amulet of ghostspeak I have the power to command you to do my will!");
+def_int $choice = ~p_choice3("Let any ghost who so wishes pass on into the next world.", 1, "Tell me a joke.", 2, "Do a chicken impression.", 3);
+if ($choice = 2) {
+    ~chatnpc("<p,neutral>Knock knock");
+    ~chatplayer("<p,quiz>Who's there?");
+    ~chatnpc("<p,neutral>Egbert.");
+    ~chatplayer("<p,quiz>Egbert who?");
+    ~chatnpc("<p,happy>Egbert no bacon.");
+    return;
+}
+if ($choice = 3) {
+    ~chatnpc("<p,neutral>Cluck cluck squuuaaaakkkk cluck cluck");
+    ~chatnpc("<p,neutral>I think I've laid an egg...");
+} else {
+    ~chatplayer("<p,neutral>Let any ghost who so wishes pass on into the next world.");
+    ~chatnpc("<p,neutral>... pass into the next world.");
+    %ahoy_questvar = 7;
+}
+// VERIFIED period RuneHQ: chicken also spends the charge; crone can recharge.
+inv_setslot(worn, ^wearpos_front, amulet_of_ghostspeak, 1);
+return;
+
+[label,ahoy_velorina_materials]
+if (%ahoy_questvar = 6) {
+    ~chatnpc("<p,happy>Oh, kind adventurer - you are the answer to all our prayers!");
+    return;
+}
+def_int $hint = ~p_choice3("Where is the Book of Haricanto?", 1, "Where are Necrovarus's robes?", 2, "Who can translate the book?", 3);
+if ($hint = 1) ~chatnpc("<p,neutral>Nobody knows what has happened to the Book. It was stolen when our port was raided by pirates many years ago, and never seen since.");
+if ($hint = 2) ~chatnpc("<p,neutral>I imagine they are still worn by his mortal body, which now lies in a coffin inside the Temple.");
+if ($hint = 3) ~chatnpc("<p,neutral>I don't really know. You could try asking some of the traders from the East - they might be able to help you.");
+return;
+
+[label,ahoy_velorina_reward]
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+~chatnpc("<p,happy>You don't need to tell me <p_name> - I sensed the removal of Necrovarus's psychic barrier!");
+~chatnpc("<p,happy>Here, take this as a thank you for the service that you have given us.");
+~chatnpc("<p,neutral>This is an Ectophial. If you ever want to come back to Port Phasmatys, empty this on the floor beneath your feet, and you will be instantly teleported to the temple - the source of its power.");
+~chatnpc("<p,neutral>Remember that once the Ectophial has been used you need to refill it from the Ectofuntus.");
+inv_add(inv, ectophial, 1);
+%ahoy_questvar = ^ahoy_complete;
+stat_advance(prayer, 24000);
+~send_quest_complete(questlist:ahoy, ectophial, 200, ^ahoy_questpoints, "You have completed Ghosts Ahoy!", "2,400 Prayer experience|An Ectophial|Free entry to Port Phasmatys");
+return;
+
+[label,ahoy_velorina_postquest]
+~chatnpc("<p,happy>All in good time, <p_name>. We stand forever in your debt, and will certainly put in a good word for you when we pass over.");
+if (inv_total(inv, ectophial) = 0 & inv_total(inv, ectophial_empty) = 0 & inv_total(bank, ectophial) = 0 & inv_total(bank, ectophial_empty) = 0) {
+    if (inv_freespace(inv) < 1) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    inv_add(inv, ectophial, 1);
+}
+return;
+
+[opheld2,amulet_of_ghostspeak_enchanted]
+~equip(last_slot);
+
+[if_button,questlist:ahoy]
+// UNKNOWN functional journal wording. Stages are this reconstruction's values.
+if (%ahoy_questvar = 0) {
+    ~quest_journal("Ghosts Ahoy", "I can start this quest by speaking to Velorina in Port Phasmatys.");
+} else if (%ahoy_questvar < 3) {
+    ~quest_journal("Ghosts Ahoy", "I offered to help Velorina. I should speak to Necrovarus, then return to her.");
+} else if (%ahoy_questvar = 3) {
+    ~quest_journal("Ghosts Ahoy", "Velorina told me about an old friend. The old crone wants nettle tea in her special cup, with milk.");
+} else if (%ahoy_questvar < 6) {
+    ~quest_journal("Ghosts Ahoy", "The old crone needs the Book of Haricanto, a translation manual and Necrovarus's robes. Her son's model ship may help me at the wreck. Gravingas wants ten signatures.");
+} else if (%ahoy_questvar = 6) {
+    ~quest_journal("Ghosts Ahoy", "I must wear the enchanted ghostspeak amulet and command Necrovarus to free the ghosts.");
+} else if (%ahoy_questvar = 7) {
+    ~quest_journal("Ghosts Ahoy", "Necrovarus freed the ghosts. I should return to Velorina.");
+} else {
+    ~quest_journal("Ghosts Ahoy", "@gre@QUEST COMPLETE! I freed the ghosts and received an Ectophial, 2 Quest Points and 2,400 Prayer experience.");
+}

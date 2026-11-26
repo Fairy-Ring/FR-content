@@ -1,0 +1,48 @@
+// Ghosts Ahoy: both original Energy Barrier locs.
+// VERIFIED: entry costs 2 ecto-tokens before quest completion and is free after it.
+// Exiting is free. A worn bedsheet blocks either direction.
+// UNKNOWN engineering boundary for wearing: the town rectangle is map tiles
+// x=3653..3700, z=3464..3507, inside the west and north barriers.
+
+[oploc1,ahoy_town_barrier]
+if (loc_coord = 0_57_54_4_29) {
+    // The west-wall barrier is crossed on the X axis; the town lies east of it.
+    if (coordx(coord) < coordx(loc_coord)) {
+        if (~ahoy_barrier_can_cross(true) = false) return;
+        p_telejump(movecoord(coord, 2, 0, 0));
+    } else {
+        if (~ahoy_barrier_can_cross(false) = false) return;
+        p_telejump(movecoord(coord, -2, 0, 0));
+    }
+    return;
+}
+if (loc_coord = 0_57_54_11_52) {
+    // The north-wall barrier is crossed on the Z axis; the town lies south of it.
+    if (coordz(coord) > coordz(loc_coord)) {
+        if (~ahoy_barrier_can_cross(true) = false) return;
+        p_telejump(movecoord(coord, 0, 0, -2));
+    } else {
+        if (~ahoy_barrier_can_cross(false) = false) return;
+        p_telejump(movecoord(coord, 0, 0, 2));
+    }
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,ahoy_barrier_can_cross](boolean $entry)(boolean)
+if (inv_total(worn, ahoy_bedsheet) > 0 | inv_total(worn, ahoy_bedsheetgreen) > 0) {
+    mes("You can't pass the barriers of Port Phasmatys while wearing the bedsheet.");
+    return(false);
+}
+if ($entry = true & %ahoy_questvar < ^ahoy_complete) {
+    if (inv_total(inv, ectotoken) < 2) {
+        // UNKNOWN functional wording; the 2-token entry fee is VERIFIED.
+        mes("You need 2 ecto-tokens to pass through the barrier.");
+        return(false);
+    }
+    inv_del(inv, ectotoken, 2);
+}
+return(true);
+
+[proc,ahoy_inside_port](coord $where)(boolean)
+return(inzone(0_57_54_5_8, 0_57_54_52_51, $where));

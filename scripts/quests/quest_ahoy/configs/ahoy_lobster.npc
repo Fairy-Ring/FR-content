@@ -1,0 +1,30 @@
+[giant_lobster]
+name=Giant Lobster
+desc=An extremely vicious lobster.
+model1=npc_1693
+size=2
+walkanim=scorpion_walk
+readyanim=scorpion_ready
+op2=Attack
+vislevel=32
+// UNKNOWN: preserve these unpacked server stats; no period stat table survives.
+hitpoints=32
+attack=18
+strength=26
+defence=40
+// UNKNOWN combat defaults; the cache and period guide establish level 32,
+// not the server stats, attack pattern, range, speed or drops.
+magic=1
+ranged=1
+param=attackrate,4
+param=damagetype,^crush_style
+param=attack_anim,scorpion_attack
+param=defend_anim,scorpion_parry
+param=death_anim,scorpion_death
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+param=death_drop,null
+huntmode=aggressive_melee
+huntrange=1
+attackrange=1

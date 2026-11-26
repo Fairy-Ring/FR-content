@@ -1,0 +1,55 @@
+// Ghosts Ahoy — map assembly, map reading/following and Dragontooth treasure.
+// VERIFIED route from the 2006 Tip.It and RuneHQ records. The map item is
+// cache-authored ahoy_map_complete (N377 interface ahoy_islandmap).
+
+[opheldu,ahoy_map_scrap_1]
+~ahoy_assemble_map;
+[opheldu,ahoy_map_scrap_2]
+~ahoy_assemble_map;
+[opheldu,ahoy_map_scrap_3]
+~ahoy_assemble_map;
+
+[proc,ahoy_assemble_map]
+if (inv_total(inv, ahoy_map_scrap_1) = 0) return;
+if (inv_total(inv, ahoy_map_scrap_2) = 0) return;
+if (inv_total(inv, ahoy_map_scrap_3) = 0) return;
+if (inv_total(inv, ahoy_map_complete) > 0) return;
+inv_del(inv, ahoy_map_scrap_1, 1);
+inv_del(inv, ahoy_map_scrap_2, 1);
+inv_del(inv, ahoy_map_scrap_3, 1);
+inv_add(inv, ahoy_map_complete, 1);
+
+[opheld1,ahoy_map_complete]
+if_openmain(ahoy_islandmap);
+
+[opheld2,ahoy_map_complete]
+if (inzone(0_59_55_0_0, 0_59_55_63_63, coord) = false) {
+    mes("This map is for use elsewhere.");
+    return;
+}
+def_int $direction = ~p_choice4("North", 1, "East", 2, "South", 3, "West", 4);
+def_int $distance = ~p_choice4("1 pace", 1, "2 paces", 2, "4 paces", 4, "10 paces", 10);
+def_coord $destination = coord;
+if ($direction = 1) $destination = movecoord(coord, 0, 0, $distance);
+else if ($direction = 2) $destination = movecoord(coord, $distance, 0, 0);
+else if ($direction = 3) $destination = movecoord(coord, 0, 0, multiply($distance, -1));
+else $destination = movecoord(coord, multiply($distance, -1), 0, 0);
+p_walk($destination);
+p_arrivedelay;
+
+// The shared spade dispatcher calls this only when an Ahoy-area action is possible.
+// Region m59_55 is Dragontooth Island; source map starts west of loc ahoy_x_start
+// (3791,3556) and the 6S/8E/2N/4E/22S route ends at (3803,3530) on plane 0.
+[proc,ahoy_dig]()(boolean)
+if (inzone(0_59_55_0_0, 0_59_55_63_63, coord) = false) return(false);
+if (inv_total(inv, ahoy_map_complete) = 0) return(true);
+if (coord ! 0_59_55_27_10) {
+    mes("Nothing interesting happens.");
+    return(true);
+}
+if (inv_total(inv, ahoy_book_of_haricanto) > 0) return(true);
+if (inv_freespace(inv) = 0) return(true);
+inv_del(inv, ahoy_map_complete, 1);
+inv_add(inv, ahoy_book_of_haricanto, 1);
+mes("You unearth the Book of Haricanto.");
+return(true);

@@ -1,0 +1,85 @@
+// Ghosts Ahoy: Ak-Haranu's signed-bow exchange and manual recovery.
+// CANDIDATE dialogue: the retained transcript and Tip.It describe the exchange.
+// ahoy_given_manual records this script's manual grant only; the crone checks item possession.
+
+[opnpc1,ahoy_akharanu]
+if (%ahoy_questvar < 4 | %ahoy_questvar > 8) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, ahoy_translation_manual) > 0) {
+    ~chatplayer("Thank you for the translation manual, Ak-Haranu - it may save many souls before long.");
+    ~chatnpc("And Ak-Haranu thanks you for kind gift of longbow.");
+    return;
+}
+if (%ahoy_given_manual = 1) {
+    @ahoy_akharanu_replace_manual;
+    return;
+}
+if (inv_total(inv, oak_longbow_signed) > 0) {
+    // UNKNOWN functional guidance: item-on-NPC transfers the signed bow.
+    mes("Use the signed oak longbow on Ak-Haranu.");
+    return;
+}
+if (inv_total(inv, oak_longbow) > 0) {
+    ~chatnpc("How Master <displayname> getting on with longbow?");
+    ~chatplayer("I'll let you know.");
+    return;
+}
+
+~chatplayer("It's nice to see a human face around here.");
+~chatnpc("My name Ak-Haranu. I am trader, come from many far across sea in east.");
+~chatplayer("You come from the lands of the East? Do you have anything that can help me translate a book that is scribed in your language?");
+~chatnpc("Ak-Haranu may help you. A translation manual I have, much good for reading Eastern language.");
+~chatplayer("How much do you want for it?");
+~chatnpc("Ak-Haranu not want money for this book, as is such small thing. But there may be something you could do for me. I am big admirer of Robin, Master Bowman. He staying in village inn.");
+~chatplayer("What would you like me to do?");
+~chatnpc("Please get Master Bowman sign an oak longbow for me, so Ak-Haranu can show family and friends when returning home and become much admired. Then I give you book in exchange.");
+def_int $choice = ~p_choice2("Okay, wait here - I'll get you your bow.", 1, "Sorry, I have too much to do at the moment.", 2);
+if ($choice = 1) {
+    ~chatplayer("Okay, wait here - I'll get you your bow.");
+} else {
+    ~chatplayer("Sorry, I have too much to do at the moment.");
+}
+return;
+
+[opnpcu,ahoy_akharanu]
+if (%ahoy_questvar < 4 | %ahoy_questvar > 8) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = oak_longbow_signed) {
+    if (%ahoy_given_manual = 1) {
+        @ahoy_akharanu_replace_manual;
+        return;
+    }
+    if (inv_total(inv, ahoy_translation_manual) > 0) {
+        ~chatnpc("Ak-Haranu has already given you the translation manual.");
+        return;
+    }
+    ~chatplayer("I have your signed longbow for you.");
+    ~chatnpc("Ah, can it be true? You have obtained bow from Master Bowman?");
+    ~chatplayer("He was more than happy to oblige (cough). Here you are.");
+    inv_del(inv, oak_longbow_signed, 1);
+    inv_add(inv, ahoy_translation_manual, 1);
+    %ahoy_given_manual = 1;
+    mes("Ak-Haranu gives you a translation manual in return for the signed oak longbow.");
+    ~chatnpc("May honour be bestowed upon you and your family!");
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,ahoy_akharanu_replace_manual]
+if (inv_total(inv, ahoy_translation_manual) > 0) {
+    ~chatnpc("Ak-Haranu has already given you the translation manual.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    ~chatplayer("I'm sorry, I seem to have lost the translation manual you gave me.");
+    ~chatnpc("Ak-Haranu cannot give you another manual until you make room in your inventory.");
+    return;
+}
+~chatplayer("I'm sorry, I seem to have lost the translation manual you gave me.");
+~chatnpc("Ah, no worry, my friend. For the gift of longbow Ak-Haranu would give a thousand books.");
+inv_add(inv, ahoy_translation_manual, 1);
+mes("Ak-Haranu gives you another translation manual.");

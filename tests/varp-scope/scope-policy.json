@@ -235,6 +235,8 @@
   },
   "deliberatelyTemporary": {
     "dwarfrock_puzzle": "Original reserved slot 237: temporary schematic overlay offsets, rotations and selection. Reinitialized when opening the puzzle; solved progress lives in dwarfrock_main.",
+    "ahoy_last_signer": "Current-session previous petition signer UID; logout clears only repeat protection, never earned signatures.",
+    "varp413_bits": "Original transmitted Rune-Draw scores and unpaid current round; close resets it, while wins persist separately.",
     "temp": "Explicit scope=temp shared sextant, puzzle, still and dialogue scratch register; no durable player progress.",
     "damagetype": "Derived combat mode, equipment bonus, animation, sound or hit value; rebuilt from equipment and attack style.",
     "damagestyle": "Derived combat mode, equipment bonus, animation, sound or hit value; rebuilt from equipment and attack style.",
@@ -969,8 +971,8 @@
     "mta_alchemy_points": "perm",
     "mta_enchantment_points": "perm",
     "mta_graveyard_points": "perm",
-    "varp235_unused": "temp",
-    "varp236_unused": "temp",
+    "ahoy_puzzle_state": "perm",
+    "ahoy_last_signer": "temp",
     "dwarfrock_puzzle": "temp",
     "varp238_unused": "temp",
     "varp239_unused": "temp",
@@ -1164,6 +1166,9 @@
     "zq_rash_timer": "temp"
   },
   "declarationReasons": {
+    "ahoy_puzzle_state": "Reserved original slot stores permanent model flag dyes, pending ecto-tokens and the crone manual hand-in.",
+    "ahoy_last_signer": "Reserved original slot holds the previous petition signer UID across NPC movement; no earned progress is stored here.",
+    "varp413_bits": "The original score components read bits 0-11; unused bits 12-21 and 30-31 hold the unpaid bag and held flags.",
     "barrows_state": "Selected crypt, run phase and durable puzzle state survive pre-loot logout and departure; paid departure resets them through the Barrows core.",
     "barrows_generation": "Saved run generation rejects stale owned actors and queued credit across logout, reset and the next run.",
     "barrows_countdowns": "Saved Prayer and paid-collapse remainders resume after login without charging offline time or rearming a fresh interval.",
