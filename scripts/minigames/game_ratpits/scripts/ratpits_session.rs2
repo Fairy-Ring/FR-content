@@ -99,7 +99,7 @@ if (%ratpits_accept_a = 1 | %ratpits_accept_b = 1) {
     mes("Wager accepted. Decline to change it.");
     return;
 }
-def_int $stake = add(%ratpits_stake, multiply($direction, ~ratpits_min_stake(%ratpits_venue)));
+def_int $stake = add(%ratpits_stake, multiply($direction, ^ratpits_wager_step));
 if ($stake < ~ratpits_min_stake(%ratpits_venue) | $stake > ~ratpits_max_stake(%ratpits_venue)) return;
 %ratpits_stake = $stake;
 if_settext(players_cat:com_15, tostring($stake));

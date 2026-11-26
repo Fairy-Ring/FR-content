@@ -1,5 +1,5 @@
 // VERIFIED qualitative training benefit: RuneHQ Rat Pits, 18 April 2006.
-// UNKNOWN exact increments approved by Main. Preserve every unrelated bit,
+// UNKNOWN exact increments. Preserve every unrelated bit,
 // especially bits 27..30, owned by the Recipe for Disaster hellrat counter.
 [proc,ratpits_growth_reward](int $state, obj $cat, int $kills)(int)
 def_int $ceiling = 320;

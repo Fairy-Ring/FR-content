@@ -7,7 +7,7 @@
 // VERIFIED Ardougne five-rat target: RuneHQ capture, 18 April 2006.
 // CANDIDATE five elsewhere: 2007rshelp, with RuneHQ's varying-target conflict.
 ^ratpits_rats_to_win = 5
-// UNKNOWN engineering cadence and bounded abort, approved by Main.
+// UNKNOWN engineering cadence and bounded abort.
 ^ratpits_combat_interval = 4
 ^ratpits_match_ticks = 1000
 ^ratpits_offer_ticks = 1000
@@ -20,7 +20,7 @@
 ^ratpits_shrimp_heal = 3
 ^ratpits_tuna_heal = 10
 
-// VERIFIED fatigue score comparison, UNKNOWN duration approved by Main.
+// VERIFIED fatigue score comparison, UNKNOWN duration.
 ^ratpits_fatigue_ticks = 600
 // UNKNOWN pagination of the sourced manual text.
 ^ratpits_manual_last_page = 8
