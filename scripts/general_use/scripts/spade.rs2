@@ -3,6 +3,7 @@ if (~giant_mole_dig = true) return;
 if (~ek_dig() = true) return;
 if (~ft1_skull_dig = true) return;
 if (~ahoy_dig = true) return;
+if (~tbw_gout_spade = true) return;
 // Pirate's Treasure
 if (distance(coord, 0_46_52_55_55) <= 1) {
     @hunt_dig;
