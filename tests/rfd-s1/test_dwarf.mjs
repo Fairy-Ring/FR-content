@@ -72,11 +72,12 @@ function killIcefiend(p) {
   icefiend.applyDamage(icefiend.levels[NpcStat.HITPOINTS], 1);
   icefiend.executeScript(state);
   for (let step = 0; state.execution === ScriptState.NPC_SUSPENDED && step < 40; step++) {
-    icefiend.processQueues();
+    p.processQueues();
     World.currentTick = Math.max(World.currentTick + 1, icefiend.delayedUntil);
     icefiend.delayed = false;
     icefiend.executeScript(state);
   }
+  p.processQueues();
   assert.equal(state.execution, ScriptState.FINISHED, 'native Icefiend death settles');
   assert(World.getObj(icefiend.x, icefiend.z, icefiend.level, types.ObjType.getId('ashes'), p.hash64),
     'the original Icefiend ashes drop survives the RFD cooling hook');

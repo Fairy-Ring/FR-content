@@ -157,7 +157,11 @@ assertNativeRoute(p, preBlast, cook, 'pre-blast kitchen');
 assertNativeRoute(p, preBlast, ladderUp, 'pre-blast kitchen');
 operate(p, ladderUp);
 const surface = tile(p);
+assert.deepEqual(surface, [0, 2961, 3506], 'surface return is beside the original ladder on its accessible side');
 assertNativeRoute(p, surface, ladderDown, 'surface return');
+// Ordinary travel opens the two native hut doors before routing to the generals.
+operate(p, nativeLoc('goblin_outpost_poordoor', rows => rows.find(row => row.x === 2958 && row.z === 3506)));
+operate(p, nativeLoc('goblin_outpost_poordoor_double_inner'));
 assertNativeRoute(p, surface, wartface, 'surface return');
 operate(p, ladderDown);
 assert.deepEqual(tile(p), preBlast, 'pre-blast ladder re-entry returns to the kitchen');

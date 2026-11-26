@@ -1,5 +1,14 @@
 // VERIFIED north-door feast route; UNKNOWN map-derived destinations and functional wording.
-[oploc1,hundred_lumbridge_door]
+[oploc1,hundred_lumbridge_door] @rfd_feast_door;
+[aploc1,hundred_lumbridge_door]
+// UNKNOWN engineering approach: the original wall door faces away from the banquet.
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_feast_door;
+
+[label,rfd_feast_door]
 if (%hundred_main_quest_var < ^rfd_feast_ready) {
     mes("The cook has not invited you to the feast.");
     return;

@@ -164,14 +164,19 @@ export function talk(p, actor, choices = []) {
   assert.match(script.name, /^\[opnpc1,/);
   return capture(p, () => assert(p.tryInteract(true)), choices);
 }
-export function operate(p, target, option = 1, { choices = [], accept = () => true } = {}) {
-  stand(p, target, accept);
+export function operate(p, target, option = 1, { choices = [], accept = () => true, from = null } = {}) {
+  if (from === null) stand(p, target, accept);
+  else {
+    walkable(from, 'native location action source');
+    assert(accept(from));
+    position(p, from);
+  }
   assert.equal(locHandler.handle(new OpLoc(option, target.x, target.z, target.type), p), true);
   assert.equal(p.target, target);
   assert(p.validateTarget(), 'native loc remains valid');
-  const script = p.getOpTrigger();
-  assert(script, 'engine resolves visible location operation');
-  assert.match(script.name, new RegExp(`^\\[oploc${option},`));
+  const script = p.inOperableDistance(target) ? p.getOpTrigger() : p.getApTrigger();
+  assert(script, 'engine resolves visible location operation or approach');
+  assert.match(script.name, new RegExp(`^\\[(?:op|ap)loc${option},`));
   return capture(p, () => assert(p.tryInteract(true)), choices);
 }
 export function useLoc(p, item, target, { accept = () => true } = {}) {

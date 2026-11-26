@@ -145,7 +145,7 @@ for (const name of ['hundred_dwarf_ambassador_base', 'hundred_goblin1_base', 'hu
   assert.equal(visibleLoc(p, guestLoc(name)), id('LocType', name), `${name} visible frozen form`);
 }
 const pete = guestLoc('hundred_pirate_base');
-operate(p, banquetDoor);
+operate(p, banquetDoor, 1, { from: [0, 1861, 5317] });
 assert.deepEqual(tile(p), [0, 3207, 3216]);
 assertLanding(tile(p), 'kitchen return', [3207, 3215], [3200, 3214, 3208, 3220]);
 operate(p, kitchenDoor);
