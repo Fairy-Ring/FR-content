@@ -43,7 +43,8 @@ if (%lost_tribe_quest = 1) {
     ~losttribe_progress;
 } else if (%lost_tribe_quest = 9) {
     if (%lost_tribe_sigmund_accused = 0) {
-        if (inv_total(inv, ham_shirt) > 0 & %lost_tribe_ham = 1) {
+        // UNKNOWN favourable proof rule: knowledge survives storing or losing the robes.
+        if (%lost_tribe_ham = 1) {
             ~chatnpc("<p,neutral>These robes show that Sigmund is a member of H.A.M. Find the missing silverware.");
             %lost_tribe_sigmund_accused = 1;
         } else {

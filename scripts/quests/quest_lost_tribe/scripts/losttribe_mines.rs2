@@ -47,7 +47,7 @@ if ($choice = 1) {
 ~chatnpc("<p,neutral>I can guide you through the tunnels to Mistag.");
 if (~p_choice2("Yes, please.", 1, "No, thank you.", 2) = 2) return;
 walktrigger(null);
-p_teleport(0_51_150_53_15);
+p_teleport(0_51_150_54_15);
 
 [proc,losttribe_sell_ore]
 // CANDIDATE prices will be backed by the retained Old School Mistag source.
@@ -60,8 +60,8 @@ if ($price = 0) {
 }
 ~chatnpc("<p,neutral>I will pay <tostring($price)> coins for your iron and silver ore.");
 if (~p_choice2("Yes, please.", 1, "No, thank you.", 2) = 2) return;
-inv_del(inv, iron_ore, $iron);
-inv_del(inv, silver_ore, $silver);
+if ($iron > 0) inv_del(inv, iron_ore, $iron);
+if ($silver > 0) inv_del(inv, silver_ore, $silver);
 if (inv_total(inv, coins) > 0 | inv_freespace(inv) > 0) inv_add(inv, coins, $price);
 else obj_add(coord, coins, $price, ^lootdrop_duration);
 
@@ -71,12 +71,12 @@ else obj_add(coord, coins, $price, ^lootdrop_duration);
 ~chatnpc("<p,neutral>Let us meet your Duke and sign this treaty.");
 p_stopaction;
 walktrigger(losttribe_scene_cancel);
-npc_add(0_51_150_53_14, lost_tribe_cutscene_duke, 100);
+npc_add(0_51_150_54_14, lost_tribe_cutscene_duke, 100);
 %npc_attacking_uid = uid;
 npc_facesquare(0_51_150_55_14);
 npc_add(0_51_150_55_14, lost_tribe_cutscene_urtag, 100);
 %npc_attacking_uid = uid;
-npc_facesquare(0_51_150_53_14);
+npc_facesquare(0_51_150_54_14);
 npc_add(0_51_150_56_17, lost_tribe_cutscene_sigmund, 100);
 %npc_attacking_uid = uid;
 cam_moveto(0_51_150_54_10, 400, 232, 232);
