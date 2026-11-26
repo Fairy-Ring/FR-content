@@ -1,5 +1,6 @@
 // requires .active_player and active_player
 [proc,deserves_pk_skull]()(boolean)
+if (~fightpits_pvp_pair = true) return(false);
 // if (~in_duel_arena(coord) = true) {
 //     return(false);
 // }

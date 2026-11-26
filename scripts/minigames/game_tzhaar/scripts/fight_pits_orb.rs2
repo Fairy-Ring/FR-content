@@ -1,0 +1,92 @@
+// Original 377 stop_viewing interface 3209: com_11..15 encode Centre, NW,
+// NE, SE, SW as varbit values 1..5; com_5 is the native Stop Viewing button.
+// Camera framing is an UNKNOWN engineering default derived from the arena box.
+
+[oploc1,viewing_orb]
+if (~fightpits_status ! 1 | ~fightpits_in_waiting(coord) = false) return;
+p_stopaction;
+%tzhaar_fightpit_orb = 1;
+// UNKNOWN placement default: replace the logout tab so its native Stop button
+// remains the exit from viewing, then restore the normal tabs on every exit.
+if_settab(stop_viewing, ^tab_logout);
+if_settabactive(^tab_logout);
+walktrigger(fightpits_orb_walk);
+~fightpits_orb_camera(1);
+
+[if_button,stop_viewing:com_5]
+// clientcode 205 sets the cache's reconnect timer; the server stop does not log out.
+~fightpits_orb_stop;
+
+[if_button,stop_viewing:com_11]
+~fightpits_orb_set_view(1);
+
+[if_button,stop_viewing:com_12]
+~fightpits_orb_set_view(2);
+
+[if_button,stop_viewing:com_13]
+~fightpits_orb_set_view(3);
+
+[if_button,stop_viewing:com_14]
+~fightpits_orb_set_view(4);
+
+[if_button,stop_viewing:com_15]
+~fightpits_orb_set_view(5);
+
+[if_close,stop_viewing]
+if (%tzhaar_fightpit_orb ! 0) queue(fightpits_orb_close, 0, 0);
+
+[queue,fightpits_orb_close]
+~fightpits_orb_stop;
+
+[proc,fightpits_orb_set_view](int $view)
+if ($view < 1 | $view > 5) {
+    ~fightpits_orb_stop;
+    return;
+}
+if (%tzhaar_fightpit_orb = 0) return;
+if (~fightpits_status ! 1 | ~fightpits_in_waiting(coord) = false) {
+    ~fightpits_orb_stop;
+    return;
+}
+%tzhaar_fightpit_orb = $view;
+~fightpits_orb_camera($view);
+walktrigger(fightpits_orb_walk);
+
+[proc,fightpits_orb_camera](int $view)
+// UNKNOWN engineering framing: inset, walkable arena stands inside the loaded scene.
+def_coord $camera = ^fightpits_centre;
+def_int $camera_height = 500;
+def_int $look_height = 300;
+if ($view = 2) $camera = movecoord(^fightpits_centre, -7, 0, 8);
+if ($view = 3) $camera = movecoord(^fightpits_centre, 7, 0, 8);
+if ($view = 4) $camera = movecoord(^fightpits_centre, 8, 0, -8);
+if ($view = 5) $camera = movecoord(^fightpits_centre, -8, 0, -8);
+cam_moveto($camera, $camera_height, 100, 100);
+cam_lookat(^fightpits_centre, $look_height, 100, 100);
+
+[walktrigger,fightpits_orb_walk]
+// A walk request ends viewing but remains the player's requested movement.
+%tzhaar_fightpit_orb = 0;
+walktrigger(null);
+cam_reset;
+~initalltabs;
+
+[proc,fightpits_orb_stop]
+if (%tzhaar_fightpit_orb = 0) {
+    walktrigger(null);
+    return;
+}
+%tzhaar_fightpit_orb = 0;
+walktrigger(null);
+p_stopaction;
+cam_reset;
+~initalltabs;
+
+[proc,fightpits_orb_recover]
+// Login/logout recovery also resets an interrupted partial view.
+if (%tzhaar_fightpit_orb = 0) return;
+%tzhaar_fightpit_orb = 0;
+walktrigger(null);
+p_stopaction;
+cam_reset;
+~initalltabs;
