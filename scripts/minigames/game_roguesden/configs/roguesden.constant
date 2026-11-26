@@ -1,0 +1,5 @@
+// UNKNOWN engineering value: an active run lasts 1,000 session timer ticks.
+^roguesden_session_ticks = 1000
+// UNKNOWN favourable-to-player substitute for the unsourced partial-run fraction:
+// half the completion rate, in tenths of XP, per recorded drained level.
+^roguesden_incomplete_xp_per_drain = 60

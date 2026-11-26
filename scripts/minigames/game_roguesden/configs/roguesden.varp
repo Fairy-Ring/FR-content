@@ -1,0 +1,9 @@
+// Original unused slot 319 is transient; keep its cached name and client fields.
+// UNKNOWN server-side layout is documented next to the session implementation.
+[varp319_unused]
+scope=temp
+
+// Original puzzle varp 493 and its transmit field are retained for its 377 varbits.
+[roguesden_puzzle]
+scope=temp
+transmit=yes

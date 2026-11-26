@@ -1,0 +1,508 @@
+// Rogues' Den traversal. The raised gallery is raw map plane 2 with f2 bridge
+// flags, so its walkable entity coordinates are effective plane 1.
+// UNKNOWN favourable timings: searched traps last 20 ticks, guards are stunned
+// for 10 ticks, and forced obstacle steps take 30 client cycles. Gallery Open
+// follows the original bridge-connected passage pair rather than teleporting.
+
+[proc,roguesden_maze_inside](coord $where)(boolean)
+def_int $x = coordx($where);
+def_int $z = coordz($where);
+if (coordy($where) = 1 & $x >= 2944 & $x < 3072 & $z >= 4992 & $z < 5120) return(true);
+return(false);
+
+[proc,roguesden_maze_start]
+cleartimer(roguesden_maze_watch);
+cleartimer(roguesden_maze_trap_armed);
+%roguesden_puzzle = setbit_range_toint(%roguesden_puzzle, 0, 24, 31);
+%varp319_unused = setbit_range_toint(%varp319_unused, 0, 24, 31);
+// CANDIDATE safety cleanup: no prayer is active while the maze session runs.
+~prayer_deactivate_all;
+settimer(roguesden_maze_watch, 1, 0, coord);
+
+[proc,roguesden_maze_stop]
+cleartimer(roguesden_maze_watch);
+cleartimer(roguesden_maze_trap_armed);
+%roguesden_puzzle = setbit_range_toint(%roguesden_puzzle, 0, 24, 31);
+%varp319_unused = setbit_range_toint(%varp319_unused, 0, 24, 31);
+
+[timer,roguesden_maze_watch](int $last_obstacle, coord $previous)
+if (~roguesden_active = false) return;
+if (~roguesden_maze_inside(coord) = false | inv_total(inv, roguesden_gem) < 1) {
+    ~roguesden_leave(0);
+    return;
+}
+~roguesden_guard_watch(roguesden_guard1);
+~roguesden_guard_watch(roguesden_guard2);
+~roguesden_guard_watch(roguesden_guard3);
+~roguesden_blade_watch(roguesden_trap_floor_spinningblades_0);
+~roguesden_blade_watch(roguesden_trap_floor_spinningblades_1);
+if (~roguesden_active = false) return;
+def_coord $here = coord;
+def_int $contact = ~roguesden_maze_contact_zone(coord, $last_obstacle, $previous);
+// A blocked moving obstacle starts at its walkable centre approach tile.
+// Its anchor can therefore also lie one tile east/north of the player's zone.
+def_int $zone_x = 0;
+def_int $zone_z = 0;
+if (calc(coordx(coord) % 8) < 3) $zone_x = -8;
+else if (calc(coordx(coord) % 8) = 7) $zone_x = 8;
+if (calc(coordz(coord) % 8) < 3) $zone_z = -8;
+else if (calc(coordz(coord) % 8) = 7) $zone_z = 8;
+def_int $other;
+if (($contact = 0 | $contact = -2) & $zone_x ! 0) {
+    $other = ~roguesden_maze_contact_zone(movecoord(coord, $zone_x, 0, 0), $last_obstacle, $previous);
+    if ($other ! 0) $contact = $other;
+}
+if (($contact = 0 | $contact = -2) & $zone_z ! 0) {
+    $other = ~roguesden_maze_contact_zone(movecoord(coord, 0, 0, $zone_z), $last_obstacle, $previous);
+    if ($other ! 0) $contact = $other;
+}
+if (($contact = 0 | $contact = -2) & $zone_x ! 0 & $zone_z ! 0) {
+    $other = ~roguesden_maze_contact_zone(movecoord(coord, $zone_x, 0, $zone_z), $last_obstacle, $previous);
+    if ($other ! 0) $contact = $other;
+}
+if (~roguesden_active = false) return;
+if ($contact = 0 & getbit_range(%varp319_unused, 31, 31) = 1) ~roguesden_maze_trap_clear;
+if ($contact >= 0) $last_obstacle = $contact;
+settimer(roguesden_maze_watch, 1, $last_obstacle, $here);
+
+// The original puzzle/session fields retain bits 0..23. The 15-bit searched
+// loc key uses 493[24..31] and 319[24..30]; 319[31] means it has been entered.
+[proc,roguesden_maze_tile_key](coord $where)(int)
+def_int $x = coordx($where);
+def_int $z = coordz($where);
+if ($x < 2944 | $x >= 3072 | $z < 4992 | $z >= 5120) return(0);
+return(add(add(multiply(sub($x, 2944), 128), sub($z, 4992)), 1));
+
+[proc,roguesden_maze_trap_key]()(int)
+def_int $low = getbit_range(%roguesden_puzzle, 24, 31);
+def_int $high = getbit_range(%varp319_unused, 24, 30);
+return(add($low, multiply($high, 256)));
+
+[proc,roguesden_maze_trap_clear]
+cleartimer(roguesden_maze_trap_armed);
+%roguesden_puzzle = setbit_range_toint(%roguesden_puzzle, 0, 24, 31);
+%varp319_unused = setbit_range_toint(%varp319_unused, 0, 24, 31);
+
+[proc,roguesden_maze_trap_arm]
+if (~roguesden_active = false) return;
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
+def_int $key = ~roguesden_maze_tile_key(loc_coord);
+if ($key <= 0) return;
+if (stat(thieving) < 1) {
+    ~roguesden_leave(0);
+    return;
+}
+~roguesden_maze_trap_clear;
+def_int $before = stat(thieving);
+stat_sub(thieving, 1, 0);
+~roguesden_maze_drain_thieving(sub($before, stat(thieving)));
+%roguesden_puzzle = setbit_range_toint(%roguesden_puzzle, getbit_range($key, 0, 7), 24, 31);
+%varp319_unused = setbit_range_toint(%varp319_unused, getbit_range($key, 8, 14), 24, 30);
+settimer(roguesden_maze_trap_armed, 20);
+
+[timer,roguesden_maze_trap_armed]
+~roguesden_maze_trap_clear;
+
+[proc,roguesden_maze_trap_trigger]
+if (~roguesden_active = false) return;
+if (~roguesden_maze_trap_key = ~roguesden_maze_tile_key(loc_coord)) {
+    cleartimer(roguesden_maze_trap_armed);
+    %varp319_unused = setbit_range_toint(%varp319_unused, 1, 31, 31);
+    return;
+}
+// UNKNOWN favourable failure consequence: safe ejection, not invented damage.
+~roguesden_leave(0);
+
+[aploc5,roguesden_trap_floor_spikes]
+~roguesden_maze_trap_arm;
+[aploc5,roguesden_trap_wall_spikes]
+~roguesden_maze_trap_arm;
+[aploc5,roguesden_trap_wall_poison_gas]
+~roguesden_maze_trap_arm;
+[aploc5,roguesden_trap_floor_explosion]
+~roguesden_maze_trap_arm;
+[aploc5,roguesden_trap_floor_springtile]
+~roguesden_maze_trap_arm;
+[aploc5,roguesden_trap_wall_crusher]
+~roguesden_maze_trap_arm;
+
+// Result: zero means no contact; -1 a Search trap; -2 the last crossed
+// obstacle; a positive result is the newly crossed obstacle's placed-loc key.
+// Keeping that key in the timer arguments avoids bouncing a stationary player
+// back over an obstacle while preserving the separate searched-trap token.
+[proc,roguesden_maze_contact_zone](coord $zone, int $last_obstacle, coord $previous)(int)
+def_int $contact = 0;
+loc_findallzone($zone);
+while (loc_findnext = true) {
+    def_int $kind = 0;
+    switch_loc(loc_type) {
+        case roguesden_trap_floor_spikes, roguesden_trap_wall_spikes,
+            roguesden_trap_wall_poison_gas, roguesden_trap_floor_explosion,
+            roguesden_trap_floor_springtile, roguesden_trap_wall_crusher : $kind = 1;
+        case roguesden_trap_wall_scytheblade, roguesden_trap_floor_pendulum,
+            roguesden_trap_floor_timedblade : $kind = 2;
+        case roguesden_trap_wall_saw : $kind = 3;
+        // The original pedestal says it cannot be dodged; avoid spin blades.
+        case roguesden_trap_floor_pitfall, roguesden_trap_floor_scytheblade : $kind = 4;
+    }
+    if ($kind > 0) {
+        def_int $width = lc_width(loc_type);
+        def_int $length = lc_length(loc_type);
+        def_boolean $axis_x = false;
+        if (calc(loc_angle % 2) = 1) {
+            $width = lc_length(loc_type);
+            $length = lc_width(loc_type);
+            $axis_x = true;
+        }
+        def_boolean $inside = false;
+        if (coordx(coord) >= coordx(loc_coord) & coordx(coord) < add(coordx(loc_coord), $width) &
+            coordz(coord) >= coordz(loc_coord) & coordz(coord) < add(coordz(loc_coord), $length)) $inside = true;
+        if ($kind = 1 & $inside = true) {
+            ~roguesden_maze_trap_trigger;
+            return(-1);
+        }
+        if ($kind = 4 & $inside = true) {
+            ~roguesden_leave(0);
+            return(-1);
+        }
+        if ($kind = 2 | $kind = 3) {
+            if ($width > $length) $axis_x = true;
+            else if ($length > $width) $axis_x = false;
+            // Approach toward the obstacle, not parallel along its edge.
+            def_boolean $approach = false;
+            if ($axis_x = true) {
+                if (coordz(coord) = add(coordz(loc_coord), divide($length, 2)) &
+                    ((coordx(coord) = sub(coordx(loc_coord), 1) & coordx($previous) < coordx(coord)) |
+                    (coordx(coord) = add(coordx(loc_coord), $width) & coordx($previous) > coordx(coord)))) $approach = true;
+            } else {
+                if (coordx(coord) = add(coordx(loc_coord), divide($width, 2)) &
+                    ((coordz(coord) = sub(coordz(loc_coord), 1) & coordz($previous) < coordz(coord)) |
+                    (coordz(coord) = add(coordz(loc_coord), $length) & coordz($previous) > coordz(coord)))) $approach = true;
+            }
+            if ($inside = true | $approach = true) {
+                def_int $key = ~roguesden_maze_tile_key(loc_coord);
+                if ($key = $last_obstacle) $contact = -2;
+                else {
+                    def_int $drain = 3;
+                    if ($kind = 3) $drain = 0;
+                    ~roguesden_cross_footprint(lc_width(loc_type), lc_length(loc_type), $drain, true);
+                    return($key);
+                }
+            }
+        }
+    }
+}
+return($contact);
+
+[proc,roguesden_cross_footprint](int $width, int $length, int $agility_drain, boolean $long_axis)
+if (~roguesden_active = false) return;
+def_int $world_width = $width;
+def_int $world_length = $length;
+def_boolean $axis_x = false;
+if (calc(loc_angle % 2) = 1) {
+    $world_width = $length;
+    $world_length = $width;
+    $axis_x = true;
+}
+if ($long_axis = true) {
+    if ($world_width > $world_length) $axis_x = true;
+    else if ($world_length > $world_width) $axis_x = false;
+}
+def_coord $landing;
+if ($axis_x = true) {
+    def_int $lane_z = max(coordz(loc_coord), min(coordz(coord), sub(add(coordz(loc_coord), $world_length), 1)));
+    if (multiply(sub(coordx(coord), coordx(loc_coord)), 2) < $world_width) {
+        $landing = movecoord(loc_coord, $world_width, 0, sub($lane_z, coordz(loc_coord)));
+    } else {
+        $landing = movecoord(loc_coord, -1, 0, sub($lane_z, coordz(loc_coord)));
+    }
+} else {
+    def_int $lane_x = max(coordx(loc_coord), min(coordx(coord), sub(add(coordx(loc_coord), $world_width), 1)));
+    if (multiply(sub(coordz(coord), coordz(loc_coord)), 2) < $world_length) {
+        $landing = movecoord(loc_coord, sub($lane_x, coordx(loc_coord)), 0, $world_length);
+    } else {
+        $landing = movecoord(loc_coord, sub($lane_x, coordx(loc_coord)), 0, -1);
+    }
+}
+~roguesden_cross_to($landing, $agility_drain);
+
+[proc,roguesden_cross_to](coord $landing, int $agility_drain)
+if (~roguesden_active = false) return;
+if ($agility_drain > stat(agility)) {
+    ~roguesden_leave(0);
+    return;
+}
+def_int $dx = sub(coordx($landing), coordx(coord));
+def_int $dz = sub(coordz($landing), coordz(coord));
+def_int $direction = ^exact_north;
+if (abs($dx) > abs($dz)) {
+    if ($dx > 0) $direction = ^exact_east;
+    else $direction = ^exact_west;
+} else if ($dz < 0) $direction = ^exact_south;
+p_stopaction;
+p_exactmove(coord, $landing, 0, 30, $direction);
+if ($agility_drain > 0) {
+    // CANDIDATE drains: balance 4, hanging 7, bars 5, moving blades 3.
+    def_int $before = stat(agility);
+    stat_sub(agility, $agility_drain, 0);
+    ~roguesden_maze_drain_agility(sub($before, stat(agility)));
+}
+p_delay(1);
+
+[aploc1,roguesden_obstacle_floor_balancing_ledge]
+~roguesden_cross_ledge(4);
+[aploc1,roguesden_obstacle_wall_hanging_ledge]
+~roguesden_cross_ledge(7);
+[aploc1,roguesden_obstacle_contortion_bars]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+~roguesden_cross_footprint(1, 1, 5, false);
+
+[proc,roguesden_cross_ledge](int $agility_drain)
+if (~roguesden_active = false) return;
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+def_coord $anchor = loc_coord;
+def_loc $kind = loc_type;
+def_int $ux = 0;
+def_int $uz = 1;
+// Parallel ledges can touch; their original angle, not a perpendicular
+// neighbour, determines which contiguous run this Climb action follows.
+if (calc(loc_angle % 2) = 1) {
+    $ux = 1;
+    $uz = 0;
+}
+def_int $low = 0;
+def_int $high = 0;
+while (loc_find(movecoord($anchor, multiply(sub($low, 1), $ux), 0, multiply(sub($low, 1), $uz)), $kind) = true) {
+    $low = sub($low, 1);
+}
+while (loc_find(movecoord($anchor, multiply(add($high, 1), $ux), 0, multiply(add($high, 1), $uz)), $kind) = true) {
+    $high = add($high, 1);
+}
+def_coord $near = movecoord($anchor, multiply(sub($low, 1), $ux), 0, multiply(sub($low, 1), $uz));
+def_coord $far = movecoord($anchor, multiply(add($high, 1), $ux), 0, multiply(add($high, 1), $uz));
+if (distance(coord, $near) < distance(coord, $far)) ~roguesden_cross_to($far, $agility_drain);
+else ~roguesden_cross_to($near, $agility_drain);
+
+[proc,roguesden_open_maze_door]
+if (~roguesden_active = false) return;
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+// A wall-shaped door separates its anchor tile from its angle-facing neighbour.
+def_int $nx = 0;
+def_int $nz = 0;
+switch_int(loc_angle) {
+    case ^loc_west : $nx = -1;
+    case ^loc_north : $nz = 1;
+    case ^loc_east : $nx = 1;
+    case ^loc_south : $nz = -1;
+}
+def_coord $other = movecoord(loc_coord, $nx, 0, $nz);
+if (distance(coord, loc_coord) < distance(coord, $other)) ~roguesden_cross_to($other, 0);
+else ~roguesden_cross_to(loc_coord, 0);
+
+[aploc1,roguesden_obstacle_magic_door]
+~roguesden_open_maze_door;
+[aploc1,roguesden_puzzle_door_rotation]
+// UNKNOWN favourable optional-door rule: the original dial is its reusable key.
+if (inv_total(inv, roguesden_puzzle_rotation) < 1) return;
+~roguesden_open_maze_door;
+[aploc1,roguesden_puzzle_door_gears]
+// UNKNOWN favourable optional-door rule: carrying all six original gears opens it.
+if (inv_total(inv, roguesden_gear1) < 1 | inv_total(inv, roguesden_gear2) < 1 |
+    inv_total(inv, roguesden_gear3) < 1 | inv_total(inv, roguesden_gear4) < 1 |
+    inv_total(inv, roguesden_gear5) < 1 | inv_total(inv, roguesden_gear6) < 1) return;
+~roguesden_open_maze_door;
+[aploc1,roguesden_puzzle_door_mosaic]
+if (~roguesden_active = false) return;
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+// VERIFIED period solution: the bottom-right of the four collected tiles.
+// UNKNOWN functional option labels; no later puzzle interface is substituted.
+def_int $choice = ~p_choice4("Top-left tile", 1, "Top-right tile", 2, "Bottom-left tile", 3, "Bottom-right tile", 4);
+if ($choice ! 4 | inv_total(inv, roguesden_puzzle_mosaic_tile4) < 1) return;
+inv_del(inv, roguesden_puzzle_mosaic_tile4, 1);
+~roguesden_open_maze_door;
+[aploc1,roguesden_obstacle_door]
+if (stat_base(thieving) < 80) return;
+// CANDIDATE: the 80 Thieving shortcut stays off the required 50/50 route.
+~roguesden_open_maze_door;
+[aploc1,roguesden_obstacle_blocking_door_enter]
+~roguesden_open_maze_door;
+
+[aploc1,roguesden_gallery_door]
+~roguesden_gallery_enter;
+
+[proc,roguesden_gallery_enter]
+if (~roguesden_active = false | ~roguesden_maze_inside(coord) = false) return;
+if (coordy(loc_coord) ! 1) return;
+def_int $normal_x = 0;
+def_int $normal_z = 0;
+switch_int(loc_angle) {
+    case ^loc_west : $normal_x = -1;
+    case ^loc_north : $normal_z = 1;
+    case ^loc_east : $normal_x = 1;
+    case ^loc_south : $normal_z = -1;
+}
+def_int $side = add(multiply(sub(coordx(coord), coordx(loc_coord)), $normal_x),
+    multiply(sub(coordz(coord), coordz(loc_coord)), $normal_z));
+// One-way from the active maze side only. The L0 central raw-map door is not
+// an active maze exit; all eleven active exits use their original bridge pair.
+if ($side < 0) return;
+def_coord $approach = movecoord(loc_coord, $normal_x, 0, $normal_z);
+def_coord $landing = movecoord(loc_coord, multiply($normal_x, -3), 0, multiply($normal_z, -3));
+if (distance(coord, $approach) > 0) {
+    p_aprange(1);
+    return;
+}
+// UNKNOWN mechanism: the Open action traverses the door and its original
+// passage_up/down bridge directly to the real raised gallery side, never via teleport.
+~roguesden_cross_to($landing, 0);
+
+[aploc1,roguesden_passage_across]
+~roguesden_cross_passage(roguesden_passage_across);
+[aploc1,roguesden_passage_up]
+~roguesden_passage_up;
+[aploc1,roguesden_passage_down]
+~roguesden_passage_down;
+
+[proc,roguesden_cross_passage](loc $kind)
+if (~roguesden_active = false) return;
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+def_coord $anchor = loc_coord;
+def_int $ux = 0;
+def_int $uz = 0;
+if (loc_find(movecoord($anchor, 2, 0, 0), $kind) = true) $ux = 1;
+else if (loc_find(movecoord($anchor, -2, 0, 0), $kind) = true) $ux = -1;
+else if (loc_find(movecoord($anchor, 0, 0, 2), $kind) = true) $uz = 1;
+else if (loc_find(movecoord($anchor, 0, 0, -2), $kind) = true) $uz = -1;
+if ($ux = 0 & $uz = 0) return;
+def_coord $mate = movecoord($anchor, multiply($ux, 2), 0, multiply($uz, 2));
+def_int $side = add(multiply(sub(coordx(coord), coordx($anchor)), $ux),
+    multiply(sub(coordz(coord), coordz($anchor)), $uz));
+if ($side <= 0) ~roguesden_cross_to(movecoord($mate, $ux, 0, $uz), 0);
+else ~roguesden_cross_to(movecoord($anchor, multiply($ux, -1), 0, multiply($uz, -1)), 0);
+
+[proc,roguesden_passage_up]
+if (~roguesden_active = false) return;
+def_int $nx = 0;
+def_int $nz = 0;
+switch_int(loc_angle) {
+    case ^loc_west : $nx = -1;
+    case ^loc_north : $nz = 1;
+    case ^loc_east : $nx = 1;
+    case ^loc_south : $nz = -1;
+}
+def_coord $start = movecoord(loc_coord, $nx, 0, $nz);
+def_coord $landing = movecoord(loc_coord, multiply($nx, -2), 0, multiply($nz, -2));
+if (distance(coord, $start) > 0) {
+    p_aprange(1);
+    return;
+}
+~roguesden_cross_to($landing, 0);
+
+[proc,roguesden_passage_down]
+if (~roguesden_active = false) return;
+def_int $nx = 0;
+def_int $nz = 0;
+switch_int(loc_angle) {
+    case ^loc_west : $nx = -1;
+    case ^loc_north : $nz = 1;
+    case ^loc_east : $nx = 1;
+    case ^loc_south : $nz = -1;
+}
+def_coord $anchor = loc_coord;
+def_coord $gallery_door = movecoord($anchor, multiply($nx, 2), 0, multiply($nz, 2));
+if (loc_find($gallery_door, roguesden_gallery_door) = true) {
+    // The gallery passage is one-way out of the maze; descend safely to lobby.
+    ~roguesden_leave(0);
+    return;
+}
+def_coord $start = movecoord($anchor, multiply($nx, -1), 0, multiply($nz, -1));
+def_coord $landing = movecoord($anchor, $nx, 0, $nz);
+if (distance(coord, $start) > 0) {
+    p_aprange(1);
+    return;
+}
+~roguesden_cross_to($landing, 0);
+
+[apnpcu,roguesden_guard1]
+~roguesden_guard_throw;
+[apnpcu,roguesden_guard2]
+~roguesden_guard_throw;
+[apnpcu,roguesden_guard3]
+~roguesden_guard_throw;
+
+[proc,roguesden_guard_throw]
+if (~roguesden_active = false | last_useitem ! roguesden_flash_powder) return;
+if (npc_range(coord) > 3) {
+    p_aprange(3);
+    return;
+}
+if (npc_range(coord) < 3 & %roguesden_guard_stun_until <= map_clock) {
+    ~roguesden_guard_contact;
+    return;
+}
+if (inv_total(inv, roguesden_flash_powder) < 1) return;
+inv_del(inv, roguesden_flash_powder, 1);
+%roguesden_guard_stun_until = add(map_clock, 10);
+// UNKNOWN animation surrogate: retain the original NPC identity and location.
+npc_anim(human_unconscious, 0);
+npc_settimer(1);
+// Throwing stuns the guard; the player must still walk through the real corridor.
+p_stopaction;
+
+[ai_timer,roguesden_guard1]
+~roguesden_guard_stun_tick;
+[ai_timer,roguesden_guard2]
+~roguesden_guard_stun_tick;
+[ai_timer,roguesden_guard3]
+~roguesden_guard_stun_tick;
+
+[proc,roguesden_guard_stun_tick]
+if (%roguesden_guard_stun_until = 0) {
+    npc_settimer(0);
+    return;
+}
+if (map_clock < %roguesden_guard_stun_until) {
+    npc_settimer(1);
+    return;
+}
+%roguesden_guard_stun_until = 0;
+npc_anim(human_ready, 0);
+npc_settimer(0);
+
+[proc,roguesden_guard_watch](npc $kind)
+if (~roguesden_active = false) return;
+if (npc_find(coord, $kind, 2, 0) = true) ~roguesden_guard_contact;
+
+[proc,roguesden_guard_contact]
+if (~roguesden_active = false) return;
+if (npc_range(coord) >= 3 | %roguesden_guard_stun_until > map_clock) return;
+if (lineofsight(coord, npc_coord) = false) return;
+%roguesden_guard_stun_until = 0;
+npc_anim(human_ready, 0);
+npc_settimer(0);
+~roguesden_leave(0);
+
+[proc,roguesden_blade_watch](npc $kind)
+if (~roguesden_active = false) return;
+// UNKNOWN favourable catch radius; the actual original NPC is moving.
+if (npc_find(coord, $kind, 1, 0) = true) {
+    if (lineofsight(coord, npc_coord) = true) ~roguesden_leave(0);
+}

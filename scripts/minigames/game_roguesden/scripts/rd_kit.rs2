@@ -1,0 +1,21 @@
+// CANDIDATE early-OSRS item behavior: one Rogue kit transforms into one
+// selected Spade, Chisel, Rope, or Tinderbox; the kit is stackable.
+
+[opheld1,roguesden_kit]
+def_int $choice = ~p_choice4("Spade", 1, "Chisel", 2, "Rope", 3, "Tinderbox", 4);
+if ($choice < 1 | $choice > 4) return;
+if (inv_total(inv, roguesden_kit) < 1) return;
+def_namedobj $tool = spade;
+switch_int($choice) {
+    case 1 : $tool = spade;
+    case 2 : $tool = chisel;
+    case 3 : $tool = rope;
+    case 4 : $tool = tinderbox;
+}
+if (inv_itemspace(inv, $tool, 1, inv_size(inv)) = false) {
+    // UNKNOWN functional refusal wording; preserve the kit when space is absent.
+    mes("You need more inventory space to build that tool.");
+    return;
+}
+inv_del(inv, roguesden_kit, 1);
+inv_add(inv, $tool, 1);

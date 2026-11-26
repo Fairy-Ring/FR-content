@@ -452,7 +452,6 @@ clientcode=9
 scope=perm
 transmit=yes
 
-[varp319_unused]
 
 [tbwt_main]
 scope=perm
@@ -881,8 +880,6 @@ transmit=yes
 scope=perm
 transmit=yes
 
-[roguesden_puzzle]
-transmit=yes
 
 [varp494_unused]
 

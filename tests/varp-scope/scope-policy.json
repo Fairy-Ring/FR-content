@@ -245,6 +245,8 @@
     }
   },
   "deliberatelyTemporary": {
+    "varp319_unused": "Reserved original slot 319 stores only the Rogues' Den maze session clock; logout and every exit discard the run.",
+    "roguesden_puzzle": "Original Rogues' Den puzzle and current-maze scratch state; entry and every exit reset it, with no durable reward entitlement.",
     "dwarfrock_puzzle": "Original reserved slot 237: temporary schematic overlay offsets, rotations and selection. Reinitialized when opening the puzzle; solved progress lives in dwarfrock_main.",
     "ahoy_last_signer": "Current-session previous petition signer UID; logout clears only repeat protection, never earned signatures.",
     "varp413_bits": "Original transmitted Rune-Draw scores and unpaid current round; close resets it, while wins persist separately.",
