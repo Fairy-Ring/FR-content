@@ -47,7 +47,9 @@ settimer(tog_session_tick, 1, add(map_clock, %qp), %qp);
 settimer(tog_session_end, %qp);
 
 [proc,tog_inside](coord $position)(boolean)
-return(inzone(2_50_148_55_42, 2_50_148_60_48, $position));
+// The sealed west corridor behind Juna is part of the packed chamber too.
+if (inzone(2_50_148_55_42, 2_50_148_60_48, $position) = true) return(true);
+return(inzone(2_50_148_53_45, 2_50_148_54_45, $position));
 
 [timer,tog_session_end]
 ~tog_session_finish(true, true);
@@ -195,7 +197,9 @@ if ($return = true) p_teleport(^tog_session_exit);
 
 [proc,tog_login]
 // Session timers/weak queues do not survive logout. Preserve quest and weekly state.
-if (%tog_minigame_collecting = 1 | ~tog_inside(coord) = true) {
+// Evacuate the whole sealed chamber even if the session bits were already cleared.
+def_boolean $inside = ~tog_inside(coord);
+if (%tog_minigame_collecting = 1 | $inside = true) {
     %tog_minigame_collecting = 0;
     %tog_minigame_7_11 = 0;
     %tog_tears_collected = 0;
@@ -205,7 +209,7 @@ if (%tog_minigame_collecting = 1 | ~tog_inside(coord) = true) {
     if (inv_total(worn, tog_bowl) > 0) inv_del(worn, tog_bowl, inv_total(worn, tog_bowl));
     if (inv_total(inv, tog_bowl) > 0) inv_del(inv, tog_bowl, inv_total(inv, tog_bowl));
     ~update_bas;
-    if (~tog_inside(coord) = true) p_teleport(^tog_session_exit);
+    if ($inside = true) p_teleport(^tog_session_exit);
 }
 
 [proc,tog_xp_per_tear](int $level)(int)

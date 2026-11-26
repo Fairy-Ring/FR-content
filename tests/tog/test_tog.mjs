@@ -11,6 +11,9 @@ const ScriptVarType = (await engineModule('cache/config/ScriptVarType.ts')).defa
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const locHandler = new ((await engineModule('network/game/client/handler/OpLocHandler.ts')).default)();
 const { getExpByLevel } = await engineModule('engine/entity/Player.ts');
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveHandler = new ((await engineModule('network/game/client/handler/MoveClickHandler.ts')).default)();
 World.vars = new Int32Array(types.VarSharedType.count);
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const rsbuf = await engineModule('network/rsbuf/index.ts');
@@ -64,6 +67,35 @@ function collect(p, index) {
   assert(locHandler.handle(new OpLoc(1, x, z, wall.type), p), 'native wall packet accepted');
   p.processInteraction();
 }
+function chamberTiles() {
+  const tiles = [[3256,9517]], seen = new Set(['3256,9517']);
+  const directions = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+  for (let next = 0; next < tiles.length; next++) {
+    const [x,z] = tiles[next];
+    for (const [dx,dz] of directions) {
+      if (!map.canTravel(2,x,z,dx,dz,1,0,CollisionType.NORMAL)) continue;
+      const key = `${x+dx},${z+dz}`;
+      if (seen.has(key)) continue;
+      seen.add(key); tiles.push([x+dx,z+dz]);
+      assert(tiles.length <= 256, 'the session chamber is enclosed');
+    }
+  }
+  return tiles;
+}
+function walk(p, x, z) {
+  const route = Array.from(map.findPath(p.level,p.x,p.z,x,z), packed => {
+    const point = CoordGrid.unpackCoord(packed); return { x: point.x, z: point.z };
+  });
+  assert(route.length, `native route to ${x},${z}`);
+  p.originX = p.x; p.originZ = p.z;
+  assert(moveHandler.handle(new MoveClick(route,0,false),p), 'native Walk-here accepted');
+  const collecting = [];
+  for (let step = 0; step < 16 && (p.x !== x || p.z !== z); step++) {
+    p.updateMovement(); environmentTick(p); collecting.push(get(p,'tog_minigame_collecting'));
+  }
+  assert.deepEqual(tile(p),[2,x,z], 'native movement reaches its destination');
+  return collecting;
+}
 try {
   test('original identities and collision-safe session entry/exit', () => {
     assert.equal(vp('tog_minigame'), 449); assert.equal(vp('tog_last_visit_minute'), 244);
@@ -75,6 +107,15 @@ try {
     for (const [x,z] of [[3256,9517],[3251,9516]])
       assert([[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz]) => map.canTravel(2,x,z,dx,dz,1,0,CollisionType.NORMAL)), `${x},${z} has a walkable exit`);
     assert.equal(types.Component.get(hud).id, 3279);
+    const p = fixture(), enclosed = chamberTiles();
+    console.log(`Packed sealed chamber (${enclosed.length} tiles): ${JSON.stringify(enclosed)}`);
+    assert.equal(enclosed.length,24, 'all packed walkable chamber tiles were inspected');
+    for (const [x,z] of enclosed)
+      assert.equal(result('[proc,tog_inside]',p,[CoordGrid.packCoord(2,x,z)]),1, `sealed tile ${x},${z} stays inside`);
+    for (const x of [3253,3254]) assert(enclosed.some(([tx,tz]) => tx === x && tz === 9517));
+    assert(!enclosed.some(([x,z]) => x === 3251 && z === 9516), 'Juna side is not connected on foot');
+    assert.equal(result('[proc,tog_inside]',p,[CoordGrid.packCoord(2,3251,9516)]),0);
+    finish(p);
   });
   test('real completed Juna story opens HUD only on session admission', () => {
     const p = fixture(); startDialogue('[oploc1,hidey_unbuilt_bush_easy]', p);
@@ -158,6 +199,41 @@ try {
     assert.equal(p.getVar(vp('tog_last_total_level')),total);
     p.baseLevels.fill(99); p.setVar(vp('tog_last_total_level'),2079);
     assert.equal(result('[proc,tog_eligible]',p),1); finish(p);
+  });
+  test('native walks to both sealed corridor tiles retain the session and timed finish reaches Juna', () => {
+    for (const x of [3254,3253]) {
+      const p = fixture(); enter(p);
+      assert(walk(p,x,9517).every(value => value === 1), 'every movement tick remains in-session');
+      ticks(p,2); assert.equal(get(p,'tog_minigame_collecting'),1);
+      assert.equal(p.overlay,hud); assert.equal(count(p,'tog_bowl',worn),1);
+      ticks(p,p.timers.get(timer.id).args[0]-World.currentTick+3);
+      assert.deepEqual(tile(p),[2,3251,9516]); assert.equal(get(p,'tog_minigame_collecting'),0);
+      assert.equal(p.overlay,-1); assert.equal(count(p,'tog_bowl',worn)+count(p,'tog_bowl'),0);
+      walk(p,3251,9517);
+      const juna = World.getLoc(3252,9516,2,id('LocType','hidey_unbuilt_bush_easy')); assert(juna);
+      assert(locHandler.handle(new OpLoc(1,juna.x,juna.z,juna.type),p));
+      p.processInteraction();
+      assert(p.messages.some(message => message.includes('wait seven days')), 'the real Juna handler is reachable after return');
+      finish(p);
+    }
+  });
+  for (const active of [true,false]) test(`real login evacuates the sealed corridor with session ${active ? 'active' : 'bits already clear'}`, () => {
+    const p = fixture(); enter(p);
+    assert(walk(p,3253,9517).every(value => value === 1));
+    if (active) set(p,'tog_tears_collected',7);
+    else for (const name of ['tog_minigame_collecting','tog_minigame_7_11','tog_tears_collected']) set(p,name,0);
+    const before = p.stats.slice(), when = p.getVar(vp('tog_last_visit_minute'));
+    const total = p.getVar(vp('tog_last_total_level')), qp = get(p,'tog_qp_before_return');
+    p.timers.clear(); p.weakQueue.clear();
+    execute('[login,_]',p); ticks(p,2);
+    assert(p.messages.includes('Welcome to RuneScape.'), 'the real compiled login trigger ran');
+    assert.deepEqual(tile(p),[2,3251,9516]); assert.deepEqual(p.stats,before);
+    assert.equal(p.overlay,-1); assert.equal(count(p,'tog_bowl',worn)+count(p,'tog_bowl'),0);
+    for (const name of ['tog_minigame_collecting','tog_minigame_7_11','tog_tears_collected']) assert.equal(get(p,name),0);
+    assert.equal(get(p,'tog_juna_bowl'),2); assert.equal(get(p,'tog_qp_before_return'),qp);
+    assert.equal(p.getVar(vp('tog_last_visit_minute')),when); assert.equal(p.getVar(vp('tog_last_total_level')),total);
+    walk(p,3251,9517);
+    finish(p);
   });
   test('logout/login clears only session state and bowl, evacuates, cannot replay rewards', () => {
     const p=fixture(); enter(p); set(p,'tog_tears_collected',7);

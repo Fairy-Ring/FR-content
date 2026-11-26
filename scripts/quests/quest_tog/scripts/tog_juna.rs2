@@ -8,10 +8,15 @@ if (%tog_juna_bowl = ^tog_quest_complete) {
     return;
 }
 if (%tog_juna_bowl = ^tog_quest_started) {
-    if (inv_total(inv, tog_bowl) > 0) {
+    if (inv_total(inv, tog_bowl) > 0 | inv_total(worn, tog_bowl) > 0) {
         // VERIFIED Talk-to hand-in; commit completion before either reward.
         %tog_juna_bowl = ^tog_quest_complete;
-        inv_del(inv, tog_bowl, 1);
+        if (inv_total(worn, tog_bowl) > 0) {
+            inv_del(worn, tog_bowl, 1);
+            ~update_bas;
+        } else {
+            inv_del(inv, tog_bowl, 1);
+        }
         stat_advance(crafting, ^tog_quest_reward_crafting_xp_tenths);
         // UNKNOWN scroll wording; reward values are VERIFIED by the period guide.
         ~send_quest_complete(questlist:tog, null, 0, ^tog_questpoints, "You have completed the\\nTears of Guthix Quest!", "1,000 Crafting XP|Weekly access to the Tears of Guthix minigame");

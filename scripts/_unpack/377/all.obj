@@ -54149,7 +54149,6 @@ weight=3lb
 category=light_source_lit
 param=next_obj_stage,tog_sapphire_lantern_unlit
 
-
 [readbook_dummy2]
 recol1s=13472
 recol1d=7494

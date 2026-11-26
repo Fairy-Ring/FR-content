@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { quests } from '../quest-points/registry.mjs';
 import {
   PlayerStat, ScriptState, World, count, engineModule, execute, id, inv,
-  inventory, map, obj, player, resumeDialogue, seed, types, use
+  inventory, map, obj, player, resumeDialogue, seed, types, use, worn
 } from '../swamp-caves/runtime.mjs';
 
 const Environment = (await engineModule('util/Environment.ts')).default;
@@ -261,7 +261,7 @@ test('chisel requires level 20 and the item can be recovered after either loss',
   assert.equal(count(p, 'tog_bowl'), 1, 'the quest remains recoverable after losing the bowl');
 }));
 
-test('talking to Juna with the bowl completes the quest and post-quest talk cannot replay the reward', () => withPlayer(p => {
+for (const wielded of [false,true]) test(`talking to Juna with the ${wielded ? 'worn' : 'inventory'} bowl completes the quest and cannot replay the reward`, () => withPlayer(p => {
   const qpBefore = seedQuestPoints(p);
   const xpBefore = p.stats[PlayerStat.CRAFTING];
   assert.equal(talkToJuna(p, 1), 1);
@@ -269,10 +269,16 @@ test('talking to Juna with the bowl completes the quest and post-quest talk cann
   mine(p, rocks[0]);
   chiselStone(p);
   assert.equal(count(p, 'tog_bowl'), 1);
+  if (wielded) {
+    // Equipment fixture: the bowl itself was earned through real mining/chiselling.
+    p.invDel(inv,obj('tog_bowl'),1); p.invSet(worn,obj('tog_bowl'),1,3);
+    assert.equal(count(p,'tog_bowl',worn),1); assert.equal(count(p,'tog_bowl'),0);
+  }
   clickLoc(p, junaLoc);
   assert.equal(p.getVarBit(questStage), 2, 'Juna Talk-to with the bowl commits the complete stage');
   assert.equal(count(p, 'tog_stone'), 0);
   assert.equal(count(p, 'tog_bowl'), 0);
+  assert.equal(count(p,'tog_bowl',worn),0, 'hand-in also consumes a worn bowl');
   assert.equal(p.getVar(questPointsVar), qpBefore + 1, 'one QP is awarded immediately');
   assert.equal(questPointCount(p), qpBefore + 1, 'the quest-point counter includes exactly one new point');
   assert.equal(p.stats[PlayerStat.CRAFTING], xpBefore + 10_000 * Environment.NODE_XPRATE, '1,000 XP uses the engine tenths unit');
