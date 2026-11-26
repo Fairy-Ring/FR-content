@@ -49,6 +49,7 @@ if (last_useitem = bowl_water) {
     @osf_heat_bowl_water(human_potterywheel);
     return;
 }
+if (last_useitem = mourning_toxic_naphtha) @mep1_heat_toxin;
 @attempt_cook_item(last_useitem);
 
 [label,osf_bowl_heat_fire]
@@ -56,6 +57,7 @@ if (last_useitem = bowl_water) {
     @osf_heat_bowl_water(human_firecooking);
     return;
 }
+if (last_useitem = mourning_toxic_naphtha) @mep1_fire_toxin;
 if (oc_param(last_useitem, unlit_arrow) = ^true) {
     @light_firearrow(last_useitem);
     return;

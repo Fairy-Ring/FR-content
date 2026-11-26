@@ -1,0 +1,13 @@
+[elf_village_treegate]
+name=Tree
+desc=An odd looking tree.
+model=elf_village_treegate
+length=4
+op1=Pass
+anim=treegate_close
+
+[elf_village_treegate_open]
+name=Tree
+desc=An odd looking tree.
+model=elf_village_treegate
+length=4

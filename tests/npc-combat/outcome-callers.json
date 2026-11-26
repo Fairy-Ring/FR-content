@@ -32,6 +32,7 @@
       "[ai_opplayer2,irvig_senay]",
       "[ai_opplayer2,melzar_the_mad]",
       "[ai_opplayer2,monk]",
+      "[ai_opplayer2,mourner_hideout_guard]",
       "[ai_opplayer2,ranalph_devere]",
       "[ai_opplayer2,san_tojalon]",
       "[ai_opplayer2,skeletonmage]",
@@ -64,7 +65,8 @@
       "[proc,blessedspider_attack]",
       "[proc,dragon_melee]",
       "[proc,kalphite_flyingqueen_melee_attack]",
-      "[proc,kalphite_melee_attack]"
+      "[proc,kalphite_melee_attack]",
+      "[proc,mep1_mourner_attack]"
     ],
     "npc_rangeattack": [
       "[ai_applayer2,_death_archer]",

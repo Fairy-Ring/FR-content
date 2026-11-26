@@ -1,0 +1,49 @@
+// VERIFIED only Mourner clothes may be worn. UNKNOWN gate wording/mechanism.
+[proc,mep1_disguised]()(boolean)
+if (inv_total(worn, gasmask) = 1 & inv_total(worn, mourning_mourner_top) = 1 & inv_total(worn, mourning_mourner_legs) = 1 & inv_total(worn, mourning_mourner_gloves) = 1 & inv_total(worn, mourning_mourner_boots) = 1 & inv_total(worn, mourning_mourner_cloak) = 1 & inv_freespace(worn) = sub(inv_size(worn), 6)) return(true);
+return(false);
+
+[proc,mep1_hq_entry]()(boolean)
+// Never pre-empt Biohazard's doctor-gown stages.
+if (%mourning_quest < ^mep1_escorted | %biohazard < ^biohazard_complete) return(false);
+if (~check_axis(coord, loc_coord, loc_angle) = true & ~mep1_disguised = false) {
+    mes("You must wear only the complete Mourner outfit to enter.");
+    return(true);
+}
+%mourning_mourner_disguise = 1;
+~open_and_close_door2(mournerstewdooropen, ~check_axis(coord, loc_coord, loc_angle), door_open);
+return(true);
+
+[oploc1,mourning_hideout_trap_door]
+if (%mourning_quest < ^mep1_briefed | ~mep1_disguised = false) {
+    mes("You must wear only the complete Mourner outfit to enter.");
+    return;
+}
+%mourning_mourner_disguise = 1;
+// UNKNOWN landing: beside packed ladder 2044,4650, not an inferred offset.
+p_teleport(^mep1_hideout);
+
+[oploc1,mourner_hideout_ladder1]
+// Exits are never outfit/key gated: a player may always leave.
+p_teleport(^mep1_surface);
+
+[oploc1,mourner_hideout_door1] ~open_and_close_door2(mourner_hideout_door1_open, ~check_axis_locactive(coord), door_open);
+[oploc1,mourner_hideout_door2] ~open_and_close_door2(mourner_hideout_door2_open, ~check_axis_locactive(coord), door_open);
+[oploc1,mourner_hideout_door4] ~open_and_close_door2(mourner_hideout_door4_open, ~check_axis_locactive(coord), door_open);
+[oploc1,mourner_hideout_door3]
+// The gnome's room is south of its packed gate. Never lock somebody inside.
+if (coordz(coord) > coordz(loc_coord) & inv_total(inv, mourning_gnome_key) = 0) {
+    mes("The door is locked. You need the tarnished key.");
+    return;
+}
+~open_and_close_door2(mourner_hideout_door3_open, ~check_axis_locactive(coord), door_open);
+
+[oploc1,mourner_hideout_door2_open] ~open_and_close_door2(mourner_hideout_door2, ~check_axis_locactive(coord), door_close);
+
+// VERIFIED guards attack when other equipment is worn in the basement.
+[ai_opplayer2,mourner_hideout_guard]
+if (~mep1_disguised = true & %npc_aggressive_player ! uid) {
+    npc_setmode(null);
+    return;
+}
+~npc_default_attack;

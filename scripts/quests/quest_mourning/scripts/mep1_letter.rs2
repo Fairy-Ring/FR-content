@@ -1,8 +1,4 @@
-// Mourning's End I — Read the mourner's message (letter) opens a mesbox.
-// CANDIDATE lines (2007-base minus Changes). Stay %mourning_quest 1. No
-// dest / Prif / leftover book 6073-6079 / Dig Site 683. Consume is a later
-// residual. Cite spine-17-remaining-impl-377.md §8; research: subject mournings-end-1.
+// CANDIDATE letter body: retained OSRS Mourner letter transcript.
 
 [opheld1,mourning_mourner_message]
-~mesbox("The letter is a recommendation to the Death Guard. It asks the Head mourner to admit the bearer as a new recruit.");
-mes("You fold the letter away.");
+~mesbox("To whom it may concern:|This is to certify that the bearer of this letter has passed all entry requirements for the Death Guard.|Death Guard HQ");

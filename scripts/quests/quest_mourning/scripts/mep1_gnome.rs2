@@ -1,0 +1,65 @@
+// VERIFIED feather twice, crunchies, magic log and soft leather: period guides.
+// UNKNOWN functional dialogue, counter integers and favourable replacement policy.
+[oploc1,mourning_gnome_rack_occupied]
+if (%mourning_quest < ^mep1_recruited) return;
+if (%mourning_gnome < 1) %mourning_gnome = 1;
+~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,sad>I hate having my feet tickled, and I love Toad crunchies.");
+
+[oplocu,mourning_gnome_rack_occupied]
+if (%mourning_quest < ^mep1_recruited | %mourning_gnome >= 7) return;
+if (last_useitem = feather) {
+    anim(mourning_player_tickle, 0);
+    sound_synth(mourning_tickle, 1, 0);
+    if (%mourning_gnome < 1) %mourning_gnome = 1;
+    %mourning_gnome = min(3, add(%mourning_gnome, 1));
+    if (%mourning_gnome >= 3) {
+        ~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,sad>Stop! Release me with some Toad crunchies, a magic log and soft leather, and I will fix the device.");
+    } else {
+        ~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,sad>Please stop tickling my feet!");
+    }
+    return;
+}
+if (last_useitem = toad_crunchies | last_useitem = premade_toad_crunchies) {
+    if (%mourning_gnome < 3) {
+        // VERIFIED period puzzle: the gnome eats an early offering without helping.
+        // Approved as replaceable puzzle consumption, not a stranding fault.
+        inv_del(inv, last_useitem, 1);
+        ~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,happy>Toad crunchies! Thank you.");
+    } else {
+        ~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,neutral>Release me with the crunchies, a magic log, some soft leather and the broken device.");
+    }
+    return;
+}
+~displaymessage(^dm_default);
+
+[oploc2,mourning_gnome_rack_occupied]
+if (%mourning_quest < ^mep1_recruited) return;
+if (%mourning_gnome < 3) {
+    ~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,sad>I will not help you.");
+    return;
+}
+if (inv_total(inv, mourning_paint_gun_broken) = 0 | inv_total(inv, magic_logs) = 0 | inv_total(inv, leather) = 0 | calc(inv_total(inv, toad_crunchies) + inv_total(inv, premade_toad_crunchies)) = 0) {
+    ~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,neutral>Bring me the broken device, Toad crunchies, a magic log and soft leather.");
+    return;
+}
+// UNKNOWN favourable dish choice: both original packed Toad crunchies are accepted.
+if (inv_total(inv, toad_crunchies) > 0) inv_del(inv, toad_crunchies, 1);
+else inv_del(inv, premade_toad_crunchies, 1);
+inv_del(inv, magic_logs, 1);
+inv_del(inv, leather, 1);
+inv_del(inv, mourning_paint_gun_broken, 1);
+%mourning_gnome = 7; // Original cache shows the released NPC and empty rack at 7.
+~chatnpc_specific("Gnome", mourner_hideout_gnome_head, "<p,neutral>Talk to me when you are ready to collect the device.");
+
+[opnpc1,mourner_hideout_gnome_head]
+if (%mourning_quest < ^mep1_recruited | %mourning_gnome < 7) return;
+if (calc(inv_total(inv, mourning_paint_gun) + inv_total(worn, mourning_paint_gun) + inv_total(bank, mourning_paint_gun)) = 0) {
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Make room in your inventory for the fixed device.");
+        return;
+    }
+    inv_add(inv, mourning_paint_gun, 1);
+}
+if (%mourning_quest = ^mep1_recruited) %mourning_quest = ^mep1_device_fixed;
+~chatnpc("<p,neutral>Fill your ogre bellows with dye, use them on a swamp toad, then load the coloured toad into the device. Match the toad's colour to the sheep's colour.");
+~update_questlist;

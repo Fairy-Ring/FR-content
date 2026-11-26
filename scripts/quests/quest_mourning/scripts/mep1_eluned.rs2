@@ -1,13 +1,17 @@
-// MEP1 access — roving Eluned (roving_female_woodelf 1679) @ 2289,3145.
-// CANDIDATE last-resort pre-SoE dump: RS3 Transcript 18 Aug 2013 / 2 May 2018
-// minus Quest Overview glue / 8-charge / Essyllt / SoE / dest / camp crystal.
-// Period camp first-talk Still missing. VERIFIED crystal line is Lletya after fade.
-// Hunt 289? no. Do not splice Islwyn / 1202 / 2372. Do not write 518 / 574.
-// Accept: %mourning_quest 0→1 then "Well, let us go then." return — no dest.
-// Roving Elves owns the consecration branches. Completion falls through to MEP1.
+// VERIFIED start and initial four-charge crystal: retained RuneHQ / Tip.It 2005–06.
+// CANDIDATE dialogue: retained RS3 2013/2018, without later era additions.
+// UNKNOWN refusal/service wording and escort presentation: mep1-runtime-defaults.
 
 [opnpc1,roving_female_woodelf]
 if (~roving_eluned = true) {
+    return;
+}
+if (%mourning_quest = 0 & (%chompybird < ^chompybird_complete | %sheepherderquest < ^sheepherder_complete | stat_base(ranged) < 60 | stat_base(thieving) < 50)) {
+    ~chatnpc("<p,neutral>You must complete Big Chompy Bird Hunting, Roving Elves and Sheep Herder, and have 60 Ranged and 50 Thieving before I can take you to Lletya.");
+    return;
+}
+if (%mourning_quest > 0 & inv_total(inv, elf_crystal_tiny) > 0) {
+    ~mep1_crystal_recharge;
     return;
 }
 if (%mourning_quest >= 1) {
@@ -27,11 +31,8 @@ if ($go = 2) {
     @mep1_eluned_refuse;
 }
 ~chatplayer("<p,happy>Yes, I should go see him now.");
-if (%mourning_quest = 0) {
-    %mourning_quest = 1;
-}
 ~chatnpc("<p,happy>Well, let us go then.");
-// Dest UNKNOWN — skip fade / crystal / Lletya stand.
+~mep1_escort;
 return;
 
 [label,mep1_eluned_refuse]
@@ -40,12 +41,15 @@ return;
 return;
 
 [label,mep1_eluned_go]
-~chatplayer("<p,happy>Hello again.");
-~chatnpc("<p,quiz>Hello again... Arianwyn is requesting a meeting with you in Lletya. Do you want to go there now?");
+~chatplayer("<p,happy>Hello.");
+~chatnpc("<p,quiz>Hello again, how is it going?");
+~chatplayer("<p,neutral>Not bad, thank you.");
+~chatnpc("<p,neutral>Oh... I have been asked to inform you, Arianwyn requests a meeting with you in Lletya. Do you want to go there now?");
 def_int $again = ~p_choice2("Yes, I should go see him now.", 1, "I have a few things to do right now.", 2);
 if ($again = 2) {
     @mep1_eluned_refuse;
 }
 ~chatplayer("<p,happy>Yes, I should go see him now.");
 ~chatnpc("<p,happy>Well, let us go then.");
+~mep1_escort;
 return;

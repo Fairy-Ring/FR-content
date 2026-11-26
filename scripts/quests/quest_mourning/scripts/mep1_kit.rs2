@@ -1,0 +1,69 @@
+// UNKNOWN functional wording: period guides give the actions, not these lines.
+[oploc1,eadgar_laundry_basket]
+if (inv_total(inv, mourning_soap) > 0) {
+    mes("I already have a bar of soap.");
+    return;
+}
+inv_add(inv, mourning_soap, 1);
+mes("I search the laundry basket and find a bar of soap.");
+
+[opheldu,mourning_bloody_mourner_top]
+if (last_useitem ! mourning_soap) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, bucket_water) = 0) {
+    mes("I need a bucket of water to wash the top.");
+    return;
+}
+inv_del(inv, mourning_bloody_mourner_top, 1);
+inv_del(inv, mourning_soap, 1);
+inv_add(inv, mourning_mourner_top, 1);
+mes("I wash the blood from the Mourner top.");
+
+[opnpc3,mourning_seamstress] ~openshop_activenpc;
+
+[opnpc1,mourning_seamstress]
+if (%mep1_oronwen_ready_at > 0) {
+    ~mep1_oronwen_collect;
+    return;
+}
+mes("Oronwen can mend the ripped trousers for two silk and one bear fur.");
+
+[opnpcu,mourning_seamstress]
+if (%mep1_oronwen_ready_at > 0) {
+    ~mep1_oronwen_collect;
+    return;
+}
+switch_obj(last_useitem) {
+    case silk, fur :
+        mes("Oronwen needs the ripped trousers, two silk and one bear fur.");
+        return;
+    case mourning_ripped_mourner_legs :
+        if (inv_total(inv, silk) < 2 | inv_total(inv, fur) < 1) {
+            mes("Oronwen needs two silk and one bear fur to mend the trousers.");
+            return;
+        }
+        inv_del(inv, mourning_ripped_mourner_legs, 1);
+        inv_del(inv, silk, 2);
+        inv_del(inv, fur, 1);
+        // UNKNOWN duration: period text says return "a few minutes" later; use the approved 2-minute default.
+        %mep1_oronwen_ready_at = add(date_minutes, ^mep1_oronwen_minutes);
+        mes("Oronwen asks me to return in a few minutes.");
+        return;
+    case default : ~displaymessage(^dm_default);
+}
+
+[proc,mep1_oronwen_collect]
+if (%mep1_oronwen_ready_at = 0) return;
+if (date_minutes < %mep1_oronwen_ready_at) {
+    mes("Oronwen asks me to return in a few minutes.");
+    return;
+}
+if (inv_itemspace(inv, mourning_mourner_legs, 1, inv_size(inv)) = false) {
+    mes("I need to make room in my inventory for the mended trousers.");
+    return;
+}
+inv_add(inv, mourning_mourner_legs, 1);
+%mep1_oronwen_ready_at = 0;
+mes("Oronwen returns the mended trousers.");

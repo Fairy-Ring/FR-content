@@ -1,0 +1,82 @@
+// VERIFIED first handover 4, recharge 3 for 750 coins, Activate: period guides.
+// UNKNOWN functional service/recovery wording and destination/presentation.
+[proc,mep1_has_crystal]()(boolean)
+if (calc(inv_total(inv, mourning_teleport_crystal_4) + inv_total(inv, mourning_teleport_crystal_3) + inv_total(inv, mourning_teleport_crystal_2) + inv_total(inv, mourning_teleport_crystal_1) + inv_total(inv, elf_crystal_tiny) + inv_total(bank, mourning_teleport_crystal_4) + inv_total(bank, mourning_teleport_crystal_3) + inv_total(bank, mourning_teleport_crystal_2) + inv_total(bank, mourning_teleport_crystal_1) + inv_total(bank, elf_crystal_tiny)) > 0) return(true);
+return(false);
+
+[proc,mep1_escort]
+def_boolean $give = true;
+if (~mep1_has_crystal = true) $give = false;
+if ($give = true & inv_freespace(inv) = 0) {
+    ~chatnpc("<p,neutral>Please make room in your inventory for a crystal.");
+    return;
+}
+if (~pre_tele_checks(coord) = false) return;
+def_boolean $first = false;
+if (%mourning_quest = 0) $first = true;
+if ($first = true) %mourning_quest = ^mep1_escorted;
+%mourning_can_see_eluned = 1;
+if_close;
+if_openoverlay(fade_to_black);
+p_delay(~seqlength20ms(seq_3541));
+~p_telejump_safe(^mep1_lletya);
+~music_playbycoord(coord);
+if_openoverlay(inter_379);
+p_delay(~seqlength20ms(seq_2115));
+if_openoverlay(null);
+if ($give = true) {
+    if ($first = true) inv_add(inv, mourning_teleport_crystal_4, 1);
+    else inv_add(inv, elf_crystal_tiny, 1); // UNKNOWN lost-crystal recovery, not free repeated charges.
+    ~chatnpc_specific("Eluned", roving_female_woodelf_temp_1, "<p,happy>Here you go... If you ever need to get back to Lletya, you can use this.");
+    ~chatnpc_specific("Eluned", roving_female_woodelf_temp_1, "<p,neutral>Use it sparingly as it only has a few uses. If you need I can re-enchant it but I am not as talented as the singer who originally made this one.");
+}
+~chatnpc_specific("Eluned", roving_female_woodelf_temp_1, "<p,neutral>Now, I had better get going or Islwyn will get worried.");
+~update_questlist;
+
+[opnpc1,roving_female_woodelf_temp_1]
+if (%mourning_quest < ^mep1_escorted) return;
+if (inv_total(inv, elf_crystal_tiny) > 0) {
+    ~mep1_crystal_recharge;
+    return;
+}
+if (~mep1_has_crystal = false) {
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Please make room in your inventory for a crystal.");
+        return;
+    }
+    inv_add(inv, elf_crystal_tiny, 1);
+}
+~chatnpc("<p,neutral>Please speak to Arianwyn.");
+
+[proc,mep1_crystal_recharge]
+~chatnpc("<p,neutral>I can re-enchant a tiny elf crystal with three charges for 750 coins.");
+if (~p_choice2("Please recharge my crystal.", 1, "Take me to Lletya instead.", 2) = 2) {
+    ~mep1_escort;
+    return;
+}
+if (inv_total(inv, coins) < 750) {
+    ~chatnpc("<p,neutral>You need 750 coins.");
+    return;
+}
+if (inv_total(inv, elf_crystal_tiny) = 0) return;
+inv_del(inv, elf_crystal_tiny, 1);
+inv_del(inv, coins, 750);
+inv_add(inv, mourning_teleport_crystal_3, 1);
+%mourning_eluned_chant = min(7, add(%mourning_eluned_chant, 1)); // UNKNOWN bookkeeping, no unsourced fee discount.
+~chatnpc("<p,happy>Here you go... If you ever need to get back to Lletya, you can use this.");
+
+[opheld1,mourning_teleport_crystal_4] ~mep1_crystal_activate(mourning_teleport_crystal_4, mourning_teleport_crystal_3);
+[opheld1,mourning_teleport_crystal_3] ~mep1_crystal_activate(mourning_teleport_crystal_3, mourning_teleport_crystal_2);
+[opheld1,mourning_teleport_crystal_2] ~mep1_crystal_activate(mourning_teleport_crystal_2, mourning_teleport_crystal_1);
+[opheld1,mourning_teleport_crystal_1] ~mep1_crystal_activate(mourning_teleport_crystal_1, elf_crystal_tiny);
+
+[proc,mep1_crystal_activate](obj $crystal, namedobj $next)
+if (%mourning_quest < ^mep1_escorted | inv_total(inv, $crystal) = 0) return;
+if (~wilderness_level(coord) > 20) {
+    mes("A mysterious force blocks your teleport spell!");
+    return;
+}
+if (~pre_tele_checks(coord) = false) return;
+inv_del(inv, $crystal, 1);
+inv_add(inv, $next, 1);
+~player_teleport_normal(^mep1_lletya);

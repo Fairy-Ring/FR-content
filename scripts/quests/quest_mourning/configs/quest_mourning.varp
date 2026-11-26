@@ -1,2 +1,10 @@
 [mourning_quest]
 scope=perm
+
+[mourning_quest_bits]
+transmit=yes
+scope=perm
+
+[mep1_oronwen_ready_at]
+scope=perm
+transmit=no

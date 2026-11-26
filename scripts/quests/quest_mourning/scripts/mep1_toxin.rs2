@@ -1,0 +1,117 @@
+[oploc1,mourning_orchard_applepile] @mep1_take_apples;
+[oplocu,mourning_orchard_applebarrel_empty] @mep1_mash_apples;
+[opheldu,mourning_applebarrel_mush] @mep1_mix_naphtha;
+[opheldu,mourning_applebarrel_naphtha_mush] @mep1_sieve_naphtha;
+[opheldu,mourning_sieve] @mep1_sieve_naphtha;
+[oplocu,grain_sacks] @mep1_poison_m39;
+[oplocu,grain_sacks_8802] @mep1_poison_m39;
+[oplocu,grain_sacks_8803] @mep1_poison_m38;
+[oplocu,grain_sacks_8804] @mep1_poison_m39;
+[oplocu,grain_sacks_8805] @mep1_poison_m39;
+[oplocu,grain_sacks_8806] @mep1_poison_m38;
+
+// UNKNOWN functional dialogue; wording is practical, not period-authentic.
+[label,mep1_elena]
+if (%mourning_quest = ^mep1_toxin_task) {
+    if (inv_total(inv, applebarrel_full) < 1) {
+        ~chatnpc("<p,neutral>Please bring me a barrel of rotten apples from the orchard north of Ardougne.");
+        return;
+    }
+    ~chatplayer("<p,happy>I have the barrel of rotten apples.");
+    if (inv_total(inv, mourning_sieve) < 1) {
+        if (inv_freespace(inv) < 1) {
+            ~chatnpc("<p,neutral>Make room in your inventory so I can give you a sieve, then speak to me again.");
+            return;
+        }
+        inv_add(inv, mourning_sieve, 1);
+        ~chatnpc("<p,neutral>Take this sieve.");
+    }
+    %mourning_quest = ^mep1_toxin_recipe;
+    ~chatnpc("<p,neutral>Mash the apples in the empty barrel in the orchard north of Ardougne, then mix the mash with naphtha.");
+    ~chatnpc("<p,neutral>Sieve the mixture and heat it on a range, not an open fire.");
+    ~chatnpc("<p,neutral>Use the poison on the grain sacks in West Ardougne.");
+    return;
+}
+if (%mourning_quest >= ^mep1_toxin_recipe & %mourning_quest < ^mourning_complete) {
+    if (inv_total(inv, mourning_sieve) < 1) {
+        if (inv_freespace(inv) < 1) {
+            ~chatnpc("<p,neutral>Make room in your inventory and speak to me again for a replacement sieve.");
+        } else {
+            inv_add(inv, mourning_sieve, 1);
+            ~chatnpc("<p,neutral>Here is a replacement sieve.");
+        }
+    }
+    ~chatnpc("<p,neutral>Mash rotten apples in the orchard barrel, mix in naphtha, sieve it, then heat it on a range, not an open fire.");
+    ~chatnpc("<p,neutral>Use the poison on the grain sacks in West Ardougne.");
+    return;
+}
+
+[label,mep1_take_apples]
+if (%mourning_quest < ^mep1_toxin_task | %mourning_quest >= ^mep1_food_poisoned) return;
+inv_add(inv, applebarrel_full, 1);
+
+[label,mep1_mash_apples]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (last_useitem ! applebarrel_full) return;
+if (inv_total(inv, applebarrel_full) < 1) return;
+inv_del(inv, applebarrel_full, 1);
+inv_add(inv, mourning_applebarrel_mush, 1);
+
+[label,mep1_mix_naphtha]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (last_useitem = regicide_barrel_naphtha & inv_total(inv, mourning_applebarrel_mush) > 0) {
+    inv_del(inv, regicide_barrel_naphtha, 1);
+    inv_del(inv, mourning_applebarrel_mush, 1);
+    inv_add(inv, mourning_applebarrel_naphtha_mush, 1);
+    return;
+}
+if (last_useitem = mourning_applebarrel_mush & inv_total(inv, regicide_barrel_naphtha) > 0) {
+    inv_del(inv, mourning_applebarrel_mush, 1);
+    inv_del(inv, regicide_barrel_naphtha, 1);
+    inv_add(inv, mourning_applebarrel_naphtha_mush, 1);
+}
+
+[label,mep1_sieve_naphtha]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (inv_total(inv, mourning_sieve) < 1 | inv_total(inv, mourning_applebarrel_naphtha_mush) < 1) return;
+if (last_useitem ! mourning_sieve & last_useitem ! mourning_applebarrel_naphtha_mush) return;
+inv_del(inv, mourning_applebarrel_naphtha_mush, 1);
+inv_add(inv, mourning_toxic_naphtha, 1);
+
+[label,mep1_heat_toxin]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (inv_total(inv, mourning_toxic_naphtha) < 1) return;
+inv_del(inv, mourning_toxic_naphtha, 1);
+inv_add(inv, mourning_apple_toxin, 1);
+
+[label,mep1_fire_toxin]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (inv_total(inv, mourning_toxic_naphtha) < 1) return;
+inv_del(inv, mourning_toxic_naphtha, 1);
+~damage_self(^mep1_fire_damage);
+
+// UNKNOWN bookkeeping: the four m39_51 sacks use flag 1, the two m38_51 sacks use flag 2,
+// and flag 3 marks both actual regions poisoned.
+[label,mep1_poison_m39]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (last_useitem ! mourning_apple_toxin) return;
+if (getbit_range(%mourning_quest_bits, 22, 22) = 1) return;
+if (inv_total(inv, mourning_apple_toxin) < 1) return;
+inv_del(inv, mourning_apple_toxin, 1);
+%mourning_quest_bits = setbit(%mourning_quest_bits, 22);
+if (getbit_range(%mourning_quest_bits, 23, 23) = 1) {
+    %mourning_quest_bits = setbit(%mourning_quest_bits, 24);
+    %mourning_quest = ^mep1_food_poisoned;
+}
+
+[label,mep1_poison_m38]
+if (%mourning_quest ! ^mep1_toxin_recipe) return;
+if (last_useitem ! mourning_apple_toxin) return;
+if (getbit_range(%mourning_quest_bits, 23, 23) = 1) return;
+if (inv_total(inv, mourning_apple_toxin) < 1) return;
+inv_del(inv, mourning_apple_toxin, 1);
+%mourning_quest_bits = setbit(%mourning_quest_bits, 23);
+if (getbit_range(%mourning_quest_bits, 22, 22) = 1) {
+    %mourning_quest_bits = setbit(%mourning_quest_bits, 24);
+    %mourning_quest = ^mep1_food_poisoned;
+}

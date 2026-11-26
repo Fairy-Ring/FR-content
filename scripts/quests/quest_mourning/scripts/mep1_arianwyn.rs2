@@ -1,18 +1,17 @@
-// MEP1 Lletya Arianwyn first Talk-to after licensed Eluned.
-// CANDIDATE last-resort pre-SoE dump (period-media §6) minus Essyllt /
-// 8-charge / dest / crystal give. Hunt 289? no.
-// Gate mourning_quest >= 1. Stay 1. No dest. Research: subject mournings-end-1.
+// CANDIDATE first briefing: retained RS3 2013/2018 transcript.
+// UNKNOWN functional reminders. Stage integers are engineering defaults.
 
 [opnpc1,mourning_arianwyn]
 if (%mourning_quest < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-if (%mourning_quest >= 9) {
-    // MEP1 complete = varp 517 = OSRS MOURNING'S_END_PART_I_PROGRESS,
-    // terminal stage 9 (Chisel 8->9). 377 unpack places mourning_quest at
-    // varp 517. Cite mep2-start-complete-gate-377.md.
+if (%mourning_quest >= ^mourning_complete) {
     @mourning2_arianwyn_start;
+    return;
+}
+if (%mourning_quest >= ^mep1_briefed) {
+    ~chatnpc("<p,neutral>Find out what the Mourners are doing in West Ardougne. There have been sightings of Mourners crossing the mountain pass.");
     return;
 }
 ~chatnpc("<p,happy>Good day <displayname()>, I have been hoping to see you. It has come to my attention that there are large numbers of those you know as 'Mourners' crossing the mountain pass through Arandar.");
@@ -22,12 +21,15 @@ if (%mourning_quest >= 9) {
 ~chatplayer("<p,shock>Mourners are Elves? But I thought they were the West Ardougne guard.");
 ~chatnpc("<p,neutral>This is what King Lathas would have you believe.");
 ~chatnpc("<p,sad>We have been unable to infiltrate West Ardougne. The Mourner guard could identify us as enemy Elves before we could even get close to the walls. They must be up to something new, something we have not anticipated.");
-~chatplayer("<p,quiz>Alright, cut to the crux. What do you need me to do?");
+~chatplayer("<p,quiz>Alright, cut to the chase. What do you need me to do?");
 ~chatnpc("<p,neutral>That which we are unable to do, penetrate the Mourners' hide-out in Ardougne without alerting them to your presence, find out why they are there and what they are up to.");
-~chatplayer("<p,quiz>So let me get this right. You want me to infiltrate the Mourners and find out their plans?");
+~chatplayer("<p,quiz>So let me get this right. You want me to infiltrate the Mourners and find out their plans.");
 ~chatnpc("<p,happy>Yes.");
 ~chatplayer("<p,quiz>And just how am I supposed to achieve that?");
 ~chatnpc("<p,neutral>I have no idea, but I know we can count on you. If I had a plan I would share it with you, but I am lost for ideas. You have proved you are capable of such things in the past.");
 ~chatnpc("<p,neutral>As I said before, there have been sightings of Mourners crossing the mountain pass.");
 ~chatplayer("<p,neutral>Alright, I'll see what I can do.");
+%mourning_quest = ^mep1_briefed;
+%mourning_can_see_eluned = 0;
+~update_questlist;
 return;

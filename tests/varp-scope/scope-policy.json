@@ -247,6 +247,7 @@
     }
   },
   "deliberatelyTemporary": {
+    "elenaquest_extra_bits": "Original temporary Plague City scene bit bank; home Elena visibility is derived from saved elenaquest by the progress setter and login, not independently saved quest progress.",
     "dwarfrock_puzzle": "Original reserved slot 237: temporary schematic overlay offsets, rotations and selection. Reinitialized when opening the puzzle; solved progress lives in dwarfrock_main.",
     "ahoy_last_signer": "Current-session previous petition signer UID; logout clears only repeat protection, never earned signatures.",
     "varp413_bits": "Original transmitted Rune-Draw scores and unpaid current round; close resets it, while wins persist separately.",
@@ -752,6 +753,7 @@
     "mortton_current_shade": "temp",
     "morttonmulti": "perm",
     "morttonquest": "perm",
+    "mep1_oronwen_ready_at": "perm",
     "mourning_part2_basevar2": "temp",
     "mourning_quest": "perm",
     "mourning_quest_beam_cross1": "temp",
@@ -762,7 +764,7 @@
     "mourning_quest_beams4": "temp",
     "mourning_quest_beams5": "temp",
     "mourning_quest_beams6": "temp",
-    "mourning_quest_bits": "temp",
+    "mourning_quest_bits": "perm",
     "mourning_quest_light_doors": "temp",
     "mourning_quest_part2": "perm",
     "mourning_quest_vert_beams1": "temp",
@@ -999,7 +1001,6 @@
     "dwarfrock_puzzle": "temp",
     "varp238_unused": "temp",
     "varp239_unused": "temp",
-    "varp240_unused": "temp",
     "varp241_unused": "temp",
     "wanted_white_knight_kills": "perm",
     "farming_tree_soil": "perm",

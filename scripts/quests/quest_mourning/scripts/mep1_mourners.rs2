@@ -1,0 +1,40 @@
+// VERIFIED period guides name the outfit pieces and letter; the cache has no drop table.
+// UNKNOWN favorable default: every real hero kill repeats the full recovery set.
+[ai_queue3,mourning_overpass_mourner1] gosub(mep1_mourner_death);
+[ai_queue3,mourning_overpass_mourner2] gosub(mep1_mourner_death);
+[ai_queue3,mourning_overpass_mourner3] gosub(mep1_mourner_death);
+
+[ai_opplayer2,mourning_overpass_mourner1] gosub(mep1_mourner_attack);
+[ai_opplayer2,mourning_overpass_mourner2] gosub(mep1_mourner_attack);
+[ai_opplayer2,mourning_overpass_mourner3] gosub(mep1_mourner_attack);
+
+[proc,mep1_mourner_death]
+if (npc_findhero = ^true) {
+    obj_add(npc_coord, gasmask, 1, ^lootdrop_duration);
+    obj_add(npc_coord, mourning_bloody_mourner_top, 1, ^lootdrop_duration);
+    obj_add(npc_coord, mourning_ripped_mourner_legs, 1, ^lootdrop_duration);
+    obj_add(npc_coord, mourning_mourner_gloves, 1, ^lootdrop_duration);
+    obj_add(npc_coord, mourning_mourner_boots, 1, ^lootdrop_duration);
+    obj_add(npc_coord, mourning_mourner_cloak, 1, ^lootdrop_duration);
+    obj_add(npc_coord, mourning_mourner_message, 1, ^lootdrop_duration);
+}
+%mep1_mourner_vial_used = 0;
+gosub(npc_default_death);
+
+// VERIFIED vial effect; UNKNOWN first-eligible-retaliation timing/presentation.
+[proc,mep1_mourner_attack]
+if (~npc_default_attack_ready = false) return;
+if (%mep1_mourner_vial_used = 0) {
+    %mep1_mourner_vial_used = 1;
+    ~mep1_mourner_cap_stat(attack);
+    ~mep1_mourner_cap_stat(strength);
+    ~mep1_mourner_cap_stat(defence);
+    ~mep1_mourner_cap_stat(ranged);
+    ~mep1_mourner_cap_stat(magic);
+    ~mep1_mourner_cap_stat(hitpoints);
+}
+~npc_meleeattack;
+
+[proc,mep1_mourner_cap_stat](stat $skill)
+def_int $drain = sub(stat($skill), ^mep1_mourner_stat_cap);
+if ($drain > 0) stat_sub($skill, $drain, 0);

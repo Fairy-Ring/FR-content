@@ -1,0 +1,18 @@
+// UNKNOWN engineering stage integers, aligned with existing completion 8.
+^mep1_escorted = 1
+^mep1_briefed = 2
+^mep1_recruited = 3
+^mep1_device_fixed = 4
+^mep1_toxin_task = 5
+^mep1_toxin_recipe = 6
+^mep1_food_poisoned = 7
+// UNKNOWN engineering destinations: adjacent to the packed Arianwyn/ladder/trapdoor.
+^mep1_lletya = 0_36_49_49_36
+^mep1_hideout = 0_31_72_60_41
+^mep1_surface = 0_39_51_46_62
+// UNKNOWN minimum damage satisfying the period RuneHQ warning "over 50".
+^mep1_fire_damage = 51
+// UNKNOWN favourable duration for the period guide's "a few minutes".
+^mep1_oronwen_minutes = 2
+// VERIFIED cap from the period Tip.It guide, including Hitpoints.
+^mep1_mourner_stat_cap = 20

@@ -24,6 +24,8 @@
 
 [opnpcu,toad]
 switch_obj(last_useitem) {
+    case mourning_ogre_bellows_blue, mourning_ogre_bellows_red, mourning_ogre_bellows_yellow, mourning_ogre_bellows_green :
+        @mep1_inflate_dyed_toad(last_useitem);
     case empty_ogre_bellows :
 
         ~come_here_toady();

@@ -22,6 +22,8 @@
 
 [label,prod_sheep](npc $npc)
 p_arrivedelay;
+if (%mourning_quest >= ^mep1_device_fixed & %mourning_quest < ^mourning_complete & inv_total(worn, mourning_paint_gun) > 0) @mep1_fire_device;
+if (~mep1_sheep_dyed($npc) = true) return;
 
 if (%sheepherderquest = ^sheepherder_not_started) {
     mes("The sheep looks extremely ill and you haven't any reason to interfere with it.");
