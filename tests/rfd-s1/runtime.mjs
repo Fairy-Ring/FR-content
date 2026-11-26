@@ -63,9 +63,8 @@ export function finish(p, state, choices = []) {
       const root = types.Component.get(p.modalChat)?.comName ?? '';
       if (/^multi[2-5]$/.test(root) || root === 'multiobj2') {
         assert(choices.length, `${state.script.name}: unanswered ${root}`);
-        const selected = root === 'multiobj2' ? com(`${root}:obj${choices.shift()}`) : com(`${root}:com_${choices.shift()}`);
+        const selected = root === 'multiobj2' ? com(`${root}:objtext${choices.shift()}`) : com(`${root}:com_${choices.shift()}`);
         assert(p.resumeButtons.includes(selected), `${root} offers selected choice`);
-        p.lastCom = selected;
         assert.equal(buttonHandler.handle(new IfButton(selected), p), true);
       } else {
         assert.equal(pauseHandler.handle(new ResumePauseButton(0), p), true);
