@@ -5,7 +5,8 @@ if (%agrith_owner = uid & %agrith_quest = 110) return(true);
 return(false);
 
 [proc,agrith_find_boss]()(boolean)
-npc_findall(2_42_76_32_35, agrith_naar, 24, 0);
+if (~agrith_in_room = false) return(false);
+npc_findall(region_getcoord(0, 32, 35), agrith_naar, 24, 0);
 while (npc_findnext = true) {
     if (%agrith_owner = uid) return(true);
 }
@@ -14,9 +15,14 @@ return(false);
 [proc,agrith_spawn_boss]
 if (%agrith_quest ! 110 | ~agrith_in_room = false) return;
 if (~agrith_find_boss = true) return;
-// UNKNOWN staging: original throne-room floor; the packed-map proof checks size 3.
+// UNKNOWN staging: the original floor copied privately; the proof checks size 3.
 ~mesbox("Agrith-Naar appears and strikes Matthew down!");
-npc_add(2_42_76_31_37, agrith_naar, 2000);
+if (npc_findexact(region_getcoord(0, 34, 34), agrith_matthew) = true) {
+    npc_anim(human_death, 0);
+    p_delay(^agrith_story_death_delay);
+    npc_del;
+}
+npc_add(region_getcoord(0, 31, 37), agrith_naar, 2000);
 %agrith_owner = uid;
 %npc_aggressive_player = uid;
 npc_settimer(1);

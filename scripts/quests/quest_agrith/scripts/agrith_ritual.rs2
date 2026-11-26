@@ -40,8 +40,8 @@ if (~agrith_in_room = false) {
     mes("You must chant in the throne room.");
     return;
 }
-// UNKNOWN engineering staging: the empty southern place in the original room.
-if (coord ! 2_42_76_32_31) {
+// UNKNOWN engineering staging: the same empty place in the private scenery copy.
+if (coord ! region_getcoord(0, 32, 31)) {
     mes("Stand at the empty place at the southern end of the circle.");
     return;
 }
@@ -72,8 +72,8 @@ if (%agrith_quest = 70) {
     ~agrith_clear_cult;
     ~agrith_room_enter;
     // Private and untradeable: the fallen wizards' sigils cannot become public.
-    obj_add(2_42_76_35_37, agrith_sigil, 1, ^lootdrop_duration);
-    obj_add(2_42_76_32_42, agrith_sigil, 1, ^lootdrop_duration);
+    obj_add(region_getcoord(0, 35, 37), agrith_sigil, 1, ^lootdrop_duration);
+    obj_add(region_getcoord(0, 32, 42), agrith_sigil, 1, ^lootdrop_duration);
     ~chatnpc_specific(nc_name(agrith_matthew), agrith_matthew, "<p,scared>Denath was Agrith-Naar! We sent him back. Take the fallen wizards' sigils and find people to help summon him again.");
     return;
 }

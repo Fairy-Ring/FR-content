@@ -1,5 +1,5 @@
 // VERIFIED flow: retained Tip.It q125, 2 May 2006, walkthrough.
-// UNKNOWN: concise functional dialogue and temporary-recruit staging. Dialogue uses the original mapped cult actors.
+// UNKNOWN: concise functional dialogue, private scenery-copy layout and actor staging.
 [opnpc1,agrith_dave]
 if (%agrith_quest < 20 | %agrith_quest >= ^agrith_complete) return;
 if (%agrith_quest = 80) {
@@ -70,12 +70,44 @@ if (%agrith_quest < 30) {
 }
 return(true);
 
+[proc,agrith_enter]
+if (%agrith_quest < 30 | %agrith_quest >= ^agrith_complete) return;
+// Copy original 377 scenery, never public NPCs. The native region owns cleanup.
+def_coord $sw = region_create(1, 8, 8);
+region_setexitcoord(0_42_76_25_49);
+def_int $x = 0;
+while ($x < 8) {
+    def_int $z = 0;
+    while ($z < 8) {
+        region_set(0, $x, $z, movecoord(2_42_76_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+p_teleport(movecoord($sw, 32, 0, 20));
+~agrith_room_enter;
+
+[proc,agrith_room_coord](coord $template)(coord)
+if (region_findbycoord(coord) = false) return(null);
+// Original source map m42_76 begins at world (2688, 4864).
+return(region_getcoord(0, sub(coordx($template), 2688), sub(coordz($template), 4864)));
+
 [proc,agrith_in_room]()(boolean)
-return(inzone(2_42_76_22_16, 2_42_76_42_54, coord));
+if (region_findbycoord(coord) = false) return(false);
+return(inzone(region_getcoord(0, 22, 16), region_getcoord(0, 42, 54), coord));
 
 [proc,agrith_room_enter]
 if (%agrith_quest < 30 | %agrith_quest >= ^agrith_complete) return;
+if (~agrith_in_room = false) return;
 ~agrith_clear_cult;
+if (%agrith_quest < 120) ~agrith_spawn_cult(agrith_matthew, 2_42_76_34_34);
+if (%agrith_quest < 80) {
+    ~agrith_spawn_cult(agrith_denath, 2_42_76_32_41);
+    ~agrith_spawn_cult(agrith_eric, 2_42_76_35_34);
+    ~agrith_spawn_cult(agrith_jennifer, 2_42_76_28_34);
+    ~agrith_spawn_cult(agrith_tanya, 2_42_76_30_40);
+    ~agrith_spawn_cult(agrith_patrick, 2_42_76_35_42);
+}
 if (%agrith_quest >= 100) {
     ~agrith_spawn_cult(agrith_badden_sigil, 2_42_76_35_37);
     ~agrith_spawn_cult(agrith_reen_sigil, 2_42_76_28_37);
@@ -84,28 +116,21 @@ if (%agrith_quest >= 100) {
 }
 
 [proc,agrith_spawn_cult](npc $type, coord $tile)
-npc_add($tile, $type, 2000);
+npc_add(~agrith_room_coord($tile), $type, ^max_32bit_int);
 %agrith_owner = uid;
 npc_setmode(none);
-npc_settimer(5);
 
 [proc,agrith_clear_cult]
-npc_huntall(2_42_76_32_35, 24, 0);
+if (region_findbycoord(coord) = false) return;
+npc_huntall(region_getcoord(0, 32, 35), 24, 0);
 while (npc_findnext = true) {
     if (%agrith_owner = uid & npc_type ! agrith_naar) npc_del;
 }
 
-[proc,agrith_cult_cleanup]
-if (finduid(%agrith_owner) = false) {
-    npc_del;
-    return;
-}
-if (~agrith_in_room = false | %agrith_quest >= ^agrith_complete) npc_del;
-
-[ai_timer,agrith_badden_sigil] ~agrith_cult_cleanup;
-[ai_timer,agrith_reen_sigil] ~agrith_cult_cleanup;
-[ai_timer,agrith_golem_sigil] ~agrith_cult_cleanup;
-[ai_timer,agrith_dave_sigil] ~agrith_cult_cleanup;
+// Only the short passage-floor death actor needs an owner-disconnect timer.
+// Private-room actors are removed by the native region when its player leaves.
+[ai_timer,agrith_tanya]
+if (finduid(%agrith_owner) = false) npc_del;
 
 [opnpc1,agrith_denath]
 if (%agrith_quest < 30 | %agrith_quest >= 80) return;
