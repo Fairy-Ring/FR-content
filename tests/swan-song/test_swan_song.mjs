@@ -243,8 +243,13 @@ function catchFish(p, ordinary = false) {
   assert(p.tryInteract(true));
   drive(p, [], false);
   const oldRandom = Math.random, oldJava = JavaRandom.nextDouble;
-  Math.random = () => 0; JavaRandom.nextDouble = () => 0;
   try {
+    if (!ordinary) {
+      Math.random = () => 0.999999; JavaRandom.nextDouble = () => 0.999999;
+      for (let i = 0; i < 12; i++) tick();
+      assert.equal(count(p, name), before, 'failed fresh-fishing rolls produce no fish');
+    }
+    Math.random = () => 0; JavaRandom.nextDouble = () => 0;
     for (let i = 0; i < 160 && count(p, name) === before; i++) tick();
     assert.equal(count(p, name), before + 1, 'the native recurring fishing action actually produces a catch');
   } finally { Math.random = oldRandom; JavaRandom.nextDouble = oldJava; p.clearInteraction(); }

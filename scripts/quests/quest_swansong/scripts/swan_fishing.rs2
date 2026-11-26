@@ -79,10 +79,9 @@ if (%action_delay < map_clock) {
     sound_synth(net, 1, 0);
 } else if (%action_delay = calc(map_clock + 3)) {
     mes("You attempt to catch a monkfish.");
-} else if (%action_delay = map_clock) {
-    @swan_fresh_fish_roll;
 }
 p_oploc(3);
+if (%action_delay = map_clock) @swan_fresh_fish_roll;
 
 [label,swan_fresh_fish_roll]
 if (inv_freespace(inv) < 1) return;
