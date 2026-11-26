@@ -1,0 +1,118 @@
+// Fixed named cache objects: no generated pack IDs or object arithmetic.
+[opheldu,hundred_dave_spice_red_4]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_red_3]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_red_2]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_red_1]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_orange_4]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_orange_3]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_orange_2]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_orange_1]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_brown_4]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_brown_3]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_brown_2]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_brown_1]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_yellow_4]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_yellow_3]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_yellow_2]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[opheldu,hundred_dave_spice_yellow_1]
+if (last_useitem = stew | last_useitem = hundred_dave_stew) { @rfd_dave_mix(last_item, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[proc,rfd_dave_spice](obj $spice)(int, namedobj)
+switch_obj($spice) {
+    case hundred_dave_spice_red_4 : return(1, hundred_dave_spice_red_3);
+    case hundred_dave_spice_red_3 : return(1, hundred_dave_spice_red_2);
+    case hundred_dave_spice_red_2 : return(1, hundred_dave_spice_red_1);
+    case hundred_dave_spice_red_1 : return(1, hundred_dave_spice_empty);
+    case hundred_dave_spice_orange_4 : return(2, hundred_dave_spice_orange_3);
+    case hundred_dave_spice_orange_3 : return(2, hundred_dave_spice_orange_2);
+    case hundred_dave_spice_orange_2 : return(2, hundred_dave_spice_orange_1);
+    case hundred_dave_spice_orange_1 : return(2, hundred_dave_spice_empty);
+    case hundred_dave_spice_brown_4 : return(3, hundred_dave_spice_brown_3);
+    case hundred_dave_spice_brown_3 : return(3, hundred_dave_spice_brown_2);
+    case hundred_dave_spice_brown_2 : return(3, hundred_dave_spice_brown_1);
+    case hundred_dave_spice_brown_1 : return(3, hundred_dave_spice_empty);
+    case hundred_dave_spice_yellow_4 : return(4, hundred_dave_spice_yellow_3);
+    case hundred_dave_spice_yellow_3 : return(4, hundred_dave_spice_yellow_2);
+    case hundred_dave_spice_yellow_2 : return(4, hundred_dave_spice_yellow_1);
+    case hundred_dave_spice_yellow_1 : return(4, hundred_dave_spice_empty);
+}
+return(0, null);
+
+[proc,rfd_dave_drop](int $colour, int $doses)(namedobj)
+switch_int($colour) {
+    case 0 :
+        switch_int($doses) {
+            case 4 : return(hundred_dave_spice_red_4);
+            case 3 : return(hundred_dave_spice_red_3);
+            case 2 : return(hundred_dave_spice_red_2);
+            case 1 : return(hundred_dave_spice_red_1);
+        }
+    case 1 :
+        switch_int($doses) {
+            case 4 : return(hundred_dave_spice_orange_4);
+            case 3 : return(hundred_dave_spice_orange_3);
+            case 2 : return(hundred_dave_spice_orange_2);
+            case 1 : return(hundred_dave_spice_orange_1);
+        }
+    case 2 :
+        switch_int($doses) {
+            case 4 : return(hundred_dave_spice_brown_4);
+            case 3 : return(hundred_dave_spice_brown_3);
+            case 2 : return(hundred_dave_spice_brown_2);
+            case 1 : return(hundred_dave_spice_brown_1);
+        }
+    case 3 :
+        switch_int($doses) {
+            case 4 : return(hundred_dave_spice_yellow_4);
+            case 3 : return(hundred_dave_spice_yellow_3);
+            case 2 : return(hundred_dave_spice_yellow_2);
+            case 1 : return(hundred_dave_spice_yellow_1);
+        }
+}
+return(hundred_dave_spice_empty);

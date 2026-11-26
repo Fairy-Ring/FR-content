@@ -1,0 +1,119 @@
+// Original 377 client fields preserved. Added only server-side behavior fields.
+[100_rantz]
+name=Rantz
+desc=A large dim looking humanoid.
+model1=npc_ogre
+model2=npc_rantz
+vislevel=hide
+size=2
+walkanim=ogre_walk
+readyanim=ogre_ready
+op1=Talk-to
+alwaysontop=yes
+head1=npc_ogre_chieftan_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_ogre_boat_full]
+name=Ogre boat
+desc=Rantz's boat, operated by his kids Fycie and Bugs.
+model1=npc_3471
+model2=npc_3471i2
+model3=npc_3471i3
+vislevel=hide
+size=5
+readyanim=100_jubbly_treading_water
+walkanim=100_jubbly_swimming
+op1=Board
+head1=npc_3471_head
+head2=npc_3471_headi2
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_ogre_boat]
+name=Ogre boat
+desc=Rantz's boat, operated by his kids Fycie and Bugs.
+model1=npc_3472
+model2=npc_3471i2
+model3=npc_3471i3
+vislevel=hide
+size=5
+readyanim=100_jubbly_treading_water
+walkanim=100_jubbly_swimming
+op1=Board
+head1=npc_3471_head
+head2=npc_3471_headi2
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_balloon_toad_brown]
+name=Balloon Toad
+desc=A toad inflated with swamp gas and tied up like a balloon.
+model1=npc_3473
+vislevel=hide
+readyanim=100_jubbly_toad_balloon_ready
+walkanim=100_jubbly_toad_balloon_ready
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_balloon_toad_white]
+name=Balloon Toad
+desc=A toad inflated with swamp gas and tied up like a balloon.
+model1=npc_3473
+recol1s=13570
+recol1d=12684
+vislevel=hide
+readyanim=100_jubbly_toad_balloon_ready
+walkanim=100_jubbly_toad_balloon_ready
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_balloon_toad_deflate]
+name=Balloon Toad
+desc=A quickly deflating balloon toad.
+model1=npc_3475
+vislevel=hide
+readyanim=100_jubbly_toad_balloon_deflate
+walkanim=100_jubbly_toad_balloon_deflate
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_bird]
+name=Jubbly bird
+desc=A large boisterous bird, a delicacy for ogres.
+model1=npc_3476
+size=3
+walkanim=100_jubbly_walk
+readyanim=100_jubbly_ready
+op5=Attack
+alwaysontop=yes
+vislevel=9
+hitpoints=^rfd_skrach_jubbly_hitpoints
+attack=^rfd_skrach_jubbly_attack
+strength=^rfd_skrach_jubbly_strength
+defence=^rfd_skrach_jubbly_defence
+param=defend_anim,100_jubbly_defend
+param=death_anim,100_jubbly_death
+wanderrange=3
+moverestrict=nomove
+defaultmode=none
+
+[100_jubbly_bird_dead]
+name=Jubbly bird
+desc=A large boisterous bird, a delicacy for ogres.
+model1=npc_3476
+vislevel=hide
+size=3
+walkanim=seagull_attack
+readyanim=seagull_attack
+op4=Pluck
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+maxrange=0

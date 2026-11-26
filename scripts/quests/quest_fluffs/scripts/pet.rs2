@@ -99,6 +99,7 @@ switch_obj(last_useitem) {
         p_delay(2);
         ~chatplayer("<p,happy>That kitten loves to play with that ball of wool.|I think it is its favourite."); //guessed linebreak
     case bucket_milk : //https://youtu.be/1vY_uGOq6qM&t=97s
+        ~rfd_dave_revert_cat;
         %cat_growth = setbit_range_toint(%cat_growth, 0, 0, 4);
         inv_del(inv, last_useitem, 1);
         inv_add(inv, bucket_empty, 1);
@@ -179,6 +180,7 @@ if (oc_category(nc_param(npc_type, pet_item_id)) = overgrown) {
 }
 if (~ratcatch_mansion_chase = true) return;
 if (~ratcatch_warehouse_cat_action = true) return;
+if (.npc_find(coord, hundred_dave_hellrat, 10, 1) = true) @rfd_dave_chase;
 if (.npc_find(coord, rat, 10, 1) = true) {  
     def_int $chance = random(2); //50%
     def_int $vermin = getbit_range(%cat_growth, 20, 26);

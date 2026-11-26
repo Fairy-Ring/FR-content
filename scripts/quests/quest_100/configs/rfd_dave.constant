@@ -1,0 +1,19 @@
+// UNKNOWN engineering stages within original three-bit hundred_dave_main.
+^rfd_dave_inspected = 1
+^rfd_dave_doris = 2
+^rfd_dave_recipe = 3
+^rfd_dave_spices = 4
+^rfd_dave_approved = 5
+^rfd_dave_complete = 7
+// VERIFIED rewards/prerequisite: RuneHQ 15 April 2006. XP is in tenths.
+^rfd_dave_cooking = 25
+^rfd_dave_xp = 70000
+// UNKNOWN map-derived landings, paired with original mapped trapdoor/stairs.
+^rfd_dave_cellar = 0_48_154_4_38
+^rfd_dave_surface = 0_48_54_5_36
+// UNKNOWN exact threshold. Period RuneHQ says approximately fifteen catches.
+^rfd_dave_hellcat_catches = 15
+// UNKNOWN engineering defaults, matching the existing ordinary cat hunt odds.
+^rfd_dave_cat_catch_odds = 2
+^rfd_dave_kitten_catch_odds = 10
+^rfd_dave_stew_heal = 11

@@ -1,4 +1,8 @@
 [opheldu,cake_tin]
+if (last_useitem = 100guide_egg | last_useitem = 100guide_bucket_milk | last_useitem = 100guide_pot_flour) {
+    @rfd_guide_make_cake;
+    return;
+}
 switch_obj (last_useitem) {
     case pot_flour, egg, bucket_milk : @make_uncooked_cake;
     case default : ~displaymessage(^dm_default);

@@ -153,10 +153,10 @@ const ratPitUnconditionalExit = execute({ ...ratPitExit, varbits: {} }, null, ra
 assert.deepEqual(ratPitUnconditionalExit.destination, ratPitExit.destination, 'Rat Pits exit never requires quest progress');
 assert.deepEqual(ratPitUnconditionalExit.messages, []);
 const retainedFallbacks = manifest.filter(entry => entry.status === 'fallback');
-assert.equal(retainedFallbacks.length, 20, 'only explicitly owned or structurally missing residual routes remain');
+assert.equal(retainedFallbacks.length, 19, 'only explicitly owned or structurally missing residual routes remain');
 assert.equal(retainedFallbacks.filter(entry => /pyramid/i.test(entry.name)).length, 12, 'Agility Pyramid flights remain owned by their course');
 assert.equal(retainedFallbacks.filter(entry => entry.coord.includes('_44_79_')).length, 4, 'Ratcatchers mansion flights remain quest-owned');
-assert.equal(retainedFallbacks.filter(entry => entry.name === '100_dave_celler_stairs').length, 1, 'RFD cellar remains quest-owned');
+assert.equal(retainedFallbacks.filter(entry => entry.name === '100_dave_celler_stairs').length, 0, 'RFD cellar stairs built by b-rfd-s2');
 assert.deepEqual(retainedFallbacks.filter(entry => entry.inaccessibleApproach).map(entry => `${entry.name}@${entry.coord}`).sort(),
   ['agility_pyramid_steps1@1_47_73_32_21', 'scenery_1723@1_47_152_52_48'], 'only the owned pyramid fixture and floorless Dwarven Mine ghost are inaccessible');
 assert.equal(retainedFallbacks.filter(entry => entry.coord === '1_48_48_20_32').length, 2, 'only the tutorial down menu choice and operation lack a native counterpart');
@@ -199,6 +199,20 @@ for (const entry of manifest) {
       const jiggig = jiggigLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
       const blastFurnace = blastFurnaceLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
       const ratPit = ratPitLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
+      if (entry.name === '100_dave_celler_stairs') {
+        assert.deepEqual(result.destination, [0, 3077, 3492], 'Dave cellar stairs return beside the original surface trapdoor');
+        assert.equal(entry.status, 'new', 'Dave link is not inherited parity');
+        walkable(result.destination);
+        const trapdoor = locs.find(r => r.name === '100_dave_celler_trapdoor' && r.coord === '0_48_54_5_37');
+        assert.ok(trapdoor, 'original trapdoor is the surface counterpart');
+        assert.ok(routeEnd(result.destination, t => reachable(t, trapdoor)), 'landing reaches the native trapdoor');
+        const wrapper = types.LocType.get(types.LocType.getId(trapdoor.name));
+        assert.equal(wrapper.multiloc[0], types.LocType.getId('100_dave_celler_trapdoor_closed'));
+        assert.equal(wrapper.multiloc[1], types.LocType.getId('100_dave_celler_trapdoor_open'));
+        // The S2 suite sends native visible-form Open/Go-down/Close operations.
+        counts.new++;
+        continue;
+      }
       if (blastFurnace) {
         assert.deepEqual(result.destination, blastFurnace.destination, 'Blast Furnace has the exact packed landing and level');
         assert.deepEqual(entry.counterpart, blastFurnace.counterpart, 'Blast Furnace uses its exact native counterpart');

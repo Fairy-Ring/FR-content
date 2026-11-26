@@ -1,0 +1,68 @@
+// VERIFIED requirements and route: RuneHQ archived 15 Apr 2006, src.rfd-runehq-0691.
+// VERIFIED requirements: Cooking 41, Firemaking 20, and Big Chompy complete.
+^rfd_skrach_cooking_level = 41
+^rfd_skrach_firemaking_level = 20
+
+// UNKNOWN engineering stages in the existing 100_ogre_prog varbit.
+^rfd_skrach_inspected = 1
+^rfd_skrach_rantz_spoken = 2
+^rfd_skrach_tree_kicked = 3
+^rfd_skrach_tree_cut_once = 4
+^rfd_skrach_tree_cut_twice = 5
+^rfd_skrach_chompy_skewered = 6
+^rfd_skrach_chompy_roasted = 7
+^rfd_skrach_returned = 8
+^rfd_skrach_jubbly_ready = 9
+// 10 is the shared ^rfd_guest_complete value from rfd_hub.constant.
+
+// VERIFIED cache children are selectors 0–5; later values are UNKNOWN progress markers.
+^rfd_skrach_tree_kick_selector = 1
+^rfd_skrach_tree_after_kick_selector = 2
+^rfd_skrach_tree_first_cut_selector = 3
+^rfd_skrach_tree_second_cut_selector = 4
+^rfd_skrach_tree_done_selector = 6
+^rfd_skrach_rock_one_selector = 7
+^rfd_skrach_rock_two_selector = 8
+^rfd_skrach_rock_three_selector = 9
+^rfd_skrach_bait_one_selector = 10
+^rfd_skrach_bait_two_selector = 11
+^rfd_skrach_bait_three_selector = 12
+^rfd_skrach_bait_reset_selector = 6
+
+// VERIFIED step counts: mine three rocks and use three balloon toads.
+^rfd_skrach_rocks_required = 3
+^rfd_skrach_balloons_required = 3
+
+// UNKNOWN map-derived destinations; period source names the boat ride, not its tiles.
+^rfd_skrach_feldip_landing = 0_41_46_25_18
+^rfd_skrach_karamja_landing = 0_43_48_10_8
+// VERIFIED map pins, used for exact-region guards.
+^rfd_skrach_karamja_arrow_tree = 0_43_48_10_9
+^rfd_skrach_feldip_min_x = 2624
+^rfd_skrach_feldip_max_x = 2687
+^rfd_skrach_feldip_min_z = 2944
+^rfd_skrach_feldip_max_z = 3007
+^rfd_skrach_karamja_min_x = 2752
+^rfd_skrach_karamja_max_x = 2815
+^rfd_skrach_karamja_min_z = 3072
+^rfd_skrach_karamja_max_z = 3135
+// UNKNOWN engineering radius around the arrow-tree fire and balloon spawn area.
+^rfd_skrach_karamja_cook_radius = 8
+^rfd_skrach_bait_spawn_radius = 4
+
+// UNKNOWN Jubbly cooking roll and XP; no period source gives these values.
+^rfd_skrach_chompy_cook_min = 200
+^rfd_skrach_chompy_cook_max = 255
+^rfd_skrach_chompy_cook_xp = 140
+^rfd_skrach_jubbly_cook_min = 200
+^rfd_skrach_jubbly_cook_max = 255
+^rfd_skrach_jubbly_cook_xp = 140
+// UNKNOWN Jubbly combat profile mirrors the original Chompy cache profile.
+^rfd_skrach_jubbly_hitpoints = 10
+^rfd_skrach_jubbly_attack = 5
+^rfd_skrach_jubbly_strength = 5
+^rfd_skrach_jubbly_defence = 3
+// UNKNOWN existing Chompy spawn lifetime; the source gives no Jubbly timer.
+^rfd_skrach_jubbly_lifetime = 100
+// UNKNOWN spit display duration.
+^rfd_skrach_spit_duration = 5

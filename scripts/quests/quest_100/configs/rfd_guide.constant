@@ -1,0 +1,11 @@
+// VERIFIED period source: RuneHQ capture 15 April 2006, Guide requirements and quiz examples.
+// UNKNOWN engineering: stage values, inline placement, prompt display, answer distractors, egg/milk one-correct cycling, and flour's listed-example order.
+^rfd_guide_started = 1
+^rfd_guide_cooking = 40
+^rfd_guide_egg_examples = 6
+^rfd_guide_flour_examples = 5
+^rfd_guide_flour_correct = 3
+^rfd_guide_milk_examples = 13
+^rfd_guide_egg_game = 1
+^rfd_guide_flour_game = 2
+^rfd_guide_milk_game = 3

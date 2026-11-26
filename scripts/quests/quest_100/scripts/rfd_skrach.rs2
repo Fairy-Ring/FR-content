@@ -1,0 +1,378 @@
+// VERIFIED route and requirements: RuneHQ archived 15 Apr 2006, src.rfd-runehq-0691.
+// UNKNOWN menu captions and mechanics are labelled at their use sites.
+
+[oploc1,hundred_ogre_base]
+if (%hundred_main_quest_var < ^rfd_frozen | %100ogrevisible = 0) return;
+if (%100_ogre_prog < ^rfd_skrach_inspected) %100_ogre_prog = ^rfd_skrach_inspected;
+
+[oplocu,hundred_ogre_base]
+switch_obj(last_useitem) {
+    case 100_jubbly_meat_cooked : ~rfd_skrach_free;
+    case default : ~displaymessage(^dm_default);
+};
+
+[proc,rfd_skrach_free]
+if (%hundred_main_quest_var < ^rfd_frozen | %100ogrevisible = 0 | %100_ogre_prog < ^rfd_skrach_jubbly_ready) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, 100_jubbly_meat_cooked) < 1) return;
+inv_del(inv, 100_jubbly_meat_cooked, 1);
+%100_ogre_prog = ^rfd_guest_complete;
+~rfd_guest_reward(6);
+
+// UNKNOWN navigation captions are approved defaults. This proc runs only after
+// Inspect and the three period requirements; it does not change Chompy state.
+[proc,rfd_skrach_rantz_offer]()(boolean)
+if (%hundred_main_quest_var < ^rfd_frozen | %100ogrevisible = 0 | %100_ogre_prog ! ^rfd_skrach_inspected) return(false);
+if (stat(cooking) < ^rfd_skrach_cooking_level | stat(firemaking) < ^rfd_skrach_firemaking_level) return(false);
+if (~p_choice2("Help with Skrach", 1, "Not now", 2) = 1) {
+    %100_ogre_prog = ^rfd_skrach_rantz_spoken;
+    %100_ogre_rantz_visible = 1;
+    return(true);
+}
+return(false);
+
+[opnpc1,100_rantz]
+if (%100_ogre_rantz_visible = 0) return;
+if (%100_ogre_prog = ^rfd_skrach_rantz_spoken) {
+    if (~p_choice2("Build a boat", 1, "Not now", 2) = 1) @rfd_skrach_kick_tree;
+    return;
+}
+if (%100_ogre_prog = ^rfd_skrach_returned | %100_ogre_prog = ^rfd_skrach_jubbly_ready) {
+    if (~p_choice2("Start Jubbly bait", 1, "Not now", 2) = 1) {
+        %100_ogre_prog = ^rfd_skrach_jubbly_ready;
+        // UNKNOWN anti-stranding recovery: reset bait progress, never issue materials.
+        %100_ogre_jubbly_push_tree = ^rfd_skrach_tree_done_selector;
+    }
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,rfd_skrach_kick_tree]
+%100_ogre_prog = ^rfd_skrach_tree_kicked;
+%100_ogre_jubbly_push_tree = ^rfd_skrach_tree_kick_selector;
+npc_anim(100_jubbly_ogre_kick, 0);
+p_delay(1);
+if (p_finduid(uid) = false) return;
+%100_ogre_jubbly_push_tree = ^rfd_skrach_tree_after_kick_selector;
+
+// The native tree has no operation. Item-on-location is the sourced hatchet action.
+[oplocu,100_jubbly_multi_push_tree] @rfd_skrach_chop_tree;
+[oplocu,100_jubbly_tree_stage1] @rfd_skrach_chop_tree;
+[oplocu,100_jubbly_tree_stage2] @rfd_skrach_chop_tree;
+[oplocu,100_jubbly_tree_stage3] @rfd_skrach_chop_tree;
+[oplocu,100_jubbly_tree_stage4] @rfd_skrach_chop_tree;
+[oplocu,100_jubbly_tree_stage5] @rfd_skrach_chop_tree;
+[oplocu,100_jubbly_tree_stage6] @rfd_skrach_chop_tree;
+
+[label,rfd_skrach_chop_tree]
+if (loc_coord ! 0_41_46_29_19) return;
+if (%100_ogre_prog ! ^rfd_skrach_tree_kicked & %100_ogre_prog ! ^rfd_skrach_tree_cut_once) return;
+switch_obj(last_useitem) {
+    case bronze_axe, iron_axe, steel_axe, black_axe, mithril_axe, adamant_axe, rune_axe :
+        def_obj $axe = ~woodcutting_axe_checker(true);
+        if ($axe = null) return;
+        anim(struct_param(oc_param($axe, woodcutting_struct), skill_anim), 0);
+    case default :
+        ~displaymessage(^dm_default);
+        return;
+}
+if (%100_ogre_prog = ^rfd_skrach_tree_kicked) {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_tree_first_cut_selector;
+    %100_ogre_prog = ^rfd_skrach_tree_cut_once;
+} else {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_tree_second_cut_selector;
+    %100_ogre_prog = ^rfd_skrach_tree_cut_twice;
+    %100_ogre_jubbly_arrow_tree = 1;
+}
+
+// First Karamja return is available only after the successful Chompy roast.
+[apnpc1,100_jubbly_ogre_boat_full] @rfd_skrach_board_karamja;
+[opnpc1,100_jubbly_ogre_boat_full] @rfd_skrach_board_karamja;
+[label,rfd_skrach_board_karamja]
+if (%100_ogre_prog = ^rfd_skrach_chompy_roasted & %100_ogre_boat_free_ride = 1) {
+    %100_ogre_boat_free_ride = 0;
+    p_telejump(^rfd_skrach_feldip_landing);
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_tree_done_selector;
+    %100_ogre_prog = ^rfd_skrach_returned;
+    return;
+}
+if (%100_ogre_prog >= ^rfd_guest_complete) {
+    if (~rfd_skrach_pay_herbs = true) p_telejump(^rfd_skrach_feldip_landing);
+    return;
+}
+~displaymessage(^dm_default);
+
+[apnpc1,100_jubbly_ogre_boat] @rfd_skrach_board_feldip;
+[opnpc1,100_jubbly_ogre_boat] @rfd_skrach_board_feldip;
+[label,rfd_skrach_board_feldip]
+if (%100_ogre_prog >= ^rfd_guest_complete) {
+    if (~rfd_skrach_pay_chompy = true) p_telejump(^rfd_skrach_karamja_landing);
+    return;
+}
+~displaymessage(^dm_default);
+
+// CANDIDATE fare variants; UNKNOWN combined accepted-item rule.
+[proc,rfd_skrach_pay_herbs]()(boolean)
+if (inv_total(inv, karamja_rum) > 0) return(false);
+if (add(add(inv_total(inv, snake_weed), inv_total(inv, rogues_purse)), add(inv_total(inv, ardrigal), inv_total(inv, volencia_moss))) < 2) return(false);
+def_int $need = 2;
+def_int $take = min(inv_total(inv, snake_weed), $need);
+if ($take > 0) inv_del(inv, snake_weed, $take);
+$need = sub($need, $take);
+$take = min(inv_total(inv, rogues_purse), $need);
+if ($take > 0) inv_del(inv, rogues_purse, $take);
+$need = sub($need, $take);
+$take = min(inv_total(inv, ardrigal), $need);
+if ($take > 0) inv_del(inv, ardrigal, $take);
+$need = sub($need, $take);
+$take = min(inv_total(inv, volencia_moss), $need);
+if ($take > 0) inv_del(inv, volencia_moss, $take);
+return(true);
+
+[proc,rfd_skrach_pay_chompy]()(boolean)
+if (inv_total(inv, karamja_rum) > 0) return(false);
+if (add(inv_total(inv, raw_chompy), inv_total(inv, cooked_chompy)) < 2) return(false);
+def_int $need = 2;
+def_int $take = min(inv_total(inv, raw_chompy), $need);
+if ($take > 0) inv_del(inv, raw_chompy, $take);
+$need = sub($need, $take);
+$take = min(inv_total(inv, cooked_chompy), $need);
+if ($take > 0) inv_del(inv, cooked_chompy, $take);
+return(true);
+
+// VERIFIED recipe from RuneHQ; the existing raw-Chompy handler supplies the other direction.
+[opheldu,spit_iron]
+if (last_useitem = raw_chompy) @rfd_skrach_skewer_chompy;
+~displaymessage(^dm_default);
+
+[label,rfd_skrach_skewer_chompy]
+if (%100_ogre_prog ! ^rfd_skrach_tree_cut_twice & %100_ogre_prog ! ^rfd_skrach_chompy_skewered) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, raw_chompy) < 1 | inv_total(inv, spit_iron) < 1) return;
+inv_del(inv, raw_chompy, 1);
+inv_del(inv, spit_iron, 1);
+inv_add(inv, spit_skewered_chompy, 1);
+%100_ogre_prog = ^rfd_skrach_chompy_skewered;
+
+// UNKNOWN engineering radius around the arrow-tree fire; source names the tree, not a radius.
+[label,rfd_skrach_cook_skewered_chompy]
+if (%100_ogre_prog ! ^rfd_skrach_chompy_skewered | stat(cooking) < ^rfd_skrach_cooking_level) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $min_x = sub(coordx(^rfd_skrach_karamja_arrow_tree), ^rfd_skrach_karamja_cook_radius);
+def_int $max_x = add(coordx(^rfd_skrach_karamja_arrow_tree), ^rfd_skrach_karamja_cook_radius);
+def_int $min_z = sub(coordz(^rfd_skrach_karamja_arrow_tree), ^rfd_skrach_karamja_cook_radius);
+def_int $max_z = add(coordz(^rfd_skrach_karamja_arrow_tree), ^rfd_skrach_karamja_cook_radius);
+if (coordx(loc_coord) < $min_x | coordx(loc_coord) > $max_x | coordz(loc_coord) < $min_z | coordz(loc_coord) > $max_z) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+anim(human_potterywheel, 0);
+sound_synth(spit_roast, 1, 0);
+p_delay(2);
+inv_del(inv, spit_skewered_chompy, 1);
+inv_add(inv, spit_iron, 1);
+if (stat_random(cooking, ^rfd_skrach_chompy_cook_min, ^rfd_skrach_chompy_cook_max) = true) {
+    inv_add(inv, cooked_chompy, 1);
+    stat_advance(cooking, ^rfd_skrach_chompy_cook_xp);
+    %100_ogre_prog = ^rfd_skrach_chompy_roasted;
+    %100_ogre_jubbly_boat_visible = 1;
+    %100_ogre_boat_free_ride = 1;
+} else {
+    inv_add(inv, ruined_chompy, 1);
+    %100_ogre_prog = ^rfd_skrach_tree_cut_twice;
+}
+
+// VERIFIED native Pile of Rock forms; UNKNOWN ballast yield mapping and quest-only gathering rule.
+[oploc1,swamp_rock1] @rfd_skrach_mine_rock;
+[oploc3,swamp_rock1] @rfd_skrach_mine_rock;
+[oplocu,swamp_rock1]
+if (oc_category(last_useitem) ! weapon_pickaxe) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@rfd_skrach_mine_rock;
+
+[label,rfd_skrach_mine_rock]
+if (%100_ogre_prog ! ^rfd_skrach_jubbly_ready | %100_ogre_jubbly_push_tree < ^rfd_skrach_tree_done_selector) return;
+if (loc_coord ! 0_41_46_13_52 & loc_coord ! 0_41_46_15_51 & loc_coord ! 0_41_46_15_54) return;
+if (inv_total(inv, rock) >= ^rfd_skrach_rocks_required) return;
+def_obj $pickaxe = ~pickaxe_checker;
+if ($pickaxe = null | inv_freespace(inv) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// Use the ordinary pickaxe's swing rate for the native quest rock.
+if (%action_delay < map_clock) {
+    %action_delay = add(map_clock, oc_param($pickaxe, mining_rate));
+    anim(oc_param($pickaxe, mining_animation), 0);
+}
+sound_synth(mine_quick, 1, 0);
+if (%action_delay ! map_clock) {
+    p_oploc(3);
+    return;
+}
+anim(oc_param($pickaxe, mining_animation), 0);
+inv_add(inv, rock, 1);
+if (%100_ogre_jubbly_push_tree = ^rfd_skrach_tree_done_selector) {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_rock_one_selector;
+} else if (%100_ogre_jubbly_push_tree = ^rfd_skrach_rock_one_selector) {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_rock_two_selector;
+} else if (%100_ogre_jubbly_push_tree = ^rfd_skrach_rock_two_selector) {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_rock_three_selector;
+}
+
+// UNKNOWN mapping: quest rock yields the original generic rock item, not gold ore.
+[opheldu,bloated_toad]
+switch_obj(last_useitem) {
+    case filled_ogre_bellow3, filled_ogre_bellow2, filled_ogre_bellow1 : @rfd_skrach_inflate_balloon;
+    case default : ~displaymessage(^dm_default);
+};
+
+[label,rfd_skrach_inflate_balloon]
+if (%100_ogre_prog ! ^rfd_skrach_jubbly_ready | %100_ogre_jubbly_push_tree < ^rfd_skrach_tree_done_selector) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_obj $bellows = last_useitem;
+def_int $placed = max(0, sub(%100_ogre_jubbly_push_tree, ^rfd_skrach_rock_three_selector));
+def_int $balloons = add(inv_total(inv, 100_jubbly_balloon_toad_brown), inv_total(inv, 100_jubbly_balloon_toad_white));
+if (add($placed, $balloons) >= ^rfd_skrach_balloons_required | inv_total(inv, rock) < 1 | inv_total(inv, ball_of_wool) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, bloated_toad, 1);
+inv_del(inv, rock, 1);
+// UNKNOWN: the single required ball of wool is reusable for the three toad balloons.
+inv_add(inv, 100_jubbly_balloon_toad_brown, 1);
+~reduce_ogre_bellows($bellows);
+
+// UNKNOWN release mapping: reuse ordinary toad release; only Drop places weighted bait.
+[opheld1,100_jubbly_balloon_toad_brown] ~rfd_skrach_drop_balloon(100_jubbly_balloon_toad_brown, 100_jubbly_balloon_toad_brown);
+[opheld5,100_jubbly_balloon_toad_brown] inv_delslot(inv, last_slot); ~release_toad;
+[opheld4,100_jubbly_balloon_toad_brown] ~rfd_skrach_release_balloons(100_jubbly_balloon_toad_brown);
+[opheld1,100_jubbly_balloon_toad_white] ~rfd_skrach_drop_balloon(100_jubbly_balloon_toad_white, 100_jubbly_balloon_toad_white);
+[opheld5,100_jubbly_balloon_toad_white] inv_delslot(inv, last_slot); ~release_toad;
+[opheld4,100_jubbly_balloon_toad_white] ~rfd_skrach_release_balloons(100_jubbly_balloon_toad_white);
+
+[proc,rfd_skrach_release_balloons](obj $item)
+def_int $count = inv_total(inv, $item);
+inv_del(inv, $item, $count);
+while ($count > 0) {
+    ~release_toad;
+    $count = sub($count, 1);
+}
+
+[proc,rfd_skrach_drop_balloon](obj $item, npc $balloon)(boolean)
+if (%100_ogre_prog ! ^rfd_skrach_jubbly_ready | %100_ogre_jubbly_push_tree < ^rfd_skrach_tree_done_selector | inv_total(inv, $item) < 1) return(false);
+def_coord $bait = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($bait = null) return(false);
+def_int $placed = max(0, sub(%100_ogre_jubbly_push_tree, ^rfd_skrach_rock_three_selector));
+if ($placed >= ^rfd_skrach_balloons_required) return(false);
+inv_del(inv, $item, 1);
+npc_add($bait, $balloon, ^rfd_skrach_jubbly_lifetime);
+%npc_attacking_uid = uid;
+npc_setmode(none);
+npc_sethuntmode(null);
+if ($placed = sub(^rfd_skrach_balloons_required, 1)) {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_bait_three_selector;
+    npc_queue(4, 1, 1);
+} else if ($placed = 0) {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_bait_one_selector;
+} else {
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_bait_two_selector;
+}
+return(true);
+
+[ai_queue4,100_jubbly_balloon_toad_brown]
+@rfd_skrach_balloon_wait;
+[ai_queue4,100_jubbly_balloon_toad_white]
+@rfd_skrach_balloon_wait;
+
+[label,rfd_skrach_balloon_wait]
+if (last_int ! 1) return;
+def_player_uid $baiter = %npc_attacking_uid;
+if (p_finduid($baiter) = true) {
+    if (%100_ogre_prog ! ^rfd_skrach_jubbly_ready | %100_ogre_jubbly_push_tree ! ^rfd_skrach_bait_three_selector) {
+        npc_del;
+        return;
+    }
+    if (distance(npc_coord, coord) <= ^rfd_skrach_bait_spawn_radius) {
+        npc_queue(4, 1, 1);
+        return;
+    }
+    def_coord $spawn = map_findsquare(npc_coord, ^rfd_skrach_bait_spawn_radius, ^rfd_skrach_bait_spawn_radius, ^map_findsquare_lineofwalk);
+    if ($spawn = null) {
+        npc_queue(4, 1, 1);
+        return;
+    }
+    // UNKNOWN recovery mapping: a real spawn releases the next bait attempt.
+    %100_ogre_jubbly_push_tree = ^rfd_skrach_tree_done_selector;
+    npc_del;
+    npc_add($spawn, 100_jubbly_bird, ^rfd_skrach_jubbly_lifetime);
+    %quest_chompybird_baiter = $baiter;
+    npc_anim(chompy_landing, 0);
+    npc_setmode(none);
+    return;
+}
+// A protected player action can temporarily prevent access.
+npc_queue(4, 1, 1);
+
+[apnpc5,100_jubbly_bird] @player_combat_chompybird_start;
+[opnpc5,100_jubbly_bird] @player_combat_chompybird_start;
+
+[ai_queue3,100_jubbly_bird]
+def_player_uid $baiter = %quest_chompybird_baiter;
+def_int $hero = npc_findhero;
+gosub(npc_death);
+if ($hero ! ^true) return;
+npc_add(npc_coord, 100_jubbly_bird_dead, ^rfd_skrach_jubbly_lifetime);
+%quest_chompybird_baiter = $baiter;
+
+[opnpc4,100_jubbly_bird_dead]
+if (%100_ogre_prog ! ^rfd_skrach_jubbly_ready | %quest_chompybird_baiter ! uid) {
+    ~displaymessage(^dm_default);
+    return;
+}
+anim(human_pickupfloor, 0);
+p_delay(1);
+obj_add(npc_coord, 100_jubbly_meat_raw, 1, ^lootdrop_duration);
+npc_del;
+
+[label,rfd_skrach_cook_jubbly]
+if (%100_ogre_prog ! ^rfd_skrach_jubbly_ready | stat(cooking) < ^rfd_skrach_cooking_level | loc_coord ! 0_41_46_6_46) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, 100_jubbly_meat_raw) < 1) return;
+loc_change(100_jubbly_spitroast, ^rfd_skrach_spit_duration);
+loc_anim(roast);
+anim(human_potterywheel, 0);
+sound_synth(spit_roast, 1, 0);
+p_delay(2);
+inv_del(inv, 100_jubbly_meat_raw, 1);
+if (stat_random(cooking, ^rfd_skrach_jubbly_cook_min, ^rfd_skrach_jubbly_cook_max) = true) {
+    loc_change(100_jubbly_spitroast_cooked, ^rfd_skrach_spit_duration);
+    loc_anim(roast);
+    anim(human_potterywheel, 0);
+    p_delay(2);
+    anim(human_pickuptable, 0);
+    inv_add(inv, 100_jubbly_meat_cooked, 1);
+    stat_advance(cooking, ^rfd_skrach_jubbly_cook_xp);
+} else {
+    loc_change(100_jubbly_spitroast_ruined, ^rfd_skrach_spit_duration);
+    loc_anim(roast);
+    anim(human_potterywheel, 0);
+    p_delay(2);
+    anim(human_pickuptable, 0);
+    inv_add(inv, 100_jubbly_meat_burned, 1);
+}
