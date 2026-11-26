@@ -449,12 +449,15 @@ assert.equal(p.getVar(gardenerMaskVarp), 1, 'Elstan has its own permanent player
 talk(p, 'elstan', [1, 2], { actor: gardener, seedSelector: true });
 assert.equal(stage(p), 2, 'revisiting the same gardener cannot count twice');
 assert.equal(p.getVar(gardenerMaskVarp), 1, 'revisiting preserves the exact mask');
-add(p, 'onion');
+p.setVarBit(varbit('garden_lyra_varbit'), 1);
+p.setVarBit(varbit('farming_allotment_varp_2_16_23'), 17);
+wear(p, 'ring_of_charos_unlocked');
 const lyra = placedNpc('lyra');
 talk(p, 'lyra', [1, 1], { actor: lyra, seedSelector: true });
 assert.equal(stage(p), 2, 'the separate Garden of Tranquillity branch does not advance FT1');
-assert.equal(count(p, 'onion'), 0);
-assert.equal(count(p, 'garden_orchid_pink_seed'), 1, 'the existing Lyra seed exchange still works');
+assert.equal(p.getVarBit(varbit('farming_allotment_varp_2_16_23')), 17, 'Lyra inspects the mature local onions without harvesting them');
+assert.equal(count(p, 'garden_orchid_pink_seed'), 3, 'the Lyra Garden trade supplies three pink orchid seeds');
+assert.equal(count(p, 'garden_orchid_yellow_seed'), 3, 'the Lyra Garden trade supplies three yellow orchid seeds');
 talk(p, 'lyra', [1, 2], { actor: lyra, seedSelector: true });
 assert.equal(stage(p), 3, 'second distinct GAG gardener reports insects');
 const kragen = placedNpc('kragen');
