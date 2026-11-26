@@ -1,0 +1,69 @@
+// CANDIDATE: src.keldagrim-townsfolk-west-boatmen-transcript, Giant Dwarf
+// progress and first completion report. Ordinary/Forget branches stay shared.
+[label,giantdwarf_brothers_menu]
+def_string $statue = "I need some help with this statue...";
+def_int $offer_statue = 1;
+if (%giantdwarf_quest >= ^giantdwarf_complete) {
+    $statue = "I have rebuilt the statue for the <~giantdwarf_company_name(%giantdwarf_original_company)>!";
+    if (%giantdwarf_brothers_toldsuccess = 1) $offer_statue = 0;
+}
+def_int $choice = 0;
+if ($offer_statue = 1) {
+    if (%forget_quest = 1) {
+        $choice = ~p_choice5("Any good spots to fish around here?", 1, "What are these mines used for?", 2, $statue, 3, "Do you know about this drunken dwarf...?", 4, "I must be off now.", 5);
+    } else {
+        $choice = ~p_choice4("Any good spots to fish around here?", 1, "What are these mines used for?", 2, $statue, 3, "I must be off now.", 5);
+    }
+} else {
+    if (%forget_quest = 1) {
+        $choice = ~p_choice4("Any good spots to fish around here?", 1, "What are these mines used for?", 2, "Do you know about this drunken dwarf...?", 4, "I must be off now.", 5);
+    } else {
+        $choice = ~p_choice3("Any good spots to fish around here?", 1, "What are these mines used for?", 2, "I must be off now.", 5);
+    }
+}
+if ($choice = 1) @keldagrim_west_boatmen_fishing;
+if ($choice = 2) @keldagrim_west_boatmen_mines;
+if ($choice = 4) @keldagrim_west_boatmen_drunk;
+if ($choice = 5) @keldagrim_west_boatmen_goodbye;
+if (%giantdwarf_quest >= ^giantdwarf_complete) {
+    ~chatplayer("<p,neutral>I have rebuilt the statue for the <~giantdwarf_company_name(%giantdwarf_original_company)>!");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,quiz>What, really?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Of course, really! <displayname> wouldn't have said it otherwise, would <text_gender("he", "she")>?");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>And didn't you see Blasidar working on the statue?");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Oh yes, he was out there for quite a while.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>That must have been a huge task.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Nothing's too difficult for old Blasidar.");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>He truly is a master builder.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>We can all take an example to his hard work and dedication.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Speaking of, shouldn't we get back to work ourselves?");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Quite right. Anything else you wanted, <displayname>?");
+    ~chatplayer("<p,neutral>Never mind.");
+    %giantdwarf_brothers_toldsuccess = 1;
+    @giantdwarf_brothers_menu;
+}
+~chatplayer("<p,neutral>I need some help with this statue... King Alvis' statue, to be precise.");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Oh yes, what's the problem then?");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>It was knocked down, remember? Parts of it nearly landed on our heads?");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>A terrible noise it made too!");
+if (%giantdwarf_quest < 5) {
+    ~chatplayer("<p,neutral>This sculptor has got me looking for a lot of items, you see.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Items eh?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>We love items.");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Can't get enough of them.");
+    ~chatplayer("<p,neutral>Well, can you he-");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>I got this puzzle box once, you know.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Oh, not that story again.");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>You have told that story before, Dernu.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Well forget about it then. I'll shut up if you don't want to hear about it.");
+} else {
+    ~chatplayer("<p,neutral>Well, the sculptor only needs to build the head now. But I need to get the Consortium to help me with that.");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>The Consortium, you say?");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>You're going to talk to the Consortium?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>My, you're certainly moving up in the dwarven world, aren't you?");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>What do you need us for then?");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>We are but simple dwarves.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Especially you, Dernu.");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Now now, Derni, there was no need for that.");
+}
+~chatplayer("<p,neutral>Never mind.");
+@giantdwarf_brothers_menu;

@@ -503,7 +503,7 @@ assert(!retry.packets.some(message => message.kind === 'CamMoveTo' || message.ki
 const completed = player(retry.save());
 assert.equal(completed.getVarBit(id('varbit', 'giantdwarf_quest')), 2);
 assert.equal(completed.getVarBit(id('varbit', 'giantdwarf_veldaban_introduced')), 1);
-for (const [stage, introduced] of [[0, 0], [1, 1], [2, 1]]) {
+for (const [stage, introduced] of [[0, 0], [1, 1], [50, 1]]) {
   const other = player();
   other.setVarBit(id('varbit', 'giantdwarf_quest'), stage);
   other.setVarBit(id('varbit', 'giantdwarf_veldaban_introduced'), introduced);
@@ -511,7 +511,17 @@ for (const [stage, introduced] of [[0, 0], [1, 1], [2, 1]]) {
   assert(other.packets.some(message => message.text?.includes('Have you heard?')),
     `existing Forget dispatch outside unfinished GD state ${stage}/${introduced} is unchanged`);
 }
-console.log('OK saved HQ interruption, refusal and repeated interruption recover through real Veldaban Talk-to; acceptance persists and Forget remains unchanged outside the recovery state');
+const inProgress = player();
+inProgress.setVarBit(id('varbit', 'giantdwarf_quest'), 2);
+inProgress.setVarBit(id('varbit', 'giantdwarf_veldaban_introduced'), 1);
+inProgress.setVarBit(id('varbit', 'forget_quest'), 1);
+const reminder = talkVeldaban(inProgress);
+assert(inProgress.packets.some(message => message.text?.startsWith('How are you getting on with rebuilding our statue,')),
+  'accepted Giant Dwarf work gets its in-progress reminder');
+finishBriefing(inProgress, reminder, true);
+assert.equal(inProgress.getVarBit(id('varbit', 'giantdwarf_quest')), 2, 'the reminder preserves Giant Dwarf progress');
+assert.equal(inProgress.getVarBit(id('varbit', 'forget_quest')), 1, 'the reminder preserves concurrent Forgettable Tale progress');
+console.log('OK saved HQ recovery; the stage-two reminder preserves both quests, and inactive/completed Giant Dwarf keeps Forget dispatch');
 const { trip: emptyTrip } = runIntro();
 assertRestoredBonuses(emptyTrip, []);
 const interrupted = runIntro([], true);

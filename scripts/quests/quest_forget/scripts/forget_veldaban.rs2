@@ -12,6 +12,10 @@ if (%giantdwarf_quest = 1 & %giantdwarf_veldaban_introduced = 0) {
     ~giantdwarf_veldaban_intro;
     return;
 }
+if (%giantdwarf_quest >= 2 & %giantdwarf_quest < ^giantdwarf_complete) {
+    ~giantdwarf_veldaban_progress;
+    return;
+}
 ~chatnpc("<p,neutral><displayname>! Have you heard?");
 ~chatnpc("<p,neutral>It's the Red Axe!");
 ~chatnpc("<p,neutral>They've left the city!");

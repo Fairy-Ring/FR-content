@@ -1,0 +1,9 @@
+// Original unused 377 slots 249/250, pre-reserved for this quest.
+// UNKNOWN internal representation. Durable errands survive travel and logout.
+[giantdwarf_statue_work]
+scope=perm
+transmit=no
+
+[giantdwarf_company_work]
+scope=perm
+transmit=no

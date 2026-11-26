@@ -1,18 +1,45 @@
 // CANDIDATE: Transcript:The Giant Dwarf, before enough secretary tasks.
-// No normal account can reach the unpublished company-selection/task states.
 [opnpc1,dwarf_city_director_purple_pewter]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(1);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Purple Pewter.");
 [opnpc1,dwarf_city_director_blue_opal]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(3);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Blue Opal.");
 [opnpc1,dwarf_city_director_yellow_fortune]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(2);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Yellow Fortune.");
 [opnpc1,dwarf_city_director_green_gemstone]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(4);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Green Gemstone.");
 [opnpc1,dwarf_city_director_white_chisel]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(5);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the White Chisel.");
 [opnpc1,dwarf_city_director_silver_cog]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(6);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Silver Cog.");
 [opnpc1,dwarf_city_director_brown_engine]
+if (%giantdwarf_quest >= 5) {
+    ~giantdwarf_company_director(7);
+    return;
+}
 ~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Brown Engine.");
 
 [proc,keldagrim_director](string $company_inquiry)
@@ -50,13 +77,16 @@ switch_int (random(^keldagrim_referee_greetings)) {
 ~mesbox("The cat appears to be sleeping, you'd better leave it alone.");
 
 // CANDIDATE: Transcript:Dromund's cat, without a catspeak amulet.
-// The published build cannot award that amulet or reach the boot-theft state.
 [opnpc1,dwarf_city_guarding_cat]
 ~chatnpc("<p,neutral>Meow!");
 
 // CANDIDATE: Transcript:The Giant Dwarf, before agreeing to help Blasidar.
 // His item-collection states and all other model forms remain quest-owned.
 [opnpc1,dwarf_city_shop_sculpture_model]
+if (%giantdwarf_quest >= 3) {
+    ~giantdwarf_riki;
+    return;
+}
 ~chatplayer("<p,neutral>Hello there, can you help me?");
 ~chatnpc("<p,neutral>Talk... to Blasidar.");
 ~chatplayer("<p,neutral>What? No, I was wondering if you could help me.");

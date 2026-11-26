@@ -1,0 +1,165 @@
+// VERIFIED sequence/rewards: src.gd-tipit-20060502, The head / Reward.
+// CANDIDATE speeches: retained src.gd-osrs-transcript-1104, Art by committee,
+// with the explicitly preserved pre-9-November-2022 opening.
+// UNKNOWN engineering presentation: player-local camera in the real palace,
+// without moving shared actors or reserving a later transcript's sixteen rooms.
+[proc,giantdwarf_veldaban_progress]()
+if (%giantdwarf_quest < 7) {
+    ~chatnpc("<p,neutral>How are you getting on with rebuilding our statue, <displayname>?");
+    ~chatplayer("<p,neutral>I haven't really done much yet...");
+    ~chatnpc("<p,neutral>Get back to it as soon as you can, please!");
+    return;
+}
+~chatnpc("<p,neutral>What news from the Consortium, <displayname>?");
+~chatplayer("<p,neutral>I have told the director of the <~giantdwarf_company_name(%giantdwarf_current_company)> that I will support their bid to be put upon the statue.");
+~chatnpc("<p,neutral>Then perhaps they can finally end their impasse! Well, let's go to the meeting then!");
+~chatplayer("<p,quiz>What, now?");
+~chatnpc("<p,neutral>Yes, now! Are you ready?");
+if (~p_choice2("I'm ready.", 1, "No, I need more time.", 2) = 2) {
+    ~chatplayer("<p,neutral>No, I need more time.");
+    ~chatnpc("<p,neutral>Very well then. Come back when you're ready, but hurry! You don't want to miss the meeting.");
+    return;
+}
+~chatplayer("<p,neutral>I'm ready.");
+~chatnpc("<p,neutral>I do have to warn you, this meeting may take a while. Do you want to attend the meeting personally, or do you simply want the minutes of the meetings so you can read what happened afterwards?");
+def_int $attend = ~p_choice2("I want to see the meeting.", 1, "I do NOT want to attend, I don't have time to waste.", 2);
+if ($attend = 2) {
+    ~chatplayer("<p,neutral>I do NOT want to attend, I don't have time to waste.");
+    ~chatnpc("<p,neutral><displayname>, are you absolutely sure? You might not get another chance like this. Are you sure you just want to read the summary of the meeting instead of seeing the actual meeting?");
+    $attend = ~p_choice2("On second thought, I can spare a few minutes to attend.", 1, "I just have a lot of smithing to do today, I can't attend.", 2);
+}
+if ($attend = 1) {
+    ~chatnpc("<p,neutral>Happy to hear that! Let's hurry then, I think the meeting is already starting!");
+    ~giantdwarf_consortium_meeting;
+} else {
+    ~chatnpc("<p,neutral>Very well. I'll give you the meeting minutes after it's finished.");
+    if_close;
+    if_openoverlay(fade_to_black);
+    p_delay(2);
+    if_openoverlay(null);
+}
+~giantdwarf_complete;
+
+[proc,giantdwarf_meeting_line](npc $speaker, string $words)
+// UNKNOWN engineering holds. These are not measured original cutscene timings.
+split_init($words, 380, 4, q8_full);
+~giantdwarf_timed_npcchat(nc_name($speaker), $speaker, 4);
+
+[proc,giantdwarf_consortium_meeting]()
+if_close;
+if_openoverlay(fade_to_black);
+p_delay(2);
+// Original palace floor: camera and account stay on the same map level.
+p_telejump(1_44_159_55_25);
+minimap_toggle(2);
+cam_moveto(1_44_159_57_18, 500, 0, 100);
+cam_lookat(1_44_159_57_29, 100, 0, 100);
+p_delay(2);
+if_openoverlay(inter_273);
+if_sethide(inter_273:com_10, true);
+if_sethide(inter_273:com_11, true);
+if_sethide(inter_273:com_12, true);
+if_sethide(inter_273:com_13, false);
+if_sethide(inter_273:com_14, true);
+if_sethide(inter_273:com_15, true);
+if_sethide(inter_273:com_16, true);
+p_delay(4);
+if_openoverlay(null);
+~giantdwarf_meeting_line(dwarf_city_director_brown_engine, "<p,neutral>Clearly it is I who is most suitable.");
+~giantdwarf_meeting_line(dwarf_city_director_yellow_fortune, "<p,angry>A male? How preposterous!");
+~giantdwarf_meeting_line(dwarf_city_director_silver_cog, "<p,neutral>But the statue is clearly male! It can't have a female head!");
+~giantdwarf_meeting_line(dwarf_city_director_red_axe, "<p,angry>Enough of this, everyone! This bickering is pointless.");
+~giantdwarf_meeting_line(dwarf_city_director_red_axe, "<p,neutral>The Red Axe is the largest and wealthiest mining company, we have all rights here!");
+if (%dwarfrock_quest >= ^dwarfrock_complete) {
+    ~giantdwarf_meeting_line(dwarf_city_director_white_chisel, "<p,neutral>Dondakan's breaking of his rock, and the finding of his gold, has laid doubt to that claim!");
+    ~giantdwarf_meeting_line(dwarf_city_director_blue_opal, "<p,neutral>It is not yet clear what consequences that discovery will have on the economy.");
+} else {
+    ~giantdwarf_meeting_line(dwarf_city_director_white_chisel, "<p,neutral>The fact that The Red Axe does its accounting behind closed doors makes that claim quite dubious!");
+    ~giantdwarf_meeting_line(dwarf_city_director_blue_opal, "<p,neutral>We are not assembled here to squabble over accounting details or the economic state of the Consortium.");
+}
+~giantdwarf_meeting_line(dwarf_city_director_green_gemstone, "<p,quiz>Perhaps, then, we should choose a director for the statue at random?");
+~giantdwarf_meeting_line(dwarf_city_director_red_axe, "<p,angry>No! I will go on top of that statue! I proposed this in the first place!");
+~giantdwarf_meeting_line(dwarf_city_black_guard_leader, "<p,neutral>Veldaban, Commander of the Black Guard in Keldagrim, presenting himself to the Consortium with a guest.");
+anim(human_bow, 0);
+~giantdwarf_meeting_line(dwarf_city_director_red_axe, "<p,angry>A human, at a Consortium meeting? What is this?");
+~giantdwarf_meeting_line(dwarf_city_black_guard_leader, "<p,neutral>This human helped to rebuild the statue. <text_gender("He deserves", "She deserves")> this honour, surely?");
+~giantdwarf_meeting_line(dwarf_city_director_purple_pewter, "<p,neutral>Aye.");
+~giantdwarf_meeting_line(dwarf_city_director_green_gemstone, "<p,neutral>Aye.");
+~giantdwarf_meeting_line(dwarf_city_director_silver_cog, "<p,neutral>Aye.");
+~giantdwarf_meeting_line(dwarf_city_director_purple_pewter, "<p,quiz>Well then... instead of flipping a coin, why don't we let the human decide?");
+~giantdwarf_meeting_line(dwarf_city_director_brown_engine, "<p,happy>Amusing, I accept!");
+~giantdwarf_meeting_line(dwarf_city_director_red_axe, "<p,angry>This is outrageous! I'm warning you, The Red Axe will boycott the Trade Octagon!");
+~giantdwarf_meeting_line(dwarf_city_director_yellow_fortune, "<p,neutral>Stop your hollow threats and let the human speak.");
+~giantdwarf_meeting_line(dwarf_city_black_guard_leader, "<p,quiz>Well then, <displayname>, what is it going to be?");
+split_init("<p,neutral>I choose...", 380, 4, q8_full);
+~giantdwarf_timed_playerchat(3);
+split_init("<p,happy>The <~giantdwarf_company_name(%giantdwarf_current_company)>!", 380, 4, q8_full);
+~giantdwarf_timed_playerchat(4);
+~giantdwarf_meeting_line(dwarf_city_director_red_axe, "<p,angry>You'll regret this, all of you!");
+if_close;
+if_openoverlay(fade_to_black);
+p_delay(2);
+%giantdwarf_red_traders_gone = 1;
+%giantdwarf_red_axe_gone = 1;
+%giantdwarf_statue_invis = 0;
+p_telejump(0_44_159_46_4);
+cam_moveto(0_44_158_58_56, 1340, 0, 100);
+cam_lookat(0_45_159_0_3, 120, 0, 100);
+p_delay(2);
+if_openoverlay(inter_273);
+if_sethide(inter_273:com_13, true);
+if_sethide(inter_273:com_14, false);
+p_delay(6);
+if_sethide(inter_273:com_14, true);
+if_openoverlay(fade_to_black);
+p_delay(2);
+p_telejump(0_44_159_11_39);
+cam_reset();
+minimap_toggle(0);
+p_delay(2);
+if_openoverlay(null);
+~music_playbycoord(coord);
+
+[proc,giantdwarf_complete]()
+if (%giantdwarf_quest ! 7) return;
+// Commit the durable terminal state and rewards together, before the scroll.
+%giantdwarf_quest = ^giantdwarf_complete;
+%giantdwarf_red_traders_gone = 1;
+%giantdwarf_red_axe_gone = 1;
+%giantdwarf_statue_invis = 0;
+%giantdwarf_cutscene_guard_visible = 0;
+// VERIFIED 16-April-2006 Tip.It reward list. STAT_ADVANCE takes tenths of XP.
+stat_advance(mining, 25000);
+stat_advance(smithing, 25000);
+stat_advance(crafting, 25000);
+stat_advance(magic, 15000);
+stat_advance(thieving, 15000);
+stat_advance(firemaking, 15000);
+~giantdwarf_give_notes;
+~send_quest_complete(questlist:giantdwarf, dwarf_quest_complete_icon, 200, ^giantdwarf_questpoints, "You have completed The Giant Dwarf!", "2,500 Mining, Smithing and Crafting XP|1,500 Magic, Thieving and Firemaking XP");
+
+[proc,giantdwarf_give_notes]()
+if (inv_total(inv, dwarf_meeting_notes1) > 0 | inv_total(bank, dwarf_meeting_notes1) > 0) return;
+if (inv_freespace(inv) > 0) inv_add(inv, dwarf_meeting_notes1, 1);
+else obj_add(coord, dwarf_meeting_notes1, 1, ^lootdrop_duration);
+
+[opheld1,dwarf_meeting_notes1]
+// Source-backed meeting lines also serve as readable minutes, without new prose.
+~mesbox("Clearly it is I who is most suitable.");
+~mesbox("Enough of this, everyone! This bickering is pointless.");
+~mesbox("Well then... instead of flipping a coin, why don't we let the human decide?");
+~mesbox("I choose...");
+~mesbox("The <~giantdwarf_company_name(%giantdwarf_original_company)>!");
+~mesbox("You'll regret this, all of you!");
+
+[if_button,questlist:giantdwarf]
+// Functional journal composed only from retained dialogue, not invented prose.
+def_string $text = "Dwarven Boatman|No no, that's what the ferryman is for! I'm going to Keldagrim, my home!";
+if (%giantdwarf_quest = 1) $text = "Commander Veldaban|Yes, I will do this.";
+if (%giantdwarf_quest >= 2) $text = "Commander Veldaban|Now, I need you to go to Blasidar, he is a sculptor who lives in Keldagrim-East.";
+if (%giantdwarf_quest >= 3) $text = "Don't worry, I'll be back later with all those items!";
+if (%giantdwarf_quest >= 4) $text = "I've all the items you asked me to get you. Can you make the statue now?";
+if (%giantdwarf_quest >= 5) $text = "Well, the sculptor only needs to build the head now. But I need to get the Consortium to help me with that.";
+if (%giantdwarf_quest = 7) $text = "Commander Veldaban|Then perhaps they can finally end their impasse! Well, let's go to the meeting then!";
+if (%giantdwarf_quest >= ^giantdwarf_complete) $text = "<col=000080>I have rebuilt the statue for the <~giantdwarf_company_name(%giantdwarf_original_company)>!";
+~quest_journal("The Giant Dwarf", $text);

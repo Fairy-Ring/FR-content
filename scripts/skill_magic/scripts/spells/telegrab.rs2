@@ -13,6 +13,9 @@ if (afk_event = ^true) {
     ~macro_event_general_spawn(~macro_event_set_random);
     return;
 }
+if (obj_type = dwarf_perfect_right_boot & ~giantdwarf_boots_telegrab_guard = true) {
+    return;
+}
 // display tea
 if (obj_type = display_tea) {
     ~chatnpc_specific(nc_name(tea_seller), tea_seller, "<p,angry>Hey! Put that back! Those are for display only!");

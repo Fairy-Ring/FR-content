@@ -390,6 +390,9 @@ if (~rag_stage >= ^rag_complete) {
 if (%roving_elves_quest >= ^roving_complete) {
     $questpoints = add($questpoints, ^roving_questpoints);
 }
+if (%giantdwarf_quest >= ^giantdwarf_complete) {
+    $questpoints = add($questpoints, ^giantdwarf_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -494,6 +497,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:deal, %deal_quest, ^deal_complete);
 ~send_quest_progress_colour(questlist:roving_elves, %roving_elves_quest, ^roving_complete);
 ~send_quest_progress_colour(questlist:tog, %tog_juna_bowl, ^tog_quest_complete);
+~send_quest_progress_colour(questlist:giantdwarf, %giantdwarf_quest, ^giantdwarf_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {
