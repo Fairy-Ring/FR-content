@@ -1,0 +1,47 @@
+// Coordinates observed in the original JM2 rows. Landing/spawn choices are UNKNOWN engineering selections.
+^ics_little_pyramid_entry = 0_51_143_14_20
+^ics_little_pyramid_surface = 0_51_43_31_28
+^ics_little_west_door = 0_51_143_16_47
+^ics_little_east_door = 0_51_143_42_47
+^ics_little_west_door_inside = 0_51_143_16_46
+^ics_little_west_door_outside = 0_51_143_16_48
+^ics_little_east_door_inside = 0_51_143_42_46
+^ics_little_east_door_outside = 0_51_143_42_48
+^ics_little_guardian_spawn = 0_51_143_22_40
+// VERIFIED q97:46 threshold, using the engine's 0..10000 run-energy scale.
+^ics_little_pit_min_runenergy = 2000
+// UNKNOWN low-energy fall recovery destination.
+^ics_little_pit_fail_landing = 0_51_143_14_20
+^ics_little_possessed_spawn = 0_51_143_42_43
+^ics_little_pit_west_land_9194 = 0_51_143_26_42
+^ics_little_pit_west_land_9196 = 0_51_143_26_44
+^ics_little_pit_east_land_9194 = 0_51_143_33_42
+^ics_little_pit_east_land_9196 = 0_51_143_33_44
+// UNKNOWN: generous encounter expiry; owner logout/exit also removes the NPC.
+^ics_little_encounter_lifetime = 3000
+^ics_little_encounter_search_radius = 64
+^ics_little_puzzle_goal = 0
+// UNKNOWN but solvable: XOR of legal toggles at (0,0), (2,2), and (4,4) from the all-zero goal.
+^ics_little_puzzle_scramble = 25901475
+// Broad bounds cover the complete original m51_143 pyramid chamber map.
+^ics_little_pyramid_min_x = 3264
+^ics_little_pyramid_max_x = 3327
+^ics_little_pyramid_min_z = 9152
+^ics_little_pyramid_max_z = 9215
+// Original eastern burial chamber sarcophagus row bounds.
+^ics_little_east_room_min_x = 3299
+^ics_little_east_room_max_x = 3312
+^ics_little_east_room_min_z = 9191
+^ics_little_east_room_max_z = 9199
+// Original western chamber pot positions; west/east landing tiles above are adjacent floor candidates.
+^ics_little_pot_x = 3286
+^ics_little_pot_intestines_z = 9193
+^ics_little_pot_liver_z = 9194
+^ics_little_pot_lungs_z = 9195
+^ics_little_pot_stomach_z = 9196
+// UNKNOWN: favourable floor-trigger positions and damage, not period-authenticated values.
+^ics_little_floor_trap_1 = 0_51_143_46_21
+^ics_little_floor_trap_2 = 0_51_143_45_23
+^ics_little_floor_trap_3 = 0_51_143_46_25
+^ics_little_trap_damage = 1
+^ics_little_sarcophagus_damage = 1

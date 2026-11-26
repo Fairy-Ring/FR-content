@@ -73,6 +73,11 @@ if (%ics_little_var = 11) {
     ~chatnpc("<p,neutral>The Carpenter should have finished the holy symbol.");
     return;
 }
+if (%ics_little_var = 19 & coordz(coord) > 9000) {
+    // UNKNOWN retry interaction after leaving an unfinished ceremony.
+    ~ics_little_start_possessed_priest;
+    return;
+}
 if (%ics_little_var = 24 & coordz(coord) > 9000) {
     ~chatnpc("<p,neutral>Thank you. Meet me at the temple in Sophanem.");
     %ics_little_var = 25;

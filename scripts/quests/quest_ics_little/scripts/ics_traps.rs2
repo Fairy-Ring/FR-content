@@ -1,0 +1,33 @@
+// VERIFIED q97:42: the pyramid has avoidable wall and floor traps.
+// Original wall-crusher locs supply their real positions. UNKNOWN: the three
+// floor-trigger tiles and one-point trap damage are favourable engineering defaults.
+// Zone timers also re-arm the checks after logging in within a trap corridor.
+[zone,0_51_143_8_16] settimer(ics_little_traps, 1);
+[zone,0_51_143_24_16] settimer(ics_little_traps, 1);
+[zone,0_51_143_32_16] settimer(ics_little_traps, 1);
+[zone,0_51_143_40_16] settimer(ics_little_traps, 1);
+[zone,0_51_143_40_24] settimer(ics_little_traps, 1);
+[zone,0_51_143_32_32] settimer(ics_little_traps, 1);
+
+[timer,ics_little_traps]
+if (~ics_little_in_pyramid(coord) = false) {
+    cleartimer(ics_little_traps);
+    return;
+}
+if (coord = ^ics_little_floor_trap_1 | coord = ^ics_little_floor_trap_2 | coord = ^ics_little_floor_trap_3) {
+    ~damage_self(^ics_little_trap_damage);
+    p_stopaction;
+    p_telejump(^ics_little_pit_fail_landing);
+    return;
+}
+if (loc_find(coord, deserttreasure_wall_crusher) = true) {
+    ~damage_self(^ics_little_trap_damage);
+}
+
+[oploc1,sarcophagus]
+if (~ics_little_in_east_room(loc_coord) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// VERIFIED q97:102: searching rather than hiding the symbol causes damage.
+~damage_self(^ics_little_sarcophagus_damage);

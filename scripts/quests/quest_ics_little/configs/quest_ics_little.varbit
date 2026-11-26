@@ -1,4 +1,4 @@
-# Quest-owned original 377 varbit definitions.
+// Quest-owned original 377 varbit definitions.
 [ics_ent_open]
 basevar=ics_little_multi
 startbit=20

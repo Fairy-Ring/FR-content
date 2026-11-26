@@ -1,0 +1,475 @@
+// Pyramid interactions use original locs/NPCs/varbits only.
+// VERIFIED q97: first Touch enters; the west-chamber tile board grants the jar and flashes the player outside.
+// UNKNOWN: initial board mask, selector-to-jar/guardian mapping, safe landings, and local recovery choices.
+
+[proc,ics_little_in_pyramid](coord $at)(boolean)
+if (coordx($at) < ^ics_little_pyramid_min_x | coordx($at) > ^ics_little_pyramid_max_x) return(false);
+if (coordz($at) < ^ics_little_pyramid_min_z | coordz($at) > ^ics_little_pyramid_max_z) return(false);
+return(true);
+
+[proc,ics_little_in_east_room](coord $at)(boolean)
+if (coordx($at) < ^ics_little_east_room_min_x | coordx($at) > ^ics_little_east_room_max_x) return(false);
+if (coordz($at) < ^ics_little_east_room_min_z | coordz($at) > ^ics_little_east_room_max_z) return(false);
+return(true);
+
+[proc,ics_little_teleport_check](coord $at)(boolean)
+// `$at` is the player's current tile in the native magic precheck.
+if (%ics_stateofmind = 1 & ~ics_little_in_pyramid($at) = true) return(false);
+if (%ics_stateofmind = 1) %ics_stateofmind = 0;
+return(true);
+
+[proc,ics_little_guardian]()(boolean)
+if (npc_type = ics_little_het | npc_type = ics_little_apmeken | npc_type = ics_little_scabaras | npc_type = ics_little_crondis) return(true);
+return(false);
+
+// Quiet admission predicate shared by native melee, ranged, and magic.
+[proc,ics_little_encounter_attackable]()(boolean)
+def_npc $type = npc_type;
+if ($type ! ics_little_het & $type ! ics_little_apmeken & $type ! ics_little_scabaras & $type ! ics_little_crondis & $type ! ics_little_possessedpriest) return(true);
+if (%npc_attacking_uid ! uid | ~ics_little_in_pyramid(coord) = false) return(false);
+if ($type = ics_little_possessedpriest) {
+    if (%ics_little_var = 19) return(true);
+    return(false);
+}
+if (%ics_little_var = 6) return(true);
+return(false);
+
+
+[oploc1,icthalarins_temple_door]
+if (%ics_little_var ! 2) return;
+%ics_stateofmind = 1;
+settimer(ics_little_traps, 1);
+p_telejump(^ics_little_pyramid_entry);
+
+[oploc3,icthalarins_temple_door]
+if (%ics_little_var < 5) return;
+if (~ics_little_has_cat = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+%ics_stateofmind = 0;
+if (%ics_little_var = 5 | %ics_little_var = 6) ~ics_little_set_pot_visibility(0);
+settimer(ics_little_traps, 1);
+p_telejump(^ics_little_pyramid_entry);
+
+// The western doorway owns the native tile puzzle. The eastern doorway is the
+// sourced exit/return trigger for the hidden symbol and the ceremony.
+[oploc1,doorway]
+if (loc_coord = ^ics_little_west_door & %ics_little_var = 2) {
+    if (%ics_little_tilecount = 0 & %ics_tilechecker = 0) ~ics_little_puzzle_reset;
+    if (%ics_tilechecker = ^ics_little_puzzle_goal & %ics_little_tilecount > 0) {
+        if (~ics_little_finish_puzzle = true) return;
+    }
+    if_openmain(inter_96);
+    ~ics_little_render_puzzle;
+    return;
+}
+if (loc_coord = ^ics_little_west_door & %ics_little_var >= 5) {
+    loc_anim(icthalarins_door_closes);
+    if (coordz(coord) <= coordz(loc_coord)) {
+        p_telejump(^ics_little_west_door_outside);
+    } else {
+        p_telejump(^ics_little_west_door_inside);
+    }
+    return;
+}
+if (loc_coord = ^ics_little_east_door) {
+    def_boolean $from_inside = false;
+    if (coordz(coord) <= coordz(loc_coord)) $from_inside = true;
+    loc_anim(icthalarins_door_closes);
+    if ($from_inside = true) {
+        p_telejump(^ics_little_east_door_outside);
+    } else {
+        p_telejump(^ics_little_east_door_inside);
+    }
+    if (%ics_little_var = 14 & $from_inside = true) {
+        %ics_little_var = 15;
+        %ics_stateofmind = 0;
+        return;
+    }
+    if ((%ics_little_var = 15 | %ics_little_var = 19) & $from_inside = false) {
+        if (%ics_little_var = 15) %ics_little_var = 19;
+        ~ics_little_start_possessed_priest;
+    }
+    return;
+}
+loc_anim(icthalarins_door_closes);
+
+[if_button,inter_96:com_4] ~ics_little_puzzle_click(0, 0);
+[if_button,inter_96:com_5] ~ics_little_puzzle_click(0, 1);
+[if_button,inter_96:com_6] ~ics_little_puzzle_click(0, 2);
+[if_button,inter_96:com_7] ~ics_little_puzzle_click(0, 3);
+[if_button,inter_96:com_8] ~ics_little_puzzle_click(0, 4);
+[if_button,inter_96:com_9] ~ics_little_puzzle_click(1, 0);
+[if_button,inter_96:com_10] ~ics_little_puzzle_click(1, 1);
+[if_button,inter_96:com_11] ~ics_little_puzzle_click(1, 2);
+[if_button,inter_96:com_12] ~ics_little_puzzle_click(1, 3);
+[if_button,inter_96:com_13] ~ics_little_puzzle_click(1, 4);
+[if_button,inter_96:com_14] ~ics_little_puzzle_click(2, 0);
+[if_button,inter_96:com_15] ~ics_little_puzzle_click(2, 1);
+[if_button,inter_96:com_16] ~ics_little_puzzle_click(2, 2);
+[if_button,inter_96:com_17] ~ics_little_puzzle_click(2, 3);
+[if_button,inter_96:com_18] ~ics_little_puzzle_click(2, 4);
+[if_button,inter_96:com_19] ~ics_little_puzzle_click(3, 0);
+[if_button,inter_96:com_20] ~ics_little_puzzle_click(3, 1);
+[if_button,inter_96:com_21] ~ics_little_puzzle_click(3, 2);
+[if_button,inter_96:com_22] ~ics_little_puzzle_click(3, 3);
+[if_button,inter_96:com_23] ~ics_little_puzzle_click(3, 4);
+[if_button,inter_96:com_24] ~ics_little_puzzle_click(4, 0);
+[if_button,inter_96:com_25] ~ics_little_puzzle_click(4, 1);
+[if_button,inter_96:com_26] ~ics_little_puzzle_click(4, 2);
+[if_button,inter_96:com_27] ~ics_little_puzzle_click(4, 3);
+[if_button,inter_96:com_28] ~ics_little_puzzle_click(4, 4);
+
+[if_button,inter_96:com_29]
+if (%ics_little_var ! 2 | %ics_stateofmind ! 1) return;
+~ics_little_puzzle_reset;
+
+[if_button,inter_96:com_31]
+if (%ics_little_var = 2 & %ics_tilechecker = ^ics_little_puzzle_goal & %ics_little_tilecount > 0) {
+    if (~ics_little_finish_puzzle = true) return;
+}
+if_close;
+
+[proc,ics_little_puzzle_reset]
+if (%ics_little_var ! 2 | %ics_stateofmind ! 1) return;
+%ics_tilechecker = ^ics_little_puzzle_scramble;
+%ics_little_tilecount = 0;
+~ics_little_render_puzzle;
+
+[proc,ics_little_render_puzzle]
+def_int $tile = 0;
+def_seq $animation;
+while ($tile < 25) {
+    $animation = null;
+    if (testbit(%ics_tilechecker, $tile) = 1) $animation = ics_tile_turn_f2b;
+    ~ics_little_set_tile_animation($tile, $animation);
+    $tile = add($tile, 1);
+}
+
+[proc,ics_little_set_tile_animation](int $tile, seq $animation)
+switch_int ($tile) {
+    case 0 : if_setanim(inter_96:com_4, $animation);
+    case 1 : if_setanim(inter_96:com_5, $animation);
+    case 2 : if_setanim(inter_96:com_6, $animation);
+    case 3 : if_setanim(inter_96:com_7, $animation);
+    case 4 : if_setanim(inter_96:com_8, $animation);
+    case 5 : if_setanim(inter_96:com_9, $animation);
+    case 6 : if_setanim(inter_96:com_10, $animation);
+    case 7 : if_setanim(inter_96:com_11, $animation);
+    case 8 : if_setanim(inter_96:com_12, $animation);
+    case 9 : if_setanim(inter_96:com_13, $animation);
+    case 10 : if_setanim(inter_96:com_14, $animation);
+    case 11 : if_setanim(inter_96:com_15, $animation);
+    case 12 : if_setanim(inter_96:com_16, $animation);
+    case 13 : if_setanim(inter_96:com_17, $animation);
+    case 14 : if_setanim(inter_96:com_18, $animation);
+    case 15 : if_setanim(inter_96:com_19, $animation);
+    case 16 : if_setanim(inter_96:com_20, $animation);
+    case 17 : if_setanim(inter_96:com_21, $animation);
+    case 18 : if_setanim(inter_96:com_22, $animation);
+    case 19 : if_setanim(inter_96:com_23, $animation);
+    case 20 : if_setanim(inter_96:com_24, $animation);
+    case 21 : if_setanim(inter_96:com_25, $animation);
+    case 22 : if_setanim(inter_96:com_26, $animation);
+    case 23 : if_setanim(inter_96:com_27, $animation);
+    case 24 : if_setanim(inter_96:com_28, $animation);
+}
+
+[proc,ics_little_puzzle_click](int $row, int $column)
+if (%ics_little_var ! 2 | %ics_stateofmind ! 1) return;
+def_int $r = sub($row, 1);
+def_int $c;
+def_int $tile;
+def_int $old_state;
+while ($r <= add($row, 1)) {
+    if ($r >= 0 & $r < 5) {
+        $c = sub($column, 1);
+        while ($c <= add($column, 1)) {
+            if ($c >= 0 & $c < 5) {
+                $tile = add(multiply($r, 5), $c);
+                $old_state = testbit(%ics_tilechecker, $tile);
+                %ics_tilechecker = togglebit(%ics_tilechecker, $tile);
+                if ($old_state = 1) {
+                    ~ics_little_set_tile_animation($tile, ics_tile_turn_b2f);
+                } else {
+                    ~ics_little_set_tile_animation($tile, ics_tile_turn_f2b);
+                }
+            }
+            $c = add($c, 1);
+        }
+    }
+    $r = add($r, 1);
+}
+%ics_little_tilecount = min(7, add(%ics_little_tilecount, 1));
+if (%ics_tilechecker = ^ics_little_puzzle_goal) ~ics_little_finish_puzzle;
+
+[proc,ics_little_finish_puzzle]()(boolean)
+if (%ics_little_var ! 2 | %ics_tilechecker ! ^ics_little_puzzle_goal) return(false);
+if (inv_freespace(inv) = 0) return(false);
+if (%ics_little_jar_multi = 0) %ics_little_jar_multi = add(random(4), 1);
+switch_int (%ics_little_jar_multi) {
+    case 1 : inv_add(inv, ics_little_canopic_jar_liver, 1);
+    case 2 : inv_add(inv, ics_little_canopic_jar_intestines, 1);
+    case 3 : inv_add(inv, ics_little_canopic_jar_stomach, 1);
+    case 4 : inv_add(inv, ics_little_canopic_jar_lungs, 1);
+}
+~ics_little_set_pot_visibility(1);
+%ics_little_var = 3;
+%ics_stateofmind = 0;
+%ics_little_tilecount = 0;
+// VERIFIED q97:42: completing the door puzzle restores all Hitpoints.
+stat_heal(hitpoints, 0, 100);
+if_close;
+p_telejump(^ics_little_pyramid_surface);
+return(true);
+
+[proc,ics_little_set_pot_visibility](int $visible)
+switch_int (%ics_little_jar_multi) {
+    case 1 : %ics_liverpot_vis = $visible;
+    case 2 : %ics_intestinespot_vis = $visible;
+    case 3 : %ics_stomachpot_vis = $visible;
+    case 4 : %ics_lungpot_vis = $visible;
+}
+
+[oploc2,ics_little_pit_to]
+if (runenergy < ^ics_little_pit_min_runenergy) {
+    p_telejump(^ics_little_pit_fail_landing);
+    return;
+}
+def_coord $landing = null;
+if (coordx(loc_coord) <= 3292) {
+    switch_int (coordz(loc_coord)) {
+        case 9194 : $landing = ^ics_little_pit_east_land_9194;
+        case 9196 : $landing = ^ics_little_pit_east_land_9196;
+    }
+} else if (coordx(loc_coord) >= 3295 & coordx(loc_coord) <= 3296) {
+    switch_int (coordz(loc_coord)) {
+        case 9194 : $landing = ^ics_little_pit_west_land_9194;
+        case 9196 : $landing = ^ics_little_pit_west_land_9196;
+    }
+}
+if ($landing = null) return;
+if (%ics_little_var = 7) {
+    %ics_little_var = 8;
+    %ics_stateofmind = 0;
+    ~ics_little_set_pot_visibility(0);
+} else if (%ics_little_var = 12 & inv_total(inv, ics_little_holy_symbol) > 0) {
+    inv_del(inv, ics_little_holy_symbol, 1);
+    inv_add(inv, ics_little_unholy_symbol, 1);
+    %ics_little_var = 13;
+    %ics_stateofmind = 1;
+}
+p_telejump($landing);
+
+[oploc1,ics_ladder]
+%ics_stateofmind = 0;
+p_telejump(^ics_little_pyramid_surface);
+
+[oplocu,sarcophagus]
+if (last_useitem ! ics_little_unholy_symbol | %ics_little_var ! 13) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~ics_little_in_east_room(loc_coord) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, ics_little_unholy_symbol) = 0) return;
+inv_del(inv, ics_little_unholy_symbol, 1);
+%ics_little_var = 14;
+%ics_stateofmind = 1;
+
+[oploc1,ics_little_pot_liver]
+~ics_little_recover_jar(1, ics_little_canopic_jar_liver);
+[oploc1,ics_little_pot_intestines]
+~ics_little_recover_jar(2, ics_little_canopic_jar_intestines);
+[oploc1,ics_little_pot_stomach]
+~ics_little_recover_jar(3, ics_little_canopic_jar_stomach);
+[oploc1,ics_little_pot_lungs]
+~ics_little_recover_jar(4, ics_little_canopic_jar_lungs);
+
+[proc,ics_little_recover_jar](int $selector, namedobj $item)
+if (%ics_little_jar_multi ! $selector) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%ics_little_var = 5 | %ics_little_var = 6) {
+    if (inv_total(inv, $item) = 0) {
+        if (inv_freespace(inv) = 0) return;
+        inv_add(inv, $item, 1);
+    }
+    ~ics_little_start_guardian;
+    return;
+}
+if (%ics_little_var ! 8 | inv_total(inv, $item) > 0 | inv_freespace(inv) = 0) return;
+inv_add(inv, $item, 1);
+
+[opheld5,ics_little_canopic_jar_liver]
+~ics_little_drop_jar(1, ics_little_canopic_jar_liver, ^ics_little_pot_liver_z);
+[opheld5,ics_little_canopic_jar_intestines]
+~ics_little_drop_jar(2, ics_little_canopic_jar_intestines, ^ics_little_pot_intestines_z);
+[opheld5,ics_little_canopic_jar_stomach]
+~ics_little_drop_jar(3, ics_little_canopic_jar_stomach, ^ics_little_pot_stomach_z);
+[opheld5,ics_little_canopic_jar_lungs]
+~ics_little_drop_jar(4, ics_little_canopic_jar_lungs, ^ics_little_pot_lungs_z);
+
+[proc,ics_little_drop_jar](int $selector, namedobj $item, int $pot_z)
+def_boolean $returning = false;
+if (%ics_little_var = 8 & %ics_little_jar_multi = $selector) {
+    if (abs(calc(coordx(coord) - ^ics_little_pot_x)) <= 1 & abs(calc(coordz(coord) - $pot_z)) <= 1) {
+        $returning = true;
+    }
+}
+inv_del(inv, $item, 1);
+obj_add(coord, $item, 1, ^lootdrop_duration);
+if ($returning = true) %ics_little_var = 9;
+
+[ai_spawn,ics_little_het] ~ics_little_guardian_spawned;
+[ai_spawn,ics_little_apmeken] ~ics_little_guardian_spawned;
+[ai_spawn,ics_little_scabaras] ~ics_little_guardian_spawned;
+[ai_spawn,ics_little_crondis] ~ics_little_guardian_spawned;
+[ai_timer,ics_little_het] ~ics_little_guardian_timer;
+[ai_timer,ics_little_apmeken] ~ics_little_guardian_timer;
+[ai_timer,ics_little_scabaras] ~ics_little_guardian_timer;
+[ai_timer,ics_little_crondis] ~ics_little_guardian_timer;
+[ai_opplayer2,ics_little_het] gosub(npc_default_attack);
+[ai_opplayer2,ics_little_apmeken] gosub(npc_default_attack);
+[ai_opplayer2,ics_little_scabaras] gosub(npc_default_attack);
+[ai_opplayer2,ics_little_crondis] gosub(npc_default_attack);
+[ai_queue1,ics_little_het] ~ics_little_guardian_retaliate;
+[ai_queue1,ics_little_apmeken] ~ics_little_guardian_retaliate;
+[ai_queue1,ics_little_scabaras] ~ics_little_guardian_retaliate;
+[ai_queue1,ics_little_crondis] ~ics_little_guardian_retaliate;
+[ai_queue2,ics_little_het] ~ics_little_encounter_damage(last_int);
+[ai_queue2,ics_little_apmeken] ~ics_little_encounter_damage(last_int);
+[ai_queue2,ics_little_scabaras] ~ics_little_encounter_damage(last_int);
+[ai_queue2,ics_little_crondis] ~ics_little_encounter_damage(last_int);
+[ai_queue3,ics_little_het] ~ics_little_guardian_death;
+[ai_queue3,ics_little_apmeken] ~ics_little_guardian_death;
+[ai_queue3,ics_little_scabaras] ~ics_little_guardian_death;
+[ai_queue3,ics_little_crondis] ~ics_little_guardian_death;
+
+[proc,ics_little_encounter_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (%npc_aggressive_player ! uid) return;
+if (~ics_little_encounter_attackable = false) return;
+~npc_default_damage($damage);
+
+[proc,ics_little_guardian_spawned]
+%npc_action_delay = map_clock;
+npc_settimer(1);
+
+[proc,ics_little_start_guardian]()(boolean)
+if (%ics_little_var = 5) %ics_little_var = 6;
+if (%ics_little_var ! 6) return(false);
+%ics_stateofmind = 1;
+def_npc $guardian;
+switch_int (%ics_little_jar_multi) {
+    case 1 : $guardian = ics_little_het;
+    case 2 : $guardian = ics_little_apmeken;
+    case 3 : $guardian = ics_little_scabaras;
+    case 4 : $guardian = ics_little_crondis;
+}
+if ($guardian = null) return(false);
+npc_findall(^ics_little_guardian_spawn, $guardian, ^ics_little_encounter_search_radius, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(true);
+}
+npc_add(^ics_little_guardian_spawn, $guardian, ^ics_little_encounter_lifetime);
+%npc_attacking_uid = uid;
+%npc_macro_event_target = uid;
+%npc_action_delay = map_clock;
+npc_setmode(opplayer2);
+npc_settimer(1);
+return(true);
+
+[proc,ics_little_guardian_timer]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | %ics_little_var ! 6 | ~ics_little_in_pyramid(coord) = false) {
+    npc_del;
+    return;
+}
+npc_settimer(1);
+
+[proc,ics_little_guardian_retaliate]
+if (~npc_retal_ready = false) return;
+if (finduid(%npc_attacking_uid) = false) return;
+%npc_action_delay = add(map_clock, divide(npc_param(attackrate), 2));
+npc_setmode(opplayer2);
+
+[proc,ics_little_guardian_death]
+if (npc_findhero = ^true & uid = %npc_attacking_uid & %ics_little_var = 6) queue(ics_little_guardian_defeated, 0, 0);
+gosub(npc_default_death);
+
+[queue,ics_little_guardian_defeated]
+if (%ics_little_var ! 6) return;
+%ics_little_var = 7;
+%ics_stateofmind = 1;
+
+[proc,ics_little_start_possessed_priest]
+if (%ics_little_var ! 19 | ~ics_little_in_pyramid(coord) = false) return;
+npc_findall(^ics_little_possessed_spawn, ics_little_possessedpriest, ^ics_little_encounter_search_radius, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return;
+}
+npc_add(^ics_little_possessed_spawn, ics_little_possessedpriest, ^ics_little_encounter_lifetime);
+%npc_attacking_uid = uid;
+%npc_macro_event_target = uid;
+%npc_action_delay = map_clock;
+%npc_int = 0;
+npc_setmode(none);
+npc_settimer(1);
+
+[ai_spawn,ics_little_possessedpriest] ~ics_little_possessed_spawned;
+[ai_timer,ics_little_possessedpriest] ~ics_little_possessed_timer;
+[ai_applayer2,ics_little_possessedpriest]
+if (~ics_little_encounter_attackable = false) return;
+// VERIFIED q97:107: spellcaster. UNKNOWN: Wind Strike is a favourable spell selection.
+~npc_cast_spell(^wind_strike, npc_param(attackrate));
+[ai_queue1,ics_little_possessedpriest] ~ics_little_possessed_retaliate;
+[ai_queue2,ics_little_possessedpriest] ~ics_little_encounter_damage(last_int);
+[ai_queue3,ics_little_possessedpriest] ~ics_little_possessed_death;
+
+[proc,ics_little_possessed_spawned]
+%npc_action_delay = map_clock;
+npc_settimer(1);
+
+[proc,ics_little_possessed_timer]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | %ics_little_var ! 19 | ~ics_little_in_pyramid(coord) = false) {
+    npc_del;
+    return;
+}
+if (~ics_little_in_east_room(coord) = false) {
+    npc_setmode(none);
+    %npc_int = 0;
+    npc_settimer(1);
+    return;
+}
+if (%npc_int = 0) {
+    npc_setmode(applayer2);
+    %npc_int = 1;
+}
+npc_settimer(1);
+
+[proc,ics_little_possessed_retaliate]
+if (~npc_retal_ready = false) return;
+if (finduid(%npc_attacking_uid) = false) return;
+%npc_action_delay = add(map_clock, divide(npc_param(attackrate), 2));
+npc_setmode(applayer2);
+
+[proc,ics_little_possessed_death]
+if (npc_findhero = ^true & uid = %npc_attacking_uid & %ics_little_var = 19) queue(ics_little_possessed_defeated, 0, 0);
+gosub(npc_default_death);
+
+[queue,ics_little_possessed_defeated]
+if (%ics_little_var ! 19) return;
+%ics_little_var = 24;
+%ics_stateofmind = 0;

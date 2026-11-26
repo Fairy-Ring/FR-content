@@ -1,4 +1,4 @@
-# Quest-owned original 377 NPC definitions; omitted combat fields remain omitted.
+// Quest-owned original 377 NPC definitions; omitted combat fields remain omitted.
 [ics_little_worker1]
 name=Slave
 desc=A malnourished worker.
