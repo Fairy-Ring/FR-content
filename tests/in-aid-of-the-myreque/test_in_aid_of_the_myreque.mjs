@@ -71,7 +71,18 @@ World.currentTick = Math.max(World.currentTick, 100);
 World.gameMap.init();
 
 function place(p, x, z, level = 0) {
-  Object.assign(p, { x, z, level, originX: x, originZ: z });
+  p.teleport(x, z, level);
+  Object.assign(p, { originX: x, originZ: z });
+}
+function leavePlayer(p) {
+  // Native World.removePlayer's in-memory teardown, without its disk-save/worker phase.
+  rsbuf.removePlayer(p.slot);
+  World.gameMap.getZone(p.x, p.z, p.level).leave(p);
+  delete World.players[p.slot];
+  p.unlink();
+  map.changeNpcCollision(p.width, p.x, p.z, p.level, false);
+  map.changePlayerOccCollision(p.width, p.x, p.z, p.level, false);
+  p.isActive = false;
 }
 function player(saved = null) {
   const n = ++serial;
@@ -100,7 +111,8 @@ function player(saved = null) {
   p.getInventory(worn);
   p.invListenOnCom(inv, invCom, p.uid);
   p.invListenOnCom(worn, wornCom, p.uid);
-  for (const [name, value] of saved ? [] : [['tutorial', 1000], ['routequest', 105], ['druidspirit', 110], ['priestperil', 60]]) {
+  // Lost City is only an equipment fixture for the ordinary dragon-weapon compatibility checks.
+  for (const [name, value] of saved ? [] : [['tutorial', 1000], ['routequest', 105], ['druidspirit', 110], ['priestperil', 60], ['zanaris', 6]]) {
     p.setVar(id('VarPlayerType', name), value);
   }
   World.players[p.slot] = p;
@@ -168,18 +180,11 @@ function result(p, name, args = [], target = null) {
 function dispatch(p, kind, args, choices = [], interaction = false) {
   for (let step = 0; p.delayed && step < 100; step++) tick(p);
   assert(!p.delayed, 'the preceding native action must finish its player delay before another packet');
-  let pending;
   const observed = capture(p, () => {
     assert(handlers[kind].handle(new messages[kind](...args), p),
       `${kind} packet rejected: ${JSON.stringify({ args, player: [p.x, p.z, p.level],
         delayed: p.delayed, delayedUntil: p.delayedUntil, tick: World.currentTick })}`);
-    if (interaction) {
-      const target = p.target;
-      pending = target && { type: target.type, subject: p.targetSubject.type, x: target.x, z: target.z,
-        entry: p.getOpTrigger()?.name, valid: p.validateTarget(), access: p.canAccess(),
-        inRange: p.inOperableDistance(target) };
-      p.processInteraction();
-    }
+    if (interaction) p.processInteraction();
   });
   if (!observed.states.length) {
     const target = p.target;
@@ -188,7 +193,7 @@ function dispatch(p, kind, args, choices = [], interaction = false) {
     }, contact: target && p.canAccess(), entry: target && p.getOpTrigger()?.name };
     if (target) context.collision = Array.from({ length: 5 }, (_, dz) =>
       Array.from({ length: 5 }, (_, dx) => map.isMapBlocked(target.x + dx - 2, target.z + dz - 2, target.level) ? '#' : '.').join(''));
-    assert.fail(`${kind} did not dispatch: ${JSON.stringify({ ...context, pending, messages: p.messages.slice(-3) })}`);
+    assert.fail(`${kind} did not dispatch: ${JSON.stringify({ ...context, messages: p.messages.slice(-3) })}`);
   }
   return finish(p, observed.states.at(-1), choices);
 }
@@ -233,6 +238,11 @@ function tick(p) {
   p.processTimers(PlayerTimerType.SOFT);
   p.processEngineQueue();
   p.processInteraction();
+}
+function turnNpcs(...actors) {
+  for (const actor of actors) if (actor.isActive) actor.turn();
+  // World.processCleanup resets spawn's INSTANT speed and each tick's movement.
+  for (const actor of actors) actor.resetEntity(false);
 }
 
 const placements = [];
@@ -329,9 +339,16 @@ function ownedActor(p, name) {
 }
 
 function check(name, body) {
-  body();
-  checks++;
-  console.log(`PASS Myreque 2: ${name}`);
+  const previousSerial = serial;
+  const previousNpcs = new Set(World.npcs);
+  try {
+    body();
+    checks++;
+    console.log(`PASS Myreque 2: ${name}`);
+  } finally {
+    for (const npc of World.npcs) if (!previousNpcs.has(npc) && npc.isActive) World.removeNpc(npc, -1);
+    for (const p of [...World.playerLoop.all()]) if (p.slot > previousSerial) leavePlayer(p);
+  }
 }
 function landing(p, expected, name) {
   assert.deepEqual([p.x, p.z, p.level], expected, `${name}: independently expected original map area`);
@@ -851,6 +868,30 @@ check('Rod capture uses the native attack dispatch, quarter-health gate, expiry 
   }
 });
 
+check('a real sixty-HP juvenile is capturable at exactly one quarter, but not one HP above it', () => {
+  const p = player();
+  setStage(p, 421);
+  give(p, 'burgh_rod_command_final_10');
+  itemOption(p, 'burgh_rod_command_final_10', 2);
+  const npc = spawn(p, 'burgh_vampire_juvenile_1');
+  const hp = npc.baseLevels[NpcStat.HITPOINTS];
+  assert.equal(hp % 4, 0, 'the real configured target must expose an exact integral quarter-health boundary');
+  npc.levels[NpcStat.HITPOINTS] = hp / 4 + 1;
+  p.setVar(id('VarPlayerType', 'sa_energy'), 1000);
+  p.setVar(id('VarPlayerType', 'sa_attack'), 1);
+  talk(p, npc, [], 2);
+  assert.equal(npc.type, id('NpcType', 'burgh_vampire_juvenile_1'));
+  assert.equal(count(p, 'burgh_rod_command_final_10', worn), 1);
+  assert.equal(p.getVar(id('VarPlayerType', 'sa_energy')), 1000);
+  npc.levels[NpcStat.HITPOINTS] = hp / 4;
+  p.setVar(id('VarPlayerType', 'sa_attack'), 1);
+  p.setVar(id('VarPlayerType', 'action_delay'), 0);
+  talk(p, npc, [], 2);
+  assert.equal(npc.type, id('NpcType', 'burgh_vampire_juvenile_held'));
+  assert.equal(count(p, 'burgh_rod_command_final_9', worn), 1);
+  assert.equal(p.getVar(id('VarPlayerType', 'sa_energy')), 900);
+});
+
 check('all balance outcomes consume one dose, preserve ownership and resolve through real NPC lifecycle', () => {
   const outcomes = new Set();
   for (const seed of [0, 4096, 24576]) {
@@ -903,6 +944,7 @@ check('ordinary NPC damage and dragon-dagger special dispatch do not enter the q
   assert(result(p, '[proc,npc_max_dealt]', [10, 0], npc) > 0);
   give(p, 'dragon_dagger');
   itemOption(p, 'dragon_dagger', 2);
+  assert.equal(count(p, 'dragon_dagger', worn), 1, p.messages.slice(-3).join(' '));
   p.setVar(id('VarPlayerType', 'sa_energy'), 1000);
   p.setVar(id('VarPlayerType', 'sa_attack'), 1);
   talk(p, npc, [], 2);
@@ -935,8 +977,7 @@ check('tithe logout removes abandoned actors and native dialogue resumes only th
   const gadderanks = ownedActor(original, 'burgh_gadderanks_attackable');
   killNpc(original, first);
   const saved = { username: original.username, data: original.save() };
-  World.players[original.slot] = null;
-  original.unlink();
+  leavePlayer(original);
   World.currentTick++;
   second.turn();
   gadderanks.turn();
@@ -1034,8 +1075,7 @@ check('native login restores journal colours and the real quest-row button opens
     const original = player();
     setStage(original, active);
     const saved = { username: original.username, data: original.save() };
-    World.players[original.slot] = null;
-    original.unlink();
+    leavePlayer(original);
     const p = player(saved);
     run(p, '[login,_]');
     assert.equal(stage(p), active, 'native save and login retain the earned quest state');
@@ -1083,6 +1123,7 @@ check('native melee applies the hammer bonus before actual NPC damage, XP and he
     setStage(p, 421);
     give(p, weapon);
     itemOption(p, weapon, 2);
+    assert.equal(count(p, weapon, worn), 1, p.messages.slice(-3).join(' '));
     const npc = spawn(p, target);
     const hp = npc.levels[NpcStat.HITPOINTS];
     const xp = p.stats[PlayerStat.ATTACK];
@@ -1108,7 +1149,7 @@ check('native melee applies the hammer bonus before actual NPC damage, XP and he
     if (bonus !== 'none') assert.equal(bonusDraws[0].value === 0, bonus === 'double');
     const expected = Math.min(hp, bonus === 'double' ? base * 2 : bonus === 'quarter' ? Math.floor(base * 5 / 4) : base);
     assert.equal(npc.heroPoints.find(hero => hero.hash64 === p.hash64)?.points, expected);
-    const multiplier = p.getVar(id('VarPlayerType', 'npc_combat_xp_multiplier'));
+    const multiplier = npc.vars[id('VarNpcType', 'npc_combat_xp_multiplier')];
     assert.equal(p.stats[PlayerStat.ATTACK] - xp, Math.floor(expected * 40 * multiplier / 1000) * Environment.NODE_XPRATE);
     for (let ticks = 0; npc.levels[NpcStat.HITPOINTS] === hp && ticks < 4; ticks++) {
       World.currentTick++;
@@ -1230,7 +1271,7 @@ check('unprotected Ivan takes real native NPC damage, fails safely and can be es
   try {
     for (let cycle = 0; cycle < 200 && actors.follower.isActive; cycle++) {
       tick(p);
-      for (const actor of [actors.follower, actors.first, actors.second]) if (actor.isActive) actor.turn();
+      turnNpcs(actors.follower, actors.first, actors.second);
       p.processQueues();
     }
   } finally { ScriptRunner.HANDLERS[ScriptOpcode.NPC_DAMAGE] = damage; }
@@ -1303,7 +1344,7 @@ check('gifted steel armour increases the actual native defence roll against Ivan
       JavaRandom.setSeed(0);
       for (let cycle = 0; cycle < 20 && draws.length < 2; cycle++) {
         tick(p);
-        first.turn();
+        turnNpcs(first);
       }
     } finally { ScriptRunner.HANDLERS[ScriptOpcode.RANDOMINC] = random; }
     assert(draws.length >= 2, 'the real hostile AI must roll attack and defence');
@@ -1331,7 +1372,7 @@ check('Ivan consumes a real gifted stew to heal after an actual native hostile a
     JavaRandom.setSeed(0);
     for (let cycle = 0; cycle < 20 && p.getVarBit(id('VarBitType', 'burgh_ivan_food_give')) > 0; cycle++) {
       tick(p);
-      first.turn();
+      turnNpcs(first);
     }
   } finally { ScriptRunner.HANDLERS[ScriptOpcode.NPC_STATHEAL] = heal; }
   assert(heals.some(hit => hit.after > hit.before && hit.script === '[proc,myreque2_escort_ivan_eat]'),
@@ -1352,6 +1393,9 @@ check('a real owner hit distracts the hostile and lets gifted-sickle Ivan deal n
     'a real native owner hit, not fixture hero credit, must enable Ivan assistance');
   // The player stops attacking after one hit so Ivan's contribution is observable.
   p.clearInteraction();
+  // Step aside after the hit: the owner must not occupy Ivan's attack approach.
+  place(p, first.x, first.z - 1, first.level);
+  assert(!map.isMapBlocked(p.x, p.z, p.level));
   const hits = [];
   const damage = ScriptRunner.HANDLERS[ScriptOpcode.NPC_DAMAGE];
   ScriptRunner.HANDLERS[ScriptOpcode.NPC_DAMAGE] = state => {
@@ -1365,8 +1409,7 @@ check('a real owner hit distracts the hostile and lets gifted-sickle Ivan deal n
   try {
     for (let cycle = 0; cycle < 100 && !hits.some(hit => hit > 0); cycle++) {
       World.currentTick++;
-      if (first.isActive) first.turn();
-      if (follower.isActive) follower.turn();
+      turnNpcs(first, follower);
       p.processQueues();
     }
   } finally { ScriptRunner.HANDLERS[ScriptOpcode.NPC_DAMAGE] = damage; }
@@ -1396,7 +1439,7 @@ check('native member order, optional provisions, actual escort kills, following 
   assert(map.findPath(0, 2838, 4579, p.x, p.z).length > 0, 'the original exit is reachable from the escort start');
   for (let ticks = 0; ticks < 20 && Math.max(Math.abs(follower.x - p.x), Math.abs(follower.z - p.z)) > 1; ticks++) {
     World.currentTick++;
-    follower.turn();
+    turnNpcs(follower);
   }
   assert.notDeepEqual([follower.x, follower.z], oldFollower, 'native playerfollow must move Ivan along the packed route');
   assert(Math.max(Math.abs(follower.x - p.x), Math.abs(follower.z - p.z)) <= 1, 'Ivan actually reaches the exit approach');
@@ -1436,12 +1479,10 @@ check('native save/reload retains member readiness and replaces the abandoned es
   const actors = startEscort(original);
   killNpc(original, actors.first);
   const saved = { username: original.username, data: original.save() };
-  World.players[original.slot] = null;
-  original.unlink();
+  leavePlayer(original);
   for (let ticks = 0; ticks < 12; ticks++) {
     World.currentTick++;
-    actors.follower.turn();
-    actors.second.turn();
+    turnNpcs(actors.follower, actors.second);
   }
   assert.equal(actors.follower.isActive, false);
   assert.equal(actors.second.isActive, false);

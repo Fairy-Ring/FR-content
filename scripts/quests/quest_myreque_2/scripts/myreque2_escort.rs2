@@ -169,13 +169,11 @@ $ivan_uid = npc_uid;
 %npc_aggressive_player = uid;
 %npc_attacking_uid = uid;
 npc_setmode(playerfollow);
-npc_settimer(10);
 npc_add(0_44_71_23_35, burgh_ivan_temple_vampire_juve_1, ^max_32bit_int);
 $juve1_uid = npc_uid;
 %npc_aggressive_player = uid;
 %npc_attacking_uid = uid;
 %npc_action_delay = map_clock;
-npc_settimer(10);
 if (npc_finduid($juve1_uid) = true) {
     if (.npc_finduid($ivan_uid) = true) npc_setmode(opnpc2);
 }
@@ -184,7 +182,6 @@ $juve2_uid = npc_uid;
 %npc_aggressive_player = uid;
 %npc_attacking_uid = uid;
 %npc_action_delay = map_clock;
-npc_settimer(10);
 if (npc_finduid($juve2_uid) = true) {
     if (.npc_finduid($ivan_uid) = true) npc_setmode(opnpc2);
 }
