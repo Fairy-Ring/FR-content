@@ -278,6 +278,7 @@ check('Falador men retain original identities and restored combat profiles; real
     ['falador_man1', 3222, 3],
     ['falador_man2', 3223, 1],
     ['falador_man3', 3224, 1],
+    ['falador_man4', 3225, 1],
   ];
   for (const [name, cacheId, strength] of targets) {
     const type = configs.NpcType.getByName(name);
@@ -285,7 +286,7 @@ check('Falador men retain original identities and restored combat profiles; real
     assert.equal(type.op[1], 'Attack');
     const npc = [...World.npcs].find(actor => actor.type === type.id && actor.isActive);
     assert(npc, `${name}: natural packed Falador spawn`);
-    assert.deepEqual([...npc.baseLevels], [1, 1, strength, 7, 1, 1], `${name}: candidate server stats`);
+    assert.deepEqual([...npc.baseLevels], [1, 1, strength, 7, 1, 1], `${name}: UNKNOWN adopted server stats`);
   }
   const npc = [...World.npcs].find(actor => actor.type === id('NpcType', 'falador_man2') && actor.isActive);
   assert(npc.x >= 2944 && npc.x < 3072 && npc.z >= 3328 && npc.z < 3456, 'real target is in Falador');
