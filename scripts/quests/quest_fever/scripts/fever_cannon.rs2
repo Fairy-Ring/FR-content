@@ -1,0 +1,107 @@
+// VERIFIED loading order, ammunition, three hits and dirty-cannon damage: period Tip.It guide.
+// UNKNOWN functional feedback and deterministic successful aim (favourable default).
+[oplocu,fever_cannon] @fever_load_cannon;
+[oplocu,fever_cannon_loaded] @fever_load_cannon;
+[oplocu,fever_cannon_destroyed] @fever_load_cannon;
+[oplocu,fever_cannon_no_barrel] @fever_load_cannon;
+[oploc1,fever_cannon_destroyed] @fever_repair_cannon;
+[oploc1,fever_cannon_no_barrel] @fever_repair_cannon;
+
+[label,fever_repair_cannon]
+if (%fever_quest ! ^fever_fix_cannon) return;
+if (inv_total(inv, fever_cannon) = 0) { mes("You need a cannon barrel from the gun locker."); return; }
+inv_del(inv, fever_cannon, 1);
+%fever_cannon = 0;
+mes("You fit the replacement cannon barrel.");
+
+[label,fever_load_cannon]
+if (%fever_quest = ^fever_fix_cannon & last_useitem = fever_cannon) @fever_repair_cannon;
+if (%fever_quest ! ^fever_canister & %fever_quest ! ^fever_canister_fired & %fever_quest ! ^fever_sink_ship) return;
+if (%fever_cannon ! 0) { mes("The cannon is not ready to load."); return; }
+if (last_useitem = fever_cannon_prod) {
+    if (%fever_cannon_clean = 1 & %fever_cannon_powder = 0) {
+        %fever_cannon_clean = 0;
+        anim(fever_prod_cannon1, 0);
+        mes("You clean the cannon with the ramrod.");
+        return;
+    }
+    if (%fever_cannon_powder = 1 & %fever_cannon_tamp = 0) {
+        %fever_cannon_tamp = 1;
+        anim(fever_prod_cannon1, 0);
+        mes("You tamp down the gunpowder.");
+        return;
+    }
+    mes("There is nothing to tamp down.");
+    return;
+}
+if (last_useitem = fever_gunpowder & %fever_cannon_powder = 0) {
+    inv_del(inv, fever_gunpowder, 1);
+    %fever_cannon_powder = 1;
+    anim(fever_load_cannon1, 0);
+    mes("You put gunpowder into the cannon.");
+    return;
+}
+if (%fever_cannon_powder = 0) { mes("Load gunpowder first."); return; }
+if (%fever_cannon_tamp = 0) { mes("Tamp the gunpowder with a ramrod first."); return; }
+if ((last_useitem = fever_cannister_load | last_useitem = fever_cannon_ball) & %fever_cannon_ammo = 0) {
+    if (last_useitem = fever_cannister_load & %fever_quest ! ^fever_canister) { mes("Use cannonballs to sink the ship."); return; }
+    if (last_useitem = fever_cannon_ball & %fever_quest ! ^fever_sink_ship) { mes("Use a canister to silence the enemy cannon first."); return; }
+    inv_del(inv, last_useitem, 1);
+    if (last_useitem = fever_cannister_load) %fever_cannon_ammo = 1;
+    else %fever_cannon_ammo = 2;
+    anim(fever_load_cannon1_cannister, 0);
+    mes("You load the ammunition.");
+    return;
+}
+if (last_useitem = fever_fuse & %fever_cannon_ammo > 0 & %fever_cannon_fuse = 0) {
+    inv_del(inv, fever_fuse, 1);
+    %fever_cannon_fuse = 1;
+    %fever_cannon = 3;
+    mes("You attach the fuse. The cannon is ready to fire.");
+    return;
+}
+mes("The cannon is not ready for that.");
+
+[oploc1,fever_cannon]
+mes("Load powder, tamp it, add ammunition and attach a fuse. Clean the cannon after every shot.");
+
+[oploc2,fever_cannon]
+~fever_clear_load;
+mes("You empty the cannon.");
+
+[oploc1,fever_cannon_loaded]
+if (%fever_quest ! ^fever_canister & %fever_quest ! ^fever_sink_ship) return;
+if (%fever_cannon ! 3 | %fever_cannon_powder = 0 | %fever_cannon_tamp = 0 | %fever_cannon_fuse = 0 | %fever_cannon_ammo = 0) return;
+if (inv_total(inv, fever_tinderbox) = 0 & inv_total(inv, tinderbox) = 0) { mes("You need a tinderbox to light the fuse."); return; }
+def_int $ammo = %fever_cannon_ammo;
+def_int $dirty = %fever_cannon_clean;
+~fever_clear_load;
+%fever_cannon_clean = 1;
+if ($dirty = 1) {
+    mes("The dirty cannon misfires!");
+    ~damage_self(5);
+    return;
+}
+if ($ammo = 1 & %fever_quest = ^fever_canister) {
+    %fever_enemy_cannon = 1;
+    %fever_quest = ^fever_canister_fired;
+    mes("The canister destroys the repaired enemy cannon.");
+    return;
+}
+if ($ammo = 2 & %fever_quest = ^fever_sink_ship) {
+    %fever_holes_in_the_hull = calc(%fever_holes_in_the_hull + 1);
+    mes("The cannonball tears a hole in the enemy ship.");
+    if (%fever_holes_in_the_hull >= 3) {
+        %fever_quest = ^fever_arrived;
+        ~fever_remove_supplies;
+        p_telejump(^fever_mos_deck);
+        mes("The enemy ship sinks. The Adventurous reaches Mos Le'Harmless.");
+    }
+}
+
+[proc,fever_clear_load]
+%fever_cannon_powder = 0;
+%fever_cannon_tamp = 0;
+%fever_cannon_ammo = 0;
+%fever_cannon_fuse = 0;
+%fever_cannon = 0;

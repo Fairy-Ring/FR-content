@@ -2,9 +2,10 @@
 // CANDIDATE last-resort 2007-base: OSRS Transcript:Cabin Fever (pre-Feb 2022 /
 // Eldevidian) minus later Changes (2022 req overlay, 2015 Travel, 2025 Sailing /
 // Pandemonium, Trouble Brewing 4 Jul 2006, RS3 Overview). Hunt 289? no.
-// This slice: inn Talk-to + refuse + accept %fever_quest 0→1. No gangplank / ship.
+// VERIFIED prerequisites: Tip.It guide captured 11 April 2006.
 
 [opnpc1,fever_teach]
+if (%fever_quest >= ^fever_complete) @fever_postquest;
 if (%fever_quest > 0) {
     @fever_teach_in_progress;
 }
@@ -58,10 +59,9 @@ if (stat(ranged) < 40) {
 @fever_teach_pirate_services;
 
 [label,fever_teach_pirate_services]
-// Pirate’s Treasure is the only authentic 377 writer. Rum Deal %deal_quest has
-// no complete surface — do not fake it from this script.
+// VERIFIED period requirements; Rum Deal stays a separate quest with its own writer.
 ~chatnpc("<p,quiz>Have ye rendered great services to pirates in the past?");
-if (%hunt < ^hunt_complete) {
+if (%hunt < ^hunt_complete | %deal_quest < ^deal_complete) {
     ~chatplayer("<p,neutral>Not yet, but I was going to!");
     @fever_teach_skill_fail;
 }
@@ -106,7 +106,8 @@ if ($stand = 2) {
 ~chatnpc("<p,neutral>My ship is the Adventurous, and she's at the east dock.");
 ~chatplayer("<p,happy>You won't...err...I mean ye'll not regret it Cap'n!");
 ~chatnpc("<p,happy>I'm sure I won't.");
-%fever_quest = 1;
+%fever_quest = ^fever_accepted;
+~send_quest_progress(questlist:fever, %fever_quest, ^fever_complete);
 return;
 
 [label,fever_teach_early_refuse]

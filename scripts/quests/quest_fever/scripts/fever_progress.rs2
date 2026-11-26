@@ -1,0 +1,106 @@
+// VERIFIED mechanics and rewards: Tip.It 20060411201422. UNKNOWN minimal functional dialogue.
+[opnpc1,fever_quest_ship_teach]
+switch_int (%fever_quest) {
+    case ^fever_sabotage :
+        ~chatnpc("Use a rope on the hoisted sail to reach the enemy ship. Attach a fuse to their powder barrel and light it.");
+    case ^fever_repairs :
+        if (%fever_hole_1 = 2 & %fever_hole_2 = 2 & %fever_hole_3 = 2) {
+            %fever_quest = ^fever_plunder_stage;
+            ~chatnpc("The leaks are fixed. Take ten stacks of plunder from their hold and store them in our chest.");
+        } else ~chatnpc("Repair all three leaks below deck. Each needs two planks, ten tacks, a hammer and swamp paste.");
+    case ^fever_plunder_stage :
+        if (%fever_plunder_points >= 10) {
+            %fever_quest = ^fever_fix_cannon;
+            ~chatnpc("The plunder is safe. Get a barrel from the gun locker and repair our cannon.");
+        } else ~chatnpc("Store ten stacks of plunder in the chest in our hold.");
+    case ^fever_fix_cannon :
+        if (%fever_cannon = 0) {
+            %fever_enemy_cannon = 0;
+            %fever_quest = ^fever_canister;
+            ~chatnpc("They repaired their cannon. Fire a canister at it. Load powder, tamp it with a ramrod, add the canister and a fuse, then fire.");
+        } else ~chatnpc("Use a barrel from the gun locker to repair our cannon.");
+    case ^fever_canister :
+        ~chatnpc("Fire a canister to destroy their cannon, then clean ours with the ramrod.");
+    case ^fever_canister_fired :
+        if (%fever_cannon_clean = 0) {
+            %fever_quest = ^fever_sink_ship;
+            ~chatnpc("Now sink their ship with three cannonballs. Clean the cannon after each shot.");
+        } else ~chatnpc("Clean the cannon with the ramrod before loading it again.");
+    case ^fever_sink_ship :
+        ~chatnpc("Fire three cannonballs into their hull. Clean the cannon after every shot.");
+    case default : ~chatnpc("Speak to me aboard the Adventurous in Port Phasmatys.");
+}
+
+[opnpc3,fever_quest_ship_teach]
+// Cache-backed Return-Home operation. UNKNOWN landing and favourable retained battle progress.
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+~chatnpc("Do you want to return to Port Phasmatys?");
+if (~p_choice2("Return to port.", 1, "Keep sailing.", 2) = 2) return;
+~fever_remove_supplies;
+p_telejump(^fever_port_pier);
+
+[opnpc1,fever_harmless_teach] @fever_island_teach;
+[opnpc1,fever_harmless_port_ship_teach] @fever_island_teach;
+
+[label,fever_island_teach]
+if (%fever_quest = ^fever_arrived) @fever_finish;
+if (%fever_quest < ^fever_complete) { ~chatnpc("We must finish the voyage first."); return; }
+@fever_postquest;
+
+[label,fever_finish]
+if (inv_total(inv, fever_piracy_book) = 0 & inv_freespace(inv) = 0) {
+    ~chatnpc("Make room for the Little Book o' Piracy first.");
+    return;
+}
+// Write completion before item/XP effects and before any interruptible scroll.
+%fever_quest = ^fever_complete;
+%fever_given_book = 1;
+if (inv_total(inv, fever_piracy_book) = 0) inv_add(inv, fever_piracy_book, 1);
+stat_advance(smithing, 70000);
+stat_advance(crafting, 70000);
+stat_advance(agility, 70000);
+~send_quest_complete(questlist:fever, fever_piracy_book, 200, ^fever_questpoints, "You have completed Cabin Fever!", "7,000 Smithing XP|7,000 Crafting XP|7,000 Agility XP|The Little Book o' Piracy|Access to Mos Le'Harmless");
+
+[label,fever_postquest]
+// VERIFIED: the 10,000 coins are claimed on a post-completion conversation, not the reward scroll.
+if (%fever_gold = 0) {
+    if (inv_itemspace(inv, coins, 10000, inv_size(inv)) = false) {
+        ~chatnpc("Make room for your 10,000 coins first.");
+        return;
+    }
+    %fever_gold = 1;
+    inv_add(inv, coins, 10000);
+    ~chatnpc("Here are your 10,000 coins.");
+    return;
+}
+def_int $choice = ~p_choice3("Sail with Bill Teach.", 1, "I lost my Book o' Piracy.", 2, "Stay here.", 3);
+if ($choice = 2) { ~fever_replace_book; return; }
+if ($choice ! 1) return;
+~fever_remove_supplies;
+if (coordz(coord) < 3100) p_telejump(^fever_port_deck);
+else p_telejump(^fever_mos_deck);
+
+[proc,fever_replace_book]
+// UNKNOWN favourable recovery rule: free replacement when neither inventory nor bank holds the book.
+if (inv_total(inv, fever_piracy_book) > 0 | inv_total(bank, fever_piracy_book) > 0) {
+    mes("You already have a Book o' Piracy.");
+    return;
+}
+if (inv_freespace(inv) = 0) { mes("You need more inventory space."); return; }
+inv_add(inv, fever_piracy_book, 1);
+mes("Bill gives you another Book o' Piracy.");
+
+[if_button,questlist:fever]
+// UNKNOWN functional journal wording, not recovered original text.
+def_string $text = "I should speak to Bill Teach at the Port Phasmatys inn. I need Pirate's Treasure, Rum Deal, 42 Agility, 45 Crafting, 50 Smithing and 40 Ranged.";
+if (%fever_quest >= ^fever_accepted) $text = "Bill's ship is at the east dock in Port Phasmatys. I can speak to him aboard it to sail or resume the voyage.";
+if (%fever_quest = ^fever_sabotage) $text = "I need ropes and a fuse from the lockers below deck. Climb the net, use a rope on the hoisted sail, then fuse and light the enemy powder barrel.";
+if (%fever_quest = ^fever_repairs) $text = "Repair all three leaks below deck: two repair planks and ten tacks with a hammer, then swamp paste. Speak to Bill when finished.";
+if (%fever_quest = ^fever_plunder_stage) $text = "Loot ten stacks of plunder from the enemy hold and store them in our chest. Then speak to Bill.";
+if (%fever_quest = ^fever_fix_cannon) $text = "Fit a barrel from the gun locker to our broken cannon, then speak to Bill.";
+if (%fever_quest = ^fever_canister) $text = "Load powder, tamp it with a ramrod, add a canister and a fuse, then fire. Clean the cannon and speak to Bill.";
+if (%fever_quest = ^fever_canister_fired) $text = "Clean the cannon with the ramrod, then speak to Bill.";
+if (%fever_quest = ^fever_sink_ship) $text = "Sink the enemy ship with three cannonballs. Clean the cannon after each shot.";
+if (%fever_quest = ^fever_arrived) $text = "We reached Mos Le'Harmless. I should speak to Bill.";
+if (%fever_quest >= ^fever_complete) $text = "<col=000080>QUEST COMPLETE!|Bill can sail between Port Phasmatys and Mos Le'Harmless. I should speak to him for my share of the plunder.";
+~quest_journal("Cabin Fever", $text);
