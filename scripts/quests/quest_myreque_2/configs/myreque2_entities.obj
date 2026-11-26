@@ -306,9 +306,9 @@ weight=1g
 
 [burgh_rod_command_final_10]
 tradeable=no
-// UNKNOWN: charged rods reuse the existing staff combat route and assets with a four-cycle engineering interval.
+// UNKNOWN: use the existing blunt-weapon tab for its native special bar, with staff assets and a four-cycle interval.
 // UNKNOWN: each charged form costs 100 of 1000 energy units; the native special dispatcher reads this parameter.
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -338,7 +338,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_9]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -368,7 +368,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_8]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -398,7 +398,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_7]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -428,7 +428,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_6]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -458,7 +458,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_5]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -488,7 +488,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_4]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -518,7 +518,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_3]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -548,7 +548,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_2]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
@@ -578,7 +578,7 @@ wearpos=righthand
 
 [burgh_rod_command_final_1]
 tradeable=no
-category=weapon_staff
+category=weapon_blunt
 param=specwep,^true
 param=sa_energy,100
 param=attackrate,4
