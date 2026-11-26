@@ -1122,6 +1122,7 @@ check('Dave accepts every guide-listed original dark-mystic, headwear, mime and 
   ]) {
     const { player, actors } = questFixture(20);
     try {
+      if (clothing === 'viking_helmet_magic') setPlayerVariable(player, 'viking', questConstant('viking_complete'));
       const dave = spawnActor(player, 'agrith_dave_at_portal', actors);
       const companion = types.ObjType.get(itemId(clothing)).wearpos === types.ObjType.get(itemId('black_cape')).wearpos
         ? 'black_full_helm' : 'black_cape';
