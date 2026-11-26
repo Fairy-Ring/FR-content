@@ -31,6 +31,29 @@
       "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
     },
     {
+      "script": "[ai_opplayer2,tbwcu_jungle_spider]",
+      "npc": "tbwcu_jungle_spider",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,tbwcu_broodoo_poison]",
+      "npc": "tbwcu_broodoo_poison",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,tbwcu_broodoo_disease]",
+      "npc": "tbwcu_broodoo_disease",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,tbwcu_broodoo_combat]",
+      "npc": "tbwcu_broodoo_combat",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
       "script": "[ai_opplayer2,zogre_1]",
       "npc": "zogre_1",
       "seeds": {

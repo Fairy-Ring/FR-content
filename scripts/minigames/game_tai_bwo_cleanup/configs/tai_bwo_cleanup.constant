@@ -30,3 +30,6 @@
 ^tbw_payout_parts = 3
 // UNKNOWN: each worn village-clothing piece raises that fraction by 10%.
 ^tbw_clothing_fraction_bonus = 10
+// CANDIDATE: OSRS undug gout plants expire after ten minutes.
+// UNKNOWN engineering reuse: the same timeout for each revealed gem-rock stage.
+^tbw_find_lifetime = 1000

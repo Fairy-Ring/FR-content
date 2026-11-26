@@ -50,7 +50,7 @@ def_int $cycle = max(8, sub(17, divide(stat(woodcutting), 10)));
 p_delay(1);
 def_int $tick = 2;
 while ($tick < sub($cycle, 3)) {
-    if (~tbw_jungle_mosquito_event = true) {
+    if (~tbw_jungle_event = true) {
         anim(null, 0);
         return;
     }

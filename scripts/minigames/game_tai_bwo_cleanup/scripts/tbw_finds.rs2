@@ -1,0 +1,75 @@
+// The 377 plant has no loc operation: use a spade, or Dig beside it.
+[oplocu,village_gout_tuber]
+if (last_useitem ! spade) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~tbw_dig_gout;
+
+[proc,tbw_gout_spade]()(boolean)
+if (~tbw_in_village = false) return (false);
+def_int $x = -1;
+while ($x <= 1) {
+    def_int $z = -1;
+    while ($z <= 1) {
+        if (loc_find(movecoord(coord, $x, 0, $z), village_gout_tuber) = true) {
+            ~tbw_dig_gout;
+            return (true);
+        }
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+return (false);
+
+[proc,tbw_dig_gout]
+def_coord $plant = loc_coord;
+p_arrivedelay;
+if (loc_find($plant, village_gout_tuber) = false) return;
+if (inv_total(inv, spade) = 0) return;
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+anim(human_dig, 0);
+// No suspension between consuming the visible plant and giving its single tuber.
+loc_change(tai_bwo_jungle_vegetation_easy_5, ^tbw_jungle_respawn);
+inv_add(inv, village_rare_tuber, 1);
+// UNKNOWN dig XP: leave Farming XP unchanged; period XP describes cultivation.
+
+// VERIFIED guide statement: each find yields three gems.
+// Reuse the ordinary mining gates, pickaxe clock and gem drop table.
+[oploc1,village_gem_rock1] @mining_firstswing(tbw_mine_gem);
+[oploc3,village_gem_rock1] @mining_continue(tbw_mine_gem);
+[oploc1,village_gem_rock2] @mining_firstswing(tbw_mine_gem);
+[oploc3,village_gem_rock2] @mining_continue(tbw_mine_gem);
+[oploc1,village_gem_rock3] @mining_firstswing(tbw_mine_gem);
+[oploc3,village_gem_rock3] @mining_continue(tbw_mine_gem);
+[oploc2,village_gem_rock1] @prospect_rock(finish_prospect_normal);
+[oploc2,village_gem_rock2] @prospect_rock(finish_prospect_normal);
+[oploc2,village_gem_rock3] @prospect_rock(finish_prospect_normal);
+
+[label,tbw_mine_gem]
+def_int $low = 28;
+def_int $high = 70;
+// UNKNOWN reuse of the ordinary gem-rock success chart for an event rock.
+// CANDIDATE ordinary-rock charged glory effect.
+def_obj $neck = inv_getobj(worn, ^wearpos_front);
+if ($neck ! null & oc_category($neck) = category_557 & map_members = ^true) {
+    $low = multiply($low, 3);
+    $high = multiply($high, 3);
+}
+if (stat_random(mining, $low, $high) = false) {
+    p_oploc(3);
+    return;
+}
+if (loc_type = village_gem_rock1) loc_change(village_gem_rock2, ^tbw_find_lifetime);
+else if (loc_type = village_gem_rock2) loc_change(village_gem_rock3, ^tbw_find_lifetime);
+else loc_change(tai_bwo_jungle_vegetation_easy_5, ^tbw_jungle_respawn);
+def_namedobj $gem;
+def_int $quantity;
+$gem, $quantity = ~roll_on_drop_table(gem_rock_table);
+inv_add(inv, $gem, 1);
+stat_advance(mining, 650);
+sound_synth(found_gem, 1, 0);
+anim(null, 0);
