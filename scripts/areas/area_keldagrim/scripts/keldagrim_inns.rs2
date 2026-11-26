@@ -48,6 +48,7 @@ inv_add(inv, $drink, 1);
 // CANDIDATE: Transcript:Barmaid. Published Forgettable Tale stage 1 reaches
 // only the words-only Kelda refusal: no stout has been collected from the vat.
 [opnpc1,dwarf_city_barmaid_poor]
+if (~forget_kelda_barmaid = true) return;
 ~chatnpc("<p,neutral>Welcome to the Laughing Miner pub, human traveller.");
 def_int $choice = 0;
 if (%forget_quest = 1) {
