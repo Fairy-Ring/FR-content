@@ -1,0 +1,79 @@
+// VERIFIED mechanics: retained Tip.It Cabin Fever guide, 11 April 2006.
+// UNKNOWN functional messages and menu layout. Supply quantities follow the guide where stated.
+[oploc1,fever_repair_locker]
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+loc_change(fever_repair_locker_open, 100);
+
+[oploc1,fever_repair_locker_open]
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+def_int $choice = ~p_choice5("Rope", 1, "Repair planks", 2, "Tacks", 3, "Swamp paste", 4, "Hammer", 5);
+switch_int ($choice) {
+    case 1 : ~fever_supply(fever_rope, 1);
+    case 2 : ~fever_supply(fever_repair_plank, 1);
+    case 3 : ~fever_supply(fever_tack, 10);
+    case 4 : ~fever_supply(swamppaste, 1);
+    case 5 : ~fever_supply(hammer, 1);
+}
+
+[oploc2,fever_repair_locker_open]
+loc_change(fever_repair_locker, 100);
+
+[oploc1,fever_weapons_locker]
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+loc_change(fever_weapons_locker_open, 100);
+
+[oploc1,fever_weapons_locker_open]
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+def_int $choice = ~p_choice5("Fuse", 1, "Ramrod", 2, "Barrel", 3, "Ammunition", 4, "Tinderbox", 5);
+switch_int ($choice) {
+    case 1 : ~fever_supply(fever_fuse, 1);
+    case 2 : ~fever_supply(fever_cannon_prod, 1);
+    case 3 : ~fever_supply(fever_cannon, 1);
+    case 4 :
+        if (~p_choice2("Canister", 1, "Cannonball", 2) = 1) ~fever_supply(fever_cannister_load, 1);
+        else ~fever_supply(fever_cannon_ball, 1);
+    case 5 : ~fever_supply(fever_tinderbox, 1);
+}
+
+[oploc2,fever_weapons_locker_open]
+loc_change(fever_weapons_locker, 100);
+
+[oploc1,fever_your_gunpowder_barrel]
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+~fever_supply(fever_gunpowder, 1);
+
+[proc,fever_supply](namedobj $item, int $amount)
+// UNKNOWN handout bounds implement the guide's three repairs without exporting tradeable supplies.
+if ($item = hammer & (inv_total(inv, hammer) > 0 | %fever_holes_patched >= 3)) {
+    mes("You already have the supplies needed for the remaining repairs.");
+    return;
+}
+if ($item = swamppaste & inv_total(inv, swamppaste) >= calc(3 - %fever_holes_proofed)) {
+    mes("You already have the supplies needed for the remaining repairs.");
+    return;
+}
+if (inv_itemspace(inv, $item, $amount, inv_size(inv)) = false) {
+    mes("You need more inventory space.");
+    return;
+}
+inv_add(inv, $item, $amount);
+mes("You take <oc_name($item)>.");
+
+// VERIFIED: the period guide says ship supplies are removed on leaving the ship.
+// Remove ordinary repair items on battle departure, not unrelated harbour or post-quest travel.
+[proc,fever_remove_supplies]
+if (coordx(coord) >= 1792 & coordx(coord) < 1856 & coordz(coord) >= 4800 & coordz(coord) < 4864) {
+    ~del_all_if_exists(inv, hammer);
+    ~del_all_if_exists(inv, swamppaste);
+}
+~del_all_if_exists(inv, fever_rope);
+~del_all_if_exists(inv, fever_tinderbox);
+~del_all_if_exists(inv, fever_gunpowder);
+~del_all_if_exists(inv, fever_fuse);
+~del_all_if_exists(inv, fever_cannister_load);
+~del_all_if_exists(inv, fever_cannon_ball);
+~del_all_if_exists(inv, fever_cannon_prod);
+~del_all_if_exists(inv, fever_cannon);
+~del_all_if_exists(inv, fever_repair_plank);
+~del_all_if_exists(inv, fever_tack);
+~del_all_if_exists(inv, fever_plunder);

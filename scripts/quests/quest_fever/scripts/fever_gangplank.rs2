@@ -1,18 +1,25 @@
-// Cabin Fever — gangplank Cross dests. Stay fever_quest 1. No write 2.
-// Cross lands on the ship TOPSIDE (L1 deck o42), not the L0 hold.
-// Plank loc tiles 3710/3711 L1 are midair. Hold 3713,3496 L0 is below deck
-// (ladder later). Pier dest is L0. Do not bind Mos Le' 11211/11212.
+// UNKNOWN functional refusal and geometry landings. Original Cross operations and client fields are unchanged.
 
 [oploc1,fever_gangplank]
 if (%fever_quest < 1) {
-    mes("I don't think that whoever owns this ship will be happy with me wandering all over it.");
+    mes("Speak to Bill Teach before boarding.");
     return;
 }
-p_telejump(1_58_54_1_40); // 3713,3496 L1 — topside deck (not hold)
+p_telejump(^fever_port_deck);
 
 [oploc1,fever_gangplank_exit]
 if (%fever_quest < 1) {
-    mes("I don't think that whoever owns this ship will be happy with me wandering all over it.");
+    mes("Speak to Bill Teach before boarding.");
     return;
 }
-p_telejump(0_57_54_61_40); // 3709,3496 L0 — pier
+~fever_remove_supplies;
+p_telejump(^fever_port_pier);
+
+[oploc1,fever_gangplank_harmless]
+if (%fever_quest < ^fever_arrived) return;
+p_telejump(^fever_mos_deck);
+
+[oploc1,fever_gangplank_exit_harmless]
+if (%fever_quest < ^fever_arrived) return;
+~fever_remove_supplies;
+p_telejump(^fever_mos_pier);

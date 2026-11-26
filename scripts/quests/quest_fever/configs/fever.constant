@@ -1,0 +1,22 @@
+// UNKNOWN engineering stage values; complete=131 is the existing CANDIDATE registry terminal.
+^fever_accepted = 1
+^fever_sabotage = 10
+^fever_repairs = 20
+^fever_plunder_stage = 30
+^fever_fix_cannon = 40
+^fever_canister = 50
+^fever_canister_fired = 55
+^fever_sink_ship = 60
+^fever_arrived = 100
+// UNKNOWN geometry destinations, checked against the packed collision map by the quest test.
+^fever_battle_deck = 1_28_75_22_35
+^fever_port_deck = 1_58_54_1_40
+^fever_port_pier = 0_57_54_61_40
+^fever_mos_deck = 1_57_46_35_5
+^fever_mos_pier = 0_57_46_36_10
+^fever_own_hold = 0_28_75_22_35
+^fever_own_deck = 1_28_75_22_35
+^fever_enemy_hold = 0_28_75_31_30
+^fever_enemy_deck = 1_28_75_32_28
+^fever_own_mast = 2_28_75_24_30
+^fever_enemy_mast = 2_28_75_31_35

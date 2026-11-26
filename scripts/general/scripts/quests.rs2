@@ -498,6 +498,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:roving_elves, %roving_elves_quest, ^roving_complete);
 ~send_quest_progress_colour(questlist:tog, %tog_juna_bowl, ^tog_quest_complete);
 ~send_quest_progress_colour(questlist:giantdwarf, %giantdwarf_quest, ^giantdwarf_complete);
+~send_quest_progress_colour(questlist:fever, %fever_quest, ^fever_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

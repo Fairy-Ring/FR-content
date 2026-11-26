@@ -1,0 +1,161 @@
+// VERIFIED sequence: Tip.It guide captured 11 April 2006. UNKNOWN functional text and movement geometry.
+[oploc1,fever_ship_ladder]
+if (coordx(loc_coord) > 3000) {
+    if (loc_angle = 3) p_telejump(movecoord(loc_coord, -1, 1, 0));
+    else p_telejump(movecoord(loc_coord, 0, 1, 1));
+    return;
+}
+if (coordx(loc_coord) < 1820) p_telejump(^fever_own_deck);
+else p_telejump(^fever_enemy_deck);
+
+[oploc1,fever_ship_laddertop]
+if (coordx(loc_coord) > 3000) {
+    if (loc_angle = 3) p_telejump(movecoord(loc_coord, -1, -1, 0));
+    else p_telejump(movecoord(loc_coord, 0, -1, 1));
+    return;
+}
+if (coordx(loc_coord) < 1820) p_telejump(^fever_own_hold);
+else p_telejump(^fever_enemy_hold);
+
+[oploc1,fever_climbing_net]
+if (stat(agility) < 42) { mes("You need an Agility level of 42."); return; }
+if (coordx(loc_coord) < 1820) p_telejump(^fever_own_mast);
+else p_telejump(^fever_enemy_mast);
+
+[oploc1,fever_climb_down_location]
+if (coordx(loc_coord) > 3000) { p_telejump(movecoord(loc_coord, -1, -1, 0)); return; }
+if (coordx(loc_coord) < 1820) p_telejump(^fever_own_deck);
+else p_telejump(^fever_enemy_deck);
+
+[oplocu,fever_sail1_hoistedl_climb] @fever_swing;
+[oplocu,fever_sail1_hoistedl_climb_nomirror] @fever_swing;
+[oplocu,fever_sail1_hoistedl_climb_withrope_] @fever_swing;
+[oplocu,fever_sail1_hoistedl_climb_nomirror_withrope_] @fever_swing;
+
+[label,fever_swing]
+if (%fever_quest < ^fever_sabotage | %fever_quest >= ^fever_arrived) return;
+if (last_useitem ! fever_rope & last_useitem ! rope) { ~displaymessage(^dm_default); return; }
+if (stat(agility) < 42) { mes("You need an Agility level of 42."); return; }
+inv_del(inv, last_useitem, 1);
+// Cache-backed player swing sequences; the two-tick crossing duration is UNKNOWN engineering timing.
+anim(fever_player_rope_swing_start, 0);
+p_delay(0);
+def_coord $landing = ^fever_own_deck;
+def_int $direction = ^exact_west;
+if (coordx(loc_coord) < 1820) { $landing = ^fever_enemy_deck; $direction = ^exact_east; }
+anim(fever_player_rope_swing_base_anim, 0);
+p_exactmove(coord, movecoord($landing, 0, 1, 0), 0, 60, $direction);
+p_delay(2);
+if (coordx(loc_coord) < 1820) {
+    %fever_swing = 1;
+    p_telejump(^fever_enemy_deck);
+} else {
+    %fever_swing_2 = 1;
+    p_telejump(^fever_own_deck);
+}
+anim(fever_player_rope_swing_land_success, 0);
+mes("You swing across to the other ship.");
+
+[oplocu,fever_gunpowder_barrel] @fever_sabotage_powder;
+[oplocu,fever_gunpowder_barrel_exploded] @fever_sabotage_powder;
+[oplocu,fever_gunpowder_barrel_fused] @fever_sabotage_powder;
+[oplocu,toms_fever_cannon_fused] @fever_sabotage_powder;
+[oplocu,toms_fever_fuse] @fever_light_powder;
+
+[label,fever_sabotage_powder]
+if (%fever_quest ! ^fever_sabotage) return;
+if (last_useitem = fever_fuse & %fever_gunpowder_barrel = 0) {
+    inv_del(inv, fever_fuse, 1);
+    %fever_gunpowder_barrel = 2;
+    %fever_fuse_1 = 1;
+    %fever_fuse_2 = 1;
+    mes("You attach the fuse to the powder barrel.");
+    return;
+}
+@fever_light_powder;
+
+[label,fever_light_powder]
+if (%fever_quest ! ^fever_sabotage | %fever_gunpowder_barrel ! 2) return;
+if (last_useitem ! fever_tinderbox & last_useitem ! tinderbox) { ~displaymessage(^dm_default); return; }
+%fever_gunpowder_barrel = 1;
+%fever_fuse_1 = 0;
+%fever_fuse_2 = 0;
+%fever_enemy_cannon = 1;
+%fever_cannon = 2;
+%fever_quest = ^fever_repairs;
+mes("The powder explodes, destroying the enemy cannon. Your own ship has taken damage.");
+
+[oploc1,toms_fever_shiphull_leak] @fever_patch_hole;
+[oploc1,toms_fever_shiphull_twickle] @fever_patch_hole;
+[oplocu,toms_fever_shiphull_leak]
+if (last_useitem ! fever_repair_plank & last_useitem ! hammer) { ~displaymessage(^dm_default); return; }
+@fever_patch_hole;
+[oplocu,toms_fever_shiphull_twickle]
+if (last_useitem ! swamppaste) { ~displaymessage(^dm_default); return; }
+@fever_patch_hole;
+[oploc1,fever_multi_hole_1] @fever_patch_hole;
+[oploc1,fever_multi_hole_2] @fever_patch_hole;
+[oploc1,fever_multi_hole_3] @fever_patch_hole;
+
+[label,fever_patch_hole]
+if (%fever_quest ! ^fever_repairs | coordx(loc_coord) ! 1816) return;
+def_int $hole = 0;
+switch_int (coordz(loc_coord)) {
+    case 4834 : $hole = %fever_hole_1;
+    case 4832 : $hole = %fever_hole_2;
+    case 4830 : $hole = %fever_hole_3;
+    case default : return;
+}
+if ($hole = 0) {
+    if (inv_total(inv, fever_repair_plank) < 2 | inv_total(inv, fever_tack) < 10 | inv_total(inv, hammer) = 0) {
+        mes("You need two repair planks, ten tacks and a hammer.");
+        return;
+    }
+    inv_del(inv, fever_repair_plank, 2);
+    inv_del(inv, fever_tack, 10);
+    $hole = 1;
+    %fever_holes_patched = calc(%fever_holes_patched + 1);
+    mes("You nail the planks over the leak.");
+} else if ($hole = 1) {
+    if (inv_total(inv, swamppaste) = 0) { mes("You need swamp paste to waterproof the repair."); return; }
+    inv_del(inv, swamppaste, 1);
+    $hole = 2;
+    %fever_holes_proofed = calc(%fever_holes_proofed + 1);
+    mes("You waterproof the repair with swamp paste.");
+} else return;
+switch_int (coordz(loc_coord)) {
+    case 4834 : %fever_hole_1 = $hole;
+    case 4832 : %fever_hole_2 = $hole;
+    case 4830 : %fever_hole_3 = $hole;
+}
+
+[oploc1,fever_crate] @fever_loot(1);
+[oploc1,fever_crate_empty] @fever_loot(1);
+[oploc1,fever_chestclosed] @fever_loot(2);
+[oploc1,fever_chestopen] @fever_loot(2);
+[oploc1,fever_barrel_full] @fever_loot(3);
+[oploc1,fever_barrel_empty] @fever_loot(3);
+
+[label,fever_loot](int $container)
+if (%fever_quest ! ^fever_plunder_stage) return;
+if (calc(%fever_plunder_points + inv_total(inv, fever_plunder)) >= 10) { mes("You have enough plunder."); return; }
+if (inv_freespace(inv) = 0) { mes("You need more inventory space."); return; }
+inv_add(inv, fever_plunder, 1);
+// UNKNOWN favourable replenishment: a lost stack never permanently empties a quest container.
+switch_int ($container) {
+    case 1 : %fever_crate = 1;
+    case 2 : %fever_chest = 1;
+    case 3 : %fever_barrel = 1;
+}
+mes("You find some plunder.");
+
+[oploc1,fever_plunder_deposit]
+mes("You have stored <tostring(%fever_plunder_points)> stacks of plunder.");
+
+[oploc2,fever_plunder_deposit]
+if (%fever_quest ! ^fever_plunder_stage) return;
+def_int $amount = min(inv_total(inv, fever_plunder), calc(10 - %fever_plunder_points));
+if ($amount = 0) { mes("You have no plunder to store."); return; }
+inv_del(inv, fever_plunder, $amount);
+%fever_plunder_points = calc(%fever_plunder_points + $amount);
+mes("You store the plunder.");

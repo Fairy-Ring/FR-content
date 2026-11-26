@@ -19,10 +19,12 @@ const left = [
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_repaired', 1, [1, 2]],
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_damaged', 0, [1]],
   ['hundred_goodchest', 'hundred_goodchest_base', 3, [1, 2, 3]],
+  ['mausoleum', 'mausoleum', null, [1]]
+];
+const builtFever = [
   ['fever_plunder_deposit', 'fever_plunder_deposit', null, [1, 2]],
   ['fever_multi_chest', 'fever_chestclosed', 0, [1]],
-  ['fever_multi_chest', 'fever_chestopen', 1, [1]],
-  ['mausoleum', 'mausoleum', null, [1]]
+  ['fever_multi_chest', 'fever_chestopen', 1, [1]]
 ];
 const natural = name => placements.filter(p => p.type === id('LocType', name));
 const component = name => id('Component', name);
@@ -153,7 +155,7 @@ for (const placement of pirateBooths) {
     assert.equal(greeting, option === 1, 'Use reuses the published pirate conversation; quick-bank does not speak');
   }
 }
-console.log("PASS Mos Le Harmless: service built; the route to the island is not built: missing Cabin Fever voyage and island arrival; three natural booths reuse published pirate bank paths");
+console.log('PASS Mos Le Harmless: three natural booths reuse the published pirate bank paths');
 // Transaction checks use the actual bank interface packet handler and its listeners.
 const transactionLoc = locAt(natural('elid_bankbooth')[0]);
 const transaction = fixture(natural('elid_bankbooth')[0], [1, 0]);
@@ -168,6 +170,24 @@ assert(invButton(transaction, 'bank_main:bank', 'bronze_dagger', 1, 0), 'real wi
 assert.equal(count(transaction, 'bronze_dagger'), 1);
 assert.equal(count(transaction, 'bronze_dagger', id('InvType', 'bank')), 0);
 console.log('PASS deposit and withdraw one item through the published bank interfaces');
+for (const [root, visible, state, options] of builtFever) {
+  const all = natural(root);
+  assert(all.length, `${root} has an original placement`);
+  for (const placement of all) {
+    for (const option of options) {
+      const loc = locAt(placement), p = fixture(placement);
+      setForm(p, loc, state);
+      assert.equal(p.resolveLocTypeForTrigger(types.LocType.get(loc.type)).id, id('LocType', visible), `${root} fixture shows ${visible}`);
+      arm(p, loc, option);
+      assert.equal(p.getApTrigger(), null, `${visible} option ${option} uses its built OP handler`);
+      const script = p.getOpTrigger();
+      assert(script, `${visible} option ${option} resolves through production dispatch`);
+      assert.equal(script.info.sourceFilePath, 'scripts/quests/quest_fever/scripts/fever_battle.rs2',
+        `${visible} option ${option} reaches its owning quest instead of a bank fallback`);
+    }
+  }
+  console.log(`PASS built Cabin Fever: ${root} -> ${visible}, options ${options.join(',')}`);
+}
 for (const [root, visible, state, options] of left) {
   const all = natural(root);
   assert(all.length, `${root} has an original placement`);
