@@ -1,0 +1,212 @@
+// Period guides attest trolley pickup, two trips, time limit, and the two stands.
+// CANDIDATE dialogue and one/four-tile movement: retained Garden transcript.
+// UNKNOWN engineering routes, five-minute deadline and recovery are favourable defaults.
+
+[label,garden_trolley_request]
+~chatplayer("<p,quiz>How am I supposed to move statues all the way here?");
+~chatnpc("<p,neutral>You use the dormant object that lies between your ears, that's how. A statue may be far too heavy to carry, but simplicity itself to push.");
+~garden_trolley_recover;
+if (%garden_trolley_uid ! null) { return; }
+if (inv_total(inv, garden_trolley_obj) > 0 | inv_total(bank, garden_trolley_obj) > 0) { return; }
+if (inv_freespace(inv) = 0) {
+    ~chatnpc("<p,neutral>Yes peasant, push. One would give you something to help with this task, but you do not appear to have room enough to carry it.");
+    return;
+}
+inv_add(inv, garden_trolley_obj, 1);
+~chatnpc("<p,neutral>Yes peasant, push. Here - take this trolley. You can use it to push the statues here.");
+return;
+
+// Restore the source of an expired, logged-out or otherwise missing owned trolley.
+// Never touch another player's actor, even after a UID becomes stale.
+[proc,garden_trolley_recover]
+if (%garden_trolley_uid ! null & map_clock < %garden_trolley_deadline) {
+    if (npc_finduid(%garden_trolley_uid) = true) {
+        if (%npc_attacking_uid = uid) { return; }
+    }
+}
+if (%garden_trolley_uid ! null) {
+    if (npc_finduid(%garden_trolley_uid) = true) {
+        if (%npc_attacking_uid = uid) { npc_del; }
+    }
+}
+%garden_trolley_uid = null;
+%garden_trolley_deadline = 0;
+%garden_trolley_varbit = 0;
+if (%garden_saradomin_statue_varbit = 1) { %garden_saradomin_statue_varbit = 0; }
+if (%garden_king_statue_varbit = 1) { %garden_king_statue_varbit = 0; }
+clearsofttimer(garden_trolley_watch);
+
+[oplocu,garden_saradomin_statue]
+p_arrivedelay;
+if (last_useitem ! garden_trolley_obj | %garden_quest < 1 | %garden_quest >= 50) { return; }
+if (%garden_saradomin_statue_varbit ! 0) { return; }
+~garden_trolley_recover;
+if (%garden_trolley_uid ! null) { return; }
+// The source statue is one square; its north neighbour is outside its collision.
+def_coord $spawn = movecoord(loc_coord, 0, 0, 1);
+if (map_blocked($spawn) = true) { return; }
+if (%garden_cutscene_billybob = 0) {
+    ~garden_falador_scene;
+    %garden_cutscene_billybob = 1;
+}
+~garden_load_trolley(garden_trolley_saradomin, $spawn, 1);
+return;
+
+[oplocu,statue_lumbridge]
+p_arrivedelay;
+if (last_useitem ! garden_trolley_obj | %garden_quest < 1 | %garden_quest >= 50) { return; }
+if (%garden_king_statue_varbit ! 0) { return; }
+~garden_trolley_recover;
+if (%garden_trolley_uid ! null) { return; }
+def_coord $spawn = movecoord(loc_coord, 1, 0, 0);
+if (map_blocked($spawn) = true) { return; }
+~garden_load_trolley(garden_trolley_king, $spawn, 2);
+return;
+
+[oplocu,garden_queen_statue]
+if (last_useitem = garden_trolley_obj) {
+    ~chatplayer("<p,neutral>I'm supposed to be getting a statue of a KING from Lumbridge. I'm no expert, but that looks like a QUEEN to me.");
+}
+return;
+
+[proc,garden_load_trolley](npc $type, coord $spawn, int $kind)
+if (inv_total(inv, garden_trolley_obj) = 0) { return; }
+inv_del(inv, garden_trolley_obj, 1);
+if ($kind = 1) { %garden_saradomin_statue_varbit = 1; }
+else { %garden_king_statue_varbit = 1; }
+%garden_trolley_varbit = $kind;
+npc_add($spawn, $type, ^garden_trolley_ticks);
+%npc_attacking_uid = uid;
+%garden_trolley_uid = npc_uid;
+%garden_trolley_deadline = add(map_clock, ^garden_trolley_ticks);
+npc_setmode(none);
+npc_settimer(10);
+softtimer(garden_trolley_watch, 10);
+
+[opnpc1,garden_trolley_saradomin] ~garden_trolley_move(1, false);
+[opnpc1,garden_trolley_king] ~garden_trolley_move(1, false);
+[opnpc3,garden_trolley_saradomin] ~garden_trolley_move(1, true);
+[opnpc3,garden_trolley_king] ~garden_trolley_move(1, true);
+[opnpc4,garden_trolley_saradomin] ~garden_trolley_move(^garden_big_push_tiles, false);
+[opnpc4,garden_trolley_king] ~garden_trolley_move(^garden_big_push_tiles, false);
+[opnpc5,garden_trolley_saradomin] ~garden_trolley_place;
+[opnpc5,garden_trolley_king] ~garden_trolley_place;
+
+[proc,garden_trolley_owned]()(boolean)
+if (npc_uid = %garden_trolley_uid & %npc_attacking_uid = uid & map_clock < %garden_trolley_deadline) { return(true); }
+return(false);
+
+[proc,garden_trolley_move](int $steps, boolean $pull)
+if (~garden_trolley_owned = false) { return; }
+def_int $dx = sub(coordx(npc_coord), coordx(coord));
+def_int $dz = sub(coordz(npc_coord), coordz(coord));
+if ($dx = 0 & $dz = 0) { return; }
+// Dominant cardinal axis. Check every tile, including walls, for a Big-push.
+if (abs($dx) > abs($dz)) {
+    $dz = 0;
+    $dx = divide($dx, abs($dx));
+} else {
+    $dx = 0;
+    $dz = divide($dz, abs($dz));
+}
+if ($pull = true) { $dx = multiply($dx, -1); $dz = multiply($dz, -1); }
+def_int $step = 0;
+while ($step < $steps) {
+    def_coord $old = npc_coord;
+    def_coord $next = movecoord($old, $dx, 0, $dz);
+    if (lineofwalk($old, $next) = false | map_blocked($next) = true) { return; }
+    if ($pull = true) {
+        def_coord $back = movecoord(coord, $dx, 0, $dz);
+        if (lineofwalk(coord, $back) = false | map_blocked($back) = true) { return; }
+        p_teleport($back);
+    } else {
+        p_teleport($old);
+    }
+    anim(garden_push_trolley, 0);
+    npc_tele($next);
+    $step = add($step, 1);
+    // Period guides: leaving Falador / crossing the Lum completes the long haul.
+    if (npc_type = garden_trolley_saradomin & inzone(0_46_52_17_53, 0_46_53_25_20, npc_coord) = true & coordz(npc_coord) >= ^garden_falador_exit_z) {
+        npc_tele(^garden_saradomin_dropoff);
+        p_teleport(movecoord(^garden_saradomin_dropoff, 0, 0, 1));
+        return;
+    }
+    if (npc_type = garden_trolley_king & inzone(0_50_50_30_16, 0_50_50_50_25, npc_coord) = true & coordx(npc_coord) >= ^garden_lumbridge_exit_x) {
+        npc_tele(^garden_king_dropoff);
+        p_teleport(movecoord(^garden_king_dropoff, 0, 0, 1));
+        return;
+    }
+    p_delay(1);
+}
+
+[proc,garden_trolley_place]
+if (~garden_trolley_owned = false) { return; }
+def_coord $plinth = ^garden_saradomin_plinth;
+if (npc_type = garden_trolley_king) { $plinth = ^garden_king_plinth; }
+if (distance(npc_coord, $plinth) > 1) {
+    mes("You need to move the trolley next to a plinth before you can place the statue - it's too heavy to carry very far.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    // UNKNOWN inventory retry message. Do not place or lose the trolley.
+    mes("You need room in your inventory for the trolley.");
+    return;
+}
+if (npc_type = garden_trolley_saradomin) {
+    %garden_saradomin_statue_varbit = 2;
+    mes("You place the statue of Saradomin on the plinth.");
+} else {
+    %garden_king_statue_varbit = 2;
+    mes("You place the statue of the king on a plinth.");
+}
+npc_del;
+%garden_trolley_uid = null;
+%garden_trolley_deadline = 0;
+%garden_trolley_varbit = 0;
+clearsofttimer(garden_trolley_watch);
+inv_add(inv, garden_trolley_obj, 1);
+
+[softtimer,garden_trolley_watch]
+if (%garden_trolley_uid = null) { clearsofttimer(garden_trolley_watch); return; }
+if (map_clock >= %garden_trolley_deadline | npc_finduid(%garden_trolley_uid) = false) {
+    queue(garden_trolley_expired, 0, 0);
+}
+
+[queue,garden_trolley_expired]
+~garden_trolley_recover;
+mes("The guards have recaptured the statue and returned it. Ask Ellamaria for another trolley.");
+
+[ai_timer,garden_trolley_saradomin] ~garden_trolley_actor_watch;
+[ai_timer,garden_trolley_king] ~garden_trolley_actor_watch;
+
+[proc,garden_trolley_actor_watch]
+if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
+if (%garden_trolley_uid ! npc_uid) { npc_del; }
+
+[oploc2,garden_saradomin_statue_plinth]
+~mesbox("An empty plinth for a statue.");
+[oploc2,garden_king_statue_plinth]
+~mesbox("An empty plinth for a statue.");
+
+[proc,garden_falador_scene]
+~chatplayer("<p,neutral>(Hmmm ... better not let those guards see me...)");
+~mesbox("Meanwhile, Billy - a new recruit of the Falador Guard - has just arrived for his first shift, guarding the Northern Falador gates...");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,quiz>So what are you doing this weekend?");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,quiz>This weekend?");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>You haven't been here long I take it.");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,quiz>What do you mean?");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,quiz>Do you know the life expectancy of a Falador guard?");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,neutral>No...");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>About thirty seconds, I reckon.");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,shock>Thirty seconds???");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,shock>They didn't tell me that when I signed up!!!");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>Any second now someone is going to try and kill us, for no apparent reason, completely unprovoked.");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,quiz>But why, Bob???");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,quiz>What have we ever done to them?");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>I don't know, Billy.");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>But I'm not wasting my final seconds worrying about it.");
+~mesbox("Meanwhile...");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>Uh-oh, someone's coming...");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,quiz>Bob???");
+~chatnpc_specific("Bob", garden_cutscene_guard_2, "<p,neutral>Steady, Billy - remember you are a guard of Falador.");
+~chatnpc_specific("Billy", garden_cutscene_guard_1, "<p,neutral>But...");

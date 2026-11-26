@@ -484,6 +484,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:dwarfrock, %dwarfrock_quest, ^dwarfrock_complete);
 ~send_quest_progress_colour(questlist:devious, %devious_main, ^devious_complete);
 ~send_quest_progress_colour(questlist:enakh, %enakh_quest, ^enakh_complete);
+~send_quest_progress_colour(questlist:garden, %garden_quest, ^garden_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

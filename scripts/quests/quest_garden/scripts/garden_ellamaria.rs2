@@ -1,12 +1,21 @@
-// Garden of Tranquillity start — Ellamaria (queen_ellamaria 2581) @ 3228,3477.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Starting off minus
-// Overview / req toast. Hunt 289? no. No king_roald splice.
-// Accept: %garden_quest 0→1 + garden_list. No farmer / trolley / statue.
-// Cite garden-tranquillity-first-product-slice-377.md §5.
+// Garden of Tranquillity. CANDIDATE dialogue from the retained transcript.
+// UNKNOWN engineering start enforcement: period requirements, functional refusal.
 
 [opnpc1,queen_ellamaria]
+if (%garden_quest = ^garden_complete) { @garden_postquest; }
+if (%garden_quest = 55) { @garden_reveal; }
+if (%garden_quest = 50) {
+    ~chatnpc("<p,quiz>So are you going to get Rollie then?");
+    ~chatplayer("<p,neutral>No, I haven't spoken to Roll ... King Roald ... yet.");
+    ~chatnpc("<p,neutral>Well hurry along peasant. This garden will be such a wonderful surprise!");
+    return;
+}
 if (%garden_quest >= 1) {
     @garden_ellamaria_started;
+}
+if (%fenk_quest < ^fenk_complete | stat_base(farming) < 25) {
+    mes("You need level 25 Farming and must have completed Creature of Fenkenstrain.");
+    return;
 }
 @garden_ellamaria_pitch;
 
@@ -41,6 +50,7 @@ if (inv_freespace(inv) < 1) {
 inv_add(inv, garden_list, 1);
 if (%garden_quest = 0) {
     %garden_quest = 1;
+    ~update_questlist;
 }
 ~chatplayer("<p,happy>I would be happy to help someone who is so in touch with the people.");
 ~chatnpc("<p,neutral>Ah, more sarcasm - wonderful. Well, it is nice to have a master of the fine art of gardening to assist me; in the absence of any such person, I gladly accept your service.");
@@ -56,7 +66,9 @@ if (%garden_quest = 0) {
 return;
 
 [label,garden_ellamaria_started]
-def_int $s = ~p_choice3("Can I have another list?", 1, "What I am supposed to be getting again?", 2, "Will these patches need much in the way of watering?", 3);
+def_int $s = ~p_choice5("Can I have another list?", 1, "What I am supposed to be getting again?", 2, "Will these patches need much in the way of watering?", 3, "How am I supposed to move statues all the way here?", 4, "Well, I think that's everything...", 5);
+if ($s = 4) { @garden_trolley_request; }
+if ($s = 5) { @garden_ellamaria_check; }
 if ($s = 3) {
     ~chatplayer("<p,quiz>Will these patches need much in the way of watering?");
     ~chatnpc("<p,neutral>Well, you are supposed to be the gardener here, but I would say not. One had the soil imported from an extremely fertile area at great cost - watering should not be necessary one would have thought.");

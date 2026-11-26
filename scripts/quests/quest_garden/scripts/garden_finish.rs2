@@ -1,0 +1,152 @@
+// Garden completion: period rewards from Tip.It, 2 May 2006.
+// Dialogue: CANDIDATE retained Garden transcript, with later changes subtracted.
+// UNKNOWN engineering stages: 50 invitation, 55 reveal, 60 existing completion.
+// UNKNOWN functional refusals below provide retryable inventory/prerequisite gates.
+
+[proc,garden_ready_for_reveal]()(boolean)
+if (~garden_all_grown = true & %garden_saradomin_statue_varbit = 2 & %garden_king_statue_varbit = 2) { return(true); }
+return(false);
+
+[label,garden_ellamaria_check]
+~chatplayer("<p,neutral>Well, I think that's everything...");
+~chatnpc("<p,neutral>One finds that hard to believe. Out of my way, let me see for myself.");
+if (~garden_ready_for_reveal = false) {
+    ~chatnpc("<p,neutral>One was right not to trust your word, common as it is. The garden is not yet complete.");
+    return;
+}
+~chatnpc("<p,happy>Oh yes, very nice, if a little yobbish. Rollie will be so pleased-");
+~chatplayer("<p,shock>Rollie?!?");
+~chatnpc("<p,angry>You will address my husband by his proper title!!!!! Speaking of whom, I think it is time that we brought him to see his new garden. And when one says we, one means you.");
+%garden_quest = 50;
+~chatplayer("<p,neutral>Oh, you want me to go and get Roald - sorry ... King Roald ... and bring him here. Fair enough, wait here then, I'll be back in a mo.");
+return;
+
+[label,garden_roald_invitation]
+~chatnpc("<p,quiz>Yes, citizen. Do you need something?");
+if (~p_choice2("Would you like to follow me for a minute?", 1, "Not really.", 2) = 2) {
+    ~chatnpc("<p,neutral>You will have to excuse me then. I am very busy as I have a kingdom to run!");
+    return;
+}
+~chatplayer("<p,quiz>Would you like to follow me for a minute?");
+~chatnpc("<p,angry>Follow you?!? I am the King! I am the followed, not the follower!!");
+if (inv_total(worn, ring_of_charos_unlocked) = 0) {
+    ~chatnpc("<p,neutral>Suit yourself.");
+    return;
+}
+if (~p_choice2("Well, if you can't be bothered then neither can I.", 1, "[Charm] Of course, your majesty - please forgive me.", 2) = 1) {
+    return;
+}
+~chatplayer("<p,neutral>Of course, your majesty - please forgive me.");
+~chatnpc("<p,neutral>Forgiveness is something that cannot be earned so easily. And I'm certainly not following you off on some wild goose chase when I have important matters of state to attend to.");
+if (~p_choice2("That's it - I've had it with royalty.", 1, "[Charm] The Queen asked me to bring you.", 2) = 1) {
+    ~chatnpc("<p,angry>And I've had enough of peasantry! Get out of my castle!");
+    return;
+}
+~chatplayer("<p,neutral>The Queen asked me to bring you.");
+~chatnpc("<p,quiz>Ellie?");
+~chatnpc("<p,neutral>Now that's a different matter. Lead on, peasant - let's see what my darling wife has been up to now.");
+%garden_quest = 55;
+// UNKNOWN engineering follower lifetime: five minutes, safely reacquired at Ellamaria.
+npc_add(coord, king_roald_cutscene, 500);
+%npc_attacking_uid = uid;
+npc_setmode(playerfollow);
+npc_settimer(10);
+return;
+
+[ai_timer,king_roald_cutscene]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%garden_quest ! 55) {
+    npc_del;
+}
+
+[label,garden_reveal]
+if (~garden_ready_for_reveal = false) {
+    return;
+}
+// Count only the additional slots needed by the three stackable seed rewards.
+def_int $spaces = 1;
+if (inv_total(inv, apple_tree_seed) = 0) { $spaces = add($spaces, 1); }
+if (inv_total(inv, acorn) = 0) { $spaces = add($spaces, 1); }
+if (inv_total(inv, guam_seed) = 0) { $spaces = add($spaces, 1); }
+if (inv_freespace(inv) < $spaces) {
+    ~chatnpc("<p,neutral>Make room in your inventory for your reward, peasant.");
+    return;
+}
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>This is murder on my hay fever you know...");
+~chatnpc("<p,happy>Ah, Rollie my love!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,quiz>What have you been up to now, pumpkin?");
+~chatnpc("<p,happy>Behold your new garden!!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,quiz>Have you been spending my money again?");
+~chatplayer("<p,neutral>Here's some orchids from Morytania.");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>Orchids bring me out in a rash.");
+~chatplayer("<p,neutral>Vines from Burthorpe!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>Oh great, let's hope they don't eat into the walls.");
+~chatplayer("<p,neutral>Snowdrops from Ardougne!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>What a boring colour.");
+~chatplayer("<p,neutral>The last surviving White Tree!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>Should make a nice table and chairs.");
+~chatplayer("<p,neutral>Delphiniums from Falador!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>I hate delphiniums.");
+~chatnpc("<p,quiz>Rollie?");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,quiz>Yes pumpkin?");
+npc_anim(garden_queen_slap, 0);
+if (.npc_find(coord, king_roald_cutscene, 10, 0) = true) {
+    if (.%npc_attacking_uid = uid) { .npc_anim(garden_slap_hit, 0); }
+}
+~chatnpc("<p,angry>One has gone to great pains to provide you with this beautiful garden!");
+~chatnpc("<p,angry>YOU CAN SHOW ONE A LITTLE GRATITUDE!!");
+~chatplayer("<p,neutral>Actually I think I did most of-");
+~chatnpc("<p,angry>SILENCE!!");
+~chatnpc("<p,angry>Well? Are you going to thank one, Rollie?");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>Pumpkin I-");
+~chatnpc("<p,angry>SPEAK UP, I CAN'T HEAR YOU!!");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>Thank you very much my darling.");
+~chatnpc("<p,neutral>Much better. Now get back to the castle and rule our kingdom.");
+~chatnpc_specific("King Roald", king_roald_cutscene, "<p,neutral>Yes pumpkin.");
+~chatnpc("<p,neutral>Excuse my husband, he can be so rude sometimes.");
+~chatplayer("<p,quiz>Only sometimes?");
+~chatnpc("<p,angry>Are you being rude again ... ?");
+~chatnpc("<p,neutral>Yes, and that's all he deserves! Here you go, your help here has proved invaluable.");
+~garden_complete;
+return;
+
+[proc,garden_complete]
+if (%garden_quest ! 55 | ~garden_ready_for_reveal = false) { return; }
+def_int $spaces = 1;
+if (inv_total(inv, apple_tree_seed) = 0) { $spaces = add($spaces, 1); }
+if (inv_total(inv, acorn) = 0) { $spaces = add($spaces, 1); }
+if (inv_total(inv, guam_seed) = 0) { $spaces = add($spaces, 1); }
+if (inv_freespace(inv) < $spaces) { return; }
+// Commit once-only state before any reward. No suspension in this transaction.
+%garden_quest = ^garden_complete;
+stat_advance(farming, 50000);
+inv_add(inv, apple_tree_seed, 1);
+inv_add(inv, acorn, 1);
+inv_add(inv, guam_seed, 5);
+inv_add(inv, supercompost_potion_4, 1);
+~send_quest_complete(questlist:garden, garden_white_tree_plantpot_sapling, 250, ^garden_questpoints, "You have completed the\\nGarden of Tranquillity!", "5,000 Farming XP|1 apple tree seed and 1 acorn|5 guam seeds|1 compost potion (4)");
+~update_questlist;
+
+[label,garden_postquest]
+if (~p_choice2("What's the supercompost potion for?", 1, "Can I use this garden for my own farming?", 2) = 1) {
+    ~chatnpc("<p,neutral>Oh, let one see peasant - perhaps it is a potion for making supercompost?");
+    ~chatnpc("<p,neutral>You wish to know how to use it? Pour it on some normal compost and it will transform into supercompost. You can do this with a bucket of compost, although it is possibly wiser to use it on a full compost bin.");
+    return;
+}
+~chatnpc("<p,angry>What, you want to dig up the plants that took one so long to grow? Don't be ridiculous, you silly little fool.");
+~chatnpc("<p,neutral>Impertinent peasant! Oh, if you promise to leave one alone then feel free to pick fruit from the White Tree. One is told that they are a great natural energy restorative.");
+return;
+
+[if_button,questlist:garden]
+if (%garden_quest = ^garden_complete) {
+    ~quest_journal("Garden of Tranquillity", "I completed King Roald's garden and received my reward.");
+} else if (%garden_quest >= 50) {
+    ~quest_journal("Garden of Tranquillity", "The garden is ready. I should bring King Roald to Ellamaria.");
+} else if (%garden_quest > 0) {
+    ~quest_journal("Garden of Tranquillity", "Ellamaria gave me a list of plants and statues for King Roald's garden.|The Wise Old Man in Draynor can help me master persuasion.");
+} else {
+    ~quest_journal("Garden of Tranquillity", "I can help Queen Ellamaria in the eastern palace garden in Varrock.|I need level 25 Farming and Creature of Fenkenstrain.");
+}
