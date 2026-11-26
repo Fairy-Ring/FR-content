@@ -1,0 +1,14 @@
+// UNKNOWN table weights and main/secondary partition. The period lists give no rates.
+// The implementation uses one slot per expanded row and leaves all other slots no-drop.
+^chaoselem_drop_main_roll_slots = 128
+^chaoselem_drop_secondary_roll_slots = 32
+
+// Quantity endpoints are reported by the period guides; selection within alternatives
+// or ranges is UNKNOWN. These constants encode only the random draw domains.
+^chaoselem_drop_coins_min = 100
+^chaoselem_drop_coin_quantity_draws = 2901
+^chaoselem_drop_iron_arrows_min = 200
+^chaoselem_drop_iron_arrow_quantity_draws = 301
+^chaoselem_drop_two_quantity_choices = 2
+^chaoselem_drop_bat_bone_quantity_choices = 4
+^chaoselem_drop_herb_quantity_choices = 3

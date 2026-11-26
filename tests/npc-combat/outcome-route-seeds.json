@@ -3,6 +3,15 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_applayer2,chaoselemental]",
+      "npc": "chaoselemental",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
       "script": "[ai_opplayer2,zogre_1]",
       "npc": "zogre_1",
       "seeds": {
