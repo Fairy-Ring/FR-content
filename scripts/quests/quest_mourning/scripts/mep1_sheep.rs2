@@ -1,0 +1,126 @@
+[opheldu,empty_ogre_bellows] @mep1_dye_bellows;
+[opheldu,mourning_paint_gun] @mep1_load_gun;
+[opheld1,mourning_paint_gun] @mep1_empty_gun;
+
+[label,mep1_dye_bellows]
+if (%mourning_quest ! ^mep1_device_fixed) return;
+if (inv_total(inv, empty_ogre_bellows) < 1) return;
+switch_obj(last_useitem) {
+    case reddye :
+        inv_del(inv, reddye, 1);
+        inv_del(inv, empty_ogre_bellows, 1);
+        inv_add(inv, mourning_ogre_bellows_red, 1);
+    case bluedye :
+        inv_del(inv, bluedye, 1);
+        inv_del(inv, empty_ogre_bellows, 1);
+        inv_add(inv, mourning_ogre_bellows_blue, 1);
+    case yellowdye :
+        inv_del(inv, yellowdye, 1);
+        inv_del(inv, empty_ogre_bellows, 1);
+        inv_add(inv, mourning_ogre_bellows_yellow, 1);
+    case greendye :
+        inv_del(inv, greendye, 1);
+        inv_del(inv, empty_ogre_bellows, 1);
+        inv_add(inv, mourning_ogre_bellows_green, 1);
+    case default :
+        return;
+}
+
+[label,mep1_inflate_dyed_toad](obj $dyed_bellows)
+if (%mourning_quest ! ^mep1_device_fixed) return;
+if (inv_freespace(inv) < 1) return;
+def_namedobj $toad = null;
+switch_obj($dyed_bellows) {
+    case mourning_ogre_bellows_red :
+        $toad = mourning_bloated_toad_red;
+    case mourning_ogre_bellows_blue :
+        $toad = mourning_bloated_toad_blue;
+    case mourning_ogre_bellows_yellow :
+        $toad = mourning_bloated_toad_yellow;
+    case mourning_ogre_bellows_green :
+        $toad = mourning_bloated_toad_green;
+    case default :
+        return;
+}
+inv_del(inv, $dyed_bellows, 1);
+inv_add(inv, empty_ogre_bellows, 1);
+inv_add(inv, $toad, 1);
+npc_del;
+
+[label,mep1_load_gun]
+if (%mourning_quest ! ^mep1_device_fixed) return;
+if (getbit_range(%mourning_quest_bits, 16, 18) ! 0) return;
+def_int $ammo = 0;
+switch_obj(last_useitem) {
+    // UNKNOWN ammo-code mapping follows Sheep Herder group order.
+    case mourning_bloated_toad_red : $ammo = 1;
+    case mourning_bloated_toad_green : $ammo = 2;
+    case mourning_bloated_toad_blue : $ammo = 3;
+    case mourning_bloated_toad_yellow : $ammo = 4;
+    case default : return;
+}
+inv_del(inv, last_useitem, 1);
+%mourning_quest_bits = setbit_range_toint(%mourning_quest_bits, $ammo, 16, 18);
+
+[label,mep1_empty_gun]
+def_int $ammo = getbit_range(%mourning_quest_bits, 16, 18);
+def_namedobj $toad = null;
+switch_int($ammo) {
+    case 1 : $toad = mourning_bloated_toad_red;
+    case 2 : $toad = mourning_bloated_toad_green;
+    case 3 : $toad = mourning_bloated_toad_blue;
+    case 4 : $toad = mourning_bloated_toad_yellow;
+    case default : return;
+}
+if (inv_freespace(inv) < 1) return;
+inv_add(inv, $toad, 1);
+%mourning_quest_bits = setbit_range_toint(%mourning_quest_bits, 0, 16, 18);
+
+// The cache names these four original sheep bits but does not define their meaning.
+// Their colour order and offsets are VERIFIED by the retained MEP1 cache fact.
+[proc,mep1_sheep_dyed](npc $sheep)(boolean)
+if (%mourning_quest < ^mep1_device_fixed) return(false);
+switch_npc($sheep) {
+    case plaguesheep_1, herder_plaguesheep_1, mourning_plaguesheep_1 :
+        if (getbit_range(%mourning_quest_bits, 13, 13) = 1) return (true);
+        return (false);
+    case plaguesheep_2, herder_plaguesheep_2, mourning_plaguesheep_2 :
+        if (getbit_range(%mourning_quest_bits, 15, 15) = 1) return (true);
+        return (false);
+    case plaguesheep_3, herder_plaguesheep_3, mourning_plaguesheep_3 :
+        if (getbit_range(%mourning_quest_bits, 12, 12) = 1) return (true);
+        return (false);
+    case plaguesheep_4, herder_plaguesheep_4, mourning_plaguesheep_4 :
+        if (getbit_range(%mourning_quest_bits, 14, 14) = 1) return (true);
+        return (false);
+    case default :
+        return (false);
+}
+
+[label,mep1_fire_device]
+if (%mourning_quest ! ^mep1_device_fixed) return;
+if (inv_total(worn, mourning_paint_gun) < 1) return;
+def_int $group = 0;
+switch_npc(npc_type) {
+    case herder_plaguesheep_1 : $group = 1;
+    case herder_plaguesheep_2 : $group = 2;
+    case herder_plaguesheep_3 : $group = 3;
+    case herder_plaguesheep_4 : $group = 4;
+    case default : return;
+}
+if (~mep1_sheep_dyed(npc_type) = true) return;
+def_int $ammo = getbit_range(%mourning_quest_bits, 16, 18);
+if ($ammo < 1 | $ammo > 4) return;
+// UNKNOWN engineering reuse: the period supports misses, not this generic ranged formula.
+def_boolean $hit = ~player_npc_hit_roll(^ranged_style);
+sound_synth(mourning_firegun, 1, 0);
+%mourning_quest_bits = setbit_range_toint(%mourning_quest_bits, 0, 16, 18);
+if ($hit = false) return;
+sound_synth(mourning_impact_sheep, 1, 0);
+if ($ammo ! $group) return;
+switch_int($group) {
+    case 1 : %mourning_quest_bits = setbit(%mourning_quest_bits, 13);
+    case 2 : %mourning_quest_bits = setbit(%mourning_quest_bits, 15);
+    case 3 : %mourning_quest_bits = setbit(%mourning_quest_bits, 12);
+    case 4 : %mourning_quest_bits = setbit(%mourning_quest_bits, 14);
+}

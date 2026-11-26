@@ -14,3 +14,5 @@
 ^mep1_fire_damage = 51
 // UNKNOWN favourable duration for the period guide's "a few minutes".
 ^mep1_oronwen_minutes = 2
+// VERIFIED cap from the period Tip.It guide, including Hitpoints.
+^mep1_mourner_stat_cap = 20

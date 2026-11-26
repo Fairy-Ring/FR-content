@@ -1,0 +1,6 @@
+[eadgar_laundry_basket]
+name=Laundry Basket
+desc=It's full of dirty robes.
+model=eadgar_laundry_basket
+blockrange=no
+op1=Search

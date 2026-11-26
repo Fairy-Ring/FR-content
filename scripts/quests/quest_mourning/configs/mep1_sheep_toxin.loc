@@ -1,0 +1,91 @@
+[mourning_orchard_applebarrel_tap]
+name=Barrel Tap
+desc=This tap runs from the apple crushing barrel.
+model=mourning_orchard_applebarrel_tap
+length=2
+
+[grain_sacks]
+name=Grain sacks
+desc=A sack full of grain.
+model=sack_full
+ambient=40
+
+[grain_sacks_8802]
+name=Grain sacks
+desc=A sack full of grain.
+model=sack_full
+ambient=40
+
+[grain_sacks_8803]
+name=Grain sacks
+desc=A sack full of grain.
+model=sack_full
+ambient=40
+
+[grain_sacks_8804]
+name=Grain sacks
+desc=These have grain in them.
+model=percy_sacks
+
+[grain_sacks_8805]
+name=Grain sacks
+desc=These have grain in them.
+model=percy_sacks
+
+[grain_sacks_8806]
+name=Grain sacks
+desc=These have grain in them.
+model=percy_sacks
+
+[mourning_orchard_applebarrel_empty]
+name=Apple Barrel
+desc=An empty barrel.
+model=mourning_orchard_applebarrel_empty
+blockrange=no
+
+[mourning_orchard_applebarrel_mush]
+name=Apple Barrel
+desc=A barrel full of mushed apples.
+model=mourning_orchard_applebarrel_mush
+recol1s=12033
+recol1d=13506
+recol2s=352
+recol2d=16871
+recol3s=5504
+recol3d=13506
+recol4s=7809
+recol4d=5504
+blockrange=no
+
+[mourning_orchard_applepile]
+name=Rotten Apple Pile
+desc=A pile of rotten apples!
+model=mourning_orchard_applepile
+recol1s=12033
+recol1d=13506
+recol2s=352
+recol2d=16871
+recol3s=13506
+recol3d=13506
+recol4s=7809
+recol4d=13506
+op1=Take-from
+
+[mourning_orchard_fencegate_l]
+name=Gate
+desc=A wooden gate.
+model=plaguesheep_gatel
+op1=Open
+active=yes
+blockrange=no
+raiseobject=no
+
+[mourning_orchard_fencegate_r]
+name=Gate
+desc=A wooden gate.
+model=plaguesheep_gatel
+mirror=yes
+op1=Open
+active=yes
+blockrange=no
+raiseobject=no

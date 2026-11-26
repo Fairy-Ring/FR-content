@@ -1,0 +1,11 @@
+// UNKNOWN runtime shop defaults: 50 of each sourced dye, restock field 100, shared stock.
+[mep1_oronwen_dyes]
+scope=shared
+size=4
+restock=yes
+stackall=yes
+allstock=no
+stock1=reddye,50,100
+stock2=bluedye,50,100
+stock3=yellowdye,50,100
+stock4=greendye,50,100
