@@ -304,6 +304,6 @@ if (inv_freespace(inv) < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-~chatplayer("Here is the shoot that Dantaera spoke of. Everything she told me is true – this tree will die once I cut this shoot. Well, here goes...");
+~chatplayer("Here is the shoot that Dantaera spoke of. Everything she told me is true - this tree will die once I cut this shoot. Well, here goes...");
 mes("You cut a shoot from the White Tree.");
 inv_add(inv, garden_white_tree_shoot, 1);

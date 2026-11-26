@@ -335,7 +335,7 @@ if (%fever_quest >= ^fever_complete) {
 if (%forget_quest >= ^forget_complete) {
     $questpoints = add($questpoints, ^forget_questpoints);
 }
-if (%garden_quest = ^garden_complete) {
+if (%garden_quest >= ^garden_complete) {
     $questpoints = add($questpoints, ^garden_questpoints);
 }
 if (%handsand_quest >= ^handsand_complete) {
