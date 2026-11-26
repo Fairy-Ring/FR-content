@@ -615,7 +615,8 @@ try {
     for (const name of ['mourner_hideout_door1', 'mourner_hideout_door2', 'mourner_hideout_door4', 'mournerstewdoor']) {
       const p = fixture(name === 'mourner_hideout_door4' ? constant('mourning_complete') : 3);
       if (name === 'mourner_hideout_door4') {
-        p.setVarBit(bit('mourning_quest_main'), constant('mep2_access'));
+        const mep2Constants = fs.readFileSync(path.join(contentRoot, 'scripts/quests/quest_mourning2/configs/mep2_quest.constant'), 'utf8');
+        p.setVarBit(bit('mourning_quest_main'), constant('mep2_access', mep2Constants));
         add(p, 'mourning_excavation_key');
       }
       disguise(p);
