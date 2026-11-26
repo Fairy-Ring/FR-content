@@ -15,6 +15,8 @@ const engine = process.env.HARNESS_ENGINE_DIR ?? path.resolve(content, '../engin
 const pack = path.join(engine, 'data/pack');
 const engineModule = async relative => (await import(pathToFileURL(path.join(engine, 'src', relative)).href)).default;
 const routefinder = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href);
+const { CollisionFlag } = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/flags.ts')).href);
+const InstanceZone = await engineModule('engine/zone/InstanceZone.ts');
 const rsbuf = await import(pathToFileURL(path.join(engine, 'src/network/rsbuf/index.ts')).href);
 const { NpcStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcStat.ts')).href);
 const Npc = await engineModule('engine/entity/Npc.ts');
@@ -32,18 +34,18 @@ const OpHeldUHandler = await engineModule('network/game/client/handler/OpHeldUHa
 const OpLocHandler = await engineModule('network/game/client/handler/OpLocHandler.ts');
 const IfButtonHandler = await engineModule('network/game/client/handler/IfButtonHandler.ts');
 const OpLocUHandler = await engineModule('network/game/client/handler/OpLocUHandler.ts');
+const IfSetText = await engineModule('network/game/server/model/IfSetText.ts');
+const IfSetNpcHead = await engineModule('network/game/server/model/IfSetNpcHead.ts');
 const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
 const { ProtectedActivePlayer } = await import(pathToFileURL(path.join(engine, 'src/engine/script/ScriptPointer.ts')).href);
 const { ParamHelper } = await import(pathToFileURL(path.join(engine, 'src/cache/config/ParamHelper.ts')).href);
 const JavaRandom = await engineModule('util/JavaRandom.ts');
-const ScriptVarType = await engineModule('cache/config/ScriptVarType.ts');
 
 const invId = requiredId(types.InvType, 'inv');
 const wornId = requiredId(types.InvType, 'worn');
 const invCom = requiredId(types.Component, 'inventory:inv');
 const wornCom = requiredId(types.Component, 'wornitems:worn');
 const ownerVar = requiredId(types.VarNpcType, 'agrith_owner');
-const unownedOwner = ScriptVarType.getDefault(types.VarNpcType.get(ownerVar).type);
 const delayVar = requiredId(types.VarNpcType, 'npc_action_delay');
 const aggressiveVar = requiredId(types.VarNpcType, 'npc_aggressive_player');
 const questBit = requiredId(types.VarBitType, 'agrith_quest');
@@ -53,13 +55,39 @@ const bossType = types.NpcType.getByName('agrith_naar');
 const bankId = requiredId(types.InvType, 'bank');
 assert(bossType, 'packed Agrith Naar type exists');
 const bossRange = bossType.size;
-const fixedRetreat = [2, 2720, 4900]; // The original hard-coded destination, retained only as a regression control.
-const movedBoss = [2, 2718, 4902]; // Parent-probed open 3x3 footprint on the original m42_76 floor.
-const distantOwner = [2, 2725, 4890];
-const closeOwner = [2, 2721, 4903];
+const roomSourceLevel = 2;
+const roomSourceMapsquareX = 42;
+const roomSourceMapsquareZ = 76;
+const roomSourceX = roomSourceMapsquareX << 6;
+const roomSourceZ = roomSourceMapsquareZ << 6;
+const roomExit = { level: 0, x: roomSourceX + 25, z: roomSourceZ + 49 };
+const bossLocal = [31, 37];
+const distantOwnerLocal = [37, 26];
+const closeOwnerLocal = [34, 37];
+const originalCultSpots = {
+  agrith_denath: [32, 41],
+  agrith_eric: [35, 34],
+  agrith_matthew: [34, 34],
+  agrith_jennifer: [28, 34],
+  agrith_tanya: [30, 40],
+  agrith_patrick: [35, 42]
+};
+const helperSpots = {
+  agrith_badden_sigil: [35, 37],
+  agrith_reen_sigil: [28, 37],
+  agrith_golem_sigil: [32, 42],
+  agrith_dave_sigil: [29, 40]
+};
+const originalCultNames = Object.keys(originalCultSpots);
+const helperNames = Object.keys(helperSpots);
+const roomActorTypes = new Set([...originalCultNames, ...helperNames].map(name => id('NpcType', name)));
 
 const handSlot = types.ObjType.get(requiredId(types.ObjType, 'silverlight')).wearpos;
 assert.equal(handSlot, 3, 'the original Silverlight config identifies the right-hand wear slot');
+const questLocationRows = [
+  'golem_insidestairs_top', 'golem_insidestairs_base', 'golem_portal', 'golem_demon_portal',
+  'agrith_kiln_1', 'agrith_kiln_2', 'agrith_kiln_3', 'agrith_kiln_4'
+].flatMap(name => nativeLocRows(name));
 let playerSerial = 0;
 let checks = 0;
 let failures = 0;
@@ -163,7 +191,7 @@ function showNpc(player, npc) {
   rsbuf.npcInfo(0, player.slot, 0, 0, true);
   assert(rsbuf.hasNpc(player.slot, npc.nid), 'the client packet path sees the native NPC');
 }
-function finishInteraction(player, choices = [], label = 'packed interaction') {
+function finishInteraction(player, choices = [], label = 'packed interaction', observePause = null) {
   const remaining = [...choices];
   for (let step = 0; step < 160; step++) {
     const state = player.activeScript;
@@ -173,6 +201,7 @@ function finishInteraction(player, choices = [], label = 'packed interaction') {
     }
     assert.notEqual(state.execution, ScriptState.ABORTED, `${label} script did not abort`);
     if (state.execution === ScriptState.PAUSEBUTTON) {
+      observePause?.(player, state);
       const root = player.modalChat >= 0 ? types.Component.get(player.modalChat)?.comName ?? '' : '';
       if (/^multi[2-5]$/.test(root)) {
         assert(remaining.length > 0, `${label} supplies a choice for ${root}`);
@@ -229,7 +258,7 @@ function cleanupQuestRun(player, actors) {
   }
   cleanup(player);
 }
-function nativeNpc(player, npc, choices = [], label = 'NPC Talk-to', expectedName = null) {
+function nativeNpc(player, npc, choices = [], label = 'NPC Talk-to', expectedName = null, observePause = null) {
   approachNpc(player, npc);
   showNpc(player, npc);
   assert(npcHandler.handle(new OpNpc(1, npc.nid), player), `${label} accepts the NPC interaction`);
@@ -239,7 +268,7 @@ function nativeNpc(player, npc, choices = [], label = 'NPC Talk-to', expectedNam
   assert(trigger, `${label} resolves its visible-form trigger`);
   if (expectedName) assert.equal(trigger.name, expectedName, `${label} resolves the expected visible script`);
   player.processInteraction();
-  finishInteraction(player, choices, label);
+  finishInteraction(player, choices, label, observePause);
   return trigger;
 }
 function nativeUseNpc(player, npc, item, label = `use ${item} on NPC`) {
@@ -265,7 +294,7 @@ function nativeLoc(player, loc, choices = [], label = 'location option', option 
 }
 function nativeUseLoc(player, row, item, label = `use ${item} on ${row.name}`) {
   const loc = locFor(row);
-  placePlayer(player, standForLoc(row));
+  positionPlayer(player, standForLoc(row));
   const message = new OpLocU(loc.x, loc.z, loc.type, itemId(item), itemSlot(player, item), invCom);
   assert(locUseHandler.handle(message, player), `${label} accepts the native item-on-location operation`);
   assert.equal(player.target, loc, `${label} selects the packed location`);
@@ -319,15 +348,15 @@ function standForLoc(row) {
       const x = row.x + dx, z = row.z + dz;
       if (x >= row.x && x < row.x + type.width && z >= row.z && z < row.z + type.length) continue;
       const tile = [row.level, x, z];
-      if (!floorTiles.has(tile.join(',')) || map.isMapBlocked(x, z, row.level)) continue;
+      if (!packedFloorAt(tile) || map.isMapBlocked(x, z, row.level)) continue;
       if (map.reachedLoc(row.level, x, z, row.x, row.z, type.width, type.length, 1,
         row.angle, row.shape, type.forceapproach)) return tile;
     }
   }
-  assert.fail(`no walkable packed stand reaches ${row.name} at ${row.coord}`);
+  assert.fail(`no walkable packed stand reaches ${row.name} at ${row.coord ?? [row.level, row.x, row.z].join(',')}`);
 }
 function nativeLocRow(player, row, choices = [], label = `loc ${row.name}`, option = 1) {
-  placePlayer(player, standForLoc(row));
+  positionPlayer(player, standForLoc(row));
   return nativeLoc(player, locFor(row), choices, label, option);
 }
 function questPoints(player) {
@@ -393,31 +422,37 @@ function playerAt(tile, stage = 110) {
   player.setVarBit(questBit, stage);
   return player;
 }
-function bossAt(tile, owner) {
-  const nid = World.npcs.next();
-  const npc = new Npc(tile[0], tile[1], tile[2], bossRange, bossRange, EntityLifeCycle.RESPAWN, nid, bossType.id, bossType.blockwalk);
-  npc.lastMovement = -100;
-  World.addNpc(npc, -1);
-  npc.setVar(ownerVar, owner.uid);
-  npc.setVar(aggressiveVar, owner.uid);
-  npc.setVar(delayVar, World.currentTick - 1);
-  return npc;
-}
 function cleanup(player, npc) {
-  if (npc) {
+  if (npc?.isActive) {
     World.removeNpc(npc, -1);
     rsbuf.removeNpc(npc.nid);
     World.npcs.remove(npc.nid);
     npc.cleanup();
   }
   if (player) {
+    const instance = currentInstance(player);
+    if (instance) {
+      if (sameCoord(instance.exitCoord, roomExit)) exitPrivateRoom(player, 'native room cleanup exit');
+      else positionPlayer(player, [0, 3270, 3158]);
+    }
     player.unlink();
     rsbuf.removePlayer(player.slot);
     delete World.players[player.slot];
   }
 }
+function packedFloorAt(tile) {
+  const zone = World.gameMap.getZoneIfExists(tile[1], tile[2], tile[0]);
+  if (zone instanceof InstanceZone) {
+    assert.equal(zone.rotation, 0, 'the throne-room copy preserves source orientation');
+    const sourceX = (zone.source.x << 3) + (tile[1] & 7);
+    const sourceZ = (zone.source.z << 3) + (tile[2] & 7);
+    return floorTiles.has([zone.source.level, sourceX, sourceZ].join(','));
+  }
+  return floorTiles.has(tile.join(','));
+}
 function packedTileWalkable(tile, label) {
-  walkable(tile, label);
+  assert(packedFloorAt(tile), `${label}: destination has the packed source floor`);
+  assert.equal(map.isMapBlocked(tile[1], tile[2], tile[0]), false, `${label}: copied collision leaves the tile walkable`);
 }
 function pathOut(start, npc) {
   for (let radius = 2; radius <= 8; radius++) {
@@ -425,7 +460,7 @@ function pathOut(start, npc) {
       if (Math.max(Math.abs(dx), Math.abs(dz)) !== radius) continue;
       const dest = [start[0], start[1] + dx, start[2] + dz];
       if (footprintDistance(dest, npc) === 0) continue;
-      if (!floorTiles.has(dest.join(',')) || map.isMapBlocked(dest[1], dest[2], dest[0])) continue;
+      if (!packedFloorAt(dest) || map.isMapBlocked(dest[1], dest[2], dest[0])) continue;
       const route = routefinder.findPath(
         start[0], start[1], start[2], dest[1], dest[2], 1, 1, 1,
         0, 0, false, 0, 32, routefinder.CollisionType.NORMAL
@@ -457,11 +492,12 @@ function runNpcQueue(npc, trigger, damage) {
   }
   assert.fail(`native ${trigger} queue did not finish`);
 }
-function combatFixture(playerTile, meleePrayer = false, magicPrayer = false) {
-  const player = playerAt(playerTile);
+function combatFixture(localTile, meleePrayer = false, magicPrayer = false) {
+  const { player } = questFixture(110);
+  const npc = summonNativeBoss(player, 'native combat fixture');
   if (meleePrayer) player.setVar(protectMelee, 1);
   if (magicPrayer) player.setVar(protectMagic, 1);
-  const npc = bossAt(movedBoss, player);
+  positionPlayer(player, roomCoord(player, localTile[0], localTile[1]));
   return { player, npc };
 }
 function param(type, name) {
@@ -482,44 +518,112 @@ check('published client/config remains byte-identical and quest items are config
   }
 });
 
-check('Agrith Naar uses its original 3x3 map footprint and current room tiles are walkable', () => {
-  assert.equal(bossRange, 3, 'the original Agrith Naar size is retained');
-  packedTileWalkable(movedBoss, 'relocated boss anchor on the original throne-room floor');
-  for (let dx = 0; dx < bossRange; dx++) for (let dz = 0; dz < bossRange; dz++) {
-    packedTileWalkable([movedBoss[0], movedBoss[1] + dx, movedBoss[2] + dz], 'relocated boss footprint');
+check('native account copies preserve the original room and stage-specific actors without shared cultists', () => {
+  assertNoSharedCultists();
+  for (const stage of [30, 40, 50, 60, 70, 80, 90, 100, 110, 120]) {
+    const { player, actors } = questFixture(stage);
+    try {
+      assertRoomActorCast(player, stage);
+      if (stage === 120) {
+        assert.equal(roomNpcOrNull(player, 'agrith_matthew'), null, 'stage 120 has no Matthew after initial entry');
+        exitPrivateRoom(player, 'stage 120 first departure');
+        enterQuestRoom(player, 'stage 120 native re-entry');
+        assertRoomActorCast(player, 120);
+        assert.equal(roomNpcOrNull(player, 'agrith_matthew'), null, 'stage 120 re-entry keeps Matthew absent');
+      }
+    } finally {
+      cleanupQuestRun(player, actors);
+    }
   }
-  packedTileWalkable(distantOwner, 'owner start tile on the original throne-room floor');
-  assert(footprintDistance(distantOwner, { level: movedBoss[0], x: movedBoss[1], z: movedBoss[2], size: bossRange }) > 1,
-    'owner starts outside melee reach');
-  assert.notEqual(footprintDistance(fixedRetreat, { level: movedBoss[0], x: movedBoss[1], z: movedBoss[2], size: bossRange }), 1,
-    'the former fixed 2_42_76_32_36 destination is not adjacent to this relocated boss');
+
+  const first = questFixture(70);
+  const second = questFixture(70);
+  try {
+    const firstActors = originalCultNames.map(name => roomNpc(first.player, name));
+    const secondActors = originalCultNames.map(name => roomNpc(second.player, name));
+    setWords(first.player);
+    addItem(first.player, 'agrith_sigil');
+    positionPlayer(first.player, roomCoord(first.player, 32, 31));
+    holdItem(first.player, 'agrith_sigil', 1, roomWords(first.player), 'first account native first chant');
+    assertFirstChantOutcome(first.player);
+    assert.equal(questStage(second.player), 70, 'first account chant leaves second account stage unchanged');
+    assert.deepEqual(roomActorCast(second.player),
+      originalCultNames.map(name => [name, ...originalCultSpots[name]]).sort((left, right) => left[0].localeCompare(right[0])),
+      'first account chant leaves the other account actor cast unchanged');
+    assert(secondActors.every(npc => npc.isActive), 'the other account keeps all six native cultists');
+    assert(firstActors.filter((_, index) => originalCultNames[index] !== 'agrith_matthew').every(npc => !npc.isActive),
+      'first account loses only the five scripted cultists');
+    assert.equal(roomNpc(first.player, 'agrith_matthew').isActive, true, 'first account keeps Matthew');
+    assert.equal(roomObjects(second.player, 'agrith_sigil').length, 0, 'first account drops no sigil into the other copy');
+    assertNoSharedSigils();
+  } finally {
+    cleanupQuestRun(first.player, first.actors);
+    cleanupQuestRun(second.player, second.actors);
+  }
 });
 
-check('compiled AI pulls a distant owner to a walkable tile adjacent to the relocated footprint', () => {
-  const { player, npc } = combatFixture(distantOwner);
+check('the sigil ritual rejects another native copy without chanting, consuming, or summoning', () => {
+  for (const stage of [70, 110]) {
+    const { player, actors } = questFixture(stage);
+    try {
+      exitPrivateRoom(player, 'leave the quest-specific copy before foreign-instance check');
+      assertUnrelatedRoomRejectsRitual(player, stage);
+    } finally {
+      cleanupQuestRun(player, actors);
+    }
+  }
+});
+
+check('Agrith Naar uses the source-local 3x3 footprint in each native room copy', () => {
+  const { player, actors } = questFixture(110);
+  let npc;
+  try {
+    npc = summonNativeBoss(player, 'native boss footprint fixture');
+    assert.equal(bossRange, 3, 'the original Agrith Naar size is retained');
+    const instance = currentInstance(player);
+    assert.deepEqual([npc.level, npc.x - instance.sw.x, npc.z - instance.sw.z], [0, ...bossLocal],
+      'the boss uses its source-local throne-room anchor');
+    for (let dx = 0; dx < bossRange; dx++) for (let dz = 0; dz < bossRange; dz++) {
+      assert(packedFloorAt([npc.level, npc.x + dx, npc.z + dz]), 'every tile of the copied boss footprint has original floor');
+    }
+    const owner = roomCoord(player, ...distantOwnerLocal);
+    packedTileWalkable(owner, 'distant owner stand on copied source floor');
+    assert(footprintDistance(owner, npc) > 1, 'owner starts outside melee reach of the native 3x3 footprint');
+  } finally {
+    cleanup(player, npc);
+    for (const other of [...World.npcs].filter(candidate => candidate.getVar(ownerVar) === player.uid)) {
+      if (!other.isActive) continue;
+      World.removeNpc(other, -1);
+      rsbuf.removeNpc(other.nid);
+      World.npcs.remove(other.nid);
+      other.cleanup();
+    }
+  }
+});
+
+check('compiled AI pulls a distant owner to a walkable tile adjacent to the copied footprint', () => {
+  const { player, npc } = combatFixture(distantOwnerLocal);
   try {
     runNpcAi(npc, player, ServerTriggerType.AI_APPLAYER2);
     const landing = [player.level, player.x, player.z];
     packedTileWalkable(landing, 'native Agrith Naar pullback landing');
-    assert.equal(footprintDistance(landing, npc), 1, 'player lands adjacent to the actual relocated 3x3 footprint');
+    assert.equal(footprintDistance(landing, npc), 1, 'player lands adjacent to the actual private 3x3 footprint');
     assert.notEqual(footprintDistance(landing, npc), 0, 'player does not land inside the boss footprint');
-    assert(pathOut(landing, npc).length > 0, 'the pullback landing has a non-empty packed collision path out');
-    assert.equal(footprintDistance(fixedRetreat, npc), 2, 'the old fixed destination is nonadjacent to the relocated boss');
+    assert(pathOut(landing, npc).length > 0, 'the pullback landing has a non-empty copied collision path out');
   } finally {
     cleanup(player, npc);
   }
 });
 
 check('compiled AI chooses melee close, magic at range, and avoids each protected style', () => {
-  const type = bossType;
-  const meleeAnim = param(type, 'attack_anim');
-  const magicAnim = param(type, 'magicattack_anim');
+  const meleeAnim = param(bossType, 'attack_anim');
+  const magicAnim = param(bossType, 'magicattack_anim');
   assert.notEqual(meleeAnim, magicAnim, 'the packed boss has distinct melee and magic animations');
   const cases = [
-    { label: 'close unprotected', tile: closeOwner, protectMelee: false, protectMagic: false, expected: meleeAnim, pull: false },
-    { label: 'close Protect from Melee', tile: closeOwner, protectMelee: true, protectMagic: false, expected: magicAnim, pull: false },
-    { label: 'distant unprotected', tile: distantOwner, protectMelee: false, protectMagic: false, expected: magicAnim, pull: true },
-    { label: 'distant Protect from Magic', tile: distantOwner, protectMelee: false, protectMagic: true, expected: meleeAnim, pull: true }
+    { label: 'close unprotected', tile: closeOwnerLocal, protectMelee: false, protectMagic: false, expected: meleeAnim, pull: false },
+    { label: 'close Protect from Melee', tile: closeOwnerLocal, protectMelee: true, protectMagic: false, expected: magicAnim, pull: false },
+    { label: 'distant unprotected', tile: distantOwnerLocal, protectMelee: false, protectMagic: false, expected: magicAnim, pull: true },
+    { label: 'distant Protect from Magic', tile: distantOwnerLocal, protectMelee: false, protectMagic: true, expected: meleeAnim, pull: true }
   ];
   for (const test of cases) {
     const { player, npc } = combatFixture(test.tile, test.protectMelee, test.protectMagic);
@@ -539,7 +643,7 @@ check('compiled AI chooses melee close, magic at range, and avoids each protecte
 
 check('lethal queue hit restores 12 HP without Silverlight and permits Silverlight or dyed-Silverlight finishers', () => {
   for (const [weapon, expectedHp] of [[null, 12], ['silverlight', 0], ['agrith_silverlight_dyed', 0]]) {
-    const { player, npc } = combatFixture(closeOwner);
+    const { player, npc } = combatFixture(closeOwnerLocal);
     try {
       npc.levels[3] = 12;
       if (weapon) player.invSet(wornId, id('ObjType', weapon), 1, handSlot);
@@ -551,12 +655,35 @@ check('lethal queue hit restores 12 HP without Silverlight and permits Silverlig
   }
 });
 
+function instanceAt(tile) {
+  return World.instances.findInstanceByCoord({ level: tile[0], x: tile[1], z: tile[2] });
+}
+function currentInstance(player) {
+  return instanceAt([player.level, player.x, player.z]);
+}
+function sameCoord(left, right) {
+  return left !== null && right !== null &&
+    left.level === right.level && left.x === right.x && left.z === right.z;
+}
+function coordLabel(coord) {
+  return `${coord.level}_${coord.x >> 6}_${coord.z >> 6}_${coord.x & 63}_${coord.z & 63}`;
+}
+function positionPlayer(player, tile) {
+  player.teleport(tile[1], tile[2], tile[0]);
+  const originX = Math.floor(tile[1] / 8) * 8;
+  const originZ = Math.floor(tile[2] / 8) * 8;
+  player.buildArea.originX = originX;
+  player.buildArea.originZ = originZ;
+  player.originX = originX;
+  player.originZ = originZ;
+  player.lastMovement = World.currentTick - 20;
+}
 function approachNpc(player, npc) {
   player.closeModal();
   for (const [dx, dz] of [[-1, 0], [npc.width, 0], [0, -1], [0, npc.length], [-1, -1]]) {
     const tile = [npc.level, npc.x + dx, npc.z + dz];
-    if (!floorTiles.has(tile.join(',')) || map.isMapBlocked(tile[1], tile[2], tile[0])) continue;
-    placePlayer(player, tile);
+    if (!packedFloorAt(tile) || map.isMapBlocked(tile[1], tile[2], tile[0])) continue;
+    positionPlayer(player, tile);
     return;
   }
   assert.fail(`no open stand beside ${types.NpcType.get(npc.type).name}`);
@@ -568,25 +695,199 @@ function questFixture(stage = 0, tile = [0, 3270, 3158]) {
   setPlayerVariable(player, 'golem_clay', 4);
   if (stage > 0) setPlayerVariable(player, 'agrith_badden_uzer', 1);
   if (stage >= 90) setPlayerVariable(player, 'agrith_reen_uzer', 1);
+  if (stage >= 100) {
+    setPlayerVariable(player, 'agrith_badden_uzer', 2);
+    setPlayerVariable(player, 'agrith_reen_uzer', 2);
+    setPlayerVariable(player, 'agrith_convinced_dave', 2);
+    setPlayerVariable(player, 'agrith_convinced_golem', 1);
+  }
   player.baseLevels[PlayerStat.CRAFTING] = 30;
   player.levels[PlayerStat.CRAFTING] = 30;
-  return { player, actors: [] };
+  const actors = [];
+  try {
+    if (stage >= 30 && stage < 125) enterQuestRoom(player);
+  } catch (error) {
+    if (currentInstance(player)) positionPlayer(player, [0, 3270, 3158]);
+    cleanupQuestRun(player, actors);
+    throw error;
+  }
+  return { player, actors };
 }
 function questStage(player) {
   return playerVariable(player, 'agrith_quest');
 }
-function ownedNpc(player, name) {
-  const npc = [...World.npcs].find(candidate => candidate.isActive && candidate.type === id('NpcType', name) &&
-    candidate.getVar(ownerVar) === player.uid);
-  assert(npc, `the product spawned owned ${name}`);
+function roomNpcOrNull(player, name) {
+  const instance = currentInstance(player);
+  if (!instance) return null;
+  const type = id('NpcType', name);
+  return [...World.npcs].find(candidate => candidate.isActive && candidate.type === type &&
+    candidate.getVar(ownerVar) === player.uid &&
+    World.instances.findInstanceByCoord({ level: candidate.level, x: candidate.x, z: candidate.z })?.uid === instance.uid) ?? null;
+}
+function roomNpc(player, name) {
+  const npc = roomNpcOrNull(player, name);
+  assert(npc, `the native copy contains this account's ${name}`);
   return npc;
 }
-function mappedNpc(name) {
-  const npcType = id('NpcType', name);
-  for (const npc of World.npcs) {
-    if (npc.isActive && npc.type === npcType && npc.level === 2 && npc.getVar(ownerVar) === unownedOwner) return npc;
+function roomCoord(player, localX, localZ) {
+  const instance = currentInstance(player);
+  assert(instance, 'player occupies a native private-room copy');
+  return [instance.sw.level, instance.sw.x + localX, instance.sw.z + localZ];
+}
+function roomLocRow(player, name, localX, localZ) {
+  const source = questLocationRows.find(row => row.name === name && row.level === roomSourceLevel &&
+    row.x === roomSourceX + localX && row.z === roomSourceZ + localZ);
+  assert(source, `original map contains ${name} at source local ${localX},${localZ}`);
+  const [level, x, z] = roomCoord(player, localX, localZ);
+  return { ...source, level, x, z, coord: coordLabel({ level, x, z }) };
+}
+function nativeRoomLocRow(player, name, localX, localZ, choices = [], label = `private loc ${name}`, option = 1) {
+  return nativeLocRow(player, roomLocRow(player, name, localX, localZ), choices, label, option);
+}
+function locSignature(zone) {
+  return (zone?.getAllLocsSafe() ?? []).map(loc => [
+    loc.baseType, loc.x & 7, loc.z & 7, loc.level, loc.baseShape, loc.baseAngle
+  ]).sort((left, right) => left.join(',').localeCompare(right.join(',')));
+}
+function assertRoomCopy(player) {
+  const instance = currentInstance(player);
+  assert(instance, 'the active quest route created a native region');
+  assert.equal(instance.floors, 1);
+  assert.equal(instance.zonesEast, 8);
+  assert.equal(instance.zonesNorth, 8);
+  assert.deepEqual(instance.exitCoord, roomExit, `native exit is ${coordLabel(roomExit)}`);
+  assert.equal(coordLabel(instance.exitCoord), '0_42_76_25_49');
+  const entityMask = CollisionFlag.NPC_OCC | CollisionFlag.PLAYER_OCC | CollisionFlag.BLOCK_NPC_AND_PLAYERS;
+  for (let east = 0; east < 8; east++) for (let north = 0; north < 8; north++) {
+    const sourceX = (roomSourceX >> 3) + east;
+    const sourceZ = (roomSourceZ >> 3) + north;
+    const targetX = instance.sw.x + (east << 3);
+    const targetZ = instance.sw.z + (north << 3);
+    const source = World.gameMap.getZoneIfExists(sourceX << 3, sourceZ << 3, roomSourceLevel);
+    const target = World.gameMap.getZoneIfExists(targetX, targetZ, instance.sw.level);
+    assert(target instanceof InstanceZone, `copied destination zone ${east},${north} is native`);
+    assert(target.hasAssignedTemplate, `copied destination zone ${east},${north} has a source template`);
+    assert.equal(target.rotation, 0, `source zone ${east},${north} is unrotated`);
+    assert.deepEqual(target.source, { level: roomSourceLevel, x: sourceX, z: sourceZ },
+      `destination zone ${east},${north} maps to the corresponding original source`);
+    assert.deepEqual(locSignature(target), locSignature(source), `destination zone ${east},${north} copies original scenery`);
+    const sourceFlags = routefinder.default.collisionFlags.getZone(sourceX << 3, sourceZ << 3, roomSourceLevel);
+    const targetFlags = routefinder.default.collisionFlags.getZone(targetX, targetZ, instance.sw.level);
+    assert(targetFlags, `destination zone ${east},${north} has native collision storage`);
+    for (let tile = 0; tile < 64; tile++) {
+      const expected = ((sourceFlags?.[tile] ?? 0) & ~entityMask) >>> 0;
+      const actual = (targetFlags[tile] & ~entityMask) >>> 0;
+      assert.equal(actual, expected, `destination collision zone ${east},${north} tile ${tile} matches its source`);
+    }
   }
-  assert.fail(`the built original map contains an active, unowned ${name}`);
+  const portal = roomLocRow(player, 'golem_demon_portal', 31, 19);
+  assert(World.getLoc(portal.x, portal.z, portal.level, id('LocType', 'golem_demon_portal')),
+    'native copy contains the original exit scenery identity');
+  return instance;
+}
+function enterQuestRoom(player, label = 'active quest native portal entry') {
+  assert(questStage(player) >= 30 && questStage(player) < 125, 'quest stage is eligible for the private copy');
+  assert.equal(currentInstance(player), null, 'native entry begins outside an existing copy');
+  const portal = nativeLocRows('golem_portal').find(row => row.level === 0);
+  assert(portal, 'the original surface Golem portal exists');
+  nativeLocRow(player, portal, [], label);
+  assert.deepEqual([player.level, player.x, player.z], roomCoord(player, 32, 20),
+    'native portal enters source-local tile 32,20');
+  assertRoomCopy(player);
+  assertRoomActorCast(player, questStage(player));
+  return currentInstance(player);
+}
+function exitPrivateRoom(player, label = 'native copied-scene exit') {
+  const instance = currentInstance(player);
+  if (!instance) return;
+  const uid = instance.uid;
+  const sw = { ...instance.sw };
+  assert.deepEqual(instance.exitCoord, roomExit, `${label} retains the native exit coordinate`);
+  const saveCoord = World.instances.getSaveCoord(
+    { level: player.level, x: player.x, z: player.z },
+    player.previousOverworldCoord
+  );
+  assert.deepEqual(saveCoord, roomExit, `${label} resolves the same persisted native exit`);
+  nativeRoomLocRow(player, 'golem_demon_portal', 31, 19, [], label, 1);
+  assert.deepEqual([player.level, player.x, player.z], [roomExit.level, roomExit.x, roomExit.z],
+    `${label} lands at ${coordLabel(roomExit)}`);
+  assert.equal(World.instances.findInstanceByUid(uid), null, `${label} deletes its empty native instance`);
+  assert(!World.instances.instances.some(candidate => candidate.uid === uid), `${label} removes its instance record`);
+  for (let east = 0; east < 8; east++) for (let north = 0; north < 8; north++) {
+    const x = sw.x + (east << 3), z = sw.z + (north << 3);
+    assert.equal(World.gameMap.getZoneIfExists(x, z, sw.level), null, `${label} removes copied zone ${east},${north}`);
+    assert.equal(routefinder.isZoneAllocated(x, z, sw.level), false, `${label} releases collision zone ${east},${north}`);
+  }
+}
+function roomActorCast(player) {
+  const instance = currentInstance(player);
+  assert(instance, 'room actor cast belongs to a current native instance');
+  return [...World.npcs]
+    .filter(npc => npc.isActive && roomActorTypes.has(npc.type) && npc.getVar(ownerVar) === player.uid &&
+      World.instances.findInstanceByCoord({ level: npc.level, x: npc.x, z: npc.z })?.uid === instance.uid)
+    .map(npc => [types.NpcType.get(npc.type).name, npc.x - instance.sw.x, npc.z - instance.sw.z])
+    .sort((left, right) => left[0].localeCompare(right[0]));
+}
+function assertRoomActorCast(player, stage) {
+  const names = stage < 80 ? originalCultNames :
+    stage < 100 ? ['agrith_matthew'] :
+      stage < 120 ? ['agrith_matthew', ...helperNames] : helperNames;
+  const spots = { ...originalCultSpots, ...helperSpots };
+  const expected = names.map(name => [name, ...spots[name]]).sort((left, right) => left[0].localeCompare(right[0]));
+  assert.deepEqual(roomActorCast(player), expected, `native stage ${stage} actor cast is exact and account-owned`);
+  assert.equal(roomNpcOrNull(player, 'agrith_matthew') !== null, stage < 120,
+    `native stage ${stage} has Matthew only before stage 120`);
+}
+function roomObjects(player, name) {
+  const instance = currentInstance(player);
+  assert(instance, 'room objects belong to a current native instance');
+  const type = itemId(name);
+  const result = [];
+  for (let east = 0; east < 8; east++) for (let north = 0; north < 8; north++) {
+    const zone = World.gameMap.getZoneIfExists(instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level);
+    for (const obj of zone?.getAllObjsUnsafe(true) ?? []) {
+      if (obj.isActive && obj.type === type && obj.receiver64 === player.hash64) result.push(obj);
+    }
+  }
+  return result;
+}
+function sharedSigils() {
+  const type = itemId('agrith_sigil');
+  const result = [];
+  for (let east = 0; east < 8; east++) for (let north = 0; north < 8; north++) {
+    const zone = World.gameMap.getZoneIfExists(roomSourceX + (east << 3), roomSourceZ + (north << 3), roomSourceLevel);
+    for (const obj of zone?.getAllObjsUnsafe(true) ?? []) {
+      if (obj.isActive && obj.type === type) result.push(obj);
+    }
+  }
+  return result;
+}
+function assertNoSharedSigils() {
+  assert.equal(sharedSigils().length, 0, 'shared source map contains no sigil ground objects');
+}
+function assertFirstChantOutcome(player) {
+  assert.equal(questStage(player), 80, 'first correct chant advances to stage 80');
+  for (const name of originalCultNames.filter(name => name !== 'agrith_matthew')) {
+    assert.equal(roomNpcOrNull(player, name), null, `first chant removes private ${name}`);
+  }
+  assertRoomActorCast(player, 80);
+  const instance = currentInstance(player);
+  const sigils = roomObjects(player, 'agrith_sigil').map(obj => [
+    obj.x - instance.sw.x, obj.z - instance.sw.z, obj.count, obj.receiver64
+  ]).sort((left, right) => left[0] - right[0] || left[1] - right[1]);
+  assert.deepEqual(sigils, [[32, 42, 1, player.hash64], [35, 37, 1, player.hash64]],
+    'first chant drops two actual receiver-bound sigils at the authored private tiles');
+  assertNoSharedSigils();
+}
+function assertNoSharedCultists() {
+  for (const name of originalCultNames) {
+    assert.equal(nativeNpcRows(name).length, 0, `original map has no shared ${name} row`);
+  }
+  const shared = [...World.npcs].filter(npc => npc.isActive && roomActorTypes.has(npc.type) &&
+    npc.level === roomSourceLevel && npc.x >= roomSourceX && npc.x < roomSourceX + 64 &&
+    npc.z >= roomSourceZ && npc.z < roomSourceZ + 64);
+  assert.deepEqual(shared.map(npc => types.NpcType.get(npc.type).name), [],
+    'loaded source plane has no unowned or shared cult actors');
 }
 function roomWords(player) {
   return Array.from({ length: 5 }, (_, i) => playerVariable(player, `agrith_incantation_${i + 1}`));
@@ -594,10 +895,6 @@ function roomWords(player) {
 function setWords(player) {
   for (let i = 1; i <= 5; i++) setPlayerVariable(player, `agrith_incantation_${i}`, i);
 }
-const questLocationRows = [
-  'golem_insidestairs_top', 'golem_insidestairs_base', 'golem_portal', 'golem_demon_portal',
-  'agrith_kiln_1', 'agrith_kiln_2', 'agrith_kiln_3', 'agrith_kiln_4'
-].flatMap(name => nativeLocRows(name));
 function rowAt(tile) {
   const row = questLocationRows.find(candidate => candidate.level === tile[0] && candidate.x === tile[1] && candidate.z === tile[2]);
   assert(row, `the original pack contains the location at ${tile.join(',')}`);
@@ -617,6 +914,123 @@ function castSigil(player) {
   const button = id('Component', 'silver_casting:com_135');
   assert(buttonHandler.handle(new IfButton(button), player), 'the native demonic-sigil casting button is accepted');
   finishInteraction(player, [], 'native sigil casting');
+}
+function unrelatedNativeCopy(player) {
+  positionPlayer(player, [0, 3270, 3158]);
+  const sourceX = Math.floor(player.x / 64) * 64;
+  const sourceZ = Math.floor(player.z / 64) * 64;
+  const sw = World.instances.createInstance(1, 8, 8);
+  const instance = World.instances.findInstanceByCoord(sw);
+  assert(instance, 'the native engine allocates an unrelated test copy');
+  for (let east = 0; east < 8; east++) for (let north = 0; north < 8; north++) {
+    World.instances.copyZone(sw, { level: 0, x: east, z: north }, {
+      level: 0, x: sourceX + (east << 3), z: sourceZ + (north << 3)
+    }, 0);
+  }
+  positionPlayer(player, [sw.level, sw.x + 32, sw.z + 31]);
+  assert.equal(World.getLoc(sw.x + 31, sw.z + 19, sw.level, id('LocType', 'golem_demon_portal')), null,
+    'unrelated native copy does not contain the copied Uzer exit scenery');
+  return instance;
+}
+function assertUnrelatedRoomRejectsRitual(player, stage = questStage(player)) {
+  const instance = unrelatedNativeCopy(player);
+  addItem(player, 'agrith_sigil');
+  holdItem(player, 'agrith_sigil', 1, [], `sigil rejects unrelated native copy at stage ${stage}`);
+  assert.equal(questStage(player), stage, `unrelated copy cannot advance stage ${stage}`);
+  assert.equal(itemCount(player, 'agrith_sigil'), 1, 'unrelated copy does not consume the sigil');
+  assert.equal(player.messages.at(-1), 'You must chant in the throne room.',
+    'compiled ritual refuses the wrong native scenery identity');
+  assert.equal(roomNpcOrNull(player, 'agrith_naar'), null, 'unrelated copy cannot activate Agrith-Naar');
+  assert.equal(roomObjects(player, 'agrith_sigil').length, 0, 'unrelated copy creates no private ritual drop');
+  positionPlayer(player, [0, 3270, 3158]);
+  assert.equal(World.instances.findInstanceByUid(instance.uid), null, 'test leaves and reclaims the unrelated native copy');
+}
+function summonNativeBoss(player, label = 'native reverse chant') {
+  assert.equal(questStage(player), 110, `${label} begins at the final ritual stage`);
+  assertRoomActorCast(player, 110);
+  if (roomWords(player).some(word => word < 1 || word > 5)) setWords(player);
+  if (itemCount(player, 'agrith_sigil') === 0) addItem(player, 'agrith_sigil');
+  positionPlayer(player, roomCoord(player, 32, 31));
+  const matthew = roomNpc(player, 'agrith_matthew');
+  const humanDeath = id('SeqType', 'human_death');
+  const events = [];
+  const originalPlayAnimation = matthew.playAnimation;
+  const originalRemoveNpc = World.removeNpc;
+  const originalAddNpc = World.addNpc;
+  matthew.playAnimation = function(sequence, ...args) {
+    if (sequence === humanDeath) events.push('human_death');
+    return originalPlayAnimation.call(this, sequence, ...args);
+  };
+  World.removeNpc = function(npc, ...args) {
+    if (npc === matthew) events.push('matthew-delete');
+    return originalRemoveNpc.call(this, npc, ...args);
+  };
+  const instanceUid = currentInstance(player).uid;
+  World.addNpc = function(npc, ...args) {
+    if (npc.type === bossType.id && npc.level === 0 &&
+        World.instances.findInstanceByCoord({ level: npc.level, x: npc.x, z: npc.z })?.uid === instanceUid) {
+      events.push({ kind: 'boss-add', matthewActive: matthew.isActive, x: npc.x, z: npc.z });
+    }
+    return originalAddNpc.call(this, npc, ...args);
+  };
+  try {
+    holdItem(player, 'agrith_sigil', 1, roomWords(player).reverse(), label);
+  } finally {
+    matthew.playAnimation = originalPlayAnimation;
+    World.removeNpc = originalRemoveNpc;
+    World.addNpc = originalAddNpc;
+  }
+  const boss = roomNpc(player, 'agrith_naar');
+  const instance = currentInstance(player);
+  assert.deepEqual(events, [
+    'human_death',
+    'matthew-delete',
+    { kind: 'boss-add', matthewActive: false, x: instance.sw.x + bossLocal[0], z: instance.sw.z + bossLocal[1] }
+  ], `${label} plays Matthew's native death animation, deletes him, then activates the boss`);
+  assert.equal(matthew.isActive, false, `${label} leaves Matthew deleted`);
+  assert.deepEqual([boss.x - instance.sw.x, boss.z - instance.sw.z], bossLocal,
+    `${label} spawns the boss at its source-local tile`);
+  return boss;
+}
+function npcDialogueCapture(player) {
+  let cursor = player.packets.length;
+  let latestRoot = null;
+  let latestTitle = null;
+  let latestPortrait = null;
+  const frames = [];
+  return {
+    frames,
+    observe(currentPlayer) {
+      assert.equal(currentPlayer, player);
+      const packets = player.packets.slice(cursor);
+      cursor = player.packets.length;
+      const root = player.modalChat >= 0 ? types.Component.get(player.modalChat)?.comName ?? '' : '';
+      if (!root.startsWith('npcchat')) return;
+      if (root !== latestRoot) {
+        latestRoot = root;
+        latestTitle = null;
+        latestPortrait = null;
+      }
+      const titleComponent = id('Component', `${root}:com_1`);
+      const portraitComponent = id('Component', `${root}:com_0`);
+      const titlePacket = packets.filter(packet => packet instanceof IfSetText && packet.component === titleComponent).at(-1);
+      const portraitPacket = packets.filter(packet => packet instanceof IfSetNpcHead && packet.component === portraitComponent).at(-1);
+      if (titlePacket) latestTitle = titlePacket.text;
+      if (portraitPacket) latestPortrait = portraitPacket.npc;
+      const lines = packets.filter(packet => packet instanceof IfSetText && packet.component !== titleComponent)
+        .map(packet => packet.text);
+      frames.push({ root, title: latestTitle, portrait: latestPortrait, lines });
+    }
+  };
+}
+function assertRecruitmentLine(capture, line, title, portraitName) {
+  const frame = capture.frames.find(candidate => candidate.lines.some(text => text.includes(line)));
+  assert(frame, `captured final recruitment line ${line}`);
+  assert.notEqual(frame.title, null, `final recruitment line ${line} has a speaker title`);
+  assert.notEqual(frame.title, 'null', `final recruitment line ${line} does not render literal null`);
+  assert.equal(frame.title, title, `final recruitment line ${line} uses the intended speaker name`);
+  assert.equal(frame.portrait, id('NpcType', portraitName),
+    `final recruitment line ${line} uses the intended native portrait`);
 }
 
 check('Reen requires both completed prerequisite quests and base level 30 Crafting', () => {
@@ -710,7 +1124,7 @@ check('mushroom ink and desert-clothing dye preserve the Golem ink and pen route
   } finally { cleanupQuestRun(player, actors); }
 });
 
-check('original stairs and portals retain open landings and do not pre-empt The Golem', () => {
+check('original stairs and portals retain open landings while active quest players enter a native copy', () => {
   const { player, actors } = questFixture();
   try {
     nativeLocRow(player, rowAt([0, 3492, 3090]), [], 'original stairs down');
@@ -718,23 +1132,31 @@ check('original stairs and portals retain open landings and do not pre-empt The 
     nativeLocRow(player, rowAt([0, 2721, 4884]), [], 'original stairs up');
     openLanding(player, [0, 3491, 3090], 'stairs up');
     setPlayerVariable(player, 'golem_a', questConstant('golem_doors_open'));
-    nativeLocRow(player, rowAt([0, 2720, 4912]), [], 'original Golem portal');
+    const portal = rowAt([0, 2720, 4912]);
+    nativeLocRow(player, portal, [], 'original Golem portal');
     openLanding(player, [2, 2720, 4884], 'Golem portal');
     assert.equal(playerVariable(player, 'golem_a'), questConstant('golem_entered_portal'));
     nativeLocRow(player, rowAt([2, 2719, 4883]), [], 'original return portal');
     openLanding(player, [0, 2713, 4913], 'return portal');
+
     setPlayerVariable(player, 'golem_a', questConstant('golem_complete'));
     setPlayerVariable(player, 'agrith_quest', 10);
-    const portal = rowAt([0, 2720, 4912]);
     nativeLocRow(player, portal, [], 'Dave blocks premature entry');
     assert.equal(player.level, 0);
+    assert.equal(currentInstance(player), null);
+
+    setPlayerVariable(player, 'agrith_quest', 125);
+    nativeLocRow(player, portal, [], 'completed Golem account keeps the shared landing');
+    openLanding(player, [2, 2720, 4884], 'completed Golem portal');
+    assert.equal(currentInstance(player), null, 'completed account does not create an Agrith copy');
+    assertNoSharedCultists();
+    nativeLocRow(player, rowAt([2, 2719, 4883]), [], 'leave the completed shared landing');
     setPlayerVariable(player, 'agrith_quest', 30);
-    const denath = mappedNpc('agrith_denath');
-    nativeLocRow(player, portal, [], 'accepted cult entry with lost quest items');
-    openLanding(player, [2, 2720, 4884], 'cult portal');
-    assert(denath.isActive, 'portal entry preserves the original mapped Denath');
-    assert.equal(denath.getVar(ownerVar), unownedOwner, 'mapped cult actors do not acquire a player owner');
-    assert.equal(playerVariable(player, 'golem_a'), questConstant('golem_complete'));
+    enterQuestRoom(player);
+    assertRoomActorCast(player, 30);
+    assertNoSharedCultists();
+    exitPrivateRoom(player, 'active quest native exit');
+    assert.equal(questStage(player), 30);
   } finally { cleanupQuestRun(player, actors); }
 });
 
@@ -744,6 +1166,7 @@ check('all four original kilns bind the chosen ordinal, reject wrong kilns and r
     const { player, actors } = questFixture(60);
     try {
       setPlayerVariable(player, 'agrith_kiln', ordinal);
+      exitPrivateRoom(player, 'leave private chamber for kiln recovery');
       nativeLocRow(player, rowAt(kilnTiles[(ordinal + 1) % 4]), [], 'wrong kiln');
       assert.equal(itemCount(player, 'agrith_book'), 0);
       nativeLocRow(player, rowAt(kilnTiles[ordinal]), [], 'correct kiln');
@@ -762,73 +1185,27 @@ check('all four original kilns bind the chosen ordinal, reject wrong kilns and r
   }
 });
 
-check('original unowned cult actors serve each account without duplicate pre-ritual copies', () => {
-  const { player, actors } = questFixture(60, [2, 2720, 4895]);
-  const other = playerAt([2, 2720, 4895], 60);
-  try {
-    const names = ['agrith_denath', 'agrith_matthew', 'agrith_jennifer', 'agrith_eric', 'agrith_tanya', 'agrith_patrick'];
-    const originals = names.map(name => mappedNpc(name));
-    for (let i = 0; i < names.length; i++) {
-      const rows = nativeNpcRows(names[i]);
-      assert.equal(rows.length, 1, `${names[i]} has exactly one checked-out map placement`);
-      assert.deepEqual([originals[i].level, originals[i].x, originals[i].z], [rows[0].level, rows[0].x, rows[0].z],
-        'the built native actor uses its actual source-map placement');
-      assert.equal(types.NpcType.get(originals[i].type).wanderrange, 0, 'the circle actor remains anchored');
-      walkable([originals[i].level, originals[i].x, originals[i].z], `${names[i]} circle spot`);
-    }
-    assert.equal(new Set(originals.map(npc => `${npc.level},${npc.x},${npc.z}`)).size, originals.length,
-      'all six mapped actors occupy different circle spots');
-    const cultTypes = new Set(originals.map(npc => npc.type));
-    const before = [...World.npcs].filter(npc => npc.isActive && cultTypes.has(npc.type)).map(npc => npc.nid);
-    runPlayerScript(player, '[proc,agrith_room_enter]');
-    runPlayerScript(other, '[proc,agrith_room_enter]');
-    assert.deepEqual([...World.npcs].filter(npc => npc.isActive && cultTypes.has(npc.type)).map(npc => npc.nid), before,
-      'entering with either account adds no duplicate pre-ritual cult actors');
-    for (const npc of originals) assert.equal(npc.getVar(ownerVar), unownedOwner, 'mapped actors stay unowned');
-    for (const account of [player, other]) {
-      addItem(account, 'agrith_book');
-      addItem(account, 'agrith_sigil');
-      nativeNpc(account, mappedNpc('agrith_matthew'), [], 'the original unowned Matthew prepares this account');
-      assert.equal(questStage(account), 70);
-      if (account === player) assert.equal(questStage(other), 60, 'one account cannot advance the other');
-    }
-    setPlayerVariable(player, 'agrith_quest', 100);
-    runPlayerScript(player, '[proc,agrith_room_enter]');
-    for (const name of ['agrith_badden_sigil', 'agrith_reen_sigil', 'agrith_golem_sigil', 'agrith_dave_sigil']) {
-      const recruit = ownedNpc(player, name);
-      for (const original of originals) {
-        assert(recruit.x + recruit.width <= original.x || original.x + original.width <= recruit.x ||
-          recruit.z + recruit.length <= original.z || original.z + original.length <= recruit.z,
-        'temporary recruits never overlap a permanent cult-circle actor');
-      }
-    }
-    runPlayerScript(player, '[proc,agrith_clear_cult]');
-    assert(originals.every(npc => npc.isActive), 'temporary-actor cleanup never deletes original mapped cult actors');
-  } finally {
-    cleanup(other);
-    cleanupQuestRun(player, actors);
-  }
-});
 
 check('cult dialogue, native casting, both chants, recruitment and real death queue complete the quest', () => {
-  const { player, actors } = questFixture(30, [2, 2720, 4895]);
+  const { player, actors } = questFixture(30);
   try {
     addItem(player, 'agrith_silverlight_dyed');
     wearItem(player, 'agrith_silverlight_dyed');
-    runPlayerScript(player, '[proc,agrith_room_enter]');
-    nativeNpc(player, mappedNpc('agrith_denath'), [], 'Denath teaches the incantation');
+    nativeNpc(player, roomNpc(player, 'agrith_denath'), [], 'Denath teaches the incantation');
     assert.equal(questStage(player), 40);
     const words = roomWords(player);
     assert.deepEqual([...words].sort(), [1, 2, 3, 4, 5], 'Denath teaches a complete permutation');
-    nativeNpc(player, mappedNpc('agrith_denath'), [], 'Denath repeats the same incantation');
+    nativeNpc(player, roomNpc(player, 'agrith_denath'), [], 'Denath repeats the same incantation');
     assert.deepEqual(roomWords(player), words);
-    nativeNpc(player, mappedNpc('agrith_jennifer'), [], 'Jennifer supplies the mould');
+    nativeNpc(player, roomNpc(player, 'agrith_jennifer'), [], 'Jennifer supplies the mould');
     assert.equal(itemCount(player, 'agrith_sigil_mould'), 1);
     removeItem(player, 'agrith_sigil_mould');
-    nativeNpc(player, mappedNpc('agrith_jennifer'), [], 'Jennifer recovers a lost mould');
+    nativeNpc(player, roomNpc(player, 'agrith_jennifer'), [], 'Jennifer recovers a lost mould');
     assert.equal(itemCount(player, 'agrith_sigil_mould'), 1);
-    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'Matthew sends the player to the golem');
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [], 'Matthew sends the player to the golem');
     assert.equal(questStage(player), 50);
+
+    exitPrivateRoom(player, 'leave for the original golem');
     const golem = spawnActor(player, 'golem_golem', actors, [0, 3481, 3097]);
     nativeNpc(player, golem, [], 'the original golem selects a kiln');
     assert.equal(questStage(player), 60);
@@ -836,9 +1213,11 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
     assert(chosen >= 0 && chosen < 4);
     nativeLocRow(player, rowAt(kilnTiles[chosen]), [], 'retrieve the period kiln book');
     assert.equal(itemCount(player, 'agrith_book'), 1);
-    placePlayer(player, [2, 2720, 4895]);
-    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'book without sigil is rejected');
+
+    enterQuestRoom(player);
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [], 'book without sigil is rejected');
     assert.equal(questStage(player), 60);
+    exitPrivateRoom(player, 'leave to cast the sigil');
     addItem(player, 'silver_bar');
     const craftingBefore = player.stats[PlayerStat.CRAFTING];
     castSigil(player);
@@ -846,43 +1225,58 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
     assert.equal(itemCount(player, 'agrith_sigil_mould'), 1);
     assert.equal(itemCount(player, 'agrith_sigil'), 1);
     assert.equal(player.stats[PlayerStat.CRAFTING] - craftingBefore, 500, 'casting uses native tenths of XP');
-    placePlayer(player, [2, 2720, 4895]);
+
+    enterQuestRoom(player);
     holdItem(player, 'agrith_book', 1, [], 'read the reversed tome');
-    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'Matthew accepts book and sigil');
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [], 'Matthew accepts book and sigil');
     assert.equal(questStage(player), 70);
+    assertRoomActorCast(player, 70);
     const wrong = words.map(word => word % 5 + 1);
-    placePlayer(player, [2, 2720, 4895]);
+    positionPlayer(player, roomCoord(player, 32, 31));
     holdItem(player, 'agrith_sigil', 1, wrong, 'wrong first chant');
     assert.equal(questStage(player), 70);
     holdItem(player, 'agrith_sigil', 1, words, 'correct forward chant');
-    assert.equal(questStage(player), 80);
+    assertFirstChantOutcome(player);
     assert.equal(playerVariable(player, 'agrith_convinced_dave'), 1);
+
+    exitPrivateRoom(player, 'leave for Dave and the recruits');
     const dave = spawnActor(player, 'agrith_dave', actors, [0, 2721, 4910]);
-    nativeNpc(player, dave, [1], 'real Tanya scene and Dave recruitment');
+    const daveDialogue = npcDialogueCapture(player);
+    nativeNpc(player, dave, [1], 'real Tanya scene and Dave recruitment', null, daveDialogue.observe);
     assert.equal(questStage(player), 90);
     assert.equal(playerVariable(player, 'agrith_convinced_dave'), 2);
-    nativeNpc(player, spawnActor(player, 'agrith_reen_uzer', actors, [0, 3483, 3090]), [1], 'recruit Reen');
-    nativeNpc(player, spawnActor(player, 'agrith_badden_uzer', actors, [0, 3484, 3090]), [1], 'recruit Badden');
+    assertRecruitmentLine(daveDialogue, "All right. I'll go back.", 'Evil Dave', 'agrith_dave');
+
+    const reenDialogue = npcDialogueCapture(player);
+    const reen = spawnActor(player, 'agrith_reen_uzer', actors, [0, 3483, 3090]);
+    nativeNpc(player, reen, [1], 'recruit Reen', null, reenDialogue.observe);
+    assertRecruitmentLine(reenDialogue, 'I will meet you in the throne room.', 'Father Reen', 'agrith_reen');
+    const baddenDialogue = npcDialogueCapture(player);
+    const badden = spawnActor(player, 'agrith_badden_uzer', actors, [0, 3484, 3090]);
+    nativeNpc(player, badden, [1], 'recruit Badden', null, baddenDialogue.observe);
+    assertRecruitmentLine(baddenDialogue, 'I will meet you in the throne room.', 'Father Badden', 'agrith_badden');
     assert.equal(playerVariable(player, 'agrith_reen_uzer'), 2);
     assert.equal(playerVariable(player, 'agrith_badden_uzer'), 2);
     addItem(player, 'golem_golemkey');
     nativeUseNpc(player, golem, 'golem_golemkey', 'recruit the golem with its original key');
     assert.equal(playerVariable(player, 'agrith_convinced_golem'), 1);
     removeItem(player, 'agrith_sigil');
-    placePlayer(player, [2, 2720, 4895]);
-    nativeNpc(player, mappedNpc('agrith_matthew'), [], 'recover lost sigils and distribute them to recruits');
+
+    enterQuestRoom(player);
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [], 'recover lost sigils and distribute them to recruits');
     assert.equal(questStage(player), 100);
     assert.equal(itemCount(player, 'agrith_sigil'), 1, 'three recovered sigils are given to the recruits');
-    nativeNpc(player, mappedNpc('agrith_matthew'), [2], 'not ready for the final ritual');
+    assertRoomActorCast(player, 100);
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [2], 'not ready for the final ritual');
     assert.equal(questStage(player), 100);
-    nativeNpc(player, mappedNpc('agrith_matthew'), [1], 'ready for the final ritual');
+    nativeNpc(player, roomNpc(player, 'agrith_matthew'), [1], 'ready for the final ritual');
     assert.equal(questStage(player), 110);
-    placePlayer(player, [2, 2720, 4895]);
+    assertRoomActorCast(player, 110);
+    positionPlayer(player, roomCoord(player, 32, 31));
     holdItem(player, 'agrith_sigil', 1, wrong, 'wrong second chant');
-    assert.equal([...World.npcs].filter(npc => npc.isActive && npc.type === bossType.id && npc.getVar(ownerVar) === player.uid).length, 0);
-    holdItem(player, 'agrith_sigil', 1, [...words].reverse(), 'correct reverse chant');
-    const boss = ownedNpc(player, 'agrith_naar');
-    placePlayer(player, [boss.level, boss.x + boss.width, boss.z]);
+    assert.equal(roomNpcOrNull(player, 'agrith_naar'), null, 'wrong second chant does not activate Agrith-Naar');
+    const boss = summonNativeBoss(player, 'correct reverse chant');
+    approachNpc(player, boss);
     boss.levels[NpcStat.HITPOINTS] = 12;
     const xpBefore = player.stats[PlayerStat.ATTACK];
     const qpBefore = questPoints(player);
@@ -902,21 +1296,30 @@ check('cult dialogue, native casting, both chants, recruitment and real death qu
 check('each missing recruit blocks Matthew even though lost sigils remain recoverable', () => {
   const flags = [['agrith_convinced_dave', 2], ['agrith_reen_uzer', 2], ['agrith_badden_uzer', 2], ['agrith_convinced_golem', 1]];
   for (const [missing] of flags) {
-    const { player, actors } = questFixture(90, [2, 2720, 4895]);
+    const { player, actors } = questFixture(90);
     try {
       for (const [name, value] of flags) setPlayerVariable(player, name, name === missing ? 0 : value);
-      nativeNpc(player, mappedNpc('agrith_matthew'), [], `Matthew rejects missing ${missing}`);
+      nativeNpc(player, roomNpc(player, 'agrith_matthew'), [], `Matthew rejects missing ${missing}`);
       assert.equal(questStage(player), 90);
       assert.equal(itemCount(player, 'agrith_sigil'), 4, 'lost ritual sigils are recoverable without bypassing recruitment');
     } finally { cleanupQuestRun(player, actors); }
   }
 });
-
-check('lost mould and sigil remain craftable through the second-ritual phase', () => {
+check('lost mould and sigil remain craftable when the player is inside and outside the cult stages', () => {
   for (const stage of [40, 70, 100, 110]) {
-    const { player, actors } = questFixture(stage, [2, 2720, 4895]);
+    const { player, actors } = questFixture(stage);
     try {
-      nativeNpc(player, mappedNpc('agrith_jennifer'), [], `recover mould at ${stage}`);
+      if (stage < 80) {
+        const jennifer = roomNpc(player, 'agrith_jennifer');
+        if (stage === 40) nativeNpc(player, jennifer, [], 'acquire Jennifer mould before losing it');
+        else addItem(player, 'agrith_sigil_mould');
+        removeItem(player, 'agrith_sigil_mould');
+        nativeNpc(player, jennifer, [], `Jennifer recovers mould at ${stage}`);
+      } else {
+        assert.equal(roomNpcOrNull(player, 'agrith_jennifer'), null, `stage ${stage} leaves Jennifer absent`);
+        addItem(player, 'agrith_sigil_mould');
+      }
+      exitPrivateRoom(player, `leave stage ${stage} copy for sigil casting`);
       addItem(player, 'silver_bar');
       castSigil(player);
       assert.equal(itemCount(player, 'agrith_sigil'), 1, `lost sigil can be remade at stage ${stage}`);
@@ -924,62 +1327,61 @@ check('lost mould and sigil remain craftable through the second-ritual phase', (
     } finally { cleanupQuestRun(player, actors); }
   }
 });
-
-check('boss owner guard, duplicate prevention, departure and death leave a repeatable reverse ritual', () => {
-  const { player, actors } = questFixture(110, [2, 2720, 4895]);
-  const outsider = playerAt([2, 2720, 4895], 110);
+check('boss ownership, duplicate prevention, native departure and death leave a repeatable reverse ritual', () => {
+  const first = questFixture(110);
+  const outsider = questFixture(110);
   try {
-    setWords(player);
-    addItem(player, 'agrith_sigil');
-    holdItem(player, 'agrith_sigil', 1, [5, 4, 3, 2, 1], 'summon for retry checks');
-    let boss = ownedNpc(player, 'agrith_naar');
+    const player = first.player;
+    let boss = summonNativeBoss(player, 'first owned reverse ritual');
+    const instance = currentInstance(player);
+    const outsiderInstance = currentInstance(outsider.player);
+    assert.notEqual(instance.uid, outsiderInstance.uid, 'each account receives a distinct native copy');
+    assert.equal(boss.getVar(ownerVar), player.uid, 'the compiled boss is owned by the summoning account');
+    if (itemCount(player, 'agrith_sigil') === 0) addItem(player, 'agrith_sigil');
     holdItem(player, 'agrith_sigil', 1, [], 'a second sigil operation cannot duplicate the boss');
-    assert.equal([...World.npcs].filter(npc => npc.isActive && npc.type === bossType.id && npc.getVar(ownerVar) === player.uid).length, 1);
-    approachNpc(outsider, boss);
-    showNpc(outsider, boss);
-    assert(npcHandler.handle(new OpNpc(2, boss.nid), outsider));
-    outsider.processInteraction();
-    finishInteraction(outsider, [], 'non-owner attack');
-    assert(outsider.messages.some(message => message.includes('not your enemy')));
-    assert.equal(boss.getVar(ownerVar), player.uid);
-    placePlayer(player, [0, 3482, 3090]);
+    assert.equal([...World.npcs].filter(npc => npc.isActive && npc.type === bossType.id &&
+      npc.getVar(ownerVar) === player.uid &&
+      World.instances.findInstanceByCoord({ level: npc.level, x: npc.x, z: npc.z })?.uid === instance.uid).length, 1);
+    assert.equal(rsbuf.hasNpc(outsider.player.slot, boss.nid), false,
+      'the other native copy does not expose the private boss in its client scene');
+
+    exitPrivateRoom(player, 'owner leaves the boss instance through its native exit');
+    assert.equal(boss.isActive, false, 'empty instance deletion removes its boss');
+    assert.equal(questStage(player), 110, 'native departure preserves the final ritual stage');
+    enterQuestRoom(player, 'owner re-enters for the retry proof');
+    boss = summonNativeBoss(player, 'retry after native departure');
     const timer = ScriptProvider.getByTrigger(ServerTriggerType.AI_TIMER, boss.type, bossType.category);
+    assert(timer, 'the packed boss timer exists');
+    player.levels[PlayerStat.HITPOINTS] = 0;
     let state = ScriptRunner.init(timer, boss);
     boss.executeScript(state);
     assert.equal(state.execution, ScriptState.FINISHED);
-    assert.equal(boss.isActive, false, 'departure cleans up the owned encounter');
-    assert.equal(questStage(player), 110);
-    placePlayer(player, [2, 2720, 4895]);
-    holdItem(player, 'agrith_sigil', 1, [5, 4, 3, 2, 1], 'retry after leaving');
-    boss = ownedNpc(player, 'agrith_naar');
-    player.levels[PlayerStat.HITPOINTS] = 0;
-    state = ScriptRunner.init(timer, boss);
-    boss.executeScript(state);
-    assert.equal(boss.isActive, false, 'death cleans up the owned encounter');
+    assert.equal(boss.isActive, false, 'owner death cleans the native encounter');
     player.levels[PlayerStat.HITPOINTS] = 99;
-    holdItem(player, 'agrith_sigil', 1, [5, 4, 3, 2, 1], 'retry after death');
-    assert(ownedNpc(player, 'agrith_naar'));
+    exitPrivateRoom(player, 'owner leaves after death before the reverse-ritual retry');
+    enterQuestRoom(player, 'owner re-enters after death');
+    boss = summonNativeBoss(player, 'retry after owner death');
+    assert.equal(roomNpc(player, 'agrith_naar'), boss);
     assert.equal(questStage(player), 110);
   } finally {
-    cleanup(outsider);
-    cleanupQuestRun(player, actors);
+    cleanupQuestRun(outsider.player, outsider.actors);
+    cleanupQuestRun(first.player, first.actors);
   }
 });
-
 check('all six combat rewards grant exactly 100000 tenths, one QP, Darklight and one completion scroll', () => {
   const rewards = [
     [PlayerStat.ATTACK, [1]], [PlayerStat.STRENGTH, [2]], [PlayerStat.DEFENCE, [3]],
     [PlayerStat.RANGED, [4]], [PlayerStat.MAGIC, [5, 1]], [PlayerStat.HITPOINTS, [5, 2]]
   ];
   for (const [skill, choices] of rewards) {
-    const { player, actors } = questFixture(120, [2, 2720, 4895]);
+    const { player, actors } = questFixture(120);
     try {
+      assertRoomActorCast(player, 120);
       addItem(player, 'silverlight');
       wearItem(player, 'silverlight');
       const xpBefore = [...player.stats];
       const qpBefore = questPoints(player);
-      const monk = spawnActor(player, 'agrith_reen_sigil', actors);
-      nativeNpc(player, monk, choices, `completion skill ${skill}`);
+      nativeNpc(player, roomNpc(player, 'agrith_reen_sigil'), choices, `completion skill ${skill}`);
       assert.equal(questStage(player), 125);
       for (let i = 0; i < xpBefore.length; i++) assert.equal(player.stats[i] - xpBefore[i], i === skill ? 100000 : 0);
       assert.equal(questPoints(player) - qpBefore, 1);
@@ -987,7 +1389,7 @@ check('all six combat rewards grant exactly 100000 tenths, one QP, Darklight and
       assert.equal(itemCount(player, 'silverlight', wornId), 0);
       assert.equal(types.Component.get(player.modalMain)?.comName, 'questscroll_death');
       const xpAfter = [...player.stats];
-      nativeNpc(player, spawnActor(player, 'agrith_badden_sigil', actors), [], 'completion cannot be replayed');
+      nativeNpc(player, roomNpc(player, 'agrith_badden_sigil'), [], 'completion cannot be replayed');
       assert.deepEqual([...player.stats], xpAfter);
       assert.equal(questPoints(player) - qpBefore, 1);
       assert.equal(itemCount(player, 'darklight', wornId), 1);
@@ -995,17 +1397,17 @@ check('all six combat rewards grant exactly 100000 tenths, one QP, Darklight and
     } finally { cleanupQuestRun(player, actors); }
   }
 });
-
 check('a full inventory cannot lose the reward, and an equipped sword can transform without a free slot', () => {
   for (const worn of [false, true]) {
-    const { player, actors } = questFixture(120, [2, 2720, 4895]);
+    const { player, actors } = questFixture(120);
     try {
+      assertRoomActorCast(player, 120);
       if (worn) {
         addItem(player, 'agrith_silverlight_dyed');
         wearItem(player, 'agrith_silverlight_dyed');
       }
       addItem(player, 'bronze_dagger', 28);
-      const monk = spawnActor(player, 'agrith_reen_sigil', actors);
+      const monk = roomNpc(player, 'agrith_reen_sigil');
       nativeNpc(player, monk, worn ? [1] : [], 'full-inventory completion');
       if (!worn) {
         assert.equal(questStage(player), 120);
@@ -1019,9 +1421,11 @@ check('a full inventory cannot lose the reward, and an equipped sword can transf
   }
 });
 
+
 check('Prysin keeps Demon Slayer recovery and hard-clue priority, then charges exactly 1000 for Darklight', () => {
   const { player, actors } = questFixture(110, [0, 3200, 3472]);
   try {
+    exitPrivateRoom(player, 'leave the quest copy for outside-quest NPC checks');
     const original = nativeNpcRows('sir_prysin')[0];
     assert(original, 'the original Sir Prysin placement exists');
     const prysin = spawnActor(player, 'sir_prysin', actors, [original.level, original.x, original.z]);
@@ -1072,6 +1476,7 @@ check('Prysin keeps Demon Slayer recovery and hard-clue priority, then charges e
 check('an incomplete Golem keeps its own dialogue and four-clay repair despite an Agrith stage', () => {
   const { player, actors } = questFixture(50, [0, 3480, 3097]);
   try {
+    exitPrivateRoom(player, 'leave the quest copy for the original Golem');
     setPlayerVariable(player, 'golem_a', questConstant('golem_not_started'));
     setPlayerVariable(player, 'golem_clay', 0);
     const golem = spawnActor(player, 'golem_golem', actors);
@@ -1091,7 +1496,7 @@ check('both ritual monks replace a lost Silverlight before the final blow', () =
   for (const name of ['agrith_reen_sigil', 'agrith_badden_sigil']) {
     const { player, actors } = questFixture(110, [2, 2720, 4895]);
     try {
-      nativeNpc(player, spawnActor(player, name, actors), [], `${name} recovers the lost finishing weapon`);
+      nativeNpc(player, roomNpc(player, name), [], `${name} recovers the lost finishing weapon`);
       assert.equal(itemCount(player, 'silverlight'), 1, 'the retained period guide permits monk recovery during the quest');
       assert.equal(questStage(player), 110);
     } finally { cleanupQuestRun(player, actors); }
