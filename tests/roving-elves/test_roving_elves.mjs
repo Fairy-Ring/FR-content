@@ -935,6 +935,25 @@ function testRangedAmmo() {
     assert.equal(p.invGetSlot(worn, rightHand)?.id, bow, `${name} stays equipped during ammo checking`);
     assert.equal(chargeUses(p, bowBitsMin, bowBitsMax), 0, 'ammo checks do not consume a crystal charge');
   }
+
+  const observer = newPlayer();
+  const runeArrow = obj('rune_arrow');
+  for (const name of [...bowNames, 'yew_shortbow', 'magic_shortbow']) {
+    p.getInventory(worn).set(rightHand, { id: obj(name), count: 1 });
+    const expectedQuiverBonus = bowNames.includes(name) ? 0 : 49;
+    for (const [script, source, target] of [
+      ['[proc,equip_get_bonuses]', p, null],
+      ['[proc,.equip_get_bonuses]', observer, p]
+    ]) {
+      p.getInventory(worn).set(quiver, null);
+      const withoutArrows = runDirect(source, script, [], target).popInt();
+      p.getInventory(worn).set(quiver, { id: runeArrow, count: 1 });
+      const withArrows = runDirect(source, script, [], target).popInt();
+      assert.equal(withArrows - withoutArrows, expectedQuiverBonus,
+        `${script}: rune arrows add ${expectedQuiverBonus} ranged strength with ${name}`);
+    }
+  }
+  cleanupPlayer(observer);
   cleanupPlayer(p);
 }
 function runRangedUse(p, mode, target) {

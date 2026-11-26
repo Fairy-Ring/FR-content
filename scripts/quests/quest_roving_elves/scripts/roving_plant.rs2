@@ -1,4 +1,4 @@
-// VERIFIED: Tip.It 2005: Plant beside the chalice, with a spade, grows a crystal tree.
+// VERIFIED: Tip.It 2005: Plant beside the urn, with a spade, grows a crystal tree.
 // UNKNOWN engineering: one-tile ring around the original 2x2 chalice and visual delays.
 // Functional messages are UNKNOWN; no period transcript is retained for this step.
 [opheld1,roving_new_consecration_seed]
