@@ -1,0 +1,228 @@
+// A Tail of Two Cats — Unferth's five chores.
+// Original 377 varbits and loc forms are retained. The plant's final cache form is stage 8.
+
+[proc,twocats_chores_start]()
+if (%twocats_quest ! 50) return;
+// UNKNOWN initial stage values: long hair and the empty table are the task's chores-stage setup.
+if (%twocats_chores_tidyhuman = 0) %twocats_chores_tidyhuman = 4;
+if (%twocats_chores_feedhuman = 0) %twocats_chores_feedhuman = 1;
+if (%twocats_chores_tidygarden < 4) %twocats_planted_at = 0;
+~twocats_chores_ensure_list();
+
+[proc,twocats_chores_done]()(boolean)
+~twocats_chores_refresh();
+if (%twocats_chores_tidyhouse ! 1) return(false);
+if (%twocats_chores_warmhuman ! 2) return(false);
+if (%twocats_chores_feedhuman < 4) return(false);
+if (%twocats_chores_tidyhuman ! 8) return(false);
+if (%twocats_chores_tidygarden = 8) return(true);
+return(false);
+
+[proc,twocats_chores_refresh]()
+if (%twocats_quest ! 50) return;
+~twocats_chores_ensure_list();
+def_int $stage = %twocats_chores_tidygarden;
+if ($stage < 4 | $stage >= 8) return;
+def_int $planted_at = %twocats_planted_at;
+// UNKNOWN engineering value: the period guide gives no duration, so growth takes one date-minute.
+def_int $growth_minutes = 1;
+if (sub(date_minutes, $planted_at) < $growth_minutes) return;
+%twocats_chores_tidygarden = 8;
+%twocats_planted_at = 0;
+
+[proc,twocats_chores_ensure_list]()
+if (%twocats_quest < 50 | %twocats_quest >= 70) return;
+if (inv_total(inv, twocats_chores) > 0 | inv_total(bank, twocats_chores) > 0) return;
+if (inv_freespace(inv) < 1) return;
+inv_add(inv, twocats_chores, 1);
+
+// The cached Make option is on the visible unmade bed form.
+[oploc1,twocats_bed_unmade]
+if (%twocats_quest ! 50 | %twocats_chores_tidyhouse = 1) return;
+%twocats_chores_tidyhouse = 1;
+// UNKNOWN functional wording; the period guide describes the action but not this line.
+mes("You make Unferth's bed.");
+
+// Logs and tinderbox act on the visible fireplace forms in order.
+[oplocu,twocats_fireplace_gone_out] @twocats_chores_fireplace_use;
+[oplocu,twocats_fireplace_got_wood] @twocats_chores_fireplace_use;
+[oplocu,twocats_fireplace_lit] @twocats_chores_fireplace_use;
+
+[label,twocats_chores_fireplace_use]
+if (%twocats_quest ! 50) return;
+def_int $stage = %twocats_chores_warmhuman;
+if (last_useitem = logs & $stage = 0) {
+    if (inv_total(inv, logs) < 1) return;
+    inv_del(inv, logs, 1);
+    anim(human_twocats_got_wood, 0);
+    %twocats_chores_warmhuman = 1;
+    // UNKNOWN functional wording; the period guide describes the action but not this line.
+    mes("You put the logs in the fireplace.");
+    return;
+}
+if (last_useitem = tinderbox & $stage = 1) {
+    if (inv_total(inv, tinderbox) < 1) return;
+    anim(human_twocats_ignite_wood, 0);
+    %twocats_chores_warmhuman = 2;
+    // UNKNOWN functional wording; the period guide describes the action but not this line.
+    mes("You light the fire.");
+    return;
+}
+~displaymessage(^dm_default);
+
+// Cake and milk may be added in either order. Milk returns an empty bucket.
+[oplocu,twocats_table_bare] @twocats_chores_table_use;
+[oplocu,twocats_table_empty] @twocats_chores_table_use;
+[oplocu,twocats_table_milk] @twocats_chores_table_use;
+[oplocu,twocats_table_cake] @twocats_chores_table_use;
+[oplocu,twocats_table_cake_milk] @twocats_chores_table_use;
+
+[label,twocats_chores_table_use]
+if (%twocats_quest ! 50) return;
+def_int $stage = %twocats_chores_feedhuman;
+if (last_useitem = bucket_milk) {
+    if ($stage ! 1 & $stage ! 3) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, bucket_milk) < 1) return;
+    inv_del(inv, bucket_milk, 1);
+    inv_add(inv, bucket_empty, 1);
+    if ($stage = 1) {
+        %twocats_chores_feedhuman = 2;
+    } else {
+        %twocats_chores_feedhuman = 4;
+    }
+    // UNKNOWN functional wording; the period guide describes the action but not this line.
+    mes("You put the milk on the table.");
+    return;
+}
+if (last_useitem = chocolate_cake) {
+    if ($stage ! 1 & $stage ! 2) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, chocolate_cake) < 1) return;
+    inv_del(inv, chocolate_cake, 1);
+    if ($stage = 1) {
+        %twocats_chores_feedhuman = 3;
+    } else {
+        %twocats_chores_feedhuman = 4;
+    }
+    // UNKNOWN functional wording; the period guide describes the action but not this line.
+    mes("You put the cake on the table.");
+    return;
+}
+~displaymessage(^dm_default);
+
+// Bind use-item handlers to every visible Unferth hair form.
+[opnpcu,twocats_unferth_bald] @twocats_chores_shear;
+[opnpcu,twocats_unferth_shorthair] @twocats_chores_shear;
+[opnpcu,twocats_unferth_mediumhair] @twocats_chores_shear;
+[opnpcu,twocats_unferth_spikeyhair] @twocats_chores_shear;
+[opnpcu,twocats_unferth_longhair] @twocats_chores_shear;
+
+[label,twocats_chores_shear]
+if (%twocats_quest ! 50) return;
+if (last_useitem ! shears) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $hair = %twocats_chores_tidyhuman;
+if ($hair >= 8) return;
+if (inv_total(inv, shears) < 1) return;
+anim(human_shearing_unferth, 0);
+%twocats_chores_tidyhuman = add($hair, 1);
+// UNKNOWN functional wording; the period guide says to make Unferth neat and tidy.
+mes("You tidy Unferth's hair.");
+
+// Patch actions resolve on each visible cache stage, not on the parent loc.
+[oplocu,twocats_patch_weed3] @twocats_chores_patch_use;
+[oplocu,twocats_patch_weed2] @twocats_chores_patch_use;
+[oplocu,twocats_patch_weed1] @twocats_chores_patch_use;
+[oplocu,twocats_patch_weeded] @twocats_chores_patch_use;
+[oplocu,twocats_patch_potato1] @twocats_chores_patch_use;
+[oplocu,twocats_patch_potato2] @twocats_chores_patch_use;
+[oplocu,twocats_patch_potato3] @twocats_chores_patch_use;
+[oplocu,twocats_patch_potato4] @twocats_chores_patch_use;
+[oplocu,twocats_patch_potato5] @twocats_chores_patch_use;
+[oploc3,twocats_patch_weed3] @twocats_chores_rake_continue;
+[oploc3,twocats_patch_weed2] @twocats_chores_rake_continue;
+[oploc3,twocats_patch_weed1] @twocats_chores_rake_continue;
+
+[label,twocats_chores_patch_use]
+if (%twocats_quest ! 50) return;
+~twocats_chores_refresh();
+if (last_useitem = rake) {
+    @twocats_chores_rake;
+    return;
+}
+if (last_useitem = potato_seed) {
+    @twocats_chores_plant;
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,twocats_chores_rake_continue]
+if (%twocats_quest ! 50) return;
+~twocats_chores_refresh();
+@twocats_chores_rake;
+
+[label,twocats_chores_rake]
+def_int $stage = %twocats_chores_tidygarden;
+if ($stage < 0 | $stage >= 3 | inv_total(inv, rake) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+anim(farming_raking, 0);
+%twocats_chores_tidygarden = add($stage, 1);
+// UNKNOWN functional wording; the period guide describes clearing the patch.
+mes("You rake the weeds from Unferth's patch.");
+if (%twocats_chores_tidygarden < 3) p_oploc(3);
+
+[label,twocats_chores_plant]
+if (%twocats_chores_tidygarden ! 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, dibber) < 1) {
+    mes("You need a seed dibber to plant the potatoes.");
+    return;
+}
+if (inv_total(inv, potato_seed) < 4) {
+    mes("You need four potato seeds to plant the patch.");
+    return;
+}
+inv_del(inv, potato_seed, 4);
+anim(farming_seed_dibbing, 0);
+%twocats_chores_tidygarden = 4;
+%twocats_planted_at = date_minutes;
+// UNKNOWN functional wording; the period guide describes planting four seeds.
+mes("You plant four potato seeds in Unferth's patch.");
+
+// Recover the recipe and chores list when the player searches the case again.
+[oploc1,twocats_bookcase]
+if (%twocats_quest < 50 | %twocats_quest >= 70) return;
+~twocats_chores_refresh();
+~twocats_chores_ensure_list();
+if (inv_total(inv, twocats_recipe) > 0 | inv_total(bank, twocats_recipe) > 0) {
+    // UNKNOWN functional wording; the cache describes this as Unferth's recipe.
+    mes("You already have the recipe.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, twocats_recipe, 1);
+// UNKNOWN functional wording; the period guide says to search the shelves for a recipe.
+mes("You find a recipe in the bookcase.");
+
+[opheld1,twocats_chores]
+~twocats_chores_refresh();
+// UNKNOWN functional text; this summary paraphrases the retained period walkthrough.
+mes("Make Unferth's bed, light the fireplace, and put chocolate cake and milk on the table.");
+mes("Use shears to tidy his hair. Rake the patch, plant four potato seeds with a dibber, and wait for them to grow.");
+
+[opheld1,twocats_recipe]
+mes("It says on the back, 'My favourite recipe.'");

@@ -9,6 +9,7 @@ if(%phoenixgang = ^phoenixgang_read_book) {
     @reldo_read_book;
 }
 if (~losttribe_reldo_hook = true) return;
+if (~twocats_reldo_hook = true) return;
 ~chatnpc("<p,neutral>Hello stranger.");
 if ((%squire = ^squire_started | (%giantdwarf_quest = 3 & ~giantdwarf_has_battleaxe = true)) & %phoenixgang = ^phoenixgang_not_started) {
     @multi4("I'm in search of a quest.", reldo_phoenixstart, "Do you have anything to trade?", reldo_trade, "What do you do?", reldo_what_do, "What do you know about the Imcando dwarves?", reldo_imcando_dwaves);

@@ -1,23 +1,84 @@
-// A Tail of Two Cats — Unferth (Burthorpe) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:A Tail of Two Cats minus overlay/catspeak chrome).
-// Cat follower needed: with cat -> first write %twocats_quest 0 -> 1.
-// No cat following -> "Hello, do you have a cat?" no write. No dest.
-// Review: Yes echoes the player line the plan names. Cat gate matches Gertrude.
-// Cite red-19-start-impl-377.md §9.
+// VERIFIED route: Tip.It q116 (2006-05-02). CANDIDATE transcript wording.
+[opnpc1,twocats_unferth_bald] ~twocats_unferth;
+[opnpc1,twocats_unferth_shorthair] ~twocats_unferth;
+[opnpc1,twocats_unferth_mediumhair] ~twocats_unferth;
+[opnpc1,twocats_unferth_spikeyhair] ~twocats_unferth;
+[opnpc1,twocats_unferth_longhair] ~twocats_unferth;
 
-[opnpc1,twocats_unferth_bald]
-if (%follower_obj ! null & oc_category(%follower_obj) = kitten | %follower_obj ! null & oc_category(%follower_obj) = cat | %follower_obj ! null & oc_category(%follower_obj) = overgrown) {
+[proc,twocats_unferth]
+if (%twocats_quest = 0) {
+    if (%ics_little_var < ^ics_little_complete) {
+        ~chatnpc("<p,neutral>Hello.");
+        ~chatnpc("<p,neutral>It's fine. Nothing for you to worry about.");
+        return;
+    }
+    if (~twocats_has_cat = false) {
+        ~chatnpc("<p,neutral>Hello, do you have a cat?");
+        ~chatnpc("<p,neutral>Oh, hmm.");
+        return;
+    }
     ~chatnpc("<p,neutral>Hello, I see you have a cat.");
     ~chatnpc("<p,neutral>I do! His name is Bob but I can't find him!");
-    def_int $go = ~p_choice2("Tell you what. I'll help you!", 1, "Goodbye.", 2);
-    if ($go = 2) {
+    if (~twocats_cat_ready = false) return;
+    if (~p_choice2("Tell you what. I'll help you!", 1, "Goodbye.", 2) = 2) {
         ~chatplayer("<p,neutral>Goodbye.");
         return;
     }
     ~chatplayer("<p,happy>Tell you what. I'll help you!");
     ~chatnpc("<p,neutral>Would you? Oh that would be so great!");
-    %twocats_quest = 1;
-} else {
-    ~chatnpc("<p,neutral>Hello, do you have a cat?");
-    ~chatnpc("<p,neutral>Oh, hmm.");
+    ~chatnpc("<p,neutral>Well he usually comes back to me once a week. Usually a Wednesday a bit before lunchtime.");
+    ~chatnpc("<p,neutral>My friend Hild might be able to locate where Bob is, she lives in the house just up the road.");
+    ~twocats_stage(1);
+    return;
+}
+switch_int (%twocats_quest) {
+    case 1 :
+        ~chatnpc("<p,neutral>Have you spoken to Hild about locating Bob?");
+        ~chatnpc("<p,neutral>She lives in the village, just follow the path north a little.");
+    case 10, 20, 30, 35, 40 :
+        ~chatnpc("<p,neutral>Have you found Bob yet?");
+        ~chatnpc("<p,neutral>Please hurry, I'm worried.");
+    case 50 :
+        if (~twocats_chores_done = false) {
+            ~twocats_recover_chores;
+            ~chatplayer("<p,neutral>Hi Unferth, I'm doing some ch...");
+            ~twocats_hild_cat("<p,neutral>Don't tell him you're doing his chores!");
+            return;
+        }
+        ~chatnpc("<p,sad>I don't feel so good...");
+        ~chatnpc("<p,sad>I think I need the Doctor...ugh...");
+        ~twocats_hild_cat("<p,neutral>I guess you're right, there is the Apothecary in Varrock.");
+        ~twocats_stage(55);
+    case 55 :
+        ~chatnpc("<p,sad>I think I need the Doctor...ugh...");
+        ~chatplayer("<p,neutral>Don't worry, I'll get the Apothecary from Varrock!");
+    case 60 :
+        if (~twocats_cat_ready = false) return;
+        if (~twocats_disguised = false) {
+            ~chatnpc("<p,neutral>No you're not! A Doctor wouldn't be holding that!");
+            return;
+        }
+        if (inv_total(inv, vial_water) = 0) {
+            // UNKNOWN functional missing-item reminder.
+            mes("You need a vial of water.");
+            return;
+        }
+        ~chatplayer("<p,neutral>Good day Unferth, I am Doctor <displayname>.");
+        ~chatnpc("<p,neutral>I am not a well man!");
+        ~chatnpc("<p,sad>My back hurts! I think my arm is broken!");
+        ~chatplayer("<p,neutral>All you need to do is take this potion.");
+        inv_del(inv, vial_water, 1);
+        ~chatplayer("<p,neutral>The potion I have given you is the latest technology. It cures all known illnesses, and a few unknown ones. It's what we call in the trade a 'miracle cure'.");
+        ~chatnpc("<p,happy>Wait! I feel something! Yes! I can feel the potion working... The pain has gone... I can walk on my leg... Doctor! I'm cured!");
+        ~twocats_stage(65);
+        ~twocats_hild_cat("<p,neutral>Indeed. Bob should be back by now; let's go find him.");
+    case 65 :
+        ~chatnpc("<p,happy>I feel much better now.");
+    case 69 :
+        ~chatnpc("<p,happy>Hello! Bob came home today! I'm so happy!");
+        ~chatnpc("<p,neutral>Fat lot of use you were! He came home on his own!");
+        ~chatnpc("<p,neutral>Before you go, I found the strangest thing. There was a package left under the bed, it's addressed to you.");
+        ~twocats_complete;
+    case 70 :
+        ~twocats_complete;
 }

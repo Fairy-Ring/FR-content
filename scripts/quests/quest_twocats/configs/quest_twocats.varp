@@ -1,3 +1,8 @@
 [twocats_varbit]
 scope=perm
 transmit=yes
+
+// UNKNOWN engineering timestamp in reserved original slot 326.
+// Permanent so planted potatoes continue to mature across logout.
+[twocats_planted_at]
+scope=perm

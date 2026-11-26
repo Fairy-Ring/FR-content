@@ -54083,27 +54083,6 @@ head1=npc_2634_head
 wanderrange=0
 moverestrict=nomove
 
-[twocats_bob_cutscene]
-name=Bob
-desc=The Jagex cat.
-model1=npc_gertrudescat
-model2=obj_cavewitchcat
-recol1s=15855
-recol1d=3171
-recol2s=4228
-recol2d=3171
-recol3s=32767
-recol3d=8456
-recol4s=15362
-recol4d=22197
-vislevel=hide
-walkanim=cat_walk
-readyanim=cat_ready
-resizeh=60
-resizev=60
-op1=Talk-to
-head1=npc_gertrudescat_head
-
 [twocats_bob_cutscene2]
 name=Bob
 desc=The Jagex cat.

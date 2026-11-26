@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "twocats_planted_at": "UNKNOWN engineering timestamp in reserved original slot 326; persists so Unferth's planted potatoes mature across logout without losing four consumed seeds.",
     "ics_little_multi": "UNKNOWN engineering persistence for original Icthlarin jar selection, opened passage, handed-in supplies, Carpenter preparation and quest-visible forms; saving these fields preserves consumed-item progress across logout.",
     "ics_little_multi_extra": "UNKNOWN engineering persistence for the original Icthlarin auxiliary cat-dialogue, chest, spectral-visibility and Sphinx-token flag word; the original cache does not establish its persistence scope.",
     "fightcaves_state": "UNKNOWN engineering storage: reserved original slot 289 saves the current Fight Caves wave across logout. Bits 7..30 hold an online-only instance token, cleared by logout/login; no transmitted field or new varbit.",
@@ -989,6 +990,7 @@
     "troll_varbit": "perm",
     "tutorial": "perm",
     "tutorial_progress_overlay": "temp",
+    "twocats_planted_at": "perm",
     "twocats_varbit": "perm",
     "tzhaar_fightpit_remaining": "temp",
     "tzhaar_temp": "temp",
@@ -1020,7 +1022,6 @@
     "fightcaves_state": "perm",
     "swansong_combat_uid": "temp",
     "varp319_unused": "temp",
-    "varp326_unused": "temp",
     "varp327_unused": "temp",
     "varp396_bits": "temp",
     "varp409_bits": "temp",

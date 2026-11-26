@@ -1,0 +1,3 @@
+// UNKNOWN engineering ownership, separate from the follower's npc_attacking_uid.
+[twocats_scene_owner]
+type=player_uid

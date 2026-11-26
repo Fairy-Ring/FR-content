@@ -1,0 +1,196 @@
+// Original 377 client fields from all.obj are retained; server-only item data follows.
+[twocats_mouse_toy]
+name=Mouse toy
+desc=An Advanced Combat Training Device.
+model=obj_twocats_mouse_toy
+2dxof=-5
+2dyof=-2
+2dzoom=790
+2dyan=1380
+2dxan=120
+iop2=Wield
+manwear=obj_twocats_mouse_toy_manwear,0
+womanwear=obj_twocats_mouse_toy_manwear,6
+members=yes
+cost=1
+iop5=Destroy
+wearpos=righthand
+weight=100g
+tradeable=no
+// VERIFIED: Tip.It Q116 (30 October 2005), listed mouse-toy attack bonuses.
+param=stabattack,-100
+param=slashattack,-100
+param=crushattack,-50
+param=strengthbonus,-10
+// UNKNOWN: the period source gives no other bonus values; use neutral server defaults.
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=prayerbonus,0
+
+[twocats_present]
+name=Present
+desc=Thanks for all your help!  Love, Bob & Neite.
+cost=1
+members=yes
+model=obj_research_package
+2dyof=-14
+2dzoom=1180
+2dyan=172
+2dxan=160
+iop1=Open
+iop5=Destroy
+weight=2kg
+tradeable=no
+
+[twocats_rewardlamp]
+name=Antique lamp
+desc=I wonder what happens if I rub it...
+recol1s=27425
+recol1d=28903
+recol2s=23201
+recol2d=19654
+model=obj_macro_genilamp
+members=yes
+iop1=Rub
+iop5=Destroy
+2dxof=2
+2dyof=-2
+2dzoom=840
+2dyan=228
+2dxan=28
+weight=100g
+tradeable=no
+
+[twocats_amuletofcatspeak]
+name=Catspeak amulet(e)
+desc=It's an amulet of cat speak. It makes vague purring noises.
+model=obj_ics_little_amulet_of_catspeak
+2dyof=-10
+2dzoom=400
+2dxan=220
+manwear=obj_ics_little_amulet_of_catspeak_manwear,0
+womanwear=obj_ics_little_amulet_of_catspeak_manwear,6
+iop2=Wear
+iop3=Open
+iop5=Destroy
+members=yes
+cost=1
+weight=3lb
+wearpos=front
+tradeable=no
+// UNKNOWN: the period capture gives no combat bonuses for this wearable; use neutral values.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[twocats_chores]
+name=Chores
+desc=A list of chores that Bob gave you to do.
+recol1s=28434
+recol1d=28400
+members=yes
+model=obj_template_for_cert
+2dyof=2
+2dzoom=760
+2dyan=28
+2dxan=552
+iop1=Read
+cost=1
+iop5=Destroy
+weight=5g
+tradeable=no
+
+[twocats_recipe]
+name=Recipe
+desc=It says on the back 'My favourite recipe.'
+recol1s=28434
+recol1d=28400
+members=yes
+model=obj_template_for_cert
+2dyof=2
+2dzoom=760
+2dyan=28
+2dxan=552
+iop1=Read
+cost=1
+iop5=Destroy
+weight=5g
+tradeable=no
+
+[twocats_doctors_hat]
+name=Doctors hat
+desc=A mirror helps reflect light on the subject.
+model=obj_twocats_doctors_hat
+iop2=Wear
+manwear=obj_twocats_doctors_hat_manwear,0
+womanwear=obj_twocats_doctors_hat_womanwear,0
+manhead=obj_twocats_doctors_hat_manhead
+womanhead=obj_twocats_doctors_hat_manhead
+members=yes
+cost=1
+2dyof=-39
+2dzoom=490
+2dyan=156
+2dxan=236
+iop5=Destroy
+wearpos=hat
+weight=300g
+tradeable=no
+// UNKNOWN: the period capture gives no combat bonuses for this wearable; use neutral values.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[twocats_nurses_hat]
+name=Nurse hat
+desc=A nurses hat, but does it have healing powers?
+model=obj_twocats_nurses_hat
+iop2=Wear
+manwear=obj_twocats_nurses_hat_manwear,0
+womanwear=obj_twocats_nurses_hat_womanwear,0
+manhead=obj_twocats_nurses_hat_manhead
+womanhead=obj_twocats_nurses_hat_manhead
+members=yes
+cost=1
+2dzoom=380
+2dxan=2032
+iop5=Destroy
+wearpos=hat
+weight=200g
+tradeable=no
+// UNKNOWN: the period capture gives no combat bonuses for this wearable; use neutral values.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
