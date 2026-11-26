@@ -180,7 +180,7 @@ export async function runtime(engine, pack) {
     active = tape;
     try { for (let i = 0; i < ticks; i++) { World.currentTick++; f.player.processQueues(); } }
     finally { active = null; JavaRandom.nextDouble = real; Math.random = realMath; }
-    return { levels: [...f.player.levels], experience: [...f.player.stats], energy: f.player.runenergy, vars: [...f.player.vars], messages: [...f.player.testMessages], events: tape.events, randomSources: tape.randomSources, error: tape.error };
+    return { levels: [...f.player.levels], experience: [...f.player.stats], energy: f.player.runenergy, vars: [...f.player.vars], messages: [...f.player.testMessages], events: tape.events, randomSources: tape.randomSources, error: tape.error, visited: tape.visited };
   }
   function dispose() {
     for (const npc of [...World.npcs]) {

@@ -96,6 +96,7 @@ try {
         settledError: result.settled.error, diagnostics: result.errors
       });
       if (trackObserved) for (const caller of result.visited) observed.add(caller);
+      if (trackObserved) for (const caller of result.settled.visited) observed.add(caller);
       return result;
     } finally {
       try { cleanup?.(); }
@@ -110,6 +111,7 @@ try {
   function differential(type, name, args, variant, style, metadata = {}, configure = null, distance = 1, rng = null, compareBase = true, fixtureType = type, selectedHead = null) {
     const head = selectedHead ?? execute(pack, type, name, args, variant, style, configure, distance, rng, fixtureType);
     for (const caller of head.visited) observed.add(caller);
+    for (const caller of head.settled.visited) observed.add(caller);
     if (base && compareBase) {
       const before = execute(base, type, name, args, variant, style, configure, distance, rng, fixtureType);
       same(head, before, `${type} ${name} ${variant}`, true);
