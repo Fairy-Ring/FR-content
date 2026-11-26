@@ -1,0 +1,12 @@
+// UNKNOWN exact clock: seven elapsed days; the period source says once a week.
+^tog_week_minutes = 10080
+// UNKNOWN engineering stream cadence and collection cadence; period guide gives neither.
+^tog_stream_ticks = 10
+^tog_collect_ticks = 2
+// UNKNOWN collision-checked engineering session entry and safe exit beside Juna.
+^tog_session_entry = 2_50_148_56_45
+^tog_session_exit = 2_50_148_51_44
+// UNKNOWN engine-limit maxed-total escape: 21 original skills * 99.
+^tog_max_total = 2079
+// UNKNOWN engineering hold to paint the original drink sequence before clearing its bowl.
+^tog_drink_ticks = 3

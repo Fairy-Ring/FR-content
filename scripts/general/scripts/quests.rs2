@@ -381,6 +381,9 @@ if (%zogre >= ^zogre_complete) {
 if (%wanted_main = ^wanted_complete) {
     $questpoints = add($questpoints, ^wanted_questpoints);
 }
+if (%tog_juna_bowl = ^tog_quest_complete) {
+    $questpoints = add($questpoints, ^tog_questpoints);
+}
 if (~rag_stage >= ^rag_complete) {
     $questpoints = add($questpoints, ^rag_questpoints);
 }
@@ -484,6 +487,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:dwarfrock, %dwarfrock_quest, ^dwarfrock_complete);
 ~send_quest_progress_colour(questlist:devious, %devious_main, ^devious_complete);
 ~send_quest_progress_colour(questlist:enakh, %enakh_quest, ^enakh_complete);
+~send_quest_progress_colour(questlist:tog, %tog_juna_bowl, ^tog_quest_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

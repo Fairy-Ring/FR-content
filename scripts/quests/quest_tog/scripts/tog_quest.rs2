@@ -1,0 +1,70 @@
+// Quest-only Mine dispatch; keep the generic mining handler untouched.
+[oploc1,tog_blue_stone_rocks1] @tog_mine_magic_stone;
+[oploc1,tog_blue_stone_rocks2] @tog_mine_magic_stone;
+[oploc1,tog_blue_stone_rocks3] @tog_mine_magic_stone;
+
+[label,tog_mine_magic_stone]
+if (%tog_juna_bowl ! ^tog_quest_started) {
+    // UNKNOWN functional refusal; the rock is quest-only.
+    mes("You should speak to Juna about the magic stone first.");
+    return;
+}
+if (inv_total(inv, tog_bowl) > 0) {
+    // UNKNOWN functional refusal; prevents duplicate quest bowls.
+    mes("You already have a stone bowl.");
+    return;
+}
+if (inv_total(inv, tog_stone) > 0) {
+    // UNKNOWN functional refusal; prevents duplicate quest stones.
+    mes("You already have a magic stone.");
+    return;
+}
+if (stat_base(mining) < ^tog_quest_requirement_mining) {
+    // UNKNOWN refusal wording and base-skill boost policy; Mining 20 is VERIFIED.
+    mes("You need a Mining level of at least 20 to mine this stone.");
+    return;
+}
+def_obj $pickaxe = ~pickaxe_checker;
+if ($pickaxe = null) {
+    // UNKNOWN functional refusal; no period wording survives.
+    mes("You need a pickaxe to mine this stone.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    // UNKNOWN functional refusal; do not lose a mined item to a full inventory.
+    mes("You need some free inventory space to carry the magic stone.");
+    return;
+}
+// UNKNOWN mechanic: one native Mine action grants one stone; no unsourced XP or roll is added.
+anim(oc_param($pickaxe, mining_animation), 0);
+sound_synth(mine, 1, 0);
+inv_add(inv, tog_stone, 1);
+// UNKNOWN functional success text; no period mining narration survives.
+mes("You manage to mine a magic stone.");
+
+[opheldu,tog_stone]
+// UNKNOWN default response for using an unrelated item on the magic stone.
+if (last_useitem ! chisel) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%tog_juna_bowl ! ^tog_quest_started) {
+    // UNKNOWN functional refusal; chisel use is limited to the active quest.
+    mes("You should speak to Juna about the magic stone first.");
+    return;
+}
+if (stat_base(crafting) < ^tog_quest_requirement_crafting) {
+    // UNKNOWN refusal wording and base-skill boost policy; Crafting 20 is VERIFIED.
+    mes("You need a Crafting level of at least 20 to make a bowl.");
+    return;
+}
+if (inv_total(inv, tog_stone) < 1) return;
+if (inv_total(inv, tog_bowl) > 0) {
+    // UNKNOWN functional refusal; prevents duplicate quest bowls.
+    mes("You already have a stone bowl.");
+    return;
+}
+inv_del(inv, tog_stone, 1);
+inv_add(inv, tog_bowl, 1);
+// UNKNOWN functional success text; no period crafting narration survives.
+mes("You chisel the magic stone into a bowl.");
