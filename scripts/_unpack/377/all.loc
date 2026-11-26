@@ -58605,31 +58605,6 @@ hillskew=yes
 length=2
 width=3
 
-[cave_entrance_9356]
-name=Cave entrance
-desc=A cave deeper into the volcano.
-model=loc_9354
-recol1s=198
-recol1d=0
-length=2
-width=3
-ambient=30
-contrast=15
-op1=Enter
-shadow=no
-
-[cave_entrance_9357]
-name=Cave entrance
-desc=A cave deeper into the volcano.
-model=loc_9354
-recol1s=198
-recol1d=0
-length=2
-width=3
-ambient=30
-contrast=15
-op1=Enter
-shadow=no
 
 [cave_entrance_9358]
 name=Cave entrance

@@ -1,0 +1,4 @@
+// CANDIDATE damage caps are declared on every Fight Cave combat actor.
+[fightcaves_maxhit]
+type=int
+default=0
