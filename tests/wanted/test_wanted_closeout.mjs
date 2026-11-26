@@ -38,7 +38,7 @@ const maps = new Map();
 function entries(kind) {
     if (!maps.has(kind)) {
         const source = fs.readFileSync(path.join(content, `pack/${kind}.pack`), 'utf8');
-        maps.set(kind, new Map([...source.matchAll(/^(\d+)=(.+)$/gm)].map(match => [match[2].trim(), Number(match[1])]));
+        maps.set(kind, new Map([...source.matchAll(/^(\d+)=(.+)$/gm)].map(match => [match[2].trim(), Number(match[1])])));
     }
     return maps.get(kind);
 }
