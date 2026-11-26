@@ -1,18 +1,104 @@
-// MEP1 HQ Head mourner first Talk-to after Arianwyn. No dest. Stay 1.
-// CANDIDATE last-resort pre-SoE dump (RS3 Talking to the Head Mourner
-// minus Essyllt / letter consume / kit / dest). Hunt 289? no.
-// Display Head mourner. Never rename 2372. Research: subject mournings-end-1.
-
+// VERIFIED task sequence and rewards: retained RuneHQ/Tip.It 2005–06.
+// CANDIDATE recruitment wording: retained RS3 2013/2018 transcript.
+// UNKNOWN reminder/recovery wording and stage integers.
 [opnpc1,mourner_hideout_head_mourner]
-if (%mourning_quest < 1) {
+if (%mourning_quest < ^mep1_briefed) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (~mep1_disguised = false) {
+    ~chatnpc("<p,angry>You must wear only your Mourner clothes here.");
+    return;
+}
+if (%mourning_quest >= ^mourning_complete) {
+    ~chatnpc("<p,neutral>That will be all for now.");
+    return;
+}
+if (%mourning_quest = ^mep1_food_poisoned) {
+    ~chatplayer("<p,neutral>I have contaminated the food stores.");
+    ~chatnpc("<p,happy>Good. You have proved your commitment to the Death Guard.");
+    // VERIFIED kbase 1785 capture 25 Apr 2006: 25000 Hitpoints, 25000 Thieving, 2 Qp.
+    // stat_advance takes tenths. Commit completion before the once-only award.
+    %mourning_quest = ^mourning_complete;
+    stat_advance(hitpoints, 250000);
+    stat_advance(thieving, 250000);
+    session_log(^log_adventure, "Quest complete: Mourning's Ends Part 1");
+    ~send_quest_complete(questlist:mourning, mourning_teleport_crystal_4, 200, ^mourning_questpoints, "You have completed Mourning's Ends Part 1!", "25,000 Hitpoints XP|25,000 Thieving XP");
+    return;
+}
+if (%mourning_quest >= ^mep1_device_fixed) {
+    if (%mourning_quest = ^mep1_device_fixed) {
+        if (%mourning_sheep_blue = 1 & %mourning_sheep_red = 1 & %mourning_sheep_yellow = 1 & %mourning_sheep_green = 1) {
+            ~chatplayer("<p,neutral>I have re-dyed all four groups of sheep.");
+            ~chatnpc("<p,neutral>Find out who made the poison and how to make more, then contaminate the food stores.");
+            %mourning_quest = ^mep1_toxin_task;
+        } else {
+            ~chatnpc("<p,neutral>Re-dye the sheep red, yellow, green and blue, matching their existing colours.");
+        }
+    } else {
+        ~chatnpc("<p,neutral>Find out how to make the poison, then contaminate the food stores.");
+    }
+    ~mep1_replace_key;
+    return;
+}
+if (%mourning_quest = ^mep1_recruited) {
+    ~mep1_replace_key;
+    if (calc(inv_total(inv, mourning_paint_gun_broken) + inv_total(bank, mourning_paint_gun_broken) + inv_total(inv, mourning_paint_gun) + inv_total(bank, mourning_paint_gun) + inv_total(worn, mourning_paint_gun)) = 0) {
+        if (inv_freespace(inv) > 0) inv_add(inv, mourning_paint_gun_broken, 1);
+        else ~chatnpc("<p,neutral>Make room in your inventory for the device.");
+    }
+    ~chatnpc("<p,neutral>Talk to the Gnome inventor next door about fixing the device.");
     return;
 }
 ~chatplayer("<p,neutral>Hello, I'm...");
 ~chatnpc("<p,quiz>Ah... I take it you are one of the new recruits?");
-~chatplayer("<p,neutral>Well I'm...");
+~chatplayer("<p,neutral>Well, I'm...");
 ~chatnpc("<p,angry>Come on, let us have a look at your paper work then.");
-~chatplayer("<p,sad>Erm... I seem to have misplaced it.");
-~chatnpc("<p,angry>GET OUT! Return to Prifddinas in shame.");
-~chatnpc("<p,angry>If the Death Guard see fit to re-issue you with a letter of recommendation then maybe we will find a use for you.");
-return;
+if (inv_total(inv, mourning_mourner_message) = 0) {
+    ~chatplayer("<p,sad>Erm... I seem to have misplaced it.");
+    ~chatnpc("<p,angry>GET OUT! Return to Prifddinas in shame.");
+    ~chatnpc("<p,angry>If the Death Guard see fit to re-issue you with a letter of recommendation then maybe we will find a use for you.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    ~chatnpc("<p,neutral>Make room in your inventory for a key and a device.");
+    return;
+}
+~chatnpc("<p,neutral>This seems to be all in order. Welcome to the Death Guard. As you may know, part of what we do here is keep the people believing in a plague...");
+~chatplayer("<p,quiz>Why?");
+~chatnpc("<p,quiz>Hm... This could take some time, do you really want me to explain it all?");
+if (~p_choice2("No.", 1, "Yes.", 2) = 2) {
+    ~chatplayer("<p,neutral>Yes.");
+    ~chatnpc("<p,quiz>Are you sure?");
+    if (~p_choice2("No.", 1, "Yes.", 2) = 2) {
+        ~chatplayer("<p,neutral>Yes.");
+        ~chatnpc("<p,quiz>Can you not just follow orders, without need of an explanation?");
+        if (~p_choice2("Yes.", 1, "No.", 2) = 2) {
+            ~chatplayer("<p,neutral>No.");
+            ~chatnpc("<p,neutral>Oh alright, if I must. Well as you undoubtedly know the original aim of the Death Guard was to secure a foothold here in the east, in preparation for 'His' arrival. Now though our objective has become little more... how shall I put it... proactive. That fool king thinks we are here as his ally, we duped him into thinking that Iban was enough of a threat that he let us setup here. Lathas even thinks 'He' will help him dispose of the Knights of Camelot. The plague was actually fabricated by King Lathas, to justify the building of the city wall. But it has also worked in our favour too. We help him keep the people of Ardougne believing in the plague, but now after the discovery we have bigger fish to fry here.");
+            ~chatplayer("<p,quiz>Discovery?");
+            ~chatnpc("<p,neutral>Yes. I can say no more until you fully prove your commitment to the Death Guard. Now... Are you ready to hear your first assignment?");
+            ~chatplayer("<p,neutral>I guess so.");
+        }
+    }
+}
+~chatnpc("<p,neutral>Good... Now let us get on with it. One of the things we do is keep the rumours of the plague active is to keep that old farmer Brumty believing his sheep are infected. The old half-wit thinks just because his sheep are an abnormal colour, that they are all ill with plague. It's amazing what a bit of dye can do.");
+~chatplayer("<p,shock>You dyed them?!?");
+~chatnpc("<p,neutral>You do not think they end up those ridiculous colours naturally do you? ... Anyway. Shame of it is we have yet to find a way to stop the dye from washing out. So we need someone, i.e. you, to go and re-dye them.");
+~chatplayer("<p,quiz>Simple enough, you want me to give a blue rinse to a load of old sheep?");
+~chatnpc("<p,neutral>Not quite, for starters the sheep need to be dyed red, yellow, green and blue. But most important is that you are not seen doing this by anyone. Also you will need to re-dye them the colours they already are or the farmer may notice the change.");
+~chatplayer("<p,quiz>That sounds a little more tricky. How did you do it before?");
+~chatnpc("<p,neutral>We have a Gnomic device that fires fat green parcels that rupture on impact. Unfortunately we have run out of the parcels and the device is broken.");
+~chatplayer("<p,quiz>Can I take a look at it?");
+~chatnpc("<p,neutral>Sure. We have a Gnome inventor here too, unfortunately he is not being very helpful about fixing it, but you can talk to him if you like. Here is the key, he is next door.");
+inv_del(inv, mourning_mourner_message, 1);
+inv_add(inv, mourning_gnome_key, 1);
+inv_add(inv, mourning_paint_gun_broken, 1);
+%mourning_quest = ^mep1_recruited;
+~update_questlist;
+
+[proc,mep1_replace_key]
+if (calc(inv_total(inv, mourning_gnome_key) + inv_total(bank, mourning_gnome_key)) = 0) {
+    if (inv_freespace(inv) > 0) inv_add(inv, mourning_gnome_key, 1);
+    else ~chatnpc("<p,neutral>Make room in your inventory for a key.");
+}
