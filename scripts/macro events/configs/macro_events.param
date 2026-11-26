@@ -41,3 +41,8 @@ default=null
 [follow_player_on_logout]
 type=int
 default=0
+
+// Outgoing event damage only; max_dealt separately caps incoming player hits.
+[macro_overworld_maxhit]
+type=int
+default=0

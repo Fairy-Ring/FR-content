@@ -98,7 +98,7 @@ def_int $accuracy;
 def_int $rolled;
 def_int $damage;
 def_int $ticks;
-$attempted, $accuracy, $rolled, $damage, $ticks = ~npc_cast_spell_outcome(^wind_strike, npc_param(attackrate), npc_param(max_dealt), false, false);
+$attempted, $accuracy, $rolled, $damage, $ticks = ~npc_cast_spell_outcome(^wind_strike, npc_param(attackrate), npc_param(macro_overworld_maxhit), false, false);
 if ($attempted = true) %npc_int = map_clock;
 
 [proc,macro_event_evil_chicken_death]

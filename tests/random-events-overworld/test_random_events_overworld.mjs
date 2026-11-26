@@ -160,7 +160,7 @@ function combatRolls(fn) {
   JavaRandom.nextDouble = () => 0.999999;
   try { return fn(); } finally { JavaRandom.nextDouble = original; }
 }
-function pumpNpc(p, n, done, limit, label) {
+function pumpNpc(p, n, done, limit, label, playerCombat = false) {
   for (let tick = 0; tick < limit && !done(); tick++) {
     // The production tick clears consumed pathing steps before the next turn.
     p.resetEntity(false);
@@ -171,6 +171,10 @@ function pumpNpc(p, n, done, limit, label) {
     if (p.delayed && World.currentTick >= p.delayedUntil) p.delayed = false;
     if (!p.delayed && p.activeScript?.execution === ScriptState.SUSPENDED) p.executeScript(p.activeScript, true, true);
     p.processQueues();
+    if (playerCombat) {
+      p.processEngineQueue();
+      p.processInteraction();
+    }
   }
   if (!done()) assert.fail(`${label}: ${JSON.stringify({
     actor: types.NpcType.get(n.type).debugname, position: tile(n), origin: [n.startLevel, n.startX, n.startZ],
@@ -179,7 +183,7 @@ function pumpNpc(p, n, done, limit, label) {
     npcScript: n.activeScript?.script.name, playerScript: p.activeScript?.script.name
   })}`);
 }
-function nativeAttack(p, n) {
+function nativeAttack(p, n, weaponName = 'bronze_dagger') {
   // Own travel to a packed, reachable adjacent square; the real Attack remains the product step.
   const approach = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dz]) => [n.x + dx, n.z + dz]).find(([x, z]) => {
     if (map.isMapBlocked(x, z, n.level)) return false;
@@ -188,7 +192,7 @@ function nativeAttack(p, n) {
   });
   assert(approach, 'packed route reaches a genuine adjacent attack square');
   [p.level, p.x, p.z] = [n.level, ...approach];
-  const weapon = types.ObjType.get(obj('bronze_dagger'));
+  const weapon = types.ObjType.get(obj(weaponName));
   p.invSet(id('InvType', 'worn'), weapon.id, 1, weapon.wearpos);
   run(p, '[proc,player_combat_stat]');
   p.target = n; p.targetOp = ServerTriggerType.APNPC2;
@@ -253,6 +257,7 @@ for (const [index, form] of combatForms.entries()) for (const family of ['hyde',
   owned(p, n, event);
   assert.deepEqual([...n.baseLevels], form[family], 'native transformed base stats match the independent fallback/default table');
   assert.deepEqual([...n.levels], form[family], 'transformation initializes real combat health and levels');
+  assert.equal(run(p, '[proc,npc_max_dealt]', [32, 0], n).intStack[0], 32, 'outgoing NPC hit limits must not cap incoming player damage');
   privateAdmission(p, n, event);
   // Own-stat fixture after selection: let the genuine NPC attack land without
   // changing its scale, replacing a combat handler, or seeding event progress.
@@ -288,6 +293,19 @@ for (const [index, form] of combatForms.entries()) for (const family of ['hyde',
     assert.equal(totals.size, 4);
   }
   assert.equal(p.getVar(v('macro_event')), 0); assert(!n.isActive);
+});
+
+check('full-health level-159 Chicken dies through repeated native whip combat without an incoming damage cap', () => {
+  const p = player(), n = spawn(p, 11);
+  assert.equal(n.type, id('NpcType', 'macro_evil_chicken_6'));
+  assert.equal(n.levels[NpcStat.HITPOINTS], 120, 'fight starts with the complete configured health');
+  combatRolls(() => {
+    nativeAttack(p, n, 'abyssal_whip');
+    pumpNpc(p, n, () => !n.isActive && p.getVar(v('macro_event')) === 0, 80, 'ordinary native player combat kills the full-health Chicken', true);
+  });
+  assert(p.levels[PlayerStat.HITPOINTS] > 0, 'the player survives ordinary native combat');
+  const feathers = lootTotals(privateLoot(p, n)).get(obj('feather'));
+  assert(feathers >= 50 && feathers <= 750, 'the unseeded native kill leaves private feather loot');
 });
 check('a stale post-death queue cannot clear a newer owned encounter', () => {
   const p = player(), old = spawn(p, 11), actor = old.uid;
