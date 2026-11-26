@@ -105,20 +105,20 @@ def_int $quantity = ^giantdwarf_company_ore_quantity;
 if ($kind >= 9) { $quantity = ^giantdwarf_company_bar_quantity; }
 def_int $minutes = ^giantdwarf_company_deadline_minutes;
 switch_int($kind) {
-    case 1 : ~chatnpc("<p,neutral>We need <quantity> pieces of copper ore in the next <minutes> minutes.");
-    case 2 : ~chatnpc("<p,neutral>We need <quantity> pieces of tin ore in the next <minutes> minutes.");
-    case 3 : ~chatnpc("<p,neutral>We need <quantity> pieces of clay in the next <minutes> minutes.");
-    case 4 : ~chatnpc("<p,neutral>We need <quantity> pieces of iron ore in the next <minutes> minutes.");
-    case 5 : ~chatnpc("<p,neutral>We need <quantity> pieces of silver ore in the next <minutes> minutes.");
-    case 6 : ~chatnpc("<p,neutral>We need <quantity> pieces of coal in the next <minutes> minutes.");
-    case 7 : ~chatnpc("<p,neutral>We need <quantity> pieces of gold ore in the next <minutes> minutes.");
-    case 8 : ~chatnpc("<p,neutral>We need <quantity> pieces of mithril ore in the next <minutes> minutes.");
-    case 9 : ~chatnpc("<p,neutral>We need <quantity> bars of bronze in the next <minutes> minutes.");
-    case 10 : ~chatnpc("<p,neutral>We need <quantity> bars of iron in the next <minutes> minutes.");
-    case 11 : ~chatnpc("<p,neutral>We need <quantity> bars of steel in the next <minutes> minutes.");
-    case 12 : ~chatnpc("<p,neutral>We need <quantity> bars of silver in the next <minutes> minutes.");
-    case 13 : ~chatnpc("<p,neutral>We need <quantity> bars of gold in the next <minutes> minutes.");
-    case 14 : ~chatnpc("<p,neutral>We need <quantity> bars of mithril in the next <minutes> minutes.");
+    case 1 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of copper ore in the next <tostring($minutes)> minutes.");
+    case 2 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of tin ore in the next <tostring($minutes)> minutes.");
+    case 3 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of clay in the next <tostring($minutes)> minutes.");
+    case 4 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of iron ore in the next <tostring($minutes)> minutes.");
+    case 5 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of silver ore in the next <tostring($minutes)> minutes.");
+    case 6 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of coal in the next <tostring($minutes)> minutes.");
+    case 7 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of gold ore in the next <tostring($minutes)> minutes.");
+    case 8 : ~chatnpc("<p,neutral>We need <tostring($quantity)> pieces of mithril ore in the next <tostring($minutes)> minutes.");
+    case 9 : ~chatnpc("<p,neutral>We need <tostring($quantity)> bars of bronze in the next <tostring($minutes)> minutes.");
+    case 10 : ~chatnpc("<p,neutral>We need <tostring($quantity)> bars of iron in the next <tostring($minutes)> minutes.");
+    case 11 : ~chatnpc("<p,neutral>We need <tostring($quantity)> bars of steel in the next <tostring($minutes)> minutes.");
+    case 12 : ~chatnpc("<p,neutral>We need <tostring($quantity)> bars of silver in the next <tostring($minutes)> minutes.");
+    case 13 : ~chatnpc("<p,neutral>We need <tostring($quantity)> bars of gold in the next <tostring($minutes)> minutes.");
+    case 14 : ~chatnpc("<p,neutral>We need <tostring($quantity)> bars of mithril in the next <tostring($minutes)> minutes.");
 }
 def_int $choice = ~p_choice2("I'll take it.", 1, "No thanks.", 2);
 if ($choice = 1) {
@@ -300,7 +300,7 @@ if ($stage = 5) {
     if ($join_choice = 1) {
         %giantdwarf_current_company = $company;
         if (%giantdwarf_quest = 5) { %giantdwarf_quest = 6; }
-        ~chatnpc("<p,happy>It is agreed then! You are now a 'trusted associate' of the <company_name>. Welcome!");
+        ~chatnpc("<p,happy>It is agreed then! You are now a 'trusted associate' of the <$company_name>. Welcome!");
         ~chatplayer("<p,neutral>I will not disappoint you!");
     }
     return;
@@ -319,18 +319,18 @@ if ($stage = 6) {
         def_int $switch_choice = ~p_choice2("I'd like to officially join your company.", 1, "Thank you for your time.", 2);
         if ($switch_choice = 1) {
             %giantdwarf_current_company = $company;
-            ~chatnpc("<p,neutral>It is agreed then! You are now a 'trusted associate' of the <company_name>. Welcome!");
+            ~chatnpc("<p,neutral>It is agreed then! You are now a 'trusted associate' of the <$company_name>. Welcome!");
         }
         return;
     }
     ~chatnpc("<p,neutral>So what do you say, will you speak out for me at the next meeting, so that they will base the head of the statue on me?");
-    def_int $bid_choice = ~p_choice2("Yes! Long live the <company_name>!", 1, "I need to have a think about that.", 2);
+    def_int $bid_choice = ~p_choice2("Yes! Long live the <$company_name>!", 1, "I need to have a think about that.", 2);
     if ($bid_choice = 1) {
         if (%giantdwarf_original_company = 0) {
             %giantdwarf_original_company = $company;
         }
         if (%giantdwarf_quest = 6) { %giantdwarf_quest = 7; }
-        ~chatplayer("<p,neutral>Yes! Long live the <company_name>!");
+        ~chatplayer("<p,neutral>Yes! Long live the <$company_name>!");
         ~chatnpc("<p,happy>Hurrah!");
         ~mesbox("Now would be a good time to visit Veldaban of the Black Guard, in the west of Keldagrim.");
     }
@@ -355,7 +355,7 @@ if ($stage >= ^giantdwarf_complete) {
         def_int $postquest_switch_choice = ~p_choice2("I'd like to officially join your company.", 1, "Thank you for your time.", 2);
         if ($postquest_switch_choice = 1) {
             %giantdwarf_current_company = $company;
-            ~chatnpc("<p,neutral>It is agreed then! You are now a 'trusted associate' of the <company_name>. Welcome!");
+            ~chatnpc("<p,neutral>It is agreed then! You are now a 'trusted associate' of the <$company_name>. Welcome!");
         }
         return;
     }

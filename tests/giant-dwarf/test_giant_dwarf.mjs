@@ -368,7 +368,9 @@ function companySwitchFixtures() {
   for (const row of companyRows.filter(row => row.id !== 1 && row.id !== 2)) {
     set(maleSwitch, 'giantdwarf_current_company', 1);
     set(maleSwitch, 'giantdwarf_original_company', 0);
-    talk(maleSwitch, row.director, [1]);
+    const switched = talk(maleSwitch, row.director, [1]);
+    assert(switched.text.includes(`You are now a 'trusted associate' of the ${row.name}.`),
+      `${row.name}: the welcome renders the selected company name`);
     assert.equal(get(maleSwitch, 'giantdwarf_current_company'), row.id,
       `${row.name}: accepted native switch selects the director's company`);
     assert.equal(get(maleSwitch, 'giantdwarf_original_company'), 0,
@@ -418,11 +420,15 @@ function companySwitchFixtures() {
 function companyErrandFixtures() {
   const secretary = companyFixture(5);
   const secret = companyRows[0].secretary;
-  talk(secretary, secret, [1]);
+  const offer = talk(secretary, secret, [1]);
   const task = activeCompanyTask(secretary);
   assert(task.kind <= 8, 'secretary offers an ore or clay order');
   assert.equal(task.quantity, constant('giantdwarf_company_ore_quantity'));
   assert.equal(task.company, companyRows[0].id);
+  assert(offer.text.includes(`We need ${task.quantity} pieces of`),
+    'the native offer renders the required quantity');
+  assert(offer.text.includes(`in the next ${constant('giantdwarf_company_deadline_minutes')} minutes.`),
+    'the native offer renders the deadline');
   give(secretary, task.item, task.quantity - 1);
   talk(secretary, secret);
   assert.equal(workField(secretary, 15, 18), task.kind, 'insufficient delivery keeps the assigned order');
@@ -584,14 +590,18 @@ function completeCompanyPath(p) {
     assert.equal(workField(p, 8, 11), progress + 1, 'accepted director delivery advances exactly one task');
     assert.equal(workField(p, 15, 18), 0, 'director delivery clears its active order');
   }
-  talk(p, first.director, [1]);
+  const joined = talk(p, first.director, [1]);
+  assert(joined.text.includes(`trusted associate' of the ${first.name}.`),
+    'joining renders the chosen company name');
   assert.equal(stage(p), 6, 'completed tasks allow joining the chosen company');
   assert.equal(get(p, 'giantdwarf_current_company'), first.id);
   const chosen = companyRows[3];
   talk(p, chosen.director, [1]);
   assert.equal(stage(p), 6, 'switching companies before support remains available');
   assert.equal(get(p, 'giantdwarf_current_company'), chosen.id);
-  talk(p, chosen.director, [1]);
+  const supported = talk(p, chosen.director, [1]);
+  assert(supported.text.includes(`Yes! Long live the ${chosen.name}!`),
+    'the support choice and reply render the chosen company name');
   assert.equal(stage(p), 7, 'the chosen director receives the support pledge');
   assert.equal(get(p, 'giantdwarf_original_company'), chosen.id);
   console.log('PASS Giant Dwarf secretary/bar errands, company joining and support');
@@ -678,7 +688,8 @@ function bootMethodFixtures() {
 function sapphiresBeforeRepairFixture() {
   const subject = player();
   set(subject, 'giantdwarf_quest', 2); // Alternate-order fixture begins at the accepted intro boundary.
-  talk(subject, 'dwarf_city_shop_sculpture', [2]);
+  const sculptor = talk(subject, 'dwarf_city_shop_sculpture', [2]);
+  assert.doesNotMatch(sculptor.text, /\bpname\b/, 'the sculptor renders the player name');
   talk(subject, 'dwarf_city_shop_weapons', [2, 2, 2]);
   give(subject, 'sapphire', 3);
   nativeItemOnItem(subject, 'sapphire', 'dwarf_battleaxe_old');
@@ -687,7 +698,8 @@ function sapphiresBeforeRepairFixture() {
   assert.equal(count(subject, 'dwarf_battleaxe_sapphires'), 1,
     'three sapphires can be fitted before Thurgo sharpens the axe');
   give(subject, 'redberry_pie', 1); give(subject, 'iron_bar', 1);
-  talk(subject, 'thurgo', [1, 1, 1, 1]);
+  const repaired = talk(subject, 'thurgo', [1, 1, 1, 1]);
+  assert.doesNotMatch(repaired.text, /\bpname\b/, 'Thurgo renders the player name');
   assert.equal(count(subject, 'redberry_pie'), 0);
   assert.equal(count(subject, 'iron_bar'), 0);
   assert.equal(count(subject, 'dwarf_battleaxe_sapphires'), 0);

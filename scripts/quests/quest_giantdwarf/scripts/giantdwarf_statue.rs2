@@ -23,7 +23,7 @@ if (%giantdwarf_quest = 2) {
     ~chatplayer("<p,neutral>Excuse me, are you Blasidar, the famous sculptor?");
     ~chatnpc("<p,neutral>Why, yes, yes, that I am!");
     ~chatnpc("<p,neutral>But I digress... simply speaking, I need some help with getting some items that I can base the new statue on.");
-    ~chatnpc("<p,neutral>Will you be able to help me with this, <pname>?");
+    ~chatnpc("<p,neutral>Will you be able to help me with this, <displayname>?");
     def_int $help = ~p_choice2("No, I can't be bothered.", 1, "Yes, I will do this.", 2);
     if ($help = 1) {
         ~chatplayer("<p,neutral>No, I can't be bothered.");
@@ -36,13 +36,13 @@ if (%giantdwarf_quest = 2) {
     ~chatnpc("<p,neutral>For the torso, I need clothes that look like King Alvis' clothes. I'm not sure where you would be able to find that, but I'm sure you'll manage.");
     ~chatnpc("<p,neutral>Also, I need a battleaxe. Now this is particularly important. You are in luck, however, as I believe King Alvis' original axe still survives.");
     ~chatplayer("<p,neutral>Right, so I need a pair of boots, a piece of clothing and a battleaxe. Is that all?");
-    ~chatnpc("<p,happy>For now, <pname>, for now! I wish you good luck, and hurry back with the items!");
+    ~chatnpc("<p,happy>For now, <displayname>, for now! I wish you good luck, and hurry back with the items!");
     %giantdwarf_sculptor_introduced = 1;
     %giantdwarf_quest = 3;
     return;
 }
 if (%giantdwarf_quest = 3) {
-    ~chatnpc("<p,neutral>How are you getting along with those items, <pname>?");
+    ~chatnpc("<p,neutral>How are you getting along with those items, <displayname>?");
     if (getbit_range(%giantdwarf_model_state, 0, 0) = 0) {
         if (inv_total(inv, dwarf_perfect_pair_of_boots) > 0) {
             ~chatplayer("<p,happy>I have your boots!");
@@ -661,7 +661,7 @@ if ($repair = 2) {
     return;
 }
 ~chatplayer("<p,neutral>Can you help me with this ancient axe?");
-~chatnpc("<p,neutral>You make excellent redberry pies, <pname>, so how can I refuse? Let me see what's wrong with it then.");
+~chatnpc("<p,neutral>You make excellent redberry pies, <displayname>, so how can I refuse? Let me see what's wrong with it then.");
 ~chatplayer("<p,neutral>Here... the blade of this axe has become extremely dull and brittle. I need it restored to its former glory.");
 def_int $has_old = inv_total(inv, dwarf_battleaxe_old);
 def_int $has_gemmed = inv_total(inv, dwarf_battleaxe_sapphires);
@@ -680,14 +680,14 @@ if ($has_gemmed > 0) {
     inv_del(inv, dwarf_battleaxe_sapphires, 1);
     inv_del(inv, iron_bar, 1);
     inv_add(inv, dwarf_battleaxe_new, 1);
-    ~chatnpc("<p,happy>Here you go, <pname>, good as new.");
+    ~chatnpc("<p,happy>Here you go, <displayname>, good as new.");
     ~chatplayer("<p,happy>Thanks for your help Thurgo!");
     ~mesbox("You have restored the axe to its former glory! You should return to Blasidar in Keldagrim now, do you wish to return at once?");
 } else {
     inv_del(inv, dwarf_battleaxe_old, 1);
     inv_del(inv, iron_bar, 1);
     inv_add(inv, dwarf_battleaxe_sharpened, 1);
-    ~chatnpc("<p,happy>Here's your axe, <pname>. It looks like there's some damage to the hilt as well, probably some missing sapphires. But I'm sure you can take care of that yourself.");
+    ~chatnpc("<p,happy>Here's your axe, <displayname>. It looks like there's some damage to the hilt as well, probably some missing sapphires. But I'm sure you can take care of that yourself.");
     ~chatplayer("<p,happy>Thanks for your help Thurgo!");
     ~mesbox("You are well on your way to restoring the axe. Do you wish to return to Keldagrim now?");
 }
