@@ -1,0 +1,4 @@
+// Original server-only slot 289. Wave survives logout; the instance token does not.
+[fightcaves_state]
+scope=perm
+transmit=no

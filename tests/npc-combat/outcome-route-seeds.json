@@ -125,6 +125,60 @@
       "seeds": { "hit": 3668340011, "miss": 2415085441, "zero": 1992887715 }
     },
     {
+      "script": "[ai_opplayer2,_tzhaar_fightcave]",
+      "npc": "tzhaar_fightcave_swarm_2a",
+      "seeds": { "hit": 1013904242, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,tzhaar_fightcave_swarm_1a]",
+      "npc": "tzhaar_fightcave_swarm_1a",
+      "seeds": { "hit": 3668340011, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,tzhaar_fightcave_swarm_1b]",
+      "npc": "tzhaar_fightcave_swarm_1b",
+      "seeds": { "hit": 3668340011, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,tzhaar_fightcave_swarm_3a]",
+      "npc": "tzhaar_fightcave_swarm_3a",
+      "style": "ranged",
+      "distance": 2,
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 683130215 }
+    },
+    {
+      "script": "[ai_applayer2,tzhaar_fightcave_swarm_3b]",
+      "npc": "tzhaar_fightcave_swarm_3b",
+      "style": "ranged",
+      "distance": 2,
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 683130215 }
+    },
+    {
+      "script": "[ai_applayer2,tzhaar_fightcave_swarm_5a]",
+      "npc": "tzhaar_fightcave_swarm_5a",
+      "style": "magic",
+      "distance": 2,
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,tzhaar_fightcave_swarm_5b]",
+      "npc": "tzhaar_fightcave_swarm_5b",
+      "style": "magic",
+      "distance": 2,
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,tzhaar_fightcave_swarm_boss]",
+      "npc": "tzhaar_fightcave_swarm_boss",
+      "seeds": { "hit": 2654435769, "miss": 621532230, "zero": 1051973509 },
+      "playerVars": { "fightcaves_state": 63 },
+      "privateRegion": {
+        "maps": ["37_79", "38_80"],
+        "enter": "[proc,fightcaves_enter]",
+        "leave": "[proc,fightcaves_logout]"
+      }
+    },
+    {
       "script": "[ai_opplayer2,deal_evil_spirit]",
       "npc": "deal_evil_spirit",
       "seeds": {

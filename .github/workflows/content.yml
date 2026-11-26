@@ -151,6 +151,7 @@ jobs:
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
           run_test tests/varp-scope/test_varp_scope.mjs node --import tsx ../content/tests/varp-scope/test_varp_scope.mjs
           run_test tests/instance-collision/test_instance_collision.mjs node --import tsx ../content/tests/instance-collision/test_instance_collision.mjs
+          run_test tests/fight-caves/test_fight_caves.mjs node --import tsx ../content/tests/fight-caves/test_fight_caves.mjs
           run_test 'tests/varp-morph-transmit/test_varp_morph_transmit.mjs + tests/varp-morph-transmit/test_ernest_scene.mjs' node --import tsx --test ../content/tests/varp-morph-transmit/test_varp_morph_transmit.mjs ../content/tests/varp-morph-transmit/test_ernest_scene.mjs
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
