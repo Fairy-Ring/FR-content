@@ -12,6 +12,11 @@
 // Cite swansong-changes-377.md · Transcript_Swan_Song.wikitext.
 
 [opnpc1,wise_old_man]
+// Outside the Swan Song interval, only the Garden quiz owns this Talk-to.
+if (%garden_quest = 1 & %fenk_charos_unlocked = 0 & (%swansong < 5 | %swansong >= 30)) {
+    @garden_wom_quiz;
+    return;
+}
 if (%swansong < 5) {
     return;
 }
@@ -19,6 +24,14 @@ if (%swansong >= 30) {
     return;
 }
 ~chatnpc("<p,neutral>Greetings, <displayname>.");
+// UNKNOWN user-requested Garden/Swan topic choice, only during the Garden quiz.
+if (%garden_quest = 1 & %fenk_charos_unlocked = 0) {
+    def_int $choice = ~p_choice2("Queen Ellamaria has sent me to seek your guidance.", 1, "Swan Song.", 2);
+    if ($choice = 1) {
+        @garden_wom_quiz_selected;
+        return;
+    }
+}
 if (getbit_range(%swansong_temp, 8, 8) = 1) {
     @swan_wom_runes_again;
 }

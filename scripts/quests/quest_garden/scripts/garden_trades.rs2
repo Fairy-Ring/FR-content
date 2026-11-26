@@ -1,0 +1,402 @@
+// Garden of Tranquillity seed trades.
+// Dialogue is CANDIDATE from the retained quest transcript; bundle sizes use
+// the shared period/decision constants in garden.constant.
+
+[proc,garden_bundle_missing](obj $item, int $target)(int)
+def_int $held = add(inv_total(inv, $item), inv_total(bank, $item));
+def_int $missing = sub($target, $held);
+if ($missing <= 0) return(0);
+return($missing);
+
+[proc,garden_bundle_slots](obj $item, int $missing)(int)
+if ($missing <= 0 | inv_total(inv, $item) > 0) return(0);
+return(1);
+
+[proc,garden_allotment_mature](int $stage, obj $produce)(boolean)
+def_dbrow $crop = ~farming_allotment_crop($stage);
+if ($crop = null) return(false);
+if (~farming_allotment_seed($produce) ! $crop) return(false);
+def_int $base = modulo($stage, ^farming_watered_offset);
+if ($base < db_getfield($crop, farming_allotment:mature, 0)) return(false);
+// Accept only the ordinary and watered forms, not disease/death offsets.
+if ($stage ! $base & $stage ! add($base, ^farming_watered_offset)) return(false);
+return(true);
+
+[proc,garden_elstan_delivery_ready]()(boolean)
+if (%garden_quest < 1 | %garden_elstan_varbit ! 3 | inv_total(inv, marigold) < 1) return(false);
+return(true);
+
+// The two public Farming callbacks are called only after the Farming action
+// has passed its own guards and written the flower stage/item.
+[proc,garden_elstan_flower_planted](obj $seed)
+if (%garden_quest < 1 | %garden_quest >= 60 | loc_type ! farming_flower_patch_1 | $seed ! marigold_seed) return;
+if (%garden_elstan_varbit < 1 | %garden_elstan_varbit >= 4) return;
+%garden_elstan_varbit = 2;
+
+[proc,garden_elstan_flower_picked](obj $produce)
+if (%garden_quest < 1 | %garden_quest >= 60 | loc_type ! farming_flower_patch_1 | $produce ! marigold) return;
+if (%garden_elstan_varbit ! 2 & %garden_elstan_varbit ! 3) return;
+%garden_elstan_varbit = 3;
+
+[label,garden_elstan_trade]
+if (%garden_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%garden_elstan_varbit = 0) {
+    @garden_elstan_intro;
+    return;
+}
+if (%garden_elstan_varbit = 4) {
+    @garden_elstan_recovery;
+    return;
+}
+if (~garden_elstan_delivery_ready = true) {
+    @garden_elstan_deliver;
+    return;
+}
+if (inv_total(inv, marigold) > 0) {
+    ~chatplayer("I have those marigolds for you.");
+    ~chatnpc("Hang on, I didn't see you growing any marigolds! I want them grown here, in this patch.");
+    ~chatplayer("But they'll be no different to any other marigolds!");
+    ~chatnpc("Do you want those seeds or not?");
+    ~chatplayer("If you're going to be like that, it'll take more than flowers to make Lyra want to date you.");
+    return;
+}
+~chatplayer("What did I agree to do for delphinium seeds?");
+~chatnpc("I need some marigolds so that I can woo Lyra. Grow them from seed to flower in this flower patch here, pick them and give them to me, and I'll give you some delphinium seeds.");
+return;
+
+[label,garden_elstan_intro]
+~chatplayer("Do you have any delphinium seeds to spare?");
+~chatnpc("I do have delphinium seeds, yes - but to spare, I'm not so sure. You don't look like that much of a gardener to me.");
+if (inv_total(worn, ring_of_charos_unlocked) < 1) {
+    ~chatplayer("I'll have you know I'm a pretty good farmer, actually!");
+    return;
+}
+def_int $expert = ~p_choice2("I'll have you know I'm a pretty good farmer, actually!", 1, "That is why I have come to an expert for advice.", 2);
+if ($expert = 1) {
+    ~chatplayer("I'll have you know I'm a pretty good farmer, actually!");
+    return;
+}
+~chatplayer("That is why I have come to an expert for advice.");
+~chatnpc("Ah, now that I like the sound of. So people are saying I'm an expert, then?");
+def_int $praise = ~p_choice3("No, I just said that to get you to give me some seeds.", 1, "Yeah, carry on - milk it for all it's worth.", 2, "Not just AN expert, Elstan - they say you are THE expert.", 3);
+if ($praise = 1) {
+    ~chatplayer("No, I just said that to get you to give me some seeds.");
+    ~chatnpc("Really?!? Well, give me any more of that kind of talk and I'll give you something to remember me by, and I'll tell you now that it ain't seeds!!");
+    return;
+}
+if ($praise = 2) {
+    ~chatplayer("Yeah, carry on - milk it for all it's worth.");
+    ~chatnpc("What?!? Any more of that talk and it'll be curtains for you, mate!");
+    return;
+}
+~chatplayer("Not just AN expert, Elstan - they say you are THE expert.");
+~chatnpc("I can't say that I'm surprised, really - I do seem to have the golden touch with the old gardening lark. Only just the other day I managed to grow a - I'm not boring you, am I?");
+def_int $story = ~p_choice2("Yes, please stop right now.", 1, "Oh no, I love listening to gardening stories...", 2);
+if ($story = 1) {
+    ~chatplayer("Yes, please stop right now.");
+    ~chatnpc("As a matter of fact I will! I'm not wasting my time on the likes of you!");
+    return;
+}
+~chatplayer("Oh no, I love listening to gardening stories...");
+~chatnpc("You do! That's the first person I've ever met has said that! Well, don't you worry mate, I've got millions of 'em!");
+def_int $story_more = ~p_choice2("Somebody kill me now.", 1, "Millions? Ah, just what I wanted to hear...", 2);
+if ($story_more = 1) {
+    ~chatplayer("Somebody kill me now.");
+    return;
+}
+~chatplayer("Millions? Ah, just what I wanted to hear...");
+~chatnpc("Ah, but there's plenty of time for stories. You wanted delphinium seeds, did you say?");
+~chatplayer("Er .. what ... er ...");
+~chatplayer("Yes, delphinium seeds!");
+~chatnpc("As I'm in an especially good mood I think I will let you have some. But you have to do something for me first.");
+~chatplayer("And what's that?");
+~chatnpc("I need some marigolds to give to Lyra, one of my fellow gardeners over in Morytania. She's a bit mysterious, and has some - well - sinister ways to be sure, but she's just my type.");
+~chatplayer("So, a bunch of marigolds then?");
+~chatnpc("Yes, and while I'm at it I can see how good a gardener you are. Grow those marigolds in this flower patch here from seed to flower, pick them and give them to me, and I'll give you some delphinium seeds.");
+def_int $offer = 3;
+while ($offer = 3) {
+    $offer = ~p_choice3("Okay, I'll grow you some marigolds.", 1, "No, I don't have time to do that.", 2, "Are you sure you don't just want to give me the seeds now?", 3);
+    if ($offer = 3) {
+        ~chatplayer("Are you sure you don't just want to give me the seeds now?");
+        ~chatnpc("Strange - there's this funny buzzing in my head that says that I should - but I don't think I will. I need those marigolds for Lyra.");
+    }
+}
+if ($offer = 2) {
+    ~chatplayer("No, I don't have time to do that.");
+    ~chatnpc("Have it your own way, mate. No seeds for you then.");
+    return;
+}
+~chatplayer("Okay, I'll grow you some marigolds.");
+%garden_elstan_varbit = 1;
+return;
+
+[label,garden_elstan_deliver]
+def_int $missing = ~garden_bundle_missing(garden_delphinium_seed, ^garden_delphinium_bundle);
+def_int $slots = ~garden_bundle_slots(garden_delphinium_seed, $missing);
+if (inv_freespace(inv) < $slots) {
+    ~chatplayer("I have those marigolds for you.");
+    ~chatnpc("I would give you some, but you don't appear to have room to carry them.");
+    return;
+}
+~chatplayer("I have those marigolds for you.");
+~chatnpc("Ah, fantastic - Lyra will surely be mine now! Here you go mate, here's those delphinium seeds you were after.");
+~chatnpc("Yes, here you go - I hope they grow for you.");
+inv_del(inv, marigold, 1);
+if ($missing > 0) inv_add(inv, garden_delphinium_seed, $missing);
+%garden_elstan_varbit = 4;
+
+[label,garden_elstan_recovery]
+def_int $missing = ~garden_bundle_missing(garden_delphinium_seed, ^garden_delphinium_bundle);
+if ($missing <= 0) return;
+def_int $slots = ~garden_bundle_slots(garden_delphinium_seed, $missing);
+~chatplayer("Can I have some more delphinium seeds?");
+if (inv_freespace(inv) < $slots) {
+    ~chatnpc("I would give you some, but you don't appear to have room to carry them.");
+    return;
+}
+~chatnpc("Yes, here you go - I hope they grow for you.");
+inv_add(inv, garden_delphinium_seed, $missing);
+
+[label,garden_lyra_trade]
+if (%garden_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%garden_lyra_varbit = 0) {
+    @garden_lyra_intro;
+    return;
+}
+if (%garden_lyra_varbit >= 2) {
+    @garden_lyra_recovery;
+    return;
+}
+if (~garden_allotment_mature(%farming_allotment_varp_2_16_23, onion) = true | ~garden_allotment_mature(%farming_allotment_varp_2_24_31, onion) = true) {
+    @garden_lyra_reward;
+    return;
+}
+~chatplayer("What did you ask me to do?");
+~chatnpc("I need you to grow some onions in one of these vegetable patches, from seed until they are fully grown - then I will give you some orchid seeds.");
+return;
+
+[label,garden_lyra_intro]
+~chatplayer("Do you have any orchid seeds to spare?");
+~chatnpc("Please, do not bother me - I have problems to attend to.");
+if (inv_total(worn, ring_of_charos_unlocked) < 1) {
+    ~chatplayer("Oh sorry, I didn't mean to take up your valuable time.");
+    return;
+}
+~chatplayer("If you tell me your problems, I may be able to help you.");
+~chatnpc("As you ask so nicely I will relate my problems to you, but I very much doubt that you may help me at all.");
+~chatplayer("Try me.");
+~chatnpc("You must think it strange that a girl such as myself would choose to ply her trade in a place such as this, this darkest of lands.");
+def_int $where = ~p_choice2("No, not really - you fit in here a treat.", 1, "Yes, I was wondering about that.", 2);
+if ($where = 1) {
+    ~chatplayer("No, not really - you fit in here a treat.");
+    ~chatnpc("Then begone simple fool and halt your churlish tongue. There are things about me that would leave you with nightmares for the rest of your life.");
+    return;
+}
+~chatplayer("Yes, I was wondering about that.");
+~chatnpc("My mother, Alice, tends to our farming shop in yonder farmhouse, while I tend to this small allotment. Passing trade has quite literally died off in recent years, and with it our income.");
+def_int $move = ~p_choice2("I can only say one thing to you - move.", 1, "Times must be very hard for you.", 2);
+if ($move = 1) {
+    ~chatplayer("I can only say one thing to you - move.");
+    ~chatnpc("And leave behind all that we possess?!? Never!!!");
+    return;
+}
+~chatplayer("Times must be very hard for you.");
+~chatnpc("It is but the smallest of our worries. We get by, we survive, on the miserable harvests that I grow here. The price of our survival is what pains me, as it is a price I have paid with the souls of others.");
+def_int $nature = ~p_choice3("Ah, it all makes sense now - you're a psychopath.", 1, "*Yawn* Could you get to the point please?", 2, "And what is the nature of this fee that you pay?", 3);
+if ($nature = 1) {
+    ~chatplayer("Ah, it all makes sense now - you're a psychopath.");
+    return;
+}
+if ($nature = 2) {
+    ~chatplayer("*Yawn* Could you get to the point please?");
+    ~chatnpc("If your time is so pressing then leave me be and go about your business!");
+    return;
+}
+~chatplayer("And what is the nature of this fee that you pay?");
+~chatnpc("Mother and I must pay a tithe of blood to the vampyres. Father would have protected us, but he is no longer with us, although his presence still walks among us in the fields. We pay with the blood of others.");
+def_int $withdraw = ~p_choice2("Er, can I withdraw my offer of help now?", 1, "If not yours, then whose blood are you offering?", 2);
+if ($withdraw = 1) {
+    ~chatplayer("Er, can I withdraw my offer of help now?");
+    return;
+}
+~chatplayer("If not yours, then whose blood are you offering?");
+~chatnpc("Sometimes I travel to market fairs in distant lands, and I use my feminine arts to lure young farmers back to this land; then the vampyres come for them and I see them no more.");
+def_int $guilt = ~p_choice2("Something tells me that you actually enjoy it, really.", 1, "How can you deal with so much guilt?", 2);
+if ($guilt = 1) {
+    ~chatplayer("Something tells me that you actually enjoy it, really.");
+    ~chatnpc("I would not talk so if I were you - I know a secret call that will bring the vampyres here right now, and then you may live only long enough to feel regret for your impertinence.");
+    return;
+}
+~chatplayer("How can you deal with so much guilt?");
+~chatnpc("Please - ask me no more. You said that you were looking for some orchid seeds? I do have some as a matter of fact, and you may as well have them because they do not grow well in this grim land.");
+~chatplayer("Okay, can I have them then...");
+~chatnpc("You must pass a test first. These are no ordinary flowers, and no ordinary farmer can grow them. You must grow onions here in one of these patches, and when they are fully grown I will give you the seeds.");
+def_int $deal = 3;
+while ($deal = 3) {
+    $deal = ~p_choice3("That's a deal - I'll grow a patch of onions for you.", 1, "I think not - I've loitered too long in this land.", 2, "Oh for Saradomin's sake, just give me the seeds!", 3);
+    if ($deal = 3) {
+        ~chatplayer("Oh for Saradomin's sake, just give me the seeds!");
+        ~chatnpc("This feeling in my head - it is so strange - and it is a feeling I have felt before, although I cannot explain it. If you are trying to use some unnatural power over me, you have failed.");
+    }
+}
+if ($deal = 2) {
+    ~chatplayer("I think not - I've loitered too long in this land.");
+    ~chatnpc("Yes, I agree - far too long.");
+    return;
+}
+~chatplayer("That's a deal - I'll grow a patch of onions for you.");
+~chatnpc("Speak to me when they are fully grown. You need not pick them for me, I will be able to assess your skills by simply watching you.");
+%garden_lyra_varbit = 1;
+
+[label,garden_lyra_reward]
+def_int $pink_missing = ~garden_bundle_missing(garden_orchid_pink_seed, ^garden_orchid_bundle);
+def_int $yellow_missing = ~garden_bundle_missing(garden_orchid_yellow_seed, ^garden_orchid_bundle);
+def_int $slots = add(~garden_bundle_slots(garden_orchid_pink_seed, $pink_missing), ~garden_bundle_slots(garden_orchid_yellow_seed, $yellow_missing));
+~chatplayer("Okay, I've grown those onions like you asked.");
+if (inv_freespace(inv) < $slots) {
+    ~chatnpc("Yes, you have demonstrated that you have some moderate skills as a farmer, but I fear that you would not have the space to carry them.");
+    return;
+}
+~chatnpc("Yes, you have demonstrated that you have some moderate skills as a farmer. Take these seeds, and do with them what you will.");
+if ($pink_missing > 0) inv_add(inv, garden_orchid_pink_seed, $pink_missing);
+if ($yellow_missing > 0) inv_add(inv, garden_orchid_yellow_seed, $yellow_missing);
+%garden_lyra_varbit = 2;
+
+[label,garden_lyra_recovery]
+def_int $pink_missing = ~garden_bundle_missing(garden_orchid_pink_seed, ^garden_orchid_bundle);
+def_int $yellow_missing = ~garden_bundle_missing(garden_orchid_yellow_seed, ^garden_orchid_bundle);
+def_int $slots = add(~garden_bundle_slots(garden_orchid_pink_seed, $pink_missing), ~garden_bundle_slots(garden_orchid_yellow_seed, $yellow_missing));
+if ($pink_missing <= 0 & $yellow_missing <= 0) return;
+~chatplayer("Can I have some more orchid seeds?");
+if (inv_freespace(inv) < $slots) {
+    ~chatnpc("I would give you some orchid seeds, but I fear that you would not have the space to carry them.");
+    return;
+}
+if ($pink_missing > 0) inv_add(inv, garden_orchid_pink_seed, $pink_missing);
+if ($yellow_missing > 0) inv_add(inv, garden_orchid_yellow_seed, $yellow_missing);
+~chatnpc("Yes, you have demonstrated that you have some moderate skills as a farmer. Take these seeds, and do with them what you will.");
+
+[label,garden_kragen_trade]
+if (%garden_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%garden_kragen_varbit = 0) {
+    @garden_kragen_intro;
+    return;
+}
+if (%garden_kragen_varbit >= 2) {
+    @garden_kragen_recovery;
+    return;
+}
+if (~garden_allotment_mature(%farming_allotment_varp_2_8_15, cabbage) = true | ~garden_allotment_mature(%farming_allotment_varp_2_0_7, cabbage) = true) {
+    @garden_kragen_reward;
+    return;
+}
+~chatplayer("What did you ask me to do?");
+~chatnpc("You said that you would grow me some cabbages in one of these allotments. When they're ready for harvest come and talk to me, and I'll give you those snowdrop seeds that you're after.");
+return;
+
+[label,garden_kragen_intro]
+~chatplayer("Do you have any snowdrop seeds to spare?");
+~chatnpc("No I don't, as it happens. Sorry.");
+if (inv_total(worn, ring_of_charos_unlocked) < 1) {
+    ~chatplayer("But I was told that you did!");
+    ~chatnpc("Well, you were told wrong then!");
+    ~chatnpc("Goodbye!!");
+    return;
+}
+def_int $angry = ~p_choice2("But I was told that you did!", 1, "You seem to be a little irritable, my friend.", 2);
+if ($angry = 1) {
+    ~chatplayer("But I was told that you did!");
+    ~chatnpc("Well, you were told wrong then!");
+    ~chatnpc("Goodbye!!");
+    return;
+}
+~chatplayer("You seem to be a little irritable, my friend.");
+~chatnpc("Oh, you think so?!? And what concern is it of yours?");
+def_int $concern = ~p_choice2("I'm not concerned, I just want you to give me some snowdrop seeds.", 1, "I don't like to see a fellow human being so upset.", 2);
+if ($concern = 1) {
+    ~chatplayer("I'm not concerned, I just want you to give me some snowdrop seeds.");
+    ~chatnpc("Is that right?!? Well, I do actually have some snowdrop seeds, but you would be the last person I would give them to.");
+    return;
+}
+~chatplayer("I don't like to see a fellow human being so upset.");
+~chatnpc("I must say, you don't often meet people who show concern the way you have done.");
+def_int $ail = ~p_choice2("I can't take it anymore - just give me the seeds.", 1, "So what ails you, my friend?", 2);
+if ($ail = 1) {
+    ~chatplayer("I can't take it anymore - just give me the seeds.");
+    ~chatnpc("And to think I listened to you! I was right after all - there is no kindness between human beings anymore.");
+    return;
+}
+~chatplayer("So what ails you, my friend?");
+~chatnpc("All these people, asking me to look after their crops! And no-one ever asking me how I feel, or if there's something they can do for me!");
+def_int $help = ~p_choice2("Oh stop whining, it's not like you do it for free.", 1, "Well, is there anything I can do for you?", 2);
+if ($help = 1) {
+    ~chatplayer("Oh stop whining, it's not like you do it for free.");
+    ~chatnpc("Kragen stares at you in silence, in such a manner that says to you that it's probably best to end this conversation right now.");
+    return;
+}
+~chatplayer("Well, is there anything I can do for you?");
+~chatnpc("Oh, that's very kind of you! And there I was, thinking of giving it all up and heading off across the seas to find my fortune!");
+def_int $sail = ~p_choice2("Don't let me stop you, there are plenty of ships missing cabin boys.", 1, "So what can I do for you?", 2);
+if ($sail = 1) {
+    ~chatplayer("Don't let me stop you, there are plenty of ships missing cabin boys.");
+    ~chatnpc("If you carry on speaking to me like that I might just put this spade to good use, and I'm not talking about digging!");
+    return;
+}
+~chatplayer("So what can I do for you?");
+~chatnpc("I'd like just for once for somebody to grow something for me. Just something simple; some vegetables would be nice.");
+~chatplayer("How about some potatoes?");
+~chatnpc("Nah, there's a whole field of them over to the west. I don't have any particular use for onions, so how about cabbages, then?");
+~chatplayer("Cabbages? Sounds good to me. Where do you want me to grow them?");
+~chatnpc("Oh, in one of these allotments here. Plant them from seed, and when they're ready for harvesting let me know, I'll give you your seeds.");
+def_int $deal = 3;
+while ($deal = 3) {
+    $deal = ~p_choice3("That's a deal - I'll let you know when your cabbages are ready.", 1, "I'm not wasting my time growing cabbages.", 2, "Aarrrrrghhhh! I hate cabbages!!!! Give me the seeds!!!!!", 3);
+    if ($deal = 3) {
+        ~chatplayer("Aarrrrrghhhh! I hate cabbages!!!! Give me the seeds!!!!!");
+        ~chatnpc("Give ... you ... the ...");
+        ~chatnpc("... yes I should ...");
+        ~chatnpc("... no I won't ...");
+        ~chatnpc("Not after speaking to me like that you upstart!!! Is it a deal or not?!?");
+    }
+}
+if ($deal = 2) {
+    ~chatplayer("I'm not wasting my time growing cabbages.");
+    ~chatnpc("And I'm not wasting my seeds on an upstart like you!");
+    return;
+}
+~chatplayer("That's a deal - I'll let you know when your cabbages are ready.");
+%garden_kragen_varbit = 1;
+
+[label,garden_kragen_reward]
+def_int $missing = ~garden_bundle_missing(garden_snowdrop_seed, ^garden_snowdrop_bundle);
+def_int $slots = ~garden_bundle_slots(garden_snowdrop_seed, $missing);
+~chatplayer("Okay, I've grown those cabbages like you asked.");
+if (inv_freespace(inv) < $slots) {
+    ~chatnpc("I would give you some, but you don't appear to have room to carry them.");
+    return;
+}
+~chatnpc("Yes, I saw - what fine farming prowess! Nobody has ever done anything like that for me before; here you go, these are the seeds you were after I believe.");
+~chatnpc("Yes, here you go - I hope they grow for you.");
+if ($missing > 0) inv_add(inv, garden_snowdrop_seed, $missing);
+%garden_kragen_varbit = 2;
+
+[label,garden_kragen_recovery]
+def_int $missing = ~garden_bundle_missing(garden_snowdrop_seed, ^garden_snowdrop_bundle);
+if ($missing <= 0) return;
+def_int $slots = ~garden_bundle_slots(garden_snowdrop_seed, $missing);
+~chatplayer("Can I have some more snowdrop seeds?");
+if (inv_freespace(inv) < $slots) {
+    ~chatnpc("I would give you some, but you don't appear to have room to carry them.");
+    return;
+}
+~chatnpc("Yes, here you go - I hope they grow for you.");
+inv_add(inv, garden_snowdrop_seed, $missing);
