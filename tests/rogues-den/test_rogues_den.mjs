@@ -350,6 +350,14 @@ assert.deepEqual(['bronze_knife', 'iron_knife', 'steel_knife'].map(name => types
   standBy(p, door); operation(p, door, 1);
   sameTile(p, { x: 3061, z: 4984, level: 1 });
   safeLanding({ x: p.x, z: p.z, level: p.level }, 'original pub trapdoor');
+  const alcoveDoor = location('roguesden_door_to_pub');
+  standBy(p, alcoveDoor); operation(p, alcoveDoor, 'Open');
+  const publicSafe = location('roguesden_walldecor_safe', 3055, 4970);
+  standBy(p, publicSafe);
+  const before = p.stats[PlayerStat.THIEVING];
+  withRolls([0, 0], () => operation(p, publicSafe, 'Crack'));
+  assert.equal(p.stats[PlayerStat.THIEVING] - before, 700, 'real pub entry and ordinary alcove-door opening lead on foot to an operable original lobby safe');
+  assert(count(p, 'coins') > 0, 'the public on-foot safe approach produces real safe loot');
   const passage = location('roguesden_passage_to_pub');
   standBy(p, passage); operation(p, passage, 1);
   sameTile(p, { x: 2906, z: 3537, level: 0 });
