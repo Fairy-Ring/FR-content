@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "twocats_planted_at": "UNKNOWN engineering timestamp in reserved original slot 326; persists so Unferth's planted potatoes mature across logout without losing four consumed seeds.",
     "ics_little_multi": "UNKNOWN engineering persistence for original Icthlarin jar selection, opened passage, handed-in supplies, Carpenter preparation and quest-visible forms; saving these fields preserves consumed-item progress across logout.",
     "ics_little_multi_extra": "UNKNOWN engineering persistence for the original Icthlarin auxiliary cat-dialogue, chest, spectral-visibility and Sphinx-token flag word; the original cache does not establish its persistence scope.",
     "deal_growth_at": "UNKNOWN engineering crop deadline in reserved original slot 247; saved so an earned Blindweed crop survives logout.",

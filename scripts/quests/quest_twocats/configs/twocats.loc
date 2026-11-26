@@ -1,0 +1,201 @@
+[twocats_patch]
+active=yes
+multivar=twocats_chores_tidygarden
+multiloc=0,twocats_patch_weed3
+multiloc=1,twocats_patch_weed2
+multiloc=2,twocats_patch_weed1
+multiloc=3,twocats_patch_weeded
+multiloc=4,twocats_patch_potato1
+multiloc=5,twocats_patch_potato2
+multiloc=6,twocats_patch_potato3
+multiloc=7,twocats_patch_potato4
+multiloc=8,twocats_patch_potato5
+
+[twocats_patch_weed1]
+name=Unferth's patch
+desc=Sparse weeds.
+model=hop_patch_weeds1
+ambient=25
+
+[twocats_patch_weed2]
+name=Unferth's patch
+desc=Weeds.
+model=hop_patch_weeds2
+ambient=25
+
+[twocats_patch_weed3]
+name=Unferth's patch
+desc=Thick weeds.
+model=hop_patch_weeds3
+ambient=25
+
+[twocats_patch_weeded]
+name=Unferth's patch
+desc=This is Unferth's patch for growing potatos.
+model=belladonna_patch_weeded
+ambient=25
+
+[twocats_patch_potato1]
+name=Potato plants
+desc=You say Potato, I say Poh-tar-to.
+model=potato_seed
+ambient=25
+
+[twocats_patch_potato2]
+name=Potato plants
+desc=You say Potato, I say Poh-tar-to.
+model=potato1
+ambient=25
+
+[twocats_patch_potato3]
+name=Potato plants
+desc=You say Potato, I say Poh-tar-to.
+model=potato2
+ambient=25
+
+[twocats_patch_potato4]
+name=Potato plants
+desc=You say Potato, I say Poh-tar-to.
+model=potato3
+ambient=25
+
+[twocats_patch_potato5]
+name=Potatoes
+desc=Looks like these potatoes have fully grown.
+model=potato
+ambient=25
+
+[twocats_table_bare]
+name=Table
+desc=A nice sturdy bare table.
+model=bigtable
+width=2
+blockrange=no
+ambient=25
+contrast=20
+op1=Inspect
+
+[twocats_table_empty]
+name=Table
+desc=A nice sturdy table.
+model=bigtable
+model2=twocats_table_empty
+model3=twocats_table_emptyi2
+width=2
+blockrange=no
+ambient=25
+contrast=20
+op1=Inspect
+
+[twocats_table_milk]
+name=Table
+desc=A table with milk.
+model=bigtable
+model2=twocats_table_empty
+model3=twocats_table_milk
+width=2
+blockrange=no
+ambient=25
+contrast=20
+op1=Inspect
+
+[twocats_table_cake]
+name=Table
+desc=A table with cake.
+model=bigtable
+model2=twocats_table_cake
+model3=twocats_table_emptyi2
+recol1s=32767
+recol1d=10432
+recol2s=15680
+recol2d=8288
+recol3s=19489
+recol3d=10432
+width=2
+blockrange=no
+ambient=25
+contrast=20
+op1=Inspect
+
+[twocats_table_cake_milk]
+name=Table
+desc=A hearty meal for Unferth.
+model=bigtable
+model2=twocats_table_cake
+model3=twocats_table_milk
+recol1s=32767
+recol1d=10432
+recol2s=15680
+recol2d=8288
+recol3s=19489
+recol3d=10432
+width=2
+blockrange=no
+ambient=25
+contrast=20
+op1=Inspect
+
+[twocats_table]
+width=2
+active=yes
+multivar=twocats_chores_feedhuman
+multiloc=0,twocats_table_bare
+multiloc=1,twocats_table_empty
+multiloc=2,twocats_table_milk
+multiloc=3,twocats_table_cake
+multiloc=4,twocats_table_cake_milk
+multiloc=5,twocats_table_empty
+
+[twocats_bed_made]
+name=Bed
+desc=Great for sleeping in.
+model=bed
+length=2
+
+[twocats_bed_unmade]
+name=Bed
+desc=Not so great for sleeping in, it's not made.
+model=twocats_bed_unmade
+length=2
+op1=Make
+
+[twocats_bed]
+length=2
+active=yes
+multivar=twocats_chores_tidyhouse
+multiloc=0,twocats_bed_unmade
+multiloc=1,twocats_bed_made
+
+[twocats_fireplace_lit]
+name=Fireplace
+desc=A fire burns brightly here.
+model=loc_2724
+anim=fireplace
+
+[twocats_fireplace_gone_out]
+name=Fireplace
+desc=An empty fire place.
+model=twocats_fireplace_gone_out
+
+[twocats_fireplace_got_wood]
+name=Fireplace
+desc=An unlit fire place.
+model=twocats_fireplace_gone_out
+model2=twocats_fireplace_got_wood
+
+[twocats_fireplace]
+anim=fireplace
+active=yes
+forceapproach=east
+multivar=twocats_chores_warmhuman
+multiloc=0,twocats_fireplace_gone_out
+multiloc=1,twocats_fireplace_got_wood
+multiloc=2,twocats_fireplace_lit
+
+[twocats_bookcase]
+name=Bookcase
+desc=A good source of books!
+model=bookcase
+length=2
+op1=Search
+forceapproach=east

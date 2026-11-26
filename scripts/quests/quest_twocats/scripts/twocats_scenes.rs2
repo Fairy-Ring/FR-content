@@ -1,0 +1,170 @@
+// CANDIDATE story and wording: Transcript:A Tail of Two Cats, memory and holiday.
+// Original 377 scene actors, sequences and scenery. UNKNOWN presentation layout,
+// camera and short animation waits. Actors never enter the shared world.
+[proc,twocats_scene_begin](coord $source, int $viewerx, int $viewerz)(int, coord)
+def_coord $origin = coord;
+if_close;
+p_stopaction;
+def_coord $sw = region_create(1, 4, 4);
+def_int $scene = region_uid;
+region_setexitcoord($origin);
+def_int $x = 0;
+def_int $z;
+while ($x < 4) {
+    $z = 0;
+    while ($z < 4) {
+        region_set(0, $x, $z, movecoord($source, multiply($x, 8), 0, multiply($z, 8)), 0);
+        $z = calc($z + 1);
+    }
+    $x = calc($x + 1);
+}
+p_telejump(region_getcoord(0, $viewerx, $viewerz));
+cam_moveto(region_getcoord(0, $viewerx, sub($viewerz, 4)), 650, 232, 232);
+cam_lookat(region_getcoord(0, $viewerx, add($viewerz, 5)), 100, 232, 232);
+minimap_toggle(2);
+weakqueue(twocats_scene_marker, ^max_32bit_int, 0);
+longqueue(twocats_scene_logout, ^max_32bit_int, $scene, ^accelerate);
+softtimer(twocats_scene_watch, 1, $scene, $origin);
+return($scene, $origin);
+
+[proc,twocats_scene_actor](int $x, int $z, npc $type)
+npc_add(region_getcoord(0, $x, $z), $type, ^max_32bit_int);
+%npc_attacking_uid = uid;
+npc_setmode(none);
+npc_facesquare(region_getcoord(0, 16, 15));
+
+[proc,twocats_scene_valid](int $scene)(boolean)
+if (getqueue(twocats_scene_marker) = 0) return(false);
+if (region_findbycoord(coord) = false) return(false);
+if (region_uid = $scene) return(true);
+return(false);
+
+[queue,twocats_scene_marker](int $unused)
+return;
+
+[softtimer,twocats_scene_watch](int $scene, coord $origin)
+if (~twocats_scene_valid($scene) = true) return;
+if_close;
+if (p_finduid(uid) = true) ~twocats_scene_end($scene, $origin);
+
+[queue,twocats_scene_logout](int $scene)
+// The normal private-region save path uses region_setexitcoord on logout.
+~twocats_scene_end($scene, null);
+
+[proc,twocats_scene_end](int $scene, coord $origin)
+def_boolean $inside = false;
+if (region_findbycoord(coord) = true) {
+    if (region_uid = $scene) $inside = true;
+}
+clearsofttimer(twocats_scene_watch);
+clearqueue(twocats_scene_marker);
+clearqueue(twocats_scene_logout);
+if (region_findbyuid($scene) = true) {
+    npc_findallany(region_getcoord(0, 16, 16), 24, 0);
+    while (npc_findnext = true) {
+        if (%npc_attacking_uid = uid) npc_del;
+    }
+}
+if_close;
+cam_reset;
+minimap_toggle(0);
+if ($inside = true & $origin ! null) p_telejump($origin);
+~initalltabs;
+
+[proc,twocats_memory]
+~chatnpc_specific("Sphinx", twocats_sphinx_cutscene, "<p,neutral>Look into my eyes.");
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>Sure... whatever.");
+~chatnpc_specific("Sphinx", twocats_sphinx_cutscene, "<p,neutral>Think back to your earliest memories.");
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>I am in front of a dark tower... the cat is called Odysseus.");
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>My name is Robert.");
+def_int $scene;
+def_coord $origin;
+$scene, $origin = ~twocats_scene_begin(0_29_70_24_32, 16, 10);
+~twocats_scene_actor(16, 12, twocats_robert_cutscene);
+~twocats_scene_actor(15, 14, twocats_odysseus_cutscene);
+~twocats_scene_actor(15, 18, twocats_dragonkin_cutscene);
+~chatnpc_specific("Robert the Strong", twocats_robert_cutscene, "<p,angry>Come, Odysseus!");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Dragonkin", twocats_dragonkin_cutscene, "<p,angry>Hesente!");
+if (~twocats_scene_valid($scene) = false) return;
+if_close;
+weakqueue(twocats_scene_marker, ^max_32bit_int, 0);
+if (npc_findexact(region_getcoord(0, 16, 12), twocats_robert_cutscene) = true) npc_anim(human_bow, 0);
+if (npc_findexact(region_getcoord(0, 15, 14), twocats_odysseus_cutscene) = true) npc_anim(panther_pounce, 0);
+p_delay(3);
+if (~twocats_scene_valid($scene) = false) return;
+if (npc_findexact(region_getcoord(0, 15, 14), twocats_odysseus_cutscene) = true) npc_anim(panther_death, 0);
+if (npc_findexact(region_getcoord(0, 16, 12), twocats_robert_cutscene) = true) npc_anim(roberts_death, 0);
+~chatnpc_specific("Dragonkin", twocats_dragonkin_cutscene, "<p,angry>Crasortius!");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Robert the Strong", twocats_robert_cutscene, "<p,angry>Never!");
+if (~twocats_scene_valid($scene) = false) return;
+if_close;
+weakqueue(twocats_scene_marker, ^max_32bit_int, 0);
+if (npc_findexact(region_getcoord(0, 16, 12), twocats_robert_cutscene) = true) npc_anim(human_bow, 0);
+if (npc_findexact(region_getcoord(0, 15, 18), twocats_dragonkin_cutscene) = true) npc_anim(dragonkin_special_death, 0);
+p_delay(3);
+if (~twocats_scene_valid($scene) = false) return;
+~twocats_scene_end($scene, $origin);
+~chatnpc_specific("Sphinx", twocats_sphinx_cutscene, "<p,neutral>You are no longer under my influence.");
+~twocats_hild_cat("<p,shock>Wow Bob! You really are Robert the Strong!");
+~chatnpc_specific("Neite", twocats_niete_cutscene, "<p,neutral>So you're supposed to be Robert the Strong?");
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>So they tell me.");
+~chatnpc_specific("Sphinx", twocats_sphinx_cutscene, "<p,neutral>Under my influence Bob was able to recall memories that had remained hidden until now. It proves he is, or was, Robert the Strong.");
+~chatnpc_specific("Neite", twocats_niete_cutscene, "<p,happy>Come here you.");
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>Myself and Neite are going away for a few days. Could you look after Unferth for me whilst I'm away?");
+~chatplayer("<p,neutral>Er... sure.");
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>I'll give you a list of what needs doing.");
+~twocats_stage(50);
+~twocats_chores_start;
+~twocats_recover_chores;
+// VERIFIED Tip.It offers the Sphinx's return teleport. UNKNOWN exact landing.
+if (~p_choice2("Teleport to Unferth.", 1, "Stay here.", 2) = 1) {
+    p_telejump(0_45_55_39_35);
+}
+
+[proc,twocats_holiday]
+def_int $scene;
+def_coord $origin;
+$scene, $origin = ~twocats_scene_begin(0_51_43_16_16, 18, 16);
+~twocats_scene_actor(16, 15, twocats_carpet_cats);
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,quiz>Where do we turn here?");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Neite", twocats_niete_cutscene, "<p,neutral>North... I think.");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Neite", twocats_niete_cutscene, "<p,shock>Slow down!");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,quiz>What camel?!");
+if (~twocats_scene_valid($scene) = false) return;
+~twocats_scene_end($scene, $origin);
+$scene, $origin = ~twocats_scene_begin(0_35_73_16_16, 16, 10);
+~twocats_scene_actor(16, 14, twocats_bob_cutscene2);
+~twocats_scene_actor(17, 14, twocats_niete_cutscene);
+~twocats_scene_actor(14, 18, twocats_kbd_cutscene);
+~twocats_scene_actor(21, 15, twocats_adventurer_cutscene);
+~chatnpc_specific("Neite", twocats_niete_cutscene, "<p,quiz>Are you sure this is a good idea?");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>Yeh, the old King and I go way back.");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("King Black Dragon", twocats_kbd_cutscene, "<p,neutral>Same as always: adventurers trying to kill me.");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("R4ng3rNo0b889", twocats_adventurer_cutscene, "<p,angry>Lolz die noob!");
+if (~twocats_scene_valid($scene) = false) return;
+if_close;
+weakqueue(twocats_scene_marker, ^max_32bit_int, 0);
+if (npc_findexact(region_getcoord(0, 14, 18), twocats_kbd_cutscene) = true) npc_anim(dragon_attack, 0);
+if (npc_findexact(region_getcoord(0, 21, 15), twocats_adventurer_cutscene) = true) npc_anim(human_death, 0);
+p_delay(3);
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("King Black Dragon", twocats_kbd_cutscene, "<p,neutral>See what I mean?");
+if (~twocats_scene_valid($scene) = false) return;
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,neutral>Mate! You need a new line of work!");
+if (~twocats_scene_valid($scene) = false) return;
+~twocats_scene_end($scene, $origin);
+$scene, $origin = ~twocats_scene_begin(1_29_75_16_16, 14, 9);
+~twocats_scene_actor(16, 8, twocats_trawler_cats);
+~chatnpc_specific("Bob", twocats_bob_cutscene2, "<p,happy>I'm the King of Gielinor!");
+if (~twocats_scene_valid($scene) = false) return;
+~twocats_scene_end($scene, $origin);
+~chatplayer("<p,neutral>Phew!");
+~twocats_stage(69);

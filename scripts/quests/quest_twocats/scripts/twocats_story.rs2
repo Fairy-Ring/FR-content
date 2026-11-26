@@ -1,0 +1,159 @@
+// VERIFIED route and requirements: Tip.It q116, capture 2006-05-02, lines195-248.
+// CANDIDATE wording: Transcript:A Tail of Two Cats, with later overlays removed.
+// UNKNOWN engineering stage encodings between the original 0 and 70 endpoints.
+[ai_spawn,death_growncat_black]
+%twocats_bob_uid = npc_uid;
+
+[proc,twocats_has_cat]()(boolean)
+if (~twocats_hild_follower = ^false) return(false);
+if (.npc_finduid(%follower_uid) = false) return(false);
+return(true);
+
+[proc,twocats_cat_ready]()(boolean)
+if (~twocats_has_cat = false) {
+    // UNKNOWN functional refusal where the retained transcript is incomplete.
+    mes("Bring your cat with you.");
+    return(false);
+}
+if (~twocats_hild_catspeak_worn = ^false) {
+    ~chatplayer("<p,neutral>Hmm... My cat is trying to say something but I'm not wearing the Amulet of Catspeak.");
+    return(false);
+}
+return(true);
+
+[proc,twocats_stage](int $stage)
+%twocats_quest = $stage;
+~send_quest_progress(questlist:twocats, %twocats_quest, ^twocats_complete);
+
+[opnpc1,death_growncat_black]
+if (~twocats_cat_ready = false) return;
+switch_int (%twocats_quest) {
+    case 1, 10 :
+        if (inv_total(inv, twocats_amuletofcatspeak) = 0 & inv_total(worn, twocats_amuletofcatspeak) = 0) {
+            ~chatnpc("<p,neutral>Have you been to Hild yet?"); // UNKNOWN functional reminder.
+            return;
+        }
+        ~chatplayer("<p,happy>Bob! I've found you at last!");
+        ~chatnpc("<p,sad>Sigh. I can't believe it but I've fallen for Neite!");
+        ~chatnpc("<p,neutral>She said she has feelings for me but would never get involved with someone like me that has no family or status.");
+        ~chatnpc("<p,neutral>All I know is that Gertrude found me on her doorstep one day. She looked after me when I was a kitten.");
+        ~twocats_hild_cat("<p,neutral>Let's go and talk to Gertrude! Perhaps she knows who Bob's parents are!");
+        ~twocats_stage(20);
+    case 20, 30 :
+        ~chatnpc("<p,sad>Hmph...Oh Neite...My bounty is as boundless as the sea, my love as deep. The more I give to thee, the more I have, for both are infinite.");
+    case 35 :
+        ~chatnpc("<p,neutral>Did you find out who my parents are?");
+        ~twocats_hild_cat("<p,neutral>We think you are... or used to be... Robert the Strong!");
+        ~chatnpc("<p,confused>Robert the who?");
+        ~twocats_hild_cat("<p,neutral>Does a black panther called Odysseus ring any bells?");
+        ~chatnpc("<p,neutral>No...");
+        ~twocats_hild_cat("<p,neutral>The Sphinx understood how you were hypnotised, it might be able to access Bob's memories of Robert the Strong.");
+        ~twocats_stage(40);
+    case 40 :
+        ~chatnpc("<p,neutral>Have you been to the Sphinx yet?");
+    case 50, 55, 60 :
+        ~twocats_recover_chores;
+        ~chatnpc("<p,neutral>Could you look after Unferth for me whilst I'm away?");
+    case 65 :
+        ~chatplayer("<p,happy>Hi Bob! How's it hang... going?");
+        ~chatnpc("<p,happy>Wonderful! Neite and I have been all over Gielinor! We 'borrowed' a magic carpet...");
+        ~twocats_holiday;
+    case 69, 70 :
+        ~chatnpc("<p,happy>Hi there son.");
+}
+
+[opnpc1,ics_little_cat]
+~twocats_neite;
+[opnpc1,ics_little_cat_visible]
+~twocats_neite;
+[proc,twocats_neite]
+if (~twocats_cat_ready = false) return;
+if (%twocats_quest >= 60) {
+    ~chatnpc("<p,neutral>So you're supposed to be Robert the Strong?");
+} else {
+    // UNKNOWN functional reminder; no new state is required for Neite.
+    ~chatnpc("<p,neutral>Speak to Bob.");
+}
+
+[proc,twocats_gertrude_hook]()(boolean)
+if (%fluffs < ^fluffs_complete | (%twocats_quest ! 20 & %twocats_quest ! 30)) return(false);
+if (~p_choice2("Ask about Bob's parents.", 1, "Talk about something else.", 2) = 2) return(false);
+if (~twocats_cat_ready = false) return(true);
+~chatplayer("<p,neutral>Ok... Well... Do you know who Bob's parents are?");
+~chatnpc("<p,neutral>Bob.... you mean the big tomcat who hangs around the Heroes' guild? No, I'm afraid I don't know a lot about him.");
+~chatnpc("<p,neutral>People round here know I care for sick and abandoned animals, and one day I found a basket with a kitten inside it left on my doorstep.");
+~twocats_hild_cat("<p,neutral>Hang on, maybe this is something to do with the legend... yes, it just might. Have you ever heard of Robert the Strong?");
+~chatnpc("<p,neutral>No, sorry. If it's a legend, it's Reldo you need to talk to. He's in Varrock palace library, knows all about that kind of thing.");
+~twocats_stage(30);
+return(true);
+
+[proc,twocats_reldo_hook]()(boolean)
+if (%twocats_quest ! 30) return(false);
+if (~p_choice2("I have a cat related question.", 1, "Talk about something else.", 2) = 2) return(false);
+if (~twocats_cat_ready = false) return(true);
+~chatplayer("<p,neutral>Do you know anything about Robert the Strong?");
+~chatnpc("<p,neutral>Ah, Robert the Strong. There's some details on him in one of my books on the history of Gielinor. Let's see now...");
+%twocats_reldo = 1;
+~chatnpc_specific("Reldo", reldo_withbook, "<p,neutral>'Not much is known about the hero called Robert the Strong. Most folk tales describe him as being taller than the tallest human and far stronger than the strongest warrior.'");
+~chatnpc_specific("Reldo", reldo_withbook, "<p,neutral>'He wields a six foot tall longbow and travels with his faithful panther, Odysseus. He is said to have had a personal crusade against the dragonkin...'");
+~chatnpc_specific("Reldo", reldo_withbook, "<p,neutral>'The stories tell of the dragonkin being an intelligent race of bird-like creatures that walked rather than using their wings. They are said to be immortal, but cannot reproduce.'");
+~twocats_hild_cat("<p,neutral>Don't you think it's odd that no one knows where Bob came from?");
+~chatplayer("<p,confused>So are you saying that Robert the Strong is... is... Bob?!");
+~twocats_stage(35);
+return(true);
+
+[proc,twocats_sphinx_hook]()(boolean)
+if (%ics_little_var < ^ics_little_complete | %twocats_quest < 40) return(false);
+if (~p_choice2("Ask the Sphinx for help for Bob.", 1, "Talk about something else.", 2) = 2) return(false);
+if (~twocats_cat_ready = false) return(true);
+if (%twocats_quest = 40) {
+    if (inv_freespace(inv) = 0) {
+        mes("Make room for Bob's list of chores."); // UNKNOWN functional capacity message.
+        return(true);
+    }
+    ~chatplayer("<p,neutral>Sphinx, we need your help!");
+    ~chatplayer("<p,neutral>Bob is in love with Neite but we need to prove that he used to be Robert the Strong before she will have anything to do with him!");
+    ~chatnpc("<p,neutral>It is true that there is something about Bob... there is the mark of power on him, I have ignored it for too long.");
+    ~chatnpc("<p,neutral>Come with me into the desert so we are not disturbed.");
+    ~twocats_memory;
+} else if (%twocats_quest >= 50 & %twocats_quest < 65) {
+    ~twocats_recover_chores;
+    ~chatnpc("<p,neutral>Have you completed the chores that Bob asked you to?");
+} else {
+    ~chatnpc("<p,neutral>Very well, I see you have a close relationship with your cat, I will help you if I can.");
+}
+return(true);
+
+[proc,twocats_recover_chores]
+if (inv_total(inv, twocats_chores) = 0 & inv_total(bank, twocats_chores) = 0 & inv_freespace(inv) > 0) inv_add(inv, twocats_chores, 1);
+
+[proc,twocats_apothecary_hook]()(boolean)
+if (%twocats_quest < 55) return(false);
+if (~p_choice2("Talk about A Tail of Two Cats.", 1, "Talk about something else.", 2) = 2) return(false);
+if (%twocats_quest = 55) {
+    ~chatplayer("<p,neutral>Hello Apothecary, Unferth has fallen ill. Could you go and see him please?");
+    ~chatnpc("<p,neutral>That Unferth! Honestly, I have been to see him more times than my Mother's hair has fallen out!");
+    ~chatnpc("<p,neutral>It's quite simple. Unferth is what we call a hypochondriac; he isn't ill but he thinks he is. All you need to do is convince him you are a Doctor or a Nurse and give him a potion to make him 'better'.");
+    ~chatnpc("<p,neutral>Easy, make sure you are dressed in white robes and take one of these hats to wear.");
+}
+if (calc(inv_total(inv, twocats_doctors_hat) + inv_total(worn, twocats_doctors_hat) + inv_total(bank, twocats_doctors_hat) + inv_total(inv, twocats_nurses_hat) + inv_total(worn, twocats_nurses_hat) + inv_total(bank, twocats_nurses_hat)) = 0) {
+    if (inv_freespace(inv) = 0) {
+        mes("Make room for a hat."); // UNKNOWN functional capacity refusal.
+        return(true);
+    }
+    if (~p_choice2("Doctor's hat.", 1, "Nurse's hat.", 2) = 1) {
+        inv_add(inv, twocats_doctors_hat, 1);
+    } else {
+        inv_add(inv, twocats_nurses_hat, 1);
+    }
+}
+~chatnpc("<p,neutral>Then all you need to do is give him a vial of water and he'll take it thinking it's a cure potion.");
+if (%twocats_quest = 55) ~twocats_stage(60);
+return(true);
+
+[proc,twocats_disguised]()(boolean)
+if (inv_total(worn, twocats_doctors_hat) = 0 & inv_total(worn, twocats_nurses_hat) = 0) return(false);
+if (inv_total(worn, desert_shirt) = 0 & inv_total(worn, druidrobetop) = 0) return(false);
+if (inv_total(worn, desert_robe) = 0 & inv_total(worn, druidrobebottom) = 0) return(false);
+if (inv_getobj(worn, ^wearpos_rhand) ! null | inv_getobj(worn, ^wearpos_lhand) ! null) return(false);
+return(true);

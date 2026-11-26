@@ -1,0 +1,107 @@
+// A Tail of Two Cats rewards and item operations.
+// VERIFIED reward contents: Tip.It Q116, captured 2 May 2006, lines 249-256.
+
+[proc,twocats_complete]
+if (%twocats_quest < ^twocats_complete) {
+    // Set the registry's completion stage before the present can be claimed.
+    %twocats_quest = ^twocats_complete;
+    ~twocats_claim_present;
+    // UNKNOWN: functional completion-scroll wording; Tip.It gives rewards, not this sentence.
+    ~send_quest_complete(questlist:twocats, twocats_present, 1, ^twocats_questpoints, "You have completed A Tail of Two Cats!", "Two antique lamps, 2,500 XP each|A toy mouse");
+    return;
+}
+// A lost unopened present can be reclaimed after completion; the open bit prevents rewards twice.
+~twocats_claim_present;
+
+[proc,twocats_claim_present]
+if (%twocats_quest < ^twocats_complete | %twocats_gotreward = 1) return;
+if (inv_total(inv, twocats_present) > 0 | inv_total(bank, twocats_present) > 0) return;
+if (inv_freespace(inv) < 1) {
+    // UNKNOWN: functional inventory warning; the period source gives no recovery wording.
+    mes("Make room for the present.");
+    return;
+}
+inv_add(inv, twocats_present, 1);
+
+[opheld1,twocats_present]
+if (inv_total(inv, twocats_present) < 1) return;
+if (%twocats_quest < ^twocats_complete) {
+    // UNKNOWN: functional refusal; the period source does not describe opening an unearned present.
+    mes("You cannot open this present yet.");
+    return;
+}
+if (%twocats_gotreward = 1) {
+    mes("This present has already been opened.");
+    return;
+}
+// Present occupies one slot; after consuming it, three reward objects need two additional slots.
+if (inv_freespace(inv) < 2) {
+    // UNKNOWN: functional inventory warning; the period source gives no opening restriction text.
+    mes("Make room to open the present.");
+    return;
+}
+%twocats_gotreward = 1;
+inv_del(inv, twocats_present, 1);
+inv_add(inv, twocats_rewardlamp, 2);
+inv_add(inv, twocats_mouse_toy, 1);
+
+[opheld1,twocats_rewardlamp]
+if (inv_total(inv, twocats_rewardlamp) < 1) return;
+%xplamp = ^xplamp_none;
+cleartimer(osf_lamp_picker);
+settimer(twocats_lamp_picker, 1000);
+if_openmain(xplamp);
+
+[timer,twocats_lamp_picker]
+return;
+
+[label,twocats_lamp_confirm]
+if (inv_total(inv, twocats_rewardlamp) < 1) {
+    cleartimer(twocats_lamp_picker);
+    if_close;
+    return;
+}
+if (%xplamp = ^xplamp_none) {
+    mes("You need to choose which skill you wish to be advanced.");
+    return;
+}
+def_stat $stat = ~twocats_lamp_stat;
+// UNKNOWN boundary: use level 30 as the minimum; the period source does not give a level requirement.
+if (stat_base($stat) < 30) {
+    mes("You need level 30 in the chosen skill to use this lamp.");
+    return;
+}
+cleartimer(twocats_lamp_picker);
+if_close;
+inv_del(inv, twocats_rewardlamp, 1);
+// stat_advance uses tenths of XP; 25,000 gives the VERIFIED 2,500 XP per Tip.It Q116.
+stat_advance($stat, 25000);
+%xplamp = ^xplamp_none;
+sound_synth(found_gem, 1, 0);
+~mesbox("Your wish has been granted!|You have been awarded 2,500 <enum(stat, string, stat_names, $stat)> experience!");
+
+[proc,twocats_lamp_stat]()(stat)
+switch_int (%xplamp) {
+    case ^xplamp_attack : return(attack);
+    case ^xplamp_strength : return(strength);
+    case ^xplamp_ranged : return(ranged);
+    case ^xplamp_magic : return(magic);
+    case ^xplamp_defence : return(defence);
+    case ^xplamp_hitpoints : return(hitpoints);
+    case ^xplamp_prayer : return(prayer);
+    case ^xplamp_agility : return(agility);
+    case ^xplamp_herblore : return(herblore);
+    case ^xplamp_thieving : return(thieving);
+    case ^xplamp_crafting : return(crafting);
+    case ^xplamp_runecraft : return(runecraft);
+    case ^xplamp_mining : return(mining);
+    case ^xplamp_smithing : return(smithing);
+    case ^xplamp_fishing : return(fishing);
+    case ^xplamp_cooking : return(cooking);
+    case ^xplamp_firemaking : return(firemaking);
+    case ^xplamp_woodcutting : return(woodcutting);
+    case ^xplamp_fletching : return(fletching);
+    case ^xplamp_slayer : return(slayer);
+    case ^xplamp_farming : return(farming);
+}
+return(attack);
