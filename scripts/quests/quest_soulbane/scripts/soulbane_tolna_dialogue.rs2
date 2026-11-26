@@ -116,14 +116,14 @@ if (%soulbane_prog ! ^soulbane_tolna_clear) return;
 return;
 
 [label,soulbane_tolna_surface_reward]
-// RECONSTRUCTION: sourced subset 79–84 plus 87–88; omit 85–86 and postquest training.
+// CANDIDATE sourced surface dialogue: soulbane.dlg.tolna.
 ~chatplayer("<p,neutral>Hello Tolna.");
 ~chatnpc("<p,neutral>Hi. Thanks again for saving me, I'm so glad to be out of that horrible place. I was foolish to ignore my parents' warnings when I ran away that day. Luckily I've been able to patch things up with them so they've returned home with peace of mind.");
 ~chatplayer("<p,neutral>What exactly happened to you down there?");
 ~chatnpc("<p,neutral>I managed to find the remnants of the ancient civilisation that the stories talked about. It seems people used to worship a god there years ago in numbers far greater than a simple cult following. Sadly there is little remaining so I have nothing else to tell. As soon as I entered this area the ground swallowed me whole. I felt there was something watching, waiting. It's like there is some evil power under the ground that wanted me to suffer. As if it got some sort of empowerment from it. At least what ever it is, it doesn't want to reveal itself to the world yet...");
 ~chatplayer("<p,neutral>At least we have a warning. Did you manage to retrieve anything?");
 ~chatnpc("<p,neutral>Not really, just a few coins, which you're welcome to have.");
-~chatplayer("<p,neutral>Thanks.");
+~soulbane_tolna_training_referral;
 if (%soulbane_prog ! ^soulbane_tolna_clear) return;
 // Durable completion mark precedes XP, coins, quest points, log and completion UI.
 %soulbane_prog = ^soulbane_complete;
@@ -141,3 +141,10 @@ return;
 ~chatnpc("<p,neutral>Hi. Thanks again for saving me, I'm so glad to be out of that horrible place. I was foolish to ignore my parents' warnings when I ran away that day. Luckily I've been able to patch things up with them so they've returned home with peace of mind.");
 ~chatplayer("<p,neutral>What exactly happened to you down there?");
 ~chatnpc("<p,neutral>I managed to find the remnants of the ancient civilisation that the stories talked about. It seems people used to worship a god there years ago in numbers far greater than a simple cult following. Sadly there is little remaining so I have nothing else to tell. As soon as I entered this area the ground swallowed me whole. I felt there was something watching, waiting. It's like there is some evil power under the ground that wanted me to suffer. As if it got some sort of empowerment from it. At least what ever it is, it doesn't want to reveal itself to the world yet...");
+~soulbane_tolna_training_referral;
+
+[proc,soulbane_tolna_training_referral]
+// CANDIDATE wording: earliest retained Tolna transcript (2020), not period proof.
+~chatplayer("<p,neutral>Thanks. So what are you going to do now?");
+~chatnpc("<p,neutral>I've decided to keep open the rift. There is a part of it that is perfectly laid out for combat training and remnants of my subconscious remain in there. I want to show people the problems I have faced, so that they may learn from them. You're welcome to go down there and practice fighting any time.");
+~chatplayer("<p,neutral>Thanks.");
