@@ -3,6 +3,7 @@
 if(map_members = ^true &inv_total(inv, trail_clue_medium_anagram002) > 0) {
     @trail_cook;
 }
+if (~losttribe_witness_hook(2) = true) return;
 
 if(%cookquest = 0) {
     ~chatnpc("<p,sad>What am I to do?");
