@@ -1,0 +1,25 @@
+// VERIFIED: Tip.It, 4 November 2005: fee, skill gates, half coal and station XP.
+^bf_fee = 2500
+// UNKNOWN engineering defaults: period sources give no exact timers or heat units.
+^bf_access_minutes = 10
+^bf_green_low = 100
+^bf_green_high = 200
+^bf_pump_heat = 25
+^bf_fuel_spade = 100
+^bf_fuel_max = 300
+// Solo usability: the belt coasts for three minutes after pedalling stops.
+^bf_conveyor_ticks = 300
+^bf_cooling_ticks = 50
+^bf_break_pulses = 40
+^bf_work_smithing_xp = 10
+^bf_overheat_damage = 5
+// CANDIDATE limits from the original 2007-base storage rules, not varbit widths.
+^bf_ore_capacity = 28
+^bf_coal_capacity = 254
+// Original all.varbit uses bits0..23 of blast_furnace_5 only. Client readers
+// address individual varbits, never this raw varp. Spare bits stay server state.
+^bf_belt_bit = 24
+^bf_cooling_start = 25
+^bf_cooling_end = 31
+// Original readings varbits end at bit29. Track the open gauge without a new client varbit.
+^bf_gauge_bit = 30

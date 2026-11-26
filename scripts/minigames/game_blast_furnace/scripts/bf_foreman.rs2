@@ -1,0 +1,43 @@
+// VERIFIED fee/free threshold and repayment after leaving: Tip.It 4 Nov 2005.
+// UNKNOWN functional dialogue below; no period transcript survives in the bounded pass.
+[opnpc1,blast_furnace_instructor]
+p_arrivedelay;
+if (stat(smithing) >= 60) {
+    ~chatnpc("With a Smithing level of 60 you can use the furnace for free.");
+    return;
+}
+if (%blast_furnace_access_until > date_minutes) {
+    ~chatnpc("You have paid to use the furnace.");
+    return;
+}
+~chatnpc("Using the furnace costs 2,500 coins below level 60 Smithing.");
+if (~p_choice2("Pay 2,500 coins.", 1, "No thanks.", 2) = 1) {
+    if_close;
+    if (~bf_pay = true) mes("You may now use the furnace.");
+}
+
+[proc,bf_access]()(boolean)
+if (stat(smithing) >= 60 | %blast_furnace_access_until > date_minutes) return(true);
+mes("You must pay the Blast Furnace Foreman 2,500 coins to use the furnace.");
+return(false);
+
+[proc,bf_pay]()(boolean)
+if (stat(smithing) >= 60 | %blast_furnace_access_until > date_minutes) return(true);
+if (inv_total(inv, coins) < ^bf_fee) {
+    mes("You don't have enough coins.");
+    return(false);
+}
+inv_del(inv, coins, ^bf_fee);
+// UNKNOWN duration from the brief's favourable default. Wall-clock minutes survive logout/restart.
+%blast_furnace_access_until = add(date_minutes, ^bf_access_minutes);
+return(true);
+
+[proc,bf_enter]
+p_arrivedelay;
+%blast_furnace_access_until = 0;
+p_telejump(0_30_77_19_27);
+
+[proc,bf_exit]
+p_arrivedelay;
+%blast_furnace_access_until = 0;
+p_telejump(0_45_159_50_18);

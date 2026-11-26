@@ -1,7 +1,22 @@
-// Leftover blast_furnace_temp_gauge 14594.
-// Unpack loc blast_furnace_gauge 9089 op1=Read. Official Update 23 Aug 2005.
-// First mid-gate: leftover chrome only. Hunt 289? no.
-
+// VERIFIED gauge role/bands: Tip.It 4 Nov 2005. Numeric scale and model angles UNKNOWN.
 [oploc1,blast_furnace_gauge]
 p_arrivedelay;
+~bf_update_readings;
 if_openmain(blast_furnace_temp_gauge);
+%blast_furnace_readings = setbit(%blast_furnace_readings, ^bf_gauge_bit);
+~bf_gauge_refresh;
+
+[if_close,blast_furnace_temp_gauge]
+%blast_furnace_readings = clearbit(%blast_furnace_readings, ^bf_gauge_bit);
+
+[proc,bf_gauge_refresh]
+def_string $band = "White";
+if (%blast_furnace_temperature_reading >= ^bf_green_low) $band = "Green";
+if (%blast_furnace_temperature_reading > ^bf_green_high) $band = "Red";
+if_settext(blast_furnace_temp_gauge:com_0, "Heat: <tostring(%blast_furnace_temperature_reading)> (<$band>)");
+if (%blast_furnace_broken_pipe_reading = 0) if_sethide(blast_furnace_temp_gauge:com_2, true);
+else if_sethide(blast_furnace_temp_gauge:com_2, false);
+if (%blast_furnace_fuel_low_reading = 0) if_sethide(blast_furnace_temp_gauge:com_3, true);
+else if_sethide(blast_furnace_temp_gauge:com_3, false);
+// UNKNOWN needle geometry: map the live byte reading to a half-turn.
+if_setangle(blast_furnace_temp_gauge:com_4, 0, scale(%blast_furnace_temperature_reading, 255, 1024), 172);

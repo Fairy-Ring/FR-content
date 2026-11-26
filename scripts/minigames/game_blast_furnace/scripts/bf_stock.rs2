@@ -1,11 +1,79 @@
-// Leftover blast_furnace_bar_stock 14458.
-// Official Update 23 Aug 2005. Hunt 289? no.
-// Cooled dispenser Take + bars Retrieve. Do not give bars / coal / XP.
-
-[oploc1,blast_furnace_ore_dispenser_cooled]
+// Original stock chrome reads the durable per-player bar/coal varbits.
+[oploc1,blast_furnace_ore_dispenser_cooled] p_arrivedelay; ~bf_stock_open;
+[oploc1,blast_furnace_bars] p_arrivedelay; ~bf_stock_open;
+[oploc1,blast_furnace_ore_dispenser_empty] p_arrivedelay; ~bf_stock_open;
+// Hot form has no cache operation. Item-on-loc is the original cooling surface.
+[oplocu,blast_furnace_ore_dispenser_full]
+def_obj $used = last_useitem;
 p_arrivedelay;
+if ($used = bucket_water) ~bf_cool;
+[oplocu,blast_furnace_dispenser]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = bucket_water) ~bf_cool;
+[oplocu,blast_furnace_bars]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = bucket_water) ~bf_cool;
+
+[proc,bf_cool]
+if (%blast_furnace_bars_hot ! 2 | ~bf_bar_count < 1 | inv_total(inv, bucket_water) < 1) return;
+inv_del(inv, bucket_water, 1);
+inv_add(inv, bucket_empty, 1);
+%blast_furnace_bars_hot = 3;
+%blast_furnace_5 = clearbit_range(%blast_furnace_5, ^bf_cooling_start, ^bf_cooling_end);
+mes("You cool the bars with water."); // UNKNOWN functional wording.
+
+[proc,bf_stock_open]
+~bf_update_readings;
+if (%blast_furnace_bars_hot = 2) {
+    mes("The bars are too hot to take."); // UNKNOWN functional wording.
+    return;
+}
 if_openmain(blast_furnace_bar_stock);
 
-[oploc1,blast_furnace_bars]
-p_arrivedelay;
-if_openmain(blast_furnace_bar_stock);
+[if_button,blast_furnace_bar_stock:com_78] ~bf_claim(bronze_bar, 1);
+[if_button,blast_furnace_bar_stock:com_75] ~bf_claim(iron_bar, 1);
+[if_button,blast_furnace_bar_stock:com_92] ~bf_claim(steel_bar, 1);
+[if_button,blast_furnace_bar_stock:com_93] ~bf_claim(mithril_bar, 1);
+[if_button,blast_furnace_bar_stock:com_94] ~bf_claim(adamantite_bar, 1);
+[if_button,blast_furnace_bar_stock:com_95] ~bf_claim(runite_bar, 1);
+[if_button,blast_furnace_bar_stock:com_96] ~bf_claim(silver_bar, 1);
+[if_button,blast_furnace_bar_stock:com_97] ~bf_claim(gold_bar, 1);
+[if_button,blast_furnace_bar_stock:com_100] ~bf_claim(bronze_bar, 28);
+[if_button,blast_furnace_bar_stock:com_101] ~bf_claim(iron_bar, 28);
+[if_button,blast_furnace_bar_stock:com_102] ~bf_claim(steel_bar, 28);
+[if_button,blast_furnace_bar_stock:com_103] ~bf_claim(mithril_bar, 28);
+[if_button,blast_furnace_bar_stock:com_104] ~bf_claim(adamantite_bar, 28);
+[if_button,blast_furnace_bar_stock:com_105] ~bf_claim(runite_bar, 28);
+[if_button,blast_furnace_bar_stock:com_106] ~bf_claim(silver_bar, 28);
+[if_button,blast_furnace_bar_stock:com_107] ~bf_claim(gold_bar, 28);
+[if_button,blast_furnace_bar_stock:com_109] ~bf_claim(bronze_bar, 1);
+[if_button,blast_furnace_bar_stock:com_110] ~bf_claim(iron_bar, 1);
+[if_button,blast_furnace_bar_stock:com_111] ~bf_claim(steel_bar, 1);
+[if_button,blast_furnace_bar_stock:com_112] ~bf_claim(mithril_bar, 1);
+[if_button,blast_furnace_bar_stock:com_113] ~bf_claim(adamantite_bar, 1);
+[if_button,blast_furnace_bar_stock:com_114] ~bf_claim(runite_bar, 1);
+[if_button,blast_furnace_bar_stock:com_115] ~bf_claim(silver_bar, 1);
+[if_button,blast_furnace_bar_stock:com_116] ~bf_claim(gold_bar, 1);
+
+[proc,bf_claim](namedobj $bar, int $requested)
+if (~bf_inside = false | distance(coord, 0_30_77_20_35) > 5) return;
+if (%blast_furnace_bars_hot = 2) {
+    mes("The bars are too hot to take."); // UNKNOWN wording.
+    return;
+}
+if (%blast_furnace_bars_hot ! 3 | $requested < 1) return;
+def_int $count = min(~bf_count($bar), min($requested, inv_freespace(inv)));
+if ($count < 1) {
+    if (~bf_count($bar) > 0) mes("You need more free inventory space.");
+    return;
+}
+def_struct $recipe = oc_param($bar, smelting_struct);
+def_int $xp = struct_param($recipe, productexp);
+if ($bar = gold_bar & inv_total(worn, gauntlets_of_goldsmithing) > 0) $xp = scale(5, 2, $xp);
+~bf_store($bar, sub(~bf_count($bar), $count));
+inv_add(inv, $bar, $count);
+stat_advance(smithing, multiply($xp, $count));
+if (~bf_bar_count = 0) %blast_furnace_bars_hot = 0;
+mes(struct_param($recipe, productmessage));

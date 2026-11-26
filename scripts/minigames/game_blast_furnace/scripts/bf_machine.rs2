@@ -1,0 +1,241 @@
+// VERIFIED manual work/gates: retained Tip.It 4 Nov 2005. Timings in bf.constant are UNKNOWN.
+[ai_spawn,blast_furnace_instructor]
+npc_settimer(1);
+
+[ai_timer,blast_furnace_instructor]
+~bf_tick;
+
+[proc,bf_inside]()(boolean)
+if (coordy(coord) = 0 & coordx(coord) >= 1930 & coordx(coord) <= 1958 & coordz(coord) >= 4948 & coordz(coord) <= 4982) return(true);
+return(false);
+
+[proc,bf_working]()(boolean)
+if (%bf_fuel > 0 & %bf_faults = 0 & %bf_temperature >= ^bf_green_low & %bf_temperature <= ^bf_green_high) return(true);
+return(false);
+
+[proc,bf_tick]
+if (%bf_fuel > 0) {
+    %bf_fuel = sub(%bf_fuel, 1);
+    if (%bf_fuel = 0 | %bf_fuel = 100 | %bf_fuel = 200) ~bf_stove_form;
+}
+// UNKNOWN engineering cooling rate: one heat unit per ten game ticks.
+if (modulo(map_clock, 10) = 0 & %bf_temperature > 0) %bf_temperature = sub(%bf_temperature, 1);
+huntall(0_30_77_24_32, 32, 0);
+while (huntnext = true) {
+    if (~bf_inside = true) {
+        if (%bf_conveyor_until >= map_clock & %bf_conveyor_until > 0 & %bf_faults = 0) {
+            %blast_furnace_5 = clearbit(%blast_furnace_5, ^bf_belt_bit);
+        }
+        def_int $cooling = getbit_range(%blast_furnace_5, ^bf_cooling_start, ^bf_cooling_end);
+        if (%blast_furnace_bars_hot = 2 & $cooling > 0) {
+            $cooling = sub($cooling, 1);
+            %blast_furnace_5 = setbit_range_toint(%blast_furnace_5, $cooling, ^bf_cooling_start, ^bf_cooling_end);
+            if ($cooling = 0) %blast_furnace_bars_hot = 3;
+        }
+        if (~bf_primary_count > 0) ~bf_smelt;
+        ~bf_update_readings;
+        if (testbit(%blast_furnace_readings, ^bf_gauge_bit) = 1) {
+            ~bf_gauge_refresh;
+            if (~bf_working = true & modulo(map_clock, 4) = 0) stat_advance(smithing, ^bf_work_smithing_xp);
+        }
+    }
+}
+
+[proc,bf_update_readings]
+%blast_furnace_temperature_reading = %bf_temperature;
+if (~bf_bar_count = 0) %blast_furnace_bars_hot = 0;
+else if (getbit_range(%blast_furnace_5, ^bf_cooling_start, ^bf_cooling_end) > 0) %blast_furnace_bars_hot = 2;
+else %blast_furnace_bars_hot = 3;
+%blast_furnace_broken_pipe_reading = 0;
+if (%bf_faults ! 0) %blast_furnace_broken_pipe_reading = 1;
+%blast_furnace_fuel_low_reading = 0;
+if (%bf_fuel < ^bf_fuel_spade) %blast_furnace_fuel_low_reading = 1;
+%blast_furnace_coal_required = max(0, calc(%blast_furnace_iron_ore + (2 * %blast_furnace_mithril_ore) + (3 * %blast_furnace_adamantite_ore) + (4 * %blast_furnace_runite_ore) - %blast_furnace_coal));
+
+[oploc1,blast_furnace_coke]
+p_arrivedelay;
+~bf_collect;
+
+[oplocu,blast_furnace_coke]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = spade) ~bf_collect;
+
+[proc,bf_collect]
+// The ordinary spade is returned on Empty/refuel; losing the coke is recoverable at its spawn.
+if (inv_total(inv, spade) < 1) {
+    mes("You need a spade to collect coke."); // UNKNOWN functional wording.
+    return;
+}
+inv_del(inv, spade, 1);
+inv_add(inv, blast_furnace_coke_spade, 1);
+mes("You collect a spadeful of coke."); // UNKNOWN functional wording.
+
+[opheld1,blast_furnace_coke_spade]
+inv_del(inv, blast_furnace_coke_spade, 1);
+inv_add(inv, spade, 1);
+
+[oploc1,blast_furnace_stove_low] p_arrivedelay; ~bf_refuel;
+[oploc1,blast_furnace_stove_medium] p_arrivedelay; ~bf_refuel;
+[oploc1,blast_furnace_stove_full] p_arrivedelay; ~bf_refuel;
+[oplocu,blast_furnace_stove_low]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = blast_furnace_coke_spade) ~bf_refuel;
+[oplocu,blast_furnace_stove_medium]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = blast_furnace_coke_spade) ~bf_refuel;
+[oplocu,blast_furnace_stove_full]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = blast_furnace_coke_spade) ~bf_refuel;
+
+[proc,bf_refuel]
+if (stat(firemaking) < 30) {
+    mes("You need a Firemaking level of 30 to refuel the stove."); // UNKNOWN wording.
+    return;
+}
+if (inv_total(inv, blast_furnace_coke_spade) < 1) {
+    mes("You need a spadeful of coke."); // UNKNOWN wording.
+    return;
+}
+if (%bf_fuel >= ^bf_fuel_max) return;
+inv_del(inv, blast_furnace_coke_spade, 1);
+inv_add(inv, spade, 1);
+%bf_fuel = min(^bf_fuel_max, add(%bf_fuel, ^bf_fuel_spade));
+if (%bf_faults = 0) {
+    stat_advance(firemaking, 50);
+    stat_advance(smithing, ^bf_work_smithing_xp);
+}
+~bf_stove_form;
+~bf_update_readings;
+mes("You refuel the stove."); // UNKNOWN wording.
+
+[proc,bf_stove_form]
+def_loc $form = blast_furnace_stove_low;
+if (%bf_fuel > 200) $form = blast_furnace_stove_full;
+else if (%bf_fuel > 100) $form = blast_furnace_stove_medium;
+if (loc_find(0_30_77_28_35, blast_furnace_stove_low) = true | loc_find(0_30_77_28_35, blast_furnace_stove_medium) = true | loc_find(0_30_77_28_35, blast_furnace_stove_full) = true) {
+    if (loc_type ! $form) loc_change($form, ^max_32bit_int);
+}
+
+[oploc1,blast_furnace_pump]
+p_arrivedelay;
+@bf_pump_start;
+
+[label,bf_pump_start]
+if (stat(strength) < 30) {
+    mes("You need a Strength level of 30 to operate the pump."); // UNKNOWN wording.
+    return;
+}
+if (%bf_fuel < 1 | %bf_faults ! 0) {
+    mes("The furnace needs fuel and working machinery."); // UNKNOWN wording.
+    return;
+}
+~bf_pump;
+weakqueue*(bf_pump_cycle, 4)(coord);
+
+[queue,bf_pump_cycle](coord $origin)
+if (coord ! $origin) return;
+@bf_pump_start;
+
+[proc,bf_pump]
+if (stat(strength) < 30 | %bf_fuel < 1 | %bf_faults ! 0) return;
+anim(blast_furnace_human_air_pump, 0);
+%bf_temperature = min(255, add(%bf_temperature, ^bf_pump_heat));
+stat_advance(strength, 10); // UNKNOWN chosen within period 1–2 XP/pump range.
+stat_advance(smithing, ^bf_work_smithing_xp);
+~bf_wear_step;
+if (%bf_temperature = 255) {
+    ~damage_self(^bf_overheat_damage); // VERIFIED overheat hurts; amount UNKNOWN.
+    %bf_temperature = ^bf_green_low;
+    anim(null, 0);
+}
+~bf_update_readings;
+
+[oploc1,blast_furnace_pedals]
+p_arrivedelay;
+@bf_pedal_start;
+
+[label,bf_pedal_start]
+if (stat(agility) < 30) {
+    mes("You need an Agility level of 30 to pedal."); // UNKNOWN wording.
+    return;
+}
+if (runenergy < 100 | %bf_faults ! 0) {
+    anim(null, 0);
+    return;
+}
+~bf_pedal;
+weakqueue*(bf_pedal_cycle, 1)(coord);
+
+[queue,bf_pedal_cycle](coord $origin)
+if (coord ! $origin) return;
+@bf_pedal_start;
+
+[proc,bf_pedal]
+if (stat(agility) < 30 | runenergy < 100 | %bf_faults ! 0) return;
+anim(blast_furnace_human_conveyer_cycle, 0);
+healenergy(-100); // UNKNOWN drain: 1% per tick, not 100%.
+%bf_conveyor_until = add(map_clock, ^bf_conveyor_ticks);
+// UNKNOWN 1 XP/tick = 1.67 XP/second, within the period guide's range.
+stat_advance(agility, 10);
+stat_advance(smithing, ^bf_work_smithing_xp);
+~bf_wear_step;
+
+[proc,bf_wear_step]
+// UNKNOWN deterministic wear mechanism/rate. No fabricated random original fault.
+%bf_wear = add(%bf_wear, 1);
+if (%bf_wear < ^bf_break_pulses) return;
+%bf_wear = 0;
+%bf_faults = setbit(%bf_faults, %bf_next_fault);
+switch_int (%bf_next_fault) {
+    case 0 : if (loc_find(0_30_77_23_33, blast_furnace_pipes2) = true) loc_change(blast_furnace_pipes2_broken, ^max_32bit_int);
+    case 1 : if (loc_find(0_30_77_27_33, blast_furnace_pipes6) = true) loc_change(blast_furnace_pipes6_broken, ^max_32bit_int);
+    case 2 : if (loc_find(0_30_77_24_39, blast_furnace_conveyer_cogs) = true) loc_change(blast_furnace_conveyer_cogs_broken, ^max_32bit_int);
+    case 3 : if (loc_find(0_30_77_25_39, blast_furnace_conveyer_cogs2) = true) loc_change(blast_furnace_conveyer_cogs2_broken, ^max_32bit_int);
+}
+%bf_next_fault = modulo(add(%bf_next_fault, 1), 4);
+
+[oploc1,blast_furnace_pipes2_broken] p_arrivedelay; ~bf_repair;
+[oploc1,blast_furnace_pipes6_broken] p_arrivedelay; ~bf_repair;
+[oploc1,blast_furnace_conveyer_cogs_broken] p_arrivedelay; ~bf_repair;
+[oploc1,blast_furnace_conveyer_cogs2_broken] p_arrivedelay; ~bf_repair;
+[oplocu,blast_furnace_pipes2_broken]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = hammer) ~bf_repair;
+[oplocu,blast_furnace_pipes6_broken]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = hammer) ~bf_repair;
+[oplocu,blast_furnace_conveyer_cogs_broken]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = hammer) ~bf_repair;
+[oplocu,blast_furnace_conveyer_cogs2_broken]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used = hammer) ~bf_repair;
+
+[proc,bf_repair]
+if (stat(crafting) < 30 | inv_total(inv, hammer) < 1) {
+    mes("You need a hammer and a Crafting level of 30 to repair this."); // UNKNOWN wording.
+    return;
+}
+def_int $bit = -1;
+def_loc $fixed = null;
+switch_loc (loc_type) {
+    case blast_furnace_pipes2_broken : $bit = 0; $fixed = blast_furnace_pipes2;
+    case blast_furnace_pipes6_broken : $bit = 1; $fixed = blast_furnace_pipes6;
+    case blast_furnace_conveyer_cogs_broken : $bit = 2; $fixed = blast_furnace_conveyer_cogs;
+    case blast_furnace_conveyer_cogs2_broken : $bit = 3; $fixed = blast_furnace_conveyer_cogs2;
+}
+if ($bit < 0 | testbit(%bf_faults, $bit) = 0) return;
+loc_change($fixed, ^max_32bit_int);
+%bf_faults = clearbit(%bf_faults, $bit);
+stat_advance(crafting, 500); // VERIFIED 50 Crafting XP, not Smithing XP.
+if (%bf_faults = 0) stat_advance(smithing, ^bf_work_smithing_xp);
+~bf_update_readings;
+mes("You repair the broken machinery."); // UNKNOWN wording.
