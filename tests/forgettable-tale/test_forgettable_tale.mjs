@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  World, PlayerStat, ScriptProvider, ScriptState, button, contentRoot, count, dialoguePage,
+  World, PlayerStat, Packet, PlayerLoading, ScriptProvider, ScriptState, button, contentRoot, count, dialoguePage,
   engineModule, execute, held, id, inv, invCom, map, obj, player, resumeDialogue, slotOf,
   tile, tick, types, useLoc, weakCount
 } from '../swamp-caves/runtime.mjs';
@@ -54,6 +54,16 @@ const stage = p => get(p, 'forget_quest');
 const proc = (p, name, args = []) => execute(`[proc,${name}]`, p, args);
 const points = p => proc(p, 'count_questpoints').popInt();
 const give = (p, name, amount = 1) => p.invAdd(inv, obj(name), amount);
+function assertSavedQuest(p, label) {
+  const loaded = PlayerLoading.load('frgt_persistence', new Packet(p.save()), null);
+  for (const name of ['forget_main_var', 'forget_clock', 'forget_puzzle_var', 'forget_puzzle_var2', 'farming_varp_9']) {
+    assert.equal(get(loaded, name), get(p, name), `${label}: native save/load preserves ${name}`);
+  }
+  for (const name of ['kelda_hop_seed', 'kelda_hops', 'kelda_stout', 'forget_gardener_letter',
+    'turnleft_trackjunction_control_card', 'turnright_trackjunction_control_card']) {
+    assert.equal(count(loaded, name), count(p, name), `${label}: native save/load preserves carried ${name}`);
+  }
+}
 function fixture() {
   const p = player();
   set(p, 'giantdwarf_quest', constant('giantdwarf_complete', gdConstants));
@@ -142,6 +152,7 @@ function configureTrack(p, board, selections) {
       assert.equal(get(p, `forget_if${field}`), colour, `${root}: configured junction ${field}`);
     }
   }
+  assertSavedQuest(p, `${root}: inserted stones`);
   nativeClose(p, root);
 }
 function nativeClose(p, label) {
@@ -361,6 +372,7 @@ itemOnLoc(p, 'kelda_hop_seed', 'farming_hops_patch_keldagrim');
 assert.equal(get(p, 'forget_farming'), 4, 'four earned seeds are planted');
 assert.equal(count(p, 'kelda_hop_seed'), 0);
 assert((get(p, 'forget_clock') & 0x7ffffff) > 0, 'product records its own real-minute plant time');
+assertSavedQuest(p, 'planted hops');
 talk(p, 'dwarf_city_gardener_dwarf', [2]);
 assert.equal(count(p, 'forget_gardener_letter'), 1, 'optional letter is accepted, not seeded');
 for (let loss = 0; loss < 2; loss++) {
@@ -419,6 +431,7 @@ for (const [ingredient, vatState] of [['bucket_water', 1], ['barley_malt', 2], [
   itemOnLoc(p, ingredient, 'brewing_vat_1');
   assert.equal(get(p, 'brewing_vat_varbit_1'), vatState, `${ingredient}: native visible-morph ingredient dispatch`);
   assert.equal(count(p, ingredient), 0, `${ingredient}: exact inputs consumed`);
+  assertSavedQuest(p, `${ingredient}: consumed brewing ingredient`);
 }
 assert.equal(count(p, 'bucket_empty'), 2);
 assert.equal(count(p, 'pot_empty'), 1, 'the yeast container is returned');
@@ -429,6 +442,7 @@ assert.equal(get(p, 'brewing_barrel_varbit_1'), 0);
 advanceMinutes(6);
 operate(p, 'vat_valve_1');
 assert.equal(get(p, 'brewing_vat_varbit_1'), 70, 'the second original fermenting morph appears after6m');
+assertSavedQuest(p, 'half-fermented stout');
 advanceMinutes(5);
 operate(p, 'vat_valve_1');
 assert.equal(get(p, 'brewing_barrel_varbit_1'), 0, 'eleven minutes are too early');
@@ -436,6 +450,7 @@ advanceMinutes(1);
 operate(p, 'vat_valve_1');
 assert.equal(get(p, 'brewing_vat_varbit_1'), 0, 'native valve drains a finished vat');
 assert.equal(get(p, 'brewing_barrel_varbit_1'), 3, 'finished stout fills the original Kelda barrel morph');
+assertSavedQuest(p, 'finished stout in the barrel');
 assert.equal(operate(p, 'brewing_barrel_1').visible, 'barrel_kelda_stout');
 give(p, 'beer_glass');
 itemOnLoc(p, 'beer_glass', 'brewing_barrel_1');
@@ -443,6 +458,7 @@ assert.equal(get(p, 'brewing_barrel_varbit_1'), 0);
 assert.equal(count(p, 'kelda_stout'), 1, 'an actual glass pours the single quest stout');
 assert.equal(count(p, 'beer_glass'), 0);
 assert((get(p, 'forget_gardener_task') & 4) !== 0, 'pouring writes the saved recovery receipt');
+assertSavedQuest(p, 'poured stout');
 itemOption(p, 'kelda_stout');
 assert.equal(count(p, 'kelda_stout'), 1, 'the player cannot accidentally drink the quest stout');
 for (let loss = 0; loss < 2; loss++) {

@@ -906,9 +906,6 @@ transmit=yes
 [varp501_bits]
 transmit=yes
 
-[farming_varp_9]
-transmit=yes
-
 [varp513_bits]
 scope=perm
 
