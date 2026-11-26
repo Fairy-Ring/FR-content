@@ -1,0 +1,911 @@
+// Quest Garden loc definitions moved from the 377 unpack; original fields retained.
+[garden_delphinium_patch]
+active=yes
+multivar=garden_delphiniums_varbit
+multiloc=0,garden_delphiniums_weeds_3
+multiloc=1,garden_delphiniums_weeds_2
+multiloc=2,garden_delphiniums_weeds_1
+multiloc=3,garden_delphiniums_weeded
+multiloc=4,garden_delphiniums_seed
+multiloc=5,garden_delphiniums_1
+multiloc=6,garden_delphiniums_2
+multiloc=7,garden_delphiniums_fullygrown
+
+[garden_delphiniums_weeded]
+name=Delphinium patch
+desc=You can grow delphiniums in this Farming patch.
+model=hop_patch_weeded
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_delphiniums_weeds_1]
+name=Delphinium patch
+desc=You can grow delphiniums in this Farming patch.
+model=garden_delphiniums_weeds1
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_delphiniums_weeds_2]
+name=Delphinium patch
+desc=You can grow delphiniums in this Farming patch.
+model=garden_delphiniums_weeds2
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_delphiniums_weeds_3]
+name=Delphinium patch
+desc=You can grow delphiniums in this Farming patch.
+model=garden_delphiniums_weeds3
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_delphiniums_seed]
+name=Delphiniums
+desc=Delphinium seeds have been sown in this farming patch.
+model=garden_delphiniums_seed
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_delphiniums_1]
+name=Delphiniums
+desc=Beautiful.
+model=garden_delphiniums1
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_delphiniums_2]
+name=Delphiniums
+desc=Beautiful.
+model=garden_delphiniums2
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_delphiniums_fullygrown]
+name=Delphiniums
+desc=These delphiniums are fully grown.
+model=garden_delphiniums_fullygrown
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_rosebush_patch_white]
+active=yes
+multivar=garden_rosebush_white_varbit
+multiloc=0,garden_rosebush_white_weeds_3
+multiloc=1,garden_rosebush_white_weeds_2
+multiloc=2,garden_rosebush_white_weeds_1
+multiloc=3,garden_rosebush_white_weeded
+multiloc=4,garden_rosebush_seedling
+multiloc=5,garden_rosebush_1
+multiloc=6,garden_rosebush_white_2
+multiloc=7,garden_rosebush_white_fullygrown
+
+[garden_rosebush_patch_red]
+active=yes
+multivar=garden_rosebush_red_varbit
+multiloc=0,garden_rosebush_red_weeds_3
+multiloc=1,garden_rosebush_red_weeds_2
+multiloc=2,garden_rosebush_red_weeds_1
+multiloc=3,garden_rosebush_red_weeded
+multiloc=4,garden_rosebush_seedling
+multiloc=5,garden_rosebush_1
+multiloc=6,garden_rosebush_red_2
+multiloc=7,garden_rosebush_red_fullygrown
+
+[garden_rosebush_patch_pink]
+active=yes
+multivar=garden_rosebush_pink_varbit
+multiloc=0,garden_rosebush_pink_weeds_3
+multiloc=1,garden_rosebush_pink_weeds_2
+multiloc=2,garden_rosebush_pink_weeds_1
+multiloc=3,garden_rosebush_pink_weeded
+multiloc=4,garden_rosebush_seedling
+multiloc=5,garden_rosebush_1
+multiloc=6,garden_rosebush_pink_2
+multiloc=7,garden_rosebush_pink_fullygrown
+
+[garden_rosebush_pink_weeded]
+name=Pink rose bush patch
+desc=You can grow a pink rose bush in this patch.
+model=hop_patch_weeded
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_pink_weeds_1]
+name=Pink rose bush patch
+desc=You can grow a pink rose bush in this patch.
+model=garden_delphiniums_weeds1
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_pink_weeds_2]
+name=Pink rose bush patch
+desc=You can grow a pink rose bush in this patch.
+model=garden_delphiniums_weeds2
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_pink_weeds_3]
+name=Pink rose bush patch
+desc=You can grow a pink rose bush in this patch.
+model=garden_delphiniums_weeds3
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_white_weeded]
+name=White rose bush patch
+desc=You can grow a white rose bush in this patch.
+model=hop_patch_weeded
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_white_weeds_1]
+name=White rose bush patch
+desc=You can grow a white rose bush in this patch.
+model=garden_delphiniums_weeds1
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_white_weeds_2]
+name=White rose bush patch
+desc=You can grow a white rose bush in this patch.
+model=garden_delphiniums_weeds2
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_white_weeds_3]
+name=White rose bush patch
+desc=You can grow a white rose bush in this patch.
+model=garden_delphiniums_weeds3
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_red_weeded]
+name=Red rose bush patch
+desc=You can grow a red rose bush in this patch.
+model=hop_patch_weeded
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_red_weeds_1]
+name=Red rose bush patch
+desc=You can grow a red rose bush in this patch.
+model=garden_delphiniums_weeds1
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_red_weeds_2]
+name=Red rose bush patch
+desc=You can grow a red rose bush in this patch.
+model=garden_delphiniums_weeds2
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_red_weeds_3]
+name=Red rose bush patch
+desc=You can grow a red rose bush in this patch.
+model=garden_delphiniums_weeds3
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_rosebush_seedling]
+name=Rose bush
+desc=A rose bush.
+model=garden_rosebush_seedling
+model2=belladonna_patch_weededi2
+ambient=25
+
+[garden_rosebush_1]
+name=Rose bush
+desc=A rose bush.
+model=garden_rosebush1
+model2=belladonna_patch_weededi2
+ambient=25
+
+[garden_rosebush_white_2]
+name=Rose bush
+desc=A rose bush.
+model=garden_rosebush_white2
+model2=belladonna_patch_weededi2
+recol1s=28777
+recol1d=29557
+ambient=25
+
+[garden_rosebush_white_fullygrown]
+name=Rose bush
+desc=This white rosebush is fully grown.
+model=garden_rosebush_white_fullygrown
+model2=belladonna_patch_weededi2
+recol1s=28777
+recol1d=29557
+ambient=25
+
+[garden_rosebush_red_2]
+name=Rose bush
+desc=A rose bush.
+model=garden_rosebush_white2
+model2=belladonna_patch_weededi2
+ambient=25
+
+[garden_rosebush_red_fullygrown]
+name=Rose bush
+desc=This red rosebush is fully grown.
+model=garden_rosebush_white_fullygrown
+model2=belladonna_patch_weededi2
+ambient=25
+
+[garden_rosebush_pink_2]
+name=Rose bush
+desc=A pink rosebush.
+model=garden_rosebush_white2
+model2=belladonna_patch_weededi2
+recol1s=28777
+recol1d=27124
+ambient=25
+
+[garden_rosebush_pink_fullygrown]
+name=Rose bush
+desc=This pink rosebush is fully grown.
+model=garden_rosebush_white_fullygrown
+model2=belladonna_patch_weededi2
+recol1s=28777
+recol1d=27124
+ambient=25
+
+[garden_orchid_pink_patch]
+active=yes
+multivar=garden_orchids_pink_varbit
+multiloc=0,garden_orchids_plantpot_empty
+multiloc=1,garden_orchids_plantpot_soil
+multiloc=4,garden_orchids_seed
+multiloc=5,garden_orchids_1
+multiloc=6,garden_orchids_2
+multiloc=7,garden_orchids_fullygrown
+
+[garden_orchid_yellow_patch]
+active=yes
+multivar=garden_orchids_yellow_varbit
+multiloc=0,garden_orchids_plantpot_empty
+multiloc=1,garden_orchids_plantpot_soil
+multiloc=4,garden_orchids_seed_yellow
+multiloc=5,garden_orchids_1_yellow
+multiloc=6,garden_orchids_2_yellow
+multiloc=7,garden_orchids_fullygrown_yellow
+
+[garden_orchids_seed]
+name=Orchids
+desc=A plantpot of pink orchids.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids_seedi3
+ambient=25
+
+[garden_orchids_1]
+name=Orchids
+desc=A plantpot of pink orchids.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids1
+ambient=25
+
+[garden_orchids_2]
+name=Orchids
+desc=A plantpot of pink orchids.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids2
+ambient=25
+
+[garden_orchids_fullygrown]
+name=Orchids
+desc=These pink orchids are fully grown.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids_fullygrown
+ambient=25
+
+[garden_orchids_plantpot_empty]
+name=Plantpot
+desc=An empty plantpot.
+model=garden_orchids_seed
+model2=garden_orchids_plantpot_empty
+ambient=25
+op2=Inspect
+
+[garden_orchids_plantpot_soil]
+name=Plantpot
+desc=A plantpot filled with soil.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+ambient=25
+op2=Inspect
+
+[garden_orchids_seed_yellow]
+name=Yellow orchids
+desc=A plantpot of yellow orchids.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids_seedi3
+recol1s=27101
+recol1d=29526
+recol2s=24987
+recol2d=30547
+recol3s=23930
+recol3d=30545
+recol4s=22903
+recol4d=28433
+recol5s=20788
+recol5d=27376
+ambient=25
+
+[garden_orchids_1_yellow]
+name=Yellow orchids
+desc=A plantpot of yellow orchids.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids1
+recol1s=27101
+recol1d=29526
+recol2s=24987
+recol2d=30547
+recol3s=23930
+recol3d=30545
+recol4s=22903
+recol4d=28433
+recol5s=20788
+recol5d=27376
+ambient=25
+
+[garden_orchids_2_yellow]
+name=Yellow orchids
+desc=A plantpot of yellow orchids.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids2
+recol1s=27101
+recol1d=29526
+recol2s=24987
+recol2d=30547
+recol3s=23930
+recol3d=30545
+recol4s=22903
+recol4d=28433
+recol5s=20788
+recol5d=27376
+ambient=25
+
+[garden_orchids_fullygrown_yellow]
+name=Yellow orchids
+desc=These yellow orchids are fully grown.
+model=garden_orchids_seed
+model2=garden_orchids_seedi2
+model3=garden_orchids_fullygrown
+recol1s=27101
+recol1d=29526
+recol2s=24987
+recol2d=30547
+recol3s=23930
+recol3d=30545
+recol4s=22903
+recol4d=28433
+recol5s=20788
+recol5d=27376
+ambient=25
+
+[garden_white_tree_patch]
+width=3
+length=3
+active=yes
+multivar=garden_white_tree_varbit
+multiloc=0,garden_white_tree_weeds_3
+multiloc=1,garden_white_tree_weeds_2
+multiloc=2,garden_white_tree_weeds_1
+multiloc=3,garden_white_tree_weeded
+multiloc=4,garden_white_tree_seedling
+multiloc=5,garden_white_tree_1
+multiloc=6,garden_white_tree_2
+multiloc=7,garden_white_tree_3
+multiloc=8,garden_white_tree_fullygrown
+multiloc=9,garden_white_tree_fruit_1
+multiloc=10,garden_white_tree_fruit_2
+multiloc=11,garden_white_tree_fruit_3
+multiloc=12,garden_white_tree_fruit_4
+
+[garden_white_tree_weeded]
+name=White Tree patch
+desc=You can grow a White Tree in this patch.
+model=calquat_patch_weeded
+model2=calquat_tree_seedlingi2
+ambient=25
+op2=Inspect
+
+[garden_white_tree_weeds_1]
+name=White Tree patch
+desc=You can grow a White Tree in this patch.
+model=garden_white_tree_weeds1
+model2=calquat_tree_seedlingi2
+ambient=25
+op2=Inspect
+
+[garden_white_tree_weeds_2]
+name=White Tree patch
+desc=You can grow a White Tree in this patch.
+model=garden_white_tree_weeds2
+model2=calquat_tree_seedlingi2
+ambient=25
+op2=Inspect
+
+[garden_white_tree_weeds_3]
+name=White Tree patch
+desc=You can grow a White Tree in this patch.
+model=garden_white_tree_weeds3
+model2=calquat_tree_seedlingi2
+ambient=25
+op2=Inspect
+
+[garden_white_tree_seedling]
+name=White Tree patch
+desc=A White Tree sapling has been planted in this patch.
+model=garden_white_tree_seedling
+model2=calquat_tree_seedlingi2
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+
+[garden_white_tree_1]
+name=White Tree patch
+desc=A White Tree is growing in this patch.
+model=garden_white_tree1
+model2=calquat_tree_seedlingi2
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+
+[garden_white_tree_2]
+name=White Tree patch
+desc=A White Tree is growing in this patch.
+model=garden_white_tree2
+model2=calquat_tree_seedlingi2
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+
+[garden_white_tree_3]
+name=White Tree patch
+desc=A White Tree is growing in this patch.
+model=garden_white_tree3
+model2=garden_white_tree3i2
+model3=calquat_tree_seedlingi2
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+
+[garden_white_tree_fullygrown]
+name=White Tree patch
+desc=This White Tree is fully grown.
+model=garden_white_tree_fullygrown
+model2=garden_white_tree_fullygrowni2
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+
+[garden_white_tree_fruit_1]
+name=White Tree patch
+desc=This White Tree bears a single fruit.
+model=garden_white_tree_fullygrown
+model2=garden_white_tree_fullygrowni2
+model3=garden_white_tree_fruit1
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+op1=Pick-fruit
+
+[garden_white_tree_fruit_2]
+name=White Tree patch
+desc=This White Tree bears two fruits.
+model=garden_white_tree_fullygrown
+model2=garden_white_tree_fullygrowni2
+model3=garden_white_tree_fruit2
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+op1=Pick-fruit
+
+[garden_white_tree_fruit_3]
+name=White Tree patch
+desc=This White Tree bears three fruits.
+model=garden_white_tree_fullygrown
+model2=garden_white_tree_fullygrowni2
+model3=garden_white_tree_fruit3
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+op1=Pick-fruit
+
+[garden_white_tree_fruit_4]
+name=White Tree patch
+desc=This White Tree bears four fruits.
+model=garden_white_tree_fullygrown
+model2=garden_white_tree_fullygrowni2
+model3=garden_white_tree_fruit4
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+ambient=25
+op1=Pick-fruit
+
+[garden_snowdrop_patch]
+active=yes
+multivar=garden_snowdrops_varbit
+multiloc=0,garden_snowdrops_weeds_3
+multiloc=1,garden_snowdrops_weeds_2
+multiloc=2,garden_snowdrops_weeds_1
+multiloc=3,garden_snowdrops_weeded
+multiloc=4,garden_snowdrops_seed
+multiloc=5,garden_snowdrops_1
+multiloc=6,garden_snowdrops_2
+multiloc=7,garden_snowdrops_fullygrown
+
+[garden_snowdrops_weeded]
+name=Snowdrop patch
+desc=You can grow snowdrops in this Farming patch.
+model=hop_patch_weeded
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_snowdrops_weeds_1]
+name=Snowdrop patch
+desc=You can grow snowdrops in this Farming patch.
+model=garden_delphiniums_weeds1
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_snowdrops_weeds_2]
+name=Snowdrop patch
+desc=You can grow snowdrops in this Farming patch.
+model=garden_delphiniums_weeds2
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_snowdrops_weeds_3]
+name=Snowdrop patch
+desc=You can grow snowdrops in this Farming patch.
+model=garden_delphiniums_weeds3
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_snowdrops_seed]
+name=Snowdrops
+desc=A patch of snowdrops.
+model=garden_snowdrops_seed
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_snowdrops_1]
+name=Snowdrops
+desc=A patch of snowdrops.
+model=garden_snowdrops1
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_snowdrops_2]
+name=Snowdrops
+desc=A patch of snowdrops.
+model=garden_snowdrops2
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_snowdrops_fullygrown]
+name=Snowdrops
+desc=These snowdrops are fully grown.
+model=garden_snowdrops_fullygrown
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_vine_patch]
+active=yes
+multivar=garden_vines_varbit
+multiloc=0,garden_vines_weeds_3
+multiloc=1,garden_vines_weeds_2
+multiloc=2,garden_vines_weeds_1
+multiloc=3,garden_vines_weeded
+multiloc=4,garden_vines_seed
+multiloc=5,garden_vines_1
+multiloc=6,garden_vines_2
+multiloc=7,garden_vines_fullygrown
+
+[garden_vines_weeded]
+name=Vine patch
+desc=You can grow Burthorpe Vine in this patch.
+model=hop_patch_weeded
+model2=flower_patch_weeds1
+ambient=25
+op2=Inspect
+
+[garden_vines_weeds_1]
+name=Vine patch
+desc=You can grow Burthorpe Vines in this patch.
+model=garden_vines_weeds1
+ambient=25
+op2=Inspect
+
+[garden_vines_weeds_2]
+name=Vine patch
+desc=You can grow Burthorpe Vines in this patch.
+model=garden_vines_weeds2
+ambient=25
+op2=Inspect
+
+[garden_vines_weeds_3]
+name=Vine patch
+desc=You can grow Burthorpe Vines in this patch.
+model=garden_vines_weeds3
+ambient=25
+op2=Inspect
+
+[garden_vines_seed]
+name=Vines
+desc=Burthorpe vines are growing in this patch.
+model=garden_vines_seed
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_vines_1]
+name=Vines
+desc=Burthorpe vines are growing in this patch.
+model=garden_vines1
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_vines_2]
+name=Vines
+desc=Burthorpe vines are growing in this patch.
+model=garden_vines2
+model2=flower_patch_weeds1
+ambient=25
+
+[garden_vines_fullygrown]
+name=Vines
+desc=These Burthorpe vines are fully grown.
+model=garden_vines_fullygrown
+model2=flower_patch_weeds1
+ambient=25
+
+[statue_plinth]
+name=Plinth
+desc=An empty plinth for a statue.
+model=statue_plinth
+ambient=10
+
+[statue_plinth_garden]
+name=Plinth
+desc=An empty plinth for a statue.
+model=statue_plinth
+ambient=10
+
+[garden_saradomin_statue]
+name=Statue of Saradomin
+desc=What a good likeness!
+model=garden_saradomin_statue
+model2=statue_plinth
+ambient=10
+
+[statue_plinth_lumbridge]
+name=Plinth
+desc=An empty plinth for a statue.
+model=statue_plinth_lumbridge
+ambient=10
+
+[garden_king_statue]
+name=Statue
+desc=An expertly carved statue of a former King of Misthalin.
+model=statue_plinth_lumbridge
+model2=garden_king_statue
+ambient=10
+
+[garden_saradomin_statue_plinth]
+name=Statue plinth
+desc=An empty plinth for a statue.
+model=garden_paving_stone_0
+ambient=15
+width=2
+shadow=no
+op2=Inspect
+
+[garden_saradomin_statue_placed]
+name=Statue of Saradomin
+desc=What a good likeness!
+model=garden_saradomin_statue_placed
+model2=garden_paving_stone_0
+ambient=15
+width=2
+shadow=no
+
+[garden_king_statue_plinth]
+name=Statue plinth
+desc=An empty plinth for a statue.
+model=garden_paving_stone_0
+ambient=10
+shadow=no
+op2=Inspect
+
+[garden_king_statue_placed]
+name=Statue
+desc=An expertly carved statue of a former King of Misthalin.
+model=garden_king_statue_placed
+model2=garden_paving_stone_0
+ambient=10
+shadow=no
+
+[falador_statue_saradomin]
+active=yes
+multivar=garden_saradomin_statue_varbit
+multiloc=0,garden_saradomin_statue
+multiloc=1,statue_plinth
+multiloc=2,statue_plinth
+
+[garden_lumbridge_statue]
+active=yes
+multivar=garden_king_statue_varbit
+multiloc=0,statue_lumbridge
+multiloc=1,statue_plinth_lumbridge
+multiloc=2,statue_plinth_lumbridge
+
+[garden_king_statue_multi]
+active=yes
+multivar=garden_king_statue_varbit
+multiloc=0,garden_king_statue_plinth
+multiloc=1,garden_king_statue_plinth
+multiloc=2,garden_king_statue_placed
+multiloc=3,garden_king_statue_placed
+
+[garden_saradomin_statue_multi]
+active=yes
+width=2
+multivar=garden_saradomin_statue_varbit
+multiloc=0,garden_saradomin_statue_plinth
+multiloc=1,garden_saradomin_statue_plinth
+multiloc=2,garden_saradomin_statue_placed
+multiloc=3,garden_saradomin_statue_placed
+
+[garden_burthorpe_vines]
+active=yes
+multivar=garden_bernald_varbit
+multiloc=0,garden_burthorpe_vines_diseased
+multiloc=1,garden_burthorpe_vines_diseased
+multiloc=2,garden_burthorpe_vines_diseased
+multiloc=3,garden_burthorpe_vines_diseased
+multiloc=4,garden_burthorpe_vines_cured
+multiloc=5,garden_burthorpe_vines_cured
+
+[garden_burthorpe_vines_cured]
+name=Grapevines
+desc=These grapevines look much healthier now.
+model=garden_burthorpe_vines_cured
+ambient=25
+active=yes
+
+[garden_burthorpe_vines_diseased]
+name=Diseased Grapevines
+desc=These grapevines are suffering from some strange disease.
+model=garden_burthorpe_vines_diseased
+ambient=25
+active=yes
+
+[garden_roses_red]
+name=Roses
+desc=Some red roses.
+model=garden_roses_red
+ambient=25
+op1=Take-seed
+
+[garden_roses_pink]
+name=Roses
+desc=Some pink roses.
+model=garden_roses_red
+recol1s=28777
+recol1d=27124
+ambient=25
+op1=Take-seed
+
+[garden_roses_white]
+name=Roses
+desc=Some white roses.
+model=garden_roses_red
+recol1s=28777
+recol1d=29557
+ambient=25
+op1=Take-seed
+
+[garden_white_tree_dead]
+name=White Tree
+desc=A White Tree.
+model=garden_white_tree_dead
+ambient=25
+width=2
+length=2
+resizex=85
+resizey=85
+resizez=85
+
+[garden_queen_statue]
+name=Statue
+desc=An expertly carved statue of a former Queen of Misthalin.
+model=statue_plinth_lumbridge
+model2=garden_queen_statue
+ambient=20
+mirror=yes
+shadow=no
+
