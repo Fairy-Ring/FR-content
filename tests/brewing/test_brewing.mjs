@@ -185,6 +185,13 @@ try {
     assert.equal(count(p, 'ectotoken'), tokens - 5 * yeast, 'period price is ecto-tokens');
     assert.equal(count(p, 'coins'), 100, 'Metarialus never charges coins');
   }
+  const ghostFriend = player();
+  ghostFriend.setVarBit(id('VarBitType', 'ahoy_questvar'), 8);
+  give(ghostFriend, 'pot_empty'); give(ghostFriend, 'ectotoken', 5);
+  startDialogue('[opnpc1,metarialus]', ghostFriend, brewer(ghostFriend, 'metarialus'));
+  finish(ghostFriend, [1]);
+  assert.equal(count(ghostFriend, 'ale_yeast'), 1, 'completed Ghosts Ahoy permits speech without an amulet');
+  assert.equal(count(ghostFriend, 'ectotoken'), 0);
   const apples = player(); give(apples, 'cooking_apple', 3); give(apples, 'bucket_empty');
   itemLoc(apples, 'cooking_apple', 'farming_applebarrel_empty');
   assert.equal(count(apples, 'cooking_apple'), 3, 'incomplete apple batch retained');
@@ -227,6 +234,58 @@ try {
     assert.equal(p.stats[PlayerStat.COOKING] - xp, recipes[index][4] * 10, 'empty valve cannot duplicate XP');
     saved(p);
   }
+  // A normally filled barrel must survive switching the vat to Kelda stout.
+  minute = 640 * 50000 + 1; roll = 64;
+  const mixed = player();
+  loadBatch(mixed, 1, 1);
+  minute = 640 * 50003; proc(mixed, 'brewing_update_all');
+  operate(mixed, 'vat_valve_1');
+  assert.equal(barrel(mixed, 1), 16, 'eight ordinary Asgarnian ale pints in barrel 1');
+  give(mixed, 'bucket_water', 2); give(mixed, 'barley_malt', 2);
+  itemLoc(mixed, 'bucket_water', 'brewing_vat_1'); assert.equal(vat(mixed, 1), 1);
+  itemLoc(mixed, 'barley_malt', 'brewing_vat_1'); assert.equal(vat(mixed, 1), 2);
+  // Only the prerequisite quest stage/items are seeded; brewing state is earned.
+  mixed.setVarBit(id('VarBitType', 'forget_quest'), 10);
+  give(mixed, 'kelda_hops'); give(mixed, 'ale_yeast');
+  itemLoc(mixed, 'kelda_hops', 'brewing_vat_1'); assert.equal(vat(mixed, 1), 68);
+  itemLoc(mixed, 'ale_yeast', 'brewing_vat_1'); assert.equal(vat(mixed, 1), 69);
+  const keldaClock = mixed.getVar(id('VarPlayerType', 'forget_clock'));
+  minute += 12;
+  let firstMessage = mixed.messages.length;
+  operate(mixed, 'vat_valve_1');
+  assert.deepEqual(mixed.messages.slice(firstMessage), ['Empty the barrel before turning the valve.']);
+  assert.equal(vat(mixed, 1), 71, 'refused Kelda transfer preserves the finished stout');
+  assert.equal(barrel(mixed, 1), 16, 'refused Kelda transfer preserves all eight ordinary pints');
+  assert.equal(mixed.getVar(id('VarPlayerType', 'forget_clock')), keldaClock, 'refusal preserves the Kelda clock');
+  give(mixed, 'beer_glass', 8);
+  for (let pint = 0; pint < 8; pint++) itemLoc(mixed, 'beer_glass', 'brewing_barrel_1');
+  assert.equal(count(mixed, 'asgarnian_ale'), 8, 'all eight preserved ordinary pints remain collectible');
+  assert.equal(barrel(mixed, 1), 0);
+  operate(mixed, 'vat_valve_1');
+  assert.equal(vat(mixed, 1), 0, 'Kelda stout transfers after the ordinary barrel is emptied');
+  assert.equal(barrel(mixed, 1), 3);
+  assert.equal(mixed.getVar(id('VarPlayerType', 'forget_clock')) & 0x7ffffff, 0);
+  // The opposite ownership order must use the ordinary valve's refusal message.
+  mixed.setVarBit(id('VarBitType', 'forget_quest'), 11);
+  give(mixed, 'bucket_water', 2); give(mixed, 'barley_malt', 2);
+  give(mixed, 'hammerstone_hops', 4); give(mixed, 'ale_yeast');
+  for (const ingredient of ['bucket_water', 'barley_malt', 'hammerstone_hops', 'ale_yeast'])
+    itemLoc(mixed, ingredient, 'brewing_vat_1');
+  assert.equal(vat(mixed, 1), 5);
+  minute += 640 * 3; proc(mixed, 'brewing_update_all');
+  assert.equal(vat(mixed, 1), 7, 'ordinary stout is ready while the Kelda barrel is occupied');
+  const blockedXp = mixed.stats[PlayerStat.COOKING];
+  firstMessage = mixed.messages.length;
+  operate(mixed, 'vat_valve_1');
+  assert.deepEqual(mixed.messages.slice(firstMessage), ['Empty the barrel before turning the valve.'],
+    'ordinary vat never reports that Kelda stout is still fermenting');
+  assert.equal(vat(mixed, 1), 7); assert.equal(barrel(mixed, 1), 3);
+  assert.equal(mixed.stats[PlayerStat.COOKING], blockedXp, 'refused ordinary transfer awards no XP');
+  give(mixed, 'beer_glass');
+  itemLoc(mixed, 'beer_glass', 'brewing_barrel_1');
+  assert.equal(count(mixed, 'kelda_stout'), 1); assert.equal(barrel(mixed, 1), 0);
+  operate(mixed, 'vat_valve_1');
+  assert.equal(vat(mixed, 1), 0); assert.equal(barrel(mixed, 1), 8, 'ordinary batch transfers after collecting Kelda stout');
   // Exact complete outcome weights, including both inclusive boundary edges.
   const outcomes = { bad: 0, mature: 0, normal: 0 };
   for (let r = 0; r < 128; r++) {

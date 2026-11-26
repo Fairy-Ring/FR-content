@@ -51,7 +51,7 @@ inv_setslot(inv, last_slot, bucket_empty, 1);
 mes("You empty the bucket of apple mush.");
 
 [opnpc1,metarialus]
-if (inv_total(worn, amulet_of_ghostspeak) = 0 & inv_total(worn, amulet_of_ghostspeak_enchanted) = 0) {
+if (~ahoy_can_speak = false) {
     mes("You cannot understand the ghost.");
     return;
 }
