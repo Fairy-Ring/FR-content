@@ -1196,12 +1196,7 @@ transmit=yes
 transmit=yes
 scope=perm
 
-[templetrek_main_var]
-transmit=yes
-
 [varp701_unused]
-
-[templetrek_temp_var]
 
 [mcannon_world_basevar]
 

@@ -1,0 +1,719 @@
+// UNKNOWN: server combat strengths, encounter credits, companion food healing and
+// Abidor's 10% boosts are engineering defaults where the 377 cache has no values.
+// CANDIDATE: Tip.It 2007-03-28 traveller food list; the 377 object identities below
+// decide which listed foods exist in this build. Slices are CANDIDATE same-food forms.
+
+[proc,templetrek_combat_actor]()(boolean)
+if (npc_type = templetrek_vampire_1 | npc_type = templetrek_vampire_2 | npc_type = templetrek_vampire_3 |
+    npc_type = templetrek_ghast_invis_1 | npc_type = templetrek_ghast_invis_2 | npc_type = templetrek_ghast_invis_3 |
+    npc_type = templetrek_ghast_vis_1 | npc_type = templetrek_ghast_vis_2 | npc_type = templetrek_ghast_vis_3 |
+    npc_type = templetrek_shade_1 | npc_type = templetrek_shade_2 | npc_type = templetrek_shade_3 |
+    npc_type = templetrek_snake_1 | npc_type = templetrek_snake_2 | npc_type = templetrek_snake_3 |
+    npc_type = templetrek_giantsnail_1 | npc_type = templetrek_giantsnail_2 | npc_type = templetrek_giantsnail_3 |
+    npc_type = templetrek_tentacle_arm | npc_type = templetrek_tentacle_head |
+    npc_type = templetrek_zombie) return(true);
+return(false);
+
+[proc,templetrek_hostile_owned]()(boolean)
+if (~templetrek_combat_actor = false) return(false);
+if (%npc_attacking_uid ! uid | %npc_aggressive_player ! uid) return(false);
+if (%templetrek_temp_var_25_25 = 0 | ~templetrek_owned = false) return(false);
+if (%npc_int ! %templetrek_last_event) return(false);
+return(true);
+
+[proc,templetrek_silver_weapon]()(boolean)
+// CANDIDATE original-cache entries from the guide's silver-weapon list.
+if (inv_total(worn, silver_sickle_blessed) > 0 | inv_total(worn, dagger_wolfbane) > 0) return(true);
+if (~myreque2_rod_next(inv_getobj(worn, ^wearpos_rhand)) ! null) return(true);
+return(false);
+
+[proc,templetrek_tentacle_arms_alive]()(boolean)
+def_npc_uid $head = npc_uid;
+def_coord $center = npc_coord;
+def_boolean $alive = false;
+npc_findall($center, templetrek_tentacle_arm, 64, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & %npc_aggressive_player = uid & %npc_int = 6 & npc_stat(hitpoints) > 0) $alive = true;
+}
+if (npc_finduid($head) = true) return($alive);
+return(false);
+
+[proc,templetrek_combat_attackable]()(boolean)
+if (~templetrek_hostile_owned = false) return(false);
+if (npc_type = templetrek_ghast_invis_1 | npc_type = templetrek_ghast_invis_2 | npc_type = templetrek_ghast_invis_3) return(false);
+if (npc_type = templetrek_vampire_1 | npc_type = templetrek_vampire_2 | npc_type = templetrek_vampire_3) {
+    if (~templetrek_silver_weapon = false) return(false);
+}
+if (npc_type = templetrek_tentacle_head & ~templetrek_tentacle_arms_alive = true) return(false);
+return(true);
+
+// Called only by the approved shared cap branch for the exact cache forms.
+[proc,templetrek_max_dealt](int $maxhit, int $spell)(int)
+if (~templetrek_hostile_owned = false | ~templetrek_combat_attackable = false) return(0);
+if (npc_type = templetrek_vampire_1 | npc_type = templetrek_vampire_2 | npc_type = templetrek_vampire_3) {
+    if ($spell ! 0 | ~templetrek_silver_weapon = false) return(0);
+}
+return(min($maxhit, npc_param(max_dealt)));
+
+[proc,templetrek_monster_count]()(int)
+if (%templetrek_last_event < 1 | %templetrek_last_event > 6) return(0);
+if (%templetrek_last_event = 6) return(5);
+if (%templetrek_temp_var_22_24 <= 2) return(3);
+if (%templetrek_temp_var_22_24 <= 4) return(4);
+if (%templetrek_temp_var_22_24 <= 6) return(5);
+return(0);
+
+[proc,templetrek_hostile_type](int $event, int $route)(npc)
+if ($event = 1) {
+    if ($route = 1) return(templetrek_ghast_invis_1);
+    if ($route = 2) return(templetrek_ghast_invis_2);
+    if ($route = 3) return(templetrek_ghast_invis_3);
+}
+if ($event = 2) {
+    if ($route = 1) return(templetrek_vampire_1);
+    if ($route = 2) return(templetrek_vampire_2);
+    if ($route = 3) return(templetrek_vampire_3);
+}
+if ($event = 3) {
+    if ($route = 1) return(templetrek_shade_1);
+    if ($route = 2) return(templetrek_shade_2);
+    if ($route = 3) return(templetrek_shade_3);
+}
+if ($event = 4) {
+    if ($route = 1) return(templetrek_snake_1);
+    if ($route = 2) return(templetrek_snake_2);
+    if ($route = 3) return(templetrek_snake_3);
+}
+if ($event = 5) {
+    if ($route = 1) return(templetrek_giantsnail_1);
+    if ($route = 2) return(templetrek_giantsnail_2);
+    if ($route = 3) return(templetrek_giantsnail_3);
+}
+return(null);
+
+[proc,templetrek_combat_spawn]
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0) return;
+def_int $event = %templetrek_last_event;
+if ($event < 1 | $event > 6 | %templetrek_temp_var_13_18 > 0) return;
+def_int $count = ~templetrek_monster_count;
+if ($count <= 0) return;
+if ($event = 6) {
+    ~templetrek_tentacle_spawn($count);
+    return;
+}
+def_npc $type = ~templetrek_hostile_type($event, %templetrek_temp_var_11_12);
+if ($type = null) return;
+def_coord $center = ~templetrek_room_coord(0_31_78_15_46);
+if ($event = 3) $center = ~templetrek_room_coord(0_33_78_31_22);
+def_int $spawned = 0;
+def_int $index = 0;
+while ($index < $count) {
+    def_coord $tile = map_findsquare($center, 1, 4, ^map_findsquare_lineofwalk);
+    if ($tile = null) $tile = $center;
+    def_boolean $target_companion = false;
+    if ($index = 0) $target_companion = true;
+    if (~templetrek_spawn_hostile($type, $tile, $event, $target_companion) = false) return;
+    $spawned = add($spawned, 1);
+    $index = add($index, 1);
+}
+%templetrek_temp_var_13_18 = $spawned;
+
+[proc,templetrek_tentacle_spawn](int $count)
+def_coord $head_tile = ~templetrek_room_coord(2_32_78_15_43);
+if (~templetrek_spawn_hostile(templetrek_tentacle_head, $head_tile, 6, false) = false) return;
+def_int $spawned = 1;
+def_int $arm = 1;
+while ($arm < $count) {
+    def_coord $arm_tile = ~templetrek_room_coord(2_32_78_14_43);
+    if ($arm = 2) $arm_tile = ~templetrek_room_coord(2_32_78_15_42);
+    if ($arm = 3) $arm_tile = ~templetrek_room_coord(2_32_78_15_44);
+    if ($arm = 4) $arm_tile = ~templetrek_room_coord(2_32_78_14_44);
+    def_boolean $target_companion = false;
+    if ($arm = 1) $target_companion = true;
+    if (~templetrek_spawn_hostile(templetrek_tentacle_arm, $arm_tile, 6, $target_companion) = false) return;
+    $spawned = add($spawned, 1);
+    $arm = add($arm, 1);
+}
+%templetrek_temp_var_13_18 = $spawned;
+
+[proc,templetrek_spawn_hostile](npc $type, coord $tile, int $event, boolean $target_companion)(boolean)
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | $tile = null) return(false);
+npc_add($tile, $type, ^max_32bit_int);
+def_npc_uid $spawned = npc_uid;
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_int = $event;
+%npc_int2 = 0;
+%npc_action_delay = map_clock;
+npc_settimer(1);
+npc_setmode(opplayer2);
+if ($target_companion = true) {
+    def_npc_uid $companion = ~templetrek_companion_uid;
+    if ($companion ! null & npc_finduid($spawned) = true) {
+        if (.npc_finduid($companion) = true) npc_setmode(opnpc2);
+    }
+}
+return(true);
+
+// A bridge ambusher is not one of the six scored combat encounters. Its original
+// death_drop parameter is the cached iron axe; npc_default_death owns the drop.
+[proc,templetrek_bridge_zombie_spawn]
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | %templetrek_last_event ! 7) return;
+def_coord $tile = ~templetrek_room_coord(0_32_78_36_44);
+npc_findall($tile, templetrek_zombie, 64, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & %npc_aggressive_player = uid & %npc_int = 7) return;
+}
+~templetrek_spawn_hostile(templetrek_zombie, $tile, 7, false);
+
+// Native multi-form followers are spawned as their wrapper; all user operations
+// bind to the six visible forms, which are what the client dispatches.
+[proc,templetrek_companion_type]()(npc)
+if (%templetrek_temp_var_22_24 = 1) return(templetrek_multi_retired_soldier_easy);
+if (%templetrek_temp_var_22_24 = 2) return(templetrek_multi_retired_man_easy);
+if (%templetrek_temp_var_22_24 = 3) return(templetrek_multi_woman_med);
+if (%templetrek_temp_var_22_24 = 4) return(templetrek_multi_man_med);
+if (%templetrek_temp_var_22_24 = 5) return(templetrek_multi_oldman_hard);
+if (%templetrek_temp_var_22_24 = 6) return(templetrek_multi_child_hard);
+return(null);
+
+[proc,templetrek_companion_child_type]()(npc)
+if (%templetrek_temp_var_22_24 = 1) return(templetrek_retired_soldier_easy);
+if (%templetrek_temp_var_22_24 = 2) return(templetrek_retired_man_easy);
+if (%templetrek_temp_var_22_24 = 3) return(templetrek_woman_med);
+if (%templetrek_temp_var_22_24 = 4) return(templetrek_man_med);
+if (%templetrek_temp_var_22_24 = 5) return(templetrek_oldman_hard);
+if (%templetrek_temp_var_22_24 = 6) return(templetrek_child_hard);
+return(null);
+
+[proc,templetrek_companion_owned]()(boolean)
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0) return(false);
+if (%npc_attacking_uid ! uid | %npc_aggressive_player ! uid) return(false);
+def_npc $wrapper = ~templetrek_companion_type;
+def_npc $child = ~templetrek_companion_child_type;
+if (npc_type ! $wrapper & npc_type ! $child) return(false);
+return(true);
+
+[proc,templetrek_companion_uid]()(npc_uid)
+def_npc $type = ~templetrek_companion_type;
+if ($type = null) return(null);
+npc_findall(coord, $type, 64, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & %npc_aggressive_player = uid) return(npc_uid);
+}
+return(null);
+
+[proc,templetrek_companion_spawn](coord $tile)
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | $tile = null) return;
+if (region_findbycoord($tile) = false) return;
+if (%templetrek_temp_var_19_21 = 0) %templetrek_multi_npc_food_give = 0;
+def_npc_uid $existing = ~templetrek_companion_uid;
+if ($existing ! null & npc_finduid($existing) = true) {
+    if (~templetrek_companion_owned = true) {
+        npc_setmode(playerfollow);
+        return;
+    }
+}
+def_npc $type = ~templetrek_companion_type;
+if ($type = null) return;
+npc_add($tile, $type, ^max_32bit_int);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_int = 0;
+%npc_int2 = 0;
+def_int $max = npc_basestat(hitpoints);
+def_int $health = %templetrek_temp_var_0_6;
+if ($health <= 0 | $health > $max) $health = $max;
+if ($health < $max) npc_statsub(hitpoints, sub($max, $health), 0);
+%templetrek_temp_var_0_6 = npc_stat(hitpoints);
+npc_settimer(1);
+npc_setmode(playerfollow);
+
+[proc,templetrek_companion_sync]
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0) return;
+def_npc_uid $companion = ~templetrek_companion_uid;
+if ($companion = null | npc_finduid($companion) = false) return;
+if (~templetrek_companion_owned = false) return;
+%templetrek_temp_var_0_6 = min(npc_stat(hitpoints), npc_basestat(hitpoints));
+
+[opnpcu,templetrek_child_hard] ~templetrek_companion_feed;
+[opnpcu,templetrek_oldman_hard] ~templetrek_companion_feed;
+[opnpcu,templetrek_woman_med] ~templetrek_companion_feed;
+[opnpcu,templetrek_man_med] ~templetrek_companion_feed;
+[opnpcu,templetrek_retired_man_easy] ~templetrek_companion_feed;
+[opnpcu,templetrek_retired_soldier_easy] ~templetrek_companion_feed;
+[proc,templetrek_companion_feed]
+if (~templetrek_companion_owned = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_obj $food = last_useitem;
+if (~templetrek_food_allowed($food) = false | inv_total(inv, $food) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%templetrek_multi_npc_food_give >= 15) {
+    mes("I cannot carry any more food.");
+    return;
+}
+inv_del(inv, $food, 1);
+%templetrek_multi_npc_food_give = add(%templetrek_multi_npc_food_give, 1);
+// UNKNOWN functional feedback; 377 Temple Trekking dialogue for feeding is absent.
+mes("Thank you. I will carry this with me.");
+
+[proc,templetrek_food_allowed](obj $food)(boolean)
+if ($food = snail_corpse_cooked1 | $food = snail_corpse_cooked2 | $food = snail_corpse_cooked3 |
+    $food = salmon | $food = stew | $food = mort_slimey_eel_cooked | $food = cooked_meat |
+    $food = tuna | $food = hundred_pirate_fishcake | $food = lobster | $food = bass |
+    $food = redberry_pie | $food = apple_pie | $food = garden_pie | $food = fish_pie |
+    $food = cake | $food = chocolate_cake | $food = sweetcorn_cooked | $food = potato_butter |
+    $food = half_a_redberry_pie | $food = half_an_apple_pie | $food = half_garden_pie | $food = half_fish_pie |
+    $food = partial_cake | $food = cake_slice | $food = partial_chocolate_cake | $food = chocolate_slice) return(true);
+return(false);
+
+// Every accepted food item is one persisted supply; the exact NPC heal amount
+// is not quantified by the source. Ten HP is the UNKNOWN engineering fallback.
+[proc,templetrek_companion_eat]
+if (.npc_stat(hitpoints) <= 0 | calc(.npc_stat(hitpoints) * 2) > .npc_basestat(hitpoints)) return;
+if (p_finduid(%npc_attacking_uid) = false) return;
+if (%npc_attacking_uid ! uid | %npc_aggressive_player ! uid | %templetrek_temp_var_25_25 = 0 | %templetrek_multi_npc_food_give <= 0) return;
+%templetrek_multi_npc_food_give = sub(%templetrek_multi_npc_food_give, 1);
+.npc_statheal(hitpoints, 10, 0);
+%templetrek_temp_var_0_6 = .npc_stat(hitpoints);
+
+[ai_timer,templetrek_multi_child_hard] ~templetrek_companion_timer;
+[ai_timer,templetrek_child_hard] ~templetrek_companion_timer;
+[ai_timer,templetrek_multi_oldman_hard] ~templetrek_companion_timer;
+[ai_timer,templetrek_oldman_hard] ~templetrek_companion_timer;
+[ai_timer,templetrek_multi_woman_med] ~templetrek_companion_timer;
+[ai_timer,templetrek_woman_med] ~templetrek_companion_timer;
+[ai_timer,templetrek_multi_man_med] ~templetrek_companion_timer;
+[ai_timer,templetrek_man_med] ~templetrek_companion_timer;
+[ai_timer,templetrek_multi_retired_man_easy] ~templetrek_companion_timer;
+[ai_timer,templetrek_retired_man_easy] ~templetrek_companion_timer;
+[ai_timer,templetrek_multi_retired_soldier_easy] ~templetrek_companion_timer;
+[ai_timer,templetrek_retired_soldier_easy] ~templetrek_companion_timer;
+[proc,templetrek_companion_timer]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%npc_attacking_uid ! uid | %npc_aggressive_player ! uid | %templetrek_temp_var_25_25 = 0 | ~templetrek_owned = false) {
+    npc_del;
+    return;
+}
+if (npc_getmode ! opnpc2) npc_setmode(playerfollow);
+
+[ai_queue3,templetrek_multi_child_hard] ~templetrek_companion_death;
+[ai_queue3,templetrek_child_hard] ~templetrek_companion_death;
+[ai_queue3,templetrek_multi_oldman_hard] ~templetrek_companion_death;
+[ai_queue3,templetrek_oldman_hard] ~templetrek_companion_death;
+[ai_queue3,templetrek_multi_woman_med] ~templetrek_companion_death;
+[ai_queue3,templetrek_woman_med] ~templetrek_companion_death;
+[ai_queue3,templetrek_multi_man_med] ~templetrek_companion_death;
+[ai_queue3,templetrek_man_med] ~templetrek_companion_death;
+[ai_queue3,templetrek_multi_retired_man_easy] ~templetrek_companion_death;
+[ai_queue3,templetrek_retired_man_easy] ~templetrek_companion_death;
+[ai_queue3,templetrek_multi_retired_soldier_easy] ~templetrek_companion_death;
+[ai_queue3,templetrek_retired_soldier_easy] ~templetrek_companion_death;
+[proc,templetrek_companion_death]
+def_player_uid $owner = %npc_attacking_uid;
+if (finduid($owner) = true) {
+    if (uid = $owner & %npc_aggressive_player = $owner & %templetrek_temp_var_25_25 = 1 & ~templetrek_owned = true) {
+        queue(templetrek_companion_failed, 0, 0);
+    }
+}
+~npc_default_death;
+
+[queue,templetrek_companion_failed]
+if (~templetrek_owned = true & %templetrek_temp_var_25_25 = 1) ~templetrek_leave(0);
+
+[ai_timer,templetrek_vampire_1] ~templetrek_hostile_timer;
+[ai_timer,templetrek_vampire_2] ~templetrek_hostile_timer;
+[ai_timer,templetrek_vampire_3] ~templetrek_hostile_timer;
+[ai_timer,templetrek_ghast_invis_1] ~templetrek_hostile_timer;
+[ai_timer,templetrek_ghast_invis_2] ~templetrek_hostile_timer;
+[ai_timer,templetrek_ghast_invis_3] ~templetrek_hostile_timer;
+[ai_timer,templetrek_ghast_vis_1] ~templetrek_hostile_timer;
+[ai_timer,templetrek_ghast_vis_2] ~templetrek_hostile_timer;
+[ai_timer,templetrek_ghast_vis_3] ~templetrek_hostile_timer;
+[ai_timer,templetrek_shade_1] ~templetrek_hostile_timer;
+[ai_timer,templetrek_shade_2] ~templetrek_hostile_timer;
+[ai_timer,templetrek_shade_3] ~templetrek_hostile_timer;
+[ai_timer,templetrek_snake_1] ~templetrek_hostile_timer;
+[ai_timer,templetrek_snake_2] ~templetrek_hostile_timer;
+[ai_timer,templetrek_snake_3] ~templetrek_hostile_timer;
+[ai_timer,templetrek_giantsnail_1] ~templetrek_hostile_timer;
+[ai_timer,templetrek_giantsnail_2] ~templetrek_hostile_timer;
+[ai_timer,templetrek_giantsnail_3] ~templetrek_hostile_timer;
+[ai_timer,templetrek_tentacle_arm] ~templetrek_hostile_timer;
+[ai_timer,templetrek_tentacle_head] ~templetrek_hostile_timer;
+[ai_timer,templetrek_zombie] ~templetrek_hostile_timer;
+[proc,templetrek_hostile_timer]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%npc_attacking_uid ! uid | %npc_aggressive_player ! uid | %templetrek_temp_var_25_25 = 0 | %npc_int ! %templetrek_last_event | ~templetrek_owned = false) npc_del;
+
+[ai_queue1,templetrek_vampire_1] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_vampire_2] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_vampire_3] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_ghast_vis_1] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_ghast_vis_2] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_ghast_vis_3] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_shade_1] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_shade_2] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_shade_3] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_snake_1] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_snake_2] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_snake_3] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_giantsnail_1] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_giantsnail_2] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_giantsnail_3] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_tentacle_arm] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_tentacle_head] ~templetrek_hostile_retaliate;
+[ai_queue1,templetrek_zombie] ~templetrek_hostile_retaliate;
+[proc,templetrek_hostile_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~templetrek_combat_attackable = false) return;
+~npc_default_retaliate;
+
+[opnpc2,templetrek_vampire_1] @templetrek_player_attack;
+[opnpc2,templetrek_vampire_2] @templetrek_player_attack;
+[opnpc2,templetrek_vampire_3] @templetrek_player_attack;
+[opnpc2,templetrek_ghast_vis_1] @templetrek_player_attack;
+[opnpc2,templetrek_ghast_vis_2] @templetrek_player_attack;
+[opnpc2,templetrek_ghast_vis_3] @templetrek_player_attack;
+[opnpc2,templetrek_shade_1] @templetrek_player_attack;
+[opnpc2,templetrek_shade_2] @templetrek_player_attack;
+[opnpc2,templetrek_shade_3] @templetrek_player_attack;
+[opnpc2,templetrek_snake_1] @templetrek_player_attack;
+[opnpc2,templetrek_snake_2] @templetrek_player_attack;
+[opnpc2,templetrek_snake_3] @templetrek_player_attack;
+[opnpc2,templetrek_giantsnail_1] @templetrek_player_attack;
+[opnpc2,templetrek_giantsnail_2] @templetrek_player_attack;
+[opnpc2,templetrek_giantsnail_3] @templetrek_player_attack;
+[opnpc2,templetrek_tentacle_arm] @templetrek_player_attack;
+[opnpc2,templetrek_tentacle_head] @templetrek_player_attack;
+[opnpc2,templetrek_zombie] @templetrek_player_attack;
+[label,templetrek_player_attack]
+if (~templetrek_combat_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,templetrek_vampire_1] @templetrek_player_magic_attack;
+[apnpc2,templetrek_vampire_2] @templetrek_player_magic_attack;
+[apnpc2,templetrek_vampire_3] @templetrek_player_magic_attack;
+[apnpc2,templetrek_ghast_vis_1] @templetrek_player_magic_attack;
+[apnpc2,templetrek_ghast_vis_2] @templetrek_player_magic_attack;
+[apnpc2,templetrek_ghast_vis_3] @templetrek_player_magic_attack;
+[apnpc2,templetrek_shade_1] @templetrek_player_magic_attack;
+[apnpc2,templetrek_shade_2] @templetrek_player_magic_attack;
+[apnpc2,templetrek_shade_3] @templetrek_player_magic_attack;
+[apnpc2,templetrek_snake_1] @templetrek_player_magic_attack;
+[apnpc2,templetrek_snake_2] @templetrek_player_magic_attack;
+[apnpc2,templetrek_snake_3] @templetrek_player_magic_attack;
+[apnpc2,templetrek_giantsnail_1] @templetrek_player_magic_attack;
+[apnpc2,templetrek_giantsnail_2] @templetrek_player_magic_attack;
+[apnpc2,templetrek_giantsnail_3] @templetrek_player_magic_attack;
+[apnpc2,templetrek_tentacle_arm] @templetrek_player_magic_attack;
+[apnpc2,templetrek_tentacle_head] @templetrek_player_magic_attack;
+[apnpc2,templetrek_zombie] @templetrek_player_magic_attack;
+[label,templetrek_player_magic_attack]
+if (~templetrek_combat_attackable = false) return;
+if (npc_type = templetrek_vampire_1 | npc_type = templetrek_vampire_2 | npc_type = templetrek_vampire_3) return;
+@player_combat_start_ap;
+
+// Native NPC-to-NPC melee follows myreque2_escort's owner-checked pattern.
+[ai_opnpc2,templetrek_vampire_1] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_vampire_2] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_vampire_3] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_ghast_vis_1] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_ghast_vis_2] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_ghast_vis_3] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_shade_1] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_shade_2] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_shade_3] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_snake_1] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_snake_2] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_snake_3] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_giantsnail_1] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_giantsnail_2] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_giantsnail_3] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_tentacle_arm] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_tentacle_head] ~templetrek_hostile_companion_attack;
+[ai_opnpc2,templetrek_zombie] ~templetrek_hostile_companion_attack;
+[proc,templetrek_hostile_companion_attack]
+if (finduid(%npc_attacking_uid) = false) return;
+if (npc_getmode ! opnpc2 | ~templetrek_hostile_owned = false) return;
+if (.npc_type ! ~templetrek_companion_child_type & .npc_type ! ~templetrek_companion_type) return;
+if (.%npc_attacking_uid ! uid | .%npc_aggressive_player ! uid) return;
+if (npc_stat(hitpoints) <= 0 | .npc_stat(hitpoints) <= 0 | %npc_action_delay > map_clock) return;
+def_int $style = npc_param(damagetype);
+def_int $attack_roll = ~npc_melee_attack_roll_typeless;
+def_int $defence_roll = ~templetrek_companion_defence_roll($style);
+def_int $maxhit = ~npc_melee_maxhit;
+def_int $damage = 0;
+if (randominc($attack_roll) > randominc($defence_roll)) $damage = randominc($maxhit);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~templetrek_apply_companion_hit($damage);
+~templetrek_companion_eat;
+
+[proc,templetrek_companion_defence_roll](int $style)(int)
+def_int $effective_defence = ~combat_effective_stat(.npc_stat(defence), 100);
+$effective_defence = add($effective_defence, 9);
+return(~combat_stat($effective_defence, ~templetrek_companion_defence_bonus($style)));
+
+[proc,templetrek_companion_defence_bonus](int $style)(int)
+if ($style = ^stab_style) return(nc_param(.npc_type, stabdefence));
+if ($style = ^slash_style) return(nc_param(.npc_type, slashdefence));
+if ($style = ^crush_style) return(nc_param(.npc_type, crushdefence));
+if ($style = ^ranged_style) return(nc_param(.npc_type, rangedefence));
+if ($style = ^magic_style) return(nc_param(.npc_type, magicdefence));
+return(nc_param(.npc_type, slashdefence));
+
+[proc,templetrek_apply_companion_hit](int $damage)
+if ($damage <= 0) {
+    .npc_damage(^hitmark_block, 0);
+    return;
+}
+.npc_damage(^hitmark_damage, $damage);
+if (.npc_stat(hitpoints) = 0) .npc_queue(3, 0, 0);
+
+[ai_queue3,templetrek_vampire_1] ~templetrek_combat_death;
+[ai_queue3,templetrek_vampire_2] ~templetrek_combat_death;
+[ai_queue3,templetrek_vampire_3] ~templetrek_combat_death;
+[ai_queue3,templetrek_ghast_invis_1] ~templetrek_combat_death;
+[ai_queue3,templetrek_ghast_invis_2] ~templetrek_combat_death;
+[ai_queue3,templetrek_ghast_invis_3] ~templetrek_combat_death;
+[ai_queue3,templetrek_ghast_vis_1] ~templetrek_combat_death;
+[ai_queue3,templetrek_ghast_vis_2] ~templetrek_combat_death;
+[ai_queue3,templetrek_ghast_vis_3] ~templetrek_combat_death;
+[ai_queue3,templetrek_shade_1] ~templetrek_combat_death;
+[ai_queue3,templetrek_shade_2] ~templetrek_combat_death;
+[ai_queue3,templetrek_shade_3] ~templetrek_combat_death;
+[ai_queue3,templetrek_snake_1] ~templetrek_combat_death;
+[ai_queue3,templetrek_snake_2] ~templetrek_combat_death;
+[ai_queue3,templetrek_snake_3] ~templetrek_combat_death;
+[ai_queue3,templetrek_giantsnail_1] ~templetrek_combat_death;
+[ai_queue3,templetrek_giantsnail_2] ~templetrek_combat_death;
+[ai_queue3,templetrek_giantsnail_3] ~templetrek_combat_death;
+[ai_queue3,templetrek_tentacle_arm] ~templetrek_combat_death;
+[ai_queue3,templetrek_tentacle_head] ~templetrek_combat_death;
+[ai_queue3,templetrek_zombie] ~templetrek_combat_death;
+[proc,templetrek_combat_death]
+if (%npc_int2 = 1) {
+    ~npc_default_death;
+    return;
+}
+%npc_int2 = 1;
+def_int $event = %npc_int;
+def_npc $dead_type = npc_type;
+def_boolean $hero = false;
+if (npc_findhero = ^true & uid = %npc_aggressive_player) $hero = true;
+def_player_uid $owner = %npc_attacking_uid;
+if (finduid($owner) = true) {
+    if (uid = $owner & %npc_aggressive_player = $owner & %templetrek_temp_var_25_25 = 1 & ~templetrek_owned = true & %templetrek_last_event = $event) {
+        if ($event >= 1 & $event <= 6) queue(templetrek_combat_decrement, 0, $event);
+        if ($event = 7 & $hero = true) queue(templetrek_zombie_credit, 0, 0);
+        if ($hero = true & ($event >= 1 & $event <= 6)) queue(templetrek_combat_credit, 0, $event);
+        if ($hero = true & $event = 1 & ($dead_type = templetrek_ghast_vis_1 | $dead_type = templetrek_ghast_vis_2 | $dead_type = templetrek_ghast_vis_3)) queue(templetrek_ghast_prayer_reward, 0, %templetrek_temp_var_11_12);
+    }
+}
+if ($dead_type = templetrek_snake_1 | $dead_type = templetrek_snake_2 | $dead_type = templetrek_snake_3) {
+    // CANDIDATE original Skin corpse and 2007 guide; UNKNOWN 100-cycle lifetime.
+    npc_changetype_keepall(templetrek_snake_dead, 100);
+    npc_setmode(none);
+    npc_settimer(0);
+    return;
+}
+~npc_default_death;
+
+[opnpc2,templetrek_snake_dead] @templetrek_skin_snake;
+[opnpcu,templetrek_snake_dead]
+if (last_useitem ! knife) { ~displaymessage(^dm_default); return; }
+@templetrek_skin_snake;
+[label,templetrek_skin_snake]
+if (~templetrek_owned = false | %npc_attacking_uid ! uid | %npc_aggressive_player ! uid) return;
+if (inv_total(inv, knife) = 0) { mes("You need a knife to skin the snake."); return; }
+// UNKNOWN full-bag edge: retain the carcass until all five possible hides fit.
+if (inv_freespace(inv) < 5) { mes("You need five free inventory spaces."); return; }
+inv_add(inv, templetrek_swamp_snake_hide, ~random_range(2, 5));
+npc_del;
+
+[queue,templetrek_combat_decrement](int $event)
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | %templetrek_last_event ! $event | %templetrek_temp_var_13_18 <= 0) return;
+%templetrek_temp_var_13_18 = sub(%templetrek_temp_var_13_18, 1);
+
+// UNKNOWN engineering score: one hundred points per owner-earned kill.
+[queue,templetrek_combat_credit](int $event)
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | %templetrek_last_event ! $event) return;
+~templetrek_credit(100);
+
+[queue,templetrek_zombie_credit]
+if (~templetrek_owned = true & %templetrek_temp_var_25_25 = 1 & %templetrek_last_event = 7) ~templetrek_credit(100);
+
+// CANDIDATE: Tip.It 2007-03-28 ghast prayer awards; stat_advance uses tenths.
+[queue,templetrek_ghast_prayer_reward](int $route)
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | %templetrek_last_event ! 1 | %templetrek_temp_var_11_12 ! $route) return;
+if ($route = 1) stat_advance(prayer, 800);
+if ($route = 2) stat_advance(prayer, 1100);
+if ($route = 3) stat_advance(prayer, 1400);
+
+[ai_opplayer2,templetrek_ghast_invis_1] ~templetrek_ghast_attack;
+[ai_opplayer2,templetrek_ghast_invis_2] ~templetrek_ghast_attack;
+[ai_opplayer2,templetrek_ghast_invis_3] ~templetrek_ghast_attack;
+[proc,templetrek_ghast_attack]
+if (npc_getmode ! opplayer2 | ~templetrek_hostile_owned = false | %templetrek_last_event ! 1) {
+    npc_setmode(null);
+    return;
+}
+if (%death = ^true) {
+    npc_setmode(null);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+if (add(%ghast_delay, 26) > map_clock) return;
+if_close;
+def_npc $visible = templetrek_ghast_vis_1;
+if (npc_type = templetrek_ghast_invis_2) $visible = templetrek_ghast_vis_2;
+if (npc_type = templetrek_ghast_invis_3) $visible = templetrek_ghast_vis_3;
+if (inv_total(inv, druid_pouch) > 0) ~templetrek_ghast_reveal($visible);
+npc_anim(inv_ghast_attack, 0);
+sound_synth(ghast_attack, 1, 0);
+def_int $rand = random(10);
+%npc_action_delay = add(map_clock, 4);
+%ghast_delay = map_clock;
+if ($rand < 3) {
+    npc_say("Oouuaarrr!");
+    if (~ghast_check_food = false) {
+        mes("A supernatural force draws energy from you.");
+        queue(damage_player, 0, ~random_range(1, 3));
+    }
+} else {
+    npc_say("OOooooohhh");
+    mes("An attacking Ghast just misses you.");
+}
+npc_setmode(null);
+
+[ai_opplayer2,templetrek_ghast_vis_1] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_ghast_vis_2] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_ghast_vis_3] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_vampire_1] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_vampire_2] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_vampire_3] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_shade_1] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_shade_2] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_shade_3] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_snake_1] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_snake_2] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_snake_3] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_giantsnail_1] npc_setmode(applayer2);
+[ai_opplayer2,templetrek_giantsnail_2] npc_setmode(applayer2);
+[ai_opplayer2,templetrek_giantsnail_3] npc_setmode(applayer2);
+[ai_applayer2,templetrek_giantsnail_1] ~templetrek_snail_attack_player;
+[ai_applayer2,templetrek_giantsnail_2] ~templetrek_snail_attack_player;
+[ai_applayer2,templetrek_giantsnail_3] ~templetrek_snail_attack_player;
+[ai_opplayer2,templetrek_tentacle_arm] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_tentacle_head] ~templetrek_hostile_attack_player;
+[ai_opplayer2,templetrek_zombie] ~templetrek_hostile_attack_player;
+// CANDIDATE guide: ranged attacks, ranged prayer and snelm protection.
+// Original snail projectile assets; UNKNOWN flight constants reuse ordinary snails.
+[proc,templetrek_snail_attack_player]
+if (~templetrek_hostile_owned = false) { npc_setmode(null); return; }
+if (~npc_default_attack_ready = false) return;
+def_int $attack_roll = ~npc_ranged_attack_roll;
+def_int $defence_roll = ~player_defence_roll_specific(^ranged_style);
+def_int $damage = 0;
+if (~npc_attack_accuracy($attack_roll, $defence_roll) = true) $damage = ~snelm_reduction(randominc(~npc_ranged_maxhit));
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~player_projectile(npc_coord, coord, uid, trek_snail_acid_travel, 43, 31, 20, 16, 26, 56, 10);
+~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
+
+[proc,templetrek_hostile_attack_player]
+if (~templetrek_hostile_owned = false) {
+    npc_setmode(null);
+    return;
+}
+~npc_default_attack;
+
+[opnpcu,templetrek_ghast_invis_1] ~templetrek_ghast_use_pouch(templetrek_ghast_vis_1);
+[opnpcu,templetrek_ghast_invis_2] ~templetrek_ghast_use_pouch(templetrek_ghast_vis_2);
+[opnpcu,templetrek_ghast_invis_3] ~templetrek_ghast_use_pouch(templetrek_ghast_vis_3);
+[proc,templetrek_ghast_use_pouch](npc $visible)
+if (last_useitem ! druid_pouch | inv_total(inv, druid_pouch) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~templetrek_hostile_owned = false | %templetrek_last_event ! 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~player_in_combat_check = false) return;
+~templetrek_ghast_reveal($visible);
+
+[proc,templetrek_ghast_reveal](npc $visible)
+mes("The druid pouch makes the Ghast visible.");
+inv_del(inv, druid_pouch, 1);
+if (inv_total(inv, druid_pouch) = 0) {
+    mes("You have nothing left in your druid pouch!");
+    inv_add(inv, druid_pouch_empty, 1);
+}
+spotanim_npc(druidpouch_impact, 124, 90);
+~npc_projectile(coord, npc_uid, druid_shooting_star, 43, 31, 51, 16, -5, 64, 10);
+npc_delay(1);
+npc_changetype_keepall($visible, 500);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+npc_setmode(opplayer2);
+
+[proc,templetrek_abidor_spawn]
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | %templetrek_last_event ! 10) return;
+def_coord $center = ~templetrek_room_coord(0_31_78_15_46);
+npc_findall($center, templetrek_good_samaritan, 64, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & %npc_aggressive_player = uid & %npc_int = 10) return;
+}
+def_coord $tile = map_findsquare($center, 1, 3, ^map_findsquare_lineofwalk);
+if ($tile = null) $tile = $center;
+npc_add($tile, templetrek_good_samaritan, ^max_32bit_int);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_int = 10;
+%npc_int2 = 0;
+npc_setmode(none);
+npc_settimer(1);
+
+[opnpc1,templetrek_good_samaritan] ~templetrek_abidor_talk;
+[proc,templetrek_abidor_talk]
+if (~templetrek_owned = false | %templetrek_temp_var_25_25 = 0 | %templetrek_last_event ! 10 |
+    %npc_attacking_uid ! uid | %npc_aggressive_player ! uid | %npc_int ! 10) return;
+if (%npc_int2 = 1) {
+    mes("Abidor has already treated your wounds.");
+    return;
+}
+def_npc_uid $abidor = npc_uid;
+def_npc_uid $companion = ~templetrek_companion_uid;
+if ($companion ! null & npc_finduid($companion) = true & ~templetrek_companion_owned = true) {
+    npc_statheal(hitpoints, 100, 0);
+    %templetrek_temp_var_0_6 = npc_stat(hitpoints);
+}
+// UNKNOWN engineering boost: restore first, then add 10% of each base stat.
+~stat_reset(hitpoints);
+~stat_reset(defence);
+stat_boost(hitpoints, 0, 10);
+stat_boost(defence, 0, 10);
+stat_heal(hitpoints, 0, 200);
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    if (inv_getobj(inv, $slot) = rotten_food) inv_setslot(inv, $slot, stew, 1);
+    $slot = add($slot, 1);
+}
+if (npc_finduid($abidor) = true) %npc_int2 = 1;
+// UNKNOWN functional feedback; the retained source describes the effect, not dialogue.
+mes("Abidor heals you and your companion.");

@@ -1,0 +1,177 @@
+// VERIFIED: original 377 landscapes, follower identities and release prerequisite.
+// UNKNOWN engineering: private copies, three encounters, equal event weights,
+// state allocation and functional messages. No later Ramble or follower levels.
+[proc,templetrek_login]
+~templetrek_cleanup;
+%templetrek_npcs_visible = 0;
+if (%myreque_2_quest >= ^myreque_2_complete) %templetrek_npcs_visible = 1;
+
+[proc,templetrek_logout]
+if (~templetrek_owned = true) p_teleport(^templetrek_burgh);
+~templetrek_cleanup;
+%templetrek_multi_npc_food_give = 0;
+
+[proc,templetrek_cleanup]
+%templetrek_temp_var = 0;
+%templetrek_button_control = 0;
+%templetrek_last_event = 0;
+%templetrek_event_flash = 0;
+%templetrek_debug_room_id = 0;
+// Native instances release their NPCs, ground objects and locs when empty.
+
+[proc,templetrek_teleport_release](coord $destination)
+if (~templetrek_owned = false) return;
+def_coord $origin = region_getcoord(0, 0, 0);
+if (region_findbycoord($destination) = true) {
+    if (region_getcoord(0, 0, 0) = $origin) return;
+}
+~templetrek_cleanup;
+
+[proc,templetrek_owned]()(boolean)
+if (%templetrek_temp_var_25_25 = 0) return(false);
+return(region_findbycoord(coord));
+
+[proc,templetrek_begin](int $route)
+if (%templetrek_button_control = 0 | %myreque_2_quest < ^myreque_2_complete) return;
+if ($route < 1 | $route > 3 | ~templetrek_owned = true) return;
+// Preserve the point value belonging to a token until it is redeemed.
+if (~templetrek_has_token = true) {
+    mes("Redeem your reward token before starting another trek.");
+    return;
+}
+def_int $escort = %templetrek_debug_room_id;
+if ($escort < 1 | $escort > 6) return;
+if_close;
+%templetrek_temp_var = 0;
+%templetrek_npc_point_value = 0;
+%templetrek_temp_var_11_12 = $route;
+%templetrek_temp_var_22_24 = $escort;
+// UNKNOWN initial escort health: strong 100, medium 60, weak 30.
+%templetrek_temp_var_0_6 = 100;
+if ($escort > 2) %templetrek_temp_var_0_6 = 60;
+if ($escort > 4) %templetrek_temp_var_0_6 = 30;
+%templetrek_button_control = 0;
+%templetrek_temp_var_25_25 = 1;
+~templetrek_next;
+
+[proc,templetrek_next]
+if (%templetrek_temp_var_25_25 = 0) return;
+if (%templetrek_temp_var_19_21 >= ^templetrek_encounters) {
+    ~templetrek_leave(1);
+    return;
+}
+def_int $previous = %templetrek_last_event;
+def_int $event = add(random(10), 1);
+while ($event = $previous | ($event = 6 & %templetrek_temp_var_11_12 ! 3)) {
+    $event = add(random(10), 1);
+}
+~templetrek_enter_event($event);
+
+[proc,templetrek_enter_event](int $event)
+~templetrek_companion_sync;
+%templetrek_last_event = $event;
+%templetrek_event_flash = $event;
+%templetrek_temp_var_7_10 = 0;
+%templetrek_temp_var_13_18 = 0;
+~templetrek_create_room;
+
+[proc,templetrek_create_room]
+def_coord $source = ~templetrek_event_source;
+def_coord $sw = region_create(3, 8, 8);
+def_int $level = 0;
+while ($level < 3) {
+    def_int $x = 0;
+    while ($x < 8) {
+        def_int $z = 0;
+        while ($z < 8) {
+            region_set($level, $x, $z, movecoord($source, multiply($x, 8), $level, multiply($z, 8)), 0);
+            $z = add($z, 1);
+        }
+        $x = add($x, 1);
+    }
+    $level = add($level, 1);
+}
+region_setexitcoord(^templetrek_burgh);
+p_teleport(~templetrek_room_coord(~templetrek_entry));
+~templetrek_companion_spawn(map_findsquare(coord, 1, 2, ^map_findsquare_lineofwalk));
+if (%templetrek_last_event <= 6) ~templetrek_combat_spawn;
+if (%templetrek_last_event >= 7) ~templetrek_puzzle_spawn;
+
+[proc,templetrek_event_source]()(coord)
+if (%templetrek_last_event = 3) return(0_33_78_0_0);
+if (%templetrek_last_event >= 6 & %templetrek_last_event <= 9) return(0_32_78_0_0);
+return(0_31_78_0_0);
+
+[proc,templetrek_entry]()(coord)
+if (%templetrek_last_event = 3) return(0_33_78_31_8);
+if (%templetrek_last_event = 6) return(2_32_78_14_42);
+if (%templetrek_last_event = 8) return(0_32_78_12_9);
+if (%templetrek_last_event = 7) return(0_32_78_37_47);
+if (%templetrek_last_event = 9) return(0_32_78_44_11);
+return(0_31_78_15_37);
+
+[proc,templetrek_room_coord](coord $template)(coord)
+return(region_getcoord(coordy($template), modulo(coordx($template), 64), modulo(coordz($template), 64)));
+
+[proc,templetrek_credit](int $points)
+%templetrek_npc_point_value = min(8000, add(%templetrek_npc_point_value, $points));
+
+[proc,templetrek_leave](int $success)
+if (~templetrek_owned = false) return;
+if ($success = 1) {
+    // Award before clearing route state. A full bag must never lose the reward.
+    if (~templetrek_award = false) return;
+    ~templetrek_cleanup;
+    p_teleport(^templetrek_temple);
+} else {
+    ~templetrek_cleanup;
+    %templetrek_npc_point_value = 0;
+    p_teleport(^templetrek_burgh);
+}
+
+[oploc2,templetrek_swamp_success_path] @templetrek_continue;
+[oploc2,templetrek_swamp_success_path_brown] @templetrek_continue;
+[oploc2,templetrek_swamp_continue_1] @templetrek_continue;
+[oploc2,templetrek_swamp_continue_2] @templetrek_continue;
+[oploc4,templetrek_boat_dummy_poly] @templetrek_continue;
+[label,templetrek_continue]
+if (~templetrek_owned = false) return;
+if (%templetrek_temp_var_13_18 > 0) {
+    mes("You must finish this encounter first.");
+    return;
+}
+if (%templetrek_temp_var_19_21 >= ^templetrek_encounters) {
+    ~templetrek_leave(1);
+    return;
+}
+if (%templetrek_last_event >= 7 & %templetrek_last_event <= 9) {
+    if (%templetrek_temp_var_7_10 ! 15) {
+        mes("You must cross the obstacle first.");
+        return;
+    }
+}
+%templetrek_temp_var_19_21 = add(%templetrek_temp_var_19_21, 1);
+~templetrek_next;
+
+[oploc2,templetrek_swamp_evade_path] @templetrek_evade;
+[oploc2,templetrek_swamp_evade_path_brown] @templetrek_evade;
+[label,templetrek_evade]
+if (~templetrek_owned = false) return;
+if (%templetrek_last_event > 5 | %templetrek_temp_var_11_12 = 3) {
+    mes("You cannot evade this encounter.");
+    return;
+}
+if (%templetrek_temp_var_11_12 = 2 & multiply(%templetrek_temp_var_13_18, 2) > ~templetrek_monster_count) {
+    mes("You must defeat at least half of the monsters before evading.");
+    return;
+}
+// CANDIDATE route1 skips freely, route2 after half. No credit for evasion.
+%templetrek_temp_var_19_21 = add(%templetrek_temp_var_19_21, 1);
+~templetrek_next;
+
+[oploc2,templetrek_swamp_fail_path] @templetrek_escape;
+[oploc2,templetrek_swamp_fail_path_brown] @templetrek_escape;
+[oploc2,templetrek_swamp_burgh_return] @templetrek_escape;
+[oploc5,templetrek_boat_dummy_poly] @templetrek_escape;
+[label,templetrek_escape]
+~templetrek_leave(0);

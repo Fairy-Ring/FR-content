@@ -1,0 +1,7 @@
+// UNKNOWN engineering chain length. The original server event weights are lost.
+^templetrek_encounters = 3
+// UNKNOWN exact recovery tile within the original Burgh escort cluster.
+^templetrek_burgh = 0_54_50_23_41
+// UNKNOWN exact arrival tile within the sourced Paterdomus destination.
+// Packed collision and a route into Misthalin are mandatory test predicates.
+^templetrek_temple = 0_53_54_14_33
