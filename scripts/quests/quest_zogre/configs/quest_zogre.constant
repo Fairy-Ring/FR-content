@@ -26,3 +26,9 @@
 ^zogre_wizard_lifetime = 100
 // UNKNOWN: stringing uses the same level as the guide's listed Fletching requirement.
 ^zogre_comp_string_level = 30
+// UNKNOWN: local encounter leases and leashes, in cycles and tiles respectively.
+^zogre_encounter_lifetime = 600
+^zogre_slash_leash = 16
+^zogre_brentle_leash = 8
+// UNKNOWN: temporary gate opening, in cycles.
+^zogre_gate_open_lifetime = 3

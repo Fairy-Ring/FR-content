@@ -51,9 +51,9 @@ if (coordz(coord) >= coordz($gate)) {
     $step = 1;
 }
 // UNKNOWN favourable open lease: three cycles; the crossing itself is immediate.
-loc_del(3);
-if (loc_find($other, ogre_cavedoorr) = true) loc_del(3);
-if (loc_find($other, ogre_cavedoorl) = true) loc_del(3);
+loc_del(^zogre_gate_open_lifetime);
+if (loc_find($other, ogre_cavedoorr) = true) loc_del(^zogre_gate_open_lifetime);
+if (loc_find($other, ogre_cavedoorl) = true) loc_del(^zogre_gate_open_lifetime);
 p_teleport(movecoord($gate, 0, 0, $step));
 
 [proc,zogre_stairs]
@@ -101,7 +101,7 @@ if (~zogre_slash_find = true) {
 }
 if (%zogre = 10) %zogre = 11;
 // UNKNOWN local lease: six minutes; the owner leash/death checks below remove it sooner.
-npc_add(0_38_147_51_37, zogre_slash_bash, 600);
+npc_add(0_38_147_51_37, zogre_slash_bash, ^zogre_encounter_lifetime);
 %npc_attacking_uid = uid;
 %npc_macro_event_target = uid;
 %npc_action_delay = map_clock;
@@ -110,7 +110,7 @@ npc_settimer(1);
 mes("Slash Bash emerges from the stand.");
 
 [proc,zogre_slash_find]()(boolean)
-npc_findall(0_38_147_51_37, zogre_slash_bash, 16, 0);
+npc_findall(0_38_147_51_37, zogre_slash_bash, ^zogre_slash_leash, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid & npc_stat(hitpoints) > 0) return(true);
 }
@@ -121,7 +121,7 @@ if (finduid(%npc_attacking_uid) = false) {
     npc_del;
     return;
 }
-if (%death = ^true | %zogre ! 11 | distance(0_38_147_51_37, coord) > 16) npc_del;
+if (%death = ^true | %zogre ! 11 | distance(0_38_147_51_37, coord) > ^zogre_slash_leash) npc_del;
 
 [ai_queue1,zogre_slash_bash]
 if (%npc_aggressive_player ! %npc_attacking_uid) return;
@@ -148,7 +148,7 @@ if (%zogre = 11) {
 
 [proc,zogre_brentle_summon]
 if (%zogre = 0 | %thzfe_brentle_skele >= 2) return;
-npc_findall(2_38_147_10_51, zogre_human_brentle_vahn, 8, 0);
+npc_findall(2_38_147_10_51, zogre_human_brentle_vahn, ^zogre_brentle_leash, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid & npc_stat(hitpoints) > 0) {
         mes("The zombie is already awake.");
@@ -156,7 +156,7 @@ while (npc_findnext = true) {
     }
 }
 // UNKNOWN local lease: six minutes; owner death/logout/leave removes it sooner.
-npc_add(2_38_147_10_51, zogre_human_brentle_vahn, 600);
+npc_add(2_38_147_10_51, zogre_human_brentle_vahn, ^zogre_encounter_lifetime);
 %npc_attacking_uid = uid;
 %npc_macro_event_target = uid;
 %npc_action_delay = map_clock;
@@ -170,7 +170,7 @@ if (finduid(%npc_attacking_uid) = false) {
     npc_del;
     return;
 }
-if (%death = ^true | %zogre = 0 | %thzfe_brentle_skele >= 2 | distance(2_38_147_10_51, coord) > 8) npc_del;
+if (%death = ^true | %zogre = 0 | %thzfe_brentle_skele >= 2 | distance(2_38_147_10_51, coord) > ^zogre_brentle_leash) npc_del;
 
 [ai_queue1,zogre_human_brentle_vahn]
 if (%npc_aggressive_player ! %npc_attacking_uid) return;
