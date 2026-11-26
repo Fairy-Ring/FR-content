@@ -17,7 +17,7 @@ cleartimer(roguesden_maze_trap_armed);
 %varp319_unused = setbit_range_toint(%varp319_unused, 0, 24, 31);
 // CANDIDATE safety cleanup: no prayer is active while the maze session runs.
 ~prayer_deactivate_all;
-settimer(roguesden_maze_watch, 1, 0, coord);
+settimer(roguesden_maze_watch, 1, 0, coord, 0);
 
 [proc,roguesden_maze_stop]
 cleartimer(roguesden_maze_watch);
@@ -25,7 +25,7 @@ cleartimer(roguesden_maze_trap_armed);
 %roguesden_puzzle = setbit_range_toint(%roguesden_puzzle, 0, 24, 31);
 %varp319_unused = setbit_range_toint(%varp319_unused, 0, 24, 31);
 
-[timer,roguesden_maze_watch](int $last_obstacle, coord $previous)
+[timer,roguesden_maze_watch](int $last_obstacle, coord $previous, int $occupied_trap)
 if (~roguesden_active = false) return;
 if (~roguesden_maze_inside(coord) = false | inv_total(inv, roguesden_gem) < 1) {
     ~roguesden_leave(0);
@@ -38,7 +38,7 @@ if (~roguesden_maze_inside(coord) = false | inv_total(inv, roguesden_gem) < 1) {
 ~roguesden_blade_watch(roguesden_trap_floor_spinningblades_1);
 if (~roguesden_active = false) return;
 def_coord $here = coord;
-def_int $contact = ~roguesden_maze_contact_zone(coord, $last_obstacle, $previous);
+def_int $contact = ~roguesden_maze_contact_zone(coord, $last_obstacle, $previous, $occupied_trap);
 // A blocked moving obstacle starts at its walkable centre approach tile.
 // Its anchor can therefore also lie one tile east/north of the player's zone.
 def_int $zone_x = 0;
@@ -49,21 +49,23 @@ if (calc(coordz(coord) % 8) < 3) $zone_z = -8;
 else if (calc(coordz(coord) % 8) = 7) $zone_z = 8;
 def_int $other;
 if (($contact = 0 | $contact = -2) & $zone_x ! 0) {
-    $other = ~roguesden_maze_contact_zone(movecoord(coord, $zone_x, 0, 0), $last_obstacle, $previous);
+    $other = ~roguesden_maze_contact_zone(movecoord(coord, $zone_x, 0, 0), $last_obstacle, $previous, $occupied_trap);
     if ($other ! 0) $contact = $other;
 }
 if (($contact = 0 | $contact = -2) & $zone_z ! 0) {
-    $other = ~roguesden_maze_contact_zone(movecoord(coord, 0, 0, $zone_z), $last_obstacle, $previous);
+    $other = ~roguesden_maze_contact_zone(movecoord(coord, 0, 0, $zone_z), $last_obstacle, $previous, $occupied_trap);
     if ($other ! 0) $contact = $other;
 }
 if (($contact = 0 | $contact = -2) & $zone_x ! 0 & $zone_z ! 0) {
-    $other = ~roguesden_maze_contact_zone(movecoord(coord, $zone_x, 0, $zone_z), $last_obstacle, $previous);
+    $other = ~roguesden_maze_contact_zone(movecoord(coord, $zone_x, 0, $zone_z), $last_obstacle, $previous, $occupied_trap);
     if ($other ! 0) $contact = $other;
 }
 if (~roguesden_active = false) return;
 if ($contact = 0 & getbit_range(%varp319_unused, 31, 31) = 1) ~roguesden_maze_trap_clear;
 if ($contact >= 0) $last_obstacle = $contact;
-settimer(roguesden_maze_watch, 1, $last_obstacle, $here);
+if ($contact < -2) $occupied_trap = sub(-2, $contact);
+else $occupied_trap = 0;
+settimer(roguesden_maze_watch, 1, $last_obstacle, $here, $occupied_trap);
 
 // The original puzzle/session fields retain bits 0..23. The 15-bit searched
 // loc key uses 493[24..31] and 319[24..30]; 319[31] means it has been entered.
@@ -77,6 +79,33 @@ return(add(add(multiply(sub($x, 2944), 128), sub($z, 4992)), 1));
 def_int $low = getbit_range(%roguesden_puzzle, 24, 31);
 def_int $high = getbit_range(%varp319_unused, 24, 30);
 return(add($low, multiply($high, 256)));
+
+// Retain an already searched footprint before Search replaces the next token,
+// even when its first occupied watch tick has not run yet.
+[proc,roguesden_maze_trap_occupied](int $key)(boolean)
+if ($key <= 0) return(false);
+def_int $offset = sub($key, 1);
+def_coord $anchor = movecoord(1_46_78_0_0, divide($offset, 128), 0, calc($offset % 128));
+loc_findallzone($anchor);
+while (loc_findnext = true) {
+    def_boolean $trap = false;
+    switch_loc(loc_type) {
+        case roguesden_trap_floor_spikes, roguesden_trap_wall_spikes,
+            roguesden_trap_wall_poison_gas, roguesden_trap_floor_explosion,
+            roguesden_trap_floor_springtile, roguesden_trap_wall_crusher : $trap = true;
+    }
+    if ($trap = true & ~roguesden_maze_tile_key(loc_coord) = $key) {
+        def_int $width = lc_width(loc_type);
+        def_int $length = lc_length(loc_type);
+        if (calc(loc_angle % 2) = 1) {
+            $width = lc_length(loc_type);
+            $length = lc_width(loc_type);
+        }
+        if (coordx(coord) >= coordx(loc_coord) & coordx(coord) < add(coordx(loc_coord), $width) &
+            coordz(coord) >= coordz(loc_coord) & coordz(coord) < add(coordz(loc_coord), $length)) return(true);
+    }
+}
+return(false);
 
 [proc,roguesden_maze_trap_clear]
 cleartimer(roguesden_maze_trap_armed);
@@ -95,13 +124,19 @@ if (stat(thieving) < 1) {
     ~roguesden_leave(0);
     return;
 }
+def_int $occupied = ~roguesden_maze_trap_key;
+if (~roguesden_maze_trap_occupied($occupied) = true) {
+    // A Search-trap footprint is no longer the last moving obstacle.
+    settimer(roguesden_maze_watch, 1, 0, coord, $occupied);
+} else $occupied = 0;
 ~roguesden_maze_trap_clear;
 def_int $before = stat(thieving);
 stat_sub(thieving, 1, 0);
 ~roguesden_maze_drain_thieving(sub($before, stat(thieving)));
 %roguesden_puzzle = setbit_range_toint(%roguesden_puzzle, getbit_range($key, 0, 7), 24, 31);
 %varp319_unused = setbit_range_toint(%varp319_unused, getbit_range($key, 8, 14), 24, 30);
-settimer(roguesden_maze_trap_armed, 20);
+if ($occupied = $key) %varp319_unused = setbit_range_toint(%varp319_unused, 1, 31, 31);
+else settimer(roguesden_maze_trap_armed, 20);
 
 [timer,roguesden_maze_trap_armed]
 ~roguesden_maze_trap_clear;
@@ -129,11 +164,11 @@ if (~roguesden_maze_trap_key = ~roguesden_maze_tile_key(loc_coord)) {
 [aploc5,roguesden_trap_wall_crusher]
 ~roguesden_maze_trap_arm;
 
-// Result: zero means no contact; -1 a Search trap; -2 the last crossed
-// obstacle; a positive result is the newly crossed obstacle's placed-loc key.
-// Keeping that key in the timer arguments avoids bouncing a stationary player
-// back over an obstacle while preserving the separate searched-trap token.
-[proc,roguesden_maze_contact_zone](coord $zone, int $last_obstacle, coord $previous)(int)
+// Result: zero means no contact; -1 a fatal trap; -2 the last crossed
+// obstacle; below -2 encodes the occupied Search-trap key as -key-2;
+// a positive result is a newly crossed obstacle's placed-loc key.
+// The timer keeps occupied-footprint safety separate from the next Search.
+[proc,roguesden_maze_contact_zone](coord $zone, int $last_obstacle, coord $previous, int $occupied_trap)(int)
 def_int $contact = 0;
 loc_findallzone($zone);
 while (loc_findnext = true) {
@@ -161,8 +196,9 @@ while (loc_findnext = true) {
         if (coordx(coord) >= coordx(loc_coord) & coordx(coord) < add(coordx(loc_coord), $width) &
             coordz(coord) >= coordz(loc_coord) & coordz(coord) < add(coordz(loc_coord), $length)) $inside = true;
         if ($kind = 1 & $inside = true) {
-            ~roguesden_maze_trap_trigger;
-            return(-1);
+            def_int $key = ~roguesden_maze_tile_key(loc_coord);
+            if ($key ! $occupied_trap) ~roguesden_maze_trap_trigger;
+            return(sub(-2, $key));
         }
         if ($kind = 4 & $inside = true) {
             ~roguesden_leave(0);

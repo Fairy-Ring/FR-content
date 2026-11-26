@@ -638,6 +638,28 @@ function stepOnto(p, destination) {
   p.teleport(destination.x, destination.z, p.level);
   environmentTick(p);
 }
+for (const occupiedTicks of [0, 4]) for (const expireNext of [false, true]) {
+  const p = enter(fixture());
+  p.teleport(3037, 4998, 1); // Isolated original adjacent-spike regression.
+  operation(p, location('roguesden_trap_floor_spikes', 3036, 4998), 'Search');
+  stepOnto(p, { x: 3036, z: 4998 });
+  for (let tick = 0; tick < occupiedTicks; tick++) environmentTick(p);
+  assert(active(p), 'the first genuinely searched footprint is safe');
+  operation(p, location('roguesden_trap_floor_spikes', 3035, 4998), 'Search');
+  for (let tick = 0; tick < (expireNext ? 21 : 4); tick++) environmentTick(p);
+  sameTile(p, { x: 3036, z: 4998, level: 1 });
+  assert(active(p), 'searching the next spike never rearms the occupied footprint');
+  assert.equal(p.levels[PlayerStat.THIEVING], 48, 'the two real Search actions still cost two levels');
+  stepOnto(p, { x: 3035, z: 4998 });
+  for (let tick = 0; tick < 4 && active(p); tick++) environmentTick(p);
+  if (!expireNext) {
+    assert(active(p), 'the independently armed next footprint remains usable');
+    sameTile(p, { x: 3035, z: 4998, level: 1 });
+    stepOnto(p, { x: 3036, z: 4998 });
+    for (let tick = 0; tick < 4 && active(p); tick++) environmentTick(p);
+  }
+  clean(p); // Expired-next entry and unsearched previous-footprint reentry fail.
+}
 for (const expired of [false, true]) {
   const p = enter(fixture());
   p.teleport(3056, 4993, 1); // Independent reachable trap-failure branch.
@@ -737,7 +759,7 @@ for (const name of mazeItems.filter(name => name !== 'roguesden_gem')) {
   clean(p);
   assert.equal(jewel(p), 1, 'Brian recovers a genuinely dropped escape jewel after cleanup');
 }
-console.log('PASS unarmed and expired traps, visible guard catch, ranged timed stun and every maze-item drop recovery');
+console.log('PASS adjacent occupied-trap lifetime, unarmed and expired traps, visible guard catch, ranged timed stun and every maze-item drop recovery');
 
 function fullMazeRoute() {
   const p = enter(fixture()), point = (x, z) => ({ x, z, level: 1 });
@@ -753,6 +775,7 @@ function fullMazeRoute() {
       if (!inside(trap, next) || inside(trap, subject)) continue;
       const before = subject.levels[PlayerStat.THIEVING];
       operation(subject, location(trap.name, trap.x, trap.z), 'Search');
+      for (let tick = 0; tick < 2; tick++) environmentTick(subject);
       assert.equal(subject.levels[PlayerStat.THIEVING], before - 1, 'a genuinely searched route trap consumes one current Thieving level');
       assert(active(subject), 'the disarmed trap leaves the original run active');
     }
