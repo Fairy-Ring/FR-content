@@ -347,6 +347,7 @@ jobs:
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/icthlarins-little-helper/test_icthlarin.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/icthlarins-little-helper/test_icthlarin.mjs
           run_test tests/tail-of-two-cats/test_tail_of_two_cats.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/tail-of-two-cats/test_tail_of_two_cats.mjs
+          run_test tests/ratcatchers/test_ratcatchers.mjs env NODE_MEMBERS=true NODE_XPRATE=1 bash -c 'node --import tsx ../content/tests/ratcatchers/test_ratcatchers.mjs && node --import tsx ../content/tests/ratcatchers/mansion.mjs && node --import tsx ../content/tests/ratcatchers/warehouse.mjs && node --import tsx ../content/tests/ratcatchers/cats.mjs'
           run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
           run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
           run_test tests/making-history/test_making_history.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/making-history/test_making_history.mjs

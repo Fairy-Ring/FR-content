@@ -1,0 +1,38 @@
+// UNKNOWN engineering duration: 20 existing 90-second growth intervals (30 minutes).
+^ratcatch_wily_age_intervals = 20
+// CANDIDATE roughly fifteen catches and five-to-ten-minute retraining; exact defaults UNKNOWN.
+^ratcatch_lazy_retrain_catches = 15
+^ratcatch_lazy_age_intervals = 4
+// UNKNOWN fixed tune and scene bounds, original 377 note encodings are retained.
+^ratcatch_tune_d = 63
+^ratcatch_tune_e = 62
+^ratcatch_tune_fs = 60
+^ratcatch_tune_g = 56
+^ratcatch_tune_a = 48
+^ratcatch_tune_b = 32
+^ratcatch_tune_cs = 1
+^ratcatch_tune_high_d = 127
+^ratcatch_sarim_min_x = 3010
+^ratcatch_sarim_max_x = 3065
+^ratcatch_sarim_min_z = 3180
+^ratcatch_sarim_max_z = 3240
+// UNKNOWN engineering short scene duration, not a historical timing claim.
+^ratcatch_scene_delay = 2
+// VERIFIED ring-of-Charos final price: Tip.It q127 line201. Other prices UNKNOWN defaults.
+^ratcatch_charos_price = 50
+// UNKNOWN ephemeral scene-actor lifetime in ticks.
+^ratcatch_scene_rat_lifetime = 12
+^ratcatch_charmer_open_price = 1000
+^ratcatch_charmer_walk_price = 100
+// UNKNOWN engineering activity curve; wily cats retain the better base draw.
+^ratcatch_wily_catch_roll = 2
+^ratcatch_lazy_catch_roll = 3
+^ratcatch_activity_step = 5
+^ratcatch_activity_max = 7
+^ratcatch_wily_activity_roll = 9
+^ratcatch_lazy_activity_roll = 8
+// Original 377 hole placements; UNKNOWN engineering adjacent scene exits.
+^ratcatch_joe_north_hole = 0_45_159_53_36
+^ratcatch_joe_north_exit = 0_45_159_53_37
+^ratcatch_joe_south_hole = 0_45_159_52_31
+^ratcatch_joe_south_exit = 0_45_159_52_30

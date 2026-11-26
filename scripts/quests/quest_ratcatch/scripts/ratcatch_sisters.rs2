@@ -1,14 +1,34 @@
-// Ratcatchers stage-0 refuse — Phingspet 2947 / Grimesquit 2946.
-// CANDIDATE last-resort 2007-base: OSRS Historical Before starting
-// (oldid 12562212 / 12562214) minus 2024 'Ello rewrite.
-// Hunt 289? no. Same Grimesquit-first block on both Talk-to.
-// 0 write. No Gertrude bolt. No inter_322. Cite ratcatchers-phingspet-first-slice-377.md §5.
+// CANDIDATE pre-2024 refusal: Transcript:Grimesquit 12562212 / Phingspet 12562214.
+// VERIFIED eight rats, pole and Jimmy handoff: Tip.It q127, 27 April 2006, lines181-185.
+// Other messages are UNKNOWN functional wording, not reconstructed dialogue.
 
 [opnpc1,vc_phingspet]
-@ratcatch_sisters_refuse;
+@ratcatch_sisters;
 
 [opnpc1,vc_grimesquit]
-@ratcatch_sisters_refuse;
+@ratcatch_sisters;
+
+[label,ratcatch_sisters]
+if (%ratcatch_var = 0) @ratcatch_sisters_refuse;
+if (%ratcatch_var = 1) {
+    if (~ratcatch_require_cat = false) return;
+    %ratcatch_ometer = 0;
+    ~ratcatch_stage(2);
+}
+if (%ratcatch_var = 2) {
+    if (%ratcatch_ometer < 8) {
+        mes("Your cat must catch eight rats in these sewers.");
+        return;
+    }
+    if (inv_freespace(inv) = 0) {
+        mes("Make room for a rat pole.");
+        return;
+    }
+    ~ratcatch_stage(3);
+}
+~ratcatch_recover_pole;
+mes("Speak to Jimmy Dazzler in East Ardougne.");
+return;
 
 [label,ratcatch_sisters_refuse]
 ~chatnpc_specific("Grimesquit", vc_grimesquit, "<p,quiz>What's you want?");

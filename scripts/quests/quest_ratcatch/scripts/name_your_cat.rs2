@@ -1,17 +1,89 @@
-// Ratcatchers — Talk-to Felkrash (2951, 2977,9639 L0) after Ratcatchers
-// progress opens the cat naming chrome (name_your_cat 15192): six letter-wheel
-// slots + arrows + ENTER + Close. Gate: main_ratcatch_var >= 1 (past the
-// shipped stage-0 sisters refuse). Complete-stage ladder is unproven
-// (ratcatch research: "no invent stage ladder"), so the gate is a labeled
-// toy: harness `::setvar main_ratcatch_var 1`. No wily/lazy check, no cat_name
-// varp, no pick_a_kitten 14664, no Gertrude bolt, no alphabet wiring (free-wheel
-// CANDIDATE, later). Cite residual-if-15192-prior-unit-377.md +
-// residual-if-name-your-cat-377.md.
+// CANDIDATE six letters/spaces for wily/lazy cats: Wily_cat and Lazy_cat, no name change in update notes.
+// UNKNOWN storage layout uses only original unused bits; no new client varps/varbits.
+// Original varbits occupy multi0..12, main0..28, temp1/2 0..27 and temp2 bit29.
+// No 377 interface reads any of the four raw base varps (only their original varbits).
+[opnpc1,vc_felkrash_the_bard]
+~ratcatch_felkrash;
 
-[opnpc1,vc_felkrash_the_bard] @name_your_cat_open;
-
-[label,name_your_cat_open]
-if (%main_ratcatch_var < 1) {
+[proc,ratcatch_name_open]
+if (%ratcatch_var < ^ratcatch_complete) return;
+if (%follower_obj = null | (oc_category(%follower_obj) ! ratcatch_wilycat & oc_category(%follower_obj) ! ratcatch_lazycat) | .npc_finduid(%follower_uid) = false) {
+    mes("Bring your wily or lazy cat to name it."); // UNKNOWN functional refusal.
     return;
 }
+~ratcatch_name_display;
 if_openmain(name_your_cat);
+
+[proc,ratcatch_name_value]()(int)
+return(calc(getbit_range(%ratcatch_var_multi, 13, 31) + getbit_range(%main_ratcatch_var, 29, 31) * 524288 + getbit_range(%ratcatch_var_temp1, 28, 31) * 4194304 + getbit_range(%ratcatch_var_temp2, 30, 31) * 67108864 + getbit_range(%ratcatch_var_temp2, 28, 28) * 268435456));
+
+[proc,ratcatch_name_store](int $value)
+%ratcatch_var_multi = setbit_range_toint(%ratcatch_var_multi, getbit_range($value, 0, 18), 13, 31);
+%main_ratcatch_var = setbit_range_toint(%main_ratcatch_var, getbit_range($value, 19, 21), 29, 31);
+%ratcatch_var_temp1 = setbit_range_toint(%ratcatch_var_temp1, getbit_range($value, 22, 25), 28, 31);
+%ratcatch_var_temp2 = setbit_range_toint(%ratcatch_var_temp2, getbit_range($value, 26, 27), 30, 31);
+%ratcatch_var_temp2 = setbit_range_toint(%ratcatch_var_temp2, getbit_range($value, 28, 28), 28, 28);
+
+[proc,ratcatch_name_letter](int $slot)(string)
+def_int $letter = modulo(divide(~ratcatch_name_value, pow(27, $slot)), 27);
+return(substring("ABCDEFGHIJKLMNOPQRSTUVWXYZ ", $letter, add($letter, 1)));
+
+[proc,ratcatch_cat_name]()(string)
+return("<~ratcatch_name_letter(0)><~ratcatch_name_letter(1)><~ratcatch_name_letter(2)><~ratcatch_name_letter(3)><~ratcatch_name_letter(4)><~ratcatch_name_letter(5)>");
+
+[proc,ratcatch_name_display]
+if_settext(name_your_cat:com_10, ~ratcatch_name_letter(0));
+if_settext(name_your_cat:com_11, ~ratcatch_name_letter(1));
+if_settext(name_your_cat:com_12, ~ratcatch_name_letter(2));
+if_settext(name_your_cat:com_13, ~ratcatch_name_letter(3));
+if_settext(name_your_cat:com_14, ~ratcatch_name_letter(4));
+if_settext(name_your_cat:com_15, ~ratcatch_name_letter(5));
+
+[proc,ratcatch_name_turn](int $slot, int $direction)
+if (%ratcatch_var < ^ratcatch_complete) return;
+def_int $value = ~ratcatch_name_value;
+def_int $power = pow(27, $slot);
+def_int $letter = modulo(divide($value, $power), 27);
+~ratcatch_name_store(calc($value + (modulo(calc($letter + 27 + $direction), 27) - $letter) * $power));
+~ratcatch_name_display;
+
+[if_button,name_your_cat:com_17]
+~ratcatch_name_turn(0, -1);
+
+[if_button,name_your_cat:com_18]
+~ratcatch_name_turn(0, 1);
+
+[if_button,name_your_cat:com_19]
+~ratcatch_name_turn(1, -1);
+
+[if_button,name_your_cat:com_20]
+~ratcatch_name_turn(1, 1);
+
+[if_button,name_your_cat:com_21]
+~ratcatch_name_turn(2, -1);
+
+[if_button,name_your_cat:com_22]
+~ratcatch_name_turn(2, 1);
+
+[if_button,name_your_cat:com_23]
+~ratcatch_name_turn(3, -1);
+
+[if_button,name_your_cat:com_24]
+~ratcatch_name_turn(3, 1);
+
+[if_button,name_your_cat:com_25]
+~ratcatch_name_turn(4, -1);
+
+[if_button,name_your_cat:com_26]
+~ratcatch_name_turn(4, 1);
+
+[if_button,name_your_cat:com_28]
+~ratcatch_name_turn(5, -1);
+
+[if_button,name_your_cat:com_27]
+~ratcatch_name_turn(5, 1);
+
+[if_button,name_your_cat:com_31]
+if (%ratcatch_var < ^ratcatch_complete) return;
+if_close;
+mes("Your wily and lazy cats are now called <~ratcatch_cat_name>."); // UNKNOWN functional confirmation.

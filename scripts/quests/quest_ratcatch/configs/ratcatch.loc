@@ -1,0 +1,86 @@
+// Original 377 Rat Catchers travel and warehouse targets. Client fields are unchanged.
+[vc_blank_trellis_top_trigger]
+name=Trellis top
+desc=Handy piece of garden decor.
+model=vc_blank_trellis_top_trigger
+op1=Climb-down
+active=yes
+
+[vc_blank_walldecor]
+name=Hole in wall
+desc=Big enough for a cat to get in.
+model=vc_blank_trellis_top_trigger
+active=yes
+
+[vc_manhole_open]
+name=Manhole
+desc=How dangerous, someone has left this manhole open.
+model=manholeopen
+recol1s=12684
+recol1d=9513
+op1=Climb-down
+forceapproach=south
+
+[vc_ladder_down]
+name=Ladder
+desc=I can climb down this.
+model=loc_1759
+active=yes
+op1=Climb-down
+mapscene=7
+forceapproach=east
+
+[vc_trellis_base]
+name=Trellis
+desc=I could climb up this.
+model=vc_trellis_base
+active=yes
+op1=Climb-up
+op2=Look-up
+ambient=5
+contrast=5
+
+[vc_trellis_top]
+name=Trellis
+desc=I could climb down this.
+model=vc_trellis_top
+active=yes
+ambient=5
+contrast=5
+
+[vc_elfdoor]
+name=Door
+desc=A magical device that enables one to walk through walls.
+model=door1
+retex1s=wall
+retex1d=elfdoor
+recol2s=6342
+recol2d=11458
+active=yes
+op1=Open
+raiseobject=no
+
+[vc_elfdoor_closed_always]
+name=Door
+desc=A locked door.
+model=door1
+retex1s=wall
+retex1d=elfdoor
+recol2s=6342
+recol2d=11458
+sharelight=yes
+active=yes
+raiseobject=no
+
+[vc_elfdooropen]
+name=Door
+desc=A magical device that enables one to walk through walls.
+model=door1
+retex1s=wall
+retex1d=elfdoor
+recol2s=6342
+recol2d=11458
+active=yes
+op1=Close
+raiseobject=no
+

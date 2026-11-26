@@ -1,0 +1,49 @@
+// VERIFIED route and rewards: Tip.It q127, 27 April 2006, lines200-215.
+// UNKNOWN functional messages and intermediate stage encodings.
+[opnpc1,vc_face]
+if (%ratcatch_var < 15) return;
+if (%ratcatch_var = 15) {
+    ~ratcatch_stage(16);
+    mes("Speak to Felkrash downstairs in the Port Sarim Rat Pits.");
+} else if (%ratcatch_var = 17) {
+    ~ratcatch_stage(18);
+    mes("The snake charmer in Pollnivneach may know how to charm the rats.");
+} else if (%ratcatch_var = 16 | %ratcatch_var >= 20) {
+    mes("Speak to Felkrash downstairs.");
+} else {
+    mes("Visit the snake charmer in Pollnivneach, then play his tune near the Port Sarim manhole or docks.");
+}
+
+[proc,ratcatch_felkrash]
+if (%ratcatch_var < 16) return;
+if (%ratcatch_var = 16) {
+    ~ratcatch_stage(17);
+    mes("Drive all the rats out of Port Sarim in one action. Ask The Face for advice.");
+    return;
+}
+if (%ratcatch_var < 20) {
+    mes("Drive all the rats out of Port Sarim in one action.");
+    return;
+}
+if (%ratcatch_var = 20) {
+    // VERIFIED: 4,500 Thieving XP, Rat Pits, wily/lazy cats; 2 QP. No medal reward.
+    ~ratcatch_stage(^ratcatch_complete);
+    stat_advance(thieving, 45000);
+    ~send_quest_complete(questlist:ratcatch, vc_rat_pole, 500, ^ratcatch_questpoints, "You have completed Rat Catchers!", "4,500 Thieving experience|Access to the Rat Pits|Wily and lazy cats|The ability to name your cat");
+    return;
+}
+~ratcatch_cat_services;
+
+[oploc1,vc_manhole_open]
+if (loc_coord ! 0_47_50_10_32) return;
+if (%ratcatch_var < 16) {
+    mes("Speak to The Face before entering.");
+    return;
+}
+// Original 377 Sarim pit ladder at2962,9651; landing is adjacent to it.
+~climb_ladder(0_46_150_18_50, false);
+
+[proc,ratcatch_pit_ladder]()(boolean)
+if (coordx(loc_coord) ! 2962 | coordz(loc_coord) ! 9651) return(false);
+~climb_ladder(0_47_50_10_31, true);
+return(true);

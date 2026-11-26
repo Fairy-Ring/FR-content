@@ -1,0 +1,237 @@
+// Original 377 Rat Catchers items; server-only privacy is UNKNOWN where no period trade rule survives.
+[ratcatchers_cat_antipoison]
+tradeable=no
+name=Cat antipoison
+desc=Antipoison for Pox.
+recol1s=15855
+recol1d=7721
+members=yes
+model=obj_strength4
+2dyof=-1
+2dzoom=550
+2dyan=1996
+2dxan=84
+iop4=Empty
+weight=35g
+category=potion
+
+[ratpits_manual]
+tradeable=no
+name=Book
+desc=The book of Rats.
+recol1s=13472
+recol1d=7424
+recol2s=29594
+recol2d=17968
+model=obj_mcannonbook
+2dxof=1
+2dyof=-21
+2dzoom=830
+2dyan=116
+2dxan=244
+members=yes
+iop1=Read
+weight=40g
+
+[ratcatchers_poisonedcheese]
+tradeable=no
+name=Poisoned cheese
+desc=A little more smelly than usual.
+recol1s=25185
+recol1d=17025
+model=obj_cheese
+members=yes
+2dzoom=1110
+2dyan=1812
+2dxan=116
+iop1=Eat
+weight=200g
+
+[ratcatchers_music]
+tradeable=no
+name=Music scroll
+desc=Charming.
+members=yes
+iop1=Read
+iop5=Destroy
+model=obj_nulodions_notes
+2dxof=1
+2dyof=7
+2dzoom=1040
+2dyan=120
+2dxan=380
+weight=20g
+
+[ratcatchers_party_directions]
+tradeable=no
+name=Directions
+desc=Jimmy Dazzler's directions.
+members=yes
+iop1=Read
+iop5=Destroy
+model=obj_nulodions_notes
+2dxof=1
+2dyof=7
+2dzoom=1040
+2dyan=120
+2dxan=380
+weight=20g
+
+[ratcatchers_weedpot]
+tradeable=no
+name=Pot of weeds
+desc=Contains garden weeds.
+members=yes
+model=obj_ratcatchers_weedpot
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+weight=600g
+
+[ratcatchers_smokey_weedpot]
+tradeable=no
+name=Smouldering pot
+desc=Contains slowly burning garden weeds.
+members=yes
+model=obj_ratcatchers_smokey_weedpot
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+manwear=obj_ratcatchers_smokey_weedpot_manwear,0
+womanwear=obj_ratcatchers_smokey_weedpot_manwear,6
+weight=500g
+
+[vc_rat_pole]
+tradeable=no
+name=Rat pole
+desc=A pole for putting rats on.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+womanwear=obj_vc_rat_pole_manwear,6
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+
+[vc_rat_pole_1]
+tradeable=no
+name=Rat pole
+desc=A pole with one rat on it.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+manwear2=obj_vc_rat_pole_1_manwear2
+womanwear=obj_vc_rat_pole_manwear,6
+womanwear2=obj_vc_rat_pole_1_manwear2
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop1=Remove-rat
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+
+[vc_rat_pole_2]
+tradeable=no
+name=Rat pole
+desc=A pole with two rats on it.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+manwear2=obj_vc_rat_pole_2_manwear2
+womanwear=obj_vc_rat_pole_manwear,6
+womanwear2=obj_vc_rat_pole_2_manwear2
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop1=Remove-rat
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+
+[vc_rat_pole_3]
+tradeable=no
+name=Rat pole
+desc=A pole with three rats on it.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+manwear2=obj_vc_rat_pole_3_manwear2
+womanwear=obj_vc_rat_pole_manwear,6
+womanwear2=obj_vc_rat_pole_3_manwear2
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop1=Remove-rat
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+
+[vc_rat_pole_4]
+tradeable=no
+name=Rat pole
+desc=A pole with four rats on it.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+manwear2=obj_vc_rat_pole_4_manwear2
+womanwear=obj_vc_rat_pole_manwear,6
+womanwear2=obj_vc_rat_pole_4_manwear2
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop1=Remove-rat
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+
+[vc_rat_pole_5]
+tradeable=no
+name=Rat pole
+desc=A pole with five rats on it.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+manwear2=obj_vc_rat_pole_5_manwear2
+womanwear=obj_vc_rat_pole_manwear,6
+womanwear2=obj_vc_rat_pole_5_manwear2
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop1=Remove-rat
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+
+[vc_rat_pole_6]
+tradeable=no
+name=Rat pole
+desc=A pole with six rats on it.
+model=obj_vc_rat_pole
+manwear=obj_vc_rat_pole_manwear,0
+manwear2=obj_vc_rat_pole_6_manwear2
+womanwear=obj_vc_rat_pole_manwear,6
+womanwear2=obj_vc_rat_pole_6_manwear2
+members=yes
+2dzoom=1990
+2dyan=1996
+2dxan=268
+iop1=Remove-rat
+iop2=Wield
+wearpos=righthand
+wearpos2=lefthand
+weight=5lb
+

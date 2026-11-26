@@ -31,60 +31,6 @@ wanderrange=0
 defaultmode=none
 param=npc_noncombat_multi,yes
 
-// Owner: party room. Base: vc_partyrat_multi1.
-[vc_partyrat_multi1]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off1
-multinpc=0,vc_party_rat
-param=npc_noncombat_multi,yes
-
-// Owner: party room. Base: vc_partyrat_multi2.
-[vc_partyrat_multi2]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off2
-multinpc=0,vc_party_rat
-param=npc_noncombat_multi,yes
-
-// Owner: party room. Base: vc_partyrat_multi3.
-[vc_partyrat_multi3]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off3
-multinpc=0,vc_party_rat
-param=npc_noncombat_multi,yes
-
-// Owner: party room. Base: vc_partyrat_multi4.
-[vc_partyrat_multi4]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off4
-multinpc=0,vc_party_rat
-param=npc_noncombat_multi,yes
-
-// Owner: party room. Base: vc_partyrat_multi5.
-[vc_partyrat_multi5]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off5
-multinpc=0,vc_party_rat
-param=npc_noncombat_multi,yes
-
-// Owner: party room. Base: vc_partyrat_multi6.
-[vc_partyrat_multi6]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off6
-multinpc=0,vc_party_rat
-param=npc_noncombat_multi,yes
-
 // Owner: Spirits of the Elid. Base: elid_ranging_target_multinpc.
 [elid_ranging_target_multinpc]
 turnspeed=0

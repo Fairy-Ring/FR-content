@@ -1,0 +1,5 @@
+// Server-only native mansion rat identity; NPC_TYPE exposes the shared display form.
+[ratcatch_mansion_rat_index]
+type=int
+default=0
+autodisable=yes

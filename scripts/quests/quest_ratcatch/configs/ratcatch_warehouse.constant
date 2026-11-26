@@ -1,0 +1,11 @@
+// VERIFIED native warehouse area: packed ladder, broken wall and four bait holes in m51_52.
+^ratcatch_warehouse_plane = 1
+^ratcatch_warehouse_min_x = 3264
+^ratcatch_warehouse_max_x = 3274
+^ratcatch_warehouse_min_z = 3377
+^ratcatch_warehouse_max_z = 3384
+// UNKNOWN cleanup bound for a private King Rat encounter, in game ticks.
+^ratcatch_warehouse_fight_lifetime = 600
+// UNKNOWN encounter staging tiles, selected on the original warehouse room's floor.
+^ratcatch_warehouse_cat_fight_tile = 1_51_52_6_53
+^ratcatch_warehouse_rat_fight_tile = 1_51_52_6_54

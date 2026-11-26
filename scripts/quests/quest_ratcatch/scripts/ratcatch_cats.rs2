@@ -1,0 +1,147 @@
+// VERIFIED advanced cats unlocked by quest: Tip.It q127, 27 April 2006, line213.
+// CANDIDATE training, six-letter/spaces names and activity: Wily_cat/Lazy_cat, change notes checked.
+// UNKNOWN functional messages. Original 377 client fields and pet ownership conventions are preserved.
+[proc,ratcatch_cat_services]
+if (%ratcatch_var < ^ratcatch_complete) return;
+def_int $option = ~p_choice2("Train my overgrown cat.", 1, "Name my wily or lazy cat.", 2);
+if ($option = 2) {
+    ~ratcatch_name_open;
+    return;
+}
+if (%follower_obj = null | oc_category(%follower_obj) ! overgrown | npc_finduid(%follower_uid) = false) {
+    mes("Bring an overgrown cat to train.");
+    return;
+}
+if (calc(~ratcatch_advanced_total(inv) + ~ratcatch_advanced_total(bank)) > 0) {
+    mes("You already have a wily or lazy cat.");
+    return;
+}
+def_npc $trained = null;
+switch_obj (%follower_obj) {
+    case overgrowncatobject : $trained = wileycat;
+    case overgrowncatobject_light : $trained = wileycat_light;
+    case overgrowncatobject_brown : $trained = wileycat_brown;
+    case overgrowncatobject_black : $trained = wileycat_black;
+    case overgrowncatobject_browngrey : $trained = wileycat_browngrey;
+    case overgrowncatobject_bluegrey : $trained = wileycat_bluegrey;
+}
+if ($trained = null) return;
+npc_changetype($trained, ^max_32bit_int);
+%follower_uid = npc_uid;
+%follower_obj = npc_param(pet_item_id);
+%cat_growth = 0;
+settimer(petcat_growth, 150);
+mes("Your overgrown cat is now a wily cat.");
+
+[proc,ratcatch_advanced_total](inv $inventory)(int)
+return(calc(inv_total($inventory, lazycatobject) + inv_total($inventory, lazycatobject_light) + inv_total($inventory, lazycatobject_brown) + inv_total($inventory, lazycatobject_black) + inv_total($inventory, lazycatobject_browngrey) + inv_total($inventory, lazycatobject_bluegrey) + inv_total($inventory, wileycatobject) + inv_total($inventory, wileycatobject_light) + inv_total($inventory, wileycatobject_brown) + inv_total($inventory, wileycatobject_black) + inv_total($inventory, wileycatobject_browngrey) + inv_total($inventory, wileycatobject_bluegrey)));
+
+[opheld5,_ratcatch_lazycat] ~cat_drop;
+[opheld5,_ratcatch_wilycat] ~cat_drop;
+
+[ai_timer,_ratcatch_petcat]
+if (finduid(%npc_attacking_uid) = true) {
+    if (coordy(coord) ! coordy(npc_coord) | npc_range(coord) > 15) {
+        npc_tele(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk));
+    }
+    // UNKNOWN engineering durations use the existing saved 90-second growth clock.
+    if (oc_category(%follower_obj) = ratcatch_wilycat & getbit_range(%cat_growth, 11, 19) >= ^ratcatch_wily_age_intervals) {
+        if (p_finduid(uid) = true) ~ratcatch_cat_change(false);
+    } else if (oc_category(%follower_obj) = ratcatch_lazycat & getbit_range(%cat_growth, 20, 26) >= ^ratcatch_lazy_retrain_catches & getbit_range(%cat_growth, 11, 19) >= ^ratcatch_lazy_age_intervals) {
+        if (p_finduid(uid) = true) ~ratcatch_cat_change(true);
+    }
+} else {
+    npc_del;
+}
+
+[proc,ratcatch_cat_change](boolean $wily)
+def_npc $next = null;
+switch_obj (%follower_obj) {
+    case wileycatobject : if ($wily = false) $next = lazycat;
+    case lazycatobject : if ($wily = true) $next = wileycat;
+    case wileycatobject_light : if ($wily = false) $next = lazycat_light;
+    case lazycatobject_light : if ($wily = true) $next = wileycat_light;
+    case wileycatobject_brown : if ($wily = false) $next = lazycat_brown;
+    case lazycatobject_brown : if ($wily = true) $next = wileycat_brown;
+    case wileycatobject_black : if ($wily = false) $next = lazycat_black;
+    case lazycatobject_black : if ($wily = true) $next = wileycat_black;
+    case wileycatobject_browngrey : if ($wily = false) $next = lazycat_browngrey;
+    case lazycatobject_browngrey : if ($wily = true) $next = wileycat_browngrey;
+    case wileycatobject_bluegrey : if ($wily = false) $next = lazycat_bluegrey;
+    case lazycatobject_bluegrey : if ($wily = true) $next = wileycat_bluegrey;
+}
+if ($next = null) return;
+npc_changetype($next, ^max_32bit_int);
+%follower_uid = npc_uid;
+%follower_obj = npc_param(pet_item_id);
+%cat_growth = setbit_range_toint(%cat_growth, 0, 11, 26);
+if ($wily = true) mes("Your lazy cat has become a wily cat.");
+else mes("Your wily cat has become a lazy cat. Catch rats to train it again.");
+
+[proc,ratcatch_pet_owner]()(boolean)
+if (%npc_attacking_uid = uid & %follower_uid = npc_uid) return(true);
+mes("This is not your cat.");
+return(false);
+
+[opnpc1,_ratcatch_petcat]
+if (~ratcatch_pet_owner = false) return;
+if (inv_freespace(inv) = 0) {
+    mes("Make room to pick up your cat.");
+    return;
+}
+inv_add(inv, npc_param(pet_item_id), 1);
+%follower_obj = null;
+%follower_uid = null;
+npc_del;
+
+[opnpc3,_ratcatch_petcat]
+if (~ratcatch_pet_owner = false) return;
+mes("Your cat, <~ratcatch_cat_name>, purrs contentedly.");
+npc_say("Purr...");
+
+[opnpc4,_ratcatch_petcat]
+if (~ratcatch_pet_owner = false) return;
+def_int $action = ~p_choice3("Stroke the cat.", 1, "Chase a rat.", 2, "Shoo the cat away.", 3);
+if ($action = 1) {
+    anim(human_pickupfloor, 0);
+    npc_anim(cat_rollingover, 0);
+    npc_say("Purr...");
+} else if ($action = 2) {
+    ~ratcatch_pet_chase;
+} else {
+    if (~p_choice2("Shoo the cat away.", 1, "Keep the cat.", 2) = 2) return;
+    ~follower_death;
+}
+
+[proc,ratcatch_pet_chase]
+if (.npc_find(coord, rat, 10, 1) = false) {
+    mes("There are no rats nearby.");
+    return;
+}
+if (lineofwalk(npc_coord, .npc_coord) = false) {
+    mes("Your cat cannot reach the rat.");
+    return;
+}
+// UNKNOWN engineering catch curve; successful activity improves the secondary draw.
+def_int $activity = min(^ratcatch_activity_max, divide(getbit_range(%cat_growth, 20, 26), ^ratcatch_activity_step));
+def_int $chance;
+if (oc_category(%follower_obj) = ratcatch_lazycat) {
+    $chance = random(^ratcatch_lazy_catch_roll);
+    if ($chance ! 0) $chance = random(sub(^ratcatch_lazy_activity_roll, $activity));
+} else {
+    $chance = random(^ratcatch_wily_catch_roll);
+    if ($chance ! 0) $chance = random(sub(^ratcatch_wily_activity_roll, $activity));
+}
+npc_setmode(none);
+npc_walk(.npc_coord);
+p_delay(1);
+npc_anim(cat_pounce, 0);
+p_delay(1); // CANDIDATE pre-2025 chase still delays the player, like ordinary cats.
+npc_setmode(playerfollow);
+if ($chance ! 0) {
+    mes("The rat escapes.");
+    return;
+}
+.npc_del;
+%cat_growth = setbit_range_toint(%cat_growth, min(100, add(getbit_range(%cat_growth, 20, 26), 1)), 20, 26);
+mes("Your cat catches the rat.");

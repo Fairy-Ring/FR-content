@@ -1,0 +1,36 @@
+// VERIFIED map bounds: native mansion map square m44_79, planes 0-1.
+^ratcatch_mansion_min = 0_44_79_0_0
+^ratcatch_mansion_max = 1_44_79_63_63
+
+// VERIFIED town-ladder source loc; UNKNOWN adjacent landings selected from native map floors.
+^ratcatch_mansion_entry = 0_44_79_45_36
+^ratcatch_mansion_town_exit = 0_40_51_2_56
+^ratcatch_mansion_town_ladder = 0_40_51_1_56
+// UNKNOWN route choice: the native west mansion door returns to Jimmy.
+^ratcatch_mansion_exit_door = 0_44_79_19_37
+
+// UNKNOWN engineering checkpoints, selected from walkable mansion rooms.
+^ratcatch_mansion_checkpoint_early = 0_44_79_45_36
+^ratcatch_mansion_checkpoint_mid = 1_44_79_17_42
+^ratcatch_mansion_checkpoint_late = 1_44_79_42_32
+
+// UNKNOWN engineering guard polling/sight values; not period timings or ranges.
+^ratcatch_mansion_guard_poll = 4
+^ratcatch_mansion_guard_sight = 8
+^ratcatch_mansion_guard_reset_grace = 8
+
+// UNKNOWN engineering catch thresholds for early/mid/late guard-reset checkpoints.
+^ratcatch_mansion_checkpoint_mid_count = 2
+^ratcatch_mansion_checkpoint_late_count = 4
+
+// Internal UNKNOWN facing codes used by the guard's forward-view check.
+^ratcatch_mansion_face_north = 0
+^ratcatch_mansion_face_east = 1
+^ratcatch_mansion_face_south = 2
+^ratcatch_mansion_face_west = 3
+
+// UNKNOWN engineering stage encodings for the retained 3 -> 6 handoff.
+^ratcatch_mansion_stage_start = 3
+^ratcatch_mansion_stage_active = 4
+^ratcatch_mansion_stage_complete = 5
+^ratcatch_mansion_stage_next = 6
