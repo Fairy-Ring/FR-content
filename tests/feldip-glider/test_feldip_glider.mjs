@@ -25,7 +25,7 @@ const destinations = [
   { button: 28, tile: [0, 2850, 3497], outward: 1, inward: 2 },
   { button: 29, tile: [0, 3320, 3430], outward: 3 },
   { button: 30, tile: [0, 3284, 3211], outward: 4, inward: 5 },
-  { button: 31, tile: feldip, outward: 8, inward: 9 }
+  { button: 31, tile: feldip, outward: 10, inward: 11 } // CANDIDATE model-bearing route pair.
 ];
 function fixture(start = tree, stage = complete, gt = treeComplete) {
   const p = player();
@@ -38,7 +38,7 @@ function fly(p, component, expectedJourney = null) {
   p.openMainModal(mapRoot);
   assert(button(p, `glidermap:com_${component}`), 'native interface button accepted');
   if (expectedJourney !== null) {
-    assert.equal(p.getVar(journey), expectedJourney, 'authentic flight animation starts before the teleport');
+    assert.equal(p.getVar(journey), expectedJourney, 'selected flight animation starts before the teleport');
     assert.equal(p.modalMain, mapRoot, 'map remains open during the flight');
   }
   settle(p);
@@ -95,7 +95,7 @@ for (const [landing, exit, target] of [
 }
 // 377 interface data, not an invented animation or a new client-side gate.
 const iface = readFileSync(path.join(contentRoot, 'scripts/interfaces/glidermap.if'), 'utf8');
-for (const [component, value] of [[41, 8], [40, 9]]) {
+for (const [component, value] of [[41, 8], [40, 9], [42, 10], [43, 11]]) {
   const block = iface.split(`[com_${component}]`)[1].split(/\n\[/)[0];
   assert(block.includes('script1op1=pushvar,pilot_journey'));
   assert(block.includes(`script1=eq,${value}`));
@@ -116,9 +116,9 @@ for (const stage of [0, 20, 21, 22, 42, 44, complete - 1]) {
 }
 for (const stage of [complete, complete + 1]) {
   const p = fixture(tree, stage);
-  fly(p, 31, 8); near(tile(p), feldip, 'outbound Feldip flight');
+  fly(p, 31, 10); near(tile(p), feldip, 'outbound Feldip flight');
   pathTo(tile(p), [0, 2544, 2968], 'actual Feldip landing has a route out');
-  fly(p, 27, 9); near(tile(p), tree, 'return Grand Tree flight');
+  fly(p, 27, 11); near(tile(p), tree, 'return Grand Tree flight');
 }
 for (const from of [destinations[0].tile, destinations[2].tile, destinations[4].tile]) {
   const p = fixture(from);
@@ -133,6 +133,20 @@ for (const from of [destinations[0].tile, destinations[2].tile, destinations[4].
   fly(p, 31);
   assert.deepEqual(tile(p), feldip, 'Feldip detects already-there');
   assert(p.messages.includes("You're already there."));
+}
+{
+  // Regression: a player can talk from here when Gnormadium wanders to 2543,2978.
+  const northStand = [0, 2543, 2979];
+  const p = fixture(northStand);
+  for (const component of [26, 28, 29, 30, 31]) {
+    p.messages.length = 0;
+    fly(p, component);
+    assert.deepEqual(tile(p), northStand, 'northern Talk-to tile remains a Feldip spoke');
+    assert(p.messages.includes(component === 31 ? "You're already there." : "You can't go there at the moment."),
+      'northern Talk-to tile enforces the hub and already-there rules');
+  }
+  fly(p, 27, 11);
+  near(tile(p), tree, 'northern Talk-to tile returns to Grand Tree with journey 11');
 }
 for (const row of destinations.slice(0, 5)) {
   const p = fixture(tree, 0);
@@ -189,5 +203,5 @@ function talk(p, actor) {
   assert.equal(count(p, 'coins'), 0, 'original 10-coin price remains');
   assert.equal(p.getVar(quest), 21, 'chisel purchase does not advance the quest');
 }
-console.log('PASS compiled Feldip glider: both quest gates, native pilot/map dispatch, authentic 8/9 flights, safe connected landings, hub restrictions, all five old buttons and original Gnormadium stages/chisel');
+console.log('PASS compiled Feldip glider: both quest gates, native pilot/map dispatch, CANDIDATE 10/11 flights, safe connected landings, northern-wander hub restrictions, all five old buttons and original Gnormadium stages/chisel');
 process.exit(0);

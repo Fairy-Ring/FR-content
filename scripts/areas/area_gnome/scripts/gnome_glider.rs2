@@ -40,7 +40,8 @@ if(inzone(movecoord(^ta_quir_priw, -8, 0, -8), movecoord(^ta_quir_priw, 8, 0, 8)
     return (^kar_hewo);
 }  else if(inzone(movecoord(^sindarpos, -8, 0, -8), movecoord(^sindarpos, 8, 0, 8), coord) = true) {
     return (^sindarpos);
-} else if(inzone(movecoord(^lemantolly_undri, -8, 0, -8), movecoord(^lemantolly_undri, 8, 0, 8), coord) = true) {
+} else if(inzone(movecoord(0_39_46_48_29, -8, 0, -8), movecoord(0_39_46_48_29, 8, 0, 8), coord) = true) {
+    // Centre on Gnormadium's original spawn, including his northern Talk-to tiles.
     return (^lemantolly_undri);
 }
 return (^ta_quir_priw);
@@ -61,11 +62,11 @@ if($start_pos = ^ta_quir_priw & $dest = ^sindarpos) {
 } else if($start_pos = ^ta_quir_priw & $dest = ^gandius) {
     return (7);
 } else if($start_pos = ^ta_quir_priw & $dest = ^lemantolly_undri) {
-    // VERIFIED 377 glidermap:com_41 selects pilot_journey 8.
-    return (8);
+    // CANDIDATE com_42: model bearing fits Grand Tree-to-Feldip better than com_41.
+    return (10);
 } else if($start_pos = ^lemantolly_undri & $dest = ^ta_quir_priw) {
-    // VERIFIED 377 glidermap:com_40 selects pilot_journey 9.
-    return (9);
+    // CANDIDATE com_43: model bearing fits Feldip-to-Grand Tree better than com_40.
+    return (11);
 }
 return (-1);
 
