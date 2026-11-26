@@ -128,7 +128,10 @@ function solveLeo(p, { inspect = false, reconnectAfterTwo = false, verifyWrongLa
     }
     const mausoleum = locAt('mausoleum', 30, 78).loc;
     run(p, '[oploc1,mausoleum]', [], { loc: mausoleum });
-    if (p.modalMain >= 0) p.closeModal();
+    assert.equal(p.modalMain, id(types.Component, 'bank_deposit_box'), 'mausoleum opens the published deposit-only interface');
+    assert(p.invListeners.some(listener => listener.type === inv
+      && listener.com === id(types.Component, 'bank_deposit_box:com_62')), 'mausoleum uses its native inventory deposit listener');
+    p.closeModal();
   }
 
   for (let index = 0; index < (reconnectAfterTwo ? 2 : 5); index++) {

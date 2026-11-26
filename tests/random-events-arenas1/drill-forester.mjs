@@ -19,7 +19,8 @@ const resumeHandler = new ResumePauseButtonHandler();
 const DRILL_EVENT = 16;
 const FORESTER_EVENT = 18;
 const DRILL_MATS = ['exercise_mat', 'exercise_mat_10077', 'exercise_mat_10078', 'exercise_mat_10079'];
-const EXERCISE_ANIMS = ['emote_pushups_5', 'emote_situps_5', 'emote_starjump_5', 'emote_run_on_spot'];
+const EXERCISE_ANIMS = ['emote_run_on_spot', 'emote_situps_5', 'emote_pushups_5', 'emote_starjump_5'];
+const EXERCISE_LABELS = ['jogging in place', 'sit-ups', 'push-ups', 'star jumps'];
 const PHEASANTS = ['macro_pheasant_onetail', 'macro_pheasant_twotail', 'macro_pheasant_threetail', 'macro_pheasant_fourtail'];
 const DRILL_OUTFIT = ['drill_top', 'drill_bottoms', 'drill_helm'];
 const FORESTER_OUTFIT = ['laderhosen_top', 'laderhosen_legs', 'laderhosen_hat'];
@@ -179,6 +180,30 @@ export default function register() {
     run(q, '[oploc1,portal_8972]', [], { loc: nativeLoc('portal_8972', 40, 74).loc });
   });
 
+  check('Drill native sign codes bind all four poses and client-cycle delays', () => {
+    const p = player();
+    startDrill(p);
+    for (const [code, animation] of EXERCISE_ANIMS.entries()) {
+      const state = drillState(p);
+      const messagesBefore = p.messages.length;
+      run(p, '[proc,macro_drill_status]');
+      assert(p.messages.some((packet, index) => index >= messagesBefore && typeof packet.text === 'string'
+        && packet.text.includes(EXERCISE_LABELS[state.target])), 'order text names the original native sign');
+      const name = DRILL_MATS[state.signs.indexOf(code)];
+      const { loc } = nativeLoc(name, 49, 75);
+      const seq = types.SeqType.get(id(types.SeqType, animation));
+      assert.equal(seq.loops, -1, 'original exercise sequence has no repeat loop');
+      const started = World.currentTick;
+      const exercise = run(p, `[oploc1,${name}]`, [], { loc, resume: false });
+      assert.equal(exercise.execution, ScriptState.SUSPENDED);
+      assert.equal(p.animId, seq.id, `native sign ${code} selects its matching exercise pose`);
+      assert.equal(p.delayedUntil - started, Math.ceil(seq.duration / 30) + 1,
+        'player delay converts client cycles and preserves the native extra scheduling tick');
+      finishInteraction(p, `native sign ${code}`);
+    }
+    if (p.getVar(v('macro_event')) === DRILL_EVENT) run(p, '[proc,macro_arena1_return]', [DRILL_EVENT]);
+  });
+
   check('Drill wrong mat penalizes progress and animation follows its shuffled sign', () => {
     const p = player();
     give(p, 'drill_top');
@@ -212,7 +237,7 @@ export default function register() {
     startDrill(full);
     solveDrill(full);
     assert.deepEqual(DRILL_OUTFIT.map(name => count(full, name)), [1, 1, 1], 'the existing full set remains unique');
-    assert.equal(count(full, 'coins'), 500, 'complete set uses the UNKNOWN 500-coin fallback exactly once');
+    assert.equal(count(full, 'coins'), 500, 'complete set uses the CANDIDATE 500-coin fallback exactly once');
   });
 
   check('Drill admission clock survives relog and expires the bonus without forcing exit', () => {

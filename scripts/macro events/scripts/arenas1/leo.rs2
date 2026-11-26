@@ -275,7 +275,10 @@ if (~macro_leo_solved = false) {
 [oploc1,mausoleum]
 if (~macro_arena1_owned(^macro_leo) = false) return;
 ~mesbox("You can store items here before you take the coffins.");
-@openbank;
+if_openmain(bank_deposit_box);
+if_settab(null, 3);
+if_settab(null, 4);
+inv_transmit(inv, bank_deposit_box:com_62);
 
 [proc,macro_leo_cleanup]
 inv_del(inv, macro_digger_coffin_object_1, ^max_32bit_int);

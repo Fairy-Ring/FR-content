@@ -31,10 +31,10 @@ while ($fourth = $first | $fourth = $second | $fourth = $third) {
 [proc,macro_drill_status]
 if (~macro_arena1_owned(^macro_drill) = false) return;
 switch_int (getbit_range(%macro_transmit, 8, 9)) {
-    case 0 : ~mesbox("UNKNOWN task: use the mat showing push-ups."); return;
+    case 0 : ~mesbox("UNKNOWN task: use the mat showing jogging in place."); return;
     case 1 : ~mesbox("UNKNOWN task: use the mat showing sit-ups."); return;
-    case 2 : ~mesbox("UNKNOWN task: use the mat showing star jumps."); return;
-    case 3 : ~mesbox("UNKNOWN task: use the mat showing jogging in place."); return;
+    case 2 : ~mesbox("UNKNOWN task: use the mat showing push-ups."); return;
+    case 3 : ~mesbox("UNKNOWN task: use the mat showing star jumps."); return;
 }
 
 [opnpc1,macro_drilldemon]
@@ -58,12 +58,13 @@ if ($mat < 0 | $mat > 3) return;
 def_int $shift = multiply($mat, 2);
 def_int $shown = getbit_range(%macro_transmit, $shift, add($shift, 1));
 def_int $requested = getbit_range(%macro_transmit, 8, 9);
-def_seq $animation = emote_pushups_5;
+def_seq $animation = emote_run_on_spot;
 if ($shown = 1) $animation = emote_situps_5;
-if ($shown = 2) $animation = emote_starjump_5;
-if ($shown = 3) $animation = emote_run_on_spot;
+if ($shown = 2) $animation = emote_pushups_5;
+if ($shown = 3) $animation = emote_starjump_5;
 anim($animation, 0);
-p_delay(seqlength($animation));
+// seqlength is in client cycles; p_delay is in server ticks (30 cycles/tick).
+p_delay(calc((seqlength($animation) + 29) / 30));
 if (~macro_arena1_owned(^macro_drill) = false) return;
 def_int $remaining = getbit_range(%macro_transmit, 10, 29);
 if ($shown = $requested) {
