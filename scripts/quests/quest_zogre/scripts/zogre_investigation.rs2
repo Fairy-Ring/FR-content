@@ -1,0 +1,78 @@
+// VERIFIED sequence/items: Tip.It guide 100, captured 2 May 2006.
+// UNKNOWN functional messages and guaranteed knife success favour the player.
+[oploc1,zogre_brentle_skeleton]
+if (%zogre = 0) return;
+if (%thzfe_brentle_skele < 2) {
+    ~zogre_brentle_summon;
+    return;
+}
+if (inv_total(inv, zogre_dragon_tankard) > 0 | inv_total(bank, zogre_dragon_tankard) > 0) {
+    mes("You have already recovered the tankard.");
+    return;
+}
+if (~zogre_give(zogre_brentle_vahn_backpack) = true) mes("You find a ruined backpack.");
+
+[opheld1,zogre_brentle_vahn_backpack]
+if (inv_freespace(inv) < 2) {
+    mes("You need two more free inventory spaces.");
+    return;
+}
+inv_del(inv, zogre_brentle_vahn_backpack, 1);
+inv_add(inv, knife, 1);
+inv_add(inv, rotten_food, 1);
+inv_add(inv, zogre_dragon_tankard, 1);
+mes("The backpack contains a knife, rotten food and a Dragon Inn tankard.");
+
+[oploc1,zogre_lecturn]
+if (%zogre = 0) return;
+if (~zogre_give(zogre_necromantic_page) = true) mes("You find a torn page in the broken lecturn.");
+
+[oplocu,zogre_coffin_special] ~zogre_pry_coffin;
+[oplocu,zogre_coffin_special_searched] ~zogre_pry_coffin;
+[proc,zogre_pry_coffin]
+if (%zogre = 0 | last_useitem ! knife) return;
+%thzfe_prismsearch = 3;
+mes("You prise open the coffin with your knife.");
+
+[oploc1,zogre_coffin_special] ~zogre_search_prism;
+[oploc1,zogre_coffin_special_searched] ~zogre_search_prism;
+[proc,zogre_search_prism]
+if (%zogre = 0) return;
+if (%thzfe_prismsearch < 3) {
+    mes("You need something to prise the coffin open.");
+    return;
+}
+if (~zogre_give(zogre_black_prism) = true) mes("You find a black prism.");
+
+[opheld1,zogre_black_prism]
+mes("The black prism was inside the coffin near the broken lecturn.");
+[opheld1,zogre_dragon_tankard]
+mes("The tankard bears the name of the Dragon Inn in Yanille.");
+[opheld1,zogre_necromantic_page]
+mes("This is a torn page from a book about necromancy.");
+
+// Shared bartender dispatcher calls this before its unchanged barcrawl branch.
+[proc,zogre_bartender]()(boolean)
+if (last_useitem ! zogre_dragon_tankard & last_useitem ! zogre_sithik_portrait_good & last_useitem ! zogre_sithik_portrait_bad & last_useitem ! zogre_sithik_portrait_signed) return(false);
+if (%zogre = 0) return(true);
+if (last_useitem = zogre_dragon_tankard) {
+    ~chatnpc("<p,neutral>This tankard belonged to Brentle Vahn. He was dealing with a wizard. I would recognise the wizard if I saw him.");
+    %thzfe_innkeepermugshown = 1;
+    return(true);
+}
+if (%thzfe_innkeepermugshown = 0) {
+    ~chatnpc("<p,neutral>Show me the tankard first.");
+    return(true);
+}
+if (last_useitem = zogre_sithik_portrait_bad) {
+    ~chatnpc("<p,neutral>I cannot recognise anyone from this portrait.");
+    return(true);
+}
+if (last_useitem = zogre_sithik_portrait_good & %zogre >= 3) {
+    inv_del(inv, zogre_sithik_portrait_good, 1);
+    inv_add(inv, zogre_sithik_portrait_signed, 1);
+    %thzfe_innkeeperportraitshown = 1;
+    if (%zogre = 3) %zogre = 4;
+    ~chatnpc("<p,neutral>That is the wizard I saw with Brentle. I will sign the portrait as evidence.");
+}
+return(true);

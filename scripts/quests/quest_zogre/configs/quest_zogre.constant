@@ -1,0 +1,28 @@
+// VERIFIED: Tip.It guide 100, captured 2 May 2006, gives 2,000 XP in each skill.
+^zogre_reward_xp = 20000
+// UNKNOWN favourable engineering choices where the retained guide gives no number.
+^zogre_balm_xp = 400
+^zogre_comp_cut_xp = 450
+^zogre_comp_string_xp = 50
+^zogre_brutal_bronze_xp = 14
+^zogre_brutal_iron_xp = 26
+^zogre_brutal_steel_xp = 51
+^zogre_brutal_black_xp = 64
+^zogre_brutal_mithril_xp = 77
+^zogre_brutal_adamant_xp = 101
+^zogre_brutal_rune_xp = 126
+// UNKNOWN: reading portraiture guarantees a usable portrait; no random failure.
+^zogre_portrait_read = 1
+// UNKNOWN: tier levels and a six-arrow batch are favourable engineering defaults.
+^zogre_brutal_bronze_level = 7
+^zogre_brutal_iron_level = 18
+^zogre_brutal_steel_level = 33
+^zogre_brutal_black_level = 38
+^zogre_brutal_mithril_level = 49
+^zogre_brutal_adamant_level = 62
+^zogre_brutal_rune_level = 77
+^zogre_brutal_batch = 6
+// UNKNOWN: the bell's temporary wizard remains outside for 100 cycles.
+^zogre_wizard_lifetime = 100
+// UNKNOWN: stringing uses the same level as the guide's listed Fletching requirement.
+^zogre_comp_string_level = 30

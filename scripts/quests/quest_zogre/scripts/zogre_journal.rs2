@@ -1,0 +1,25 @@
+// UNKNOWN functional journal wording, approved to expose the sourced quest steps.
+[if_button,questlist:zogre]
+def_string $text = "I can speak to Grish near Jiggig after completing Big Chompy Bird Hunting and Jungle Potion. I need 4 Smithing, 8 Herblore and 30 Ranged.";
+if (%zogre >= ^zogre_complete) {
+    $text = "I returned the ogre artefact to Grish. Quest complete! I received 1 Quest Point and 2,000 experience each in Fletching, Ranged and Herblore. I can make Relicym's balm, brutal arrows and ogre composite bows. Uglug Nar will buy a four-dose balm and open his shop.";
+} else if (%zogre = 12) {
+    $text = "Slash Bash is defeated. I should take the ogre artefact back to Grish. If I lose it, I can search the coffin stand again.";
+} else if (%zogre >= 10) {
+    $text = "Grish gave me a key to the locked tomb and taught me to make ogre composite bows. I must search the coffin stand beyond the gates and defeat Slash Bash to recover the ogre artefact.";
+} else if (%zogre >= 7) {
+    $text = "Sithik confessed and taught me to make Relicym's balm and brutal arrows. I should return to Grish. Relicym's balm uses rogue's purse and snake weed in water.";
+} else if (%zogre = 6) {
+    $text = "I put Zavistic's potion in Sithik's tea. I should speak to Sithik again about the curse.";
+} else if (%zogre = 5) {
+    $text = "Zavistic gave me a strange potion. I should put it into Sithik's tea in his upstairs room.";
+} else if (%zogre = 4) {
+    $text = "The Dragon Inn bartender signed my portrait of Sithik. I should take the signed portrait and evidence from Sithik's books to Zavistic.";
+} else if (%zogre = 3) {
+    $text = "Sithik allowed me to search his room. I should read the books, compare the torn page with the necromancy book, draw Sithik with papyrus and charcoal, then show a good portrait to the Dragon Inn bartender.";
+} else if (%zogre = 2) {
+    $text = "Zavistic identified the black prism and torn page. I should visit Sithik Ints upstairs in Yanille and ask to search his room.";
+} else if (%zogre = 1) {
+    $text = "Grish asked me to investigate Jiggig. The ogre guard can open the barricade. I should search the skeleton, backpack, lectern and unusual coffin below the stairs, show the tankard to the Dragon Inn bartender, then ring the bell at the Wizards' Guild with the prism and page.";
+}
+~quest_journal("Zogre Flesh Eaters", $text);
