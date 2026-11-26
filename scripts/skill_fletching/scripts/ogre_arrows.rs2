@@ -11,6 +11,7 @@ switch_obj(last_useitem) {
 }
 
 [opheldu,ogre_headless_arrow]
+if (~zogre_brutal_arrows = true) return;
 switch_obj(last_useitem) {
     case wolfbone_arrowheads : @make_ogre_arrows;
     case default : ~displaymessage(^dm_default);

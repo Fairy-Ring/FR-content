@@ -92,6 +92,11 @@ if ($ammo = null) {
     return(null);
 }
 def_category $ammo_cat = oc_category($ammo);
+if ($rhand = zogre_bow) {
+    if ($ammo_cat = ogre_arrows) return ($ammo);
+    mes("You can't use that ammo with your bow.");
+    return (null);
+}
 if (($rhand = ogre_bow & $ammo_cat ! ogre_arrows) | 
     ($rhand ! ogre_bow & $weapon_cat = weapon_bow & $ammo_cat ! arrows)) {
     mes("You can't use that ammo with your bow."); // todo confirm this for 2004.

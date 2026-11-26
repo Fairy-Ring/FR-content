@@ -91,6 +91,7 @@ return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
 // "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
 // magic callers (pass spell id or 0). Quest-local ai_queue2 remains secondary.
 [proc,npc_max_dealt](int $maxhit, int $spell)(int)
+if (~zogre_undead = true) return (~zogre_damage_max($maxhit, $spell));
 if (npc_category = dwarfrock_avatar & ~dwarfrock_avatar_attackable = false) return(0);
 if (npc_type = fairy_tanglefoot) return(~ft1_tanglefoot_max_dealt($maxhit, $spell));
 if (~soulbane_rage_npc = true) return(~soulbane_rage_max(min($maxhit, npc_param(max_dealt)), $spell));
