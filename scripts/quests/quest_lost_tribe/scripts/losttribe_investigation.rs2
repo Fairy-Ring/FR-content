@@ -1,0 +1,128 @@
+// VERIFIED mechanics: retained Tip.It quest 101, capture 2006-05-02, steps 1-8.
+// UNKNOWN functional dialogue and intermediate stage writes, not recovered wording.
+[proc,losttribe_bob_hook]()(boolean)
+return(~losttribe_witness_hook(0));
+
+[proc,losttribe_witness_hook](int $witness)(boolean)
+if (%lost_tribe_quest < 1 | %lost_tribe_quest >= ^lost_tribe_complete) return(false);
+if (~p_choice2("Do you know what happened in the castle cellar?", 1, "I'd like to talk about something else.", 2) = 2) return(false);
+~chatplayer("<p,neutral>Do you know what happened in the castle cellar?");
+if (%lost_tribe_quest = 1 & %lost_tribe_contact = $witness) {
+    ~chatnpc("<p,neutral>I saw a goblin-like creature in the cellar. It had a light on its helmet. The Duke did not believe me.");
+    %lost_tribe_quest = 2;
+    ~losttribe_progress;
+} else {
+    ~chatnpc("<p,neutral>You should ask the other people in Lumbridge.");
+}
+return(true);
+
+[proc,losttribe_duke_hook]()(boolean)
+if (%lost_tribe_quest < 1 | %lost_tribe_quest >= ^lost_tribe_complete) return(false);
+if (~p_choice2("About the disturbance in the cellar...", 1, "I'd like to talk about something else.", 2) = 2) return(false);
+if (%lost_tribe_quest = 1) {
+    ~chatnpc("<p,neutral>Ask Hans, the cook, Bob and Father Aereck about the disturbance.");
+} else if (%lost_tribe_quest = 2) {
+    ~chatnpc("<p,neutral>Investigate the blocked hole in the cellar. You may clear the rubble.");
+    %lost_tribe_quest = 3;
+    ~losttribe_progress;
+} else if (%lost_tribe_quest = 3) {
+    ~chatnpc("<p,neutral>Use a pickaxe on the rubble in the cellar.");
+} else if (%lost_tribe_quest = 4) {
+    if (inv_total(inv, lost_tribe_brooch) = 0) {
+        ~chatnpc("<p,neutral>Look for evidence in the tunnel.");
+    } else {
+        ~chatnpc("<p,neutral>Reldo in Varrock's library may know about the symbol on this brooch.");
+        %lost_tribe_quest = 5;
+        %lost_tribe_contact = 0;
+        ~losttribe_progress;
+    }
+} else if (%lost_tribe_quest < 8) {
+    ~chatnpc("<p,neutral>Find out who lives in the tunnels beneath the castle.");
+} else if (%lost_tribe_quest = 8) {
+    ~chatnpc("<p,neutral>Our silverware is missing. It must be returned before we can make peace.");
+    %lost_tribe_quest = 9;
+    ~losttribe_progress;
+} else if (%lost_tribe_quest = 9) {
+    if (%lost_tribe_sigmund_accused = 0) {
+        // UNKNOWN favourable proof rule: knowledge survives storing or losing the robes.
+        if (%lost_tribe_ham = 1) {
+            ~chatnpc("<p,neutral>These robes show that Sigmund is a member of H.A.M. Find the missing silverware.");
+            %lost_tribe_sigmund_accused = 1;
+        } else {
+            ~chatnpc("<p,neutral>We need evidence of what happened to the silverware.");
+        }
+    } else if (inv_total(inv, lost_tribe_silverware) > 0) {
+        ~chatnpc("<p,neutral>You have proved Sigmund's guilt. He is dismissed. Take this peace treaty to Mistag.");
+        inv_del(inv, lost_tribe_silverware, 1);
+        %lost_tribe_quest = 10;
+        ~losttribe_give(lost_tribe_treaty);
+        ~losttribe_progress;
+    } else {
+        ~chatnpc("<p,neutral>Search the H.A.M. headquarters for our silverware.");
+    }
+} else {
+    ~chatnpc("<p,neutral>Take the peace treaty to Mistag.");
+    ~losttribe_give(lost_tribe_treaty);
+}
+return(true);
+
+[proc,losttribe_reldo_hook]()(boolean)
+if (%lost_tribe_quest ! 5 & %lost_tribe_quest ! 6) return(false);
+if (~p_choice2("Can you identify this goblin symbol?", 1, "I'd like to talk about something else.", 2) = 2) return(false);
+if (inv_total(inv, lost_tribe_brooch) = 0) {
+    ~chatnpc("<p,neutral>Bring the brooch so I can see the symbol.");
+} else {
+    ~chatnpc("<p,neutral>There is a book on ancient goblin tribes in a bookcase on the west wall. You should read it.");
+    %lost_tribe_contact = 1;
+}
+return(true);
+
+[oploc1,lost_tribe_bookcase]
+if (%lost_tribe_quest < 5 | %lost_tribe_contact = 0) {
+    mes("You find nothing to interest you.");
+    return;
+}
+~losttribe_give(lost_tribe_book);
+mes("You find a book about goblin tribes.");
+
+[proc,losttribe_read_book]
+if (%lost_tribe_quest = 5 & %lost_tribe_contact = 1) {
+    %lost_tribe_quest = 6;
+    ~losttribe_progress;
+}
+
+[proc,losttribe_general_hook]()(boolean)
+if (%lost_tribe_quest ! 6) return(false);
+if (~p_choice2("What do you know about the Dorgeshuun?", 1, "I'd like to talk about something else.", 2) = 2) return(false);
+~chatnpc("<p,goblinchat>Dorgeshuun not fight in war. They hide underground. We show you goblin greeting.");
+~mesbox("The generals teach you the Goblin Bow and Goblin Dance.");
+%lost_tribe_quest = 7;
+%lost_tribe_contact = 0;
+~losttribe_progress;
+return(true);
+
+[proc,losttribe_progress]
+~send_quest_progress(questlist:lost_tribe, %lost_tribe_quest, ^lost_tribe_complete);
+
+[proc,losttribe_give](namedobj $item)
+// UNKNOWN favourable replacement policy: recover lost quest objects without a fee.
+if (inv_total(inv, $item) > 0 | inv_total(bank, $item) > 0) return;
+if (inv_freespace(inv) > 0) inv_add(inv, $item, 1);
+else obj_add(coord, $item, 1, ^lootdrop_duration);
+
+[if_button,questlist:lost_tribe]
+// UNKNOWN functional journal wording.
+def_string $text = "I can speak to Sigmund upstairs in Lumbridge Castle. I need Rune Mysteries, Goblin Diplomacy, 17 Mining, 13 Agility and 13 Thieving.";
+switch_int (%lost_tribe_quest) {
+    case 1 : $text = "I should ask Hans, the cook, Bob and Father Aereck about the disturbance, then tell the Duke.";
+    case 2, 3 : $text = "I should speak to the Duke, then use a pickaxe on the rubble in the cellar. I need a light source and tinderbox.";
+    case 4 : $text = "I should take the brooch from the tunnel to Duke Horacio.";
+    case 5 : $text = "Reldo in Varrock's library can identify the brooch. I should search the west bookcase and read the book.";
+    case 6 : $text = "I should ask the generals in Goblin Village about the Dorgeshuun.";
+    case 7 : $text = "I should follow the symbols through the tunnels and bow to Mistag, then speak to him.";
+    case 8 : $text = "Mistag says the damage was an accident. I should tell Duke Horacio.";
+    case 9 : $text = "I need to recover the silverware. Sigmund's key opens his chest. I should show the Duke his H.A.M. robes, then search the crate in H.A.M. headquarters.";
+    case 10 : $text = "I must take the peace treaty to Mistag. Kazgar can guide me through the tunnels.";
+    case 11 : $text = "<col=000080>QUEST COMPLETE!|The humans and Dorgeshuun are at peace. Kazgar and Mistag can guide me through the tunnels. Mistag buys iron and silver ore.";
+}
+~quest_journal("The Lost Tribe", $text);

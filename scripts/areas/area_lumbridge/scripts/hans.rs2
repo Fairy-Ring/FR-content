@@ -14,6 +14,7 @@ if(map_members = ^true) {
         return;
     }
 }
+if (~losttribe_witness_hook(1) = true) return;
 
 ~chatnpc("<p,neutral>Hello. What are you doing here?");
 def_int $option = ~p_choice3("I'm looking for whoever is in charge of this place.", 1, "I have come to kill everyone in this castle!", 2, "I don't know. I'm lost. Where am I?", 3);

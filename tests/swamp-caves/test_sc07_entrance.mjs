@@ -165,22 +165,44 @@ test('synchronous rope release clears a pending gas count (compiled own-position
   out(p); const before=hp(p); ticks(p,40); assert.equal(hp(p),before); assert.equal(count(p,'lit_candle'),1); ownership(p,false); finish(p);
 });
 // The only operable stands: each parent's own tile (cellar 3219,9618; maze 3221,9618).
-for(const [name,x] of [['lost_tribe_cellar_wall',3219],['lost_tribe_cellar_wall_back',3221]]) for(let stage=0;stage<=11;stage++) test(`${name} stage ${stage}: original morph and real packet never grants mine travel, progress or scripted text`,()=>{
+for(const [name,x] of [['lost_tribe_cellar_wall',3219],['lost_tribe_cellar_wall_back',3221]]) for(let stage=0;stage<=11;stage++) test(`${name} stage ${stage}: original morph gates native passage without changing inventory or quest state`,()=>{
   const loc=World.getLoc(x,9618,0,id('LocType',name)),type=types.LocType.get(loc.type);
-  const p=fixture([], [0,x,9618]); p.setVarBit(quest,stage); const child=types.LocType.get(type.multiloc[stage]);
+  const p=fixture(['bullseye_lantern_lit','tinderbox'], [0,x,9618]); p.setVarBit(quest,stage); const child=types.LocType.get(type.multiloc[stage]);
   assert.equal(child.id,stage>=4?6905:name==='lost_tribe_cellar_wall'?(stage===0?6904:6903):6909);
   if(stage>=4) assert.deepEqual(child.op,['Squeeze-through',null,null,null,null],'the visible original op stays');
-  const before={vars:[...p.vars],bag:inventory(p),tile:tile(p)}; assert.equal(click(p,loc),stage>=4); ticks(p,4);
-  assert.deepEqual(tile(p),before.tile); assert.deepEqual([...p.vars],before.vars); assert.deepEqual(inventory(p),before.bag);
+  const before={vars:[...p.vars],quest:p.getVar(id('VarPlayerType','lost_tribe')),rope:p.getVarBit(rope),bag:inventory(p),tile:tile(p)};
+  assert.equal(click(p,loc),stage>=4); ticks(p,4);
+  const arrival=stage>=4?[0,x===3219?3222:3218,9618]:before.tile;
+  assert.deepEqual(tile(p),arrival); assert(!map.isMapBlocked(arrival[1],arrival[2],arrival[0]),'packed arrival is walkable');
+  assert.equal(p.getVar(id('VarPlayerType','lost_tribe')),before.quest); assert.equal(p.getVarBit(rope),before.rope);
+  assert.deepEqual(inventory(p),before.bag);
+  if(stage>=4) ownership(p,x===3219); else assert.deepEqual([...p.vars],before.vars);
   assert.deepEqual(p.messages,[]); finish(p);
 });
 // Hole 6912 (1x3 at 3224,9601-9603) is operable only from main-cave 3224,9600 and maze 3224,9604.
-for(const stand of [[0,3224,9600],[0,3224,9604]]) test(`southern hole6912 keeps the published default and no travel from ${stand}`,()=>{
-  const loc=World.getLoc(3224,9601,0,6912);assert(loc);const p=fixture([],stand),before=[...p.vars];
-  const type=types.LocType.get(loc.type); assert(!ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1,type.id,type.category));
+for(const stand of [[0,3224,9600],[0,3224,9604]]) for(const cleared of [false,true]) test(`southern hole6912 ${cleared?'cleared passage':'rubble gate'} from ${stand}`,()=>{
+  const loc=World.getLoc(3224,9601,0,6912); assert(loc);
+  const p=fixture(cleared?['bullseye_lantern_lit','tinderbox']:[],stand),dug=id('VarBitType','lost_tribe_hole_2_dug');
+  p.setVarBit(quest,4); p.setVarBit(dug,Number(cleared));
+  const fromCave=stand[2]<9602;
+  if(cleared&&fromCave) execute('[proc,swamp_cave_start]',p);
+  const before={vars:[...p.vars],bag:inventory(p),quest:p.getVar(id('VarPlayerType','lost_tribe')),rope:p.getVarBit(rope)};
+  const type=types.LocType.get(loc.type); assert(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1,type.id,type.category));
   assert(!map.isMapBlocked(stand[1],stand[2],0)); assert(p.inOperableDistance(loc));
-  assert(click(p,loc)); ticks(p,4); assert.deepEqual(tile(p),stand); assert.deepEqual([...p.vars],before);
-  assert.equal(p.messages.at(-1),'Nothing interesting happens.'); finish(p);
+  assert(click(p,loc)); ticks(p,4);
+  assert.deepEqual(inventory(p),before.bag);
+  assert.equal(p.getVar(id('VarPlayerType','lost_tribe')),before.quest); assert.equal(p.getVarBit(rope),before.rope);
+  if(cleared) {
+    const arrival=fromCave?[0,3224,9604]:[0,3224,9599];
+    assert.deepEqual(tile(p),arrival); assert(!map.isMapBlocked(arrival[1],arrival[2],arrival[0]),'packed arrival is walkable');
+    // Both sides lie in the existing main/mine cave-environment regions.
+    ownership(p,true);
+    assert.deepEqual(p.messages,[]);
+  } else {
+    assert.deepEqual(tile(p),stand); assert.deepEqual([...p.vars],before.vars);
+    assert.equal(p.messages.length,1,'uncleared rubble explains the refusal');
+  }
+  finish(p);
 });
 for(const typeId of [6919,6920]) test(`city door ${typeId} has no visible operation or native dispatch`,()=>{
   const type=types.LocType.get(typeId); assert(!type.op || type.op.every(value=>value===null));

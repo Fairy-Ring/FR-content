@@ -111,6 +111,7 @@ if (p_finduid(uid) = true) {
     if(%lost_tribe_quest < 7) {
         @lockemote_lost_tribe;
     }
+    ~losttribe_bow;
     @controls_emote(human_cave_goblin_bow);
 }
 
