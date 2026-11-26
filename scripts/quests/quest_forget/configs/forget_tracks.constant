@@ -6,7 +6,7 @@
 ^forget_tracks_puzzle_cart = 1_29_77_8_29
 ^forget_tracks_puzzle_start = 1_29_77_8_30
 ^forget_tracks_card_box_coord = 1_29_77_6_26
-// UNKNOWN candidate scene/reading-room landings pending collision verification.
+// UNKNOWN scene/reading-room coordinates; original room identity and packed collision are tested.
 ^forget_tracks_witness_landing = 2_29_77_12_55
 ^forget_tracks_archive_landing = 2_29_77_47_36
 ^forget_tracks_final_landing = 2_29_77_6_11
@@ -21,7 +21,6 @@
 ^forget_tracks_final_shaman = 2_29_77_6_9
 // UNKNOWN 30-minute expiry bounds actors abandoned by logout; normal scenes delete their own UIDs.
 ^forget_tracks_scene_lifetime = 3000
-^forget_tracks_fade_ticks = 2
 // CANDIDATE required bank-aware stone stock by room and trip, from the retained guide.
 ^forget_tracks_r1_trip1_green = 1
 ^forget_tracks_r1_trip1_yellow = 1

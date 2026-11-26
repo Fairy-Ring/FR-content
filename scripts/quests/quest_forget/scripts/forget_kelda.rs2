@@ -194,8 +194,10 @@ return(true);
 
 // UNKNOWN: new seed, lost-hop, and optional-letter dialogue/menu wording is not sourced; existing greeting and garden-history text are CANDIDATE.
 [proc,forget_rind_talk]()(boolean)
-if (%forget_quest ! 10) return(false);
+if (%forget_quest < 10) return(false);
 def_int $status = ~forget_kelda_letter_state;
+// UNKNOWN favourable recovery rule: an accepted optional errand never expires.
+if (%forget_quest ! 10 & $status ! 1 & $status ! 2) return(false);
 def_boolean $recoverable = ~forget_kelda_hops_recoverable;
 if (%forget_seed3_told = 0) {
     // CANDIDATE greeting retained from the existing Rind handler.

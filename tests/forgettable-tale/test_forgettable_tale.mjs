@@ -742,6 +742,29 @@ for (const name of ['kelda_hop_seed', 'kelda_hops', 'kelda_stout', 'turnright_tr
   'turnleft_trackjunction_control_card', 'forget_gardener_letter']) {
   assert.equal(types.ObjType.get(obj(name)).tradeable, false, `${name}: quest item is untradeable`);
 }
+// Branch fixtures retain a genuinely accepted errand after every later quest beat.
+for (const progress of [20, 30, 40, 50, 60, 70, 80, complete]) {
+  const lateLetter = fixture();
+  set(lateLetter, 'forget_quest', progress);
+  set(lateLetter, 'forget_seed3_told', 1);
+  set(lateLetter, 'forget_gardener_task', 1);
+  for (let loss = 0; loss < 2; loss++) {
+    talk(lateLetter, 'dwarf_city_gardener_dwarf');
+    assert.equal(count(lateLetter, 'forget_gardener_letter'), 1, `stage${progress}: lost accepted letter recovers`);
+    lateLetter.invDel(inv, obj('forget_gardener_letter'), 1);
+  }
+  lateLetter.invAdd(bank, obj('forget_gardener_letter'), 1);
+  talk(lateLetter, 'dwarf_city_gardener_dwarf', [2]);
+  assert.equal(count(lateLetter, 'forget_gardener_letter'), 0, `stage${progress}: banked letter is not duplicated`);
+  lateLetter.invDel(bank, obj('forget_gardener_letter'), 1);
+  give(lateLetter, 'forget_gardener_letter');
+  talk(lateLetter, 'elstan', [1]);
+  talk(lateLetter, 'dwarf_city_gardener_dwarf');
+  assert.equal(count(lateLetter, 'marrentill_seed'), 2, `stage${progress}: late delivery earns the exact optional reward`);
+  talk(lateLetter, 'dwarf_city_gardener_dwarf', [2]);
+  assert.equal(count(lateLetter, 'marrentill_seed'), 2, `stage${progress}: late delivery rewards once`);
+  assert.equal(stage(lateLetter), progress, 'the optional errand never changes the main quest stage');
+}
 console.log('PASS Forgettable shared non-regression, strict finale, exact rewards, once-only scroll');
 loc(fixture(), 'dwarf_keldagrim_bankbooth');
 console.log(`PACKED_APPROACHES ${JSON.stringify(approaches)}`);
