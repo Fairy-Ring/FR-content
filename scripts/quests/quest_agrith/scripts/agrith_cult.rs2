@@ -215,6 +215,8 @@ if (%agrith_quest = 120) {
     ~agrith_reward;
     return;
 }
+// VERIFIED: the period guide permits monk recovery throughout the unfinished quest.
+~agrith_sword_recovery;
 @agrith_cult_greeting;
 
 [proc,agrith_golem_talk]
