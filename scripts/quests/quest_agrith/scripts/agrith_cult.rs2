@@ -96,6 +96,8 @@ return(region_getcoord(0, sub(coordx($template), 2688), sub(coordz($template), 4
 
 [proc,agrith_in_room]()(boolean)
 if (region_findbycoord(coord) = false) return(false);
+// The copied original exit identifies Uzer, not another quest's private map.
+if (.loc_find(region_getcoord(0, 31, 19), golem_demon_portal) = false) return(false);
 return(inzone(region_getcoord(0, 22, 16), region_getcoord(0, 42, 54), coord));
 
 [proc,agrith_room_enter]
