@@ -145,6 +145,7 @@ if ($round ! %fightpits_round | %fightpits_phase ! 4 | ~fightpits_status ! 2 | s
 // CANDIDATE reward basis; the admission snapshot excludes the winner's level.
 def_int $reward = max(sub(%fightpits_total_levels, getbit_range(%fightpits_state, 2, 9)), 0);
 %fightpits_state = setbit_range_toint(%fightpits_state, 3, 0, 1);
+// UNKNOWN champion title format; no retained source establishes this wording.
 %fightpits_champion_name = "JalYt-Ket-<displayname>";
 %fightpits_remaining_count = 0;
 %fightpits_phase = 0;

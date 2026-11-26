@@ -13,6 +13,10 @@ const [{ default: Runner }, { default: Trigger }, { default: Player }, { default
   load('src/engine/script/ScriptRunner.ts'), load('src/engine/script/ServerTriggerType.ts'), load('src/engine/entity/Player.ts'),
   load('src/util/JavaRandom.ts'), load('src/engine/CoordGrid.ts'), load('src/engine/routefinder/index.ts'), load('src/engine/routefinder/flags.ts'),
 ]);
+const [{ NetworkPlayer }, { default: Packet }, { default: CamMoveToEncoder }, { default: CamLookAtEncoder }] = await Promise.all([
+  load('src/engine/entity/NetworkPlayer.ts'), load('src/io/Packet.ts'),
+  load('src/network/game/server/codec/CamMoveToEncoder.ts'), load('src/network/game/server/codec/CamLookAtEncoder.ts'),
+]);
 const { World, Provider, State, Pointer, configs, id } = rt;
 const { VarPlayerType, VarSharedType, VarBitType, LocType, NpcType, ObjType, InvType, Component } = configs;
 const pv = name => id(VarPlayerType, name), sv = name => id(VarSharedType, name);
@@ -135,15 +139,41 @@ try {
     assert(p.testMessages.some(text => text.includes('waiting room')));
     p.activeScript = null; p.protect = false; p.delayed = false; p.closeModal();
   });
-  check('all five native orb views preserve other 561 bits and Stop Viewing restores controls', () => {
+  check('all five native orb views encode in-scene fast cameras and restore controls', () => {
     reset(); enter(p); p.setVar(pv('tzhaar_temp'), 0x11f);
     interact(p, orb);
     assert.equal(p.getVarBit(id(VarBitType, 'tzhaar_fightpit_orb')), 1);
     assert.equal(p.tabs[10], id(Component, 'stop_viewing'));
-    for (let view = 1; view <= 5; view++) {
-      button(p, `stop_viewing:com_${view + 10}`);
-      assert.equal(p.getVarBit(id(VarBitType, 'tzhaar_fightpit_orb')), view);
-      assert.equal(p.getVar(pv('tzhaar_temp')) & ~0xe0, 0x11f);
+    // Entering the room retains the scene built from the original outer-door approach.
+    p.originX = outer.x; p.originZ = outer.z + 1;
+    p.cameraPackets.clear();
+    const written = [], originalWrite = p.write;
+    const encoders = [new CamMoveToEncoder(), new CamLookAtEncoder()];
+    p.write = message => written.push(message);
+    try {
+      for (let view = 1; view <= 5; view++) {
+        button(p, `stop_viewing:com_${view + 10}`);
+        assert.equal(p.getVarBit(id(VarBitType, 'tzhaar_fightpit_orb')), view);
+        assert.equal(p.getVar(pv('tzhaar_temp')) & ~0xe0, 0x11f);
+        written.length = 0; // Observe the native camera flush, not the button's varp update.
+        NetworkPlayer.prototype.updateMap.call(p);
+        assert.deepEqual(written.map(message => message.constructor.name), ['CamMoveTo', 'CamLookAt']);
+        for (let index = 0; index < encoders.length; index++) {
+          const message = written[index], packet = new Packet(new Uint8Array(6));
+          encoders[index].encode(packet, message);
+          assert.equal(packet.pos, 6);
+          const [x, z, , , rate, rate2] = packet.data;
+          assert(x >= 0 && x < 104 && z >= 0 && z < 104, `view ${view}: encoded camera target inside loaded scene`);
+          assert.equal(x, message.x, `view ${view}: local x did not wrap to a byte`);
+          assert.equal(z, message.z, `view ${view}: local z did not wrap to a byte`);
+          assert(rate >= 100 && rate2 >= 100, `view ${view}: encoded camera snaps immediately`);
+          const worldX = x + CoordGrid.zoneOrigin(p.originX), worldZ = z + CoordGrid.zoneOrigin(p.originZ);
+          assert(worldX >= 2377 && worldX <= 2418 && worldZ >= 5129 && worldZ <= 5167, `view ${view}: target on inset arena floor`);
+          assert(!routefinder.isFlagged(worldX, worldZ, 0, Flag.WALK_BLOCKED), `view ${view}: target walkable on packed map`);
+        }
+      }
+    } finally {
+      p.write = originalWrite;
     }
     button(p, 'stop_viewing:com_5');
     assert.equal(p.getVarBit(id(VarBitType, 'tzhaar_fightpit_orb')), 0);

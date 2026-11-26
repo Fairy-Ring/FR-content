@@ -53,16 +53,16 @@ if (~fightpits_status ! 1 | ~fightpits_in_waiting(coord) = false) {
 walktrigger(fightpits_orb_walk);
 
 [proc,fightpits_orb_camera](int $view)
-// UNKNOWN engineering framing: corners use the outer bounds of the arena box.
+// UNKNOWN engineering framing: inset, walkable arena stands inside the loaded scene.
 def_coord $camera = ^fightpits_centre;
 def_int $camera_height = 500;
 def_int $look_height = 300;
-if ($view = 2) $camera = movecoord(^fightpits_centre, -30, 0, 19);
-if ($view = 3) $camera = movecoord(^fightpits_centre, 31, 0, 19);
-if ($view = 4) $camera = movecoord(^fightpits_centre, 31, 0, -27);
-if ($view = 5) $camera = movecoord(^fightpits_centre, -30, 0, -27);
-cam_moveto($camera, $camera_height, 1, 1);
-cam_lookat(^fightpits_centre, $look_height, 1, 1);
+if ($view = 2) $camera = movecoord(^fightpits_centre, -7, 0, 8);
+if ($view = 3) $camera = movecoord(^fightpits_centre, 7, 0, 8);
+if ($view = 4) $camera = movecoord(^fightpits_centre, 8, 0, -8);
+if ($view = 5) $camera = movecoord(^fightpits_centre, -8, 0, -8);
+cam_moveto($camera, $camera_height, 100, 100);
+cam_lookat(^fightpits_centre, $look_height, 100, 100);
 
 [walktrigger,fightpits_orb_walk]
 // A walk request ends viewing but remains the player's requested movement.

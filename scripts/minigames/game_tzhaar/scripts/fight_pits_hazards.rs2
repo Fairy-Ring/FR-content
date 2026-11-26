@@ -1,4 +1,4 @@
-// CANDIDATE creature order from the early guide; UNKNOWN encounter bindings.
+// CANDIDATE creature order: 2013 Old School Wiki revision 17743; UNKNOWN bindings.
 [ai_timer,_tzhaar_fightpit]
 if (%fightpits_phase ! 3) {
     npc_del;
