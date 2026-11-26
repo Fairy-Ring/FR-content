@@ -1,0 +1,60 @@
+// CANDIDATE creature order from the early guide; UNKNOWN encounter bindings.
+[ai_timer,_tzhaar_fightpit]
+if (%fightpits_phase ! 3) {
+    npc_del;
+    return;
+}
+if (npc_stat(hitpoints) = 0) return;
+if (finduid(%npc_attacking_uid) = true) {
+    if (~fightpits_status = 2 & ~fightpits_in_arena(coord) = true & stat(hitpoints) > 0) return;
+}
+// Reservoir selection gives each current contender equal target probability.
+def_int $seen = 0;
+def_player_uid $target = null;
+huntall(^fightpits_centre, 50, 0);
+while (huntnext = true) {
+    if (~fightpits_status = 2 & ~fightpits_in_arena(coord) = true & stat(hitpoints) > 0) {
+        $seen = add($seen, 1);
+        if (random($seen) = 0) $target = uid;
+    }
+}
+%npc_attacking_uid = $target;
+%npc_aggressive_player = $target;
+if ($target = null) {
+    npc_setmode(none);
+} else if (npc_type = tzhaar_fightpit_swarm_3a) {
+    npc_setmode(applayer2);
+} else {
+    npc_setmode(opplayer2);
+}
+
+[ai_queue1,_tzhaar_fightpit]
+// The timer chooses only contenders, rather than retaliating on lobby viewers.
+return;
+
+[ai_queue3,_tzhaar_fightpit]
+~npc_death;
+
+[ai_opplayer2,_tzhaar_fightpit]
+if (~fightpits_status ! 2 | ~fightpits_in_arena(coord) = false) {
+    npc_setmode(none);
+    return;
+}
+~npc_default_attack;
+
+[ai_opplayer2,tzhaar_fightpit_swarm_3a]
+npc_setmode(applayer2);
+
+[ai_applayer2,tzhaar_fightpit_swarm_3a]
+~fightpits_xil_attack;
+
+[proc,fightpits_xil_attack]
+if (~fightpits_status ! 2 | ~fightpits_in_arena(coord) = false | stat(hitpoints) = 0 | npc_stat(hitpoints) = 0) {
+    npc_setmode(none);
+    return;
+}
+if (%npc_action_delay > map_clock | ~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
+npc_anim(magmaquris_spine_attack, 0);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~player_projectile(npc_coord, coord, uid, tzhaar_spine_attack, 40, 36, 32, 15, 0, 11, 5);
+~npc_rangeattack_resolve(~npc_ranged_attack_roll, ~player_defence_roll_specific(^ranged_style), ~npc_ranged_maxhit, 0, $duration);

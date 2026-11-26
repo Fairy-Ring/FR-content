@@ -1,0 +1,250 @@
+// Fight Pits: research subject fight-pits. Functional messages and controller
+// timings/landings are UNKNOWN beta defaults, not original server quotations.
+[proc,fightpits_status]()(int)
+return(getbit_range(%fightpits_state, 0, 1));
+
+[proc,fightpits_in_waiting](coord $point)(boolean)
+return(inzone(0_37_80_24_49, 0_37_80_38_55, $point));
+
+[proc,fightpits_in_arena](coord $point)(boolean)
+return(inzone(0_37_80_1_1, 0_37_80_62_47, $point));
+
+[proc,fightpits_pvp_pair]()(boolean)
+if (%fightpits_phase ! 3) return(false);
+if (~fightpits_status ! 2 | getbit_range(.%fightpits_state, 0, 1) ! 2) return(false);
+if (uid = .uid | stat(hitpoints) = 0 | .stat(hitpoints) = 0) return(false);
+if (~fightpits_in_arena(coord) = true & ~fightpits_in_arena(.coord) = true) return(true);
+return(false);
+
+[oploc1,hot_vent_door_9369]
+~fightpits_orb_stop;
+if (~fightpits_in_waiting(coord) = true) {
+    %fightpits_state = 0;
+    p_teleport(^fightpits_lobby);
+    if_openoverlay(null);
+} else {
+    %fightpits_state = 1;
+    p_teleport(^fightpits_waiting);
+    mes("Wait here for the next fight. At least two contenders are needed.");
+}
+
+[oploc1,hot_vent_door_9368]
+if (~fightpits_in_arena(coord) = true) {
+    ~fightpits_remove(false);
+    ~fightpits_restore;
+    %fightpits_state = 1;
+    p_teleport(^fightpits_waiting);
+} else {
+    mes("Wait here for the next fight.");
+}
+
+[proc,fightpits_eligible]()(boolean)
+if (stat(hitpoints) = 0) return(false);
+if (~fightpits_status = 1 & ~fightpits_in_waiting(coord) = true) return(true);
+if (~fightpits_status = 3 & ~fightpits_in_arena(coord) = true) return(true);
+return(false);
+
+[ai_timer,tzhaar_fightpit_master]
+~fightpits_controller;
+
+[proc,fightpits_controller]
+def_int $eligible = 0;
+def_int $remaining = 0;
+huntall(^fightpits_centre, 50, 0);
+while (huntnext = true) {
+    if (~fightpits_eligible = true) $eligible = add($eligible, 1);
+    if (~fightpits_status = 2 & ~fightpits_in_arena(coord) = true & stat(hitpoints) > 0) $remaining = add($remaining, 1);
+}
+%fightpits_remaining_count = $remaining;
+if (%fightpits_phase = 0 | %fightpits_phase = 1) {
+    if ($eligible < 2) {
+        %fightpits_phase = 0;
+        return;
+    }
+    if (%fightpits_phase = 0) {
+        %fightpits_phase = 1;
+        %fightpits_deadline = add(map_clock, ^fightpits_countdown_ticks);
+        huntall(^fightpits_centre, 50, 0);
+        while (huntnext = true) {
+            if (~fightpits_eligible = true) mes("The next fight starts in 30 seconds.");
+        }
+        return;
+    }
+    if (map_clock < %fightpits_deadline) return;
+    %fightpits_round = add(%fightpits_round, 1);
+    %fightpits_phase = 2;
+    %fightpits_total_levels = 0;
+    %fightpits_escalation = 0;
+    huntall(^fightpits_centre, 50, 0);
+    while (huntnext = true) {
+        if (~fightpits_eligible = true) {
+            if_close;
+            queue*(fightpits_admit, 0)(%fightpits_round);
+        }
+    }
+    return;
+}
+if (%fightpits_phase = 2) {
+    if ($remaining < 2) {
+        %fightpits_phase = 0;
+        huntall(^fightpits_centre, 50, 0);
+        while (huntnext = true) {
+            if (~fightpits_status = 2) queue(fightpits_return, 0, 0);
+        }
+        return;
+    }
+    %fightpits_phase = 3;
+    %fightpits_deadline = add(map_clock, ^fightpits_escalation_ticks);
+}
+if (%fightpits_phase = 3) {
+    if ($remaining <= 1) {
+        %fightpits_phase = 4;
+        ~fightpits_clear_hazards;
+    } else if (map_clock >= %fightpits_deadline & %fightpits_escalation < 4) {
+        %fightpits_escalation = add(%fightpits_escalation, 1);
+        %fightpits_deadline = add(map_clock, ^fightpits_escalation_step);
+        ~fightpits_escalate;
+    }
+}
+huntall(^fightpits_centre, 50, 0);
+while (huntnext = true) {
+    if (~fightpits_status = 2 & ~fightpits_in_arena(coord) = true) {
+        queue(fightpits_update_hud, 0, 0);
+        if (%fightpits_phase = 4 & stat(hitpoints) > 0) queue*(fightpits_win, 0)(%fightpits_round);
+        if (%fightpits_phase = 3 & %fightpits_escalation = 4) queue(combat_damage_player, 0, 1);
+    }
+}
+if (%fightpits_phase = 4 & $remaining = 0) %fightpits_phase = 0;
+
+[queue,fightpits_admit](int $round)
+if ($round ! %fightpits_round | %fightpits_phase ! 2 | ~fightpits_eligible = false) return;
+~fightpits_orb_stop;
+~combat_clearqueue;
+p_stopaction;
+%fightpits_state = add(multiply(~player_combat_level, 4), 2);
+%fightpits_total_levels = add(%fightpits_total_levels, getbit_range(%fightpits_state, 2, 9));
+p_teleport(^fightpits_entry);
+set_player_op("Attack", 2, ^true);
+mes("Fight!");
+
+[proc,fightpits_hud]
+if_openoverlay(current_champion);
+if (compare(%fightpits_champion_name, "") = 0) {
+    // VERIFIED cache default champion name, not an invented human champion.
+    if_settext(current_champion:com_0, "Current Champion: TzHaar-Xil-Huz");
+} else {
+    if_settext(current_champion:com_0, "Current Champion: <%fightpits_champion_name>");
+}
+%tzhaar_fightpit_remaining = max(sub(%fightpits_remaining_count, 1), 0);
+
+[queue,fightpits_update_hud]
+if (~fightpits_status = 2 & ~fightpits_in_arena(coord) = true) ~fightpits_hud;
+
+[queue,fightpits_win](int $round)
+if ($round ! %fightpits_round | %fightpits_phase ! 4 | ~fightpits_status ! 2 | stat(hitpoints) = 0 | ~fightpits_in_arena(coord) = false) return;
+// CANDIDATE reward basis; the admission snapshot excludes the winner's level.
+def_int $reward = max(sub(%fightpits_total_levels, getbit_range(%fightpits_state, 2, 9)), 0);
+%fightpits_state = setbit_range_toint(%fightpits_state, 3, 0, 1);
+%fightpits_champion_name = "JalYt-Ket-<displayname>";
+%fightpits_remaining_count = 0;
+%fightpits_phase = 0;
+~combat_clearqueue;
+p_stopaction;
+set_player_op(null, 2, ^false);
+if ($reward > 0) {
+    if (inv_itemspace(inv, tzhaar_token, $reward, inv_size(inv)) = true) inv_add(inv, tzhaar_token, $reward);
+    else obj_add(coord, tzhaar_token, $reward, ^lootdrop_duration);
+}
+~fightpits_hud;
+mes("You are the champion! You have won <tostring($reward)> Tokkul.");
+
+[proc,fightpits_remove](boolean $defeated)
+if (~fightpits_status = 2) {
+    %fightpits_remaining_count = max(sub(%fightpits_remaining_count, 1), 0);
+    if ($defeated = false) %fightpits_total_levels = max(sub(%fightpits_total_levels, getbit_range(%fightpits_state, 2, 9)), 0);
+}
+%fightpits_state = 0;
+set_player_op(null, 2, ^false);
+if_openoverlay(null);
+
+[proc,fightpits_restore]
+~combat_clearqueue;
+clearqueue(player_death_default);
+p_stopaction;
+~prayer_deactivate_all;
+~stat_reset_all;
+healenergy(10000);
+~clear_poison;
+~player_end_poison;
+%frozen = 0;
+%action_delay = 0;
+%lastcombat = 0;
+%lastcombat_pvp = 0;
+%aggressive_npc = null;
+%death = ^false;
+anim(null, 0);
+cam_reset;
+
+[queue,fightpits_return]
+if (~fightpits_status ! 2) return;
+~fightpits_remove(false);
+~fightpits_restore;
+%fightpits_state = 1;
+p_teleport(^fightpits_waiting);
+
+[proc,fightpits_player_death]
+~fightpits_remove(true);
+~player_death;
+~fightpits_restore;
+%fightpits_state = 1;
+p_teleport(^fightpits_waiting);
+mes("You have been defeated.");
+
+[proc,fightpits_logout]
+~fightpits_orb_recover;
+if (~fightpits_in_arena(coord) = true) {
+    ~fightpits_remove(false);
+    ~fightpits_restore;
+    p_teleport(^fightpits_waiting);
+}
+%fightpits_state = 0;
+[proc,fightpits_login]
+~fightpits_orb_recover;
+if (~fightpits_in_arena(coord) = true) {
+    ~fightpits_restore;
+    p_teleport(^fightpits_waiting);
+}
+%fightpits_state = 0;
+if (~fightpits_in_waiting(coord) = true) %fightpits_state = 1;
+[proc,fightpits_teleport_check](coord $departure)(boolean)
+if (~fightpits_in_arena($departure) = true | %tzhaar_fightpit_orb ! 0) {
+    mes("You cannot teleport from the Fight Pits. Leave through the hot vent door.");
+    return(false);
+}
+return(true);
+
+[proc,fightpits_escalate]
+if (%fightpits_escalation > 3) return;
+def_npc $type = tzhaar_fightpit_swarm_1a;
+if (%fightpits_escalation = 2) $type = tzhaar_fightpit_swarm_2a;
+if (%fightpits_escalation = 3) $type = tzhaar_fightpit_swarm_3a;
+// UNKNOWN engineering bounded pressure: four creatures per tier, at floor stands.
+def_int $i = 0;
+while ($i < 4) {
+    // All four UNKNOWN placements fit the largest (3x3) hazard on packed floor.
+    def_coord $stand = 0_37_80_23_20;
+    if ($i = 1) $stand = 0_37_80_39_20;
+    if ($i = 2) $stand = 0_37_80_24_36;
+    if ($i = 3) $stand = 0_37_80_38_36;
+    .npc_add($stand, $type, ^max_32bit_int);
+    .npc_sethunt(0);
+    $i = add($i, 1);
+}
+
+[proc,fightpits_clear_hazards]
+def_npc_uid $controller = npc_uid;
+npc_findallany(^fightpits_centre, 50, 0);
+while (npc_findnext = true) {
+    if (npc_category = tzhaar_fightpit) npc_del;
+}
+if (npc_finduid($controller) = false) return;

@@ -248,6 +248,9 @@
     }
   },
   "deliberatelyTemporary": {
+    "fightpits_state": "UNKNOWN engineering session participation and admission combat level in reserved original server-only slot 410; logout removes the participant and login recovers arena coordinates.",
+    "tzhaar_fightpit_remaining": "Original transmitted Fight Pits HUD foes count; recomputed during each round.",
+    "tzhaar_temp": "Original shared temporary client bit bank; Fight Pits writes only the original orb selector bits 5..7 and preserves all other fields.",
     "elenaquest_extra_bits": "Original temporary Plague City scene bit bank; home Elena visibility is derived from saved elenaquest by the progress setter and login, not independently saved quest progress.",
     "dwarfrock_puzzle": "Original reserved slot 237: temporary schematic overlay offsets, rotations and selection. Reinitialized when opening the puzzle; solved progress lives in dwarfrock_main.",
     "ahoy_last_signer": "Current-session previous petition signer UID; logout clears only repeat protection, never earned signatures.",
@@ -1017,7 +1020,7 @@
     "varp327_unused": "temp",
     "varp396_bits": "temp",
     "varp409_bits": "temp",
-    "varp410_unused": "temp",
+    "fightpits_state": "temp",
     "varp411_unused": "temp",
     "varp412_bits": "temp",
     "varp413_bits": "temp",

@@ -1,10 +1,10 @@
-// Fight Pits — first code: Talk-to the pit master and Look-into the viewing
-// orb are explicit no-ops. Bodies UNKNOWN (news silent) — do not invent lines.
-// 2804 (current_champion) / 3209 (stop_viewing logout) stay closed; the logout
-// tab stays logout (no if_settab). Cite xl-minigames-remaining-impl-377.md D.1.
-
+// The 19 September 2005 Jagex update supplies the objective as information, not
+// recovered TzHaar-Mej-Kah dialogue. Keep this verbatim source line in Talk-to.
 [opnpc1,tzhaar_fightpit_master]
-return;
-
-[oploc1,viewing_orb]
-return;
+mes("The objective in the pit is simple Kill or be killed. Last one standing wins.");
+// UNKNOWN plain functional information, not recovered NPC dialogue.
+if (compare(%fightpits_champion_name, "") = 0) mes("Current Champion: TzHaar-Xil-Huz");
+else mes("Current Champion: <%fightpits_champion_name>");
+mes("The last contender standing wins Tokkul for defeated opponents.");
+mes("You keep your items when defeated and return to the waiting room.");
+mes("Enter through the hot vent door to wait for the next fight.");

@@ -56706,28 +56706,6 @@ anim=glowy_thing
 op1=Pass
 shadow=no
 
-[hot_vent_door_9368]
-name=Hot vent door
-desc=A barrier of heat.
-model=loc_9367
-recol1s=198
-recol1d=0
-hillskew=yes
-anim=glowy_thing
-op1=Pass
-shadow=no
-
-[hot_vent_door_9369]
-name=Hot vent door
-desc=A barrier of heat.
-model=loc_9367
-recol1s=198
-recol1d=0
-hillskew=yes
-anim=glowy_thing
-op1=Pass
-shadow=no
-
 [scenery_9370]
 model=loc_9370
 recol1s=198
@@ -56960,14 +56938,6 @@ forceapproach=west
 op2=Smelt
 shadow=no
 category=smithing_furnace
-
-[viewing_orb]
-name=Viewing orb
-desc=I spy with my little eye...
-model=loc_9391
-op1=Look-into
-anim=tzhaar_viewing_orb
-ambient=60
 
 [scenery_9392]
 model=loc_9391

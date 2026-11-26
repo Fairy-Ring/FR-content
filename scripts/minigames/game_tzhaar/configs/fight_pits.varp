@@ -1,0 +1,12 @@
+// Original transmitted client HUD/orb words. Keep every unrelated 561 bit.
+[tzhaar_fightpit_remaining]
+transmit=yes
+
+[tzhaar_temp]
+transmit=yes
+
+// UNKNOWN engineering session storage in reserved original slot 410.
+// Low two bits: outside/waiting/fighting/champion. Bits 2..9: admission combat level.
+[fightpits_state]
+scope=temp
+protect=no

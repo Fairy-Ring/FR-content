@@ -179,6 +179,22 @@
       }
     },
     {
+      "script": "[ai_opplayer2,_tzhaar_fightpit]",
+      "npc": "tzhaar_fightpit_swarm_1a",
+      "position": { "x": 2399, "z": 5148, "level": 0 },
+      "playerVars": { "fightpits_state": 2 },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,tzhaar_fightpit_swarm_3a]",
+      "npc": "tzhaar_fightpit_swarm_3a",
+      "style": "ranged",
+      "distance": 2,
+      "position": { "x": 2399, "z": 5148, "level": 0 },
+      "playerVars": { "fightpits_state": 2 },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 683130215 }
+    },
+    {
       "script": "[ai_opplayer2,deal_evil_spirit]",
       "npc": "deal_evil_spirit",
       "seeds": {

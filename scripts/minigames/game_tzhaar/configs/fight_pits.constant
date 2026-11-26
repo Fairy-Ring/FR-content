@@ -1,0 +1,10 @@
+// UNKNOWN engineering landings chosen from the original m37_80 door sides.
+fightpits_lobby=0_37_80_31_58
+fightpits_waiting=0_37_80_31_54
+fightpits_entry=0_37_80_31_46
+fightpits_centre=0_37_80_31_28
+// UNKNOWN engineering waits: 30-second admission, 10-minute first escalation,
+// then two minutes per hazard tier and one damage every five ticks at the cap.
+fightpits_countdown_ticks=50
+fightpits_escalation_ticks=1000
+fightpits_escalation_step=200

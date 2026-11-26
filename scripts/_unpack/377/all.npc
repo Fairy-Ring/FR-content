@@ -54306,28 +54306,6 @@ param=attack_sound,tzhaar_ket_attack_club
 param=defend_sound,tzhaar_ket_hit
 param=death_sound,tzhaar_ket_death
 
-[tzhaar_fightpit_master]
-name=TzHaar-Mej-Kah
-desc=Another one of those mystic-types.
-model1=npc_2591
-model2=npc_2591i2
-model3=npc_2591i3
-model4=npc_2591i4
-model5=npc_2591i5
-recol1s=29921
-recol1d=28705
-recol2s=8291
-recol2d=14336
-vislevel=hide
-op1=Talk-to
-walkanim=thzaar_staff_walk
-readyanim=thzaar_staff_ready
-contrast=0
-ambient=10
-resizeh=120
-resizev=128
-head1=npc_2591_head
-
 [tzhaar_banker1]
 name=TzHaar-Ket-Zuh
 desc=Maybe it'll guard my possessions.
@@ -54509,21 +54487,6 @@ wanderrange=0
 moverestrict=nomove
 defaultmode=none
 
-[tzhaar_fightpit_swarm_1a]
-name=Tz-Kih
-desc=Some kind of bat...
-model1=npc_2627
-op2=Attack
-walkanim=firebat_walk
-readyanim=firebat_ready
-ambient=60
-contrast=60
-vislevel=22
-hitpoints=10
-attack=20
-strength=30
-defence=15
-
 [tzhaar_fightpit_swarm_1b]
 name=Tz-Kih
 desc=Some kind of bat...
@@ -54538,22 +54501,6 @@ hitpoints=10
 attack=20
 strength=30
 defence=15
-
-[tzhaar_fightpit_swarm_2a]
-name=Tz-Kek
-desc=Looks like living lava...
-model1=npc_2629
-size=2
-op2=Attack
-readyanim=lavabeast_ready
-walkanim=lavabeast_walk
-ambient=40
-contrast=40
-vislevel=45
-hitpoints=20
-attack=40
-strength=60
-defence=30
 
 [tzhaar_fightpit_swarm_2b]
 name=Tz-Kek
@@ -54582,25 +54529,6 @@ hitpoints=20
 attack=40
 strength=60
 defence=30
-
-[tzhaar_fightpit_swarm_3a]
-name=Tok-Xil
-desc=I don't like the look of those spines...
-model1=poh_tok_xil_8
-model2=poh_tok_xili2_8
-model3=poh_tok_xili3_8
-model4=poh_tok_xili4_8
-size=3
-op2=Attack
-walkanim=magmaquris_walk
-readyanim=magmaquris_ready
-ambient=60
-contrast=60
-vislevel=90
-hitpoints=40
-attack=80
-strength=120
-defence=60
 
 [tzhaar_fightpit_swarm_3b]
 name=Tok-Xil

@@ -714,8 +714,6 @@ scope=perm
 
 [varp409_bits]
 
-[varp410_unused]
-
 [varp411_unused]
 
 [varp412_bits]
@@ -989,12 +987,6 @@ protect=no
 [varp558_unused]
 
 [varp559_unused]
-
-[tzhaar_fightpit_remaining]
-transmit=yes
-
-[tzhaar_temp]
-transmit=yes
 
 [bankpin_1]
 
