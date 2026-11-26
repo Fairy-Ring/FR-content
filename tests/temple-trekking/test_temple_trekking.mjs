@@ -616,6 +616,9 @@ assert.equal(tomes.length, 21, 'all original seven-skill, three-tier tomes are p
 for (const name of [...tokens, 'templetrek_swamptree_branch', 'templetrek_short_vine', 'templetrek_long_vine', ...tomes.map(cfg => cfg.debugname)]) {
     assert.equal(types.ObjType.get(obj(name)).tradeable, false, `private trek item ${name} is untradeable in packed config`);
 }
+for (const name of ['templetrek_swamp_snake_hide', 'cert_templetrek_swamp_snake_hide']) {
+    assert.equal(types.ObjType.get(obj(name)).tradeable, true, `ordinary crafting hide ${name} remains tradeable in packed config`);
+}
 console.log('PASS private-item tradeability audit and original tome catalogue');
 
 const boothBase = id('LocType', 'burgh_bank_booth_multiloc');

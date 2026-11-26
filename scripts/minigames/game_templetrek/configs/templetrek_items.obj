@@ -642,9 +642,7 @@ model=obj_village_snake_hide
 cost=35
 members=yes
 weight=1kg
-tradeable=no
 
 [cert_templetrek_swamp_snake_hide]
 certlink=templetrek_swamp_snake_hide
 certtemplate=template_for_cert
-tradeable=no
