@@ -176,6 +176,7 @@ if ($stage = ^farming_veg_weeded) {
     inv_del(inv, $seed, 1);
     ~farming_flower_set_stage(db_getfield($crop, farming_flower:first, 0));
     stat_advance(farming, db_getfield($crop, farming_flower:plant_xp, 0));
+    ~garden_elstan_flower_planted($seed);
     // UNKNOWN functional wording.
     mes("You plant the flower seed in the patch.");
     return;
@@ -219,6 +220,7 @@ if (inv_freespace(inv) < $yield) {
 anim(picking_low, 0);
 inv_add(inv, db_getfield($crop, farming_flower:produce, 0), $yield);
 stat_advance(farming, db_getfield($crop, farming_flower:harvest_xp, 0));
+~garden_elstan_flower_picked(db_getfield($crop, farming_flower:produce, 0));
 ~farming_flower_set_stage(^farming_veg_weeded);
 // UNKNOWN functional wording.
 mes("You pick the flowers from the patch.");
