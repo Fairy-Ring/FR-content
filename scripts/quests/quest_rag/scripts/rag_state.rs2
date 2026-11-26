@@ -1,8 +1,7 @@
 // VERIFIED: RuneHQ 2006-04-24 and Tip.It 2006-05-02 list these eight bones.
 // UNKNOWN: server encoding, not a claim about the original stage numbers.
 // 714 has no original varbits or raw cache readers. Stage: bits 0..1;
-// first-part hand-ins: bits 2..9. Reserve 10..31 for a future wish-list unit.
-// Its remaining five flags can use original 716's unused bits 0..4.
+// first-part hand-ins: bits 2..9. Wish-list state uses reserved slot421.
 [proc,rag_stage]()(int)
 return(getbit_range(%rag_quest, 0, 1));
 
@@ -20,6 +19,33 @@ switch_int($bone) {
     case 6 : return(rag_monkey_bone);
     case 7 : return(rag_giant_rat_bone);
     case 8 : return(rag_giant_bat_bone);
+    case 9 : return(rag_wolf_bone);
+    case 10 : return(rag_bat_bone);
+    case 11 : return(rag_rat_bone);
+    case 12 : return(rag_baby_blue_dragon_bone);
+    case 13 : return(rag_ogre_bone);
+    case 14 : return(rag_jogre_bone);
+    case 15 : return(rag_zogre_bone);
+    case 16 : return(rag_mogre_bone);
+    case 17 : return(rag_dagganoth_bone);
+    case 18 : return(rag_snake_bone);
+    case 19 : return(rag_zombie_bone);
+    case 20 : return(rag_werewolf_bone);
+    case 21 : return(rag_moss_giant_bone);
+    case 22 : return(rag_fire_giant_bone);
+    case 23 : return(rag_ice_giant_bone);
+    case 24 : return(rag_terrorbird_bone);
+    case 25 : return(rag_ghoul_bone);
+    case 26 : return(rag_troll_bone);
+    case 27 : return(rag_seagull_bone);
+    case 28 : return(rag_undead_cow_bone);
+    case 29 : return(rag_experiment_bone);
+    case 30 : return(rag_rabbit_bone);
+    case 31 : return(rag_baby_basilisk_bone);
+    case 32 : return(rag_desert_lizard_bone);
+    case 33 : return(rag_cave_goblin_bone);
+    case 34 : return(rag_vulture_bone);
+    case 35 : return(rag_jackal_bone);
 }
 return(null);
 
@@ -33,6 +59,33 @@ switch_int($bone) {
     case 6 : return(rag_pot_monkey_bone);
     case 7 : return(rag_pot_giant_rat_bone);
     case 8 : return(rag_pot_giant_bat_bone);
+    case 9 : return(rag_pot_wolf_bone);
+    case 10 : return(rag_pot_bat_bone);
+    case 11 : return(rag_pot_rat_bone);
+    case 12 : return(rag_pot_baby_blue_dragon_bone);
+    case 13 : return(rag_pot_ogre_bone);
+    case 14 : return(rag_pot_jogre_bone);
+    case 15 : return(rag_pot_zogre_bone);
+    case 16 : return(rag_pot_mogre_bone);
+    case 17 : return(rag_pot_dagganoth_bone);
+    case 18 : return(rag_pot_snake_bone);
+    case 19 : return(rag_pot_zombie_bone);
+    case 20 : return(rag_pot_werewolf_bone);
+    case 21 : return(rag_pot_moss_giant_bone);
+    case 22 : return(rag_pot_fire_giant_bone);
+    case 23 : return(rag_pot_ice_giant_bone);
+    case 24 : return(rag_pot_terrorbird_bone);
+    case 25 : return(rag_pot_ghoul_bone);
+    case 26 : return(rag_pot_troll_bone);
+    case 27 : return(rag_pot_seagull_bone);
+    case 28 : return(rag_pot_undead_cow_bone);
+    case 29 : return(rag_pot_experiment_bone);
+    case 30 : return(rag_pot_rabbit_bone);
+    case 31 : return(rag_pot_baby_basilisk_bone);
+    case 32 : return(rag_pot_desert_lizard_bone);
+    case 33 : return(rag_pot_cave_goblin_bone);
+    case 34 : return(rag_pot_vulture_bone);
+    case 35 : return(rag_pot_jackal_bone);
 }
 return(null);
 
@@ -46,12 +99,39 @@ switch_int($bone) {
     case 6 : return(rag_polished_monkey_bone);
     case 7 : return(rag_polished_giant_rat_bone);
     case 8 : return(rag_polished_giant_bat_bone);
+    case 9 : return(rag_polished_wolf_bone);
+    case 10 : return(rag_polished_bat_bone);
+    case 11 : return(rag_polished_rat_bone);
+    case 12 : return(rag_polished_baby_blue_dragon_bone);
+    case 13 : return(rag_polished_ogre_bone);
+    case 14 : return(rag_polished_jogre_bone);
+    case 15 : return(rag_polished_zogre_bone);
+    case 16 : return(rag_polished_mogre_bone);
+    case 17 : return(rag_polished_dagganoth_bone);
+    case 18 : return(rag_polished_snake_bone);
+    case 19 : return(rag_polished_zombie_bone);
+    case 20 : return(rag_polished_werewolf_bone);
+    case 21 : return(rag_polished_moss_giant_bone);
+    case 22 : return(rag_polished_fire_giant_bone);
+    case 23 : return(rag_polished_ice_giant_bone);
+    case 24 : return(rag_polished_terrorbird_bone);
+    case 25 : return(rag_polished_ghoul_bone);
+    case 26 : return(rag_polished_troll_bone);
+    case 27 : return(rag_polished_seagull_bone);
+    case 28 : return(rag_polished_undead_cow_bone);
+    case 29 : return(rag_polished_experiment_bone);
+    case 30 : return(rag_polished_rabbit_bone);
+    case 31 : return(rag_polished_baby_basilisk_bone);
+    case 32 : return(rag_polished_desert_lizard_bone);
+    case 33 : return(rag_polished_cave_goblin_bone);
+    case 34 : return(rag_polished_vulture_bone);
+    case 35 : return(rag_polished_jackal_bone);
 }
 return(null);
 
 [proc,rag_bone_index](obj $item)(int)
 def_int $bone = 1;
-while ($bone <= 8) {
+while ($bone <= 35) {
     if ($item = ~rag_raw($bone) | $item = ~rag_potted($bone) | $item = ~rag_polished($bone)) return($bone);
     $bone = add($bone, 1);
 }

@@ -7,3 +7,9 @@ scope=perm
 [rag_bone_2]
 transmit=yes
 scope=perm
+
+// UNKNOWN engineering layout in original reserved server-only slot 421.
+// Bits0..26: wish-list hand-ins; bits27..28: 0 not started, 1 active, 2 rewarded.
+// Bit29 distinguishes wish-list pot identity from the original first eight.
+[rag_wishlist]
+scope=perm

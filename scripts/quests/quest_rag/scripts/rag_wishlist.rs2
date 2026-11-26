@@ -1,0 +1,166 @@
+// VERIFIED: RuneHQ 24 April 2006 and Tip.It 2 May 2006: 27 further bones.
+// UNKNOWN engineering layout: original reserved server-only perm slot421.
+// Bits0..26 are hand-ins; bits27..28 are inactive/active/rewarded (0/1/2).
+// Bit29 tags a wish-list bone in the original five-bit rag_inv_check field.
+[proc,rag_wishlist_state]()(int)
+return(getbit_range(%rag_wishlist, 27, 28));
+
+[proc,rag_wishlist_handed](int $bone)(boolean)
+if (testbit(%rag_wishlist, sub($bone, 1)) = ^true) return(true);
+return(false);
+
+[proc,rag_boiler_bone]()(int)
+if (testbit(%rag_wishlist, 29) = ^true) return(add(%rag_inv_check, 8));
+return(%rag_inv_check);
+
+// CANDIDATE 1/4: Mod Ash's distinction retained in the Old School guide.
+// VERIFIED period Tip.It: wish-list bones do not drop every time.
+// UNKNOWN container policy: match Part1 inventory/bank/worn/own-boiler gates.
+[proc,rag_wishlist_drop](int $bone)
+if (~rag_stage < ^rag_complete | ~rag_wishlist_state ! 1) return;
+if (~rag_wishlist_handed($bone) = true) return;
+def_int $index = add($bone, 8);
+if (~obj_gettotal(~rag_raw($index)) > 0 | ~obj_gettotal(~rag_potted($index)) > 0 | ~obj_gettotal(~rag_polished($index)) > 0) return;
+if (~rag_boiler_bone = $index & %rag_boiler >= 2) return;
+// All eligibility checks precede RNG, so unrelated deaths retain their rolls.
+if (random(4) = 0) obj_add(npc_coord, ~rag_raw($index), 1, ^lootdrop_duration);
+
+// VERIFIED species: both retained period guides. Original377 supplies forms.
+// UNKNOWN variant policy: ordinary forms of the listed species, not bosses,
+// summoned creatures, pets, minigame copies or unrelated quest encounters.
+[proc,rag_wishlist_monster]()(int)
+switch_category(npc_category) {
+    case werewolf : return(12);
+    case dagganoth : return(9);
+    case mountain_troll : return(18);
+    case rabbit : return(22);
+    case slayer_basilisk : return(23);
+}
+switch_npc(npc_type) {
+    case wolf, whitewolf_sentry, whitewolf, pack_wolf, viking_wolf : return(1);
+    case small_bat : return(2);
+    case rat, rat_indoors : return(3);
+    case babybluedragon : return(4);
+    case ogre, ogre2, lathastrainingogre : return(5);
+    case jogre : return(6);
+    case zogre_1, zogre_2, zogre_3, zogre_4, zogre_5, zogre_6,
+        zogre_dance_1, zogre_dance_2, zogre_dance_3, zogre_dance_4,
+        zogre_drummer1 : return(7);
+    case mudskipper_ogre : return(8);
+    case snake, mm_jungle_snake : return(10);
+    case zombie_unarmed, zombie2, zombie_armed, zombie_entranan : return(11);
+    case mossgiant, mossgiant2, mossgiant3 : return(13);
+    case firegiant, firegiant2, firegiant3, firegiant_big, firegiant_big2, firegiant_big3 : return(14);
+    case icegiant, icegiant_low_wanderrange : return(15);
+    case terrorbird : return(16);
+    case ghoul : return(17);
+    case sarim_seagull_pier, sarim_seagull_pier_big : return(19);
+    case ahoy_undead_cow : return(20);
+    case fenk_experiment_1, fenk_experiment_2 : return(21);
+    case slayer_lizard_massive : return(24);
+    case cave_goblin, cave_goblin2, cave_goblin3, cave_goblin4,
+        cave_goblin_miner, cave_goblin_miner2, cave_goblin_miner3, cave_goblin_miner4,
+        cave_goblin_guard1, cave_goblin_guard2, cave_goblin_miner_mining,
+        cave_goblin_miner2_mining, cave_goblin_miner3_mining, cave_goblin_miner4_mining : return(25);
+    case rag_vulture, rag_vulture_flying : return(26);
+    case ics_little_jackal : return(27);
+}
+return(0);
+
+// UNKNOWN: plain functional wording; period guides retain no conversation.
+[proc,rag_wishlist_talk]
+if (~rag_stage < ^rag_complete) return;
+if (~rag_wishlist_state = 2) {
+    ~rag_wishlist_replacement;
+    return;
+}
+if (~rag_wishlist_state = 0) {
+    %rag_wishlist = setbit_range_toint(%rag_wishlist, 1, 27, 28);
+    ~chatnpc("<p,neutral>I need the bones on my wish-list. Clean them in vinegar as before.");
+    ~rag_wishlist_remaining;
+    return;
+}
+def_int $bone = 1;
+def_int $given = 0;
+while ($bone <= 27) {
+    if (~rag_wishlist_handed($bone) = false & inv_total(inv, ~rag_polished(add($bone, 8))) > 0) {
+        inv_del(inv, ~rag_polished(add($bone, 8)), 1);
+        %rag_wishlist = setbit(%rag_wishlist, sub($bone, 1));
+        $given = add($given, 1);
+    }
+    $bone = add($bone, 1);
+}
+// Saved flags precede dialogue. An interrupted final choice remains claimable.
+if (getbit_range(%rag_wishlist, 0, 26) = 134217727) {
+    ~rag_wishlist_reward;
+    return;
+}
+if ($given > 0) ~chatnpc("<p,neutral>Thank you for the clean bones.");
+~rag_wishlist_remaining;
+
+[oploc1,rag_shopping_list]
+if (~rag_stage < ^rag_complete) {
+    // UNKNOWN functional instruction, not a historical transcript.
+    mes("Complete Rag and Bone Man first.");
+    return;
+}
+~rag_wishlist_remaining;
+
+[proc,rag_wishlist_remaining]
+// UNKNOWN presentation. Bone names are the original377 item names.
+if (~rag_wishlist_state = 2) {
+    mes("You have collected every bone on the wish-list.");
+    return;
+}
+mes("Bones still needed:");
+def_int $bone = 1;
+while ($bone <= 27) {
+    if (~rag_wishlist_handed($bone) = false) mes(oc_name(~rag_raw(add($bone, 8))));
+    $bone = add($bone, 1);
+}
+
+[proc,rag_wishlist_reward]
+if (~rag_wishlist_state ! 1) return;
+if (inv_freespace(inv) < 1) {
+    ~displaymessage(^dm_invspace);
+    return;
+}
+// UNKNOWN functional choice wording. VERIFIED choice and amounts: RuneHQ
+// 2006-04-24: "1 Quest Point, 5k Prayer exp, and either a Bonesack or Ram skull helmet".
+def_int $choice = ~p_choice2("Bonesack", 1, "Ram skull helmet", 2);
+def_namedobj $reward = rag_bonesack;
+if ($choice = 2) $reward = rag_ram_helm;
+%rag_wishlist = setbit_range_toint(%rag_wishlist, 2, 27, 28);
+inv_add(inv, $reward, 1);
+stat_advance(prayer, 50000);
+// UNKNOWN generic scroll layout/title/scale; no first-part reward is repeated.
+~send_quest_complete(questlist:rag, $reward, 200, 1, "You have completed the wish-list!", "5,000 Prayer XP|<oc_name($reward)>");
+
+[proc,rag_wishlist_replacement]
+// VERIFIED Tip.It 2006-05-02: "You can change or retrieve your Bonesack or
+// Ram Skull Helmet from the Odd Old Man whenever you want."
+// UNKNOWN: free service is the favourable-to-player default; no fee survives.
+// UNKNOWN functional menu and instructions, not reconstructed dialogue.
+def_int $choice = ~p_choice3("Bonesack", 1, "Ram skull helmet", 2, "Not now", 3);
+if ($choice = 3) return;
+def_namedobj $reward = rag_bonesack;
+def_namedobj $other = rag_ram_helm;
+if ($choice = 2) {
+    $reward = rag_ram_helm;
+    $other = rag_bonesack;
+}
+if (~obj_gettotal($reward) > 0) {
+    ~chatnpc("<p,neutral>You already have one.");
+    return;
+}
+if (~obj_gettotal($other) > inv_total(inv, $other)) {
+    ~chatnpc("<p,neutral>Bring your other reward in your inventory to exchange it.");
+    return;
+}
+if (inv_total(inv, $other) = 0 & inv_freespace(inv) < 1) {
+    ~displaymessage(^dm_invspace);
+    return;
+}
+if (inv_total(inv, $other) > 0) inv_del(inv, $other, 1);
+inv_add(inv, $reward, 1);
+~chatnpc("<p,neutral>Here you are.");
