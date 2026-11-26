@@ -74,6 +74,7 @@ if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena 
 ~ferment_wines_login;
 ~thieving_stall_timers_login;
 ~farming_login;
+~forget_login;
 ~rag_login;
 ~mta_login;
 ~stat_boost_login; // f2p boost reset
