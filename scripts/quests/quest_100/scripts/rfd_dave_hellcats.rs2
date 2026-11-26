@@ -1,0 +1,144 @@
+// VERIFIED approximate transformation and milk reversion: RuneHQ 15 April 2006.
+// UNKNOWN exact threshold and counter storage: approved cat_growth bits27..30.
+[proc,rfd_dave_hellcat_catch]
+if (~rfd_dave_is_hellcat = true) return;
+def_int $caught = min(^rfd_dave_hellcat_catches, add(getbit_range(%cat_growth, 27, 30), 1));
+%cat_growth = setbit_range_toint(%cat_growth, $caught, 27, 30);
+%hundred_dave_hellrats_caught = min(7, $caught);
+if ($caught < ^rfd_dave_hellcat_catches) return;
+switch_obj(%follower_obj) {
+    case kittenobject : %hundred_dave_original_cat_colour = 0;
+    case kittenobject_light : %hundred_dave_original_cat_colour = 1;
+    case kittenobject_brown : %hundred_dave_original_cat_colour = 2;
+    case kittenobject_black : %hundred_dave_original_cat_colour = 3;
+    case kittenobject_browngrey : %hundred_dave_original_cat_colour = 4;
+    case kittenobject_bluegrey : %hundred_dave_original_cat_colour = 5;
+    case growncatobject : %hundred_dave_original_cat_colour = 6;
+    case growncatobject_light : %hundred_dave_original_cat_colour = 7;
+    case growncatobject_brown : %hundred_dave_original_cat_colour = 8;
+    case growncatobject_black : %hundred_dave_original_cat_colour = 9;
+    case growncatobject_browngrey : %hundred_dave_original_cat_colour = 10;
+    case growncatobject_bluegrey : %hundred_dave_original_cat_colour = 11;
+    case lazycatobject : %hundred_dave_original_cat_colour = 12;
+    case lazycatobject_light : %hundred_dave_original_cat_colour = 13;
+    case lazycatobject_brown : %hundred_dave_original_cat_colour = 14;
+    case lazycatobject_black : %hundred_dave_original_cat_colour = 15;
+    case lazycatobject_browngrey : %hundred_dave_original_cat_colour = 16;
+    case lazycatobject_bluegrey : %hundred_dave_original_cat_colour = 17;
+    case wileycatobject : %hundred_dave_original_cat_colour = 18;
+    case wileycatobject_light : %hundred_dave_original_cat_colour = 19;
+    case wileycatobject_brown : %hundred_dave_original_cat_colour = 20;
+    case wileycatobject_black : %hundred_dave_original_cat_colour = 21;
+    case wileycatobject_browngrey : %hundred_dave_original_cat_colour = 22;
+    case wileycatobject_bluegrey : %hundred_dave_original_cat_colour = 23;
+}
+def_npc $hell = growncat_hell;
+switch_int(%hundred_dave_original_cat_colour) {
+    case 0, 1, 2, 3, 4, 5 : $hell = kittenpet_hell;
+    case 12, 13, 14, 15, 16, 17 : $hell = lazycat_hell;
+    case 18, 19, 20, 21, 22, 23 : $hell = wileycat_hell;
+}
+npc_changetype_keepall($hell, ^max_32bit_int);
+%follower_uid = npc_uid;
+%follower_obj = npc_param(pet_item_id);
+mes("Your cat turns into a hellcat.");
+
+[proc,rfd_dave_is_hellcat]()(boolean)
+switch_obj(%follower_obj) {
+    case overgrowncatobject_hell, growncatobject_hell, kittenobject_hell, lazycatobject_hell, wileycatobject_hell : return(true);
+}
+return(false);
+
+[proc,rfd_dave_revert_cat]
+if (~rfd_dave_is_hellcat = false) return;
+def_namedobj $normal = kittenobject;
+// Preserve the original coat, but respect growth or training since transformation.
+def_int $colour = modulo(%hundred_dave_original_cat_colour, 6);
+switch_obj(%follower_obj) {
+    case kittenobject_hell :
+        switch_int($colour) {
+            case 0 : $normal = kittenobject;
+            case 1 : $normal = kittenobject_light;
+            case 2 : $normal = kittenobject_brown;
+            case 3 : $normal = kittenobject_black;
+            case 4 : $normal = kittenobject_browngrey;
+            case 5 : $normal = kittenobject_bluegrey;
+        }
+    case growncatobject_hell :
+        switch_int($colour) {
+            case 0 : $normal = growncatobject;
+            case 1 : $normal = growncatobject_light;
+            case 2 : $normal = growncatobject_brown;
+            case 3 : $normal = growncatobject_black;
+            case 4 : $normal = growncatobject_browngrey;
+            case 5 : $normal = growncatobject_bluegrey;
+        }
+    case lazycatobject_hell :
+        switch_int($colour) {
+            case 0 : $normal = lazycatobject;
+            case 1 : $normal = lazycatobject_light;
+            case 2 : $normal = lazycatobject_brown;
+            case 3 : $normal = lazycatobject_black;
+            case 4 : $normal = lazycatobject_browngrey;
+            case 5 : $normal = lazycatobject_bluegrey;
+        }
+    case wileycatobject_hell :
+        switch_int($colour) {
+            case 0 : $normal = wileycatobject;
+            case 1 : $normal = wileycatobject_light;
+            case 2 : $normal = wileycatobject_brown;
+            case 3 : $normal = wileycatobject_black;
+            case 4 : $normal = wileycatobject_browngrey;
+            case 5 : $normal = wileycatobject_bluegrey;
+        }
+    case overgrowncatobject_hell :
+        switch_int($colour) {
+            case 0 : $normal = overgrowncatobject;
+            case 1 : $normal = overgrowncatobject_light;
+            case 2 : $normal = overgrowncatobject_brown;
+            case 3 : $normal = overgrowncatobject_black;
+            case 4 : $normal = overgrowncatobject_browngrey;
+            case 5 : $normal = overgrowncatobject_bluegrey;
+        }
+}
+npc_changetype_keepall(oc_param($normal, follower_id), ^max_32bit_int);
+%follower_uid = npc_uid;
+%follower_obj = $normal;
+%cat_growth = setbit_range_toint(%cat_growth, 0, 27, 30);
+%hundred_dave_hellrats_caught = 0;
+mes("The milk turns your hellcat back into a normal cat.");
+
+[opnpc3,overgrowncat_hell]
+if (%follower_uid ! npc_uid | %npc_attacking_uid ! uid) return;
+mes("Your hellcat watches you.");
+[opnpc4,overgrowncat_hell] @rfd_dave_hellcat_interact;
+[opnpc3,growncat_hell]
+if (%follower_uid ! npc_uid | %npc_attacking_uid ! uid) return;
+mes("Your hellcat watches you.");
+[opnpc4,growncat_hell] @rfd_dave_hellcat_interact;
+[opnpc3,kittenpet_hell]
+if (%follower_uid ! npc_uid | %npc_attacking_uid ! uid) return;
+mes("Your hellcat watches you.");
+[opnpc4,kittenpet_hell] @rfd_dave_hellcat_interact;
+[opnpc3,lazycat_hell]
+if (%follower_uid ! npc_uid | %npc_attacking_uid ! uid) return;
+mes("Your hellcat watches you.");
+[opnpc4,lazycat_hell] @rfd_dave_hellcat_interact;
+[opnpc3,wileycat_hell]
+if (%follower_uid ! npc_uid | %npc_attacking_uid ! uid) return;
+mes("Your hellcat watches you.");
+[opnpc4,wileycat_hell] @rfd_dave_hellcat_interact;
+
+[label,rfd_dave_hellcat_interact]
+if (%follower_uid ! npc_uid | %npc_attacking_uid ! uid) return;
+def_int $choice = ~p_choice3("Chase vermin", 1, "Stroke", 2, "Shoo away", 3);
+if ($choice = 1) {
+    if (oc_category(%follower_obj) = overgrown) { mes("Your cat is too large to catch vermin."); return; }
+    @rfd_dave_chase;
+} else if ($choice = 2) {
+    npc_anim(cat_rollingover, 0);
+    %cat_growth = setbit_range_toint(%cat_growth, 23, 5, 10);
+    mes("You stroke your hellcat.");
+} else {
+    if (~p_choice2("Shoo away my hellcat.", 1, "Keep my hellcat.", 2) = 1) ~follower_death;
+}

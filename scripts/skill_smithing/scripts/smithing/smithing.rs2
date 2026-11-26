@@ -179,6 +179,8 @@ switch_obj ($last_item)
         inv_transmit(smithing_iron2, smithing:column2);
         inv_transmit(smithing_iron3, smithing:column3);
         inv_transmit(smithing_iron4, smithing:column4);
+        if_sethide (smithing:other_layer, false);
+        if_settext (smithing:com_101, "Iron spit");
         inv_transmit(smithing_iron5, smithing:column5);
         inv_transmit(smithing_iron_claws, smithing:column_claws);
         inv_transmit(smithing_lamp_iron, smithing:com_147);

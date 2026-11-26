@@ -1,0 +1,386 @@
+// Original 377 blocks. UNKNOWN untradeable quest-item default; pet params are server-only.
+[hundred_dave_stew]
+name=Spicy stew
+desc=It's a meat and potato stew with fancy seasoning.
+recol1s=21119
+recol1d=11488
+iop1=Eat
+cost=20
+model=obj_hundred_dave_stew
+2dzoom=910
+2dyan=1856
+2dxan=204
+members=yes
+iop2=Smell
+weight=1500g
+tradeable=no
+
+[hundred_dave_spice_red_4]
+name=Red spice (4)
+desc=Allows for equal distribution of spice.
+recol1s=27615
+recol1d=19654
+recol2s=26559
+recol2d=19654
+recol3s=25503
+recol3d=19654
+recol4s=24447
+recol4d=19654
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_red_3]
+name=Red spice (3)
+desc=Allows for equal distribution of spice.
+recol1s=26559
+recol1d=19654
+recol2s=25503
+recol2d=19654
+recol3s=24447
+recol3d=19654
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_red_2]
+name=Red spice (2)
+desc=Allows for equal distribution of spice.
+recol1s=25503
+recol1d=19654
+recol2s=24447
+recol2d=19654
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_red_1]
+name=Red spice (1)
+desc=Allows for equal distribution of spice.
+recol1s=24447
+recol1d=19654
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_orange_4]
+name=Orange spice (4)
+desc=Allows for equal distribution of spice.
+recol1s=27615
+recol1d=24997
+recol2s=26559
+recol2d=24997
+recol3s=25503
+recol3d=24997
+recol4s=24447
+recol4d=24997
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_orange_3]
+name=Orange spice (3)
+desc=Allows for equal distribution of spice.
+recol1s=26559
+recol1d=24997
+recol2s=25503
+recol2d=24997
+recol3s=24447
+recol3d=24997
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_orange_2]
+name=Orange spice (2)
+desc=Allows for equal distribution of spice.
+recol1s=25503
+recol1d=24997
+recol2s=24447
+recol2d=24997
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_orange_1]
+name=Orange spice (1)
+desc=Allows for equal distribution of spice.
+recol1s=24447
+recol1d=24997
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_brown_4]
+name=Brown spice (4)
+desc=Allows for equal distribution of spice.
+recol1s=27615
+recol1d=12549
+recol2s=26559
+recol2d=12549
+recol3s=25503
+recol3d=12549
+recol4s=24447
+recol4d=12549
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_brown_3]
+name=Brown spice (3)
+desc=Allows for equal distribution of spice.
+recol1s=26559
+recol1d=12549
+recol2s=25503
+recol2d=12549
+recol3s=24447
+recol3d=12549
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_brown_2]
+name=Brown spice (2)
+desc=Allows for equal distribution of spice.
+recol1s=25503
+recol1d=12549
+recol2s=24447
+recol2d=12549
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_brown_1]
+name=Brown spice (1)
+desc=Allows for equal distribution of spice.
+recol1s=24447
+recol1d=12549
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_yellow_4]
+name=Yellow spice (4)
+desc=Allows for equal distribution of spice.
+recol1s=27615
+recol1d=31430
+recol2s=26559
+recol2d=31430
+recol3s=25503
+recol3d=31430
+recol4s=24447
+recol4d=31430
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_yellow_3]
+name=Yellow spice (3)
+desc=Allows for equal distribution of spice.
+recol1s=26559
+recol1d=31430
+recol2s=25503
+recol2d=31430
+recol3s=24447
+recol3d=31430
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_yellow_2]
+name=Yellow spice (2)
+desc=Allows for equal distribution of spice.
+recol1s=25503
+recol1d=31430
+recol2s=24447
+recol2d=31430
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_yellow_1]
+name=Yellow spice (1)
+desc=Allows for equal distribution of spice.
+recol1s=24447
+recol1d=31430
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[hundred_dave_spice_empty]
+name=Empty spice shaker
+desc=Allows for equal distribution of spice.
+model=obj_hundred_dave_spice_red_4
+members=yes
+cost=1
+2dzoom=848
+2dyan=1985
+2dxan=222
+weight=1g
+tradeable=no
+
+[overgrowncatobject_hell]
+name=Overgrown hellcat
+desc=Your hellish pet cat!!
+model=obj_overgrowncatobject_hell
+members=yes
+2dxof=38
+2dyof=29
+2dzoom=1308
+2dyan=159
+2dxan=1994
+weight=2500g
+weight=2500g
+tradeable=no
+category=overgrown
+param=follower_id,overgrowncat_hell
+
+[growncatobject_hell]
+name=Hell cat
+desc=Your hellish pet cat!!
+recol1s=9480
+recol1d=9216
+model=obj_overgrowncatobject_hell
+members=yes
+2dxof=38
+2dyof=20
+2dzoom=1373
+2dyan=159
+2dxan=12
+weight=4g
+weight=1500g
+weight=1500g
+tradeable=no
+category=cat
+param=follower_id,growncat_hell
+
+[kittenobject_hell]
+name=Hell-kitten
+desc=Your hellish pet cat!!
+model=obj_kittenobject_hell
+members=yes
+2dxof=33
+2dyof=36
+2dzoom=1438
+2dyan=141
+2dxan=1967
+weight=750g
+weight=750g
+tradeable=no
+category=kitten
+param=follower_id,kittenpet_hell
+
+[lazycatobject_hell]
+name=Lazy hell cat
+desc=Your hellish pet cat!!
+model=obj_lazycatobject_hell
+members=yes
+2dxof=50
+2dyof=28
+2dzoom=1178
+2dyan=210
+2dxan=2003
+weight=750g
+weight=750g
+tradeable=no
+category=cat
+param=follower_id,lazycat_hell
+
+[wileycatobject_hell]
+name=Wily hellcat
+desc=Your hellish pet cat!!
+model=obj_wileycatobject_hell
+members=yes
+2dxof=32
+2dyof=27
+2dzoom=1308
+2dyan=120
+2dxan=2024
+weight=750g
+weight=750g
+tradeable=no
+category=cat
+param=follower_id,wileycat_hell

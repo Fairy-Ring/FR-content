@@ -161,6 +161,20 @@ for (const entry of manifest) {
       const collision = collisionExceptions.get(executionKey(entry));
       const jiggig = jiggigLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
       const blastFurnace = blastFurnaceLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
+      if (entry.name === '100_dave_celler_stairs') {
+        assert.deepEqual(result.destination, [0, 3077, 3492], 'Dave cellar stairs return beside the original surface trapdoor');
+        assert.equal(entry.status, 'new', 'Dave link is not inherited parity');
+        walkable(result.destination);
+        const trapdoor = locs.find(r => r.name === '100_dave_celler_trapdoor' && r.coord === '0_48_54_5_37');
+        assert.ok(trapdoor, 'original trapdoor is the surface counterpart');
+        assert.ok(routeEnd(result.destination, t => reachable(t, trapdoor)), 'landing reaches the native trapdoor');
+        const wrapper = types.LocType.get(types.LocType.getId(trapdoor.name));
+        assert.equal(wrapper.multiloc[0], types.LocType.getId('100_dave_celler_trapdoor_closed'));
+        assert.equal(wrapper.multiloc[1], types.LocType.getId('100_dave_celler_trapdoor_open'));
+        // The S2 suite sends native visible-form Open/Go-down/Close operations.
+        counts.new++;
+        continue;
+      }
       if (blastFurnace) {
         assert.deepEqual(result.destination, blastFurnace.destination, 'Blast Furnace has the exact packed landing and level');
         assert.deepEqual(entry.counterpart, blastFurnace.counterpart, 'Blast Furnace uses its exact native counterpart');

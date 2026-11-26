@@ -98,6 +98,10 @@ if (%cookquest < ^cook_complete) {
     return;
 } else {
     if (last_useitem = hundred_pirate_raw_fishcake) @rfd_pete_cook;
+    if (last_useitem = 100guide_guidecake_uncooked) {
+        @rfd_guide_cook;
+        return;
+    }
     //TODO 377 enable Lumbridge range after cooking is ported
     //@attempt_cook_item(last_useitem);
 }

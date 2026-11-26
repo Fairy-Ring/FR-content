@@ -1266,6 +1266,7 @@ switch_coord (loc_coord) {
 [oploc1,100_dave_celler_stairs]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 0_48_154_4_37 : p_telejump(^rfd_dave_surface);
     case default : @unhandled_stairs(loc_coord);
 }
 

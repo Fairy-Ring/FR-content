@@ -65391,32 +65391,6 @@ vislevel=hide
 readyanim=fairy_dragon_flame
 head1=npc_3377_head
 
-[hundred_evil_dave]
-name=Evil Dave
-desc=He seems to like wearing black.
-model1=npc_2906
-model2=idk_42
-model3=idk_man_jaw_pointy
-model4=npc_2906i2
-model5=npc_3378
-model6=npc_2906i4
-model7=npc_3378i2
-recol1s=4228
-recol1d=5285
-recol2s=3171
-recol2d=5285
-recol3s=8324
-recol3d=8390
-vislevel=hide
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-vislevel=hide
-op1=Talk-to
-alwaysontop=yes
-head1=obj_pickpocket_guide_man
-head2=npc_2906_head
-head3=idk_man_jaw_pointy_head
-
 [hundred_dave_frozen]
 vislevel=1
 multivar=100davevisible
@@ -65449,37 +65423,6 @@ head3=idk_man_jaw_pointy_head
 wanderrange=0
 moverestrict=nomove
 defaultmode=none
-
-[hundred_dave_mum]
-name=Doris
-desc=One of RuneScape's many citizens.
-model1=idk_woman_hair_cropped
-model2=npc_3381
-model3=npc_frenita
-model4=obj_macro_prince_torso_womanwear2
-model5=obj_cert_drill_top_womanwear3
-model6=npc_3381i2
-model7=npc_3381i3
-recol1s=14724
-recol1d=9618
-recol2s=14801
-recol2d=24075
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-op1=Talk-to
-vislevel=hide
-alwaysontop=yes
-head1=npc_3381_head
-head2=npc_3381_headi2
-
-[hundred_dave_hellrat]
-name=Hell-Rat
-desc=Vermin from the underworld.
-model1=npc_3382
-readyanim=mouse_ready
-walkanim=mouse_walk
-minimap=no
-vislevel=hide
 
 [hundred_aris]
 vislevel=hide
@@ -66844,19 +66787,6 @@ vislevel=1
 multivar=100_ogre_rantz_visible
 multinpc=1,100_rantz
 
-[100_rantz]
-name=Rantz
-desc=A large dim looking humanoid.
-model1=npc_ogre
-model2=npc_rantz
-vislevel=hide
-size=2
-walkanim=ogre_walk
-readyanim=ogre_ready
-op1=Talk-to
-alwaysontop=yes
-head1=npc_ogre_chieftan_head
-
 [100_rantz1]
 name=Rantz
 desc=A large dim looking humanoid.
@@ -66899,80 +66829,6 @@ vislevel=1
 multivar=100_ogre_jubbly_boat_visible
 multinpc=1,100_jubbly_ogre_boat_full
 
-[100_jubbly_ogre_boat_full]
-name=Ogre boat
-desc=Rantz's boat, operated by his kids Fycie and Bugs.
-model1=npc_3471
-model2=npc_3471i2
-model3=npc_3471i3
-vislevel=hide
-size=5
-readyanim=100_jubbly_treading_water
-walkanim=100_jubbly_swimming
-op1=Board
-head1=npc_3471_head
-head2=npc_3471_headi2
-
-[100_jubbly_ogre_boat]
-name=Ogre boat
-desc=Rantz's boat, operated by his kids Fycie and Bugs.
-model1=npc_3472
-model2=npc_3471i2
-model3=npc_3471i3
-vislevel=hide
-size=5
-readyanim=100_jubbly_treading_water
-walkanim=100_jubbly_swimming
-op1=Board
-head1=npc_3471_head
-head2=npc_3471_headi2
-
-[100_jubbly_balloon_toad_brown]
-name=Balloon Toad
-desc=A toad inflated with swamp gas and tied up like a balloon.
-model1=npc_3473
-vislevel=hide
-readyanim=100_jubbly_toad_balloon_ready
-walkanim=100_jubbly_toad_balloon_ready
-
-[100_jubbly_balloon_toad_white]
-name=Balloon Toad
-desc=A toad inflated with swamp gas and tied up like a balloon.
-model1=npc_3473
-recol1s=13570
-recol1d=12684
-vislevel=hide
-readyanim=100_jubbly_toad_balloon_ready
-walkanim=100_jubbly_toad_balloon_ready
-
-[100_jubbly_balloon_toad_deflate]
-name=Balloon Toad
-desc=A quickly deflating balloon toad.
-model1=npc_3475
-vislevel=hide
-readyanim=100_jubbly_toad_balloon_deflate
-walkanim=100_jubbly_toad_balloon_deflate
-
-[100_jubbly_bird]
-name=Jubbly bird
-desc=A large boisterous bird, a delicacy for ogres.
-model1=npc_3476
-size=3
-walkanim=100_jubbly_walk
-readyanim=100_jubbly_ready
-op5=Attack
-alwaysontop=yes
-vislevel=9
-
-[100_jubbly_bird_dead]
-name=Jubbly bird
-desc=A large boisterous bird, a delicacy for ogres.
-model1=npc_3476
-vislevel=hide
-size=3
-walkanim=seagull_attack
-readyanim=seagull_attack
-op4=Pluck
 
 [hundred_monkey]
 name=King Awowogei
@@ -67478,98 +67334,6 @@ hitpoints=240
 attack=78
 strength=78
 defence=81
-
-[overgrowncat_hell]
-name=Overgrown hellcat
-desc=A hellish not-so little pet.
-model1=npc_3503
-model2=obj_overgrowncatobject_hell
-recol1s=4228
-recol1d=9216
-vislevel=hide
-readyanim=cat_ready
-walkanim=cat_walk
-op1=Pick-up
-op3=Talk-to
-op4=Interact-with
-resizeh=80
-resizev=65
-ambient=40
-head1=npc_3503_head
-
-[growncat_hell]
-name=Hellcat
-desc=A hellish pet cat!
-model1=npc_3503
-model2=obj_overgrowncatobject_hell
-recol1s=4228
-recol1d=9216
-vislevel=hide
-readyanim=cat_ready
-walkanim=cat_walk
-op1=Pick-up
-op3=Talk-to
-op4=Interact-with
-resizeh=60
-resizev=60
-ambient=40
-head1=npc_3503_head
-
-[kittenpet_hell]
-name=Kitten
-desc=A hellish little pet.
-model1=obj_kittenobject_hell
-model2=npc_3505
-recol1s=4228
-recol1d=9216
-recol2s=9480
-recol2d=9216
-vislevel=hide
-resizeh=40
-resizev=30
-walkanim=kitten_walk
-readyanim=cat_ready
-op1=Pick-up
-op2=Hidden
-op3=Talk-to
-op4=Interact-with
-head1=npc_3505_head
-
-[lazycat_hell]
-name=Lazy HellCat
-desc=A hellish not-so-little pet.
-model1=npc_3506
-model2=obj_lazycatobject_hell
-recol1s=4228
-recol1d=9216
-vislevel=hide
-readyanim=cat_ready
-walkanim=cat_walk
-op1=Pick-up
-op3=Talk-to
-op4=Interact-with
-resizeh=70
-resizev=70
-ambient=40
-head1=npc_3506_head
-
-[wileycat_hell]
-name=Wily hellcat
-desc=Wild and hellish.
-model1=npc_3507
-model2=obj_wileycatobject_hell
-recol1s=2114
-recol1d=9216
-vislevel=hide
-readyanim=cat_ready
-walkanim=cat_walk
-op1=Pick-up
-op3=Talk-to
-op4=Interact-with
-resizeh=70
-resizev=70
-ambient=40
-head1=npc_3507_head
 
 [0_54_49_memberfish]
 name=Fishing spot

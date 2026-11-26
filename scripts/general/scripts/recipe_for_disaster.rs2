@@ -25,6 +25,9 @@ if (%hundred_main_quest_var = 0) {
 ~send_quest_progress_colour(recipe_for_disaster:com_2, %hundred_dwarf_quest, ^rfd_guest_complete);
 ~send_quest_progress_colour(recipe_for_disaster:com_3, %100goblin, ^rfd_guest_complete);
 ~send_quest_progress_colour(recipe_for_disaster:com_4, %100_pirate_quest_var, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_5, %100guide_prog, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_6, %hundred_dave_main, ^rfd_dave_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_10, %100_ogre_prog, ^rfd_guest_complete);
 if_openmain(recipe_for_disaster);
 
 [if_close,recipe_for_disaster]
@@ -68,3 +71,30 @@ if (%100_pirate_quest_var = ^rfd_guest_complete) {
     $text = "I need breadcrumbs, ground cod, ground kelp and ground crab meat.|I can grind the cod, kelp and crab meat with a pestle and mortar,|and cut bread with a knife. I should combine all four ingredients,|cook the raw fishcake on a range, then use it on Pirate Pete.";
 }
 ~quest_journal("Freeing Pirate Pete", $text);
+
+[if_button,recipe_for_disaster:com_5]
+def_string $text;
+if (%100guide_prog = ^rfd_guest_complete) {
+    $text = "@str@I freed the Lumbridge Guide with a Cake of Guidance.|@red@GUEST RESCUED!";
+} else {
+    $text = "I should inspect the frozen Lumbridge Guide.|I need level 40 Cooking, Big Chompy Bird Hunting, Biohazard,|Demon Slayer, Murder Mystery, Nature Spirit, Priest in Peril,|The Restless Ghost and Witch's House.|Traiborn in the Wizards' Tower can enchant cake ingredients.|I should bake the Cake of Guidance in Lumbridge Castle.";
+}
+~quest_journal("Freeing the Lumbridge Guide", $text);
+
+[if_button,recipe_for_disaster:com_6]
+def_string $text;
+if (%hundred_dave_main = ^rfd_dave_complete) {
+    $text = "@str@I freed Evil Dave with his specially seasoned stew.|@red@GUEST RESCUED!";
+} else {
+    $text = "I should inspect frozen Evil Dave.|I need Gertrude's Cat, Shadow of the Storm and level 25 Cooking.|Doris lives west of Edgeville bank. Dave is in her cellar.|My cat can catch Hell-Rats for four colours of spice.|Dave can taste my stew and count the correct spice amounts.|I should take an approved stew to Dave in the banquet.";
+}
+~quest_journal("Freeing Evil Dave", $text);
+
+[if_button,recipe_for_disaster:com_10]
+def_string $text;
+if (%100_ogre_prog = ^rfd_guest_complete) {
+    $text = "@str@I freed Skrach Uglogwee with cooked Jubbly.|@red@GUEST RESCUED!";
+} else {
+    $text = "I should inspect frozen Skrach Uglogwee.|I need Big Chompy Bird Hunting, level 41 Cooking and|level 20 Firemaking. Rantz in Feldip Hills can help.|I need balloon toads to lure a Jubbly, then my ogre bow|to hunt it. I should pluck it and roast it on Rantz's spit.";
+}
+~quest_journal("Freeing Skrach Uglogwee", $text);

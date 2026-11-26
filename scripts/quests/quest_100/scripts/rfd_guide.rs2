@@ -1,0 +1,225 @@
+// VERIFIED route, requirements, quiz examples and finish from RuneHQ captured 15 April 2006.
+// UNKNOWN: stage values, mesbox prompt display, flour example order, egg/milk one-correct cycling, distractors, and inline quiz placement.
+// The 377 cache has no mapped quiz NPC or destination; quizzes stay with Traiborn instead of guessing a teleport.
+[proc,rfd_guide_requirements_met]()(boolean)
+if (%chompybird ! ^chompybird_complete) return(false);
+if (%biohazard < ^biohazard_complete) return(false);
+if (%demonstart ! ^demon_complete) return(false);
+if (%murderquest ! ^murder_complete) return(false);
+if (%druidspirit ! ^druidspirit_complete) return(false);
+if (%priestperil < ^priestperil_complete) return(false);
+if (%prieststart ! ^priest_complete) return(false);
+if (%ballquest ! ^ball_complete) return(false);
+return(true);
+
+[oploc1,hundred_guide_base]
+if (%hundred_main_quest_var < ^rfd_frozen | %100guidevisible = 0 | %100guide_prog >= ^rfd_guest_complete) return;
+if (%100guide_prog >= ^rfd_guide_started) {
+    ~mesbox("The gypsy tells you that you need to go to Traiborn the wizard.");
+    return;
+}
+if (stat(cooking) < ^rfd_guide_cooking | ~rfd_guide_requirements_met = false) {
+    ~mesbox("Requirements: Level 40 Cooking|Must have completed Big Chompy Bird Hunting, Biohazard, Demon Slayer, Murder Mystery, Nature Spirit, Priest in Peril, Restless Ghost, and Witch's House.");
+    return;
+}
+%100guide_prog = ^rfd_guide_started;
+%100guide_q1 = 0;
+%100guide_q2 = 0;
+%100guide_tot = 0;
+%100guide_lastgame = 0;
+~mesbox("The gypsy tells you that you need to go to Traiborn the wizard.");
+
+[label,rfd_guide_traiborn]
+if (%hundred_main_quest_var < ^rfd_frozen | %100guidevisible = 0 | %100guide_prog < ^rfd_guide_started | %100guide_prog >= ^rfd_guest_complete) return;
+// UNKNOWN recovery policy: only restore ingredients when neither raw nor finished cake remains carried or banked.
+if (inv_total(inv, 100guide_guidecake_uncooked) = 0 & inv_total(bank, 100guide_guidecake_uncooked) = 0 & inv_total(inv, 100guide_guidecake) = 0 & inv_total(bank, 100guide_guidecake) = 0) {
+    if (%100guide_eggdone = 1 & inv_total(inv, 100guide_egg) = 0 & inv_total(bank, 100guide_egg) = 0) {
+        inv_add(inv, 100guide_egg, 1);
+        return;
+    }
+    if (%100guide_flourdone = 1 & inv_total(inv, 100guide_pot_flour) = 0 & inv_total(bank, 100guide_pot_flour) = 0) {
+        inv_add(inv, 100guide_pot_flour, 1);
+        return;
+    }
+    if (%100guide_milkdone = 1 & inv_total(inv, 100guide_bucket_milk) = 0 & inv_total(bank, 100guide_bucket_milk) = 0) {
+        inv_add(inv, 100guide_bucket_milk, 1);
+        return;
+    }
+}
+if (%100guide_eggdone = 0) {
+    @rfd_guide_egg_quiz;
+    return;
+}
+if (%100guide_flourdone = 0) {
+    @rfd_guide_flour_quiz;
+    return;
+}
+if (%100guide_milkdone = 0) {
+    @rfd_guide_milk_quiz;
+    return;
+}
+~mesbox("Once they are all enchanted, use them on a cake tin and bake the cake on a range.");
+
+[label,rfd_guide_egg_quiz]
+if (inv_total(inv, egg) < 1) return;
+if (%100guide_q1 >= ^rfd_guide_egg_examples) %100guide_q1 = 0;
+%100guide_lastgame = ^rfd_guide_egg_game;
+def_int $answer = 0;
+switch_int(%100guide_q1) {
+    case 0 :
+        ~mesbox("Green ghostly person:");
+        $answer = ~p_choice3("Velorina", 1, "Gertrude", 2, "Ali Morrisane", 3);
+    case 1 :
+        ~mesbox("Lady in purple:");
+        $answer = ~p_choice3("Ali Morrisane", 1, "Gertrude", 2, "Unferth", 3);
+    case 2 :
+        ~mesbox("Man in white:");
+        $answer = ~p_choice3("King Lathas", 1, "Reldo", 2, "Ali Morrisane", 3);
+    case 3 :
+        ~mesbox("Muscleman in purple:");
+        $answer = ~p_choice3("Unferth", 1, "Velorina", 2, "Gertrude", 3);
+    case 4 :
+        ~mesbox("Kingly man in white/red outfit:");
+        $answer = ~p_choice3("Reldo", 1, "King Lathas", 2, "Ali Morrisane", 3);
+    case 5 :
+        ~mesbox("Man with a ponytail holding a book:");
+        $answer = ~p_choice3("Gertrude", 1, "Ali Morrisane", 2, "Reldo", 3);
+}
+if ((%100guide_q1 = 0 & $answer = 1) | (%100guide_q1 = 1 & $answer = 2) | (%100guide_q1 = 2 & $answer = 3) | (%100guide_q1 = 3 & $answer = 1) | (%100guide_q1 = 4 & $answer = 2) | (%100guide_q1 = 5 & $answer = 3)) {
+    inv_del(inv, egg, 1);
+    inv_add(inv, 100guide_egg, 1);
+    %100guide_eggdone = 1;
+    %100guide_q1 = 0;
+} else {
+    %100guide_q1 = calc(%100guide_q1 + 1);
+    if (%100guide_q1 >= ^rfd_guide_egg_examples) %100guide_q1 = 0;
+}
+
+[label,rfd_guide_flour_quiz]
+if (inv_total(inv, pot_flour) < 1) return;
+if (%100guide_q2 >= ^rfd_guide_flour_examples) {
+    %100guide_q2 = 0;
+    %100guide_tot = 0;
+}
+%100guide_lastgame = ^rfd_guide_flour_game;
+def_int $answer = 0;
+switch_int(%100guide_q2) {
+    case 0 :
+        ~mesbox("Ball, Flypaper, Potato seed, Onion seed, Cadava berries, Jangerberries, Herring, Salmon, Dwellberries, Mithril arrow");
+        ~mesbox("Which of the following items were NOT shown to you?");
+        $answer = ~p_choice3("Trout", 1, "Herring", 2, "Salmon", 3);
+    case 1 :
+        ~mesbox("Fire rune, Yew shortbow, Tin ore, Iron ore, Holy Book, Dwellberries, Mithril arrow, Trout, Silver ore, Chaos rune");
+        ~mesbox("How many types of runes were there?");
+        $answer = ~p_choice3("3", 1, "2", 2, "5", 3);
+    case 2 :
+        ~mesbox("Wolfbane, Bloated toad, Distillator, Cider, Dwarven stout, Chef's delight, Jade, Opal, Chaos talisman, Mind talisman");
+        ~mesbox("Which item began with the letter \"m\"?");
+        $answer = ~p_choice3("Chaos talisman", 1, "Jade", 2, "Mind talisman", 3);
+    case 3 :
+        ~mesbox("Air rune, Maple longbow, Magic shortbow, Tomato seed, Unholy Book, Poisonivy berries, Coconut, Water rune, Logs, Black longsword");
+        ~mesbox("How many weapons were you shown?");
+        $answer = ~p_choice3("2", 1, "3", 2, "5", 3);
+    case 4 :
+        ~mesbox("Silverlight, Druid pouch, Ghostspeak amulet, Moonlight mead, Book of Balance, Trout, Pike, Yew logs, Death Talisman, Magic logs");
+        ~mesbox("Which items were amongst those you were shown?");
+        $answer = ~p_choice3("Guthix prayer book, Magic logs, Pike", 1, "Book of Balance, Pike, Coconut", 2, "Druid pouch, Moonlight mead, Logs", 3);
+}
+if ((%100guide_q2 = 0 & $answer = 1) | (%100guide_q2 = 1 & $answer = 2) | (%100guide_q2 = 2 & $answer = 3) | (%100guide_q2 = 3 & $answer = 2) | (%100guide_q2 = 4 & $answer = 1)) {
+    %100guide_tot = calc(%100guide_tot + 1);
+}
+if (%100guide_tot >= ^rfd_guide_flour_correct) {
+    inv_del(inv, pot_flour, 1);
+    inv_add(inv, 100guide_pot_flour, 1);
+    %100guide_flourdone = 1;
+    %100guide_q2 = 0;
+    %100guide_tot = 0;
+    return;
+}
+%100guide_q2 = calc(%100guide_q2 + 1);
+if (%100guide_q2 >= ^rfd_guide_flour_examples) {
+    %100guide_q2 = 0;
+    %100guide_tot = 0;
+}
+
+[label,rfd_guide_milk_quiz]
+if (inv_total(inv, bucket_milk) < 1) return;
+if (%100guide_q1 >= ^rfd_guide_milk_examples) %100guide_q1 = 0;
+%100guide_lastgame = ^rfd_guide_milk_game;
+def_int $answer = 0;
+switch_int(%100guide_q1) {
+    case 0 :
+        ~mesbox("A gold ring is to 5, as a holy symbol is to...");
+        $answer = ~p_choice3("16", 1, "20", 2, "33", 3);
+    case 1 :
+        ~mesbox("If I'm going to need glass, first I will need:");
+        $answer = ~p_choice3("Sand and a bucket", 1, "Sand, Bucket, Soda ash, Glass blowing pipe", 2, "Soda ash and a glass blowing pipe", 3);
+    case 2 :
+        ~mesbox("What is the nearest guild to the Fishing Platform (as the seagull flies)?");
+        $answer = ~p_choice3("Crafting guild", 1, "Keep le Faye", 2, "Legends", 3);
+    case 3 :
+        ~mesbox("I'm in a bar west of Pollnivneach. Where am I?");
+        $answer = ~p_choice3("Catherby", 1, "Bandit camp", 2, "Keep le Faye", 3);
+    case 4 :
+        ~mesbox("I can hear howling in one direction and buzzing in the other - where am I?");
+        $answer = ~p_choice3("Legends", 1, "Catherby", 2, "Bandit camp", 3);
+    case 5 :
+        ~mesbox("What ingredients are used in a cake?");
+        $answer = ~p_choice3("Flour and eggs", 1, "Flour, Eggs, and Milk", 2, "Eggs and milk", 3);
+    case 6 :
+        ~mesbox("What doesn't lie between Morytania and Asgarnia?");
+        $answer = ~p_choice3("Keep le Faye", 1, "Catherby", 2, "Bandit camp", 3);
+    case 7 :
+        ~mesbox("The river salve runs from?");
+        $answer = ~p_choice3("Bandit camp", 1, "Catherby", 2, "North to south", 3);
+    case 8 :
+        ~mesbox("How much gp does it take to bribe a guard at the toll gate to Al Kharid prior to earning their trust?");
+        $answer = ~p_choice3("10", 1, "20", 2, "33", 3);
+    case 9 :
+        ~mesbox("What is the defence level requirment to wear a Mystic Hat?");
+        $answer = ~p_choice3("16", 1, "20", 2, "33", 3);
+    case 10 :
+        ~mesbox("Which tower is closest to the Crafting guild?");
+        $answer = ~p_choice3("Crafting guild", 1, "Dark wizards", 2, "Bandit camp", 3);
+    case 11 :
+        ~mesbox("The combat level of goblins near Lumbridge is...");
+        $answer = ~p_choice3("5", 1, "2", 2, "10", 3);
+    case 12 :
+        ~mesbox("A glass vial is to 33, as a glass orb is to...");
+        $answer = ~p_choice3("33", 1, "46", 2, "20", 3);
+}
+if ((%100guide_q1 = 0 & $answer = 1) | (%100guide_q1 = 1 & $answer = 2) | (%100guide_q1 = 2 & $answer = 3) | (%100guide_q1 = 3 & $answer = 2) | (%100guide_q1 = 4 & $answer = 2) | (%100guide_q1 = 5 & $answer = 2) | (%100guide_q1 = 6 & $answer = 1) | (%100guide_q1 = 7 & $answer = 3) | (%100guide_q1 = 8 & $answer = 1) | (%100guide_q1 = 9 & $answer = 2) | (%100guide_q1 = 10 & $answer = 2) | (%100guide_q1 = 11 & $answer = 2) | (%100guide_q1 = 12 & $answer = 2)) {
+    inv_del(inv, bucket_milk, 1);
+    inv_add(inv, 100guide_bucket_milk, 1);
+    %100guide_milkdone = 1;
+    %100guide_q1 = 0;
+} else {
+    %100guide_q1 = calc(%100guide_q1 + 1);
+    if (%100guide_q1 >= ^rfd_guide_milk_examples) %100guide_q1 = 0;
+}
+
+[oplocu,hundred_guide_base]
+if (last_useitem ! 100guide_guidecake) return;
+if (%hundred_main_quest_var < ^rfd_frozen | %100guidevisible = 0 | %100guide_prog < ^rfd_guide_started | %100guide_prog >= ^rfd_guest_complete) return;
+if (%100guide_eggdone = 0 | %100guide_flourdone = 0 | %100guide_milkdone = 0 | inv_total(inv, 100guide_guidecake) < 1) return;
+inv_del(inv, 100guide_guidecake, 1);
+%100guide_prog = ^rfd_guest_complete;
+~rfd_guest_reward(4);
+
+[label,rfd_guide_make_cake]
+if (%hundred_main_quest_var < ^rfd_frozen | %100guidevisible = 0 | %100guide_prog < ^rfd_guide_started | %100guide_prog >= ^rfd_guest_complete) return;
+if (%100guide_eggdone = 0 | %100guide_flourdone = 0 | %100guide_milkdone = 0) return;
+if (inv_total(inv, 100guide_egg) < 1 | inv_total(inv, 100guide_pot_flour) < 1 | inv_total(inv, 100guide_bucket_milk) < 1 | inv_total(inv, cake_tin) < 1) return;
+inv_del(inv, 100guide_egg, 1);
+inv_del(inv, 100guide_pot_flour, 1);
+inv_del(inv, 100guide_bucket_milk, 1);
+inv_del(inv, cake_tin, 1);
+inv_add(inv, 100guide_guidecake_uncooked, 1);
+
+[label,rfd_guide_cook]
+if (loc_type ! cooksquestrange & lc_category(loc_type) ! cooking_oven) return;
+if (%hundred_main_quest_var < ^rfd_frozen | %100guidevisible = 0 | %100guide_prog < ^rfd_guide_started | %100guide_prog >= ^rfd_guest_complete) return;
+if (stat(cooking) < ^rfd_guide_cooking | inv_total(inv, 100guide_guidecake_uncooked) < 1) return;
+anim(human_potterywheel, 0);
+inv_del(inv, 100guide_guidecake_uncooked, 1);
+inv_add(inv, 100guide_guidecake, 1);

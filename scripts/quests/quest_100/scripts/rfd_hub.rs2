@@ -51,10 +51,31 @@ if ($guest = 1) {
     stat_advance(crafting, ^rfd_guest_xp);
     stat_advance(fishing, ^rfd_guest_xp);
     stat_advance(smithing, ^rfd_guest_xp);
+} else if ($guest = 4) {
+    if (%100guide_prog ! ^rfd_guest_complete | %100guidevisible = 0) return;
+    %100guidevisible = 0;
+    stat_advance(magic, 25000);
+} else if ($guest = 5) {
+    if (%hundred_dave_main ! ^rfd_dave_complete | %100davevisible = 0) return;
+    %100davevisible = 0;
+} else if ($guest = 6) {
+    if (%100_ogre_prog ! ^rfd_guest_complete | %100ogrevisible = 0) return;
+    %100ogrevisible = 0;
+    stat_advance(woodcutting, 15000);
+    stat_advance(crafting, 15000);
+    stat_advance(ranged, 15000);
 } else {
     return;
 }
-stat_advance(cooking, ^rfd_guest_xp);
+if ($guest = 4) {
+    stat_advance(cooking, 25000);
+} else if ($guest = 5) {
+    stat_advance(cooking, ^rfd_dave_xp);
+} else if ($guest = 6) {
+    stat_advance(cooking, 15000);
+} else {
+    stat_advance(cooking, ^rfd_guest_xp);
+}
 %hundred_subquest_tally = add(%hundred_subquest_tally, 1);
 ~update_questpoints;
 ~send_quest_progress_colour(questlist:hundred_main, %hundred_main_quest_var, ^rfd_complete);

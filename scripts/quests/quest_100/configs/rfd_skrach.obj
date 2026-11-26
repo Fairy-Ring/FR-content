@@ -1,0 +1,106 @@
+// Original 377 client fields preserved. Tradeability is server-side.
+[spit_iron]
+name=Iron spit
+desc=An iron spit.
+model=obj_spit_iron
+cost=64
+2dyof=-16
+2dzoom=1488
+2dyan=1856
+2dxan=168
+members=yes
+weight=1500g
+
+[spit_skewered_chompy]
+name=Skewered chompy
+desc=A skewered chompy bird.
+model=obj_spit_skewered_chompy
+cost=149
+2dyof=7
+2dzoom=976
+2dyan=1776
+2dxan=234
+members=yes
+weight=2500g
+tradeable=no
+
+[100_jubbly_balloon_toad_brown]
+name=Balloon toad
+desc=An inflated toad tied to a rock like a balloon.
+model=obj_100_jubbly_balloon_toad_brown
+2dxof=-5
+2dyof=-1
+2dzoom=3536
+2dyan=1979
+2dxan=207
+members=yes
+iop1=Drop
+iop4=Release-all
+iop5=Release
+weight=4kg
+tradeable=no
+
+[100_jubbly_balloon_toad_white]
+name=Balloon toad
+desc=An inflated toad tied to a rock like a balloon.
+recol1s=13570
+recol1d=12684
+model=obj_100_jubbly_balloon_toad_brown
+2dxof=-5
+2dyof=-1
+2dzoom=3536
+2dyan=1979
+2dxan=207
+members=yes
+iop1=Drop
+iop4=Release-all
+iop5=Release
+weight=4kg
+tradeable=no
+
+[100_jubbly_meat_raw]
+name=Raw jubbly
+desc=The uncooked meat of a Jubbly bird.
+cost=100
+model=obj_100_jubbly_meat_raw
+2dxof=-3
+2dyof=-35
+2dzoom=2346
+2dyan=1247
+2dxan=195
+members=yes
+weight=10kg
+tradeable=no
+
+[100_jubbly_meat_cooked]
+name=Cooked jubbly
+desc=Lovely Jubbly!
+recol1s=18918
+recol1d=14594
+cost=150
+model=obj_100_jubbly_meat_raw
+2dxof=-3
+2dyof=-35
+2dzoom=2346
+2dyan=1247
+2dxan=195
+iop1=Eat
+members=yes
+weight=10kg
+tradeable=no
+
+[100_jubbly_meat_burned]
+name=Burnt jubbly
+desc=The burnt meat of a Jubbly bird.
+recol1s=18918
+recol1d=6273
+cost=1
+model=obj_100_jubbly_meat_raw
+2dxof=-3
+2dyof=-35
+2dzoom=2346
+2dyan=1247
+2dxan=195
+members=yes
+weight=8kg
+tradeable=no

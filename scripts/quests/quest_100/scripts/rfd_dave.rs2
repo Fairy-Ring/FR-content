@@ -1,0 +1,199 @@
+// VERIFIED route: RuneHQ 15 April 2006. UNKNOWN functional wording and stages.
+[oploc1,hundred_dave_base] @rfd_dave_inspect;
+[aploc1,hundred_dave_base] @rfd_dave_inspect;
+[label,rfd_dave_inspect]
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+if (%fluffs < ^fluffs_complete | %agrith_quest < ^agrith_complete | stat(cooking) < ^rfd_dave_cooking) {
+    mes("You need Gertrude's Cat, Shadow of the Storm and level 25 Cooking to help Evil Dave.");
+    return;
+}
+if (%hundred_dave_main ! 0) return;
+// UNKNOWN engineering seed. Generate once, then persist all four original target fields.
+// Exclude the all-zero recipe so an ordinary stew cannot be the required spicy stew.
+def_int $seed = add(random(255), 1);
+%hundred_dave_red_target = getbit_range($seed, 0, 1);
+%hundred_dave_orange_target = getbit_range($seed, 2, 3);
+%hundred_dave_brown_target = getbit_range($seed, 4, 5);
+%hundred_dave_yellow_target = getbit_range($seed, 6, 7);
+%hundred_dave_main = ^rfd_dave_inspected;
+mes("Evil Dave needs a specially seasoned stew. Speak to Doris in Edgeville.");
+
+[opnpc1,hundred_dave_mum]
+if (%hundred_dave_main = ^rfd_dave_inspected) {
+    ~chatnpc("<p,neutral>Dave is in the basement. Are you evil?");
+    if (~p_choice2("Yes.", 1, "No.", 2) = 2) return;
+    %hundred_dave_main = ^rfd_dave_doris;
+    ~chatnpc("<p,neutral>You can go down the trapdoor.");
+} else if (%hundred_dave_main = ^rfd_dave_recipe) {
+    %hundred_dave_main = ^rfd_dave_spices;
+    ~chatnpc("<p,neutral>The Hell-Rats took my spices. Have your cat catch them, then season ordinary stew and let Dave taste it.");
+} else {
+    ~chatnpc("<p,neutral>Dave is downstairs.");
+}
+
+[oploc1,100_dave_celler_trapdoor_closed]
+%hundred_dave_trapdoor = 1;
+[oploc2,100_dave_celler_trapdoor_open]
+%hundred_dave_trapdoor = 0;
+[oploc1,100_dave_celler_trapdoor_open]
+p_telejump(^rfd_dave_cellar);
+
+[opnpc1,hundred_evil_dave]
+if (%hundred_dave_main = ^rfd_dave_doris) {
+    %hundred_dave_main = ^rfd_dave_recipe;
+    ~chatnpc("<p,neutral>The stew was like the one my mother makes. Ask her about it.");
+} else if (%hundred_dave_main >= ^rfd_dave_spices) {
+    ~chatnpc("<p,neutral>Use a spicy stew on me and I will taste it. Each colour needs between zero and three doses.");
+}
+
+[proc,rfd_dave_clear_stew]
+%hundred_dave_red = 0;
+%hundred_dave_orange = 0;
+%hundred_dave_brown = 0;
+%hundred_dave_yellow = 0;
+
+[proc,rfd_dave_matches]()(int)
+def_int $matches = 0;
+if (%hundred_dave_red = %hundred_dave_red_target) $matches = add($matches, 1);
+if (%hundred_dave_orange = %hundred_dave_orange_target) $matches = add($matches, 1);
+if (%hundred_dave_brown = %hundred_dave_brown_target) $matches = add($matches, 1);
+if (%hundred_dave_yellow = %hundred_dave_yellow_target) $matches = add($matches, 1);
+return($matches);
+
+[opnpcu,hundred_evil_dave]
+if (last_useitem ! hundred_dave_stew | %hundred_dave_main < ^rfd_dave_spices) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $matches = ~rfd_dave_matches;
+if ($matches = 4) {
+    // VERIFIED guide returns the approved stew for delivery to the banquet guest.
+    if (%hundred_dave_main < ^rfd_dave_complete) %hundred_dave_main = ^rfd_dave_approved;
+    ~chatnpc("<p,neutral>That stew is totally evil! Take it to the banquet.");
+    return;
+}
+inv_del(inv, hundred_dave_stew, 1);
+inv_add(inv, bowl_empty, 1);
+~rfd_dave_clear_stew;
+~chatnpc("<p,neutral><tostring($matches)> of the four spice amounts are correct.");
+
+[oplocu,hundred_dave_base] @rfd_dave_rescue;
+[aplocu,hundred_dave_base]
+if (distance(coord, loc_coord) > 1) { p_aprange(1); return; }
+@rfd_dave_rescue;
+[label,rfd_dave_rescue]
+if (last_useitem ! hundred_dave_stew | %hundred_dave_main ! ^rfd_dave_approved | %100davevisible = 0 | ~rfd_dave_matches ! 4) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, hundred_dave_stew, 1);
+~rfd_dave_clear_stew;
+%hundred_dave_main = ^rfd_dave_complete;
+~rfd_guest_reward(5);
+
+// CANDIDATE 2007-base rules: only one spicy stew at a time, maximum three doses/colour.
+// Original current-dose varbits belong to that one stew. Lost stew resets on new mixing.
+[opheldu,stew] @rfd_dave_mix(last_useitem, stew);
+[opheldu,hundred_dave_stew] @rfd_dave_mix(last_useitem, hundred_dave_stew);
+[label,rfd_dave_mix](obj $spice, obj $stew)
+if (%hundred_dave_main < ^rfd_dave_spices | stat(cooking) < ^rfd_dave_cooking) return;
+def_int $colour;
+def_namedobj $next;
+$colour, $next = ~rfd_dave_spice($spice);
+if ($colour = 0) { ~displaymessage(^dm_default); return; }
+if ($stew = stew) {
+    if (~obj_gettotal(hundred_dave_stew) > 0) {
+        mes("Finish your existing spicy stew first.");
+        return;
+    }
+    ~rfd_dave_clear_stew;
+}
+def_int $doses = 0;
+switch_int($colour) {
+    case 1 : $doses = %hundred_dave_red;
+    case 2 : $doses = %hundred_dave_orange;
+    case 3 : $doses = %hundred_dave_brown;
+    case 4 : $doses = %hundred_dave_yellow;
+}
+if ($doses >= 3) { mes("That stew already has three doses of this spice."); return; }
+inv_del(inv, $spice, 1);
+inv_add(inv, $next, 1);
+if ($stew = stew) {
+    inv_del(inv, stew, 1);
+    inv_add(inv, hundred_dave_stew, 1);
+}
+switch_int($colour) {
+    case 1 : %hundred_dave_red = add($doses, 1);
+    case 2 : %hundred_dave_orange = add($doses, 1);
+    case 3 : %hundred_dave_brown = add($doses, 1);
+    case 4 : %hundred_dave_yellow = add($doses, 1);
+}
+mes("You shake a dose of spice into the stew.");
+
+[opheld2,hundred_dave_stew]
+mes("Red: <tostring(%hundred_dave_red)>; orange: <tostring(%hundred_dave_orange)>; brown: <tostring(%hundred_dave_brown)>; yellow: <tostring(%hundred_dave_yellow)>.");
+
+[opheld1,hundred_dave_stew]
+if (%hundred_dave_main ! ^rfd_dave_complete) {
+    mes("Save the stew for Evil Dave until you have freed him.");
+    return;
+}
+if (map_clock < %action_delay) return;
+%action_delay = add(map_clock, 3);
+anim(human_eat, 0);
+inv_del(inv, hundred_dave_stew, 1);
+inv_add(inv, bowl_empty, 1);
+stat_heal(hitpoints, ^rfd_dave_stew_heal, 0);
+// CANDIDATE Old School base minus later Construction, Hunter, Sailing and Preserve.
+~rfd_dave_boost(attack, %hundred_dave_red);
+~rfd_dave_boost(strength, %hundred_dave_red);
+~rfd_dave_boost(defence, %hundred_dave_red);
+~rfd_dave_boost(ranged, %hundred_dave_red);
+~rfd_dave_boost(magic, %hundred_dave_red);
+~rfd_dave_boost(smithing, %hundred_dave_orange);
+~rfd_dave_boost(crafting, %hundred_dave_orange);
+~rfd_dave_boost(fletching, %hundred_dave_orange);
+~rfd_dave_boost(runecraft, %hundred_dave_orange);
+~rfd_dave_boost(cooking, %hundred_dave_orange);
+~rfd_dave_boost(firemaking, %hundred_dave_orange);
+~rfd_dave_boost(agility, %hundred_dave_yellow);
+~rfd_dave_boost(slayer, %hundred_dave_yellow);
+~rfd_dave_boost(thieving, %hundred_dave_yellow);
+~rfd_dave_boost(prayer, %hundred_dave_yellow);
+~rfd_dave_boost(woodcutting, %hundred_dave_brown);
+~rfd_dave_boost(farming, %hundred_dave_brown);
+~rfd_dave_boost(fishing, %hundred_dave_brown);
+~rfd_dave_boost(mining, %hundred_dave_brown);
+~rfd_dave_boost(herblore, %hundred_dave_brown);
+~rfd_dave_clear_stew;
+mes("You eat the spicy stew.");
+
+[proc,rfd_dave_boost](stat $skill, int $doses)
+if ($doses = 0) return;
+def_int $amount = random(calc($doses * 2));
+if (random(2) = 0) {
+    stat_drain($skill, $amount, 0);
+} else {
+    stat_boost($skill, $amount, 0);
+}
+
+// Called from the existing cat Chase-vermin action. Secondary NPC pointer is the prey.
+[label,rfd_dave_chase]
+if (%hundred_dave_main < ^rfd_dave_spices) { mes("Ask Doris about the spices first."); return; }
+if (.npc_find(coord, hundred_dave_hellrat, 10, 1) = false) { mes("There are no Hell-Rats nearby."); return; }
+if (lineofwalk(npc_coord, .npc_coord) = false) { mes("Your cat cannot get to its prey."); return; }
+def_int $chance = ^rfd_dave_cat_catch_odds;
+if (oc_category(%follower_obj) = kitten) $chance = ^rfd_dave_kitten_catch_odds;
+npc_setmode(none);
+npc_walk(.npc_coord);
+p_delay(1);
+npc_anim(cat_pounce, 0);
+p_delay(1);
+npc_setmode(playerfollow);
+if (random($chance) ! 0) { mes("The Hell-Rat gets away."); return; }
+def_coord $drop = .npc_coord;
+.npc_del;
+// UNKNOWN equal colour and dose distribution; period sources give four colours and 1-4 doses.
+obj_add($drop, ~rfd_dave_drop(random(4), add(random(4), 1)), 1, ^lootdrop_duration);
+mes("Your cat catches a Hell-Rat. It drops some spice.");
+~rfd_dave_hellcat_catch;

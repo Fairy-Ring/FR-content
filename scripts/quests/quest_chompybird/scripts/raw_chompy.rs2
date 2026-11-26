@@ -1,6 +1,7 @@
 [opheldu,raw_chompy]
 switch_obj (last_useitem)
 {
+    case spit_iron : @rfd_skrach_skewer_chompy;
     case cabbage, tomato, potato, equa_leaves, doogleleaves :
         @quest_chompybird_add_ingredients_to_chompy_message;
     case default : ~displaymessage(^dm_default);
@@ -12,6 +13,10 @@ switch_obj (last_useitem)
 ~mesbox("You can only add ingredients when you're cooking a chompy bird. Ensure you have the seasonings you want to use in your inventory when cooking the chompy bird and you will use them automatically when cooking.");
 
 [oplocu,multi_chompybird_spitroast_entity]
+if (last_useitem = 100_jubbly_meat_raw) {
+    @rfd_skrach_cook_jubbly;
+    return;
+}
 if (stat(cooking) < 30) { // before obj check
     mes("You need a cooking level of 30 to use the spit roast.");
     return;
