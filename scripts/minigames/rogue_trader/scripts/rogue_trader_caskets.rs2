@@ -23,11 +23,13 @@ if ($large = 0) {
 def_int $slot = 0;
 def_int $price = 0;
 def_int $needed = 0;
+def_int $overflow = 0;
 while ($slot < inv_size(roguetrader_alim_runedump)) {
     def_obj $rune = inv_getobj(roguetrader_alim_runedump, $slot);
     if ($rune ! null) {
         $price = calc($price + oc_cost($rune) * inv_getnum(roguetrader_alim_runedump, $slot));
         if (inv_total(inv, $rune) = 0) $needed = calc($needed + 1);
+        if (inv_total(inv, $rune) > calc(^max_32bit_int - inv_getnum(roguetrader_alim_runedump, $slot))) $overflow = 1;
     }
     $slot = calc($slot + 1);
 }
@@ -44,7 +46,7 @@ if (inv_total(inv, coins) < $price) {
 }
 def_int $space = inv_freespace(inv);
 if (inv_total(inv, coins) = $price) $space = calc($space + 1);
-if ($space < $needed) {
+if ($space < $needed | $overflow = 1) {
     ~mesbox("You need more inventory space.");
     return;
 }

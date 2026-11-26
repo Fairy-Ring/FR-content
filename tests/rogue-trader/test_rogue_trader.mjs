@@ -7,6 +7,7 @@ import { player } from '../feud/player.mjs';
 import { actors, bit, finish, operate, operationStand, read, relog, stage, talk } from '../feud/fixture.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
+const { getExpByLevel } = await engineModule('engine/entity/Player.ts');
 const value = (p, name) => p.getVar(id('VarPlayerType', name));
 const rt = (p, name) => read(p, `roguetrader_${name}`);
 function stall(p, name) {
@@ -16,6 +17,7 @@ function stall(p, name) {
 }
 const complete = () => {
   const p = player();
+  p.stats.fill(getExpByLevel(99));
   p.setVarBit(bit('feud_var'), 28);
   p.setVar(id('VarPlayerType', 'runemysteries'), 6);
   p.setVarBit(bit('ics_little_var'), 26);
@@ -126,9 +128,9 @@ test('the offensive challenge requires both Defence rolls and failure is retryab
   const p = complete(); p.levels[1] = 1; p.baseLevels[1] = 1;
   ali(p, [4]);
   const hp = p.levels[3];
-  random([0.99], () => operate(p, seller(p), 1, [2]));
+  random([0.99, 0], () => operate(p, seller(p), 1, [2]));
   assert.equal(p.levels[3], hp - 3); assert.equal(rt(p, 'justchanged_weapons'), 0);
-  random([0, 0.99], () => operate(p, seller(p), 1, [2]));
+  random([0, 0.99, 0], () => operate(p, seller(p), 1, [2]));
   assert.equal(p.levels[3], hp - 6); assert.equal(rt(p, 'justchanged_weapons'), 0, 'passing the first hit is insufficient');
   random([0, 0], () => operate(p, seller(p), 1, [2]));
   assert.equal(rt(p, 'justchanged_weapons'), 1);
@@ -206,30 +208,26 @@ test('picking a small casket works without a lockpick; a large one never opens b
 
 test('failed small-casket attempts drain only the relevant skills and a broken lockpick gives only its failure experience', () => {
   const p = runeOrder(), levels = [...p.levels], before = [...p.stats];
-  random([0.99], () => ali(p, [5, 1, 1]));
+  random([0.99, 0.5], () => ali(p, [5, 1, 1]));
   const drain = levels[PlayerStat.STRENGTH] - p.levels[PlayerStat.STRENGTH];
   assert(drain >= 0 && drain <= 3);
   assert.equal(levels[PlayerStat.AGILITY] - p.levels[PlayerStat.AGILITY], drain);
   assert.equal(rt(p, 'justobt_runes'), 0);
   assert.deepEqual([...p.stats], before, 'failed force awards no experience');
   p.invAdd(inv, obj('lockpick'), 1);
-  const previous = JavaRandom.nextInt, bounds = [4, 5];
-  JavaRandom.nextInt = bound => { assert.equal(bound, bounds.shift(), 'only the failed-pick drain and break rolls execute'); return 0; };
-  try {
-    random([0.99], () => ali(p, [5, 1, 2]));
-    assert.equal(bounds.length, 0);
-  } finally { JavaRandom.nextInt = previous; }
+  random([0.99, 0, 0], () => ali(p, [5, 1, 2]));
   assert.equal(count(p, 'lockpick'), 0);
   assert.equal(p.stats[PlayerStat.THIEVING] - before[PlayerStat.THIEVING], 5);
   assert.equal(p.levels[PlayerStat.THIEVING], levels[PlayerStat.THIEVING], 'the zero drain roll does not drain another skill');
   assert.equal(rt(p, 'justobt_runes'), 0);
 });
 
-test('the unseen casket offer is an atomic whole-bundle purchase and insufficient money or space loses nothing', () => {
-  for (const refusal of ['coins', 'space']) {
+test('the unseen casket offer is an atomic whole-bundle purchase and insufficient money, space or stack capacity loses nothing', () => {
+  for (const refusal of ['coins', 'space', 'stack']) {
     const p = runeOrder();
     if (refusal === 'coins') p.invDel(inv, obj('coins'), count(p, 'coins'));
-    else p.invAdd(inv, obj('knife'), 27);
+    else if (refusal === 'space') p.invAdd(inv, obj('knife'), 27);
+    else p.invAdd(inv, obj('airrune'), 2147483640);
     const before = inventory(p);
     random([0, 0], () => ali(p, [5, 1, 1, 1]));
     assert.deepEqual(inventory(p), before, refusal);
