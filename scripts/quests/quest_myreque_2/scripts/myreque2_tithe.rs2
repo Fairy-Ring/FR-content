@@ -87,6 +87,8 @@ if (~myreque2_attackable = false) return;
 [ai_opplayer2,burgh_vampire_juve_2_attackable] ~myreque2_tithe_attack;
 [proc,myreque2_tithe_attack]
 if (~myreque2_attackable = false) return;
+// Tip.It 20060409: kill the vampyres first; an invulnerable boss must not lock single combat.
+if (npc_type = burgh_gadderanks_attackable & %juvinate_deaths ! 3) return;
 ~npc_default_attack;
 
 [ai_queue3,burgh_vampire_juve_1_attackable] ~myreque2_tithe_death(0);

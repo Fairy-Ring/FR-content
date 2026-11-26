@@ -844,6 +844,20 @@ check('tithe dialogue creates real owned actors; both native deaths and Gadderan
   JavaRandom.setSeed(0);
   attack(first);
   assert.equal(p.getVarBit(id('VarBitType', 'juvinate_deaths')), 1);
+  // Let the previous combat expire before a late-arriving boss's native attack phase.
+  adjacent(p, gadderanks);
+  for (let cycle = 0; cycle < 12; cycle++) {
+    tick(p);
+    p.resetEntity(false);
+  }
+  run(p, '[ai_opplayer2,burgh_gadderanks_attackable]', [], gadderanks);
+  assert.notEqual(p.getVar(id('VarPlayerType', 'aggressive_npc')), gadderanks.uid,
+    'Gadderanks must not claim single combat before both Juvinates are defeated');
+  for (let cycle = 0; cycle < 12; cycle++) {
+    tick(p);
+    turnNpcs(first, second, gadderanks);
+    p.resetEntity(false);
+  }
   attack(second);
   assert.equal(p.getVarBit(id('VarBitType', 'juvinate_deaths')), 3);
   assert(result(p, '[proc,npc_max_dealt]', [20, 0], gadderanks) > 0);
