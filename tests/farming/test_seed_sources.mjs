@@ -294,14 +294,21 @@ const questAndContainers = [
 ];
 const cacheObjects = new Map();
 let currentObject;
-for (const line of fs.readFileSync(path.join(content, 'scripts/_unpack/377/all.obj'), 'utf8').split(/\r?\n/)) {
-  const header = /^\[([^\]]+)\]$/.exec(line);
-  if (header) {
-    currentObject = {};
-    cacheObjects.set(header[1], currentObject);
-  } else if (currentObject && !line.startsWith('//') && line.includes('=')) {
-    const equals = line.indexOf('=');
-    currentObject[line.slice(0, equals)] = line.slice(equals + 1);
+for (const file of [
+  'scripts/_unpack/377/all.obj',
+  'scripts/quests/quest_roving_elves/configs/roving_crystals.obj',
+  'scripts/quests/quest_roving_elves/configs/roving_seeds.obj'
+]) {
+  currentObject = undefined;
+  for (const line of fs.readFileSync(path.join(content, file), 'utf8').split(/\r?\n/)) {
+    const header = /^\[([^\]]+)\]$/.exec(line);
+    if (header) {
+      currentObject = {};
+      cacheObjects.set(header[1], currentObject);
+    } else if (currentObject && !line.startsWith('//') && line.includes('=')) {
+      const equals = line.indexOf('=');
+      currentObject[line.slice(0, equals)] = line.slice(equals + 1);
+    }
   }
 }
 const countAliases = new Set(Array.from(cacheObjects.values()).flatMap(config =>

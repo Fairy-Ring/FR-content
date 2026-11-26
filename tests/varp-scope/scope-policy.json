@@ -870,7 +870,7 @@
     "routequestmulti": "perm",
     "roving_elves_bits": "perm",
     "roving_elves_quest": "perm",
-    "roving_update_ilfeen_chant": "temp",
+    "roving_update_ilfeen_chant": "perm",
     "rune_pouch_type_2_basevar": "temp",
     "runemysteries": "perm",
     "sa_attack": "temp",
