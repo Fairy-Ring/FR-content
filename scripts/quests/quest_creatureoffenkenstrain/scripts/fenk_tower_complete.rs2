@@ -106,12 +106,11 @@ return (false);
 // Recovery predicates (honest residual — do NOT claim all historical (u) loss paths):
 //   1. mem=1 → yield ring_of_charos_unlocked
 //   2. else → yield base ring_of_charos (first-complete form)
-// mem is set only when unlocked is OBSERVED held (pickpocket-refuse path via
+// mem is set when unlocked is OBSERVED held (pickpocket-refuse path via
 // ~fenk_note_charos_unlocked). CoF first complete grants base only and never notes.
-// Garden of Tranquillity base→(u) conversion is OUT OF SCOPE and does not set mem
-// here; prior-(u) loss without a later doctor observation of (u) therefore recovers
-// BASE, not (u). Full Tip.it retained-unlock path needs Garden (or equivalent) to
-// set mem on unlock — residual until that content lands.
+// Garden of Tranquillity records %fenk_charos_unlocked = 1 durably when it
+// unlocks the ring. A later loss therefore recovers the unlocked form without
+// requiring Fenkenstrain to observe the player holding it first.
 [proc,fenk_give_charos_recovery]
 if (%fenk_charos_unlocked = 1) {
     inv_add(inv, ring_of_charos_unlocked, 1);
