@@ -1,0 +1,84 @@
+// VERIFIED task order and rewards: Tip.It 20060609200331, sections
+// Out with the new, Another small favour, Potting the skeletons and Reward.
+// UNKNOWN plain functional dialogue and intermediate stages, chosen to retain
+// the original 377 multi-NPC selectors; completion 200 is CANDIDATE.
+[label,swan_herman_colony]
+if (%swansong = ^swansong_complete) {
+    ~chatnpc("The Colony is safe. Thank you for your help.");
+    return;
+}
+if (%swansong = 180) { ~swan_finish; return; }
+if (%swansong = 150) {
+    if (~swan_fight_active = false) ~swan_final_enter;
+    return;
+}
+if (%swansong = 140) {
+    if (inv_total(inv, swan_army) = 0) {
+        ~chatnpc("Bring the bone seeds from Malignius Mortifer.");
+        return;
+    }
+    inv_del(inv, swan_army, 1);
+    %swansong = 150;
+    ~swan_final_scene;
+    ~swan_final_enter;
+    return;
+}
+if (%swansong >= 100) {
+    ~chatnpc("Ask Wizard Frumscone in the Wizards' Guild for an army to defend the Colony.");
+    return;
+}
+if (%swansong = 60) {
+    %swansong = 65;
+    ~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
+    ~chatnpc("Help Franklin repair our walls and Arnold replenish our food stocks.");
+    return;
+}
+if (%swansong = 65) {
+    if (%swansong_franklin = 4 & %swansong_arnold = 6) {
+        if (stat(magic) < 66) {
+            ~chatnpc("You need level 66 Magic to seek help from the Wizards' Guild.");
+            return;
+        }
+        %swansong = 100;
+        ~chatnpc("We need an army. Speak to Wizard Frumscone in the basement of the Wizards' Guild in Yanille.");
+    } else {
+        ~chatnpc("Franklin needs the five wall sections repaired. Arnold needs five cooked fresh monkfish.");
+    }
+}
+
+[proc,swan_finish]
+if (%swansong ! 180) return;
+if (inv_itemspace(inv, coins, 25000, inv_size(inv)) = false) {
+    ~chatnpc("Make room for your 25,000 coins first.");
+    return;
+}
+// VERIFIED exact Reward lines: 15,000 Magic, 10,000 Prayer, 10,000 Fishing,
+// 25,000 Coins; Quest points gained on completion: 2. XP uses tenths.
+// Commit before every reward and before the interruptible completion scroll.
+%swansong = ^swansong_complete;
+inv_add(inv, coins, 25000);
+stat_advance(magic, 150000);
+stat_advance(prayer, 100000);
+stat_advance(fishing, 100000);
+~send_quest_complete(questlist:swansong, monkfish, 200, ^swansong_questpoints, "You have completed Swan Song!", "15,000 Magic XP|10,000 Prayer/Fishing XP|25,000 coins|Access to the Piscatoris|Fishing Colony");
+
+[oploc1,hermans_desk]
+if (%swansong < 60) return;
+if (~obj_gettotal(swan_book) > 0) return;
+if (inv_freespace(inv) = 0) { mes("You need more inventory space."); return; }
+inv_add(inv, swan_book, 1);
+
+[opheld1,swan_book]
+// UNKNOWN functional summary; the retained guide identifies the subject, not its text.
+~mesbox("This book records the life and adventures of the Wise Old Man.");
+
+[if_button,questlist:swansong]
+// UNKNOWN functional journal summary, not a recovered period transcript.
+def_string $text = "I should speak to Herman Caranos outside the Piscatoris Fishing Colony. I need 100 Quest Points, One Small Favour and Garden of Tranquillity.";
+if (%swansong >= 5) $text = "Herman needs the Wise Old Man of Draynor Village. He requires five blood runes, ten lava runes and ten mist runes.";
+if (%swansong >= 30) $text = "The Wise Old Man is outside the Colony. Enter the tunnel and defeat the sea troll ambush.";
+if (%swansong >= 60) $text = "Speak to Herman in the eastern office. Help Franklin repair five walls and Arnold store five cooked fresh monkfish.";
+if (%swansong >= 100) $text = "Ask Wizard Frumscone in Yanille for an army. Malignius Mortifer near Falador can help with seven bones and a pot with a lid.";
+if (%swansong >= 140) $text = "Take the bone seeds to Herman. Defeat the Sea Troll Queen, then speak to Herman for the reward.";
+if (%swansong >= ^swansong_complete) $text = "<col=000080>QUEST COMPLETE!|The Colony is safe. I can use Arnold's bank and fish for monkfish.";
+~quest_journal("Swan Song", $text);

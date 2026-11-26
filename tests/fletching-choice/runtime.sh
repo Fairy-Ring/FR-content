@@ -8,4 +8,6 @@ TMP="$(mktemp -d "$ENGINE/.fletching-test.XXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
 cp "$HERE/bootstrap.mts" "$HERE/runtime.mts" "$TMP/"
 cd "$ENGINE"
-COOKING_SOURCE="$HERE/../../scripts/skill_cooking/configs/cooking_source/cooking_generic.dbrow" NODE_XPRATE=1 NODE_MEMBERS=true node --import tsx "$TMP/bootstrap.mts"
+NODE_XPRATE=1 NODE_MEMBERS=true node --import tsx "$TMP/bootstrap.mts" \
+  "$HERE/../../scripts/skill_cooking/configs/cooking_source/cooking_generic.dbrow" \
+  "$HERE/../../scripts/quests/quest_swansong/configs/swan_cooking.dbrow"

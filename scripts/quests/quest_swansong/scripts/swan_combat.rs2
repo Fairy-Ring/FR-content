@@ -1,0 +1,242 @@
+// VERIFIED ambush, fishing trolls, skeleton army and Queen: Tip.It 20060609200331.
+// CANDIDATE eight ambush trolls, ten Saradomin casts then stones, Water Wave
+// max37 / melee16 and ranged protection drain: OSRS Swan Song walkthrough.
+// UNKNOWN timing, support damage, drain, sequential cadence and lifetime:
+// see the named constants in swan_combat.constant.
+[proc,swan_combat_npc]()(boolean)
+if (npc_type = swan_troll_ambush | npc_type = swan_troll_fishing_1 | npc_type = swan_troll_fishing_2 | npc_type = swan_troll_fishing_3 | npc_type = swan_seatroll_queen) return(true);
+return(false);
+
+[proc,swan_attackable]()(boolean)
+if (%npc_attacking_uid ! uid | %swansong_combat_uid ! npc_uid | %death = ^true) return(false);
+if (npc_type = swan_troll_ambush) {
+    if (%swansong >= 30 & %swansong < 60) return(true);
+    return(false);
+}
+if (npc_type = swan_seatroll_queen) {
+    if (%swansong = 150) return(true);
+    return(false);
+}
+if (%swansong = 65 & %swansong_arnold > 0 & %swansong_arnold < 6) return(true);
+return(false);
+
+[proc,swan_fight_active]()(boolean)
+if (%swansong_combat_uid = null) return(false);
+if (npc_finduid(%swansong_combat_uid) = false) return(false);
+if (~swan_combat_npc = false | %npc_attacking_uid ! uid | npc_stat(hitpoints) = 0) return(false);
+return(true);
+
+[proc,swan_spawn](npc $type, coord $tile)
+if (~swan_fight_active = true) return;
+npc_add($tile, $type, ^swan_actor_lifetime);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_start_coord = $tile;
+%swansong_combat_uid = npc_uid;
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+npc_sethunt(0);
+npc_setmode(applayer2);
+npc_settimer(^swan_heartbeat_ticks);
+
+[proc,swan_ambush_next]
+if (%swansong < 30 | %swansong >= 60 | coordz(coord) < 3653) return;
+// Three-bit ordinal represents completed trolls 0..7; the eighth writes stage60.
+~swan_spawn(swan_troll_ambush, 0_36_57_40_11);
+
+[proc,swan_ambush_enter]
+// Remove this owner's previous support actor when resuming an interrupted fight.
+npc_findallany(coord, 24, 0);
+while (npc_findnext = true) {
+    if (npc_type = swan_wom_ambush & %npc_attacking_uid = uid) npc_del;
+}
+~swan_ambush_next;
+// Visible support actor, not a fixture-spawned substitute.
+npc_add(0_36_57_42_8, swan_wom_ambush, ^swan_actor_lifetime);
+%npc_attacking_uid = uid;
+npc_settimer(^swan_heartbeat_ticks);
+
+[proc,swan_spawn_fishing](npc $type)
+if (%swansong ! 65 | %swansong_trolls >= 3) return;
+~swan_spawn($type, movecoord(coord, 2, 0, 0));
+
+[proc,swan_final_enter]
+if (%swansong ! 150) return;
+p_telejump(0_36_57_38_50);
+~swan_spawn(swan_seatroll_queen, 0_36_57_39_48);
+
+[proc,swan_final_scene]
+// UNKNOWN scene timing/camera; original actors enact the sourced army battle.
+p_telejump(0_36_57_38_50);
+cam_moveto(0_36_57_35_45, 500, 232, 232);
+cam_lookat(0_36_57_41_49, 100, 232, 232);
+npc_add(0_36_57_39_47, swan_skeleton_battle, 16);
+npc_anim(skeleton_mage_rise, 0);
+npc_add(0_36_57_42_47, swan_skeleton_battle, 16);
+npc_anim(skeleton_mage_rise, 0);
+npc_add(0_36_57_39_51, swan_troll_battle, 12);
+npc_anim(swan_seatroll_water_rise, 0);
+npc_add(0_36_57_42_51, swan_troll_battle, 12);
+npc_anim(swan_seatroll_water_rise, 0);
+p_delay(4);
+npc_anim(swan_seatroll_death, 0);
+npc_add(0_36_57_40_48, swan_troll_general, 8);
+spotanim_npc(saradomin_lightning, 0, 0);
+npc_anim(swan_general_death, 0);
+p_delay(4);
+npc_add(0_36_57_37_49, swan_wom_coma, ^swan_actor_lifetime);
+p_delay(2);
+cam_reset;
+
+[ai_timer,swan_wom_ambush]
+if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
+if (%swansong < 30 | %swansong >= 60 | %death = ^true | coordz(coord) < 3653 | distance(coord, npc_coord) > 24) { npc_del; return; }
+// Counter belongs to the visible support actor; never mutate a protected
+// player varp from an unprotected NPC timer.
+def_int $casts = %npc_int;
+if ($casts < ^swan_support_casts) {
+    %npc_int = add($casts, 1);
+} else {
+    npc_anim(swan_stone_throw_launch, 0);
+}
+if (npc_finduid(%swansong_combat_uid) = false) return;
+if (npc_type ! swan_troll_ambush | %npc_attacking_uid ! uid | npc_stat(hitpoints) = 0) return;
+// The helper can kill a troll; the same owner-credit queue handles both routes.
+if ($casts < ^swan_support_casts) {
+    spotanim_npc(saradomin_lightning, 0, 0);
+    ~npc_default_damage(add(^swan_support_hit_min, randominc(^swan_support_hit_span)));
+} else {
+    spotanim_npc(swan_stone_throw_launch, 0, 0);
+    ~npc_default_damage(randominc(^swan_stone_maxhit));
+}
+
+[ai_timer,swan_troll_ambush] ~swan_heartbeat;
+[ai_timer,swan_troll_fishing_1] ~swan_heartbeat;
+[ai_timer,swan_troll_fishing_2] ~swan_heartbeat;
+[ai_timer,swan_troll_fishing_3] ~swan_heartbeat;
+[ai_timer,swan_seatroll_queen] ~swan_heartbeat;
+[proc,swan_heartbeat]
+if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
+if (~swan_attackable = false | distance(coord, npc_coord) > 48 | coordz(coord) < 3653 | (npc_type ! swan_troll_ambush & coordz(coord) < 3663)) {
+    if (%swansong_combat_uid = npc_uid) %swansong_combat_uid = null;
+    npc_del;
+}
+
+[opnpc2,swan_troll_ambush] @swan_attack;
+[opnpc2,swan_troll_fishing_1] @swan_attack;
+[opnpc2,swan_troll_fishing_2] @swan_attack;
+[opnpc2,swan_troll_fishing_3] @swan_attack;
+[opnpc2,swan_seatroll_queen] @swan_attack;
+[label,swan_attack]
+if (~swan_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,swan_troll_ambush] @swan_attack_ap;
+[apnpc2,swan_troll_fishing_1] @swan_attack_ap;
+[apnpc2,swan_troll_fishing_2] @swan_attack_ap;
+[apnpc2,swan_troll_fishing_3] @swan_attack_ap;
+[apnpc2,swan_seatroll_queen] @swan_attack_ap;
+[label,swan_attack_ap]
+if (~swan_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,swan_troll_ambush] ~swan_retaliate;
+[ai_queue1,swan_troll_fishing_1] ~swan_retaliate;
+[ai_queue1,swan_troll_fishing_2] ~swan_retaliate;
+[ai_queue1,swan_troll_fishing_3] ~swan_retaliate;
+[ai_queue1,swan_seatroll_queen] ~swan_retaliate;
+[proc,swan_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~swan_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate_ap;
+
+[ai_opplayer2,swan_troll_ambush] ~swan_npc_attack;
+[ai_opplayer2,swan_troll_fishing_1] ~swan_npc_attack;
+[ai_opplayer2,swan_troll_fishing_2] ~swan_npc_attack;
+[ai_opplayer2,swan_troll_fishing_3] ~swan_npc_attack;
+[ai_opplayer2,swan_seatroll_queen] ~swan_npc_attack;
+[ai_applayer2,swan_troll_ambush] ~swan_npc_attack;
+[ai_applayer2,swan_troll_fishing_1] ~swan_npc_attack;
+[ai_applayer2,swan_troll_fishing_2] ~swan_npc_attack;
+[ai_applayer2,swan_troll_fishing_3] ~swan_npc_attack;
+[ai_applayer2,swan_seatroll_queen] ~swan_npc_attack;
+[proc,swan_npc_attack]
+if (finduid(%npc_attacking_uid) = false) { npc_setmode(none); return; }
+if (~swan_attackable = false) { npc_setmode(none); return; }
+if (npc_type ! swan_seatroll_queen) {
+    def_int $maximum = ^swan_ambush_maxhit;
+    if (npc_type = swan_troll_fishing_1) $maximum = ^swan_fishing_1_maxhit;
+    else if (npc_type = swan_troll_fishing_2) $maximum = ^swan_fishing_2_maxhit;
+    else if (npc_type = swan_troll_fishing_3) $maximum = ^swan_fishing_3_maxhit;
+    ~swan_melee_attack($maximum);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (npc_range(coord) = 1 & random(2) = 0) {
+    ~swan_melee_attack(^swan_queen_melee_maxhit);
+    return;
+}
+if (npc_range(coord) > 1 & (~check_protect_prayer(^magic_style) = true | ~check_protect_prayer(^ranged_style) = true | ~check_protect_prayer(^crush_style) = true)) queue*(swan_prayer_drain, 0)(npc_uid);
+~npc_cast_spell_with_forced_max_hit(^water_wave, 4, ^swan_queen_magic_maxhit);
+
+[proc,swan_melee_attack](int $maximum)
+// Preserve native readiness, accuracy, prayer, presentation and hit delivery.
+// CANDIDATE caps retain the CANDIDATE osrsbox-imported Strength declarations.
+if (~npc_default_attack_ready = false) return;
+~npc_meleeattack_resolve(~npc_melee_attack_roll, ~player_defence_roll_specific(npc_param(damagetype)), $maximum, 0);
+
+[ai_queue2,swan_troll_ambush] ~swan_damage(last_int);
+[ai_queue2,swan_troll_fishing_1] ~swan_damage(last_int);
+[ai_queue2,swan_troll_fishing_2] ~swan_damage(last_int);
+[ai_queue2,swan_troll_fishing_3] ~swan_damage(last_int);
+[ai_queue2,swan_seatroll_queen] ~swan_damage(last_int);
+[proc,swan_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (~swan_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_damage($damage);
+
+[ai_queue3,swan_troll_ambush] ~swan_death;
+[ai_queue3,swan_troll_fishing_1] ~swan_death;
+[ai_queue3,swan_troll_fishing_2] ~swan_death;
+[ai_queue3,swan_troll_fishing_3] ~swan_death;
+[ai_queue3,swan_seatroll_queen] ~swan_death;
+[proc,swan_death]
+if (npc_stat(hitpoints) ! 0) return;
+if (finduid(%npc_attacking_uid) = true) {
+    if (~swan_attackable = true & %npc_int = 0) {
+        // Invalidate the actor before delayed death, but retain its UID until
+        // the protected owner queue checks that no replacement superseded it.
+        %npc_int = 1;
+        queue*(swan_credit, 0)(npc_type, npc_uid);
+    }
+}
+~npc_death;
+
+[queue,swan_credit](npc $type, npc_uid $dead)
+if (%swansong_combat_uid ! $dead) return;
+if (%death = ^true) return;
+// A reused NPC slot cannot turn an old callback into a new live actor's kill.
+if (npc_finduid($dead) = true) {
+    if (npc_stat(hitpoints) > 0 | %npc_attacking_uid ! uid) return;
+}
+%swansong_combat_uid = null;
+if ($type = swan_seatroll_queen) {
+    if (%swansong = 150) %swansong = 180;
+    return;
+}
+if ($type = swan_troll_ambush & %swansong >= 30 & %swansong < 60) {
+    if (%swansong_ambush = 7) {
+        %swansong = 60;
+        mes("The sea trolls have been defeated. Find Herman inside the Colony.");
+    } else {
+        %swansong_ambush = add(%swansong_ambush, 1);
+        ~swan_ambush_next;
+    }
+    return;
+}
+if (%swansong = 65 & %swansong_trolls < 3) %swansong_trolls = add(%swansong_trolls, 1);
+
+[queue,swan_prayer_drain](npc_uid $queen)
+if (%swansong ! 150 | %death = ^true | %swansong_combat_uid ! $queen) return;
+if (npc_finduid($queen) = false) return;
+if (npc_type ! swan_seatroll_queen | %npc_attacking_uid ! uid) return;
+stat_sub(prayer, ^swan_queen_prayer_drain, 0);

@@ -1,0 +1,41 @@
+// VERIFIED original 377 tunnel/gate anchors and Kathy's 50-coin fare:
+// Tip.It 20060609200331. UNKNOWN exact landing tiles and functional messages.
+[oploc1,hole_14922]
+if (%swansong < 30) {
+    mes("The Wise Old Man must join you before you enter the Colony.");
+    return;
+}
+if (coordz(coord) < 3653) p_telejump(0_36_57_40_7);
+else p_telejump(0_36_57_40_2);
+if (%swansong >= 30 & %swansong < 60 & coordz(coord) > 3653) {
+    if (~swan_fight_active = false) ~swan_ambush_enter;
+}
+
+[oploc1,colony_gate] @swan_colony_gate;
+[oploc1,colony_gate_14931] @swan_colony_gate;
+[label,swan_colony_gate]
+if (%swansong < 60) {
+    mes("Defeat the sea trolls before entering the Colony.");
+    if (%swansong >= 30 & ~swan_fight_active = false) ~swan_ambush_enter;
+    return;
+}
+if (coordz(coord) < 3663) p_telejump(0_36_57_40_16);
+else p_telejump(0_36_57_40_13);
+
+[opnpc1,swan_boatwoman_1] @swan_kathy;
+[opnpc1,swan_boatwoman_2] @swan_kathy;
+[opnpc3,swan_boatwoman_2] @swan_kathy;
+[label,swan_kathy]
+// The original word has no varbits above bit29. UNKNOWN server storage:
+// spare bit30 retains the once-paid fare without adding client configuration.
+if (getbit_range(%swansong_quest, 30, 30) = 0 & %swansong = 0 & coordz(coord) < 3600) {
+    if (inv_total(worn, ring_of_charos_unlocked) = 0) {
+        ~chatnpc("The trip costs 50 coins.");
+        if (~p_choice2("Pay 50 coins.", 1, "Stay here.", 2) = 2) return;
+        if (inv_total(inv, coins) < 50) { mes("You need 50 coins."); return; }
+        inv_del(inv, coins, 50);
+    }
+    %swansong_quest = setbit_range(%swansong_quest, 30, 30);
+}
+if (coordz(coord) < 3600) p_telejump(0_36_56_53_57);
+else p_telejump(0_37_54_1_30);

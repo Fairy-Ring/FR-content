@@ -436,8 +436,6 @@ transmit=yes
 transmit=yes
 clientcode=9
 
-[varp310_unused]
-
 [rune_pouch_type_2_basevar]
 
 [emote_access]
@@ -1118,9 +1116,6 @@ transmit=yes
 
 
 [varp637_bits]
-
-[swansong_temp]
-transmit=yes
 
 [varp639_bits]
 

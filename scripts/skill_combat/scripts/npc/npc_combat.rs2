@@ -91,6 +91,7 @@ return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
 // "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
 // magic callers (pass spell id or 0). Quest-local ai_queue2 remains secondary.
 [proc,npc_max_dealt](int $maxhit, int $spell)(int)
+if (~swan_combat_npc = true & ~swan_attackable = false) return(0);
 if (~zogre_undead = true) return (~zogre_damage_max($maxhit, $spell));
 if (npc_category = dwarfrock_avatar & ~dwarfrock_avatar_attackable = false) return(0);
 if (npc_type = fairy_tanglefoot) return(~ft1_tanglefoot_max_dealt($maxhit, $spell));
@@ -162,6 +163,7 @@ return(npc_hasop(2));
 [proc,npc_is_attackable]()(boolean)
 if (~ics_little_encounter_attackable = false) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);
+if (~swan_combat_npc = true) return(~swan_attackable);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
@@ -285,6 +287,7 @@ return (false);
 if (~ics_little_encounter_attackable = false) return(false);
 if (~ics_little_guardian = true) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);
+if (~swan_combat_npc = true) return(~swan_attackable);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
@@ -391,6 +394,7 @@ return (false);
 if (~ics_little_encounter_attackable = false) return(false);
 if (~ics_little_guardian = true) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);
+if (~swan_combat_npc = true) return(~swan_attackable);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);

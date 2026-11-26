@@ -1,0 +1,134 @@
+// VERIFIED task order and seven normal bones: Tip.It 20060609200331, lines 228-232.
+// UNKNOWN dialogue and intermediate stage values; wording below is functional only.
+// Colony arrival reuses the gate's mapped landing tile; the exact teleport tile is UNKNOWN.
+
+[label,swan_frumscone]
+if (%swansong ! 100) return;
+~chatnpc("<p,neutral>I cannot lend the Colony an army. Malignius Mortifer may be able to help.");
+%swansong = 110;
+~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
+
+[label,swan_mortifer]
+if (%swansong >= ^swansong_complete) {
+    if (inv_total(inv, brown_apron) = 0 & inv_total(worn, brown_apron) = 0) {
+        if (inv_freespace(inv) = 0) {
+            ~chatnpc("<p,neutral>Make room for a brown apron first.");
+            return;
+        }
+        inv_add(inv, brown_apron, 1);
+        ~chatnpc("<p,neutral>Here is a brown apron.");
+        return;
+    }
+    if (~obj_gettotal(swan_army) > 0) {
+        ~chatnpc("<p,neutral>You already have a pot with bone seeds.");
+        return;
+    }
+    if (inv_total(inv, pot_empty) = 0 | inv_total(inv, potlid) = 0) {
+        ~chatnpc("<p,neutral>Bring me an empty pot and a lid and I can prepare bone seeds.");
+        return;
+    }
+    inv_del(inv, pot_empty, 1);
+    inv_del(inv, potlid, 1);
+    inv_add(inv, swan_army, 1);
+    ~chatnpc("<p,neutral>Here are the bone seeds.");
+    return;
+}
+if (%swansong < 110 | %swansong > 140) return;
+
+// Once the Master Crafter has sent the player to Mortifer, replace a lost apron.
+if (%swansong >= 120 & %swansong < 140 & inv_total(inv, brown_apron) = 0 & inv_total(worn, brown_apron) = 0) {
+    if (inv_freespace(inv) = 0) {
+        ~chatnpc("<p,neutral>Make room for a brown apron first.");
+        return;
+    }
+    inv_add(inv, brown_apron, 1);
+    ~chatnpc("<p,neutral>Here is a replacement brown apron.");
+    return;
+}
+
+if (%swansong = 110) {
+    if (inv_total(inv, bones) < 7) {
+        ~chatnpc("<p,neutral>I need seven normal bones before I can help.");
+        return;
+    }
+    inv_del(inv, bones, 7);
+    %swansong_bones = 7;
+    if (inv_total(inv, brown_apron) = 0 & inv_total(worn, brown_apron) = 0) {
+        inv_add(inv, brown_apron, 1);
+    }
+    %swansong = 120;
+    ~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
+    ~chatnpc("<p,neutral>Take the brown apron and ask the Master Crafter in the Crafting Guild about an army.");
+    return;
+}
+
+if (%swansong = 120) {
+    ~chatnpc("<p,neutral>Ask the Master Crafter in the Crafting Guild what is needed next.");
+    return;
+}
+
+if (%swansong = 130) {
+    if (~obj_gettotal(swan_army) > 0) {
+        %swansong = 140;
+        ~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
+        p_telejump(0_36_57_40_16);
+        return;
+    }
+    if (inv_total(inv, pot_empty) = 0 | inv_total(inv, potlid) = 0) {
+        ~chatnpc("<p,neutral>The Master Crafter said to bring me a pot and a lid.");
+        return;
+    }
+    inv_del(inv, pot_empty, 1);
+    inv_del(inv, potlid, 1);
+    inv_add(inv, swan_army, 1);
+    %swansong = 140;
+    ~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
+    ~chatnpc("<p,neutral>The bone seeds are ready. Take them to Herman in the Colony.");
+    p_telejump(0_36_57_40_16);
+    return;
+}
+
+// Recovery after losing the seeds costs another ordinary pot and lid, not bones.
+if (%swansong = 140) {
+    if (~obj_gettotal(swan_army) > 0) {
+        ~chatnpc("<p,neutral>Take the bone seeds to Herman in the Colony.");
+        return;
+    }
+    if (inv_total(inv, pot_empty) = 0 | inv_total(inv, potlid) = 0) {
+        ~chatnpc("<p,neutral>Bring me a pot and a lid and I can prepare replacement bone seeds.");
+        return;
+    }
+    inv_del(inv, pot_empty, 1);
+    inv_del(inv, potlid, 1);
+    inv_add(inv, swan_army, 1);
+    ~chatnpc("<p,neutral>The replacement bone seeds are ready. Take them to Herman.");
+    p_telejump(0_36_57_40_16);
+}
+
+[label,swan_master_crafter]
+if (%swansong = 120) {
+    %swansong = 130;
+    ~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
+    ~chatnpc("<p,neutral>Mortifer needs a pot and an airtight lid to prepare the bone seeds.");
+    return;
+}
+if (%swansong = 130) {
+    ~chatnpc("<p,neutral>Take a pot and an airtight lid to Malignius Mortifer.");
+}
+[opheld4,swan_army]
+if (%swansong < ^swansong_complete) {
+    mes("The bone seeds are needed to defend the Colony.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need one free inventory space to open the bone seeds.");
+    return;
+}
+inv_del(inv, swan_army, 1);
+inv_add(inv, pot_empty, 1);
+inv_add(inv, potlid, 1);
+// VERIFIED show shape: Tip.It 20060609200331, line 257. UNKNOWN staging and emote.
+npc_add(movecoord(coord, 1, 0, 0), swan_skeleton_battle, 16);
+npc_anim(skeleton_mage_rise, 0);
+p_delay(2);
+npc_anim(skeleton_death, 0);

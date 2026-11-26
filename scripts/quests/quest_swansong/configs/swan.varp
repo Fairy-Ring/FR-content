@@ -1,0 +1,8 @@
+// Preserve original 377 varp 638 transmit behavior for existing Swan Song flags.
+[swansong_temp]
+transmit=yes
+
+// Original slot 310 is temporary actor ownership. protect=no lets its heartbeat clear it.
+[swansong_combat_uid]
+type=npc_uid
+protect=no

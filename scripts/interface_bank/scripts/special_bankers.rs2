@@ -55,6 +55,7 @@ if (inv_total(worn, amulet_of_ghostspeak) = 0) {
 // His bank is only available after Swan Song; ^swansong_complete is 200.
 [opnpc1,swan_arnold]
 if (%swansong < ^swansong_complete) {
+    if (%swansong >= 65 & %swansong <= 180) @swan_arnold_talk;
     return;
 }
 @special_arnold_talk;
@@ -71,6 +72,7 @@ if (npc_range(coord) > 2) {
     return;
 }
 if (%swansong < ^swansong_complete) {
+    if (%swansong >= 65 & %swansong <= 180) @swan_arnold_talk;
     return;
 }
 @special_arnold_talk;

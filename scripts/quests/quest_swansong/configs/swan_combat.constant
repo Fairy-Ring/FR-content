@@ -1,0 +1,18 @@
+// UNKNOWN engineering bounds, not recovered period timing or damage.
+^swan_actor_lifetime = 6000
+^swan_heartbeat_ticks = 4
+^swan_support_hit_min = 20
+^swan_support_hit_span = 20
+// Page says over20; UNKNOWN exact amount, using the smallest matching drain.
+^swan_queen_prayer_drain = 21
+// UNKNOWN engineering range to speak across Herman's original colony desk.
+^swan_herman_talk_range = 2
+// CANDIDATE OSRS 2007-base battle values; see Swan Song research facts.
+^swan_support_casts = 10
+^swan_stone_maxhit = 2
+^swan_queen_magic_maxhit = 37
+^swan_ambush_maxhit = 7
+^swan_fishing_1_maxhit = 6
+^swan_fishing_2_maxhit = 8
+^swan_fishing_3_maxhit = 10
+^swan_queen_melee_maxhit = 16
