@@ -568,7 +568,7 @@ try {
   // duplicate raw inputs. Cooked lookups now resolve the same complete row sets.
   const cooking = DbTableType.getByName("cooking_generic");
   assert(cooking);
-  const source = readFileSync(process.env.COOKING_SOURCE!, "utf8");
+  const source = process.argv.slice(2).map((file) => readFileSync(file, "utf8")).join("\n");
   const cookingRecipes = source
     .split(/^\[/m)
     .slice(1)

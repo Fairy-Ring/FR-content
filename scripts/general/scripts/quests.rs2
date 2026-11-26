@@ -368,7 +368,7 @@ if (%ratcatch_var >= ^ratcatch_complete) {
 if (%soulbane_prog >= ^soulbane_complete) {
     $questpoints = add($questpoints, ^soulbane_questpoints);
 }
-if (%swansong = ^swansong_complete) {
+if (%swansong >= ^swansong_complete) {
     $questpoints = add($questpoints, ^swansong_questpoints);
 }
 if (%twocats_quest = ^twocats_complete) {

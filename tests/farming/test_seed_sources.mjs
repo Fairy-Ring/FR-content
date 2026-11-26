@@ -299,6 +299,7 @@ for (const file of [
   'scripts/quests/quest_deal/configs/quest_deal.obj',
   'scripts/quests/quest_garden/configs/garden.obj',
   'scripts/quests/quest_roving_elves/configs/roving_crystals.obj',
+  'scripts/quests/quest_swansong/configs/swan.obj',
   'scripts/quests/quest_roving_elves/configs/roving_seeds.obj'
 ]) {
   currentObject = undefined;
