@@ -88,13 +88,13 @@ export async function runtime(engine, pack) {
     Object.assign(Provider, packs.get(directory));
   }
   select(pack);
-  function fixture(type, variant = 'hit', style = 'melee', distance = 1) {
+  function fixture(type, variant = 'hit', style = 'melee', distance = 1, position = null) {
     World.currentTick = 100;
     const previous = World.players[1];
     if (previous) previous.unlink();
     const player = new Player('outcomevm', 1001n, 100001n);
     player.slot = 1; player.pid = 1; player.uid = (1001 << 11) | 1;
-    player.x = 3500; player.z = 3500; player.level = 0; player.isActive = true;
+    player.x = position?.x ?? 3500; player.z = position?.z ?? 3500; player.level = position?.level ?? 0; player.isActive = true;
     player.vars.fill(0); player.baseLevels.fill(80); player.levels.fill(80); player.stats.fill(0);
     player.baseLevels[3] = 255; player.levels[3] = 255;
     player.getInventory(id(InvType, 'worn')); player.getInventory(id(InvType, 'inv'));
@@ -104,7 +104,7 @@ export async function runtime(engine, pack) {
     player.wrappedMessageGame = player.messageGame;
     World.players[1] = player; World.playerLoop.add(player.hash64, player);
     const config = NpcType.getByName(type); assert(config, type);
-    const npc = new Npc(0, player.x + distance, player.z, config.size, config.size, EntityLifeCycle.RESPAWN, 1, config.id, config.blockwalk);
+    const npc = new Npc(player.level, player.x + distance, player.z, config.size, config.size, EntityLifeCycle.RESPAWN, 1, config.id, config.blockwalk);
     World.addNpc(npc, -1); npc.lastMovement = -100;
     npc.setVar(id(VarNpcType, 'npc_aggressive_player'), player.uid);
     applyVariant({ player, npc }, variant, style);

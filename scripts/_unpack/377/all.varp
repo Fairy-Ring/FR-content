@@ -775,13 +775,7 @@ transmit=yes
 scope=perm
 transmit=yes
 
-[ics_little_multi]
-transmit=yes
-
 [varp444_unused]
-
-[ics_little_multi_extra]
-transmit=yes
 
 [follower_npc]
 

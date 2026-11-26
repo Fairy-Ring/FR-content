@@ -337,6 +337,7 @@ jobs:
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
+          run_test tests/icthlarins-little-helper/test_icthlarin.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/icthlarins-little-helper/test_icthlarin.mjs
           run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
           run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
           run_test tests/making-history/test_making_history.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/making-history/test_making_history.mjs

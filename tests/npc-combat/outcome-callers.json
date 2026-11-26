@@ -25,6 +25,10 @@
       "[ai_opplayer2,fairy_tanglefoot]",
       "[ai_opplayer2,firediamond_firewarrior]",
       "[ai_opplayer2,giant_lobster]",
+      "[ai_opplayer2,ics_little_apmeken]",
+      "[ai_opplayer2,ics_little_crondis]",
+      "[ai_opplayer2,ics_little_het]",
+      "[ai_opplayer2,ics_little_scabaras]",
       "[ai_opplayer2,irvig_senay]",
       "[ai_opplayer2,melzar_the_mad]",
       "[ai_opplayer2,monk]",
@@ -87,6 +91,7 @@
     ],
     "npc_cast_spell": [
       "[ai_applayer2,_witch]",
+      "[ai_applayer2,ics_little_possessedpriest]",
       "[ai_applayer2,koldemon]",
       "[ai_applayer2,kolethereal]",
       "[ai_applayer2,kolhuman]",
