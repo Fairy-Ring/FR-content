@@ -1,0 +1,366 @@
+// UNKNOWN server stats are explicit in pest.npc; original client fields remain unchanged.
+// No new client options, quest variables, or varbits are added.
+[proc,pest_spawn_match]
+def_npc_uid $controller = npc_uid;
+def_int $portal = 0;
+while ($portal < 4) {
+    if ($portal = 0) {
+        npc_add(~pest_portal_coord($portal), pest_portal_1_active, ^max_32bit_int);
+    } else if ($portal = 1) {
+        npc_add(~pest_portal_coord($portal), pest_portal_2_active, ^max_32bit_int);
+    } else if ($portal = 2) {
+        npc_add(~pest_portal_coord($portal), pest_portal_3_active, ^max_32bit_int);
+    } else {
+        npc_add(~pest_portal_coord($portal), pest_portal_4_active, ^max_32bit_int);
+    }
+
+    $portal = add($portal, 1);
+}
+
+npc_finduid($controller);
+~pest_fort_spawn;
+npc_finduid($controller);
+
+def_int $family = 0;
+while ($family < 7) {
+    ~pest_spawn_family($family, modulo($family, 4), $controller);
+    $family = add($family, 1);
+}
+// The caller adds the Squire immediately afterwards; leave the Knight selected.
+npc_finduid($controller);
+
+[proc,pest_portal_coord](int $portal)(coord)
+if ($portal = 0) return(~pest_match_coord(^pest_combat_portal_west_coord));
+if ($portal = 1) return(~pest_match_coord(^pest_combat_portal_east_coord));
+if ($portal = 2) return(~pest_match_coord(^pest_combat_portal_southeast_coord));
+if ($portal = 3) return(~pest_match_coord(^pest_combat_portal_southwest_coord));
+return(~pest_match_coord(^pest_combat_portal_west_coord));
+
+[proc,pest_portal_spawn_coord](int $portal)(coord)
+if ($portal = 0) return(~pest_match_coord(^pest_combat_portal_west_spawn_coord));
+if ($portal = 1) return(~pest_match_coord(^pest_combat_portal_east_spawn_coord));
+if ($portal = 2) return(~pest_match_coord(^pest_combat_portal_southeast_spawn_coord));
+if ($portal = 3) return(~pest_match_coord(^pest_combat_portal_southwest_spawn_coord));
+return(~pest_match_coord(^pest_combat_portal_west_spawn_coord));
+
+[proc,pest_portal_alive](int $portal)(boolean)
+def_coord $where = ~pest_portal_coord($portal);
+if ($portal = 0) {
+    if (npc_find($where, pest_portal_1_active, 2, 0) = true & npc_stat(hitpoints) > 0) return(true);
+} else if ($portal = 1) {
+    if (npc_find($where, pest_portal_2_active, 2, 0) = true & npc_stat(hitpoints) > 0) return(true);
+} else if ($portal = 2) {
+    if (npc_find($where, pest_portal_3_active, 2, 0) = true & npc_stat(hitpoints) > 0) return(true);
+} else if ($portal = 3) {
+    if (npc_find($where, pest_portal_4_active, 2, 0) = true & npc_stat(hitpoints) > 0) return(true);
+}
+return(false);
+
+[proc,pest_portals_alive]()(int)
+def_int $alive = 0;
+def_int $portal = 0;
+while ($portal < 4) {
+    if (~pest_portal_alive($portal) = true) $alive = add($alive, 1);
+    $portal = add($portal, 1);
+}
+return($alive);
+
+[proc,pest_next_live_portal](int $start)(int)
+def_int $offset = 0;
+while ($offset < 4) {
+    def_int $portal = modulo(add($start, $offset), 4);
+    if (~pest_portal_alive($portal) = true) return($portal);
+    $offset = add($offset, 1);
+}
+return(-1);
+
+[proc,pest_spawn_family](int $family, int $portal, npc_uid $controller)
+def_coord $where = ~pest_portal_spawn_coord($portal);
+if ($family >= 4) $where = movecoord($where, 0, 0, ^pest_combat_sibling_spawn_offset);
+if ($family = 0) {
+    npc_add($where, pest_splatter_1, ^max_32bit_int);
+} else if ($family = 1) {
+    npc_add($where, pest_shifter_1a, ^max_32bit_int);
+} else if ($family = 2) {
+    npc_add($where, pest_ravager_1, ^max_32bit_int);
+} else if ($family = 3) {
+    npc_add($where, pest_spinner_1, ^max_32bit_int);
+} else if ($family = 4) {
+    npc_add($where, pest_torcher_1a, ^max_32bit_int);
+} else if ($family = 5) {
+    npc_add($where, pest_defiler_1a, ^max_32bit_int);
+} else {
+    npc_add($where, pest_brawler_1, ^max_32bit_int);
+}
+npc_settimer(^pest_combat_ai_ticks);
+npc_finduid($controller);
+
+[proc,pest_match_player_count](npc_uid $controller)(int)
+def_int $instance = add(region_uid, 1);
+def_coord $center = ~pest_match_coord(^pest_knight_coord);
+def_int $players = 0;
+huntall($center, 64, 0);
+while (huntnext = true) {
+    if (%pest_instance = $instance & ~pest_owned = true) {
+        $players = add($players, 1);
+    }
+}
+npc_finduid($controller);
+return($players);
+
+[proc,pest_live_pest_count](coord $center)(int)
+def_int $count = 0;
+npc_findallany($center, 64, 0);
+while (npc_findnext = true) {
+    if (npc_type = pest_splatter_1 | npc_type = pest_shifter_1a | npc_type = pest_ravager_1 | npc_type = pest_spinner_1 | npc_type = pest_torcher_1a | npc_type = pest_defiler_1a | npc_type = pest_brawler_1) {
+        if (npc_stat(hitpoints) > 0) $count = add($count, 1);
+    }
+}
+return($count);
+
+// Called by the controller's native ai_timer after its survival/death checks.
+[proc,pest_combat_tick]
+def_npc_uid $controller = npc_uid;
+if (~pest_portals_alive = 0) {
+    npc_finduid($controller);
+    ~pest_match_finish(1);
+    return;
+}
+def_int $players = ~pest_match_player_count($controller);
+if ($players <= 0 | modulo(map_clock, ^pest_combat_spawn_interval) >= ^pest_combat_ai_ticks) return;
+
+def_coord $center = ~pest_match_coord(^pest_knight_coord);
+def_int $current = ~pest_live_pest_count($center);
+npc_finduid($controller);
+def_int $maximum = multiply($players, ^pest_combat_live_pests_per_player);
+if ($maximum < ^pest_combat_min_live_pests) $maximum = ^pest_combat_min_live_pests;
+def_int $to_spawn = min($players, sub($maximum, $current));
+if ($to_spawn <= 0) return;
+
+def_int $spawned = 0;
+while ($spawned < $to_spawn) {
+    def_int $family = modulo(add(map_clock, $spawned), 7);
+    def_int $portal = ~pest_next_live_portal(modulo(add(map_clock, $spawned), 4));
+    if ($portal >= 0) {
+        ~pest_spawn_family($family, $portal, $controller);
+        $spawned = add($spawned, 1);
+    } else {
+        $spawned = $to_spawn;
+    }
+}
+npc_finduid($controller);
+
+// The NPC queue receives a hit amount but no active player; preserve native damage.
+[proc,pest_apply_damage]
+def_int $damage = last_int;
+~npc_default_damage($damage);
+
+
+[proc,pest_portal_death]
+if (~pest_npc_match = false) return;
+def_coord $knight = ~pest_match_coord(^pest_knight_coord);
+gosub(npc_default_death);
+if (npc_find($knight, pest_voidknight_control1, 64, 0) = false) return;
+def_npc_uid $controller = npc_uid;
+if (npc_stat(hitpoints) = 0) {
+    ~pest_match_finish(2);
+    return;
+}
+npc_statheal(hitpoints, ^pest_combat_portal_knight_heal, 0);
+def_int $alive = ~pest_portals_alive;
+npc_finduid($controller);
+if ($alive = 0) ~pest_match_finish(1);
+[proc,pest_spinner_heal](npc_uid $spinner)
+def_coord $center = npc_coord;
+if (npc_find($center, pest_portal_1_active, 6, 0) = true & npc_stat(hitpoints) > 0) {
+npc_statheal(hitpoints, ^pest_combat_spinner_heal, 0);
+} else if (npc_find($center, pest_portal_2_active, 6, 0) = true & npc_stat(hitpoints) > 0) {
+npc_statheal(hitpoints, ^pest_combat_spinner_heal, 0);
+} else if (npc_find($center, pest_portal_3_active, 6, 0) = true & npc_stat(hitpoints) > 0) {
+npc_statheal(hitpoints, ^pest_combat_spinner_heal, 0);
+} else if (npc_find($center, pest_portal_4_active, 6, 0) = true & npc_stat(hitpoints) > 0) {
+npc_statheal(hitpoints, ^pest_combat_spinner_heal, 0);
+}
+npc_finduid($spinner);
+
+[proc,pest_ravager_tick]()(boolean)
+def_coord $target = ~pest_match_coord(^pest_fort_ravager_gate_coord);
+def_coord $stand = ~pest_match_coord(^pest_fort_ravager_stand_coord);
+if (npc_coord ! $stand) {
+    npc_walk($stand);
+    return(true);
+}
+if (loc_find($target, pest_wall_gate_fixed) = true) {
+    loc_change(pest_wall_gate_damaged_1, ^max_32bit_int);
+    return(true);
+}
+if (loc_find($target, pest_wall_gate_damaged_1) = true) {
+    loc_change(pest_wall_gate_destroyed, ^max_32bit_int);
+    return(true);
+}
+return(false);
+
+[proc,pest_shifter_jump](npc_uid $shifter)
+def_coord $target = movecoord(~pest_match_coord(^pest_knight_coord), 1, 0, 0);
+npc_finduid($shifter);
+npc_telejump($target);
+
+[proc,pest_pest_tick]
+if (~pest_npc_match = false) return;
+def_npc_uid $pest = npc_uid;
+npc_settimer(^pest_combat_ai_ticks);
+def_int $family = -1;
+if (npc_type = pest_splatter_1) $family = 0;
+else if (npc_type = pest_shifter_1a) $family = 1;
+else if (npc_type = pest_ravager_1) $family = 2;
+else if (npc_type = pest_spinner_1) $family = 3;
+else if (npc_type = pest_torcher_1a) $family = 4;
+else if (npc_type = pest_defiler_1a) $family = 5;
+else if (npc_type = pest_brawler_1) $family = 6;
+if ($family < 0 | npc_stat(hitpoints) = 0) return;
+
+if ($family = 3) {
+    ~pest_spinner_heal($pest);
+    return;
+}
+npc_finduid($pest);
+if ($family = 2 & ~pest_ravager_tick = true) {
+    npc_finduid($pest);
+    return;
+}
+if ($family = 1 & modulo(map_clock, ^pest_combat_shifter_interval) < ^pest_combat_ai_ticks) {
+    ~pest_shifter_jump($pest);
+}
+npc_finduid($pest);
+
+def_coord $knight = ~pest_match_coord(^pest_knight_coord);
+def_coord $from = npc_coord;
+def_int $reach = ^pest_combat_melee_reach;
+if ($family = 4 | $family = 5) $reach = ^pest_combat_ranged_reach;
+def_int $instance = add(region_uid, 1);
+huntall($from, $reach, 0);
+while (huntnext = true) {
+    if (%pest_instance = $instance & ~pest_owned = true & stat(hitpoints) > 0) {
+        npc_walk($from);
+        queue*(pest_player_attack, 0)($pest, $family);
+        npc_finduid($pest);
+        return;
+    }
+}
+npc_finduid($pest);
+if (npc_find($from, pest_voidknight_control1, $reach, 1) = true) {
+    if (npc_stat(hitpoints) > 0) {
+        def_npc_uid $knight_uid = npc_uid;
+        npc_finduid($pest);
+        npc_walk($from);
+        def_spotanim $projectile = ~pest_attack_presentation($family);
+        npc_finduid($knight_uid);
+        def_int $delay = 0;
+        if ($projectile ! null) {
+            def_int $duration = ~npc_projectile($from, $knight_uid, $projectile, 40, 36, 32, 15, 0, 11, 5);
+            $delay = divide($duration, 30);
+        }
+        npc_queue(2, ^pest_combat_pest_damage, $delay);
+    }
+    npc_finduid($pest);
+    return;
+}
+npc_finduid($pest);
+npc_walk($knight);
+
+// Original 377 Torcher/Defiler assets; numeric combat behavior remains UNKNOWN.
+[proc,pest_attack_presentation](int $family)(spotanim)
+if ($family = 4) {
+    npc_anim(torcher_attack, 0);
+    spotanim_npc(torcher_fireball_launch_spotanim, 40, 0);
+    return(torcher_fireball_travel_spotanim);
+}
+if ($family = 5) {
+    npc_anim(defiler_attack, 0);
+    spotanim_npc(defiler_spike_launch_spotanim, 40, 0);
+    return(defiler_spike_travel_spotanim);
+}
+return(null);
+
+// A native player queue obtains protected access without corrupting an NPC hunt.
+[queue,pest_player_attack](npc_uid $attacker, int $family)
+if (~pest_owned = false | stat(hitpoints) = 0 | npc_finduid($attacker) = false) return;
+def_int $instance = %pest_instance;
+if (region_findbycoord(npc_coord) = false) return;
+if (add(region_uid, 1) ! $instance) return;
+def_int $style = ^melee_style;
+if ($family = 4) $style = ^magic_style;
+else if ($family = 5) $style = ^ranged_style;
+def_int $damage = ^pest_combat_pest_damage;
+if (~check_protect_prayer($style) = true) $damage = 0;
+def_spotanim $projectile = ~pest_attack_presentation($family);
+def_int $duration = 0;
+if ($projectile ! null) {
+    $duration = ~player_projectile(npc_coord, coord, uid, $projectile, 40, 36, 32, 15, 0, 11, 5);
+    if ($family = 4) spotanim_pl(torcher_fireball_impact_spotanim, 92, $duration);
+    else spotanim_pl(defiler_spike_impact_spotanim, 92, $duration);
+}
+~npc_set_attack_vars;
+queue(combat_damage_player, divide($duration, 30), $damage);
+queue*(playerhit_n_retaliate, divide($duration, 30))($attacker);
+
+
+// Keep the 377 native presentation/blocking; don't add the 2007 portal-death poison
+// or its increased Shifter teleport frequency.
+[proc,pest_splatter_death]
+if (~pest_npc_match = false) return;
+def_coord $center = npc_coord;
+def_int $instance = add(region_uid, 1);
+def_int $damage = ^pest_combat_pest_damage;
+huntall($center, ^pest_combat_splatter_radius, 0);
+while (huntnext = true) {
+    if (%pest_instance = $instance & ~pest_owned = true & stat(hitpoints) > 0) {
+        queue*(damage_player, 0)($damage);
+    }
+}
+gosub(npc_default_death);
+
+[ai_timer,pest_splatter_1] ~pest_pest_tick;
+[ai_timer,pest_shifter_1a] ~pest_pest_tick;
+[ai_timer,pest_ravager_1] ~pest_pest_tick;
+[ai_timer,pest_spinner_1] ~pest_pest_tick;
+[ai_timer,pest_torcher_1a] ~pest_pest_tick;
+[ai_timer,pest_defiler_1a] ~pest_pest_tick;
+[ai_timer,pest_brawler_1] ~pest_pest_tick;
+
+[ai_queue2,pest_splatter_1] ~pest_apply_damage;
+[ai_queue2,pest_shifter_1a] ~pest_apply_damage;
+[ai_queue2,pest_ravager_1] ~pest_apply_damage;
+[ai_queue2,pest_spinner_1] ~pest_apply_damage;
+[ai_queue2,pest_torcher_1a] ~pest_apply_damage;
+[ai_queue2,pest_defiler_1a] ~pest_apply_damage;
+[ai_queue2,pest_brawler_1] ~pest_apply_damage;
+[ai_queue2,pest_portal_1_active] ~pest_apply_damage;
+[ai_queue2,pest_portal_2_active] ~pest_apply_damage;
+[ai_queue2,pest_portal_3_active] ~pest_apply_damage;
+[ai_queue2,pest_portal_4_active] ~pest_apply_damage;
+
+[ai_queue3,pest_splatter_1] ~pest_splatter_death;
+[ai_queue3,pest_shifter_1a] gosub(npc_default_death);
+[ai_queue3,pest_ravager_1] gosub(npc_default_death);
+[ai_queue3,pest_spinner_1] gosub(npc_default_death);
+[ai_queue3,pest_torcher_1a] gosub(npc_default_death);
+[ai_queue3,pest_defiler_1a] gosub(npc_default_death);
+[ai_queue3,pest_brawler_1] gosub(npc_default_death);
+[ai_queue3,pest_portal_1_active] ~pest_portal_death;
+[ai_queue3,pest_portal_2_active] ~pest_portal_death;
+[ai_queue3,pest_portal_3_active] ~pest_portal_death;
+[ai_queue3,pest_portal_4_active] ~pest_portal_death;
+
+// Retaliation must not enter the unrelated generic melee mode between Pest ticks.
+[ai_queue1,pest_splatter_1] npc_setmode(none);
+[ai_queue1,pest_shifter_1a] npc_setmode(none);
+[ai_queue1,pest_ravager_1] npc_setmode(none);
+[ai_queue1,pest_spinner_1] npc_setmode(none);
+[ai_queue1,pest_torcher_1a] npc_setmode(none);
+[ai_queue1,pest_defiler_1a] npc_setmode(none);
+[ai_queue1,pest_brawler_1] npc_setmode(none);
+[ai_queue1,pest_portal_1_active] npc_setmode(none);
+[ai_queue1,pest_portal_2_active] npc_setmode(none);
+[ai_queue1,pest_portal_3_active] npc_setmode(none);
+[ai_queue1,pest_portal_4_active] npc_setmode(none);

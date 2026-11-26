@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "pest_points": "Earned Pest Control commendations persist across logout in assigned original server-only slot 238.",
     "deal_growth_at": "UNKNOWN engineering crop deadline in reserved original slot 247; saved so an earned Blindweed crop survives logout.",
     "deal_var": "Original Rum Deal progress varbits hold the growing patch, inserted ingredients and brewery faces; saved so logout does not erase earned quest steps.",
     "disease": "UNKNOWN engineering persistent Fever Spider disease; login restarts its timer, Relicym and death clear it.",
@@ -355,6 +356,8 @@
     "desert": "Current desert-heat timer; the inherited name is temporary.",
     "feud_trial_villager": "Session-only active distracted, lured or unconscious trial villager UID; logout releases it while original saved quest checkpoints remain.",
     "soulbane_instance": "Owned emotion-room region UID plus one; leaving, logout and death discard the encounter, not completed-room progress.",
+    "pest_instance": "Current Pest Control queue marker or owned match region UID plus one. Login, logout and departure discard participation.",
+    "pest_activity": "Transient activity in assigned original server-only slot 239 is abandoned with the match; entry, leaving and login reset it before any reward.",
     "soulbane_unprotected": "Current emotion-room fear encounter, anger meter and illusion hit counters; unfinished rooms restart after leaving or logout.",
     "soulbane_unprotected2": "Current emotion-room dialogue and anger-special presentation flags; rebuilt on room entry.",
     "swansong_temp": "Explicit temporary ambush/colony state; current bits 8 and 9 are repeat-dialogue cursors, not a quest stage or consumed-item count.",

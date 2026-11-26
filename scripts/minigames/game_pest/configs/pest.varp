@@ -1,0 +1,12 @@
+// Original 377 server-only slot. -1 waits, 0 is outside, otherwise region UID+1.
+[pest_instance]
+
+// UNKNOWN storage in pre-reserved original slots. No client fields are added.
+[pest_points]
+scope=perm
+
+// Transient match activity never survives logout; entry, departure and login
+// also reset it so no unfinished game can award a later match's reward.
+[pest_activity]
+// NPC departure/damage scripts record priority and activity without player access.
+protect=no

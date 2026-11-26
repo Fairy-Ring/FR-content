@@ -1,8 +1,55 @@
-// Pest Control — Cross onto the waiting lander TOPSIDE (open boat floor).
-// L1 is only the plank loc (midair). There is no L1 deck. Dest is L0
-// pest_lander_boat_floor occupancy. Ladder 14314 is Climb-out later, not dest.
-// Stand 2657,2639 L0. Dest 2660,2640 L0.
-
+// VERIFIED: 24 April 2006 requires combat 40. Text is UNKNOWN functional wording.
 [oploc1,pest_lander_gangplank]
-p_telejump(0_41_41_36_16); // 2660,2640 L0 — lander well / topside
-mes("You board the waiting lander. The boat will leave when enough volunteers have boarded.");
+if (~player_combat_level < ^pest_min_combat) {
+    mes("You need a combat level of 40 to board the lander.");
+    return;
+}
+if (%pest_instance ! 0) return;
+if (npc_find(0_41_41_34_23, pest_squire_lander, 8, 0) = false) return;
+%pest_instance = -1;
+%pest_activity = 0;
+p_telejump(^pest_wait_coord);
+if (%pest_depart_clock = 0) %pest_depart_clock = add(map_clock, ^pest_wait_ticks);
+mes("You board the waiting lander.");
+settimer(pest_wait, 5);
+
+[oploc1,pest_lander_ladder]
+if (%pest_instance = -1 | ~pest_waiting(coord) = true) ~pest_leave;
+
+[proc,pest_waiting](coord $position)(boolean)
+return(inzone(0_41_41_35_14, 0_41_41_39_20, $position));
+
+[ai_spawn,pest_squire_lander]
+npc_settimer(5);
+
+[ai_timer,pest_squire_lander]
+def_int $count = 0;
+huntall(^pest_wait_coord, 6, 0);
+while (huntnext = true) {
+    if (%pest_instance = -1 & ~pest_waiting(coord) = true) $count = add($count, 1);
+}
+if ($count < ^pest_min_players) {
+    %pest_depart_clock = 0;
+    return;
+}
+if (%pest_depart_clock = 0) %pest_depart_clock = add(map_clock, ^pest_wait_ticks);
+if (map_clock < %pest_depart_clock) return;
+%pest_depart_clock = 0;
+~pest_depart;
+
+[timer,pest_wait]
+if (%pest_instance ! -1) {
+    cleartimer(pest_wait);
+    return;
+}
+if (~pest_waiting(coord) = false) {
+    %pest_instance = 0;
+    cleartimer(pest_wait);
+    return;
+}
+if (npc_find(0_41_41_34_23, pest_squire_lander, 8, 0) = true) {
+    def_int $remaining = sub(%pest_depart_clock, map_clock);
+    if ($remaining > 0 & modulo($remaining, 25) = 0) {
+        mes("The lander departs in <tostring(divide(multiply($remaining, 3), 5))> seconds.");
+    }
+}

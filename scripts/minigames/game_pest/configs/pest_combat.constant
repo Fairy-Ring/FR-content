@@ -1,0 +1,33 @@
+// All unmeasured combat pacing, damage, healing, and spawn anchors are UNKNOWN engineering choices.
+// The 377 cache gives Pest visible levels but not a complete server combat table.
+^pest_combat_ai_ticks = 5
+^pest_combat_spawn_interval = 50
+^pest_combat_min_live_pests = 7
+^pest_combat_live_pests_per_player = 2
+^pest_combat_pest_damage = 1
+^pest_combat_melee_reach = 1
+^pest_combat_ranged_reach = 8
+^pest_combat_splatter_radius = 3
+^pest_combat_spinner_heal = 1
+^pest_combat_shifter_interval = 200
+^pest_combat_portal_knight_heal = 50
+^pest_combat_sibling_spawn_offset = 4
+
+// UNKNOWN portal labels/positions follow the four apparent pads in m41_40; size-3 portal footprints are avoided.
+^pest_combat_portal_west_coord = 0_41_40_4_31
+^pest_combat_portal_east_coord = 0_41_40_56_28
+^pest_combat_portal_southeast_coord = 0_41_40_45_10
+^pest_combat_portal_southwest_coord = 0_41_40_21_9
+^pest_combat_portal_west_spawn_coord = 0_41_40_7_31
+^pest_combat_portal_east_spawn_coord = 0_41_40_55_28
+^pest_combat_portal_southeast_spawn_coord = 0_41_40_46_13
+^pest_combat_portal_southwest_spawn_coord = 0_41_40_21_12
+
+// UNKNOWN fort targets around the existing central plinth; use native original loc forms.
+^pest_fort_repair_barricade_coord = 0_41_40_28_32
+^pest_fort_repair_gate_coord = 0_41_40_32_25
+^pest_fort_open_gate_coord = 0_41_40_33_25
+^pest_fort_ravager_gate_coord = 0_41_40_46_32
+^pest_fort_ravager_stand_coord = 0_41_40_47_32
+// UNKNOWN functional crafting reward: RuneScript XP uses tenths.
+^pest_fort_crafting_xp_tenths = 10

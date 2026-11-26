@@ -336,10 +336,6 @@ type=player_uid
 
 [gnome_crunchies_bits2]
 
-[varp238_unused]
-
-[varp239_unused]
-
 [varp240_unused]
 
 [varp241_unused]
@@ -1326,8 +1322,6 @@ scope=perm
 [varp715_unused]
 
 [varp717_unused]
-
-[pest_instance]
 
 [varp719_bits]
 transmit=yes

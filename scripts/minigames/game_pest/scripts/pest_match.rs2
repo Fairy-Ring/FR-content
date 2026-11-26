@@ -1,0 +1,193 @@
+// UNKNOWN engineering ownership: one copied original arena per departing boat.
+// Region exit coordinates and empty-region destruction are native engine features.
+[proc,pest_depart]
+def_coord $southwest = region_create(4, 8, 8);
+def_int $level = 0;
+while ($level < 4) {
+    def_int $east = 0;
+    while ($east < 8) {
+        def_int $north = 0;
+        while ($north < 8) {
+            region_set($level, $east, $north, movecoord(0_41_40_0_0, multiply($east, 8), $level, multiply($north, 8)), 0);
+            $north = add($north, 1);
+        }
+        $east = add($east, 1);
+    }
+    $level = add($level, 1);
+}
+region_setexitcoord(^pest_dock_coord);
+def_int $instance = add(region_uid, 1);
+npc_add(~pest_match_coord(^pest_knight_coord), pest_voidknight_control1, ^max_32bit_int);
+def_npc_uid $controller = npc_uid;
+%pest_end_clock = add(map_clock, ^pest_match_ticks);
+%pest_result = 0;
+npc_settimer(5);
+~pest_spawn_match;
+npc_add(~pest_match_coord(^pest_match_lander), pest_squire_instance, ^max_32bit_int);
+def_int $boarded = 0;
+// VERIFIED 24 April: volunteers left behind receive next-boat priority.
+// UNKNOWN encoding: activity -1 means priority, -2 means this departure queued it.
+huntall(^pest_wait_coord, 6, 0);
+while (huntnext = true) {
+    if (%pest_instance = -1 & ~pest_waiting(coord) = true & %pest_activity = -1 & $boarded < ^pest_max_players) {
+        %pest_activity = -2;
+        longqueue*(pest_enter, 0, ^discard)($instance, $controller);
+        $boarded = add($boarded, 1);
+    }
+}
+huntall(^pest_wait_coord, 6, 0);
+while (huntnext = true) {
+    if (%pest_instance = -1 & ~pest_waiting(coord) = true & %pest_activity ! -2) {
+        if ($boarded < ^pest_max_players) {
+            %pest_activity = -2;
+            longqueue*(pest_enter, 0, ^discard)($instance, $controller);
+            $boarded = add($boarded, 1);
+        } else {
+            %pest_activity = -1;
+        }
+    }
+}
+
+[queue,pest_enter](int $instance, npc_uid $controller)
+if (%pest_instance ! -1 | ~pest_waiting(coord) = false) return;
+if (region_findbyuid(sub($instance, 1)) = false | npc_finduid($controller) = false) {
+    ~pest_leave;
+    return;
+}
+if (%pest_result ! 0) {
+    ~pest_leave;
+    return;
+}
+cleartimer(pest_wait);
+%pest_instance = $instance;
+%pest_activity = 0;
+p_teleport(~pest_match_coord(^pest_match_lander));
+// UNKNOWN plain functional presentation; the in-game HUD was added after 377.
+mes("Defend the Void Knight and destroy the four portals.");
+
+[proc,pest_match_coord](coord $template)(coord)
+return(region_getcoord(coordy($template), sub(coordx($template), 2624), sub(coordz($template), 2560)));
+
+[proc,pest_owned]()(boolean)
+if (%pest_instance <= 0) return(false);
+if (region_findbycoord(coord) = false) return(false);
+if (add(region_uid, 1) = %pest_instance) return(true);
+return(false);
+
+[proc,pest_npc_match]()(boolean)
+return(region_findbycoord(npc_coord));
+
+[proc,pest_activity](int $amount)
+if (~pest_owned = false | $amount <= 0) return;
+%pest_activity = min(^pest_reward_activity, add(%pest_activity, $amount));
+
+// UNKNOWN attribution timing follows existing combat XP and hero-point credit.
+// Those native hit paths still know the actual attacker before NPC queue2 loses it.
+[proc,pest_hit_activity](int $damage)
+if ($damage <= 0 | ~pest_owned = false) return;
+def_int $instance = %pest_instance;
+if (region_findbycoord(npc_coord) = false) return;
+if (add(region_uid, 1) ! $instance) return;
+if (npc_type = pest_splatter_1 | npc_type = pest_shifter_1a | npc_type = pest_ravager_1 | npc_type = pest_spinner_1 | npc_type = pest_torcher_1a | npc_type = pest_defiler_1a | npc_type = pest_brawler_1 | npc_type = pest_portal_1_active | npc_type = pest_portal_2_active | npc_type = pest_portal_3_active | npc_type = pest_portal_4_active) {
+    ~pest_activity($damage);
+}
+
+[ai_timer,pest_voidknight_control1]
+if (%pest_result ! 0) return;
+if (region_findbycoord(npc_coord) = false) return;
+if (npc_stat(hitpoints) = 0) {
+    ~pest_match_finish(2);
+    return;
+}
+if (map_clock >= %pest_end_clock) {
+    ~pest_match_finish(1);
+    return;
+}
+~pest_combat_tick;
+
+// Called with the match knight selected. Queue each participant once.
+[proc,pest_match_finish](int $result)
+if (%pest_result ! 0 | ($result ! 1 & $result ! 2)) return;
+if (region_findbycoord(npc_coord) = false) return;
+%pest_result = $result;
+def_int $instance = add(region_uid, 1);
+def_npc_uid $controller = npc_uid;
+def_int $level = 0;
+while ($level < 4) {
+    huntall(~pest_match_coord(movecoord(^pest_knight_coord, 0, $level, 0)), 32, 0);
+    while (huntnext = true) {
+        if (%pest_instance = $instance) longqueue*(pest_finish, 0, ^discard)($instance, $controller, $result);
+    }
+    $level = add($level, 1);
+}
+
+[queue,pest_finish](int $instance, npc_uid $controller, int $result)
+if (%pest_instance ! $instance | ~pest_owned = false) return;
+if (npc_finduid($controller) = false) return;
+if (%pest_result ! $result) return;
+def_int $activity = %pest_activity;
+// A lethal hit can queue ordinary death behind this already queued result.
+// Finish safe death while ownership still protects the player's items.
+if (stat(hitpoints) = 0) ~pest_player_death;
+// UNKNOWN plain functional result wording; no period result transcript survived.
+~pest_leave;
+if ($result = 1) {
+    if ($activity >= ^pest_reward_activity) {
+        ~pest_award;
+    } else {
+        mes("You did not do enough damage or repairs to earn a reward.");
+    }
+} else {
+    mes("The Pest Control game has ended without a victory.");
+}
+
+[opnpc1,pest_squire_instance]
+if (~pest_owned = false) return;
+~pest_leave;
+
+[proc,pest_leave]
+cleartimer(pest_wait);
+clearqueue(pest_enter);
+clearqueue(pest_finish);
+~combat_clearqueue;
+%pest_instance = 0;
+%pest_activity = 0;
+p_teleport(^pest_dock_coord);
+
+// Safe death never enters the ordinary keep/drop allocation pipeline.
+[proc,pest_player_death]
+~player_death;
+~combat_clearqueue;
+clearqueue(player_death_default);
+~prayer_deactivate_all;
+~stat_reset_all;
+healenergy(10000);
+~clear_poison;
+~deal_disease_clear;
+~player_end_poison;
+anim(null, 0);
+p_stopaction;
+if (~pest_owned = true) {
+    p_teleport(~pest_match_coord(^pest_match_lander));
+} else {
+    ~pest_leave;
+}
+~update_all(null);
+~initalltabs;
+
+[proc,pest_logout]
+if (%pest_instance ! 0) ~pest_leave;
+
+[proc,pest_login]
+%pest_activity = 0;
+if (%pest_instance ! 0 | ~pest_waiting(coord) = true) ~pest_leave;
+
+// UNKNOWN favourable safety policy: use the Squire rather than spending runes
+// on a teleport during a match. Eligibility checks never mutate participation.
+// The refusal text is UNKNOWN plain functional wording, not a period quotation.
+[proc,pest_teleport_check](coord $origin)(boolean)
+if (%pest_instance ! 0 | ~pest_waiting($origin) = true) {
+    mes("Leave the lander or speak to the Squire to return to the outpost.");
+    return(false);
+}
+return(true);
