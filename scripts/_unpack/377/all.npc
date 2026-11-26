@@ -59979,35 +59979,6 @@ head2=npc_woman2_head
 wanderrange=0
 defaultmode=none
 
-[wanted_summoned_black_knight]
-name=Black Knight
-desc=A dark-hearted knight.
-model1=obj_iron_full_helm_manwear
-model2=obj_khazard_platemail_manwear
-model3=obj_iron_platebody_manwear2
-model4=obj_gauntlets_of_cooking_manwear
-model5=obj_iron_platelegs_manwear
-model6=obj_ikov_bootsoflightness_manwear
-model7=obj_bronze_longsword_manwear
-recol1s=17969
-recol1d=6342
-recol2s=10468
-recol2d=4226
-recol3s=10570
-recol3d=4226
-recol4s=15855
-recol4d=6342
-recol5s=14798
-recol5d=6342
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-alwaysontop=yes
-op2=Attack
-vislevel=32
-hitpoints=42
-attack=0
-strength=0
-defence=0
 
 [wanted_black_knight_attackable_base_config]
 name=Black Knight
@@ -60065,41 +60036,6 @@ op2=Attack
 head1=npc_ranging_guild_poison_salesman_head
 head2=idk_man_jaw_pointy_head
 
-[wanted_solus_attackable]
-name=Solus Dellagar
-desc=A powerful warrior mage.
-model1=npc_2747
-model2=idk_man_hair_medium
-model3=idk_man_jaw_long
-model4=obj_priest_gown_manwear
-model5=obj_viking_cloak_green_manwear
-model6=obj_viking_top_darkbrown_manwear
-model7=obj_gauntlets_of_cooking_manwear
-model8=npc_2747i2
-model9=obj_unfinished_saradominbook_manwear
-model10=npc_2747i3
-model11=obj_mystic_boots_manwear
-model12=npc_2747i4
-recol1s=14724
-recol1d=8225
-recol2s=4367
-recol2d=8225
-recol3s=7329
-recol3d=8225
-recol4s=6273
-recol4d=10405
-recol5s=7328
-recol5d=6144
-recol6s=20033
-recol6d=8225
-vislevel=hide
-walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
-readyanim=human_staffready
-op2=Attack
-alwaysontop=yes
-head1=obj_pickpocket_guide_farmer
-head2=npc_2747_head
-head3=idk_man_jaw_long_head
 
 [grandtree_spawnedguard]
 name=Gnome guard

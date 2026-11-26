@@ -47,6 +47,17 @@ if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_
 if (%wanted_main ! ^wanted_commorb_issued & %wanted_daquarius_hint = 2 & %wanted_zammy_mage_hint = 2) {
     ~chatplayer("<p,neutral>Hi Savant. Where am I supposed to look for Solus again?");
     ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>The clue was that Solus is somewhere where you might find Fur, East of Varrock...");
+    // Preserve the supplied clue reminder, then give current proof guidance.
+    if (%wanted_main = ^wanted_solus_defeated) {
+        ~wanted_savant_hat_recovery;
+    }
+    return;
+}
+if (%wanted_main = ^wanted_solus_defeated) {
+    ~wanted_savant_hat_recovery;
+    return;
+}
+if (%wanted_main = ^wanted_complete) {
     return;
 }
 @wanted_savant_assignment_transfer;
@@ -141,4 +152,24 @@ return;
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Still no harm done, I guess! Call me if you need me!");
 ~chatplayer("<p,neutral>Okay Savant, will do.");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Savant out.");
+return;
+
+// CANDIDATE wording: wanted.dlg.savant-after-solus.
+[proc,wanted_savant_hat_recovery]
+if (%wanted_main ! ^wanted_solus_defeated) {
+    return;
+}
+~chatplayer("<p,neutral>Hi Savant. Where am I supposed to be looking for Solus again?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You're not looking for Solus <displayname>, you are supposed to be taking his hat to Sir Amik of the White Knights as proof that you have defeated him.");
+// A held or banked hat already satisfies the clue; never issue another.
+if (inv_total(inv, wanted_solus_trophy) > 0 | inv_total(bank, wanted_solus_trophy) > 0 | inv_freespace(inv) = 0) {
+    return;
+}
+~chatplayer("<p,neutral>But I lost his hat...");
+if (%wanted_main ! ^wanted_solus_defeated | inv_total(inv, wanted_solus_trophy) > 0 | inv_total(bank, wanted_solus_trophy) > 0 | inv_freespace(inv) = 0) {
+    return;
+}
+inv_add(inv, wanted_solus_trophy, 1);
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I have sent you a duplicate, try not to lose it.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Go and take it to Sir Amik so that he can make you a full-fledged White Knight!");
 return;

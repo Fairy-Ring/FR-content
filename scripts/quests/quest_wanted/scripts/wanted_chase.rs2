@@ -1,0 +1,271 @@
+// CANDIDATE scenes: retained wanted.dlg.scan-* and essence-mine records.
+// UNKNOWN staging: five field scans (period says four or more), third-scan
+// Flames, fifth-scan knight, two rangers, native FX and owner-bound actors.
+[proc,wanted_chase_scan]
+if (%wanted_main ! ^wanted_chase | inv_total(inv, wanted_crystal_ball) = 0) return;
+def_int $mission = ~wanted_chase_target;
+if (~wanted_chase_near($mission) = false) {
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Scan results are negative, <displayname>. Savant out.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("Before scanning, make sure you have one free inventory space!"); // Period guide wording, game-message presentation UNKNOWN.
+    return;
+}
+// Rescans cannot duplicate an active encounter. Departures/timers permit retry.
+npc_findallany(coord, ^wanted_actor_search_radius, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & (npc_type = wanted_summoned_black_knight | npc_type = wanted_solus_attackable | npc_type = wanted_solus_fake_woman_base_config)) return;
+}
+anim(wanted_crystal_ball_scan, 0);
+spotanim_pl(wanted_crystal_ball_scan_spotanim, 0, 0);
+sound_synth(wanted_scan, 1, 0);
+p_delay(^wanted_scan_delay);
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
+if ($mission = 19) { ~wanted_mine_confrontation; return; }
+def_int $count = ~wanted_chase_count;
+if ($count = ^wanted_knight_after_scans) {
+    npc_add(coord, wanted_solus, ^wanted_actor_lifetime);
+    %npc_attacking_uid = uid;
+    spotanim_npc(wanted_teleport, 0, 0);
+    %npc_int = $mission;
+    npc_settimer(^wanted_actor_timer);
+    ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Well you ARE a persistent <text_gender("fellow", "madam")> aren't you?");
+    ~chatplayer("<p,neutral>I am here to take you in Solus. You can forget your little tricks.");
+    ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Little tricks, you say? Well how about this one!");
+    ~chatnpc_specific("Solus", wanted_solus, "<p,neutral>Say hello to my little friend! And goodbye to me!");
+    if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
+    npc_del;
+    npc_add(coord, wanted_summoned_black_knight, ^wanted_actor_lifetime);
+    %npc_attacking_uid = uid;
+    %npc_aggressive_player = uid;
+    %npc_int = $mission;
+    npc_settimer(^wanted_actor_timer);
+    npc_say("Solus commands you to die now!");
+    npc_setmode(opplayer2);
+    return;
+}
+if ($count = ^wanted_flames_after_scans) {
+    npc_add(coord, wanted_solus, ^wanted_actor_lifetime);
+    %npc_attacking_uid = uid;
+    spotanim_npc(wanted_teleport, 0, 0);
+    %npc_int = $mission;
+    npc_settimer(^wanted_actor_timer);
+    ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>This is getting very tiresome!");
+    ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>Little White Knight, I command powers beyond your imagination!");
+    ~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>This charade bores me!");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral><displayname> I am reading a huge power surge from Solus, be very careful...");
+    if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
+    // UNKNOWN favourable damage: most current HP, leaving at least one.
+    spotanim_pl(zamorak_flame, 0, 0);
+    damage(uid, ^hitmark_damage, sub(stat(hitpoints), max(1, divide(stat(hitpoints), ^wanted_flames_hp_divisor))));
+    npc_del;
+    p_teleport(0_46_52_42_17); // UNKNOWN reachable Falador castle courtyard staging.
+    ~wanted_chase_next($mission);
+    ~chatplayer("<p,neutral>Ow! What happened?");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I managed to shield you from most of his attack, and bring you back to Falador Castle, but you are lucky I was monitoring, that could have killed you!");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But keep chasing him, together we are going to bring him to justice!");
+    return;
+}
+if ($mission = 11) {
+    npc_add(coord, wanted_solus_fake_woman_base_config, ^wanted_actor_lifetime);
+    %npc_attacking_uid = uid;
+    %npc_int = $mission;
+    npc_settimer(^wanted_actor_timer);
+    return;
+}
+npc_add(coord, wanted_solus, ^wanted_actor_lifetime);
+%npc_attacking_uid = uid;
+spotanim_npc(wanted_teleport, 0, 0);
+%npc_int = $mission;
+npc_settimer(^wanted_actor_timer);
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>What the...?");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Well well well! I was wondering when the White Knights would come looking for me!");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>Well you'll have to be quicker than that, my friend!");
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_near($mission) = false) return;
+npc_del;
+~wanted_chase_next($mission);
+
+[proc,wanted_chase_next](int $mission)
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_done($mission) = 1) return;
+if (inv_freespace(inv) = 0) return;
+~wanted_chase_mark($mission);
+def_int $next = 19;
+if (~wanted_chase_count < ^wanted_field_scan_count) {
+    $next = add(2, random(17));
+    // UNKNOWN temporary exclusion while Q082 Dorgeshuun mine route is unbuilt; Tip.It 2 May 2006 allows chases without bone spear
+    while ($next = 11 | ~wanted_chase_done($next) = 1) {
+        $next = add($next, 1);
+        if ($next = 19) $next = 2;
+    }
+}
+~wanted_chase_select($next);
+def_namedobj $clue = ~wanted_chase_clue($next);
+inv_add(inv, $clue, 1);
+mes("Savant transfers the item to you.");
+~wanted_chase_item_hint($next, $clue);
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral><displayname>, I want you to search for him, and use your Comm-Orb to scan for him if you think he is nearby!");
+
+// CANDIDATE retained scan-canifis item reactions. Cake/bone spear have no wording.
+[proc,wanted_chase_item_hint](int $mission, namedobj $clue)
+switch_int ($mission) {
+    case 2 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... a hat?");
+        ~chatplayer("<p,neutral>How does a hat help us?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I'm sorry, I don't know. Maybe somewhere where hats like this are common?");
+    case 3 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's a cape...");
+        ~chatplayer("<p,neutral>More than you might think Savant. This type of cape used to be called the Cape of Champions...");
+    case 4 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's a beer?");
+        ~chatplayer("<p,neutral>I doubt he's getting drunk in hiding...");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>That type of beer is only sold in one place that I know of");
+    case 5 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... a banana?");
+        ~chatplayer("<p,neutral>A banana? How is that a clue to where he is?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, for it to have got caught in his teleport, it must be a place where there are many around...");
+    case 6 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... an eye patch?");
+        ~chatplayer("<p,neutral>Do you think he might be injured?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>No, I think he must be somewhere where there are a lot of people who wear eye patches...");
+    case 7 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... an unholy symbol!");
+        ~chatplayer("<p,neutral>The symbol of Zamorak? That tells us nothing.");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Yes, sadly there are many Zamorakians in these lands...But it must be somewhere of special significance...");
+    case 8 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... a ticket?");
+        ~chatplayer("<p,neutral>I am sure I have seen tickets like that somewhere before...");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, wherever it is that you have seen them, I would guess he is nearby!");
+    case 9 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... some big frog legs?");
+        ~chatplayer("<p,neutral>The frog those came from must be huge!");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I have heard rumours of giant frogs in a subterranean area...");
+    case 10 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... goblin armour?");
+        ~chatplayer("<p,neutral>Goblin armour? Why would he wear that?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, it must be a place here there is a lot of it around for it to have been caught in his teleport...");
+    case 12 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's...a fake beard?");
+        ~chatplayer("<p,neutral>What the...? You think he is in disguise somewhere?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I've seen this design of beard before... But I cannot remember where...");
+    case 13 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... a cloak?");
+        ~chatplayer("<p,neutral>Very stylish, but it doesn't seem to be his colour.");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I don't think he would have been wearing it... But he might be nearby somewhere that sells this type of cloak.");
+    case 14 :
+        if ($clue = fur) {
+            ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... fur?");
+            ~chatplayer("<p,neutral>Fur? How does that help us find him?");
+            ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, this is not fur directly from an animal, look it has been prepared for sale...");
+        }
+    case 15 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... a worm?");
+        ~chatplayer("<p,neutral>Maybe he's doing a little fishing?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>No, this is a very specific worm that is only found in one place...");
+    case 16 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's...a wizard hat?");
+        ~chatplayer("<p,neutral>So he is improving his dress sense you think?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I think it's more likely he happens to be in an area where there are many wizards around.");
+    case 17 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... ear muffs?");
+        ~chatplayer("<p,neutral>Why on gielinor would he be wearing those?");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, they are standard equipment for any slayer looking to kill Banshees...");
+    case 18 :
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It's... a toy horse?");
+        ~chatplayer("<p,neutral>What a weird thing to be carrying...");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well <displayname>, bear in mind that it might just be an object that as in the vicinity rather than something he was carrying...");
+}
+
+[opnpc1,wanted_solus_fake_woman_base_config]
+if (%npc_attacking_uid ! uid | %wanted_main ! ^wanted_chase | ~wanted_chase_target ! 11) return;
+if (inv_freespace(inv) = 0) return;
+~chatnpc("<p,neutral>Oh thank you, you have freed me!");
+~chatplayer("<p,neutral>W-what? Who are you?");
+~chatnpc("<p,neutral>Oh, I am but a poor maiden kidnapped by the evil Solus!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral><displayname>, I am getting some strange readings from this 'maiden'...");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,laugh>Muhahaha! Sucker!");
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! 11) return;
+npc_del;
+anim(wanted_human_injured_cutscene, 0);
+~wanted_chase_next(11);
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Sorry <displayname>, I should have spotted his little trick earlier...");
+
+[proc,wanted_mine_confrontation]
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>There he is!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Okay, I've blocked all exits from this place except for Temple Knight teleports...");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>Argh! I am so sick of your interference!");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>I think it is time we end this once and for all!");
+~chatplayer("<p,neutral>In the name of the White Knights of Falador, and of the Temple Knights of Saradomin, I am placing you under arrest!");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,neutral>You and what army?");
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) return;
+// UNKNOWN count and placement. Spawn only on the player's reachable floor tile.
+def_int $rangers = 0;
+while ($rangers < ^wanted_ranger_count) {
+    npc_add(coord, wanted_white_ranger, ^wanted_ranger_lifetime);
+    %npc_attacking_uid = uid;
+    spotanim_npc(ice_barrage_impact, 0, 0);
+    $rangers = add($rangers, 1);
+}
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>This one, Solus!");
+~chatnpc_specific("Solus Dellagar", wanted_solus, "<p,angry>You'll never take me alive!");
+npc_findall(coord, wanted_white_ranger, ^wanted_ranger_cleanup_radius, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) npc_del;
+}
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral><displayname>, Solus is very weakened, and we don't have any more fighters to spare!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Take him out now! This might be your only chance!");
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) return;
+npc_add(coord, wanted_solus_attackable, ^wanted_actor_lifetime);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+npc_settimer(^wanted_actor_timer);
+npc_say("YOU DIE NOW!");
+npc_setmode(opplayer2);
+
+[ai_timer,wanted_solus] @wanted_combat_timer;
+[ai_timer,wanted_summoned_black_knight] @wanted_combat_timer;
+[ai_timer,wanted_solus_attackable] @wanted_combat_timer;
+[ai_timer,wanted_solus_fake_woman_base_config] @wanted_combat_timer;
+[label,wanted_combat_timer]
+if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
+if (%wanted_main ! ^wanted_chase | distance(coord, npc_coord) > ^wanted_actor_distance) { npc_del; return; }
+if (npc_type = wanted_solus_attackable) {
+    if (~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) npc_del;
+} else if (~wanted_chase_target ! %npc_int) npc_del;
+
+[ai_queue1,wanted_summoned_black_knight] @wanted_combat_retaliate;
+[ai_queue1,wanted_solus_attackable] @wanted_combat_retaliate;
+[label,wanted_combat_retaliate]
+if (%npc_aggressive_player = %npc_attacking_uid) ~npc_default_retaliate;
+
+[ai_queue2,wanted_summoned_black_knight] @wanted_combat_damage;
+[ai_queue2,wanted_solus_attackable] @wanted_combat_damage;
+[label,wanted_combat_damage]
+if (%npc_aggressive_player ! %npc_attacking_uid) { npc_damage(^hitmark_block, 0); return; }
+~npc_default_damage(last_int);
+
+[ai_queue3,wanted_summoned_black_knight]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid) queue(wanted_knight_defeated, 0, %npc_int);
+}
+~npc_death;
+
+[queue,wanted_knight_defeated](int $mission)
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! $mission | ~wanted_chase_count ! ^wanted_knight_after_scans | ~wanted_chase_near($mission) = false) return;
+// A full inventory cannot lose progress: the next Scan can repeat the fight.
+~wanted_chase_next($mission);
+
+[ai_queue3,wanted_solus_attackable]
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid) queue(wanted_solus_defeated, 0, 0);
+}
+~npc_death;
+
+[queue,wanted_solus_defeated]
+if (%wanted_main ! ^wanted_chase | ~wanted_chase_target ! 19 | ~wanted_chase_near(19) = false) return;
+%wanted_main = ^wanted_solus_defeated;
+%wanted_mission19complete = 1;
+~wanted_update_progress;
+if (inv_freespace(inv) > 0) inv_add(inv, wanted_solus_trophy, 1);
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Now that Solus is defeated you should take his hat to Sir Amik to prove that you were responsible.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>VERY well done, <displayname>. Very well done indeed.");

@@ -1,0 +1,175 @@
+// UNKNOWN product mapping of the original mission pairs; no new saved fields.
+// Period guides give places, not precise tiles. Centres/radius are engineering values.
+[proc,wanted_chase_coord](int $mission)(coord)
+switch_int ($mission) {
+    case 1 : return(0_54_54_48_30);
+    case 2 : return(1_38_54_33_39);
+    case 3 : return(0_49_52_55_34);
+    case 4 : return(0_39_48_53_21);
+    case 5 : return(0_45_49_33_29);
+    case 6 : return(0_43_49_44_19);
+    case 7 : return(0_38_50_7_25);
+    case 8 : return(0_38_48_10_18);
+    case 9 : return(0_50_149_20_24);
+    case 10 : return(0_46_54_11_49);
+    case 11 : return(0_51_150_37_5);
+    case 12 : return(0_51_50_36_11);
+    case 13 : return(0_40_57_60_22);
+    case 14 : return(0_41_51_38_39);
+    case 15 : return(0_41_54_29_24);
+    case 16 : return(0_48_49_36_26);
+    case 17 : return(0_53_55_31_30);
+    case 18 : return(0_48_50_9_52);
+    case 19 : return(0_45_75_32_33);
+}
+return(null);
+
+[proc,wanted_chase_clue](int $mission)(namedobj)
+switch_int ($mission) {
+    case 2 : return(gnome_hat_cream);
+    case 3 : return(blue_cape);
+    case 4 : return(greenmans_ale);
+    case 5 : return(banana);
+    case 6 : return(eye_patch);
+    case 7 : return(blessedsnake);
+    case 8 : return(castlewars_ticket);
+    case 9 : return(giant_frog_legs);
+    case 10 : return(goblin_armour);
+    case 11 : return(cave_goblin_bone_spear);
+    case 12 : return(feud_karidian_fakebeard);
+    case 13 : return(viking_cloak_grey);
+    case 14 : if (random(2) = 0) return(cake); return(fur);
+    case 15 : return(red_vine_worm);
+    case 16 : return(bluewizhat);
+    case 17 : return(slayer_earmuffs);
+    case 18 : return(horsey_grey);
+    case 19 : return(blankrune);
+}
+return(null);
+
+[proc,wanted_chase_target]()(int)
+if (%wanted_mission1 = 1) return(1);
+if (%wanted_mission2 = 1) return(2);
+if (%wanted_mission3 = 1) return(3);
+if (%wanted_mission4 = 1) return(4);
+if (%wanted_mission5 = 1) return(5);
+if (%wanted_mission6 = 1) return(6);
+if (%wanted_mission7 = 1) return(7);
+if (%wanted_mission8 = 1) return(8);
+if (%wanted_mission9 = 1) return(9);
+if (%wanted_mission10 = 1) return(10);
+if (%wanted_mission11 = 1) return(11);
+if (%wanted_mission12 = 1) return(12);
+if (%wanted_mission13 = 1) return(13);
+if (%wanted_mission14 = 1) return(14);
+if (%wanted_mission15 = 1) return(15);
+if (%wanted_mission16 = 1) return(16);
+if (%wanted_mission17 = 1) return(17);
+if (%wanted_mission18 = 1) return(18);
+if (%wanted_mission19 = 1) return(19);
+return(1);
+
+[proc,wanted_chase_done](int $mission)(int)
+switch_int ($mission) {
+    case 1 : return(%wanted_mission1complete);
+    case 2 : return(%wanted_mission2complete);
+    case 3 : return(%wanted_mission3complete);
+    case 4 : return(%wanted_mission4complete);
+    case 5 : return(%wanted_mission5complete);
+    case 6 : return(%wanted_mission6complete);
+    case 7 : return(%wanted_mission7complete);
+    case 8 : return(%wanted_mission8complete);
+    case 9 : return(%wanted_mission9complete);
+    case 10 : return(%wanted_mission10complete);
+    case 11 : return(%wanted_mission11complete);
+    case 12 : return(%wanted_mission12complete);
+    case 13 : return(%wanted_mission13complete);
+    case 14 : return(%wanted_mission14complete);
+    case 15 : return(%wanted_mission15complete);
+    case 16 : return(%wanted_mission16complete);
+    case 17 : return(%wanted_mission17complete);
+    case 18 : return(%wanted_mission18complete);
+    case 19 : return(%wanted_mission19complete);
+}
+return(0);
+
+[proc,wanted_chase_mark](int $mission)
+switch_int ($mission) {
+    case 1 : %wanted_mission1complete = 1;
+    case 2 : %wanted_mission2complete = 1;
+    case 3 : %wanted_mission3complete = 1;
+    case 4 : %wanted_mission4complete = 1;
+    case 5 : %wanted_mission5complete = 1;
+    case 6 : %wanted_mission6complete = 1;
+    case 7 : %wanted_mission7complete = 1;
+    case 8 : %wanted_mission8complete = 1;
+    case 9 : %wanted_mission9complete = 1;
+    case 10 : %wanted_mission10complete = 1;
+    case 11 : %wanted_mission11complete = 1;
+    case 12 : %wanted_mission12complete = 1;
+    case 13 : %wanted_mission13complete = 1;
+    case 14 : %wanted_mission14complete = 1;
+    case 15 : %wanted_mission15complete = 1;
+    case 16 : %wanted_mission16complete = 1;
+    case 17 : %wanted_mission17complete = 1;
+    case 18 : %wanted_mission18complete = 1;
+    case 19 : %wanted_mission19complete = 1;
+}
+
+[proc,wanted_chase_select](int $mission)
+%wanted_mission1 = 0;
+%wanted_mission2 = 0;
+%wanted_mission3 = 0;
+%wanted_mission4 = 0;
+%wanted_mission5 = 0;
+%wanted_mission6 = 0;
+%wanted_mission7 = 0;
+%wanted_mission8 = 0;
+%wanted_mission9 = 0;
+%wanted_mission10 = 0;
+%wanted_mission11 = 0;
+%wanted_mission12 = 0;
+%wanted_mission13 = 0;
+%wanted_mission14 = 0;
+%wanted_mission15 = 0;
+%wanted_mission16 = 0;
+%wanted_mission17 = 0;
+%wanted_mission18 = 0;
+%wanted_mission19 = 0;
+switch_int ($mission) {
+    case 1 : %wanted_mission1 = 1;
+    case 2 : %wanted_mission2 = 1;
+    case 3 : %wanted_mission3 = 1;
+    case 4 : %wanted_mission4 = 1;
+    case 5 : %wanted_mission5 = 1;
+    case 6 : %wanted_mission6 = 1;
+    case 7 : %wanted_mission7 = 1;
+    case 8 : %wanted_mission8 = 1;
+    case 9 : %wanted_mission9 = 1;
+    case 10 : %wanted_mission10 = 1;
+    case 11 : %wanted_mission11 = 1;
+    case 12 : %wanted_mission12 = 1;
+    case 13 : %wanted_mission13 = 1;
+    case 14 : %wanted_mission14 = 1;
+    case 15 : %wanted_mission15 = 1;
+    case 16 : %wanted_mission16 = 1;
+    case 17 : %wanted_mission17 = 1;
+    case 18 : %wanted_mission18 = 1;
+    case 19 : %wanted_mission19 = 1;
+}
+
+[proc,wanted_chase_count]()(int)
+def_int $count = 0;
+def_int $mission = 1;
+while ($mission < 19) {
+    $count = add($count, ~wanted_chase_done($mission));
+    $mission = add($mission, 1);
+}
+return($count);
+
+[proc,wanted_chase_near](int $mission)(boolean)
+if ($mission = 19) return(inzone(0_45_75_0_0, 0_45_75_63_63, coord));
+def_coord $centre = ~wanted_chase_coord($mission);
+if (coordy(coord) ! coordy($centre)) return(false);
+if (distance(coord, $centre) <= ^wanted_scan_radius) return(true);
+return(false);

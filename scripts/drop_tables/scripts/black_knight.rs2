@@ -9,6 +9,9 @@ if (npc_findhero = ^true) {
         if (%wanted_main = ^wanted_intelligence_open) {
             %wanted_black_knight_dead = ^true;
         }
+        if (%wanted_main = ^wanted_complete) {
+            ~wanted_armoury_record_black_knight_kill;
+        }
     }
 } else {
     return;

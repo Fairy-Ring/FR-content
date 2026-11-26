@@ -1,0 +1,34 @@
+// Original 377 identities and client fields; quest-only ownership flags.
+[wanted_crystal_ball]
+name=Commorb
+desc=A Temple Knight Communication Orb. Top Secret!
+model=obj_wanted_crystal_ball
+manwear=obj_wanted_crystal_ball_manwear,0
+womanwear=obj_wanted_crystal_ball_manwear,0
+2dxof=1
+2dyof=-1
+2dzoom=740
+2dyan=2028
+2dxan=160
+ambient=20
+members=yes
+iop1=Scan
+iop2=Contact
+iop4=Playback
+weight=1g
+// UNKNOWN favourable quest-item policy.
+tradeable=no
+
+[wanted_solus_trophy]
+name=Solus's hat
+desc=Proof that I have defeated the evil mage Solus.
+model=obj_wanted_solus_trophy
+2dxof=2
+2dyof=-1
+2dzoom=810
+2dyan=268
+2dxan=144
+members=yes
+weight=1g
+// UNKNOWN favourable quest-item policy.
+tradeable=no

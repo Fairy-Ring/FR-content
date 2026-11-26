@@ -250,6 +250,7 @@ jobs:
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
+          run_test tests/wanted/test_wanted_closeout.mjs env NODE_XPRATE=1 node --import tsx ../content/tests/wanted/test_wanted_closeout.mjs
           run_test tests/feud/test_feud_start.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_start.mjs
           run_test tests/feud/test_feud_junk_sale.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_junk_sale.mjs
           run_test tests/feud/test_feud_trials.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_trials.mjs
