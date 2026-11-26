@@ -63,10 +63,13 @@ if (~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
 def_boolean $magic = false;
 if (~check_protect_prayer(^magic_style) = false & (npc_range(coord) > 1 | ~check_protect_prayer(^crush_style) = true)) $magic = true;
 if (npc_range(coord) > 1 & p_finduid(%agrith_owner) = true) {
-    // VERIFIED retreat teleport; UNKNOWN favourable adjacent landing on the
-    // original ritual floor. A compiled native-map path proves it is unblocked.
+    // VERIFIED pullback; UNKNOWN exact landing. The radius-two ring around
+    // this size-three boss's centre is adjacent to, but outside, its footprint.
+    def_coord $centre = movecoord(npc_coord, 1, 0, 1);
+    def_coord $landing = map_findsquare($centre, 2, 2, ^map_findsquare_lineofwalk);
+    if ($landing = $centre) return;
     mes("Agrith-Naar pulls you back towards him!");
-    p_telejump(2_42_76_32_36);
+    p_telejump($landing);
 }
 if ($magic = true) {
     ~npc_cast_spell_with_forced_max_hit(^fire_blast, npc_param(attackrate), ^agrith_magic_maxhit);
