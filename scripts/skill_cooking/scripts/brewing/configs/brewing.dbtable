@@ -1,0 +1,14 @@
+// Recipe order and state bands are the original 377 multiloc table.
+[brewing_recipe]
+column=number,int,INDEXED,REQUIRED
+column=ingredient,obj,INDEXED,REQUIRED
+column=amount,int
+column=level,int
+column=experience,int,int
+column=pint,namedobj,namedobj
+column=keg,namedobj,namedobj
+
+[brewing_drink]
+column=item,obj,INDEXED,REQUIRED
+column=effect,obj
+column=next,namedobj

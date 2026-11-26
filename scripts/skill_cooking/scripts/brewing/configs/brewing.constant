@@ -1,0 +1,5 @@
+// CANDIDATE: OSRS Brewing, before The stuff (4 July 2006).
+^brewing_window_minutes = 640
+^brewing_ferment_windows = 3
+^brewing_bad_weight = 16
+^brewing_mature_weight = 6

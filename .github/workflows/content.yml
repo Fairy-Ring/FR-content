@@ -167,6 +167,7 @@ jobs:
           run_test tests/pest-control/test_pest_control.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/pest-control/test_pest_control.mjs
           run_test tests/giant-dwarf/test_giant_dwarf.mjs node --import tsx ../content/tests/giant-dwarf/test_giant_dwarf.mjs
           run_test tests/forgettable-tale/test_forgettable_tale.mjs node --import tsx ../content/tests/forgettable-tale/test_forgettable_tale.mjs
+          run_test tests/brewing/test_brewing.mjs node --import tsx ../content/tests/brewing/test_brewing.mjs
           run_test tests/cabin-fever/test_cabin_fever.mjs node --import tsx ../content/tests/cabin-fever/test_cabin_fever.mjs
           run_test tests/hand-in-the-sand/test_hand_in_the_sand.mjs node --import tsx ../content/tests/hand-in-the-sand/test_hand_in_the_sand.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs

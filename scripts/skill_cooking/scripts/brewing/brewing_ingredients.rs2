@@ -1,0 +1,71 @@
+// UNKNOWN: functional feedback is not recovered period wording.
+[proc,brewing_cook_ingredient](obj $used)(boolean)
+if ($used ! barley) return(false);
+if (lc_category(loc_type) ! cooking_oven) {
+    mes("Barley must be roasted on a range.");
+    return(true);
+}
+anim(human_potterywheel, 0);
+inv_changeslot(inv, barley, barley_malt, 1);
+// UNKNOWN favourable roasting reward: one Cooking XP; the period guide is silent.
+stat_advance(cooking, 10);
+mes("You roast the barley into barley malt.");
+return(true);
+
+[opheldu,calquat_fruit]
+if (last_useitem ! knife) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@brewing_hollow_calquat;
+
+[label,brewing_hollow_calquat]
+// Both native item-use orientations reach this label with different slots.
+if (last_item = calquat_fruit) inv_setslot(inv, last_slot, calquat_fruit_keg_empty, 1);
+else inv_setslot(inv, last_useslot, calquat_fruit_keg_empty, 1);
+mes("You hollow out the calquat fruit to make a keg.");
+
+[oplocu,farming_applebarrel_empty] @brewing_crush_apples;
+[oplocu,farming_applebarrel_mush] @brewing_crush_apples;
+[oplocu,farming_applebarrel_tap] @brewing_crush_apples;
+
+[label,brewing_crush_apples]
+def_obj $used = last_useitem;
+p_arrivedelay;
+if ($used ! cooking_apple & $used ! bucket_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// UNKNOWN favourable choreography: crush a complete bucket in one interaction,
+// retaining the apples until an empty bucket is present, rather than losing them.
+if (inv_total(inv, cooking_apple) < 4 | inv_total(inv, bucket_empty) < 1) {
+    mes("You need four cooking apples and an empty bucket.");
+    return;
+}
+inv_del(inv, cooking_apple, 4);
+inv_changeslot(inv, bucket_empty, apple_mush, 1);
+mes("You crush the apples and fill a bucket with apple mush.");
+
+[opheld4,apple_mush]
+inv_setslot(inv, last_slot, bucket_empty, 1);
+mes("You empty the bucket of apple mush.");
+
+[opnpc1,metarialus]
+if (~ahoy_can_speak = false) {
+    mes("You cannot understand the ghost.");
+    return;
+}
+// VERIFIED: Tip.It Cooking guide, 5 November 2005: five ecto-tokens and a pot.
+~chatnpc("<p,neutral>A pot of ale yeast costs 5 ecto-tokens.");
+if (~p_choice2("Buy ale yeast.", 1, "No thanks.", 2) = 2) return;
+if (inv_total(inv, pot_empty) < 1) {
+    mes("You need an empty pot.");
+    return;
+}
+if (inv_total(inv, ectotoken) < 5) {
+    mes("You need 5 ecto-tokens.");
+    return;
+}
+inv_del(inv, ectotoken, 5);
+inv_changeslot(inv, pot_empty, ale_yeast, 1);
+mes("You buy a pot of ale yeast.");
