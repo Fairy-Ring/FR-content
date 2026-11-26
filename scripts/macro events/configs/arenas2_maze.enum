@@ -1,0 +1,8 @@
+// CANDIDATE entrance choices from the cited finished 274 implementation.
+[macro_maze_entrances]
+inputtype=int
+outputtype=coord
+val=0,0_45_71_11_53
+val=1,0_45_71_53_53
+val=2,0_45_71_53_11
+val=3,0_45_71_11_11

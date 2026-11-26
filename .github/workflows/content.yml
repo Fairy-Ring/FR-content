@@ -399,6 +399,14 @@ jobs:
           run_test tests/random-events-u00/test_random_events_u00.mjs node --import tsx ../content/tests/random-events-u00/test_random_events_u00.mjs
           run_test tests/random-events-u01/test_random_events_u01.mjs node --import tsx ../content/tests/random-events-u01/test_random_events_u01.mjs
           run_test tests/random-events-overworld/test_random_events_overworld.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-overworld/test_random_events_overworld.mjs
+          run_test tests/random-events-arenas2/test_common.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_common.mjs
+          run_test tests/random-events-arenas2/test_free_world.mjs env NODE_MEMBERS=false node --import tsx ../content/tests/random-events-arenas2/test_free_world.mjs
+          run_test tests/random-events-arenas2/test_maze.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_maze.mjs
+          run_test tests/random-events-arenas2/test_maze_route.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_maze_route.mjs
+          run_test tests/random-events-arenas2/test_mime.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_mime.mjs
+          run_test tests/random-events-arenas2/test_pillory.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_pillory.mjs
+          run_test tests/random-events-arenas2/test_prison_pete.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_prison_pete.mjs
+          run_test tests/random-events-arenas2/test_quiz.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/random-events-arenas2/test_quiz.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test tests/multiform-guards/test_multiform_guards.mjs node --import tsx ../content/tests/multiform-guards/test_multiform_guards.mjs
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'

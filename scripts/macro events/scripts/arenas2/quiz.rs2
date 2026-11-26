@@ -1,0 +1,159 @@
+[proc,macro_quiz_start]
+if (~macro_arena_enter(^macro_quiz, 0_30_74_32_33, false) = false) return;
+anim(human_sitting_chair, 0);
+%macro_transmit = 0;
+%xplamp = 0;
+~macro_quiz_choose_question;
+
+[proc,macro_quiz_login]
+if (~macro_arena_active(^macro_quiz) = false) return;
+anim(human_sitting_chair, 0);
+if (%macro_transmit >= ^macro_quiz_round_count) {
+    %xplamp = ^macro_quiz_prize_sentinel;
+    ~macro_quiz_show_prize;
+    return;
+}
+~macro_quiz_show_question;
+
+[proc,macro_quiz_cleanup]
+anim(null, 0);
+if_close;
+
+[proc,macro_quiz_choose_question]
+if (~macro_arena_active(^macro_quiz) = false) return;
+def_int $odd_category = random(^macro_quiz_category_count);
+def_int $common_offset = random(^macro_quiz_common_category_offset_count);
+def_int $odd_variant = random(^macro_quiz_variant_count);
+def_int $common_first_variant = random(^macro_quiz_variant_count);
+def_int $common_second_variant = random(^macro_quiz_variant_count);
+def_int $question = multiply($odd_category, ^macro_quiz_odd_category_stride);
+$question = add($question, multiply($common_offset, ^macro_quiz_common_offset_stride));
+$question = add($question, multiply($odd_variant, ^macro_quiz_odd_variant_stride));
+$question = add($question, multiply($common_first_variant, ^macro_quiz_common_variant_stride));
+$question = add($question, $common_second_variant);
+%xplamp = add(multiply($question, ^macro_quiz_question_stride), random(^macro_quiz_answer_count));
+~macro_quiz_show_question;
+
+[proc,macro_quiz_show_question]
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (%macro_transmit >= ^macro_quiz_round_count) {
+    %xplamp = ^macro_quiz_prize_sentinel;
+    ~macro_quiz_show_prize;
+    return;
+}
+def_int $question = divide(%xplamp, ^macro_quiz_question_stride);
+def_int $correct = calc(%xplamp % ^macro_quiz_question_stride);
+def_int $odd_category = divide($question, ^macro_quiz_odd_category_stride);
+def_int $common_offset = calc(divide($question, ^macro_quiz_common_offset_stride) % ^macro_quiz_common_category_offset_count);
+def_int $common_category = $common_offset;
+if ($common_category >= $odd_category) $common_category = add($common_category, 1);
+def_int $odd_variant = calc(divide($question, ^macro_quiz_odd_variant_stride) % ^macro_quiz_variant_count);
+def_int $common_first_variant = calc(divide($question, ^macro_quiz_common_variant_stride) % ^macro_quiz_variant_count);
+def_int $common_second_variant = calc($question % ^macro_quiz_variant_count);
+def_int $common_seen = 0;
+def_int $slot = 0;
+while ($slot < ^macro_quiz_answer_count) {
+    def_int $category = $common_category;
+    def_int $variant = 0;
+    if ($slot = $correct) {
+        $category = $odd_category;
+        $variant = $odd_variant;
+    } else {
+        if ($common_seen = 0) $variant = $common_first_variant;
+        else $variant = $common_second_variant;
+        $common_seen = add($common_seen, 1);
+    }
+    def_int $model = enum(int, int, macro_quiz_item_models, add(multiply($category, ^macro_quiz_variant_count), $variant));
+    switch_int($slot) {
+        case 0 : if_setmodel(pick_the_odd_one_out:com_5, $model);
+        case 1 : if_setmodel(pick_the_odd_one_out:com_6, $model);
+        case 2 : if_setmodel(pick_the_odd_one_out:com_7, $model);
+    }
+    $slot = add($slot, 1);
+}
+if_sethide(pick_the_odd_one_out:com_5, ^false);
+if_sethide(pick_the_odd_one_out:com_6, ^false);
+if_sethide(pick_the_odd_one_out:com_7, ^false);
+// UNKNOWN functional prompt; the native interface supplies the screen layout.
+if_settext(pick_the_odd_one_out:com_8, "Pick the odd one out.");
+if_openchat(pick_the_odd_one_out);
+
+[proc,macro_quiz_show_prize]
+if (~macro_arena_active(^macro_quiz) = false) return;
+if_setobject(pick_the_odd_one_out:com_5, coins, 500);
+if_setobject(pick_the_odd_one_out:com_6, macro_quiz_mystery_box, 500);
+if_sethide(pick_the_odd_one_out:com_5, ^false);
+if_sethide(pick_the_odd_one_out:com_6, ^false);
+if_sethide(pick_the_odd_one_out:com_7, ^true);
+// UNKNOWN functional prompt; the prize choices are source-backed.
+if_settext(pick_the_odd_one_out:com_8, "Choose a prize.");
+if_openchat(pick_the_odd_one_out);
+
+[if_button,pick_the_odd_one_out:com_5] ~macro_quiz_button(0);
+[if_button,pick_the_odd_one_out:com_6] ~macro_quiz_button(1);
+[if_button,pick_the_odd_one_out:com_7] ~macro_quiz_button(2);
+
+[proc,macro_quiz_answer](int $choice)
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (%macro_transmit >= ^macro_quiz_round_count) return;
+if ($choice ! calc(%xplamp % ^macro_quiz_question_stride)) {
+    // UNKNOWN functional retry prompt; preserve the complete question identity.
+    if_settext(pick_the_odd_one_out:com_8, "Wrong. Try again.");
+    return;
+}
+%macro_transmit = add(%macro_transmit, 1);
+if (%macro_transmit >= ^macro_quiz_round_count) {
+    %xplamp = ^macro_quiz_prize_sentinel;
+    ~macro_quiz_show_prize;
+    return;
+}
+~macro_quiz_choose_question;
+
+[proc,macro_quiz_choose_cash]
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (%macro_transmit ! ^macro_quiz_round_count | %xplamp ! ^macro_quiz_prize_sentinel) return;
+if_close;
+~macro_arena_return(^macro_quiz);
+~macro_arena_reward(coins, ^macro_quiz_cash_reward);
+
+[proc,macro_quiz_choose_box]
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (%macro_transmit ! ^macro_quiz_round_count | %xplamp ! ^macro_quiz_prize_sentinel) return;
+if_close;
+~macro_arena_return(^macro_quiz);
+~macro_arena_reward(macro_quiz_mystery_box, 1);
+[proc,macro_quiz_button](int $choice)
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (%macro_transmit < ^macro_quiz_round_count) {
+    ~macro_quiz_answer($choice);
+    return;
+}
+if (%macro_transmit ! ^macro_quiz_round_count | %xplamp ! ^macro_quiz_prize_sentinel) return;
+if ($choice = 0) ~macro_quiz_choose_cash;
+else if ($choice = 1) ~macro_quiz_choose_box;
+
+
+[opheld1,macro_quiz_mystery_box]
+~macro_quiz_open_box;
+
+[proc,macro_quiz_open_box]
+if (inv_total(inv, macro_quiz_mystery_box) < 1) return;
+inv_del(inv, macro_quiz_mystery_box, 1);
+def_namedobj $reward = cabbage;
+def_int $amount = 1;
+switch_int(random(^macro_quiz_box_outcome_draw_bound)) {
+    case 0 : $reward = cabbage;
+    case 1 : $reward = steel_platebody;
+    case 2 : $reward = bucket_empty;
+    case 3 : $reward = flier;
+    case 4 : $reward = old_boot;
+    case 5 : {
+        $reward = naturerune;
+        $amount = ^macro_quiz_box_naturerune_amount;
+    }
+    case 6 : {
+        $reward = enum(int, namedobj, macro_quiz_box_gems, random(^macro_quiz_box_gem_draw_bound));
+        $amount = ^macro_quiz_box_gem_amount;
+    }
+}
+~macro_arena_reward($reward, $amount);

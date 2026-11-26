@@ -19,6 +19,8 @@ scope=perm
 [macro_transmit]
 transmit=yes
 scope=perm
+// UNKNOWN engineering access policy: owned Maze softtimer updates the native HUD through modals.
+protect=no
 
 [macro_candlelight_var]
 transmit=yes

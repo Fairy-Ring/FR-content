@@ -1,0 +1,17 @@
+// VERIFIED 377 model.pack ids for the four native balloon NPC models.
+[macro_prison_pete_balloon_models]
+inputtype=int
+outputtype=int
+val=0,10734
+val=1,10735
+val=2,10736
+val=3,10737
+
+// CANDIDATE source category: one noted uncut gem; exact species draw is UNKNOWN.
+[macro_prison_pete_reward_gems]
+inputtype=int
+outputtype=namedobj
+val=0,cert_uncut_sapphire
+val=1,cert_uncut_emerald
+val=2,cert_uncut_ruby
+val=3,cert_uncut_diamond

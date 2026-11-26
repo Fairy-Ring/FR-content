@@ -1,0 +1,25 @@
+// UNKNOWN historical round count; the assigned event contract requires four.
+^macro_quiz_round_count = 4
+// VERIFIED native cache: five categories with two model variants each.
+^macro_quiz_category_count = 5
+^macro_quiz_variant_count = 2
+^macro_quiz_answer_count = 3
+^macro_quiz_common_category_offset_count = 4
+// Internal xplamp serialization strides derived from the pool dimensions.
+^macro_quiz_common_variant_stride = 2
+^macro_quiz_odd_variant_stride = 4
+^macro_quiz_common_offset_stride = 8
+^macro_quiz_odd_category_stride = 32
+^macro_quiz_question_stride = 3
+// UNKNOWN internal prize-screen sentinel; not a historical value.
+^macro_quiz_prize_sentinel = 3
+// VERIFIED pre-target Zybez: Quiz Master choice is 1000gp or a box.
+^macro_quiz_cash_reward = 1000
+// UNKNOWN equal-weight draw over the source-backed box outcome union.
+^macro_quiz_box_outcome_draw_bound = 7
+// UNKNOWN engineering bound; uniform across the four selected uncut gems.
+^macro_quiz_box_gem_draw_bound = 4
+// UNKNOWN engineering quantity; one uncut gem is selected for the gem outcome.
+^macro_quiz_box_gem_amount = 1
+// CANDIDATE Aug 2006 source; nature-rune outcome is not pre-target evidence.
+^macro_quiz_box_naturerune_amount = 20

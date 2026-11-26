@@ -1,0 +1,136 @@
+[proc,macro_mime_start]
+if (~macro_arena_enter(^macro_mime, 1_31_74_30_28, true) = false) return;
+%xplamp = 0;
+~macro_mime_choose_action;
+~macro_mime_login;
+
+[proc,macro_mime_login]
+if (~macro_arena_active(^macro_mime) = false) return;
+if (npc_finduid(%macro_event_uid) = true) {
+    if (%npc_macro_event_target = uid) {
+        ~macro_mime_show_action;
+        return;
+    }
+}
+// UNKNOWN task actor lifetime: it remains until owned return/logout cleanup, not a ten-minute expiry.
+npc_add(1_31_74_23_28, macro_mime, ^max_32bit_int);
+%npc_macro_event_target = uid;
+%macro_event_uid = npc_uid;
+~macro_mime_show_action;
+
+[proc,macro_mime_cleanup]
+if (npc_finduid(%macro_event_uid) = true) {
+    if (%npc_macro_event_target = uid) npc_del;
+}
+%macro_event_uid = null;
+if_close;
+
+[proc,macro_mime_choose_action]
+%macro_transmit = random(enum_getoutputcount(macro_mime_actions));
+
+[proc,macro_mime_show_action]
+if (~macro_arena_active(^macro_mime) = false) return;
+if (npc_finduid(%macro_event_uid) = true) {
+    npc_anim(enum(int, seq, macro_mime_actions, %macro_transmit), 0);
+}
+if_openchat(macro_mime_emotes);
+
+[if_button,macro_mime_emotes:com_2] ~macro_mime_answer(0);
+[if_button,macro_mime_emotes:com_3] ~macro_mime_answer(1);
+[if_button,macro_mime_emotes:com_4] ~macro_mime_answer(2);
+[if_button,macro_mime_emotes:com_5] ~macro_mime_answer(3);
+[if_button,macro_mime_emotes:com_6] ~macro_mime_answer(4);
+[if_button,macro_mime_emotes:com_7] ~macro_mime_answer(5);
+[if_button,macro_mime_emotes:com_8] ~macro_mime_answer(6);
+[if_button,macro_mime_emotes:com_9] ~macro_mime_answer(7);
+
+[proc,macro_mime_answer](int $answer)
+if (~macro_arena_active(^macro_mime) = false) return;
+if ($answer ! %macro_transmit) {
+    if_close;
+    %xplamp = 0;
+    ~macro_mime_choose_action;
+    ~macro_mime_show_action;
+    return;
+}
+if_close;
+p_stopaction;
+anim(enum(int, seq, macro_mime_actions, $answer), 20);
+p_delay(^macro_mime_action_ticks);
+%xplamp = add(%xplamp, 1);
+if (%xplamp >= ^macro_mime_steps) {
+    if (~macro_arena_active(^macro_mime) = false) return;
+    ~macro_arena_return(^macro_mime);
+    ~macro_mime_reward;
+    return;
+}
+// A resumed delayed script closes its chat on return. Open the next prompt
+// from the ordinary queue after that completion boundary.
+queue*(macro_mime_prompt, 0)();
+
+[queue,macro_mime_prompt]
+if (~macro_arena_active(^macro_mime) = false) return;
+~macro_mime_choose_action;
+~macro_mime_show_action;
+
+[proc,macro_mime_item_owned](namedobj $item)(boolean)
+if (inv_total(inv, $item) > 0 | inv_total(worn, $item) > 0 | inv_total(bank, $item) > 0) return(true);
+return(false);
+
+[proc,macro_mime_group_missing](int $group)(boolean)
+def_boolean $missing = false;
+switch_int($group) {
+    case 0 : if (%emote_glasswall = ^false) $missing = true;
+    case 1 : if (%emote_glassbox = ^false) $missing = true;
+    case 2 : if (%emote_lean = ^false) $missing = true;
+    case 3 : if (%emote_climbrope = ^false) $missing = true;
+    case 4 : if (~macro_mime_item_owned(macro_mime_mask) = false) $missing = true;
+    case 5 : {
+        if (~macro_mime_item_owned(macro_mime_top) = false | ~macro_mime_item_owned(macro_mime_boots) = false) $missing = true;
+    }
+    case 6 : {
+        if (~macro_mime_item_owned(macro_mime_gloves) = false | ~macro_mime_item_owned(macro_mime_legs) = false) $missing = true;
+    }
+}
+return($missing);
+
+[proc,macro_mime_reward]
+def_int $available = 0;
+def_int $group = 0;
+while ($group < ^macro_mime_reward_group_count) {
+    if (~macro_mime_group_missing($group) = true) $available = add($available, 1);
+    $group = add($group, 1);
+}
+if ($available = 0) {
+    ~macro_arena_reward(coins, 500);
+    return;
+}
+def_int $pick = random($available);
+$group = 0;
+while ($group < ^macro_mime_reward_group_count) {
+    if (~macro_mime_group_missing($group) = true) {
+        if ($pick = 0) {
+            ~macro_mime_grant_group($group);
+            return;
+        }
+        $pick = sub($pick, 1);
+    }
+    $group = add($group, 1);
+}
+
+[proc,macro_mime_grant_group](int $group)
+switch_int($group) {
+    case 0 : %emote_glasswall = ^true;
+    case 1 : %emote_glassbox = ^true;
+    case 2 : %emote_lean = ^true;
+    case 3 : %emote_climbrope = ^true;
+    case 4 : ~macro_arena_reward(macro_mime_mask, 1);
+    case 5 : {
+        if (~macro_mime_item_owned(macro_mime_top) = false) ~macro_arena_reward(macro_mime_top, 1);
+        if (~macro_mime_item_owned(macro_mime_boots) = false) ~macro_arena_reward(macro_mime_boots, 1);
+    }
+    case 6 : {
+        if (~macro_mime_item_owned(macro_mime_gloves) = false) ~macro_arena_reward(macro_mime_gloves, 1);
+        if (~macro_mime_item_owned(macro_mime_legs) = false) ~macro_arena_reward(macro_mime_legs, 1);
+    }
+}

@@ -1,0 +1,190 @@
+[proc,macro_maze_start]
+def_coord $destination = enum(int, coord, macro_maze_entrances, random(enum_getoutputcount(macro_maze_entrances)));
+if (~macro_arena_enter(^macro_maze, $destination, true) = false) return;
+%macro_transmit = 100;
+%xplamp = 100;
+%macro_arena_clock = map_clock;
+clearsofttimer(macro_maze_decay);
+softtimer(macro_maze_decay, ^macro_maze_decay_ticks);
+cleartimer(macro_maze_display);
+settimer(macro_maze_display, ^macro_maze_decay_ticks);
+if_openoverlay(mazetimer);
+
+[proc,macro_maze_login]
+if (~macro_arena_active(^macro_maze) = false) return;
+%macro_arena_clock = map_clock;
+%xplamp = %macro_transmit;
+clearsofttimer(macro_maze_decay);
+cleartimer(macro_maze_display);
+if (%macro_transmit > 0) {
+    softtimer(macro_maze_decay, ^macro_maze_decay_ticks);
+    settimer(macro_maze_display, ^macro_maze_decay_ticks);
+}
+if_openoverlay(mazetimer);
+
+[proc,macro_maze_logout]
+if (%macro_event = ^macro_maze) ~macro_maze_apply_elapsed;
+clearsofttimer(macro_maze_decay);
+cleartimer(macro_maze_display);
+
+[proc,macro_maze_cleanup]
+clearsofttimer(macro_maze_decay);
+cleartimer(macro_maze_display);
+if_openoverlay(null);
+
+[proc,macro_maze_apply_elapsed]
+if (%macro_event ! ^macro_maze) return;
+if (~macro_arena_active(^macro_maze) = false) return;
+def_int $elapsed = sub(map_clock, %macro_arena_clock);
+if ($elapsed < ^macro_maze_decay_ticks) return;
+def_int $decay = divide($elapsed, ^macro_maze_decay_ticks);
+%macro_transmit = max(0, sub(%macro_transmit, $decay));
+%macro_arena_clock = add(%macro_arena_clock, multiply($decay, ^macro_maze_decay_ticks));
+
+[proc,macro_maze_refresh]
+if (~macro_arena_active(^macro_maze) = false) return;
+~macro_maze_apply_elapsed;
+%xplamp = %macro_transmit;
+
+[softtimer,macro_maze_decay]
+if (%macro_event ! ^macro_maze | ~macro_arena_active(^macro_maze) = false) {
+    clearsofttimer(macro_maze_decay);
+    return;
+}
+~macro_maze_apply_elapsed;
+if (%macro_transmit > 0) softtimer(macro_maze_decay, ^macro_maze_decay_ticks);
+else clearsofttimer(macro_maze_decay);
+
+[timer,macro_maze_display]
+if (%macro_event ! ^macro_maze | ~macro_arena_active(^macro_maze) = false) {
+    cleartimer(macro_maze_display);
+    return;
+}
+~macro_maze_refresh;
+if (%macro_transmit > 0) settimer(macro_maze_display, ^macro_maze_decay_ticks);
+else cleartimer(macro_maze_display);
+
+[oploc1,macro_maze_wallhigh]
+if (~macro_arena_active(^macro_maze) = false) return;
+p_arrivedelay;
+~macro_maze_refresh;
+~mesbox("I can't open that.");
+
+[oploc1,_macro_maze_wall_door]
+if (~macro_arena_active(^macro_maze) = false) return;
+p_arrivedelay;
+p_walk(loc_coord);
+~macro_maze_refresh;
+def_int $door_entry_side = loc_param(approach_direction);
+def_boolean $player_side = ~check_axis(coord, loc_coord, loc_angle);
+def_boolean $should_open = false;
+if ($door_entry_side = 0) {
+    $should_open = true;
+} else if ($door_entry_side = 1 & $player_side = true) {
+    $should_open = true;
+} else if ($door_entry_side = 2 & $player_side = false) {
+    $should_open = true;
+}
+if ($should_open = true) ~open_and_close_door(macro_maze_wallinactive, $player_side, false);
+else ~mesbox("I don't think that's the right way.");
+
+[oploc1,macro_maze_chest]
+~macro_maze_open_chest(macro_maze_chestempty);
+
+[oploc1,macro_maze_chestempty]
+if (~macro_arena_active(^macro_maze) = false) return;
+p_arrivedelay;
+~macro_maze_refresh;
+~mesbox("Awww, it's empty!");
+
+[proc,macro_maze_open_chest](loc $other_chest)
+if (~macro_arena_active(^macro_maze) = false) return;
+p_arrivedelay;
+~macro_maze_refresh;
+anim(human_openchest, 0);
+sound_synth(chest_open, 1, 0);
+p_delay(0);
+~macro_maze_refresh;
+loc_change($other_chest, ^macro_maze_chest_ticks);
+~macro_maze_calculate_chest_loot;
+
+[proc,macro_maze_calculate_chest_loot]
+if (~macro_arena_active(^macro_maze) = false) return;
+~macro_maze_refresh;
+if (%macro_transmit <= 0) {
+    ~mesbox("Awww, it's empty!");
+    return;
+}
+def_int $roll;
+if (map_members() = ^false) $roll = random(8);
+else $roll = random(10);
+switch_int($roll) {
+    case 0 : ~macro_maze_give_chest_loot(airrune, 15, "You've found some air runes!", 0);
+    case 1 : ~macro_maze_give_chest_loot(waterrune, 10, "You've found some water runes!", 0);
+    case 2 : ~macro_maze_give_chest_loot(earthrune, 10, "You've found some earth runes!", 0);
+    case 3 : ~macro_maze_give_chest_loot(firerune, 10, "You've found some fire runes!", 0);
+    case 4 : ~macro_maze_give_chest_loot(bronze_arrow, 20, "You've found some bronze arrows!", 0);
+    case 5 : ~macro_maze_give_chest_loot(bolt, 10, "You've found some bolts!", ^objbox_height);
+    case 6 : ~macro_maze_give_chest_loot(iron_arrow, 15, "You've found some iron arrows!", 0);
+    case 7 : ~macro_maze_give_chest_loot(2dose1strength, 1, "You've found a strength potion!", ^objbox_height);
+    case 8 : ~macro_maze_give_chest_loot(2dose1attack, 1, "You've found an attack potion!", ^objbox_height);
+    case 9 : ~macro_maze_give_chest_loot(2dose1defense, 1, "You've found a defence potion!", ^objbox_height);
+}
+
+[proc,macro_maze_give_chest_loot](namedobj $item, int $qty, string $text, int $y_offset)
+~macro_arena_reward($item, $qty);
+~objbox($item, $text, 200, 0, $y_offset);
+
+[oploc1,macro_maze_complete]
+if (~macro_arena_active(^macro_maze) = false) return;
+p_arrivedelay;
+~macro_maze_refresh;
+~music_jingle("maze centre");
+anim(emote_cheer, 20);
+p_delay(5);
+~macro_maze_refresh;
+def_int $potential = %macro_transmit;
+def_int $total_level = ~macro_maze_total_level;
+~macro_arena_return(^macro_maze);
+if ($potential > 0) ~macro_maze_give_reward($total_level, $potential);
+
+[proc,macro_maze_give_reward](int $total_level, int $potential)
+if ($potential <= 0) return;
+def_int $i = 0;
+while ($i < 3) {
+    ~macro_maze_calc_reward($total_level, $potential);
+    $i = add($i, 1);
+}
+if (random(100) < ^macro_maze_extra_item_policy) ~macro_maze_calc_reward($total_level, $potential);
+
+[proc,macro_maze_calc_reward](int $total_level, int $potential)
+def_int $roll = random(9);
+def_int $divisor;
+def_namedobj $reward_type;
+switch_int($roll) {
+    case 0 : { $reward_type = coins; $divisor = 1; }
+    case 1 : { $reward_type = feather; $divisor = 2; }
+    case 2 : { $reward_type = iron_arrow; $divisor = 3; }
+    case 3 : { $reward_type = chaosrune; $divisor = 9; }
+    case 4 : { $reward_type = steel_arrow; $divisor = 12; }
+    case 5 : { $reward_type = deathrune; $divisor = 18; }
+    case 6 : { $reward_type = cert_coal; $divisor = 45; }
+    case 7 : { $reward_type = cert_mithril_ore; $divisor = 162; }
+    case 8 : { $reward_type = naturerune; $divisor = 180; }
+}
+def_int $numerator = multiply(multiply($total_level, $potential), 10);
+def_int $denominator = multiply(multiply(3, $divisor), 100);
+def_int $qty = divide($numerator, $denominator);
+if ($qty < 1) $qty = 1;
+~macro_arena_reward($reward_type, $qty);
+
+[proc,macro_maze_total_level]()(int)
+def_int $i = 1;
+def_int $total = 0;
+def_stat $stat;
+while ($i <= enum_getoutputcount(stats)) {
+    $stat = enum(int, stat, stats, $i);
+    $total = add($total, stat_base($stat));
+    $i = add($i, 1);
+}
+return($total);

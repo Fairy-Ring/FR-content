@@ -55,6 +55,11 @@ switch_int ($event) {
     case 25 : return("frogs");
     case 26 : return("certers");
     case 27 : return("sandwich-lady");
+    case 28 : return("maze");
+    case 29 : return("mime");
+    case 30 : return("pillory");
+    case 31 : return("prison-pete");
+    case 32 : return("quiz-master");
 }
 return("");
 
@@ -65,6 +70,16 @@ if (~macro_event_allowed = false) {
 }
 if (p_finduid(uid) = false) {
     mes("[staff fixture] Refused: player unavailable.");
+    return;
+}
+if ($event >= 28 & $event <= 32) {
+    if (~macro_arena_allowed = false) {
+        mes("[staff fixture] Refused: arena world or recent combat.");
+        return;
+    }
+    if_close;
+    mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+    ~macro_event_general_spawn(sub($event, 8));
     return;
 }
 if ($event >= 21 & $event <= 27) {
