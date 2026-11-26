@@ -37,8 +37,9 @@ if (%garden_king_statue_varbit = 1) { %garden_king_statue_varbit = 0; }
 clearsofttimer(garden_trolley_watch);
 
 [oplocu,garden_saradomin_statue]
+if (last_useitem ! garden_trolley_obj) { return; }
 p_arrivedelay;
-if (last_useitem ! garden_trolley_obj | %garden_quest < 1 | %garden_quest >= 50) { return; }
+if (%garden_quest < 1 | %garden_quest >= 50) { return; }
 if (%garden_saradomin_statue_varbit ! 0) { return; }
 ~garden_trolley_recover;
 if (%garden_trolley_uid ! null) { return; }
@@ -53,8 +54,9 @@ if (%garden_cutscene_billybob = 0) {
 return;
 
 [oplocu,statue_lumbridge]
+if (last_useitem ! garden_trolley_obj) { return; }
 p_arrivedelay;
-if (last_useitem ! garden_trolley_obj | %garden_quest < 1 | %garden_quest >= 50) { return; }
+if (%garden_quest < 1 | %garden_quest >= 50) { return; }
 if (%garden_king_statue_varbit ! 0) { return; }
 ~garden_trolley_recover;
 if (%garden_trolley_uid ! null) { return; }
