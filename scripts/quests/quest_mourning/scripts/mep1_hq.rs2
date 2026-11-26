@@ -31,7 +31,7 @@ p_teleport(^mep1_surface);
 [oploc1,mourner_hideout_door2] ~open_and_close_door2(mourner_hideout_door2_open, ~check_axis_locactive(coord), door_open);
 [oploc1,mourner_hideout_door4]
 // Only inward excavation access is gated. A player may always leave the cavern.
-if (coordx(coord) > coordx(loc_coord) & ~mep2_hq_access = false) {
+if (coordx(coord) >= coordx(loc_coord) & ~mep2_hq_access = false) {
     // UNKNOWN functional locked-door wording.
     mes("The door is locked.");
     return;
