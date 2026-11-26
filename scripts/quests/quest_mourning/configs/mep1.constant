@@ -12,3 +12,5 @@
 ^mep1_surface = 0_39_51_46_62
 // UNKNOWN minimum damage satisfying the period RuneHQ warning "over 50".
 ^mep1_fire_damage = 51
+// UNKNOWN favourable duration for the period guide's "a few minutes".
+^mep1_oronwen_minutes = 2
