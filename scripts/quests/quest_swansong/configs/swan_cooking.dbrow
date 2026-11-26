@@ -1,4 +1,4 @@
-// VERIFIED Cooking requirement: 62. CANDIDATE XP: 150 per monkfish (2007 base).
+// VERIFIED quest-level Cooking requirement from the guide: 62. CANDIDATE XP: 150 (2007 base).
 // UNKNOWN burn curve: reuse the local level-60 cooking success band.
 [swan_monkfish_cooking]
 table=cooking_generic

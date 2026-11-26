@@ -282,11 +282,25 @@ talk(p, 'wise_old_man'); assert.equal(stage(p), 30);
 for (const name of ['bloodrune', 'lavarune', 'mistrune']) assert.equal(count(p, name), 0);
 talk(p, 'wom_cutscene_2', [1]); assert.equal(stage(p), 30);
 
+const checkedTrollMaxHits = new Set();
 function nativeBattle(p, n) {
   approach(p, n); showNpc(p, n);
   const oldRandom = Math.random, oldJava = JavaRandom.nextDouble;
-  Math.random = () => 0.999999999999; JavaRandom.nextDouble = () => 0.999999999999;
   try {
+    const name = types.NpcType.get(n.type).debugname;
+    const expectedMaxHit = name === 'swan_troll_ambush' ? 7 : name === 'swan_troll_fishing_1' ? 6 : null;
+    if (expectedMaxHit !== null && !checkedTrollMaxHits.has(name)) {
+      const queued = new Set(p.queue.all()), draws = [0.999999, 0, 0.999999];
+      let draw = 0;
+      const random = () => { assert(draw < draws.length, 'native troll attack has no unplanned random draws'); return draws[draw++]; };
+      Math.random = random; JavaRandom.nextDouble = random;
+      runNpc(n, 'AI_OPPLAYER2');
+      assert.equal(draw, draws.length, 'native troll attack rolls accuracy and maximum damage');
+      const hit = [...p.queue.all()].find(q => !queued.has(q) && q.script.name === '[queue,combat_damage_player]');
+      assert.equal(hit?.args[0], expectedMaxHit, `${name}: compiled maximum matches the pinned Sea troll capture`);
+      checkedTrollMaxHits.add(name);
+    }
+    Math.random = () => 0.999999999999; JavaRandom.nextDouble = () => 0.999999999999;
     assert(OpNpcHandler.handle(new OpNpc(2, n.nid), p), 'real Attack packet accepts the owned opponent');
     assert.match(p.getOpTrigger()?.name ?? '', /^\[opnpc2,swan_/);
     assert(p.canAccess(), 'native dialogue handling releases input before battle');
@@ -406,6 +420,7 @@ assert(finalQueen && types.NpcType.get(finalQueen.type).debugname === 'swan_seat
 routeOut(p, p => p.x < 2343 && p.z >= 3694 && p.z <= 3702, { x: 2340, z: 3698 });
 nativeBattle(p, finalQueen); assert.equal(stage(p), 180);
 const rewardBefore = { coins: count(p, 'coins'), xp: [...p.stats], qp: variable(p, 'qp') };
+const rewardPacketStart = p.packets.length;
 talk(p, 'swan_herman'); assert.equal(stage(p), 200);
 assert.equal(count(p, 'coins') - rewardBefore.coins, 25000);
 for (const [skill, amount] of [[PlayerStat.MAGIC, 150000], [PlayerStat.PRAYER, 100000], [PlayerStat.FISHING, 100000]]) {
@@ -414,6 +429,11 @@ for (const [skill, amount] of [[PlayerStat.MAGIC, 150000], [PlayerStat.PRAYER, 1
 assert.equal(variable(p, 'qp') - rewardBefore.qp, 2);
 assert.equal(p.modalMain, id('Component', 'questscroll_death'), 'the real completion scroll opens');
 assert(text(p).includes('You have completed Swan Song!'));
+const rewardRows = Array.from({ length: 5 }, (_, row) => id('Component', `questscroll_death:com_${10 + row}`));
+const rewardLines = p.packets.slice(rewardPacketStart).filter(packet => packet.constructor.name === 'IfSetText' && rewardRows.includes(packet.component)).map(packet => packet.text);
+assert.equal(rewardLines.length, 5, 'the native completion scroll has exactly five reward lines');
+assert.deepEqual(rewardLines, ['15,000 Magic XP', '10,000 Prayer/Fishing XP', '25,000 coins', 'Access to the Piscatoris', 'Fishing Colony']);
+assert(rewardLines.join(' ').includes('Access to the Piscatoris Fishing Colony'), 'colony access is not truncated by the native text splitter');
 const rewardAfter = { coins: count(p, 'coins'), xp: [...p.stats], qp: variable(p, 'qp') };
 talk(p, 'swan_herman');
 assert.deepEqual({ coins: count(p, 'coins'), xp: [...p.stats], qp: variable(p, 'qp') }, rewardAfter, 'repeated completion cannot duplicate coins, XP or quest points');
@@ -723,5 +743,6 @@ for (let i = 0; i < types.VarBitType.count; i++) {
   assert.equal(count(q, 'raw_monkfish'), 0); assert.equal(count(q, 'monkfish'), 1, 'tradeable monkfish cook through the ordinary skill outside Piscatoris');
 }
 
+assert.deepEqual([...checkedTrollMaxHits].sort(), ['swan_troll_ambush', 'swan_troll_fishing_1'], 'both reviewed troll maximum hits were exercised natively');
 console.log('PASS Swan Song: native end-to-end progression, original-map routes, rewards, ownership, recovery, skills and post-quest services');
 process.exit(0);

@@ -447,7 +447,7 @@ hitpoints=100
 attack=60
 strength=60
 defence=60
-// CANDIDATE attack cadence; original 377 stats above remain unchanged.
+// CANDIDATE osrsbox-imported stats above and later attack cadence below.
 wanderrange=0
 huntrange=0
 maxrange=48
@@ -480,7 +480,7 @@ hitpoints=80
 attack=50
 strength=50
 defence=50
-// CANDIDATE attack cadence; original 377 stats above remain unchanged.
+// CANDIDATE osrsbox-imported stats above and later attack cadence below.
 wanderrange=0
 huntrange=0
 maxrange=48
@@ -513,7 +513,7 @@ hitpoints=80
 attack=75
 strength=75
 defence=75
-// CANDIDATE attack cadence; original 377 stats above remain unchanged.
+// CANDIDATE osrsbox-imported stats above and later attack cadence below.
 wanderrange=0
 huntrange=0
 maxrange=48
@@ -543,7 +543,7 @@ hitpoints=80
 attack=90
 strength=90
 defence=90
-// CANDIDATE attack cadence; original 377 stats above remain unchanged.
+// CANDIDATE osrsbox-imported stats above and later attack cadence below.
 wanderrange=0
 huntrange=0
 maxrange=48
@@ -618,7 +618,7 @@ strength=70
 defence=100
 readyanim=swan_queen_ready
 op2=Attack
-// CANDIDATE later combat profile; original 377 stats above remain unchanged.
+// CANDIDATE osrsbox-imported stats above and later combat profile below.
 magic=150
 moverestrict=nomove
 wanderrange=0

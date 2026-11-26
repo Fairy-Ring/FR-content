@@ -11,8 +11,8 @@
 ^swan_support_casts = 10
 ^swan_stone_maxhit = 2
 ^swan_queen_magic_maxhit = 37
-^swan_ambush_maxhit = 6
-^swan_fishing_1_maxhit = 7
+^swan_ambush_maxhit = 7
+^swan_fishing_1_maxhit = 6
 ^swan_fishing_2_maxhit = 8
 ^swan_fishing_3_maxhit = 10
 ^swan_queen_melee_maxhit = 16

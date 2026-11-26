@@ -180,7 +180,7 @@ if (npc_range(coord) > 1 & (~check_protect_prayer(^magic_style) = true | ~check_
 
 [proc,swan_melee_attack](int $maximum)
 // Preserve native readiness, accuracy, prayer, presentation and hit delivery.
-// Candidate caps do not replace the original 377 Strength declarations.
+// CANDIDATE caps retain the CANDIDATE osrsbox-imported Strength declarations.
 if (~npc_default_attack_ready = false) return;
 ~npc_meleeattack_resolve(~npc_melee_attack_roll, ~player_defence_roll_specific(npc_param(damagetype)), $maximum, 0);
 
