@@ -1,0 +1,106 @@
+// VERIFIED sequence/rewards: retained Tip.It 2 May 2006 quest 130.
+// UNKNOWN functional wording and compact spell presentation.
+[proc,handsand_zavistic]()(boolean)
+if (%handsand_quest < ^handsand_captain | %handsand_quest >= ^handsand_complete) return(^false);
+if (%handsand_quest = ^handsand_captain) {
+    if (inv_total(inv, handsand_beerhand) = 0) {
+        mes("Bring the beer soaked hand from the Guard Captain.");
+        return(^true);
+    }
+    inv_del(inv, handsand_beerhand, 1);
+    %handsand_quest = ^handsand_identified;
+    ~chatnpc("<p,sad>This hand belongs to my student Clarence. Please investigate how it reached the sandpit. Ask Bert about his work.");
+    return(^true);
+}
+if (%handsand_quest = ^handsand_scroll) {
+    if (inv_total(inv, handsand_scroll_magic) = 0) {
+        mes("Bring me the magical scroll from Bert.");
+        return(^true);
+    }
+    inv_del(inv, handsand_scroll_magic, 1);
+    if (~handsand_give(handsand_orb_storage) = ^false) {
+        inv_add(inv, handsand_scroll_magic, 1);
+        return(^true);
+    }
+    %handsand_quest = ^handsand_betty;
+    ~chatnpc("<p,neutral>Betty in Port Sarim can make a truth serum. Use this orb to record Sandy's confession.");
+    return(^true);
+}
+if (%handsand_quest >= ^handsand_betty & %handsand_quest <= ^handsand_confession) {
+    // UNKNOWN recovery: the retained change log dates OSRS reclaim to 2021.
+    // No period stranding fault is sourced; the beta recovery rule takes priority.
+    if (inv_total(inv, handsand_orb_storage) = 0 & inv_total(inv, handsand_orb_recording) = 0 & inv_total(bank, handsand_orb_recording) = 0) {
+        if (~handsand_give(handsand_orb_storage) = ^false) return(^true);
+    }
+    if (%handsand_quest < ^handsand_confession) {
+        mes("Ask Betty for the truth serum, then record Sandy answering all three questions.");
+        return(^true);
+    }
+    if (inv_total(inv, handsand_orb_recording) = 0) {
+        mes("Activate the orb and bring the recording of Sandy's confession.");
+        return(^true);
+    }
+    if (inv_total(inv, earthrune) < 5 | inv_total(inv, bucket_sand) = 0) {
+        mes("Zavistic needs five earth runes and a bucket of sand to help Bert.");
+        return(^true);
+    }
+    inv_del(inv, earthrune, 5);
+    inv_del(inv, bucket_sand, 1);
+    inv_add(inv, bucket_empty, 1);
+    inv_del(inv, handsand_orb_recording, 1);
+    %handsand_quest = ^handsand_spell;
+    // UNKNOWN scene staging: visit the real mapped pit, then return to the guild.
+    def_coord $origin = coord;
+    anim(human_casthighlvlalchemy, 0);
+    p_delay(2);
+    p_teleport(0_39_48_49_28);
+    p_delay(1);
+    if (loc_find(0_39_48_46_31, handsand_sandpit_anim) = ^true) loc_anim(handsand_sand_magic);
+    ~mesbox("Zavistic's spell fills Bert's sandpit. Bert sees the sand magically refill, freeing him from Sandy's impossible rota.");
+    p_teleport($origin);
+    ~mesbox("Zavistic asks you to help recover Clarence's body. Speak to Mazion by the sandpit on Entrana.");
+    return(^true);
+}
+if (%handsand_quest = ^handsand_head) {
+    if (inv_total(inv, handsand_wizhead) = 0) {
+        mes("Bring Clarence's head from Mazion on Entrana.");
+        return(^true);
+    }
+    inv_del(inv, handsand_wizhead, 1);
+    %handsand_quest = ^handsand_complete;
+    // VERIFIED exact rewards: Tip.It capture 20060502085646 lines229-233.
+    // Engine XP is in tenths; terminal write precedes both once-only grants.
+    stat_advance(thieving, 10000);
+    stat_advance(crafting, 90000);
+    ~send_quest_complete(questlist:handsand, handsand_sandyhand, 250, ^handsand_questpoints, "You have completed The Hand in the Sand!", "1,000 Thieving XP|9,000 Crafting XP|Bert's daily sand delivery");
+    return(^true);
+}
+if (%handsand_quest = ^handsand_spell) {
+    mes("Speak to Mazion by the sandpit on Entrana to recover Clarence's head.");
+} else {
+    mes("Investigate Bert's rota and Sandy's office in Brimhaven.");
+}
+return(^true);
+
+[proc,handsand_zavistic_use](obj $used)(boolean)
+if ($used = vial_empty & %handsand_quest >= ^handsand_betty & %handsand_quest <= ^handsand_serum_ready) {
+    if (inv_total(inv, vial_empty) = 0) return(^true);
+    inv_del(inv, vial_empty, 1);
+    // UNKNOWN engineering landing outside Betty's original mapped doorway.
+    p_teleport(0_47_50_10_59);
+    mes("Zavistic takes the vial and teleports you to Port Sarim.");
+    return(^true);
+}
+if ($used = handsand_beerhand | $used = handsand_scroll_magic | $used = handsand_orb_recording | $used = earthrune | $used = bucket_sand | $used = handsand_wizhead) {
+    return(~handsand_zavistic);
+}
+return(^false);
+
+[opnpc1,handsand_naziom]
+if (%handsand_quest = ^handsand_spell | %handsand_quest = ^handsand_head) {
+    if (~handsand_give(handsand_wizhead) = ^false) return;
+    %handsand_quest = ^handsand_head;
+    mes("Mazion gives you the dead wizard's head that he found in the sand.");
+    return;
+}
+mes("Mazion works at the Entrana sandpit.");

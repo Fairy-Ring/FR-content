@@ -76,7 +76,11 @@ if(last_useitem = ground_bat_bones) {
 ~attempt_brew_potion(last_useslot, last_slot);
 
 [opheldu,white_berries]
-~attempt_brew_potion(last_useslot, last_slot);
+def_obj $used = last_useitem;
+def_int $use_slot = last_useslot;
+def_int $slot = last_slot;
+if (~handsand_mix(white_berries, $used) = ^true) return;
+~attempt_brew_potion($use_slot, $slot);
 
 [opheldu,dragon_scale_dust]
 ~attempt_brew_potion(last_useslot, last_slot);

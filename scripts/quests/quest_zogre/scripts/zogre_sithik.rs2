@@ -9,8 +9,13 @@ if (npc_findnext = false) {
 }
 mes("Zavistic Rarve comes to answer the bell.");
 
-[opnpc1,zogre_human_zavistic_rarve] ~zogre_zavistic;
-[opnpcu,zogre_human_zavistic_rarve] ~zogre_zavistic;
+[opnpc1,zogre_human_zavistic_rarve]
+if (~handsand_zavistic = true) return;
+~zogre_zavistic;
+[opnpcu,zogre_human_zavistic_rarve]
+def_obj $used = last_useitem;
+if (~handsand_zavistic_use($used) = true) return;
+~zogre_zavistic;
 [proc,zogre_zavistic]
 if (%zogre = 0) {
     ~chatnpc("<p,neutral>Speak to Grish at Jiggig about the undead ogres.");

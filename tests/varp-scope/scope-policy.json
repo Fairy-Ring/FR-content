@@ -15,7 +15,8 @@
     "macro_event_origin_coord": "U01 lifecycle departure O reuses unused original slot 59; no client reader or varbit base. Kept separately from intended destination D across reconnect.",
     "magictraining6": "Original MTA bit bank includes the permanent Bones to Peaches spell entitlement; room counters are reset on entry and exit.",
     "varp625_bits": "MTA completed-maze streak survives leaving and logout, as the 15 April 2006 official guide requires.",
-    "varp626_bits": "MTA deposited-coin bank rewards remain owed until leaving or login recovery; transient cupboard rotation fields are reset on entry and cleanup."
+    "varp626_bits": "MTA deposited-coin bank rewards remain owed until leaving or login recovery; transient cupboard rotation fields are reset on entry and cleanup.",
+    "handsand_last_sand_minutes": "UNKNOWN engineering storage in reserved original slot 271 stores the last daily sand delivery, so logout cannot reset the service."
   },
   "inheritedPermanent": [
     "bunny_ears_unlocked",
@@ -402,7 +403,8 @@
     "mortton_current_shade": "This is a short-lived current-burn selector, not a lasting quest or inventory record: the handler consumes it for that pyre interaction and clears it, so it should reset with the session rather than preserve a stale shade handle.",
     "temple_sanctity": "The drain timer does not survive logout, so a saved pool would remain undrained. Period logout behaviour is UNKNOWN. Keep the temporary scope as an engineering choice.",
     "ghast_delay": "This timestamp is meaningful only in the current map-clock/session and the delay rebuilds naturally; persisting it across logout would retain a stale cooldown rather than preserve lasting progress.",
-    "mortmyre": "This flag only prevents starting duplicate active decay timers and is cleared by the timer; it is transient runtime state, not a quest or reward record."
+    "mortmyre": "This flag only prevents starting duplicate active decay timers and is cleared by the timer; it is transient runtime state, not a quest or reward record.",
+    "handsand_transmit": "Original transmitted bits 0..3 control temporary Sandy, coffee, and counter morphs. Sandy distraction resets on logout; quest stage 635 remains saved, and the required view can rebuild. Cosmetic coffee and counter states can reset."
   },
   "declarationScopes": {
     "100_ogre": "perm",
@@ -998,7 +1000,7 @@
     "varp248_unused": "temp",
     "varp251_unused": "temp",
     "varp252_unused": "temp",
-    "varp271_unused": "temp",
+    "handsand_last_sand_minutes": "perm",
     "varp278_unused": "temp",
     "varp280_unused": "temp",
     "varp283_unused": "temp",
@@ -1381,6 +1383,7 @@
     "haunted_manor_fountain_poisoned": "Whether the manor fountain has been poisoned for Ernest’s quest. The manor quest checks this event as completed; clearing it would undo the poisoned-fountain step and force the player to repeat it.",
     "imp": "Imp Catcher quest stage and completion. The stage records the beads/quest handoffs and reward; resetting it would erase the player’s completed collection and completion credit.",
     "handsand": "Hand in the Sand quest stage and active question/teleport/serum answer flags. The values record answers and item steps the quest has already accepted; clearing them would undo completed puzzle/interview work and lose the reward route.",
+    "handsand_last_sand_minutes": "The last-delivery timestamp remains across logout so logout cannot reset the once-a-day service. It is not client-transmitted state.",
     "hazeelcultquest": "Hazeel Cult quest stage through side task, decision, and reward. The stage gates the next NPC/object interactions and quest reward; clearing it would undo the player’s completed cult tasks.",
     "hazeelcult_valves": "Bitset of the current Hazeel sewer-valve positions. The valve puzzle reads these positions to decide whether the water route is solved; resetting them would undo the player’s completed valve configuration.",
     "hazeelcult_side": "The chosen Hazeel Cult good/evil side. The NPC dialogue, quest steps, and reward branch depend on this decision; clearing it could change the player’s chosen side after they have committed to it.",

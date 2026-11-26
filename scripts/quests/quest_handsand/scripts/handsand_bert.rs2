@@ -1,19 +1,74 @@
-// The Hand in the Sand — Bert (Yanille) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:The Hand in the Sand minus overlay / POH portal).
-// First write %handsand_quest 0 -> 1, give sandy hand (pack names obj).
-// Chat + inv_add + write only — no pub dest, no guild bell, no sandpit dest.
-// Cite red-19-start-impl-377.md §14.
-
+// Start wording CANDIDATE: retained OSRS transcript, without later landmarks.
+// Later functional wording UNKNOWN; sequence/rewards VERIFIED: Tip.It 2 May 2006.
 [opnpc1,handsand_bert]
-~chatnpc("<p,neutral>Eeee, wha' shall I do! I'll mos' certainly lose tha job...");
-~chatplayer("<p,neutral>Lose your job? What's wrong, why?");
-~chatnpc("<p,neutral>I w-w-work... over yon sand pit... and weeell... I found... this... hand!");
-def_int $go = ~p_choice2("Sure, I'll give you a hand.", 1, "I want no part in this!", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>I want no part in this!");
+if (%handsand_quest >= ^handsand_complete) {
+    ~handsand_sand_delivery;
     return;
 }
-~chatplayer("<p,neutral>Sure, I'll give you a hand.");
-~chatnpc("<p,neutral>..... Nae, ye can 'ave the 'and as h'evidence.");
-inv_add(inv, handsand_sandyhand, 1);
-%handsand_quest = 1;
+if (%handsand_quest = 0) {
+    // UNKNOWN boostability: favourable default accepts current boosted levels.
+    if (stat(thieving) < 17 | stat(crafting) < 49) {
+        mes("You need level 17 Thieving and level 49 Crafting to help Bert.");
+        return;
+    }
+    ~chatnpc("<p,neutral>Eeee, wha' shall I do! I'll mos' certainly lose tha job...");
+    ~chatplayer("<p,neutral>Lose your job? What's wrong, why?");
+    ~chatnpc("<p,neutral>I w-w-work... over yon sand pit... and weeell... I found... this... hand!");
+    if (~p_choice2("Sure, I'll give you a hand.", 1, "I want no part in this!", 2) = 2) return;
+    ~chatnpc("<p,neutral>..... Nae, ye can 'ave the 'and as h'evidence.");
+    if (~handsand_give(handsand_sandyhand) = ^false) return;
+    %handsand_quest = ^handsand_hand;
+    ~send_quest_progress(questlist:handsand, %handsand_quest, ^handsand_complete);
+    return;
+}
+if (%handsand_quest = ^handsand_hand) {
+    if (~handsand_give(handsand_sandyhand) = ^false) return;
+    mes("Take the hand to the Guard Captain at the Dragon Inn.");
+    return;
+}
+if (%handsand_quest = ^handsand_identified) {
+    if (~handsand_give(handsand_rota_bert) = ^false) return;
+    %handsand_quest = ^handsand_bert_rota;
+    mes("Bert gives you his work rota. His employer Sandy works in Brimhaven.");
+    return;
+}
+if (%handsand_quest >= ^handsand_bert_rota & %handsand_quest < ^handsand_rotas_compared) {
+    if (~handsand_give(handsand_rota_bert) = ^false) return;
+    mes("Compare Bert's rota with the original at Sandy's office in Brimhaven.");
+    return;
+}
+if (%handsand_quest = ^handsand_rotas_compared | %handsand_quest = ^handsand_scroll) {
+    if (~handsand_give(handsand_scroll_magic) = ^false) return;
+    %handsand_quest = ^handsand_scroll;
+    mes("Bert cannot explain the different rotas. He gives you a magical scroll for Zavistic Rarve.");
+    return;
+}
+mes("Continue the investigation with Zavistic Rarve at the Wizards' Guild.");
+
+// UNKNOWN recovery policy: replace missing evidence rather than strand a player.
+[proc,handsand_give](namedobj $item)(boolean)
+if (inv_total(inv, $item) > 0) return(^true);
+if (inv_total(bank, $item) > 0) {
+    mes("You already have that item in your bank.");
+    return(^false);
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space.");
+    return(^false);
+}
+inv_add(inv, $item, 1);
+return(^true);
+
+[proc,handsand_sand_delivery]
+// VERIFIED: period Tip.It reward, 84 ordinary buckets sent to the bank.
+if (%handsand_last_sand_minutes > 0 & sub(date_minutes, %handsand_last_sand_minutes) < ^handsand_sand_interval_minutes) {
+    mes("Bert has already delivered your sand today.");
+    return;
+}
+if (inv_itemspace(bank, bucket_sand, 84, inv_size(bank)) = ^false) {
+    mes("Make room in your bank for the sand first.");
+    return;
+}
+inv_add(bank, bucket_sand, 84);
+%handsand_last_sand_minutes = date_minutes;
+mes("Bert delivers 84 buckets of sand to your bank.");
