@@ -273,13 +273,13 @@ const kingPlinth = packedLoc('garden_king_statue_plinth');
 for (const [name, landing, plinth] of [
   ['Saradomin', saraDropoff, saraPlinth], ['king', kingDropoff, kingPlinth]
 ]) {
-  const exit = findApproachTile(plinth);
+  const [, exitX, exitZ] = findApproachTile(plinth);
   assert(Math.max(Math.abs(landing.x - plinth.x), Math.abs(landing.z - plinth.z)) <= 12,
     `${name} arrival is beside its original palace garden plinth`);
   for (const tile of [landing, { ...landing, z: landing.z + 1 }]) {
     assert(floorTiles.has(`${tile.level},${tile.x},${tile.z}`), `${name} landing has packed floor`);
     assert.equal(map.isMapBlocked(tile.x, tile.z, tile.level), false, `${name} landing is walkable`);
-    assert(map.findPath(tile.level, tile.x, tile.z, exit.x, exit.z).length > 0,
+    assert(map.findPath(tile.level, tile.x, tile.z, exitX, exitZ).length > 0,
       `${name} player and trolley landings have a native path out to the garden`);
   }
 }
