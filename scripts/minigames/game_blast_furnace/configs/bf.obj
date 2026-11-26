@@ -1,0 +1,62 @@
+// Original 377 Blast Furnace objects; cached fields and names retained.
+[blast_furnace_coke_spade]
+tradeable=no
+name=Spadeful of coke
+desc=A spadeful of refined coal.
+recol1s=15855
+recol1d=16878
+recol2s=14798
+recol2d=15821
+recol3s=17969
+recol3d=18992
+model=obj_blast_furnace_coke_spade
+manwear=obj_blast_furnace_coke_spade_manwear,0
+womanwear=obj_blast_furnace_coke_spade_manwear,0
+2dxof=-1
+2dyof=15
+2dzoom=1650
+2dyan=1468
+2dxan=304
+cost=3
+members=yes
+iop1=Empty
+weight=4lb
+weight=4lb
+
+[blast_furnace_pump_held]
+manwear=obj_blast_furnace_pump_held_manwear,0
+womanwear=obj_blast_furnace_pump_held_manwear,0
+model=obj_blast_furnace_pump_held_manwear
+members=yes
+wearpos=righthand
+
+[cert_blast_furnace_pump_held]
+name=Whoopsie
+desc=Just chuck this away, it's useless!
+recol1s=2340
+recol1d=25073
+iop1=Wear
+cost=1
+model=obj_priest_robe
+2dyof=1
+2dzoom=1940
+2dxan=572
+
+[blast_furnace_conveyor_held]
+manwear=obj_blast_furnace_conveyor_held_manwear,0
+womanwear=obj_blast_furnace_conveyor_held_manwear,0
+model=obj_blast_furnace_conveyor_held_manwear
+members=yes
+wearpos=righthand
+
+[cert_blast_furnace_conveyor_held]
+name=Whoopsie
+desc=Just chuck this away, it's useless!
+recol1s=2340
+recol1d=25073
+iop1=Wear
+cost=1
+model=obj_priest_robe
+2dyof=1
+2dzoom=1940
+2dxan=572

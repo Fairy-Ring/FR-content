@@ -34,7 +34,6 @@ return(true);
 
 [proc,bf_enter]
 p_arrivedelay;
-%blast_furnace_access_until = 0;
 p_telejump(0_30_77_19_27);
 
 [proc,bf_exit]

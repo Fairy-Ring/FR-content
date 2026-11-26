@@ -1,0 +1,120 @@
+// Original 377 Blast Furnace NPC blocks; cached fields and names retained.
+[blast_furnace_instructor]
+name=Blast Furnace Foreman
+desc=Looks after the blast furnace.
+model1=npc_dwarf_normal
+model2=npc_2109
+model3=npc_2095
+model4=npc_dwarf_mountaini2
+model5=npc_2099i2
+model6=npc_dwarf_normali5
+recol1s=7266
+recol1d=12615
+recol2s=15855
+recol2d=17900
+recol3s=9475
+recol3d=9410
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+op1=Talk-to
+head1=npc_lawgof2_head
+head2=npc_2109_head
+
+[blast_furnace_tin_ore]
+name=Tin ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=14798
+vislevel=hide
+size=3
+
+[blast_furnace_copper_ore]
+name=Copper ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=29095
+vislevel=hide
+size=3
+
+[blast_furnace_iron_ore]
+name=Iron ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=6242
+recol2s=11627
+recol2d=6242
+vislevel=hide
+size=3
+
+[blast_furnace_mithril_ore]
+name=Mithril ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=6346
+vislevel=hide
+size=3
+
+[blast_furnace_adamantite_ore]
+name=Adamantite ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=6438
+vislevel=hide
+size=3
+
+[blast_furnace_runite_ore]
+name=Runite ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=6476
+vislevel=hide
+size=3
+
+[blast_furnace_silver_ore]
+name=Silver ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=22198
+recol2s=11627
+recol2d=22198
+vislevel=hide
+size=3
+
+[blast_furnace_gold_ore]
+name=Gold ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=31393
+recol2s=11627
+recol2d=31393
+vislevel=hide
+size=3
+
+[blast_furnace_coal]
+name=Coal
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=4226
+vislevel=hide
+size=3
+
+[blast_furnace_perfect_gold_ore]
+name=Perfect gold ore
+desc=Some ore going into the furnace.
+model1=npc_2554
+recol1s=11488
+recol1d=31393
+recol2s=11627
+recol2d=31393
+vislevel=hide
+size=3

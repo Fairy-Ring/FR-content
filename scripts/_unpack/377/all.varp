@@ -714,7 +714,6 @@ scope=perm
 
 [varp410_unused]
 
-[varp411_unused]
 
 [varp412_bits]
 
@@ -940,25 +939,7 @@ transmit=yes
 
 [varp542_bits]
 
-[blast_furnace_readings]
-transmit=yes
-
 [varp544_unused]
-
-[blast_furnace_1]
-transmit=yes
-
-[blast_furnace_2]
-transmit=yes
-
-[blast_furnace_3]
-transmit=yes
-
-[blast_furnace_4]
-transmit=yes
-
-[blast_furnace_5]
-transmit=yes
 
 [prayer_drain_counter]
 protect=no
