@@ -53,6 +53,7 @@ while ($slot < inv_size(worn)) {
 ~chatnpc("<p,neutral>mirrors to find the diamonds.");
 if (%deserttreasure = 8) {
     %deserttreasure = 10;
+    ~dt_stranger_login;
     ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
 %fd_mirror_present = 1; // CANDIDATE present-bit — Eblis sets up the mirrors (research: subject desert-treasure)
