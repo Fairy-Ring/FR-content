@@ -1,0 +1,134 @@
+// VERIFIED: blood-tithe confrontation and blessed-sickle fights, Tip.It 20060409.
+// UNKNOWN: functional dialogue, 1000-tick actor lifetime and 20-tile leash.
+[opnpc1,burgh_gadderanks]
+if (%myreque_2_quest < ^myreque2_furnace) return;
+%gadderanks_blood_tithe_chat = 1;
+~chatnpc("<p,neutral>This store is now used to collect the blood tithes.");
+~myreque2_tithe_begin;
+
+[opnpc1,burgh_vampire_juve1_blood_tithe] @myreque2_tithe_juve;
+[opnpc1,burgh_vampire_juve2_blood_tithe] @myreque2_tithe_juve;
+[label,myreque2_tithe_juve]
+if (%myreque_2_quest < ^myreque2_furnace) return;
+%juve_blood_tithe_chat = 1;
+~chatnpc("<p,neutral>We have come for the blood tithe.");
+~myreque2_tithe_begin;
+
+[opnpc1,burgh_villager_blood_tithe] @myreque2_tithe_villager;
+[opnpc1,burgh_villager_0_blood_tithe] @myreque2_tithe_villager;
+[label,myreque2_tithe_villager]
+if (%myreque_2_quest < ^myreque2_furnace) return;
+%villager_blood_tithe_chat = 1;
+~chatnpc("<p,neutral>Please help us. They have come to take our blood.");
+~myreque2_tithe_begin;
+
+[proc,myreque2_tithe_begin]
+if (%myreque_2_quest < ^myreque2_furnace | %myreque_2_quest > ^myreque2_tithe_fight) return;
+if (%gadderanks_blood_tithe_chat = 0 | %juve_blood_tithe_chat = 0 | %villager_blood_tithe_chat = 0) return;
+%myreque_2_quest = ^myreque2_tithe_fight;
+if (testbit(%juvinate_deaths, 0) = 0) ~myreque2_tithe_spawn(burgh_vampire_juve_1_attackable, 0_54_50_57_41);
+if (testbit(%juvinate_deaths, 1) = 0) ~myreque2_tithe_spawn(burgh_vampire_juve_2_attackable, 0_54_50_57_42);
+~myreque2_tithe_spawn(burgh_gadderanks_attackable, 0_54_50_58_41);
+mes("The vampyres attack. Use your blessed silver sickle against them.");
+
+[proc,myreque2_tithe_spawn](npc $type, coord $tile)
+npc_findall($tile, $type, 20, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid) return;
+}
+npc_add($tile, $type, 1000);
+%npc_aggressive_player = uid;
+%npc_attacking_uid = uid;
+%npc_action_delay = map_clock;
+npc_settimer(1);
+npc_setmode(opplayer2);
+
+[proc,myreque2_combat_actor]()(boolean)
+if (npc_type = burgh_gadderanks_attackable | npc_type = burgh_vampire_juve_1_attackable | npc_type = burgh_vampire_juve_2_attackable | npc_type = burgh_ivan_temple_vampire_juve_1 | npc_type = burgh_ivan_temple_vampire_juve_2 | npc_type = burgh_vampire_juve_held | npc_type = burgh_vampire_juvenile_held) return(true);
+return(false);
+
+// Pure: the same predicate serves quiet area scans without chat or mutation.
+[proc,myreque2_attackable]()(boolean)
+if (npc_type = burgh_vampire_juve_held | npc_type = burgh_vampire_juvenile_held) return(false);
+if (npc_type = burgh_ivan_temple_vampire_juve_1 | npc_type = burgh_ivan_temple_vampire_juve_2) return(~myreque2_escort_attackable);
+if (~myreque2_combat_actor = false) return(true);
+if (%npc_aggressive_player = uid & %myreque_2_quest = ^myreque2_tithe_fight) return(true);
+return(false);
+
+[proc,myreque2_max_dealt](int $maxhit, int $spell)(int)
+if (~myreque2_attackable = false) return(0);
+if (npc_type = burgh_gadderanks_attackable & %juvinate_deaths ! 3) return(0);
+if (npc_type = burgh_vampire_juve_1_attackable | npc_type = burgh_vampire_juve_2_attackable) {
+    if ($spell ! 0 | inv_total(worn, silver_sickle_blessed) = 0) return(0);
+}
+return(min($maxhit, npc_param(max_dealt)));
+
+[ai_timer,burgh_gadderanks_attackable] ~myreque2_tithe_timer;
+[ai_timer,burgh_vampire_juve_1_attackable] ~myreque2_tithe_timer;
+[ai_timer,burgh_vampire_juve_2_attackable] ~myreque2_tithe_timer;
+[ai_timer,burgh_gadderanks_wounded] ~myreque2_tithe_timer;
+[proc,myreque2_tithe_timer]
+if (finduid(%npc_aggressive_player) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | %myreque_2_quest ! ^myreque2_tithe_fight | distance(coord, npc_coord) > 20) npc_del;
+
+[ai_queue1,burgh_gadderanks_attackable] ~myreque2_tithe_retaliate;
+[ai_queue1,burgh_vampire_juve_1_attackable] ~myreque2_tithe_retaliate;
+[ai_queue1,burgh_vampire_juve_2_attackable] ~myreque2_tithe_retaliate;
+[proc,myreque2_tithe_retaliate]
+if (finduid(%npc_aggressive_player) = false) return;
+if (~myreque2_attackable = false) return;
+~npc_default_retaliate;
+
+[ai_opplayer2,burgh_gadderanks_attackable] ~myreque2_tithe_attack;
+[ai_opplayer2,burgh_vampire_juve_1_attackable] ~myreque2_tithe_attack;
+[ai_opplayer2,burgh_vampire_juve_2_attackable] ~myreque2_tithe_attack;
+[proc,myreque2_tithe_attack]
+if (~myreque2_attackable = false) return;
+~npc_default_attack;
+
+[ai_queue3,burgh_vampire_juve_1_attackable] ~myreque2_tithe_death(0);
+[ai_queue3,burgh_vampire_juve_2_attackable] ~myreque2_tithe_death(1);
+[proc,myreque2_tithe_death](int $bit)
+if (npc_findhero = ^true) {
+    if (uid = %npc_aggressive_player & %myreque_2_quest = ^myreque2_tithe_fight) queue(myreque2_tithe_credit, 0, $bit);
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,myreque2_tithe_credit](int $bit)
+if (%myreque_2_quest = ^myreque2_tithe_fight) %juvinate_deaths = setbit(%juvinate_deaths, $bit);
+
+[ai_queue3,burgh_gadderanks_attackable]
+if (npc_findhero = ^true) {
+    if (uid = %npc_aggressive_player & %myreque_2_quest = ^myreque2_tithe_fight & %juvinate_deaths = 3) {
+        npc_changetype_keepall(burgh_gadderanks_wounded, 1000);
+        npc_setmode(none);
+        return;
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[opnpc1,burgh_gadderanks_attackable]
+mes("Defeat the vampyres before confronting Gadderanks.");
+
+[opnpc1,burgh_gadderanks_wounded]
+if (%npc_aggressive_player ! uid | %myreque_2_quest ! ^myreque2_tithe_fight | %juvinate_deaths ! 3) return;
+if (inv_freespace(inv) = 0 & ~obj_gettotal(gadderanks_warhammer) = 0) {
+    mes("You need a free inventory space for Gadderanks's hammer.");
+    return;
+}
+~chatnpc("<p,neutral>Garlic and silver... in a restore potion... Guthix balance.");
+if (~obj_gettotal(gadderanks_warhammer) = 0) inv_add(inv, gadderanks_warhammer, 1);
+%gadderanks_warhammer_give = 1;
+%myreque_2_quest = ^myreque2_tithe_won;
+%blood_tithe_visible = 2;
+npc_del;
+
+// UNKNOWN favourable recovery: Veliaf keeps a replacement hammer.
+[proc,myreque2_reclaim_hammer]
+if (%myreque_2_quest >= ^myreque2_tithe_won & ~obj_gettotal(gadderanks_warhammer) = 0 & inv_freespace(inv) > 0) {
+    inv_add(inv, gadderanks_warhammer, 1);
+    mes("You recover Gadderanks's hammer.");
+}

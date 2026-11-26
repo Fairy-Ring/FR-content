@@ -2103,6 +2103,41 @@
         "miss": 2415085441,
         "zero": 683130215
       }
+    },
+    {
+      "script": "[ai_opplayer2,burgh_gadderanks_attackable]",
+      "npc": "burgh_gadderanks_attackable",
+      "playerVars": { "myreque_2_quest": 110 },
+      "npcVars": { "npc_aggressive_player": "target" },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,burgh_vampire_juve_1_attackable]",
+      "npc": "burgh_vampire_juve_1_attackable",
+      "playerVars": { "myreque_2_quest": 110 },
+      "npcVars": { "npc_aggressive_player": "target" },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,burgh_vampire_juve_2_attackable]",
+      "npc": "burgh_vampire_juve_2_attackable",
+      "playerVars": { "myreque_2_quest": 110 },
+      "npcVars": { "npc_aggressive_player": "target" },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,burgh_ivan_temple_vampire_juve_1]",
+      "npc": "burgh_ivan_temple_vampire_juve_1",
+      "playerVars": { "myreque_2_quest": 150, "myreque2_extravar": 32768 },
+      "npcVars": { "npc_aggressive_player": "target", "npc_attacking_uid": "target" },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,burgh_ivan_temple_vampire_juve_2]",
+      "npc": "burgh_ivan_temple_vampire_juve_2",
+      "playerVars": { "myreque_2_quest": 150, "myreque2_extravar": 32768 },
+      "npcVars": { "npc_aggressive_player": "target", "npc_attacking_uid": "target" },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
     }
   ]
 }

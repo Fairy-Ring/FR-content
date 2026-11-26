@@ -161,6 +161,7 @@ jobs:
           run_test tests/between-a-rock/test_between_a_rock.mjs node --import tsx ../content/tests/between-a-rock/test_between_a_rock.mjs
           run_test tests/tog/test_tog.mjs node --import tsx ../content/tests/tog/test_tog.mjs
           run_test tests/giant-dwarf/test_giant_dwarf.mjs node --import tsx ../content/tests/giant-dwarf/test_giant_dwarf.mjs
+          run_test tests/in-aid-of-the-myreque/test_in_aid_of_the_myreque.mjs node --import tsx ../content/tests/in-aid-of-the-myreque/test_in_aid_of_the_myreque.mjs
           run_test tests/cabin-fever/test_cabin_fever.mjs node --import tsx ../content/tests/cabin-fever/test_cabin_fever.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/armourrows/test_armourrows.mjs node --import tsx ../content/tests/armourrows/test_armourrows.mjs

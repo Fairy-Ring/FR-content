@@ -42,6 +42,8 @@
       "[proc,dt_kamil_attack]",
       "[proc,feud_champion_attack]",
       "[proc,invrigar_attack]",
+      "[proc,myreque2_escort_attack]",
+      "[proc,myreque2_tithe_attack]",
       "[proc,necro_attack]",
       "[proc,sarawiz_melee_attack]",
       "[proc,soulbane_confusion_npc_attack]",

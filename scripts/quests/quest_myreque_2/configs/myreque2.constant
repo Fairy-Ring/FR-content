@@ -1,0 +1,33 @@
+// UNKNOWN: internal progression values are engineering milestones; completion is registry CANDIDATE.
+^myreque2_started = 1
+^myreque2_admitted = 10
+^myreque2_hideout = 30
+^myreque2_store = 50
+^myreque2_bank = 70
+^myreque2_furnace = 90
+^myreque2_tithe_fight = 110
+^myreque2_tithe_won = 120
+^myreque2_relocate = 130
+^myreque2_escort = 150
+^myreque2_ivan_safe = 200
+^myreque2_library = 210
+^myreque2_books = 240
+^myreque2_mould = 300
+^myreque2_rod = 400
+
+// UNKNOWN placement/timing: no cached rubble placement exists; use a map-walkable
+// native-basement tile and refresh the dynamic loc whenever the trapdoor is used.
+^myreque2_rubble_spawn_tile = 0_54_150_35_32
+^myreque2_rubble_spawn_angle = 0
+// CANDIDATE: five item-list buckets, each with three cached rubble stages.
+^myreque2_rubble_scoops_required = 15
+// UNKNOWN engineering amount, approved: consume three nails for each three-plank repair.
+^myreque2_nails_per_repair = 3
+// UNKNOWN engineering quantity; retained 2006 guide says “some random nails,” not a count.
+^myreque2_rubble_nail_drop_count = 1
+// VERIFIED 377 map counterparts: the surface trapdoor and native basement ladder.
+// UNKNOWN engineering landings: adjacent walkable tiles; the surface rubble clips its west side.
+^myreque2_inn_basement_landing = 0_54_150_34_31
+^myreque2_inn_surface_return = 0_54_50_35_32
+// UNKNOWN: no source exposes the dynamic rubble loc shape; centrepiece_straight is the placement default.
+^myreque2_rubble_spawn_shape = centrepiece_straight

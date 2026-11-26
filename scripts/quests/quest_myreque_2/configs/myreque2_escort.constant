@@ -1,0 +1,10 @@
+// UNKNOWN engineering state allocation within original varp 706.
+^myreque2_escort_radigad_bit = 13
+^myreque2_escort_polmafi_bit = 14
+^myreque2_escort_active_bit = 15
+^myreque2_escort_juve1_kill_bit = 16
+^myreque2_escort_juve2_kill_bit = 17
+
+// UNKNOWN: free server-only storage in the original 706 varp for pooled food healing.
+^myreque2_escort_food_pool_first_bit = 18
+^myreque2_escort_food_pool_last_bit = 25

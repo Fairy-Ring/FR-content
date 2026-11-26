@@ -1,6 +1,8 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "myreque_2_main_var": "Original Myreque 2 repair and service state must survive logout so completed village work remains earned.",
+    "myreque2_extravar": "Original Myreque 2 equipment and food fields plus unused server-only book and escort bits retain earned preparations; native Ivan interaction resets an abandoned encounter.",
     "deal_growth_at": "UNKNOWN engineering crop deadline in reserved original slot 247; saved so an earned Blindweed crop survives logout.",
     "deal_var": "Original Rum Deal progress varbits hold the growing patch, inserted ingredients and brewery faces; saved so logout does not erase earned quest steps.",
     "disease": "UNKNOWN engineering persistent Fever Spider disease; login restarts its timer, Relicym and death clear it.",
@@ -785,8 +787,8 @@
     "musicmulti_9": "perm",
     "musicplay": "temp",
     "musicstart": "temp",
-    "myreque_2_main_var": "temp",
-    "myreque2_extravar": "temp",
+    "myreque_2_main_var": "perm",
+    "myreque2_extravar": "perm",
     "myreque2_multivar": "perm",
     "necklace_of_binding": "perm",
     "newcomers_pos": "temp",

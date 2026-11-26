@@ -1,0 +1,469 @@
+// In Aid of the Myreque: Ivan's escort from Burgh de Rott to Paterdomus.
+// VERIFIED: Tip.It 2006-04-09 says the juvinates attack Ivan; the player can
+// distract them, and food, a sickle, and steel armour help him survive or fight.
+// UNKNOWN: Ivan's 377 combat levels/HP/attackrate, NPC food threshold, and local tiles.
+// The route tiles are map-derived engineering picks, not period coordinates.
+
+[label,myreque2_radigad]
+if (%myreque_2_quest ! ^myreque2_relocate & %myreque_2_quest ! ^myreque2_escort) return;
+if (testbit(%myreque2_extravar, ^myreque2_escort_radigad_bit) = 1) {
+    ~chatnpc("<p,neutral>I have already told Veliaf that I am ready to move.");
+    return;
+}
+%myreque2_extravar = setbit(%myreque2_extravar, ^myreque2_escort_radigad_bit);
+~chatnpc("<p,neutral>I am ready to move to Burgh de Rott.");
+
+[label,myreque2_polmafi]
+if (%myreque_2_quest ! ^myreque2_relocate & %myreque_2_quest ! ^myreque2_escort) return;
+if (testbit(%myreque2_extravar, ^myreque2_escort_polmafi_bit) = 1) {
+    ~chatnpc("<p,neutral>I have already told Veliaf that I am ready to move.");
+    return;
+}
+%myreque2_extravar = setbit(%myreque2_extravar, ^myreque2_escort_polmafi_bit);
+~chatnpc("<p,neutral>I am ready to move to Burgh de Rott.");
+
+[label,myreque2_ivan]
+if (%myreque_2_quest ! ^myreque2_relocate & %myreque_2_quest ! ^myreque2_escort) return;
+if (getbit_range(%myreque2_extravar, ^myreque2_escort_radigad_bit, ^myreque2_escort_polmafi_bit) ! 3) {
+    ~chatnpc("<p,neutral>Please speak to Radigad and Polmafi before we leave.");
+    return;
+}
+~chatnpc("<p,neutral>Are you ready to travel with me to Paterdomus?");
+def_int $choice = ~p_choice2("Let's go.", 1, "Not yet.", 2);
+if ($choice ! 1) return;
+~chatplayer("<p,neutral>Let's go.");
+~chatnpc("<p,neutral>Stay close. We must deal with the juvinates before leaving the swamp.");
+~myreque2_escort_start;
+
+// Optional provisions are the original cache gifts. They persist through an
+// escort restart; only the original sickle NPC form has a visible actor variant.
+[opnpcu,route_ivan_strom]
+if (%myreque_2_quest ! ^myreque2_relocate & %myreque_2_quest ! ^myreque2_escort) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = silver_sickle | last_useitem = silver_sickle_blessed) {
+    if (%ivan_sickle_give = 1) {
+        ~chatnpc("<p,neutral>I already have a silver sickle.");
+        return;
+    }
+    if (inv_total(inv, last_useitem) = 0) return;
+    if (last_useitem = silver_sickle_blessed & add(inv_total(inv, silver_sickle_blessed), inv_total(worn, silver_sickle_blessed)) <= 1) {
+        ~chatnpc("<p,neutral>Please keep a blessed silver sickle to fight the juvinates.");
+        return;
+    }
+    inv_del(inv, last_useitem, 1);
+    %ivan_sickle_give = 1;
+    ~chatnpc("<p,neutral>Thank you. I will carry this with me.");
+    return;
+}
+if (last_useitem = steel_med_helm) {
+    if (%burgh_ivan_armour_give_helm = 1) {
+        ~chatnpc("<p,neutral>I already have a helmet.");
+        return;
+    }
+    if (inv_total(inv, steel_med_helm) = 0) return;
+    inv_del(inv, steel_med_helm, 1);
+    %burgh_ivan_armour_give_helm = 1;
+    ~chatnpc("<p,neutral>Thank you. I will carry this with me.");
+    return;
+}
+if (last_useitem = steel_chainbody) {
+    if (%burgh_ivan_armour_give_body = 1) {
+        ~chatnpc("<p,neutral>I already have armour for my body.");
+        return;
+    }
+    if (inv_total(inv, steel_chainbody) = 0) return;
+    inv_del(inv, steel_chainbody, 1);
+    %burgh_ivan_armour_give_body = 1;
+    ~chatnpc("<p,neutral>Thank you. I will carry this with me.");
+    return;
+}
+if (last_useitem = steel_platelegs) {
+    if (%burgh_ivan_armour_give_legs = 1) {
+        ~chatnpc("<p,neutral>I already have armour for my legs.");
+        return;
+    }
+    if (inv_total(inv, steel_platelegs) = 0) return;
+    inv_del(inv, steel_platelegs, 1);
+    %burgh_ivan_armour_give_legs = 1;
+    ~chatnpc("<p,neutral>Thank you. I will carry this with me.");
+    return;
+}
+if (last_useitem = mort_slimey_eel_cooked | last_useitem = stew | last_useitem = snail_corpse_cooked1 | last_useitem = snail_corpse_cooked2 | last_useitem = snail_corpse_cooked3) {
+    if (~myreque2_escort_give_food(last_useitem) = false) {
+        if (%burgh_ivan_food_give >= 15) {
+            ~chatnpc("<p,neutral>I cannot carry any more food.");
+        } else {
+            ~displaymessage(^dm_default);
+        }
+        return;
+    }
+    ~chatnpc("<p,neutral>Thank you. I will carry this with me.");
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,myreque2_escort_give_food](obj $food)(boolean)
+if (%burgh_ivan_food_give >= 15 | inv_total(inv, $food) = 0) return(false);
+def_int $heal = ~myreque2_escort_food_heal($food);
+if ($heal <= 0) return(false);
+def_int $pool = getbit_range(%myreque2_extravar, ^myreque2_escort_food_pool_first_bit, ^myreque2_escort_food_pool_last_bit);
+inv_del(inv, $food, 1);
+%burgh_ivan_food_give = add(%burgh_ivan_food_give, 1);
+%myreque2_extravar = setbit_range_toint(%myreque2_extravar, add($pool, $heal), ^myreque2_escort_food_pool_first_bit, ^myreque2_escort_food_pool_last_bit);
+return(true);
+
+// UNKNOWN engineering model: the original gift varbit stores only a count, so
+// the NPC reserves the existing player-food heal midpoint as a pooled total.
+[proc,myreque2_escort_food_heal](obj $food)(int)
+switch_obj($food) {
+    case mort_slimey_eel_cooked : return(8); // midpoint of 6-10
+    case snail_corpse_cooked1 : return(6); // midpoint of 5-7
+    case snail_corpse_cooked2 : return(7); // midpoint of 6-8
+    case snail_corpse_cooked3 : return(8); // midpoint of 7-9
+    case stew : return(9);
+    case default : return(0);
+}
+
+// Parent Veliaf invokes this on the stage-130 relocation transition and Ivan
+// invokes it before every attempt. It never lowers the monotonic quest stage.
+[proc,myreque2_escort_reset]
+if (%myreque_2_quest ! ^myreque2_relocate & %myreque_2_quest ! ^myreque2_escort) return;
+%myreque2_extravar = setbit_range_toint(%myreque2_extravar, 0, ^myreque2_escort_active_bit, ^myreque2_escort_juve2_kill_bit);
+~myreque2_escort_cleanup_at(0_44_71_22_35, 64);
+~myreque2_escort_cleanup_at(0_53_154_48_43, 64);
+
+[proc,myreque2_escort_cleanup_at](coord $center, int $radius)
+~myreque2_escort_cleanup_type($center, $radius, burgh_ivan_strom_temple_ambush);
+~myreque2_escort_cleanup_type($center, $radius, burgh_ivan_strom_temple_ambush_sickle);
+~myreque2_escort_cleanup_type($center, $radius, burgh_ivan_temple_vampire_juve_1);
+~myreque2_escort_cleanup_type($center, $radius, burgh_ivan_temple_vampire_juve_2);
+
+[proc,myreque2_escort_cleanup_type](coord $center, int $radius, npc $type)
+npc_findall($center, $type, $radius, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid & %npc_attacking_uid = uid) npc_del;
+}
+
+[proc,myreque2_escort_start]
+if (%myreque_2_quest ! ^myreque2_relocate & %myreque_2_quest ! ^myreque2_escort) return;
+if (getbit_range(%myreque2_extravar, ^myreque2_escort_radigad_bit, ^myreque2_escort_polmafi_bit) ! 3) return;
+def_npc_uid $ivan_uid;
+def_npc_uid $juve1_uid;
+def_npc_uid $juve2_uid;
+~myreque2_escort_reset;
+p_arrivedelay;
+p_teleport(0_44_71_22_35);
+if (%myreque_2_quest < ^myreque2_escort) {
+    %myreque_2_quest = ^myreque2_escort;
+    ~send_quest_progress(questlist:myreque_2, %myreque_2_quest, ^myreque_2_complete);
+}
+%myreque2_extravar = setbit(%myreque2_extravar, ^myreque2_escort_active_bit);
+if (%ivan_sickle_give = 1) {
+    npc_add(0_44_71_21_35, burgh_ivan_strom_temple_ambush_sickle, ^max_32bit_int);
+} else {
+    npc_add(0_44_71_21_35, burgh_ivan_strom_temple_ambush, ^max_32bit_int);
+}
+$ivan_uid = npc_uid;
+%npc_aggressive_player = uid;
+%npc_attacking_uid = uid;
+npc_setmode(playerfollow);
+npc_settimer(10);
+npc_add(0_44_71_23_35, burgh_ivan_temple_vampire_juve_1, ^max_32bit_int);
+$juve1_uid = npc_uid;
+%npc_aggressive_player = uid;
+%npc_attacking_uid = uid;
+%npc_action_delay = map_clock;
+npc_settimer(10);
+if (npc_finduid($juve1_uid) = true) {
+    if (.npc_finduid($ivan_uid) = true) npc_setmode(opnpc2);
+}
+npc_add(0_44_71_22_36, burgh_ivan_temple_vampire_juve_2, ^max_32bit_int);
+$juve2_uid = npc_uid;
+%npc_aggressive_player = uid;
+%npc_attacking_uid = uid;
+%npc_action_delay = map_clock;
+npc_settimer(10);
+if (npc_finduid($juve2_uid) = true) {
+    if (.npc_finduid($ivan_uid) = true) npc_setmode(opnpc2);
+}
+mes("Defeat both juvinates before using the swamp exit path.");
+
+[oploc2,burgh_swamp_exit_path]
+if (%myreque_2_quest ! ^myreque2_escort | testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (getbit_range(%myreque2_extravar, ^myreque2_escort_juve1_kill_bit, ^myreque2_escort_juve2_kill_bit) ! 3) {
+    ~chatplayer("<p,neutral>We must defeat both juvinates before leaving this swamp.");
+    ~myreque2_escort_reset;
+    p_arrivedelay;
+    p_teleport(0_54_153_35_32);
+    return;
+}
+if (~myreque2_escort_move_ivan(coord) = false) {
+    ~chatplayer("<p,neutral>Ivan is not with me. I should return to the hideout and speak with him.");
+    ~myreque2_escort_reset;
+    p_arrivedelay;
+    p_teleport(0_54_153_35_32);
+    return;
+}
+~chatplayer("<p,neutral>We can now travel safely to Paterdomus.");
+p_arrivedelay;
+p_teleport(0_53_154_48_43);
+
+[proc,myreque2_escort_move_ivan](coord $center)(boolean)
+def_boolean $found = false;
+npc_findall($center, burgh_ivan_strom_temple_ambush, 64, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid & %npc_attacking_uid = uid) {
+        npc_telejump(0_53_154_47_43);
+        npc_setmode(playerfollow);
+        $found = true;
+    }
+}
+npc_findall($center, burgh_ivan_strom_temple_ambush_sickle, 64, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid & %npc_attacking_uid = uid) {
+        npc_telejump(0_53_154_47_43);
+        npc_setmode(playerfollow);
+        $found = true;
+    }
+}
+return($found);
+
+[proc,myreque2_escort_arrived]()(boolean)
+if (%myreque_2_quest ! ^myreque2_escort | testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 0) return(false);
+if (getbit_range(%myreque2_extravar, ^myreque2_escort_juve1_kill_bit, ^myreque2_escort_juve2_kill_bit) ! 3) return(false);
+def_coord $drezel = npc_coord;
+def_npc_uid $drezel_uid = npc_uid;
+if (coordy($drezel) ! 0 | distance($drezel, 0_53_154_48_39) > 1 | distance(coord, $drezel) > 8) return(false);
+if (~myreque2_escort_has_owned_ivan($drezel) = false) return(false);
+if (npc_finduid($drezel_uid) = false) return(false);
+~chatnpc("<p,neutral>Thank you for bringing Ivan safely to Paterdomus.");
+%myreque_2_quest = ^myreque2_ivan_safe;
+%myreque2_extravar = setbit_range_toint(%myreque2_extravar, 0, ^myreque2_escort_active_bit, ^myreque2_escort_juve2_kill_bit);
+~send_quest_progress(questlist:myreque_2, %myreque_2_quest, ^myreque_2_complete);
+~myreque2_escort_cleanup_at($drezel, 64);
+return(true);
+
+[proc,myreque2_escort_has_owned_ivan](coord $center)(boolean)
+npc_findall($center, burgh_ivan_strom_temple_ambush, 8, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid & %npc_attacking_uid = uid) return(true);
+}
+npc_findall($center, burgh_ivan_strom_temple_ambush_sickle, 8, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid & %npc_attacking_uid = uid) return(true);
+}
+return(false);
+
+[ai_timer,burgh_ivan_strom_temple_ambush] ~myreque2_escort_ivan_timer;
+[ai_timer,burgh_ivan_strom_temple_ambush_sickle] ~myreque2_escort_ivan_timer;
+[proc,myreque2_escort_ivan_timer]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%npc_attacking_uid ! uid | %npc_aggressive_player ! uid | %myreque_2_quest ! ^myreque2_escort | testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 0) {
+    npc_del;
+    return;
+}
+if (%death = ^true | (inzone(0_44_71_0_0, 0_44_71_63_63, coord) = false & inzone(0_53_154_0_0, 0_53_154_63_63, coord) = false)) {
+    queue(myreque2_escort_abort, 0, 0);
+    npc_del;
+    return;
+}
+if (npc_getmode ! opnpc2) npc_setmode(playerfollow);
+
+[ai_timer,burgh_ivan_temple_vampire_juve_1] ~myreque2_escort_hostile_timer;
+[ai_timer,burgh_ivan_temple_vampire_juve_2] ~myreque2_escort_hostile_timer;
+[proc,myreque2_escort_hostile_timer]
+if (finduid(%npc_aggressive_player) = false) {
+    npc_del;
+    return;
+}
+if (%myreque_2_quest ! ^myreque2_escort | testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 0) {
+    npc_del;
+    return;
+}
+if (%death = ^true | (inzone(0_44_71_0_0, 0_44_71_63_63, coord) = false & inzone(0_53_154_0_0, 0_53_154_63_63, coord) = false)) {
+    queue(myreque2_escort_abort, 0, 0);
+    npc_del;
+}
+
+[ai_queue1,burgh_ivan_temple_vampire_juve_1] ~myreque2_escort_retaliate;
+[ai_queue1,burgh_ivan_temple_vampire_juve_2] ~myreque2_escort_retaliate;
+[proc,myreque2_escort_retaliate]
+if (finduid(%npc_aggressive_player) = false) return;
+if (~myreque2_escort_attackable = false) return;
+def_npc_uid $attacked = npc_uid;
+~npc_default_retaliate;
+if (%ivan_sickle_give = 0) return;
+npc_findall(coord, burgh_ivan_strom_temple_ambush_sickle, 8, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid & %npc_attacking_uid = uid) {
+        if (.npc_finduid($attacked) = true) {
+            npc_setmode(opnpc2);
+            return;
+        }
+    }
+}
+
+[ai_opplayer2,burgh_ivan_temple_vampire_juve_1] ~myreque2_escort_attack;
+[ai_opplayer2,burgh_ivan_temple_vampire_juve_2] ~myreque2_escort_attack;
+[proc,myreque2_escort_attack]
+if (~myreque2_escort_attackable = false) return;
+~npc_default_attack;
+
+[proc,myreque2_escort_attackable]()(boolean)
+if (%myreque_2_quest ! ^myreque2_escort | testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 0) return(false);
+if (%npc_aggressive_player ! uid | %npc_attacking_uid ! uid) return(false);
+return(true);
+
+// Native NPC-to-NPC melee: the juvinates start on Ivan; their normal queue-1
+// retaliation still switches them to the owner when the player attacks.
+[ai_opnpc2,burgh_ivan_temple_vampire_juve_1] ~myreque2_escort_vampire_attack;
+[ai_opnpc2,burgh_ivan_temple_vampire_juve_2] ~myreque2_escort_vampire_attack;
+[proc,myreque2_escort_vampire_attack]
+if (npc_getmode ! opnpc2) return;
+if (npc_type ! burgh_ivan_temple_vampire_juve_1 & npc_type ! burgh_ivan_temple_vampire_juve_2) return;
+if (.npc_type ! burgh_ivan_strom_temple_ambush & .npc_type ! burgh_ivan_strom_temple_ambush_sickle) return;
+if (finduid(%npc_attacking_uid) = false) return;
+if (~myreque2_escort_attackable = false) return;
+if (npc_stat(hitpoints) <= 0 | .npc_stat(hitpoints) <= 0 | %npc_action_delay > map_clock) return;
+def_int $style = npc_param(damagetype);
+def_int $attack_roll = ~npc_melee_attack_roll_typeless;
+def_int $defence_roll = ~myreque2_escort_npc_defence_roll($style);
+def_int $maxhit = ~npc_melee_maxhit;
+def_int $damage = 0;
+if (randominc($attack_roll) > randominc($defence_roll)) $damage = randominc($maxhit);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~myreque2_escort_apply_secondary_hit($damage);
+if (%ivan_sickle_give = 1 & .npc_stat(hitpoints) > 0) {
+    if (npc_findhero = ^true & uid = %npc_aggressive_player) .npc_setmode(opnpc2);
+}
+~myreque2_escort_ivan_eat;
+
+// Ivan only attacks after the owner has damaged this vampire, preserving the
+// existing owner-only kill-credit check when his sickle lands the final blow.
+[ai_opnpc2,burgh_ivan_strom_temple_ambush_sickle] ~myreque2_escort_ivan_attack;
+[proc,myreque2_escort_ivan_attack]
+if (npc_getmode ! opnpc2 | npc_type ! burgh_ivan_strom_temple_ambush_sickle) return;
+if (.npc_type ! burgh_ivan_temple_vampire_juve_1 & .npc_type ! burgh_ivan_temple_vampire_juve_2) return;
+if (finduid(%npc_attacking_uid) = false) return;
+if (~myreque2_escort_attackable = false) return;
+if (npc_stat(hitpoints) <= 0 | .npc_stat(hitpoints) <= 0 | %npc_action_delay > map_clock) return;
+if (.npc_findhero = ^false) return;
+def_int $style = npc_param(damagetype);
+def_int $attack_roll = ~npc_melee_attack_roll_typeless;
+def_int $defence_roll = ~myreque2_escort_npc_defence_roll($style);
+def_int $maxhit = ~npc_melee_maxhit;
+def_int $damage = 0;
+if (randominc($attack_roll) > randominc($defence_roll)) $damage = randominc($maxhit);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~myreque2_escort_apply_secondary_hit($damage);
+
+[proc,myreque2_escort_npc_defence_roll](int $style)(int)
+def_int $effective_defence = ~combat_effective_stat(.npc_stat(defence), 100);
+$effective_defence = add($effective_defence, 9);
+return(~combat_stat($effective_defence, ~myreque2_escort_npc_defence_bonus($style)));
+
+[proc,myreque2_escort_npc_defence_bonus](int $style)(int)
+def_int $bonus = ~myreque2_escort_target_base_defence_bonus($style);
+if (.npc_type = burgh_ivan_strom_temple_ambush | .npc_type = burgh_ivan_strom_temple_ambush_sickle) {
+    $bonus = add($bonus, ~myreque2_escort_ivan_armour_bonus($style));
+}
+return($bonus);
+
+[proc,myreque2_escort_target_base_defence_bonus](int $style)(int)
+if ($style = ^stab_style) return(nc_param(.npc_type, stabdefence));
+if ($style = ^slash_style) return(nc_param(.npc_type, slashdefence));
+if ($style = ^crush_style) return(nc_param(.npc_type, crushdefence));
+if ($style = ^ranged_style) return(nc_param(.npc_type, rangedefence));
+if ($style = ^magic_style) return(nc_param(.npc_type, magicdefence));
+return(nc_param(.npc_type, slashdefence));
+
+[proc,myreque2_escort_item_defence_bonus](obj $item, int $style)(int)
+if ($style = ^stab_style) return(oc_param($item, stabdefence));
+if ($style = ^slash_style) return(oc_param($item, slashdefence));
+if ($style = ^crush_style) return(oc_param($item, crushdefence));
+if ($style = ^ranged_style) return(oc_param($item, rangedefence));
+if ($style = ^magic_style) return(oc_param($item, magicdefence));
+return(oc_param($item, slashdefence));
+
+[proc,myreque2_escort_ivan_armour_bonus](int $style)(int)
+def_int $bonus = 0;
+if (%burgh_ivan_armour_give_helm = 1) {
+    $bonus = add($bonus, ~myreque2_escort_item_defence_bonus(steel_med_helm, $style));
+}
+if (%burgh_ivan_armour_give_body = 1) {
+    $bonus = add($bonus, ~myreque2_escort_item_defence_bonus(steel_chainbody, $style));
+}
+if (%burgh_ivan_armour_give_legs = 1) {
+    $bonus = add($bonus, ~myreque2_escort_item_defence_bonus(steel_platelegs, $style));
+}
+return($bonus);
+
+[proc,myreque2_escort_apply_secondary_hit](int $damage)
+if ($damage <= 0) {
+    .npc_damage(^hitmark_block, 0);
+    return;
+}
+.npc_damage(^hitmark_damage, $damage);
+if (.npc_stat(hitpoints) = 0) .npc_queue(3, 0, 0);
+
+[proc,myreque2_escort_ivan_eat]
+if (.npc_stat(hitpoints) = 0 | calc(.npc_stat(hitpoints) * 2) > .npc_basestat(hitpoints)) return;
+// Acquire protection only for provision writes, not for the hostile attack.
+if (p_finduid(%npc_attacking_uid) = false) return;
+def_int $count = %burgh_ivan_food_give;
+if ($count <= 0) return;
+def_int $pool = getbit_range(%myreque2_extravar, ^myreque2_escort_food_pool_first_bit, ^myreque2_escort_food_pool_last_bit);
+if ($pool <= 0) return;
+def_int $heal = $pool;
+if ($count > 1) $heal = divide($pool, $count);
+if ($heal <= 0) $heal = 1;
+if ($heal > $pool) $heal = $pool;
+%burgh_ivan_food_give = calc($count - 1);
+%myreque2_extravar = setbit_range_toint(%myreque2_extravar, calc($pool - $heal), ^myreque2_escort_food_pool_first_bit, ^myreque2_escort_food_pool_last_bit);
+.npc_statheal(hitpoints, $heal, 0);
+
+// UNKNOWN favorable recovery: losing Ivan clears the active attempt, keeps
+// already-given provisions, and returns the owner to Burgh de Rott to restart.
+[ai_queue3,burgh_ivan_strom_temple_ambush] ~myreque2_escort_ivan_death;
+[ai_queue3,burgh_ivan_strom_temple_ambush_sickle] ~myreque2_escort_ivan_death;
+[proc,myreque2_escort_ivan_death]
+def_player_uid $owner = %npc_attacking_uid;
+if (finduid($owner) = true) {
+    if (uid = $owner & %myreque_2_quest = ^myreque2_escort & testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 1) {
+        queue(myreque2_escort_ivan_failed, 0, 0);
+    }
+}
+~npc_default_death;
+
+[ai_queue3,burgh_ivan_temple_vampire_juve_1] ~myreque2_escort_death(^myreque2_escort_juve1_kill_bit);
+[ai_queue3,burgh_ivan_temple_vampire_juve_2] ~myreque2_escort_death(^myreque2_escort_juve2_kill_bit);
+[proc,myreque2_escort_death](int $bit)
+if (npc_findhero = ^true) {
+    if (uid = %npc_aggressive_player & %myreque_2_quest = ^myreque2_escort & testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 1) {
+        queue(myreque2_escort_credit, 0, $bit);
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,myreque2_escort_credit](int $bit)
+if (%myreque_2_quest = ^myreque2_escort & testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 1) {
+    %myreque2_extravar = setbit(%myreque2_extravar, $bit);
+}
+
+[queue,myreque2_escort_abort](int $unused)
+~myreque2_escort_reset;
+
+[queue,myreque2_escort_ivan_failed]
+if (%myreque_2_quest ! ^myreque2_escort | testbit(%myreque2_extravar, ^myreque2_escort_active_bit) = 0) return;
+~myreque2_escort_reset;
+mes("Ivan has fallen. I should return to the hideout and speak with him.");
+p_arrivedelay;
+p_teleport(0_54_153_35_32);

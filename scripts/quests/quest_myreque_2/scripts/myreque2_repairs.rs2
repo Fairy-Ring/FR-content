@@ -1,0 +1,613 @@
+// VERIFIED: the retained 2006 Tip.It guide requires In Search of the Myreque and Nature Spirit,
+// 15 Mining, 25 Crafting and 7 Magic. Parent quest-start logic owns these prerequisite gates.
+// VERIFIED: repair materials and order follow that guide. Player-facing lines here are functional,
+// not claims of verbatim period dialogue.
+// CANDIDATE: 15 dumped scoops follows five listed buckets and the three cached bucket stages.
+// UNKNOWN: rubble placement/timing and the three-nail roof/wall costs are engineering choices;
+// the one-nail drop is the guide's “some random nails” represented by its approved UNKNOWN constant.
+
+[opnpc1,burgh_vilager_8] ~myreque2_florin_talk;
+
+[oploc1,burgh_quest_food_table]
+if (%myreque_2_quest >= ^myreque2_started) mes("The villagers need food. Leave an edible food item in the chest.");
+
+[oploc1,burgh_quest_food_chest_closed]
+if (%myreque_2_quest < ^myreque2_started) return;
+loc_change(burgh_quest_food_chest_open, ^max_32bit_int);
+mes("You open the food chest.");
+
+[oploc2,burgh_quest_food_chest_open]
+if (%myreque_2_quest < ^myreque2_started) return;
+if (%burghvillagerfoodpelt = 1) {
+    mes("Food has been left for the villagers.");
+} else {
+    mes("The villagers are waiting for food.");
+}
+
+[oplocu,burgh_quest_food_chest_open]
+~myreque2_offer_food(last_useitem);
+
+[oplocu,burgh_quest_food_chest_closed]
+~myreque2_offer_food(last_useitem);
+
+[proc,myreque2_florin_talk]
+if (%myreque_2_quest < ^myreque2_started) return;
+if (%myreque_2_quest < ^myreque2_admitted) {
+    ~chatnpc("<p,neutral>Leave some food in the chest for the villagers.");
+    return;
+}
+if (%myreque_2_quest < ^myreque2_hideout) {
+    ~chatnpc("<p,neutral>The rubble still blocks the way. Use a pickaxe, then fill buckets and dump them outside.");
+    return;
+}
+~chatnpc("<p,neutral>The passage is clear. Aurel can tell you what repairs the village still needs.");
+
+[proc,myreque2_offer_food](obj $item)
+if (%myreque_2_quest < ^myreque2_started) return;
+if (%myreque_2_quest >= ^myreque2_admitted) {
+    mes("The villagers already have food.");
+    return;
+}
+if (~myreque2_is_food($item) = false | inv_total(inv, $item) < 1) {
+    mes("Use one edible food item on the chest.");
+    return;
+}
+inv_del(inv, $item, 1);
+%burghvillagerfoodpelt = 1;
+~myreque2_set_stage(^myreque2_admitted);
+mes("You leave food in the chest for the villagers.");
+
+[proc,myreque2_is_food](obj $item)(boolean)
+def_category $category = oc_category($item);
+if ($category = meat | $category = category_58 | $category = category_59 | $category = category_86 | $category = category_120 | $category = category_129 | $category = category_130 | $category = category_131 | $category = category_132) {
+    return (true);
+}
+if ($item = tbwt_cooked_karambwan | $item = tbwt_cooked_karambwanji | $item = tbwt_poorly_cooked_karambwan | $item = tbwt_sliced_banana | $item = kebab | $item = ugthanki_kebab | $item = ugthanki_kebab_bad | $item = mort_slimey_eel_cooked | $item = snail_corpse_cooked1 | $item = snail_corpse_cooked2 | $item = snail_corpse_cooked3 | $item = mm_monkey_nuts | $item = mm_monkey_bar | $item = mm_banana_stew | $item = stew | $item = stew1 | $item = stew2 | $item = curry | $item = jangerberries) {
+    return (true);
+}
+return (false);
+
+[oploc1,burgh_inn_climb_over]
+if (%myreque_2_quest < ^myreque2_admitted) {
+    mes("Bring food for the villagers before entering the inn.");
+    return;
+}
+p_arrivedelay;
+def_coord $wall = loc_coord;
+def_int $dz = -1;
+if (coordz(coord) <= coordz($wall)) $dz = 1;
+mes("You climb over the broken wall.");
+p_telejump(movecoord($wall, 0, 0, $dz));
+
+[oplocu,burgh_inn_rubble_blocked]
+if (~myreque2_is_pickaxe(last_useitem) = false) return;
+if (%myreque_2_quest < ^myreque2_admitted) return;
+if (~myreque2_has_pickaxe() = false) return;
+%burgh_inn_colapsed_wall = 1;
+mes("You clear the rubble covering the trapdoor.");
+
+[oploc1,burgh_inn_trapdoor_closed]
+if (%myreque_2_quest < ^myreque2_admitted) {
+    mes("The trapdoor is not ready to be opened.");
+    return;
+}
+if (%burgh_inn_colapsed_wall = 0) {
+    mes("Clear the rubble covering the trapdoor with a pickaxe first.");
+    return;
+}
+%burgh_inn_trapdoor = 1;
+mes("You open the trapdoor.");
+
+[oploc1,burgh_inn_trapdoor_open]
+if (%myreque_2_quest < ^myreque2_admitted) {
+    mes("The trapdoor is not ready to be used.");
+    return;
+}
+p_arrivedelay;
+~myreque2_ensure_rubble;
+~climb_ladder(^myreque2_inn_basement_landing, false);
+
+[oploc2,burgh_inn_trapdoor_open]
+%burgh_inn_trapdoor = 0;
+mes("You close the trapdoor.");
+
+[oploc1,burgh_inn_basement_ladderup]
+p_arrivedelay;
+~climb_ladder(^myreque2_inn_surface_return, true);
+%burgh_inn_trapdoor = 1;
+
+[oploc1,burgh_ladder_generalstore_up]
+p_arrivedelay;
+~climb_ladder(movecoord(loc_coord, 0, 2, 1), true);
+
+[oploc1,burgh_ladder_generalstore_down]
+p_arrivedelay;
+~climb_ladder(movecoord(loc_coord, 0, -2, 1), false);
+
+[proc,myreque2_ensure_rubble]
+if (%myreque_2_quest < ^myreque2_admitted | %myreque_2_quest >= ^myreque2_hideout | %burgh_inn_rubble_pile >= ^myreque2_rubble_scoops_required) return;
+def_coord $tile = ^myreque2_rubble_spawn_tile;
+if (loc_find($tile, burgh_rubble_a_1) = true | loc_find($tile, burgh_rubble_a_2) = true | loc_find($tile, burgh_rubble_a_3) = true | loc_find($tile, burgh_rubble_a_4) = true) return;
+loc_add($tile, burgh_rubble_a_1, ^myreque2_rubble_spawn_angle, ^myreque2_rubble_spawn_shape, ^max_32bit_int);
+
+[proc,myreque2_remove_rubble]
+def_coord $tile = ^myreque2_rubble_spawn_tile;
+if (loc_find($tile, burgh_rubble_a_1) = true) loc_del(^max_32bit_int);
+if (loc_find($tile, burgh_rubble_a_2) = true) loc_del(^max_32bit_int);
+if (loc_find($tile, burgh_rubble_a_3) = true) loc_del(^max_32bit_int);
+if (loc_find($tile, burgh_rubble_a_4) = true) loc_del(^max_32bit_int);
+
+[proc,myreque2_is_pickaxe](obj $item)(boolean)
+if ($item = bronze_pickaxe | $item = iron_pickaxe | $item = steel_pickaxe | $item = mithril_pickaxe | $item = adamant_pickaxe | $item = rune_pickaxe) return (true);
+return (false);
+
+[proc,myreque2_has_pickaxe]()(boolean)
+if (inv_total(inv, bronze_pickaxe) > 0 | inv_total(inv, iron_pickaxe) > 0 | inv_total(inv, steel_pickaxe) > 0 | inv_total(inv, mithril_pickaxe) > 0 | inv_total(inv, adamant_pickaxe) > 0 | inv_total(inv, rune_pickaxe) > 0 | inv_total(worn, bronze_pickaxe) > 0 | inv_total(worn, iron_pickaxe) > 0 | inv_total(worn, steel_pickaxe) > 0 | inv_total(worn, mithril_pickaxe) > 0 | inv_total(worn, adamant_pickaxe) > 0 | inv_total(worn, rune_pickaxe) > 0) return (true);
+return (false);
+
+[oploc1,burgh_rubble_a_1] ~myreque2_mine_rubble(burgh_rubble_a_2);
+[oploc1,burgh_rubble_a_2] ~myreque2_mine_rubble(burgh_rubble_a_3);
+[oploc1,burgh_rubble_a_3] ~myreque2_mine_rubble(burgh_rubble_a_4);
+
+[oplocu,burgh_rubble_a_1]
+if (~myreque2_is_pickaxe(last_useitem) = false) return;
+~myreque2_mine_rubble(burgh_rubble_a_2);
+
+[oplocu,burgh_rubble_a_2]
+if (~myreque2_is_pickaxe(last_useitem) = false) return;
+~myreque2_mine_rubble(burgh_rubble_a_3);
+
+[oplocu,burgh_rubble_a_3]
+if (~myreque2_is_pickaxe(last_useitem) = false) return;
+~myreque2_mine_rubble(burgh_rubble_a_4);
+
+[proc,myreque2_mine_rubble](loc $next)
+if (%myreque_2_quest < ^myreque2_admitted | %myreque_2_quest >= ^myreque2_hideout) return;
+if (~myreque2_has_pickaxe() = false) {
+    mes("You need a pickaxe to clear the rubble.");
+    return;
+}
+loc_change($next, ^max_32bit_int);
+mes("You break up some of the rubble.");
+
+[oplocu,burgh_rubble_a_4]
+if (last_useitem ! spade & last_useitem ! pot_empty) return;
+if (%myreque_2_quest < ^myreque2_admitted | %myreque_2_quest >= ^myreque2_hideout) return;
+if (inv_total(inv, burgh_rubble_bucket_2) > 0) {
+    inv_del(inv, burgh_rubble_bucket_2, 1);
+    inv_add(inv, burgh_rubble_bucket_3, 1);
+    mes("You fill the bucket further with rubble.");
+    return;
+}
+if (inv_total(inv, burgh_rubble_bucket_1) > 0) {
+    inv_del(inv, burgh_rubble_bucket_1, 1);
+    inv_add(inv, burgh_rubble_bucket_2, 1);
+    mes("You fill the bucket with rubble.");
+    return;
+}
+if (inv_total(inv, bucket_empty) > 0) {
+    inv_del(inv, bucket_empty, 1);
+    inv_add(inv, burgh_rubble_bucket_1, 1);
+    mes("You begin filling a bucket with rubble.");
+    return;
+}
+mes("You need an empty bucket or a partly filled rubble bucket.");
+
+[opheld4,burgh_rubble_bucket_1] @myreque2_empty_rubble_bucket;
+[opheld4,burgh_rubble_bucket_2] @myreque2_empty_rubble_bucket;
+[opheld4,burgh_rubble_bucket_3] @myreque2_empty_rubble_bucket;
+
+[label,myreque2_empty_rubble_bucket]
+inv_del(inv, last_item, 1);
+inv_add(inv, bucket_empty, 1);
+mes("You empty the bucket.");
+
+[oplocu,burgh_outside_rubble_pile]
+if (%myreque_2_quest < ^myreque2_admitted | %myreque_2_quest >= ^myreque2_hideout) return;
+def_int $scoops = 0;
+if (last_useitem = burgh_rubble_bucket_1) $scoops = 1;
+if (last_useitem = burgh_rubble_bucket_2) $scoops = 2;
+if (last_useitem = burgh_rubble_bucket_3) $scoops = 3;
+if ($scoops = 0) return;
+def_int $current = %burgh_inn_rubble_pile;
+def_int $next = add($current, $scoops);
+if ($next > ^myreque2_rubble_scoops_required) $next = ^myreque2_rubble_scoops_required;
+if ($next >= ^myreque2_rubble_scoops_required & inv_freespace(inv) < 1) {
+    mes("Make one inventory space before clearing the final bucket.");
+    return;
+}
+inv_del(inv, last_useitem, 1);
+inv_add(inv, bucket_empty, 1);
+%burgh_inn_rubble_pile = $next;
+if ($next < ^myreque2_rubble_scoops_required) {
+    mes("You dump the rubble outside.");
+    return;
+}
+%burgh_inn_colapsed_wall = 1;
+%burgh_inn_trapdoor = 1;
+~myreque2_remove_rubble;
+~myreque2_drop_random_nail;
+~myreque2_set_stage(^myreque2_hideout);
+mes("The rubble is clear. You find a nail among the debris.");
+
+[proc,myreque2_drop_random_nail]
+switch_int(random(7)) {
+    case 0 : inv_add(inv, nails_bronze, ^myreque2_rubble_nail_drop_count);
+    case 1 : inv_add(inv, nails_iron, ^myreque2_rubble_nail_drop_count);
+    case 2 : inv_add(inv, nails, ^myreque2_rubble_nail_drop_count);
+    case 3 : inv_add(inv, nails_black, ^myreque2_rubble_nail_drop_count);
+    case 4 : inv_add(inv, nails_mithril, ^myreque2_rubble_nail_drop_count);
+    case 5 : inv_add(inv, nails_adamant, ^myreque2_rubble_nail_drop_count);
+    case 6 : inv_add(inv, nails_rune, ^myreque2_rubble_nail_drop_count);
+}
+
+[proc,myreque2_total_nails]()(int)
+def_int $total = inv_total(inv, nails);
+$total = calc($total + inv_total(inv, nails_bronze));
+$total = calc($total + inv_total(inv, nails_iron));
+$total = calc($total + inv_total(inv, nails_black));
+$total = calc($total + inv_total(inv, nails_mithril));
+$total = calc($total + inv_total(inv, nails_adamant));
+$total = calc($total + inv_total(inv, nails_rune));
+return ($total);
+
+[proc,myreque2_consume_nails](int $count)(boolean)
+if (~myreque2_total_nails() < $count) return (false);
+def_int $remaining = $count;
+def_int $take = inv_total(inv, nails);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails, $take);
+    $remaining = calc($remaining - $take);
+}
+$take = inv_total(inv, nails_bronze);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails_bronze, $take);
+    $remaining = calc($remaining - $take);
+}
+$take = inv_total(inv, nails_iron);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails_iron, $take);
+    $remaining = calc($remaining - $take);
+}
+$take = inv_total(inv, nails_black);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails_black, $take);
+    $remaining = calc($remaining - $take);
+}
+$take = inv_total(inv, nails_mithril);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails_mithril, $take);
+    $remaining = calc($remaining - $take);
+}
+$take = inv_total(inv, nails_adamant);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails_adamant, $take);
+    $remaining = calc($remaining - $take);
+}
+$take = inv_total(inv, nails_rune);
+if ($take > $remaining) $take = $remaining;
+if ($take > 0) {
+    inv_del(inv, nails_rune, $take);
+    $remaining = calc($remaining - $take);
+}
+return (true);
+
+[oploc1,burgh_store_roof_broken] mes("Repair the roof with three planks, three nails and a hammer.");
+[oploc1,burgh_store_roof_fixed] mes("The store roof has been repaired.");
+
+[oplocu,burgh_store_roof_broken]
+if (%myreque_2_quest < ^myreque2_hideout | last_useitem ! woodplank | %burgh_store_roof = 1) return;
+if (inv_total(inv, woodplank) < 3 | inv_total(inv, hammer) < 1 | ~myreque2_total_nails() < ^myreque2_nails_per_repair) {
+    mes("You need three planks, a hammer, and three nails to repair the roof.");
+    return;
+}
+if (~myreque2_consume_nails(^myreque2_nails_per_repair) = false) return;
+inv_del(inv, woodplank, 3);
+%burgh_store_roof = 1;
+mes("You repair the store roof.");
+
+
+[oploc1,burgh_boared_up_wall_clickzone]
+mes("Repair this wall with three planks, three nails and a hammer.");
+[oplocu,burgh_boared_up_wall_clickzone]
+if (last_useitem ! woodplank | %myreque_2_quest < ^myreque2_hideout) return;
+def_coord $wall = loc_coord;
+if (loc_find($wall, burgh_general_store_wall_multiloc) = true) {
+    if (%burgh_store_roof = 0) {
+        mes("Repair the store roof first.");
+        return;
+    }
+    if (%burgh_store_wall = 1) return;
+    if (inv_total(inv, woodplank) < 3 | inv_total(inv, hammer) < 1 | ~myreque2_total_nails() < ^myreque2_nails_per_repair) {
+        mes("You need three planks, a hammer, and three nails to repair this wall.");
+        return;
+    }
+    if (~myreque2_consume_nails(^myreque2_nails_per_repair) = false) return;
+    inv_del(inv, woodplank, 3);
+    %burgh_store_wall = 1;
+    mes("You repair the store wall.");
+    return;
+}
+if (loc_find($wall, burgh_bank_wall_multiloc) = true & %myreque_2_quest >= ^myreque2_store) {
+    if (%burgh_bank_booth_open = 0) {
+        mes("The bank booth must be repaired first.");
+        return;
+    }
+    if (%burgh_bank_wall = 1) return;
+    if (inv_total(inv, woodplank) < 3 | inv_total(inv, hammer) < 1 | ~myreque2_total_nails() < ^myreque2_nails_per_repair) {
+        mes("You need three planks, a hammer, and three nails to repair the bank wall.");
+        return;
+    }
+    if (~myreque2_consume_nails(^myreque2_nails_per_repair) = false) return;
+    inv_del(inv, woodplank, 3);
+    %burgh_bank_wall = 1;
+    mes("You repair the bank wall.");
+    return;
+}
+
+[oplocu,burgh_bankbooth_damaged] @myreque2_repair_bank_booth;
+[oplocu,burgh_bankbooth_too_damaged] @myreque2_repair_bank_booth;
+[oplocu,burgh_bankbooth_too_damaged2] @myreque2_repair_bank_booth;
+
+[label,myreque2_repair_bank_booth]
+if (%myreque_2_quest < ^myreque2_store) return;
+if (last_useitem ! woodplank & last_useitem ! swamppaste & last_useitem ! hammer) return;
+if (%burgh_bank_booth_open = 1) {
+    mes("The bank booth is already repaired.");
+    return;
+}
+if (inv_total(inv, woodplank) < 2 | inv_total(inv, swamppaste) < 1 | inv_total(inv, hammer) < 1) {
+    mes("You need two planks, swamp paste, and a hammer to repair the booth.");
+    return;
+}
+inv_del(inv, woodplank, 2);
+inv_del(inv, swamppaste, 1);
+%burgh_bank_booth_open = 1;
+mes("You repair the bank booth.");
+
+[oploc1,burgh_bankbooth_damaged]
+mes("Repair the bank booth with two planks, swamp paste and a hammer.");
+
+[oploc1,burgh_bankbooth_repaired] @myreque2_open_bank;
+[oploc2,burgh_bankbooth_repaired] @myreque2_open_bank;
+
+[label,myreque2_open_bank]
+if (%burgh_bank_teller = 0 | %myreque_2_quest < ^myreque2_bank) {
+    mes("Ask Cornelius to work here before using the bank.");
+    return;
+}
+@openbank;
+
+[opnpc1,burgh_potential_bank_teller] ~myreque2_cornelius_talk;
+[opnpc1,burgh_bank_teller] ~myreque2_cornelius_talk;
+
+[proc,myreque2_cornelius_talk]
+if (%myreque_2_quest < ^myreque2_store) {
+    ~chatnpc("<p,neutral>The village is not ready for a bank yet.");
+    return;
+}
+if (%burgh_bank_booth_open = 0 | %burgh_bank_wall = 0) {
+    ~chatnpc("<p,neutral>Repair the bank booth and the wall before I can work here.");
+    return;
+}
+if (%burgh_bank_teller = 1) {
+    ~chatnpc("<p,neutral>I will keep the bank open for the village.");
+    if (%myreque_2_quest < ^myreque2_bank) ~myreque2_set_stage(^myreque2_bank);
+    return;
+}
+~chatnpc("<p,neutral>Would you like me to work as the village banker?");
+def_int $choice = ~p_choice2("Yes.", 1, "No.", 2);
+if ($choice = 1) {
+    %burgh_bank_teller = 1;
+    ~chatplayer("<p,neutral>Yes, the village needs a banker.");
+    ~myreque2_set_stage(^myreque2_bank);
+} else {
+    ~chatplayer("<p,neutral>Not yet.");
+}
+
+[oploc1,burgh_furnace_broken] mes("Repair the furnace with two steel bars and a hammer.");
+[oploc1,burgh_furnace_repaired] mes("Put some coal in the repaired furnace.");
+[oploc1,burgh_furnace_coal_loaded] mes("Light the coal with a tinderbox.");
+
+[oplocu,burgh_furnace_broken] ~myreque2_repair_furnace(0);
+[oplocu,burgh_furnace_repaired] ~myreque2_repair_furnace(1);
+[oplocu,burgh_furnace_coal_loaded] ~myreque2_repair_furnace(2);
+
+[proc,myreque2_repair_furnace](int $state)
+if (%myreque_2_quest < ^myreque2_bank) return;
+if ($state = 0) {
+    if (last_useitem ! steel_bar) return;
+    if (inv_total(inv, steel_bar) < 2 | inv_total(inv, hammer) < 1) {
+        mes("You need two steel bars and a hammer to repair the furnace.");
+        return;
+    }
+    inv_del(inv, steel_bar, 2);
+    %burgh_furnace_fix = 1;
+    mes("You repair the furnace with the steel bars.");
+    return;
+}
+if ($state = 1) {
+    if (last_useitem ! coal) return;
+    if (inv_total(inv, coal) < 1) return;
+    inv_del(inv, coal, 1);
+    %burgh_furnace_fix = 2;
+    mes("You put coal in the furnace.");
+    return;
+}
+if ($state = 2) {
+    if (last_useitem ! tinderbox) return;
+    if (inv_total(inv, tinderbox) < 1) return;
+    %burgh_furnace_fix = 3;
+    ~myreque2_set_stage(^myreque2_furnace);
+    mes("You light the furnace.");
+}
+
+[opnpc1,burgh_general_store_owner] ~myreque2_aurel_talk;
+
+[opnpc3,burgh_general_store_owner]
+if (%myreque_2_quest < ^myreque2_store) {
+    mes("The village shop is not ready to open yet.");
+    return;
+}
+~openshop_activenpc;
+
+[proc,myreque2_choose_crate_food]()(boolean)
+// UNKNOWN: let the player choose among the guide's listed supply foods.
+if (%burgh_food_type > 0) return (true);
+~chatnpc("<p,neutral>Choose the crate's food before loading anything: ten cooked mackerel, ten raw mackerel or ten cooked thin snail meats.");
+def_int $choice = ~p_choice3("Cooked mackerel", 1, "Raw mackerel", 2, "Cooked thin snail meat", 3);
+if ($choice = 1) {
+    %burgh_food_type = 1;
+    ~chatnpc("<p,neutral>The crate needs ten cooked mackerel.");
+    return (true);
+}
+if ($choice = 2) {
+    %burgh_food_type = 2;
+    ~chatnpc("<p,neutral>The crate needs ten raw mackerel.");
+    return (true);
+}
+if ($choice = 3) {
+    %burgh_food_type = 3;
+    ~chatnpc("<p,neutral>The crate needs ten cooked thin snail meats.");
+    return (true);
+}
+return (false);
+
+[proc,myreque2_aurel_talk]
+if (%myreque_2_quest < ^myreque2_hideout) {
+    ~chatnpc("<p,neutral>The inn passage must be cleared before the village repairs can begin.");
+    return;
+}
+if (%myreque_2_quest < ^myreque2_store) {
+    if (%burgh_store_roof = 0) {
+        ~chatnpc("<p,neutral>The general store roof needs three planks, nails and a hammer.");
+        return;
+    }
+    if (%burgh_store_wall = 0) {
+        ~chatnpc("<p,neutral>The general store wall needs three planks, nails and a hammer.");
+        return;
+    }
+    if (%burgh_store_stocked = 1) {
+        if (inv_total(inv, burgh_generalstore_crate) = 0) {
+            if (inv_freespace(inv) < 1) {
+                mes("Make one inventory space to receive a replacement crate.");
+                return;
+            }
+            inv_add(inv, burgh_generalstore_crate, 1);
+            ~chatnpc("<p,neutral>The stock is ready. Bring the crate back to me.");
+            return;
+        }
+        inv_del(inv, burgh_generalstore_crate, 1);
+        ~chatnpc("<p,neutral>Thank you. The store can reopen now.");
+        ~myreque2_set_stage(^myreque2_store);
+        return;
+    }
+    if (~myreque2_choose_crate_food() = false) return;
+    if (inv_total(inv, burgh_generalstore_crate) = 0) {
+        if (inv_freespace(inv) < 1) {
+            mes("Make one inventory space to receive the supply crate.");
+            return;
+        }
+        inv_add(inv, burgh_generalstore_crate, 1);
+        ~chatnpc("<p,neutral>Load the crate with ten bronze axes, ten of the selected food, and three tinderboxes.");
+        return;
+    }
+    ~chatnpc("<p,neutral>Load the crate with ten bronze axes, ten of the selected food, and three tinderboxes, then bring it back.");
+    return;
+}
+if (%myreque_2_quest < ^myreque2_bank) {
+    if (%burgh_bank_booth_open = 0) {
+        ~chatnpc("<p,neutral>The bank booth needs two planks, swamp paste and a hammer.");
+    } else if (%burgh_bank_wall = 0) {
+        ~chatnpc("<p,neutral>The bank wall needs three planks, three nails and a hammer.");
+    } else {
+        ~chatnpc("<p,neutral>Speak with Cornelius about working in the repaired bank.");
+    }
+    return;
+}
+if (%myreque_2_quest < ^myreque2_furnace) {
+    ~chatnpc("<p,neutral>The village furnace needs two steel bars, coal and a tinderbox.");
+    return;
+}
+~chatnpc("<p,neutral>The village is ready to trade again.");
+
+[opheld1,burgh_generalstore_crate] ~myreque2_search_store_crate;
+
+[proc,myreque2_search_store_crate]
+mes("Bronze axes: <tostring(%burgh_axes_crate)> of 10.");
+switch_int(%burgh_food_type) {
+    case 0 : mes("Food selected: none. Talk to Aurel before loading the crate.");
+    case 1 : mes("Food selected: cooked mackerel.");
+    case 2 : mes("Food selected: raw mackerel.");
+    case 3 : mes("Food selected: cooked thin snail meat.");
+}
+mes("Food loaded: <tostring(%burgh_food_crate)> of 10.");
+mes("Tinderboxes: <tostring(%burgh_tinderbox_crate)> of 3.");
+
+[opheldu,burgh_generalstore_crate] ~myreque2_load_store_crate(last_item, last_useitem);
+
+[proc,myreque2_load_store_crate](obj $first, obj $second)
+def_obj $item = $first;
+if ($first = burgh_generalstore_crate) {
+    $item = $second;
+} else if ($second = burgh_generalstore_crate) {
+    $item = $first;
+} else {
+    return;
+}
+if (inv_total(inv, burgh_generalstore_crate) < 1 | %myreque_2_quest < ^myreque2_hideout | %myreque_2_quest >= ^myreque2_store) return;
+if (%burgh_food_type = 0) {
+    mes("Talk to Aurel and choose the crate's food before loading anything.");
+    return;
+}
+if ($item = bronze_axe) {
+    if (%burgh_axes_crate >= 10) {
+        mes("The crate already has enough bronze axes.");
+        return;
+    }
+    if (inv_total(inv, bronze_axe) < 1) return;
+    inv_del(inv, bronze_axe, 1);
+    %burgh_axes_crate = add(%burgh_axes_crate, 1);
+} else if ($item = tinderbox) {
+    if (%burgh_tinderbox_crate >= 3) {
+        mes("The crate already has enough tinderboxes.");
+        return;
+    }
+    if (inv_total(inv, tinderbox) < 1) return;
+    inv_del(inv, tinderbox, 1);
+    %burgh_tinderbox_crate = add(%burgh_tinderbox_crate, 1);
+} else if ($item = mackerel | $item = raw_mackerel | $item = snail_corpse_cooked1) {
+    if ((%burgh_food_type = 1 & $item ! mackerel) | (%burgh_food_type = 2 & $item ! raw_mackerel) | (%burgh_food_type = 3 & $item ! snail_corpse_cooked1)) {
+        mes("That is not the food selected for this crate. Search the crate to check the request.");
+        return;
+    }
+    if (%burgh_food_crate >= 10) {
+        mes("The crate already has enough food.");
+        return;
+    }
+    if (inv_total(inv, $item) < 1) return;
+    inv_del(inv, $item, 1);
+    %burgh_food_crate = add(%burgh_food_crate, 1);
+} else {
+    return;
+}
+~myreque2_update_store_stocked;
+
+[proc,myreque2_update_store_stocked]
+if (%burgh_axes_crate >= 10 & %burgh_food_crate >= 10 & %burgh_tinderbox_crate >= 3) {
+    %burgh_store_stocked = 1;
+    mes("The crate is fully stocked. Return it to Aurel.");
+}
+
+[proc,myreque2_set_stage](int $stage)
+if (%myreque_2_quest < $stage) {
+    %myreque_2_quest = $stage;
+    ~send_quest_progress(questlist:myreque_2, %myreque_2_quest, ^myreque_2_complete);
+}
+

@@ -1,0 +1,11 @@
+// CANDIDATE: OSRS Gadderhammer, citing Mod Ash on 1 September 2015:
+// one chance in twenty doubles damage; otherwise damage increases by 25%.
+// Original cache identities select the revision-377 combat shade forms.
+[proc,myreque2_gadderhammer_hit](int $damage)(int)
+if ($damage = 0) return(0);
+switch_npc(npc_type) {
+    case shade_level1, shade_level2, shade_level3, shade_level4, shade_level5, macro_shade1, macro_shade2, macro_shade3, macro_shade4, macro_shade5, macro_shade6, templetrek_shade_1, templetrek_shade_2, templetrek_shade_3 :
+        if (random(20) = 0) return(multiply($damage, 2));
+        return(scale(5, 4, $damage));
+}
+return($damage);
