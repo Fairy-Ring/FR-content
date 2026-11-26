@@ -149,11 +149,13 @@
       "[proc,chaos_druid_spell]",
       "[proc,dt_fareed_cast]",
       "[proc,dt_kamil_attack]",
+      "[proc,fightcaves_zek_attack]",
       "[proc,killerwatt_attack]",
       "[proc,npc_druid_entangle]",
       "[proc,npc_zap_attack]",
       "[proc,roving_guardian_attack]",
-      "[proc,waterbirth_prime_attack]"
+      "[proc,waterbirth_prime_attack]",
+      "[queue,fightcaves_jad_impact]"
     ],
     "npc_spell_cast": [
       "[proc,chaos_druid_spell]",

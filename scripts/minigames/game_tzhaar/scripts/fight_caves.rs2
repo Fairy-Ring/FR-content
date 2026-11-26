@@ -1,10 +1,210 @@
-// Fight Caves — first code: Mej-Jal Talk-to and cave-entrance Enter are
-// explicit no-ops. Talk-to UNKNOWN (news silent); Enter refuse-or-no-op until
-// dest-from-maps remesure. 9357 @ 2412,5118 occupancy is NOT dest (EXHAUSTED).
-// 2804 stays closed. Cite xl-minigames-remaining-impl-377.md D.2 (unit 26).
-
+// Mechanics and labels: research subject fight-caves. Slot 561 remains untouched:
+// its original transmitted bits are shared with the Fight Pits and client morphs.
 [opnpc1,tzhaar_fightcave_master]
-return;
+// UNKNOWN functional wording. No retained period transcript supplies these lines.
+~chatnpc("Fight the creatures in the cave. If you die, you keep your items. The further you get, the more Tokkul you earn.");
+~chatnpc("Defeat all 63 waves and you earn a fire cape and 8,032 Tokkul.");
 
 [oploc1,cave_entrance_9356]
-return;
+~fightcaves_enter;
+
+[oploc1,cave_entrance_9357]
+if (~fightcaves_owned = false) return;
+// UNKNOWN favourable default: leaving needs no modal while monsters attack.
+~fightcaves_finish(false);
+
+[proc,fightcaves_current_wave]()(int)
+return(getbit_range(%fightcaves_state, 0, 6));
+
+[proc,fightcaves_owned]()(boolean)
+def_int $token = getbit_range(%fightcaves_state, 7, 30);
+if ($token = 0 | ~fightcaves_current_wave = 0) return(false);
+if (region_findbycoord(coord) = false) return(false);
+if (add(region_uid, 1) = $token) return(true);
+return(false);
+
+[proc,fightcaves_enter]
+if (~fightcaves_owned = true) return;
+def_int $wave = max(1, ~fightcaves_current_wave);
+def_coord $sw = region_create(1, 8, 8);
+def_int $x = 0;
+while ($x < 8) {
+    def_int $z = 0;
+    while ($z < 8) {
+        region_set(0, $x, $z, movecoord(^fightcaves_source, multiply($x, 8), 0, multiply($z, 8)), 0);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+region_setexitcoord(^fightcaves_outside);
+%fightcaves_state = setbit_range_toint($wave, add(region_uid, 1), 7, 30);
+p_teleport(~fightcaves_coord(^fightcaves_entry));
+~fightcaves_wave($wave);
+settimer(fightcaves_tick, 1);
+
+[proc,fightcaves_coord](coord $template)(coord)
+return(region_getcoord(0, sub(coordx($template), coordx(^fightcaves_source)), sub(coordz($template), coordz(^fightcaves_source))));
+
+// CANDIDATE original binary-carry progression. Tier weights are 1,3,7,15,31.
+[proc,fightcaves_wave_count](int $wave, int $tier)(int)
+if ($wave < 1 | $wave > 63 | $tier < 0 | $tier > 5) return(0);
+if ($wave = 63) {
+    if ($tier = 5) return(1);
+    return(0);
+}
+if ($tier = 5) return(0);
+def_int $weight = 31;
+def_int $current = 4;
+while ($current > $tier) {
+    $wave = modulo($wave, $weight);
+    $weight = divide($weight, 2);
+    $current = sub($current, 1);
+}
+return(divide($wave, $weight));
+
+[proc,fightcaves_wave](int $wave)
+if (~fightcaves_owned = false) return;
+%fightcaves_state = setbit_range_toint(%fightcaves_state, $wave, 0, 6);
+// UNKNOWN functional wave announcement.
+mes("Wave: <tostring($wave)>");
+def_int $tier = 5;
+def_int $spawn = 0;
+while ($tier >= 0) {
+    def_int $count = ~fightcaves_wave_count($wave, $tier);
+    def_int $i = 0;
+    while ($i < $count) {
+        ~fightcaves_spawn(~fightcaves_wave_type($tier, $i), ~fightcaves_spawn_coord($spawn));
+        $spawn = add($spawn, 1);
+        $i = add($i, 1);
+    }
+    $tier = sub($tier, 1);
+}
+
+[proc,fightcaves_wave_type](int $tier, int $variant)(npc)
+switch_int($tier) {
+    case 0 :
+        if ($variant = 0) return(tzhaar_fightcave_swarm_1a);
+        return(tzhaar_fightcave_swarm_1b);
+    case 1 :
+        if ($variant = 0) return(tzhaar_fightcave_swarm_2a);
+        return(tzhaar_fightcave_swarm_2b);
+    case 2 :
+        if ($variant = 0) return(tzhaar_fightcave_swarm_3a);
+        return(tzhaar_fightcave_swarm_3b);
+    case 3 :
+        if ($variant = 0) return(tzhaar_fightcave_swarm_4a);
+        return(tzhaar_fightcave_swarm_4b);
+    case 4 :
+        if ($variant = 0) return(tzhaar_fightcave_swarm_5a);
+        return(tzhaar_fightcave_swarm_5b);
+}
+return(tzhaar_fightcave_swarm_boss);
+
+[proc,fightcaves_spawn_coord](int $index)(coord)
+switch_int($index) {
+    case 0 : return(~fightcaves_coord(^fightcaves_spawn0));
+    case 1 : return(~fightcaves_coord(^fightcaves_spawn1));
+    case 2 : return(~fightcaves_coord(^fightcaves_spawn2));
+    case 3 : return(~fightcaves_coord(^fightcaves_spawn3));
+    case 4 : return(~fightcaves_coord(^fightcaves_spawn4));
+}
+return(~fightcaves_coord(^fightcaves_spawn5));
+
+[proc,fightcaves_spawn](npc $type, coord $stand)
+// Instance departure owns the lifetime; no ordinary attempt times this actor out.
+npc_add($stand, $type, ^max_32bit_int);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_int = 0;
+npc_sethunt(0);
+npc_setmode(opplayer2);
+if (npc_param(damagetype) = ^ranged_style | npc_param(damagetype) = ^magic_style | $type = tzhaar_fightcave_swarm_boss) npc_setmode(applayer2);
+npc_settimer(4);
+
+[timer,fightcaves_tick]
+if (~fightcaves_owned = false) {
+    settimer(fightcaves_tick, 0);
+    return;
+}
+// Death owns the safe recovery branch, never advance while the player dies.
+if (%death = ^true | stat(hitpoints) = 0) return;
+def_int $alive = 0;
+npc_findallany(region_getcoord(0, 32, 32), 64, 0);
+while (npc_findnext = true) {
+    // A zero-HP corpse still owns its split/death queue. Wait for native deletion.
+    if (npc_category = tzhaar_fightcave & %npc_attacking_uid = uid & npc_type ! tzhaar_fightcave_swarm_boss_cleric) $alive = add($alive, 1);
+}
+if ($alive > 0) return;
+def_int $wave = ~fightcaves_current_wave;
+if ($wave = 63) {
+    ~fightcaves_finish(true);
+    return;
+}
+~fightcaves_wave(add($wave, 1));
+
+[proc,fightcaves_finish](boolean $victory)
+if (~fightcaves_owned = false) return;
+def_int $reward = ~fightcaves_partial_reward(sub(~fightcaves_current_wave, 1));
+// CANDIDATE: all 63 completed waves plus the 4,000-Tokkul Jad bonus.
+if ($victory = true) $reward = add(~fightcaves_partial_reward(63), 4000);
+// Clear entitlement before departure or delivery. A second call cannot pay twice.
+~fightcaves_clear;
+p_stopaction;
+p_teleport(^fightcaves_outside);
+if ($victory = true) ~fightcaves_reward(tzhaar_cape_fire, 1);
+if ($reward > 0) ~fightcaves_reward(tzhaar_token, $reward);
+
+[proc,fightcaves_reward](namedobj $item, int $amount)
+if (inv_itemspace(inv, $item, $amount, inv_size(inv)) = true) {
+    inv_add(inv, $item, $amount);
+} else {
+    // UNKNOWN favourable delivery: private untradeable reward, outside the copy.
+    obj_add(coord, $item, $amount, ^lootdrop_duration);
+}
+
+[proc,fightcaves_clear]
+settimer(fightcaves_tick, 0);
+clearqueue(fightcaves_jad_impact);
+~combat_clearqueue;
+%fightcaves_state = 0;
+
+[proc,fightcaves_player_death]
+~player_death;
+clearqueue(player_death_default);
+~fightcaves_finish(false);
+~prayer_deactivate_all;
+~stat_reset_all;
+healenergy(10000);
+~clear_poison;
+~deal_disease_clear;
+~player_end_poison;
+anim(null, 0);
+~update_all(null);
+~initalltabs;
+
+// The engine deletes the empty instance and saves its configured outside tile.
+// Keep only the current wave. Re-entering creates a fresh copy of that wave.
+[proc,fightcaves_logout]
+if (~fightcaves_owned = false) return;
+def_int $wave = ~fightcaves_current_wave;
+~fightcaves_clear;
+%fightcaves_state = $wave;
+p_teleport(^fightcaves_outside);
+
+[proc,fightcaves_login]
+if (%fightcaves_state = 0) return;
+// Also handles an abrupt disconnect or server restart before the logout hook.
+%fightcaves_state = ~fightcaves_current_wave;
+
+[proc,fightcaves_teleport_check](coord $destination)(boolean)
+if (~fightcaves_owned = false) return(true);
+if (region_findbycoord($destination) = true) {
+    if (add(region_uid, 1) = getbit_range(%fightcaves_state, 7, 30)) return(true);
+}
+// UNKNOWN functional wording until a period rejection line survives.
+mes("You cannot teleport out of the Fight Caves. Use the exit to leave.");
+return(false);
+
+// CANDIDATE Old School fallback: cumulative 2+4+6+... for completed waves.
+[proc,fightcaves_partial_reward](int $completed_wave)(int)
+return(multiply($completed_wave, add($completed_wave, 1)));

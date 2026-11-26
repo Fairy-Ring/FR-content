@@ -1,0 +1,197 @@
+// Fight Caves combat. Original 377 actors/animations; source labels live in configs.
+[ai_queue1,_tzhaar_fightcave]
+~npc_default_retaliate;
+
+[ai_opplayer2,_tzhaar_fightcave]
+~fightcaves_melee;
+
+[ai_queue3,_tzhaar_fightcave]
+~npc_death;
+
+[proc,fightcaves_melee]()(boolean, int)
+if (npc_stat(hitpoints) = 0 | ~npc_default_attack_ready = false) return(false, 0);
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $ticks;
+def_int $defence_style = npc_param(damagetype);
+// UNKNOWN melee defence binding for hybrid actors: crush, not their distant style.
+if ($defence_style = ^ranged_style | $defence_style = ^magic_style) $defence_style = ^crush_style;
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_meleeattack_resolve(~npc_melee_attack_roll, ~player_defence_roll_specific($defence_style), npc_param(fightcaves_maxhit), 0);
+return($attempted, $delivered);
+
+[ai_opplayer2,tzhaar_fightcave_swarm_1a] ~fightcaves_kih_attack;
+[ai_opplayer2,tzhaar_fightcave_swarm_1b] ~fightcaves_kih_attack;
+[proc,fightcaves_kih_attack]
+def_boolean $attempted;
+def_int $damage;
+$attempted, $damage = ~fightcaves_melee;
+// CANDIDATE: Old School Tz-Kih drains one Prayer per attack, including zero damage.
+if ($attempted = true) stat_sub(prayer, 1, 0);
+
+[ai_queue2,tzhaar_fightcave_swarm_2a] ~fightcaves_kek_damage(last_int);
+[ai_queue2,tzhaar_fightcave_swarm_2b] ~fightcaves_kek_damage(last_int);
+[proc,fightcaves_kek_damage](int $damage)
+~npc_default_damage($damage);
+// CANDIDATE: the large Tz-Kek recoils one on a damaging melee hit only.
+if ($damage > 0 & finduid(%npc_aggressive_player) = true) {
+    if (%damagetype <= ^crush_style) queue(combat_damage_player, 0, 1);
+}
+
+[ai_queue3,tzhaar_fightcave_swarm_2a] ~fightcaves_kek_death;
+[ai_queue3,tzhaar_fightcave_swarm_2b] ~fightcaves_kek_death;
+[proc,fightcaves_kek_death]
+// Both tiles lie inside the dead parent's walkable 2x2 footprint.
+def_int $i = 0;
+while ($i < 2) {
+    .npc_add(movecoord(npc_coord, $i, 0, $i), tzhaar_fightcave_swarm_2spawn, ^max_32bit_int);
+    .%npc_attacking_uid = %npc_attacking_uid;
+    .%npc_aggressive_player = %npc_attacking_uid;
+    .npc_sethunt(0);
+    .npc_setmode(opplayer2);
+    $i = add($i, 1);
+}
+~npc_death;
+
+[ai_queue1,tzhaar_fightcave_swarm_3a] ~npc_default_retaliate_ap;
+[ai_queue1,tzhaar_fightcave_swarm_3b] ~npc_default_retaliate_ap;
+[ai_opplayer2,tzhaar_fightcave_swarm_3a] npc_setmode(applayer2);
+[ai_opplayer2,tzhaar_fightcave_swarm_3b] npc_setmode(applayer2);
+[ai_applayer2,tzhaar_fightcave_swarm_3a] ~fightcaves_xil_attack;
+[ai_applayer2,tzhaar_fightcave_swarm_3b] ~fightcaves_xil_attack;
+[proc,fightcaves_xil_attack]
+if (~fightcaves_attack_ready = false) return;
+if (npc_range(coord) <= 1 & random(2) = 0) {
+    ~fightcaves_melee;
+    return;
+}
+npc_anim(magmaquris_spine_attack, 0);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~player_projectile(npc_coord, coord, uid, tzhaar_spine_attack, 40, 36, 32, 15, 0, 11, 5);
+~npc_rangeattack_resolve(~npc_ranged_attack_roll, ~player_defence_roll_specific(^ranged_style), npc_param(fightcaves_maxhit), 0, $duration);
+
+// AP admission already supplies line-of-sight and native pursuit.
+[proc,fightcaves_attack_ready]()(boolean)
+if (%death = ^true | stat(hitpoints) = 0 | npc_stat(hitpoints) = 0) return(false);
+if (%npc_action_delay > map_clock) return(false);
+if (~npc_check_notcombat = false) {
+    npc_setmode(none);
+    return(false);
+}
+return(~npc_check_notcombat_self);
+
+[ai_queue1,tzhaar_fightcave_swarm_5a] ~npc_default_retaliate_ap;
+[ai_queue1,tzhaar_fightcave_swarm_5b] ~npc_default_retaliate_ap;
+[ai_opplayer2,tzhaar_fightcave_swarm_5a] npc_setmode(applayer2);
+[ai_opplayer2,tzhaar_fightcave_swarm_5b] npc_setmode(applayer2);
+[ai_applayer2,tzhaar_fightcave_swarm_5a] ~fightcaves_zek_attack;
+[ai_applayer2,tzhaar_fightcave_swarm_5b] ~fightcaves_zek_attack;
+[proc,fightcaves_zek_attack]
+if (~fightcaves_attack_ready = false) return;
+if (npc_range(coord) <= 1 & random(2) = 0) {
+    ~fightcaves_melee;
+    return;
+}
+npc_anim(igniferum_ranged, 0);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~player_projectile(npc_coord, coord, uid, tzhaar_fire_launch_travel, 40, 36, 32, 15, 0, 11, 5);
+def_int $damage = 0;
+if (~npc_player_hit_roll(^magic_style) = true) $damage = randominc(npc_param(fightcaves_maxhit));
+~npc_set_attack_vars;
+queue(combat_damage_player, divide($duration, 30), $damage);
+queue*(playerhit_n_retaliate, divide($duration, 30))(npc_uid);
+
+[ai_queue1,tzhaar_fightcave_swarm_boss] ~npc_default_retaliate_ap;
+[ai_opplayer2,tzhaar_fightcave_swarm_boss] npc_setmode(applayer2);
+[ai_applayer2,tzhaar_fightcave_swarm_boss] ~fightcaves_jad_attack;
+[proc,fightcaves_jad_attack]
+if (~fightcaves_attack_ready = false) return;
+def_int $style = random(2);
+if (npc_range(coord) <= 1) $style = random(3);
+if ($style = 2) {
+    ~fightcaves_melee;
+    return;
+}
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~npc_set_attack_vars;
+// CANDIDATE matching 377 animation identities. UNKNOWN exact packet offsets.
+def_int $damage_style = ^ranged_style;
+if ($style = 0) {
+    npc_anim(lordmagmus_smash, 0);
+    // A rear then stomp signals ranged; rocks arrive above the player's head.
+    spotanim_pl(tzhaar_rock_smash, 0, 90);
+} else {
+    npc_anim(lordmagmus_fire, 0);
+    spotanim_npc(tzhaar_fire_spit_launch, 0, 0);
+    ~player_projectile(npc_coord, coord, uid, tzhaar_fire_spit_travel, 100, 36, 60, 15, 0, 11, 5);
+    $damage_style = ^magic_style;
+}
+queue*(fightcaves_jad_impact, 3)(npc_uid, $damage_style);
+
+[queue,fightcaves_jad_impact](npc_uid $source, int $style)
+if (%death = ^true | stat(hitpoints) = 0 | ~fightcaves_owned = false) return;
+if (npc_finduid($source) = false) return;
+if (%npc_attacking_uid ! uid | npc_stat(hitpoints) = 0) return;
+// Prayer is sampled AFTER the telegraph, not when Jad starts its animation.
+def_int $damage = 0;
+if (~npc_player_hit_roll($style) = true) $damage = randominc(npc_param(fightcaves_maxhit));
+queue(combat_damage_player, 0, $damage);
+queue*(playerhit_n_retaliate, 0)($source);
+
+[ai_queue2,tzhaar_fightcave_swarm_boss]
+~npc_default_damage(last_int);
+if (npc_stat(hitpoints) > 0 & npc_stat(hitpoints) <= divide(npc_basestat(hitpoints), 2) & %npc_int = 0) {
+    %npc_int = 1;
+    def_int $i = 0;
+    while ($i < 4) {
+        // All four stands are within Jad's existing walkable 5x5 footprint.
+        def_int $dx = multiply(modulo($i, 2), 4);
+        def_int $dz = multiply(divide($i, 2), 4);
+        .npc_add(movecoord(npc_coord, $dx, 0, $dz), tzhaar_fightcave_swarm_boss_cleric, ^max_32bit_int);
+        .%npc_attacking_uid = %npc_attacking_uid;
+        .%npc_int = 0;
+        .npc_sethunt(0);
+        .npc_setmode(none);
+        .npc_settimer(4);
+        $i = add($i, 1);
+    }
+}
+
+[ai_queue1,tzhaar_fightcave_swarm_boss_cleric]
+// A player hit switches a healer to combat. No later timer restores healing.
+%npc_int = 1;
+~npc_default_retaliate;
+
+[ai_timer,_tzhaar_fightcave]
+if (npc_stat(hitpoints) = 0) return;
+if (npc_type = tzhaar_fightcave_swarm_4a | npc_type = tzhaar_fightcave_swarm_4b) {
+    if (npc_stat(hitpoints) < divide(npc_basestat(hitpoints), 2)) ~fightcaves_mejkot_heal;
+}
+if (npc_type = tzhaar_fightcave_swarm_boss_cleric & %npc_int = 0) ~fightcaves_hurkot_heal;
+
+[proc,fightcaves_mejkot_heal]
+def_npc_uid $self = npc_uid;
+def_player_uid $owner = %npc_attacking_uid;
+def_coord $stand = npc_coord;
+npc_anim(lizard_cleric_heal, 0);
+spotanim_npc(tzhaar_heal, 0, 0);
+// UNKNOWN engineering amount/cadence: 5 HP every four ticks within four tiles.
+npc_findallany($stand, 4, 0);
+while (npc_findnext = true) {
+    if (npc_category = tzhaar_fightcave & %npc_attacking_uid = $owner & npc_stat(hitpoints) > 0) npc_statheal(hitpoints, 5, 0);
+}
+npc_finduid($self);
+
+[proc,fightcaves_hurkot_heal]
+def_npc_uid $self = npc_uid;
+def_player_uid $owner = %npc_attacking_uid;
+def_coord $stand = npc_coord;
+npc_findallany($stand, 8, 0);
+while (npc_findnext = true) {
+    if (npc_type = tzhaar_fightcave_swarm_boss & %npc_attacking_uid = $owner & npc_stat(hitpoints) > 0) {
+        npc_statheal(hitpoints, 5, 0);
+        spotanim_npc(tzhaar_heal, 0, 0);
+    }
+}
+if (npc_finduid($self) = true) npc_anim(lizard_cleric_heal, 0);

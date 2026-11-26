@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "fightcaves_state": "UNKNOWN engineering storage: reserved original slot 289 saves the current Fight Caves wave across logout. Bits 7..30 hold an online-only instance token, cleared by logout/login; no transmitted field or new varbit.",
     "deal_growth_at": "UNKNOWN engineering crop deadline in reserved original slot 247; saved so an earned Blindweed crop survives logout.",
     "deal_var": "Original Rum Deal progress varbits hold the growing patch, inserted ingredients and brewery faces; saved so logout does not erase earned quest steps.",
     "disease": "UNKNOWN engineering persistent Fever Spider disease; login restarts its timer, Relicym and death clear it.",
