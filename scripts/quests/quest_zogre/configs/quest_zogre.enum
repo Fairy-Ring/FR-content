@@ -1,0 +1,8 @@
+// Map the existing 377 balm dose variants for the native potion decanter.
+[zogre_relicyms_balm_doses]
+inputtype=int
+outputtype=namedobj
+val=1,relicyms_balm1
+val=2,relicyms_balm2
+val=3,relicyms_balm3
+val=4,relicyms_balm4

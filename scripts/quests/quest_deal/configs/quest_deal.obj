@@ -17,6 +17,8 @@ iop4=Empty
 weight=35g
 category=potion
 param=next_obj_stage,relicyms_balm3
+param=dose_count,4
+param=decant_potion_enum,zogre_relicyms_balm_doses
 
 [relicyms_balm3]
 name=Relicym's balm(3)
@@ -35,6 +37,8 @@ iop4=Empty
 weight=30g
 category=potion
 param=next_obj_stage,relicyms_balm2
+param=dose_count,3
+param=decant_potion_enum,zogre_relicyms_balm_doses
 
 [relicyms_balm2]
 name=Relicym's balm(2)
@@ -53,6 +57,8 @@ iop4=Empty
 weight=25g
 category=potion
 param=next_obj_stage,relicyms_balm1
+param=dose_count,2
+param=decant_potion_enum,zogre_relicyms_balm_doses
 
 [relicyms_balm1]
 name=Relicym's balm(1)
@@ -71,6 +77,8 @@ iop4=Empty
 weight=20g
 category=potion
 param=next_obj_stage,vial_empty
+param=dose_count,1
+param=decant_potion_enum,zogre_relicyms_balm_doses
 
 [fishbowl_net]
 name=Fishbowl and net
