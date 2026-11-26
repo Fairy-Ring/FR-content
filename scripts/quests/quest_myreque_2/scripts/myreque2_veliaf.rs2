@@ -66,6 +66,7 @@ if (%myreque_2_quest < ^myreque2_rod | ~myreque2_has_rod = false) {
 }
 // Commit before granting XP: repeated conversations cannot grant rewards twice.
 %myreque_2_quest = ^myreque_2_complete;
+~templetrek_login;
 stat_advance(attack, 20000);
 stat_advance(strength, 20000);
 stat_advance(defence, 20000);

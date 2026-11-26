@@ -86,6 +86,7 @@ if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena 
 if (%soulbane_prog >= 2 & %soulbane_prog <= ^soulbane_tolna_clear) ~soulbane_login;
 if (%elenaquest >= ^quest_elena_freed_elena) %plaguecity_elena_at_home = 1;
 ~roguesden_login;
+~templetrek_login;
 
 // A fresh login cannot retain the session timers for saved Smoke torch bits.
 if (%fd_torch_count1 ! 0 | %fd_torch_count2 ! 0 | %fd_torch_count3 ! 0 | %fd_torch_count4 ! 0) ~dt_smoke_logout;

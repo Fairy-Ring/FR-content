@@ -9,6 +9,7 @@ if (%darkness_level ! 0) ~swamp_cave_release;
 ~fenk_on_player_cleanup;
 ~duel_arena_logout;
 ~roguesden_logout;
+~templetrek_logout;
 ~macro_event_logout;
 ~castlewars_logout;
 ~pest_logout;
