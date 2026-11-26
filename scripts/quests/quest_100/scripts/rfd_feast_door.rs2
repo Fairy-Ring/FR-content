@@ -1,11 +1,36 @@
-// Recipe for Disaster — kitchen feast door Open.
-// var < 2: refuse. var >= 2: dest-cite banquet floor 1861,5317 L0.
-// No portal 4. No leftover 18436. No Inspect. Hunt 289? no.
-// Cite rfd-kitchen-open-dest-next-377.md + dest-cite-index.
-
+// VERIFIED north-door feast route; UNKNOWN map-derived destinations and functional wording.
 [oploc1,hundred_lumbridge_door]
-if (%hundred_main_quest_var < 2) {
-    ~displaymessage(^dm_default);
+if (%hundred_main_quest_var < ^rfd_feast_ready) {
+    mes("The cook has not invited you to the feast.");
     return;
 }
-p_telejump(0_29_83_5_5);
+if (coordx(coord) < 2000) {
+    p_telejump(^rfd_kitchen_landing);
+    return;
+}
+if (%hundred_main_quest_var = ^rfd_feast_ready) {
+    p_telejump(^rfd_feast_landing);
+    ~mesbox("The guests gather for the cook's banquet.");
+    ~mesbox("The Culinaromancer attacks. The gypsy stops time to protect the guests.");
+    %100dwarfvisible = 1;
+    %100goblinsvisible = 1;
+    %100piratevisible = 1;
+    %100guidevisible = 1;
+    %100davevisible = 1;
+    %100ogrevisible = 1;
+    %100amikvisible = 1;
+    %100monkeyvisible = 1;
+    %100culinaromancervisible = 1;
+    %hundred_main_quest_var = ^rfd_frozen;
+}
+~rfd_prepare_banquet;
+p_telejump(^rfd_banquet_landing);
+
+[oploc1,hundred_portal_door1]
+if (%hundred_main_quest_var >= ^rfd_frozen) p_telejump(^rfd_kitchen_landing);
+
+[oploc1,hundred_portal_door2]
+if (%hundred_main_quest_var >= ^rfd_frozen) p_telejump(^rfd_kitchen_landing);
+
+[oploc1,hundred_portal_door3]
+if (%hundred_main_quest_var >= ^rfd_frozen) p_telejump(^rfd_kitchen_landing);

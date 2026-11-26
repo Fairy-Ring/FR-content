@@ -1,0 +1,210 @@
+// VERIFIED route: RuneHQ capture, 15 April 2006. UNKNOWN functional wording, intermediate stages, and table tile.
+[oploc1,hundred_dwarf_ambassador_base] @rfd_dwarf_inspect;
+[aploc1,hundred_dwarf_ambassador_base] @rfd_dwarf_inspect;
+
+[label,rfd_dwarf_inspect]
+if (%hundred_main_quest_var < ^rfd_frozen | %fishingcompo < ^fishingcompo_complete) return;
+if (%hundred_dwarf_quest ! 0) {
+    mes("The Mountain Dwarf remains frozen.");
+    return;
+}
+%hundred_dwarf_quest = ^rfd_dwarf_inspected;
+mes("You inspect the frozen Mountain Dwarf.");
+
+// Called by the common Aris choice after the frozen Dwarf has been inspected.
+[label,rfd_dwarf_aris]
+if (%hundred_dwarf_quest ! ^rfd_dwarf_inspected) return;
+~chatplayer("<p,neutral>I inspected the frozen Mountain Dwarf.");
+~chatnpc("<p,neutral>Speak to his father in the White Wolf Mountain tunnel.");
+%hundred_dwarf_quest = ^rfd_dwarf_aris_spoken;
+%hundred_dwarf_multi_dad = 0;
+
+// The map contains the multi wrappers; interactions resolve on their visible child forms.
+[opnpc1,hundred_dwarf_dad_multi] @rfd_dwarf_talk;
+[apnpc1,hundred_dwarf_dad_multi] @rfd_dwarf_talk;
+[opnpc1,hundred_dwarf_dad] @rfd_dwarf_talk;
+[apnpc1,hundred_dwarf_dad] @rfd_dwarf_talk;
+[opnpc1,hundred_dwarf_dad_rohak] @rfd_dwarf_talk;
+[apnpc1,hundred_dwarf_dad_rohak] @rfd_dwarf_talk;
+[opnpc1,hundred_dwarf_drunk_multi] @rfd_dwarf_talk;
+[apnpc1,hundred_dwarf_drunk_multi] @rfd_dwarf_talk;
+[opnpc1,hundred_dwarf_dad_drunk] @rfd_dwarf_talk;
+[apnpc1,hundred_dwarf_dad_drunk] @rfd_dwarf_talk;
+
+[label,rfd_dwarf_talk]
+if (%hundred_dwarf_quest = ^rfd_dwarf_aris_spoken) {
+    ~chatnpc("<p,neutral>I will not give you my secret rock-cake recipe.");
+    ~chatplayer("<p,neutral>I should ask about dwarves and ale at the Rising Sun.");
+    %hundred_dwarf_quest = ^rfd_dwarf_father_spoken;
+    %hundred_dwarf_multi_dad = 1;
+    return;
+}
+if (%hundred_dwarf_quest = ^rfd_dwarf_father_spoken) {
+    ~chatnpc("<p,neutral>The recipe costs 200 coins, unless you wear a Ring of charos(u).");
+    ~chatnpc("<p,neutral>Bring me four Asgarnian ales with a coin in each, and 100 coins.");
+    return;
+}
+if (%hundred_dwarf_quest = ^rfd_dwarf_recipe_paid) {
+    if (inv_total(inv, hundred_dwarf_asgarnian_ale) < ^rfd_dwarf_ales_required) {
+        ~chatnpc("<p,neutral>I need four Asgarnian ales with a coin in each.");
+        return;
+    }
+    if (inv_total(inv, coins) < ^rfd_dwarf_rohak_cost) {
+        ~chatnpc("<p,neutral>I also need 100 coins.");
+        return;
+    }
+    inv_del(inv, hundred_dwarf_asgarnian_ale, ^rfd_dwarf_ales_required);
+    inv_del(inv, coins, ^rfd_dwarf_rohak_cost);
+    %hundred_dwarf_quest = ^rfd_dwarf_rohak_drunk;
+    %hundred_dwarf_multi_dad = 2;
+    ~chatnpc("<p,neutral>Bring a bucket of milk, a pot of flour, an egg and a bowl of water.");
+    return;
+}
+if (%hundred_dwarf_quest = ^rfd_dwarf_rohak_drunk) {
+    @rfd_dwarf_make_cake;
+    return;
+}
+if (%hundred_dwarf_quest >= ^rfd_dwarf_cake_table & %hundred_dwarf_quest < ^rfd_guest_complete) {
+    @rfd_dwarf_recover_cake;
+    return;
+}
+
+// The old Rising Sun service remains the source of the four ordinary ales.
+[label,rfd_dwarf_barmaid]
+if (%hundred_dwarf_quest ! ^rfd_dwarf_father_spoken) return;
+if (inv_total(worn, ring_of_charos_unlocked) = 0) {
+    if (inv_total(inv, coins) < ^rfd_dwarf_recipe_cost) {
+        ~chatnpc("<p,neutral>The recipe costs 200 coins; bring them or wear a Ring of charos(u).");
+        return;
+    }
+    inv_del(inv, coins, ^rfd_dwarf_recipe_cost);
+}
+%hundred_dwarf_quest = ^rfd_dwarf_recipe_paid;
+~chatnpc("<p,neutral>Buy four Asgarnian ales, and use one coin on each.");
+
+// VERIFIED route direction: drop one gold coin into an ordinary Asgarnian ale.
+[opheldu,asgarnian_ale]
+if (last_useitem ! coins | %hundred_dwarf_quest ! ^rfd_dwarf_recipe_paid) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, coins) < ^rfd_dwarf_coins_per_ale | inv_total(inv, asgarnian_ale) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, coins, ^rfd_dwarf_coins_per_ale);
+inv_del(inv, asgarnian_ale, 1);
+inv_add(inv, hundred_dwarf_asgarnian_ale, 1);
+mes("You put a coin in the Asgarnian ale.");
+
+[label,rfd_dwarf_make_cake]
+if (%hundred_dwarf_quest ! ^rfd_dwarf_rohak_drunk) return;
+if (obj_find(^rfd_dwarf_cake_table_coord, hundred_dwarf_hot_rockcake) = true) {
+    %hundred_dwarf_quest = ^rfd_dwarf_cake_table;
+    ~chatnpc("<p,neutral>The hot rock cake is on the table.");
+    return;
+}
+if (obj_find(^rfd_dwarf_cake_table_coord, hundred_dwarf_cool_rockcake) = true) {
+    %hundred_dwarf_quest = ^rfd_dwarf_cool_cake;
+    ~chatnpc("<p,neutral>The cool rock cake is on the table.");
+    return;
+}
+if (~obj_gettotal(hundred_dwarf_cool_rockcake) > 0) {
+    %hundred_dwarf_quest = ^rfd_dwarf_cool_cake;
+    ~chatnpc("<p,neutral>You already have a cool rock cake.");
+    return;
+}
+if (~obj_gettotal(hundred_dwarf_hot_rockcake) > 0) {
+    %hundred_dwarf_quest = ^rfd_dwarf_hot_cake;
+    ~chatnpc("<p,neutral>Take the hot rock cake to Ice Mountain to cool it.");
+    return;
+}
+if (inv_total(inv, bucket_milk) = 0 | inv_total(inv, pot_flour) = 0 | inv_total(inv, egg) = 0 | inv_total(inv, bowl_water) = 0) {
+    ~chatnpc("<p,neutral>Bring a bucket of milk, a pot of flour, an egg and a bowl of water.");
+    return;
+}
+inv_del(inv, bucket_milk, 1);
+inv_del(inv, pot_flour, 1);
+inv_del(inv, egg, 1);
+inv_del(inv, bowl_water, 1);
+obj_add(^rfd_dwarf_cake_table_coord, hundred_dwarf_hot_rockcake, 1, ^lootdrop_duration);
+%hundred_dwarf_quest = ^rfd_dwarf_cake_table;
+~chatnpc("<p,neutral>The hot rock cake is on the table. Wear gloves to take it.");
+
+// Reissue only after the private table cake has gone and no cake remains in inventory, bank or worn.
+[label,rfd_dwarf_recover_cake]
+if (obj_find(^rfd_dwarf_cake_table_coord, hundred_dwarf_hot_rockcake) = true) {
+    if (%hundred_dwarf_quest = ^rfd_dwarf_cool_cake & ~obj_gettotal(hundred_dwarf_cool_rockcake) = 0) {
+        %hundred_dwarf_quest = ^rfd_dwarf_cake_table;
+    }
+    ~chatnpc("<p,neutral>The hot rock cake is on the table.");
+    return;
+}
+if (obj_find(^rfd_dwarf_cake_table_coord, hundred_dwarf_cool_rockcake) = true) {
+    ~chatnpc("<p,neutral>The cool rock cake is on the table.");
+    return;
+}
+if (~obj_gettotal(hundred_dwarf_hot_rockcake) = 0 & ~obj_gettotal(hundred_dwarf_cool_rockcake) = 0) {
+    obj_add(^rfd_dwarf_cake_table_coord, hundred_dwarf_hot_rockcake, 1, ^lootdrop_duration);
+    %hundred_dwarf_quest = ^rfd_dwarf_cake_table;
+    ~chatnpc("<p,neutral>I have put another hot rock cake on the table.");
+    return;
+}
+if (~obj_gettotal(hundred_dwarf_cool_rockcake) = 0 & ~obj_gettotal(hundred_dwarf_hot_rockcake) > 0) {
+    %hundred_dwarf_quest = ^rfd_dwarf_hot_cake;
+}
+~chatnpc("<p,neutral>Retrieve your rock cake from your inventory or bank.");
+
+[opobj3,hundred_dwarf_hot_rockcake] @rfd_dwarf_take_hot_cake;
+[apobj3,hundred_dwarf_hot_rockcake]
+if (distance(coord, obj_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_dwarf_take_hot_cake;
+[label,rfd_dwarf_take_hot_cake]
+if (%hundred_dwarf_quest ! ^rfd_dwarf_cake_table & %hundred_dwarf_quest ! ^rfd_dwarf_hot_cake) return;
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space.");
+    return;
+}
+if (inv_total(worn, ice_gloves) > 0) {
+    obj_del;
+    inv_add(inv, hundred_dwarf_cool_rockcake, 1);
+    %hundred_dwarf_quest = ^rfd_dwarf_cool_cake;
+    mes("Your ice gloves cool the rock cake.");
+    return;
+}
+if (inv_totalcat(worn, armour_hands) = 0) {
+    mes("You need to wear gloves to take the hot rock cake.");
+    return;
+}
+obj_takeitem(inv);
+%hundred_dwarf_quest = ^rfd_dwarf_hot_cake;
+mes("The rock cake is too hot. Take it to Ice Mountain to cool it.");
+
+// Native item-on-Dwarf action; APLOCU closes distance through the ordinary routefinder.
+[oplocu,hundred_dwarf_ambassador_base] @rfd_dwarf_use_cake;
+[aplocu,hundred_dwarf_ambassador_base]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_dwarf_use_cake;
+
+[label,rfd_dwarf_use_cake]
+if (last_useitem ! hundred_dwarf_cool_rockcake | %hundred_dwarf_quest ! ^rfd_dwarf_cool_cake | inv_total(inv, hundred_dwarf_cool_rockcake) = 0 | %100dwarfvisible = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, hundred_dwarf_cool_rockcake, 1);
+%hundred_dwarf_quest = ^rfd_guest_complete;
+~rfd_guest_reward(1);
+
+// VERIFIED cooling route; UNKNOWN functional wording. The Icefiend keeps its ordinary drops.
+[proc,rfd_dwarf_icefiend]
+if (%hundred_dwarf_quest ! ^rfd_dwarf_hot_cake | inv_total(inv, hundred_dwarf_hot_rockcake) = 0) return;
+inv_del(inv, hundred_dwarf_hot_rockcake, 1);
+inv_add(inv, hundred_dwarf_cool_rockcake, 1);
+%hundred_dwarf_quest = ^rfd_dwarf_cool_cake;
+mes("The Icefiend cools the rock cake.");

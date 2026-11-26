@@ -1,0 +1,16 @@
+// UNKNOWN engineering stages. Original 377 morph selectors require the frozen hub at 3.
+^rfd_feast_ready = 2
+^rfd_frozen = 3
+^rfd_complete = 5
+^rfd_guest_complete = 10
+// VERIFIED: RuneHQ capture 15 April 2006, each introductory/guest reward is one QP.
+^rfd_step_qp = 1
+^rfd_guest_xp = 10000
+// UNKNOWN map-derived landing tiles; packed-map route tests establish playability, not historical coordinates.
+^rfd_feast_landing = 0_29_83_5_29
+^rfd_banquet_landing = 0_29_83_5_5
+^rfd_kitchen_landing = 0_50_50_7_16
+// UNKNOWN engineering shop multipliers; no period source gives the trading margins.
+^rfd_shop_buy = 1000
+^rfd_shop_sell = 1000
+^rfd_shop_haggle = 10

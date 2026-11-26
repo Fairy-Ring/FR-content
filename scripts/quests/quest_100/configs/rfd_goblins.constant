@@ -1,0 +1,14 @@
+// UNKNOWN engineering stages and map-derived landing tiles. The guide does not name these values or exact destinations.
+^rfd_goblins_inspected = 1
+^rfd_goblins_general_spoke = 2
+^rfd_goblins_cook_requested = 3
+^rfd_goblins_charred = 4
+^rfd_goblins_recipe_known = 5
+^rfd_goblins_slop_ready = 6
+// VERIFIED 377 multi selector for the charred local appearance.
+^rfd_goblins_explosion_charred = 2
+// VERIFIED native 377 cauldron anchor at (0,2980,9910).
+^rfd_goblins_cauldron = 0_46_154_36_54
+^rfd_goblins_kitchen_landing = 0_46_154_37_59
+^rfd_goblins_charred_landing = 0_46_154_36_16
+^rfd_goblins_surface_landing = 0_46_54_16_52

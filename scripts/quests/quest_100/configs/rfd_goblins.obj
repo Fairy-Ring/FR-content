@@ -1,0 +1,58 @@
+[100goblin_compromise_mush]
+name=Slop of compromise
+desc=Two out of two goblin generals prefer it!
+model=obj_100goblin_compromise_mush
+2dzoom=490
+2dyan=1943
+2dxan=96
+members=yes
+cost=10
+weight=1g
+tradeable=no
+
+[100goblin_soggy_bread]
+name=Soggy bread
+desc=Previously a nice crispy loaf of bread.  Now just kind of icky.
+recol1s=20929
+recol1d=15819
+model=obj_bread
+members=yes
+2dyof=5
+2dzoom=830
+2dyan=268
+2dxan=392
+cost=6
+weight=1g
+tradeable=no
+
+[100goblin_spicey_maggots]
+name=Spicy maggots
+desc=They clearly taste so much better this way!
+recol1s=31365
+recol1d=18625
+model=obj_fishing_bait
+members=yes
+2dxof=1
+2dyof=-6
+2dzoom=650
+2dyan=1840
+2dxan=236
+cost=3
+weight=1g
+tradeable=no
+
+[100goblin_dyed_oranges]
+name=Dyed orange
+desc=Orange slices which have been dyed, but it looks more like they died.
+recol1s=31201
+recol1d=12684
+recol2s=20083
+recol2d=32767
+model=obj_lemon_slices
+members=yes
+2dzoom=1090
+2dyan=336
+2dxan=284
+cost=2
+weight=1g
+tradeable=no

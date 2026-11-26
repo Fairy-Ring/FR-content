@@ -1,0 +1,19 @@
+// VERIFIED: RuneHQ capture 15 April 2006, Pirate Pete requirements.
+^rfd_pete_cooking = 31
+^rfd_pete_max_weight = 27000
+^rfd_pete_hides = 5
+^rfd_pete_wire = 3
+^rfd_pete_rocks = 5
+// UNKNOWN engineering stages and map-derived safe landings, not historical stage/destination claims.
+^rfd_pete_inspected = 1
+^rfd_pete_recipe = 2
+^rfd_pete_gear = 3
+^rfd_pete_nung_hides = 4
+^rfd_pete_nung_wire = 5
+^rfd_pete_pen_access = 6
+^rfd_pete_dive = 1_46_148_19_7
+^rfd_pete_surface = 0_41_49_43_25
+^rfd_pete_cavern = 1_46_148_5_48
+^rfd_pete_seabed = 1_46_148_5_42
+^rfd_pete_pen_inside = 1_46_148_30_44
+^rfd_pete_pen_outside = 1_46_148_30_40

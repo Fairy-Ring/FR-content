@@ -1,0 +1,205 @@
+// Original 377 client fields retained. UNKNOWN: quest ingredients are untradeable.
+[hundred_pirate_breadcrumbs]
+name=Breadcrumbs
+desc=Glad these aren't in my bed.
+model=obj_hundred_pirate_breadcrumbs
+members=yes
+2dyof=-13
+2dzoom=848
+2dyan=2018
+2dxan=273
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_kelp]
+name=Kelp
+desc=Slightly damp seaweed.
+model=obj_hundred_pirate_kelp
+2dyan=1460
+2dxan=297
+members=yes
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_ground_kelp]
+name=Ground kelp
+desc=Kelp flakes. Smells of the sea.
+recol1s=21140
+recol1d=5345
+cost=2
+model=obj_unicorn_horn_dust
+2dxof=-6
+2dzoom=1210
+2dyan=1892
+2dxan=264
+members=yes
+cost=1
+weight=2oz
+tradeable=no
+
+[hundred_pirate_giant_crab_meat]
+name=Crab meat
+desc=A smelly meat.
+model=obj_hundred_pirate_giant_crab_meat
+members=yes
+2dxof=8
+2dyof=-10
+2dzoom=1232
+2dyan=60
+2dxan=243
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_ground_giant_crab_meat]
+name=Ground crab meat
+desc=A smelly paste.
+recol1s=4228
+recol1d=24144
+model=obj_swamp_tar
+members=yes
+2dxof=1
+2dyof=-22
+2dzoom=710
+2dyan=148
+2dxan=224
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_ground_cod]
+name=Ground cod
+desc=A smelly paste.
+recol1s=4228
+recol1d=15855
+model=obj_swamp_tar
+members=yes
+2dxof=1
+2dyof=-22
+2dzoom=710
+2dyan=148
+2dxan=224
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_raw_fishcake]
+name=Raw fishcake
+desc=Would taste nicer if I cooked it.
+model=obj_hundred_pirate_raw_fishcake
+members=yes
+2dxof=1
+2dyof=3
+2dzoom=592
+2dyan=1848
+2dxan=303
+cost=100
+weight=2lb
+tradeable=no
+
+[hundred_pirate_fishcake]
+name=Cooked fishcake
+desc=Mmmm, reminds me of the seaside.
+recol1s=31297
+recol1d=26017
+recol2s=27041
+recol2d=21793
+model=obj_hundred_pirate_raw_fishcake
+members=yes
+2dxof=1
+2dyof=3
+2dzoom=592
+2dyan=1848
+2dxan=303
+iop1=Eat
+cost=100
+weight=2lb
+tradeable=no
+
+[hundred_pirate_burned_fishcake]
+name=Burnt fishcake
+desc=Darn thing's all burnt!
+recol1s=31297
+recol1d=17697
+recol2s=27041
+recol2d=15585
+model=obj_hundred_pirate_raw_fishcake
+members=yes
+2dxof=1
+2dyof=3
+2dzoom=592
+2dyan=1848
+2dxan=303
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_mudskipper_hide]
+name=Mudskipper hide
+desc=Hmmm, what can I use this for?
+model=obj_hundred_pirate_mudskipper_hide
+members=yes
+2dzoom=1360
+2dyan=2045
+2dxan=273
+cost=1
+weight=2lb
+tradeable=no
+
+[hundred_pirate_rock]
+name=Rock
+desc=A rock.
+model=obj_rock
+2dxof=-5
+2dyof=-16
+2dzoom=820
+2dyan=20
+2dxan=204
+members=yes
+cost=1
+weight=1kg
+tradeable=no
+
+[hundred_pirate_diving_helmet]
+name=Fishbowl helmet
+desc=You'll look daft, but at least you won't drown!
+model=obj_hundred_pirate_diving_helmet
+iop2=Wear
+manwear=obj_hundred_pirate_diving_helmet_manwear,0
+womanwear=obj_hundred_pirate_diving_helmet_womanwear,0
+manwear2=obj_hundred_pirate_diving_helmet_manwear2
+womanwear2=obj_hundred_pirate_diving_helmet_womanwear2
+manhead=obj_hundred_pirate_diving_helmet_manhead
+womanhead=obj_hundred_pirate_diving_helmet_womanhead
+2dxof=2
+2dzoom=848
+2dyan=1679
+2dxan=27
+members=yes
+cost=1
+wearpos=hat
+wearpos2=head
+wearpos3=jaw
+weight=5kg
+tradeable=no
+
+[hundred_pirate_diving_backpack]
+name=Diving apparatus
+desc=I'll need a helmet to make this work.
+iop2=Wear
+model=obj_hundred_pirate_diving_backpack
+manwear=obj_hundred_pirate_diving_backpack_manwear,0
+womanwear=obj_hundred_pirate_diving_backpack_womanwear,0
+2dxof=4
+2dyof=-7
+2dzoom=1358
+2dyan=1400
+2dxan=435
+members=yes
+cost=1
+wearpos=back
+weight=10kg
+tradeable=no
+

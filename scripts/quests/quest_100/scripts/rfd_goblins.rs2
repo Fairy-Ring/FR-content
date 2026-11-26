@@ -1,0 +1,142 @@
+// VERIFIED route and rewards: RuneHQ, captured 15 April 2006.
+// UNKNOWN engineering stages, map-derived landings, and concise functional wording.
+
+[oploc1,hundred_goblin1_base] @rfd_goblins_inspect;
+[oploc1,hundred_goblin2_base] @rfd_goblins_inspect;
+
+[label,rfd_goblins_inspect]
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+// VERIFIED prerequisite: Goblin Diplomacy complete. Message wording is UNKNOWN.
+if (%goblinquest ! ^gobdip_complete) {
+    ~mesbox("Goblin Diplomacy must be complete before helping the generals.");
+    return;
+}
+if (%100goblin = ^rfd_guest_complete) return;
+if (%100goblin = 0) %100goblin = ^rfd_goblins_inspected;
+~mesbox("The generals need Slop of Compromise. Ask their cook in the village cellar.");
+
+[label,rfd_goblins_village_general]
+if (%100goblin = ^rfd_goblins_inspected) %100goblin = ^rfd_goblins_general_spoke;
+// UNKNOWN concise wording; the period source says the generals refuse to discuss their food.
+~mesbox("The general refuses to discuss their food.");
+
+[oploc1,100_goblin_ladder_down]
+if (%100goblin_explosion = ^rfd_goblins_explosion_charred) {
+    p_telejump(^rfd_goblins_charred_landing);
+} else {
+    p_telejump(^rfd_goblins_kitchen_landing);
+}
+
+[oploc1,100_goblin_ladder_up] p_telejump(^rfd_goblins_surface_landing);
+[oploc1,100_goblin_ladder_up_charred] p_telejump(^rfd_goblins_surface_landing);
+
+[opnpc1,goblin_cook]
+if (%hundred_main_quest_var < ^rfd_frozen | %goblinquest ! ^gobdip_complete | %100goblin < ^rfd_goblins_general_spoke | %100goblin >= ^rfd_goblins_charred) return;
+if (%100goblin = ^rfd_goblins_general_spoke) %100goblin = ^rfd_goblins_cook_requested;
+// UNKNOWN functional wording; the period guide gives no exact dialogue.
+~mesbox("The cook needs charcoal. Bring it to him to start the cooking.");
+
+[opnpcu,goblin_cook]
+if (last_useitem ! charcoal) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%hundred_main_quest_var < ^rfd_frozen | %goblinquest ! ^gobdip_complete | %100goblin ! ^rfd_goblins_cook_requested) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (loc_find(^rfd_goblins_cauldron, 100_goblin_cauldren_still) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, charcoal, 1);
+%100goblin_explosion = 0;
+// Use the full cached sequence lengths; one server tick is 30 client cycles.
+loc_anim(100_goblin_cauldren_shake);
+p_delay(calc((seqlength(100_goblin_cauldren_shake) + 29) / 30));
+%100goblin_explosion = 1;
+loc_anim(100_goblin_cauldren_blast);
+p_delay(calc((seqlength(100_goblin_cauldren_blast) + 29) / 30));
+%100goblin_explosion = ^rfd_goblins_explosion_charred;
+%100goblin = ^rfd_goblins_charred;
+p_telejump(^rfd_goblins_charred_landing);
+
+[opnpc1,goblin_cook_charred]
+if (%hundred_main_quest_var < ^rfd_frozen | %goblinquest ! ^gobdip_complete | %100goblin < ^rfd_goblins_charred | %100goblin >= ^rfd_guest_complete) return;
+if (%100goblin = ^rfd_goblins_charred) %100goblin = ^rfd_goblins_recipe_known;
+if (inv_total(inv, 100goblin_soggy_bread) < 1 | inv_total(inv, 100goblin_spicey_maggots) < 1 | inv_total(inv, 100goblin_dyed_oranges) < 1) {
+    // UNKNOWN functional wording; the period guide names these three ingredients.
+    ~mesbox("Bring soggy bread, spicy maggots, and a dyed orange.");
+    return;
+}
+inv_del(inv, 100goblin_soggy_bread, 1);
+inv_del(inv, 100goblin_spicey_maggots, 1);
+inv_del(inv, 100goblin_dyed_oranges, 1);
+inv_add(inv, 100goblin_compromise_mush, 1);
+%100goblin = ^rfd_goblins_slop_ready;
+// UNKNOWN functional wording.
+mes("The cook prepares the Slop of Compromise.");
+
+[proc,rfd_goblins_can_prepare]()(boolean)
+if (%hundred_main_quest_var < ^rfd_frozen | %100goblin < ^rfd_goblins_recipe_known | %100goblin >= ^rfd_guest_complete) return(false);
+return(true);
+
+[opheldu,fishing_bait]
+switch_obj(last_useitem) {
+    case spicespot : @rfd_goblins_make_spicy_maggots(spicespot);
+    case gnome_spice : @rfd_goblins_make_spicy_maggots(gnome_spice);
+    case default : ~displaymessage(^dm_default);
+}
+
+[label,rfd_goblins_make_spicy_maggots](namedobj $spice)
+if (~rfd_goblins_can_prepare = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, fishing_bait, 1);
+if ($spice ! gnome_spice) inv_del(inv, $spice, 1);
+inv_add(inv, 100goblin_spicey_maggots, 1);
+// UNKNOWN functional wording.
+mes("You season the fishing bait.");
+
+[opheldu,bread]
+switch_obj(last_useitem) {
+    case knife : @rfd_pete_breadcrumbs;
+    case bucket_water : @rfd_goblins_make_soggy_bread(bucket_water, bucket_empty);
+    case jug_water : @rfd_goblins_make_soggy_bread(jug_water, jug_empty);
+    case bowl_water : @rfd_goblins_make_soggy_bread(bowl_water, bowl_empty);
+    case default : ~displaymessage(^dm_default);
+}
+
+[label,rfd_goblins_make_soggy_bread](namedobj $water, namedobj $empty)
+if (~rfd_goblins_can_prepare = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, bread, 1);
+inv_del(inv, $water, 1);
+inv_add(inv, $empty, 1);
+inv_add(inv, 100goblin_soggy_bread, 1);
+// UNKNOWN favourable-to-player vessel recovery; matches ordinary water uses.
+mes("You soak the bread in water.");
+
+[proc,rfd_goblins_dye_orange_slices](namedobj $dye)
+if (~rfd_goblins_can_prepare = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, orange_slices, 1);
+inv_del(inv, $dye, 1);
+inv_add(inv, 100goblin_dyed_oranges, 1);
+// UNKNOWN functional wording.
+mes("You dye the orange slices.");
+
+[oplocu,hundred_goblin1_base] @rfd_goblins_rescue;
+[oplocu,hundred_goblin2_base] @rfd_goblins_rescue;
+
+[label,rfd_goblins_rescue]
+if (last_useitem ! 100goblin_compromise_mush) return;
+if (%hundred_main_quest_var < ^rfd_frozen | %100goblin < ^rfd_goblins_slop_ready | %100goblin = ^rfd_guest_complete) return;
+inv_del(inv, 100goblin_compromise_mush, 1);
+%100goblin = ^rfd_guest_complete;
+~rfd_guest_reward(2);

@@ -170,6 +170,7 @@ jobs:
           run_test tests/brewing/test_brewing.mjs node --import tsx ../content/tests/brewing/test_brewing.mjs
           run_test tests/cabin-fever/test_cabin_fever.mjs node --import tsx ../content/tests/cabin-fever/test_cabin_fever.mjs
           run_test tests/hand-in-the-sand/test_hand_in_the_sand.mjs node --import tsx ../content/tests/hand-in-the-sand/test_hand_in_the_sand.mjs
+          run_test tests/rfd-s1/run.mjs node ../content/tests/rfd-s1/run.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/swan-song/test_swan_song.mjs node --import tsx ../content/tests/swan-song/test_swan_song.mjs
           run_test tests/armourrows/test_armourrows.mjs node --import tsx ../content/tests/armourrows/test_armourrows.mjs

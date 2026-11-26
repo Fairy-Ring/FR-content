@@ -1,12 +1,19 @@
-// Recipe for Disaster — Inspect frozen Pirate Pete after feast dest.
-// Stay hundred_main_quest_var 2. No portal 4. No leftover 18436.
-// CANDIDATE mes (2007-base minus Changes). Hunt 289? no.
-// Cite spine-17-remaining-impl-377.md §12 + rfd-pirate-pete-inspect-377.md.
-
+// VERIFIED Inspect-first route and 31 Cooking: RuneHQ capture 15 April 2006.
+// UNKNOWN plain functional wording and engineering stages.
 [oploc1,hundred_pirate_base]
-if (%hundred_main_quest_var < 2) {
-    ~displaymessage(^dm_default);
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+if (%100_pirate_quest_var = ^rfd_guest_complete) return;
+if (stat(cooking) < ^rfd_pete_cooking) {
+    mes("You need a Cooking level of 31 to help Pirate Pete.");
     return;
 }
-mes("You inspect Pirate Pete.");
-mes("You'll need to free him.");
+if (%100_pirate_quest_var = 0) %100_pirate_quest_var = ^rfd_pete_inspected;
+~mesbox("Pirate Pete needs a fishcake. Ask the cook how to make one.");
+
+[oplocu,hundred_pirate_base]
+if (last_useitem ! hundred_pirate_fishcake | %hundred_main_quest_var < ^rfd_frozen) return;
+if (%100_pirate_quest_var < ^rfd_pete_pen_access | %100_pirate_quest_var = ^rfd_guest_complete) return;
+if (stat(cooking) < ^rfd_pete_cooking) return;
+inv_del(inv, hundred_pirate_fishcake, 1);
+%100_pirate_quest_var = ^rfd_guest_complete;
+~rfd_guest_reward(3);

@@ -4,6 +4,12 @@
 // Accept: %hundred_main_quest_var 0→1 + 100 coins. No leftover 18436. No feast.
 
 [label,rfd_another_cooks_start]
+// VERIFIED: RuneHQ 15 April 2006 lists 10 Cooking for Another Cook.
+if (stat(cooking) < 10) {
+    // UNKNOWN functional refusal.
+    mes("You need a Cooking level of 10.");
+    return;
+}
 ~chatplayer("<p,quiz>Do you have any other quests for me? That last one of yours was so much fun, I was hoping you would!");
 ~chatnpc("<p,sad>Ooooh dear, I might have, but it's all very embarrassing...");
 ~chatplayer("<p,quiz>Embarrassing? How do you mean?");
@@ -88,9 +94,14 @@ if ($yes = 2) {
 ~chatplayer("<p,happy>I'll go look for those for you then!");
 inv_add(inv, coins, 100);
 %hundred_main_quest_var = 1;
+~send_quest_progress_colour(questlist:hundred_main, %hundred_main_quest_var, ^rfd_complete);
 return;
 
 [label,rfd_another_cooks_pointer]
+if (%hundred_main_quest_var >= ^rfd_frozen & %100_pirate_quest_var > 0) {
+    def_int $topic = ~p_choice2("About Pirate Pete...", 1, "About the banquet...", 2);
+    if ($topic = 1) @rfd_pete_cook_talk;
+}
 if (%hundred_main_quest_var >= 2) {
     @rfd_another_cooks_feast_nag;
 }
@@ -209,11 +220,18 @@ inv_del(inv, greenmans_ale, 1);
 inv_del(inv, rotten_tomato, 1);
 inv_del(inv, hundred_fruit_blast, 1);
 %hundred_main_quest_var = 2;
+~update_questpoints;
+~send_quest_progress_colour(questlist:hundred_main, %hundred_main_quest_var, ^rfd_complete);
 ~chatnpc("<p,happy>You absolutely MUST go through into the dining room just there and see the feast I have prepared.");
 ~chatnpc("<p,shock>I simply won't take no for an answer!");
 return;
 
 [label,rfd_another_cooks_feast_nag]
+if (%hundred_main_quest_var >= ^rfd_frozen) {
+    // UNKNOWN functional post-feast acknowledgement.
+    ~chatnpc("The banquet guests still need your help. Ask me if you need Pete's fishcake recipe.");
+    return;
+}
 ~chatplayer("<p,quiz>How's that banquet going?");
 ~chatnpc("<p,angry>Why haven't you gone and looked at the feast I have prepared yet? Trust me, it will be a sight the likes of which you will never see again!");
 ~chatplayer("<p,sad>I don't know... I'm just... quite busy, I guess...");

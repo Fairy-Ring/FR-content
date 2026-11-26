@@ -1,0 +1,17 @@
+// VERIFIED route, prices, and quantities: RuneHQ capture, 15 April 2006.
+// UNKNOWN engineering stages and map-derived table coordinate; terminal 10 is shared.
+^rfd_dwarf_inspected = 1
+^rfd_dwarf_aris_spoken = 2
+^rfd_dwarf_father_spoken = 3
+^rfd_dwarf_recipe_paid = 4
+^rfd_dwarf_rohak_drunk = 5
+^rfd_dwarf_cake_table = 6
+^rfd_dwarf_hot_cake = 7
+^rfd_dwarf_cool_cake = 8
+^rfd_dwarf_recipe_cost = 200
+^rfd_dwarf_rohak_cost = 100
+^rfd_dwarf_ales_required = 4
+// UNKNOWN: the period instruction says to add a gold coin to each ale; use one coin per ale.
+^rfd_dwarf_coins_per_ale = 1
+// UNKNOWN map-derived cake placement on one packed bigtable2 tile (2862,9875).
+^rfd_dwarf_cake_table_coord = 0_44_154_46_19
