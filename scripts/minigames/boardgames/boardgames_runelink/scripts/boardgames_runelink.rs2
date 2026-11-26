@@ -126,7 +126,7 @@ if(.%duel2accept = uid) {
 
     ~boardgames_table_setup;
 
-    if(%boardgames_tablenum = -1) {
+    if(%boardgames_tablenum = 127) {
         ~reset_boardgames_varp;
         %duel2accept = null;
         return;
