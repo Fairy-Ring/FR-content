@@ -279,6 +279,7 @@ return (false);
 
 // this proc is used for magic (TODO 377: re-enable later!!)
 [proc,npc_is_attackable_opt]()(boolean)
+if (~ics_little_guardian = true) return(false);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
@@ -382,6 +383,7 @@ return (false);
 // Area scans call this only after multiway admits the secondary NPC tile.
 // Dialogue-specific refusal branches are absent because their maps are single-combat.
 [proc,npc_is_attackable_opt_quiet]()(boolean)
+if (~ics_little_guardian = true) return(false);
 if (npc_category = dwarfrock_avatar) return(~dwarfrock_avatar_attackable);
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
