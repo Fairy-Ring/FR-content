@@ -1,6 +1,7 @@
 //most linebreaks in the quest are guessed (added for 2004 flair) based off rsc dialogue breaks
 [opnpc1,gertrude]
 if (~twocats_gertrude_hook = true) return;
+if (~ratcatch_gertrude_hook = true) return;
 switch_int (%fluffs) {
     case ^fluffs_not_started :
         ~chatplayer("<p,happy>Hello, are you okay?");

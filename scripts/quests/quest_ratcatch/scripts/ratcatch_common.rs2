@@ -1,0 +1,68 @@
+// VERIFIED requirements and route: Tip.It q127, 27 April 2006, lines 173-215.
+// Intermediate stage numbers are UNKNOWN engineering encodings; original terminal is 127.
+[proc,ratcatch_stage](int $stage)
+%ratcatch_var = $stage;
+~send_quest_progress(questlist:ratcatch, %ratcatch_var, ^ratcatch_complete);
+
+[proc,ratcatch_has_cat]()(boolean)
+if (%follower_obj = null) return(false);
+if (oc_category(%follower_obj) ! kitten & oc_category(%follower_obj) ! cat) return(false);
+if (.npc_finduid(%follower_uid) = false) return(false);
+return(true);
+
+[proc,ratcatch_require_cat]()(boolean)
+if (~ratcatch_has_cat = true) return(true);
+mes("Bring a kitten or cat with you."); // UNKNOWN functional refusal; period guide establishes the requirement.
+return(false);
+
+[proc,ratcatch_gertrude_hook]()(boolean)
+if (%fluffs < ^fluffs_complete | %ratcatch_var > 2) return(false);
+// UNKNOWN functional menu. Opting out preserves every Gertrude service and Two Cats branch.
+if (~p_choice2("Ask about rat catching.", 1, "Talk about something else.", 2) = 2) return(false);
+if (%ics_little_var < ^ics_little_complete) {
+    mes("Complete Icthlarin's Little Helper first."); // UNKNOWN functional prerequisite message.
+    return(true);
+}
+if (~ratcatch_require_cat = false) return(true);
+if (%ratcatch_var = 0) ~ratcatch_stage(1);
+mes("Visit Phingspet and Grimesquit in the Varrock sewers."); // UNKNOWN functional directions.
+return(true);
+
+[proc,ratcatch_sewer_caught](coord $rat)
+if (%ratcatch_var ! 2 | coordy($rat) ! 0) return;
+// VERIFIED native Varrock sewer map square; ordinary catches elsewhere earn no quest credit.
+if (coordx($rat) < 3200 | coordx($rat) > 3263 | coordz($rat) < 9856 | coordz($rat) > 9919) return;
+%ratcatch_ometer = min(8, add(%ratcatch_ometer, 1));
+if (%ratcatch_ometer = 8) mes("Your cat has caught eight sewer rats. Return to Phingspet and Grimesquit."); // UNKNOWN functional progress line.
+
+[proc,ratcatch_poles](inv $inv)(int)
+return(calc(inv_total($inv, vc_rat_pole) + inv_total($inv, vc_rat_pole_1) + inv_total($inv, vc_rat_pole_2) + inv_total($inv, vc_rat_pole_3) + inv_total($inv, vc_rat_pole_4) + inv_total($inv, vc_rat_pole_5) + inv_total($inv, vc_rat_pole_6)));
+
+[proc,ratcatch_recover_pole]
+if (%ratcatch_var < 3) return;
+if (calc(~ratcatch_poles(inv) + ~ratcatch_poles(worn) + ~ratcatch_poles(bank)) > 0) return;
+if (inv_freespace(inv) = 0) {
+    mes("Make room for a rat pole."); // UNKNOWN functional capacity message.
+    return;
+}
+inv_add(inv, vc_rat_pole, 1);
+
+// UNKNOWN functional journal wording summarises the retained period walkthrough.
+[if_button,questlist:ratcatch]
+def_string $text;
+if (%ratcatch_var = 0) {
+    $text = "Speak to Gertrude west of Varrock.|Requirements: Gertrude's Cat, Icthlarin's Little Helper and a kitten or cat.|Overgrown cats cannot catch rats.";
+} else if (%ratcatch_var < 3) {
+    $text = "Visit Phingspet and Grimesquit in the Varrock sewers.|My cat must catch eight sewer rats.|Caught: <tostring(%ratcatch_ometer)> of eight.";
+} else if (%ratcatch_var < 6) {
+    $text = "Jimmy Dazzler in East Ardougne has a job for me.|Avoid the mansion guards and catch all six rats.";
+} else if (%ratcatch_var < 12) {
+    $text = "Help Hooknosed Jack in south-east Varrock.|Poison the warehouse rats, cure Pox and defeat the King rat with my cat.";
+} else if (%ratcatch_var < 15) {
+    $text = "Help Smokin' Joe in east Keldagrim.|Smoke the rats from their hole and stop them escaping.";
+} else if (%ratcatch_var < ^ratcatch_complete) {
+    $text = "Speak to The Face and Felkrash in Port Sarim.|The snake charmer in Pollnivneach knows how to charm rats with music.";
+} else {
+    $text = "@red@QUEST COMPLETE!|I can use the Rat Pits and train and name wily and lazy cats.";
+}
+~quest_journal("Rat Catchers", $text);

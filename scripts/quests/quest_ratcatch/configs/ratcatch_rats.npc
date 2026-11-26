@@ -1,0 +1,47 @@
+// Original 377 Rat Catchers rat blocks. Client fields and IDs are unchanged.
+[vc_rat]
+name=Rat
+desc=A popular dwarven delicacy.
+model1=npc_rat
+recol1s=14724
+recol1d=6342
+minimap=no
+vislevel=hide
+op2=Attack
+readyanim=mouse_ready
+walkanim=mouse_walk
+resizeh=133
+resizev=134
+
+[vc_kingrat]
+// UNKNOWN engineering HP18 applies Tip.It q127's roughly-three-times cat HP to CANDIDATE grown-cat HP6.
+hitpoints=18
+// CANDIDATE levels: King_rat oldid15196405; Changes lists only the later 2022 flee change.
+attack=4
+strength=4
+defence=1
+// UNKNOWN engineering interval, not a sourced period timing claim.
+param=attackrate,4
+param=attack_anim,mouse_attack
+param=death_anim,mouse_death
+name=King rat
+desc=The master of all rats.
+model1=npc_rat
+recol1s=14724
+recol1d=4162
+recol2s=12679
+recol2d=2113
+recol3s=17801
+recol3d=15687
+readyanim=mouse_ready
+walkanim=mouse_walk
+alwaysontop=yes
+resizeh=180
+resizev=175
+vislevel=hide
+op2=Hidden
+readyanim=mouse_ready
+walkanim=mouse_walk
+resizeh=140
+resizev=140
+head1=npc_2982_head

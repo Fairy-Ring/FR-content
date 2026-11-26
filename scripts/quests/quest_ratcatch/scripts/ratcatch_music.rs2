@@ -1,0 +1,169 @@
+// VERIFIED eight-page instrument and octave control: 377 inter_322 and Tip.It q127 lines201-209.
+// UNKNOWN functional wording and tune preset pending surviving tune evidence.
+[proc,ratcatch_charmer_talk]()(boolean)
+if (%ratcatch_var < 18 | %ratcatch_var > 20) return(false);
+if (%ratcatch_var = 18) {
+    mes("Put a coin in the snake charmer's bowl to get his attention.");
+} else {
+    ~ratcatch_recover_music;
+}
+return(true);
+
+[proc,ratcatch_charmer_bowl]()(boolean)
+if (%ratcatch_var < 18 | %ratcatch_var > 20) return(false);
+if (~p_choice2("Ask about charming rats.", 1, "Ask for a snake charming kit.", 2) = 2) return(false);
+if (%ratcatch_var >= 19) {
+    ~ratcatch_recover_music;
+    return(true);
+}
+mes("The snake charmer asks for <tostring(^ratcatch_charmer_open_price)> coins.");
+if (~p_choice2("Pay the asking price.", 1, "No thanks.", 2) = 1) {
+    if (inv_total(inv, coins) < ^ratcatch_charmer_open_price) {
+        mes("You do not have enough coins.");
+        return(true);
+    }
+    if (~ratcatch_music_space = false) return(true);
+    inv_del(inv, coins, ^ratcatch_charmer_open_price);
+} else {
+    if (~p_choice2("Walk away slowly.", 1, "Leave.", 2) = 2) return(true);
+    // UNKNOWN favourable-to-player final price after period-sourced bargaining.
+    def_int $price = ^ratcatch_charmer_walk_price;
+    if (inv_total(worn, ring_of_charos_unlocked) > 0) $price = ^ratcatch_charos_price;
+    mes("The snake charmer lowers his price to <tostring($price)> coins.");
+    if (inv_total(inv, coins) < $price) {
+        mes("You do not have enough coins.");
+        return(true);
+    }
+    if (~ratcatch_music_space = false) return(true);
+    inv_del(inv, coins, $price);
+}
+%ratcatch_music_len = 8;
+~ratcatch_stage(19);
+~ratcatch_recover_music;
+return(true);
+
+[proc,ratcatch_music_space]()(boolean)
+def_int $space = 0;
+if (inv_total(inv, ratcatchers_music) = 0) $space = add($space, 1);
+if (inv_total(inv, snake_flute) = 0) $space = add($space, 1);
+if (inv_freespace(inv) >= $space) return(true);
+mes("Make room for the music scroll and flute.");
+return(false);
+
+[proc,ratcatch_recover_music]
+if (~ratcatch_music_space = false) return;
+if (inv_total(inv, ratcatchers_music) = 0) inv_add(inv, ratcatchers_music, 1);
+if (inv_total(inv, snake_flute) = 0) inv_add(inv, snake_flute, 1);
+mes("Play the eight notes on the music scroll near the Port Sarim manhole or docks.");
+
+[opheld1,ratcatchers_music]
+// UNKNOWN fixed engineering tune; the original cache determines its note encoding, not its order.
+~quest_journal("Music scroll", "D | E | F# | G | A | B | C# | High D ||Select one note on each of the eight pages, then press PLAY.|Raise an octave only for the final note.");
+
+
+[proc,ratcatch_flute_open]()(boolean)
+if (%ratcatch_var < 19) return(false);
+if (inv_total(inv, snake_flute) = 0) return(false);
+%vc_note_number = 0;
+~ratcatch_music_page;
+if_openmain(inter_322);
+return(true);
+
+[proc,ratcatch_music_page]
+%vc_note_current = ~ratcatch_note_get(%vc_note_number);
+if_settext(inter_322:com_11, "Page <tostring(add(%vc_note_number, 1))> of 8");
+
+[proc,ratcatch_note_get](int $page)(int)
+switch_int ($page) {
+    case 0 : return(%vc_note1);
+    case 1 : return(%vc_note2);
+    case 2 : return(%vc_note3);
+    case 3 : return(%vc_note4);
+    case 4 : return(%vc_note5);
+    case 5 : return(%vc_note6);
+    case 6 : return(%vc_note7);
+    case 7 : return(%vc_note8);
+}
+return(0);
+
+[proc,ratcatch_note_set](int $page, int $note)
+switch_int ($page) {
+    case 0 : %vc_note1 = $note;
+    case 1 : %vc_note2 = $note;
+    case 2 : %vc_note3 = $note;
+    case 3 : %vc_note4 = $note;
+    case 4 : %vc_note5 = $note;
+    case 5 : %vc_note6 = $note;
+    case 6 : %vc_note7 = $note;
+    case 7 : %vc_note8 = $note;
+}
+
+[proc,ratcatch_music_select](int $fingers)
+if (inv_total(inv, snake_flute) = 0 | %ratcatch_var < 19) return;
+%vc_fingers_current = $fingers;
+~ratcatch_note_set(%vc_note_number, %vc_note_current);
+
+[if_button,inter_322:com_13]
+~ratcatch_music_select(63);
+
+[if_button,inter_322:com_14]
+~ratcatch_music_select(62);
+
+[if_button,inter_322:com_15]
+~ratcatch_music_select(60);
+
+[if_button,inter_322:com_16]
+~ratcatch_music_select(56);
+
+[if_button,inter_322:com_17]
+~ratcatch_music_select(48);
+
+[if_button,inter_322:com_18]
+~ratcatch_music_select(32);
+
+[if_button,inter_322:com_19]
+~ratcatch_music_select(1);
+
+[if_button,inter_322:com_20]
+~ratcatch_music_select(24);
+
+[if_button,inter_322:com_12]
+if (inv_total(inv, snake_flute) = 0 | %ratcatch_var < 19) return;
+%vc_note_current_hi = sub(1, %vc_note_current_hi);
+~ratcatch_note_set(%vc_note_number, %vc_note_current);
+
+[if_button,inter_322:com_22]
+if (inv_total(inv, snake_flute) = 0 | %ratcatch_var < 19) return;
+%vc_note_number = min(7, add(%vc_note_number, 1));
+~ratcatch_music_page;
+
+[if_button,inter_322:com_23]
+if (inv_total(inv, snake_flute) = 0 | %ratcatch_var < 19) return;
+%vc_note_number = max(0, sub(%vc_note_number, 1));
+~ratcatch_music_page;
+
+[if_button,inter_322:com_21]
+if (inv_total(inv, snake_flute) = 0 | %ratcatch_var < 19) return;
+if (%ratcatch_var ! 19) {
+    mes("You play the flute.");
+    return;
+}
+if (coordy(coord) ! 0 | coordx(coord) < ^ratcatch_sarim_min_x | coordx(coord) > ^ratcatch_sarim_max_x | coordz(coord) < ^ratcatch_sarim_min_z | coordz(coord) > ^ratcatch_sarim_max_z) {
+    mes("Play the tune near the Port Sarim manhole or docks.");
+    return;
+}
+if (%vc_note1 ! ^ratcatch_tune_d | %vc_note2 ! ^ratcatch_tune_e | %vc_note3 ! ^ratcatch_tune_fs | %vc_note4 ! ^ratcatch_tune_g | %vc_note5 ! ^ratcatch_tune_a | %vc_note6 ! ^ratcatch_tune_b | %vc_note7 ! ^ratcatch_tune_cs | %vc_note8 ! ^ratcatch_tune_high_d) {
+    mes("That does not match the music scroll.");
+    return;
+}
+if_close;
+anim(ratcatcher_walk_with_flute, 0);
+// UNKNOWN scene representation: two ephemeral rats gather around the piper.
+def_npc_uid $rat1 = ~ratcatch_scene_rat(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk), coord);
+def_npc_uid $rat2 = ~ratcatch_scene_rat(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk), coord);
+p_delay(^ratcatch_scene_delay);
+if (npc_finduid($rat1) = true) npc_del;
+if (npc_finduid($rat2) = true) npc_del;
+anim(null, 0);
+~ratcatch_stage(20);
+mes("The rats follow your tune out of Port Sarim. Return to Felkrash.");

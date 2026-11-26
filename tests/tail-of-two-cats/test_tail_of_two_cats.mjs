@@ -294,7 +294,7 @@ for (const [lamp, amount, level] of [['macro_genilamp', 9900, 99], ['thosf_rewar
 }
 {
   const q = player({ cat: false }); q.setVarBit(b('twocats_quest'), 30); add(q, 'coins', 100);
-  talk(q, 'gertrude', [2, 1], 'pick_a_kitten');
+  talk(q, 'gertrude', [2, 2, 1], 'pick_a_kitten');
   assert.equal(q.modalChat, id('Component', 'pick_a_kitten')); assert.equal(count(q, 'coins'), 0);
   assert.equal(stage(q), 30, 'kitten purchase remains available while Bob needs Gertrude');
   q.closeModal();

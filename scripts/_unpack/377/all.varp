@@ -976,14 +976,6 @@ transmit=yes
 
 [varp608_unused]
 
-[ratcatch_var_multi]
-transmit=yes
-
-[ratcatch_var_temp1]
-transmit=yes
-
-[ratcatch_var_temp2]
-transmit=yes
 
 [varp612_bits]
 

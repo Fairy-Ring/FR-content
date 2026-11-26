@@ -1,0 +1,378 @@
+// VERIFIED route: Tip.It q127, 27 April 2006, lines 189-193.
+// UNKNOWN functional messages and intermediate stage encodings.
+[proc,ratcatch_jack_hook]()(boolean)
+if (%ratcatch_var < 6 | %ratcatch_var > 12) return(false);
+if (%ratcatch_var = 6) {
+    if (inv_total(inv, kwuarm) = 0 | inv_total(inv, red_spiders_eggs) = 0 | inv_total(inv, vial_empty) = 0) {
+        mes("Jack needs kwuarm, red spider eggs and an empty vial for rat poison.");
+        return(true);
+    }
+    inv_del(inv, kwuarm, 1);
+    inv_del(inv, red_spiders_eggs, 1);
+    inv_del(inv, vial_empty, 1);
+    if (inv_total(inv, rat_poison) = 0 & inv_total(bank, rat_poison) = 0) inv_add(inv, rat_poison, 1);
+    ~ratcatch_stage(7);
+    mes("Jack makes rat poison. Use it on four pieces of cheese, then bait the warehouse holes.");
+    return(true);
+}
+if (%ratcatch_var = 7) {
+    def_int $progress = ~ratcatch_warehouse_cheese_progress;
+    if ($progress < 4 & inv_total(inv, rat_poison) = 0 & inv_total(bank, rat_poison) = 0) {
+        if (inv_freespace(inv) = 0) {
+            mes("Make room for more rat poison.");
+            return(true);
+        }
+        inv_add(inv, rat_poison, 1);
+        mes("Jack gives you more rat poison.");
+        return(true);
+    }
+    mes("Poison four pieces of cheese and place one at each warehouse hole.");
+    return(true);
+}
+if (%ratcatch_var = 8) {
+    ~ratcatch_stage(9);
+    mes("Ask the Apothecary to make cat antipoison for Pox.");
+    return(true);
+}
+if (%ratcatch_var = 9) {
+    if (inv_total(inv, ratcatchers_cat_antipoison) > 0) {
+        inv_del(inv, ratcatchers_cat_antipoison, 1);
+        ~ratcatch_stage(10);
+        %ratcatch_withdrawfrom_kingrat = 0;
+        mes("Jack takes the cat antipoison. His cat Pox recovers, but the King rat remains.");
+        return(true);
+    }
+    if (inv_total(bank, ratcatchers_cat_antipoison) > 0) {
+        mes("Take the cat antipoison from your bank and bring it to Jack.");
+    } else {
+        mes("Bring Jack the cat antipoison from the Apothecary.");
+    }
+    return(true);
+}
+if (%ratcatch_var = 10) {
+    mes("Send your kitten or cat through the broken wall to fight the King rat.");
+    return(true);
+}
+if (%ratcatch_var = 11) {
+    ~ratcatch_stage(12);
+    mes("The King rat is defeated. Speak to Smokin' Joe in Keldagrim.");
+    return(true);
+}
+mes("Speak to Smokin' Joe in Keldagrim.");
+return(true);
+
+[proc,ratcatch_apothecary_hook]()(boolean)
+if (%ratcatch_var ! 9) return(false);
+if (inv_total(inv, ratcatchers_cat_antipoison) > 0 | inv_total(bank, ratcatchers_cat_antipoison) > 0) {
+    mes("Take the cat antipoison to Hooknosed Jack.");
+    return(true);
+}
+if (inv_total(inv, marentill) = 0 | inv_total(inv, unicorn_horn_dust) = 0 | inv_total(inv, bucket_milk) = 0) {
+    mes("The Apothecary needs marrentill, ground unicorn horn and a bucket of milk.");
+    return(true);
+}
+inv_del(inv, marentill, 1);
+inv_del(inv, unicorn_horn_dust, 1);
+inv_del(inv, bucket_milk, 1);
+inv_add(inv, bucket_empty, 1);
+inv_add(inv, ratcatchers_cat_antipoison, 1);
+mes("The Apothecary makes cat antipoison for Pox. Take it back to Jack.");
+return(true);
+
+// This function owns only the Rat Catchers warehouse's native floor tiles.
+[proc,ratcatch_warehouse_inside](coord $at)(boolean)
+if (coordy($at) ! ^ratcatch_warehouse_plane) return(false);
+if (coordx($at) < ^ratcatch_warehouse_min_x | coordx($at) > ^ratcatch_warehouse_max_x) return(false);
+if (coordz($at) < ^ratcatch_warehouse_min_z | coordz($at) > ^ratcatch_warehouse_max_z) return(false);
+return(true);
+
+[proc,ratcatch_warehouse_all_baited]()(boolean)
+if (%ratcatch_rathole_1 = 0 | %ratcatch_rathole_2 = 0 | %ratcatch_rathole_3 = 0 | %ratcatch_rathole_4 = 0) return(false);
+return(true);
+
+// The packed holes are active item-on-location targets; the broken wall stays untouched.
+[oplocu,ratcatchers_rathole1] ~ratcatch_warehouse_use_hole(1);
+[oplocu,ratcatchers_rathole2] ~ratcatch_warehouse_use_hole(2);
+[oplocu,ratcatchers_rathole3] ~ratcatch_warehouse_use_hole(3);
+[oplocu,ratcatchers_rathole4] ~ratcatch_warehouse_use_hole(4);
+
+[proc,ratcatch_warehouse_use_hole](int $hole)
+if (~ratcatch_warehouse_inside(loc_coord) = false) return;
+if (last_useitem = ratcatchers_poisonedcheese) {
+    ~ratcatch_warehouse_bait_hole($hole);
+    return;
+}
+if (~ratcatch_warehouse_feed_cat(last_useitem) = true) return;
+~ratcatch_warehouse_use_cat_item(last_useitem);
+
+[proc,ratcatch_warehouse_bait_hole](int $hole)
+if (%ratcatch_var ! 7) {
+    mes("The warehouse holes are not ready for poisoned cheese.");
+    return;
+}
+switch_int($hole) {
+    case 1 : if (%ratcatch_rathole_1 = 1) { mes("This hole already has poisoned cheese."); return; }
+    case 2 : if (%ratcatch_rathole_2 = 1) { mes("This hole already has poisoned cheese."); return; }
+    case 3 : if (%ratcatch_rathole_3 = 1) { mes("This hole already has poisoned cheese."); return; }
+    case 4 : if (%ratcatch_rathole_4 = 1) { mes("This hole already has poisoned cheese."); return; }
+    case default : return;
+}
+if (inv_total(inv, ratcatchers_poisonedcheese) = 0) {
+    mes("You need poisoned cheese.");
+    return;
+}
+inv_del(inv, ratcatchers_poisonedcheese, 1);
+switch_int($hole) {
+    case 1 : %ratcatch_rathole_1 = 1;
+    case 2 : %ratcatch_rathole_2 = 1;
+    case 3 : %ratcatch_rathole_3 = 1;
+    case 4 : %ratcatch_rathole_4 = 1;
+}
+if (~ratcatch_warehouse_all_baited = true) {
+    ~ratcatch_stage(8);
+    mes("You bait the fourth hole. The warehouse rats should eat the poisoned cheese.");
+} else {
+    mes("You place poisoned cheese in the hole.");
+}
+
+[proc,ratcatch_warehouse_cheese_progress]()(int)
+def_int $baited = calc(%ratcatch_rathole_1 + %ratcatch_rathole_2 + %ratcatch_rathole_3 + %ratcatch_rathole_4);
+return(calc($baited + inv_total(inv, ratcatchers_poisonedcheese) + inv_total(bank, ratcatchers_poisonedcheese)));
+
+// `rat_poison` stays until four portions are baited or carried.
+[proc,ratcatch_poison_cheese_hook]()(boolean)
+if (%ratcatch_var ! 7 | last_useitem ! rat_poison) return(false);
+if (inv_total(inv, rat_poison) = 0 | inv_total(inv, cheese) = 0) {
+    mes("Use rat poison on a piece of cheese.");
+    return(true);
+}
+if (~ratcatch_warehouse_cheese_progress >= 4) {
+    mes("You already have enough poisoned cheese for the four warehouse holes.");
+    return(true);
+}
+inv_del(inv, cheese, 1);
+inv_add(inv, ratcatchers_poisonedcheese, 1);
+if (~ratcatch_warehouse_cheese_progress >= 4) inv_del(inv, rat_poison, 1);
+mes("You poison a piece of cheese.");
+return(true);
+
+// Cooked fish use their normal consume-table healing.
+[proc,ratcatch_warehouse_is_fish](obj $food)(boolean)
+switch_obj($food) {
+    case raw_shrimp, raw_anchovies, raw_sardine, raw_trout, raw_salmon, raw_tuna,
+         shrimp, anchovies, sardine, salmon, trout, giant_carp, cod, herring, pike,
+         mackerel, tuna, bass, swordfish, lobster, shark, mantaray, seaturtle : return(true);
+}
+return(false);
+
+// CANDIDATE: pet.rs2 accepts these six raw fish. UNKNOWN: cat healing uses each cooked fish's normal amount.
+[proc,ratcatch_warehouse_heal_source](obj $food)(obj)
+switch_obj($food) {
+    case raw_shrimp : return(shrimp);
+    case raw_anchovies : return(anchovies);
+    case raw_sardine : return(sardine);
+    case raw_trout : return(trout);
+    case raw_salmon : return(salmon);
+    case raw_tuna : return(tuna);
+}
+return($food);
+
+[proc,ratcatch_warehouse_feed_cat](obj $food)(boolean)
+if (%ratcatch_var ! 10 | ~ratcatch_warehouse_is_fish($food) = false) return(false);
+if (~ratcatch_has_cat = false) return(false);
+if (npc_finduid(%follower_uid) = false) return(false);
+if (npc_stat(hitpoints) >= npc_basestat(hitpoints)) {
+    mes("Your cat is not hungry.");
+    return(true);
+}
+def_obj $heal_source = ~ratcatch_warehouse_heal_source($food);
+db_find(consume_table:consumable, $heal_source);
+def_dbrow $effect = db_findnext;
+if ($effect = null) return(false);
+if (db_getfieldcount($effect, consume_table:stat_heal) = 0) return(false);
+def_stat $heal_stat;
+def_int $heal_amount;
+def_int $heal_percent;
+$heal_stat, $heal_amount, $heal_percent = db_getfield($effect, consume_table:stat_heal, 0);
+if ($heal_stat ! hitpoints | $heal_amount <= 0) return(false);
+inv_del(inv, $food, 1);
+npc_statheal(hitpoints, $heal_amount, $heal_percent);
+npc_say("Purr!");
+mes("Your cat eats the fish and recovers some health.");
+return(true);
+
+
+// Pick up an ordinary kitten or cat and use it on an active hole to begin the fight.
+[proc,ratcatch_warehouse_use_cat_item](obj $item)(boolean)
+if (%ratcatch_var ! 10 & %ratcatch_var ! 11) return(false);
+if (oc_category($item) ! kitten & oc_category($item) ! cat) return(false);
+if (~ratcatch_warehouse_inside(loc_coord) = false) return(false);
+if (%ratcatch_var = 11) {
+    mes("The King rat is already defeated.");
+    return(true);
+}
+if (inv_total(inv, $item) = 0) return(false);
+if (~ratcatch_has_cat = true) {
+    mes("Pick up your current kitten or cat first.");
+    return(true);
+}
+if (%follower_uid ! null & .npc_finduid(%follower_uid) = true) {
+    mes("Pick up your current follower first.");
+    return(true);
+}
+def_npc $type = oc_param($item, follower_id);
+if ($type = null) return(false);
+inv_del(inv, $item, 1);
+~cat_spawn($type);
+~ratcatch_warehouse_begin_fight;
+return(true);
+
+// Parent's pet script calls this shared hook after the mansion handler.
+[proc,ratcatch_warehouse_cat_action]()(boolean)
+if (%ratcatch_var ! 10 & %ratcatch_var ! 11) return(false);
+if (~ratcatch_warehouse_inside(coord) = false) return(false);
+if (~ratcatch_has_cat = false) return(false);
+if (%ratcatch_var = 11) {
+    mes("The King rat is already defeated.");
+    return(true);
+}
+def_npc_uid $cat_uid = npc_uid;
+def_npc_uid $fight_uid = ~ratcatch_warehouse_fight_uid;
+if ($fight_uid ! null) {
+    %ratcatch_withdrawfrom_kingrat = 1;
+    npc_del;
+    if (npc_finduid($cat_uid) = true) {
+        npc_setmode(none);
+        npc_telejump(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk));
+        npc_setmode(playerfollow);
+    }
+    mes("Your cat returns from the warehouse fight.");
+    return(true);
+}
+%ratcatch_withdrawfrom_kingrat = 0;
+~ratcatch_warehouse_begin_fight;
+return(true);
+
+[proc,ratcatch_warehouse_fight_uid]()(npc_uid)
+npc_findall(coord, vc_kingrat, 16, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(npc_uid);
+}
+return(null);
+
+[proc,ratcatch_warehouse_begin_fight]
+if (%ratcatch_var ! 10 | ~ratcatch_has_cat = false) return;
+%ratcatch_withdrawfrom_kingrat = 0;
+if (npc_finduid(%follower_uid) = false) return;
+// Same-type reset restores the visible cat profile without healing its damage deficit.
+npc_changetype(npc_type, ^max_32bit_int);
+if (npc_stat(hitpoints) <= 0) {
+    ~follower_death;
+    return;
+}
+def_npc_uid $cat_uid = npc_uid;
+def_player_uid $owner_uid = uid;
+npc_setmode(none);
+npc_telejump(^ratcatch_warehouse_cat_fight_tile);
+npc_anim(cat_pounce, 0);
+npc_add(^ratcatch_warehouse_rat_fight_tile, vc_kingrat, ^ratcatch_warehouse_fight_lifetime);
+%npc_attacking_uid = $owner_uid;
+%ratcatch_king_cat_uid = $cat_uid;
+npc_setmode(none);
+if (oc_category(%follower_obj) = kitten) npc_statsub(hitpoints, 6, 0);
+npc_settimer(npc_param(attackrate));
+mes("Your cat slips through the broken wall and faces the King rat.");
+
+[ai_timer,vc_kingrat]
+if (npc_stat(hitpoints) <= 0) return;
+def_npc_uid $rat_uid = npc_uid;
+def_player_uid $owner_uid = %npc_attacking_uid;
+def_npc_uid $cat_uid = %ratcatch_king_cat_uid;
+if (p_finduid($owner_uid) = true) {
+    if (%ratcatch_var ! 10 | %ratcatch_withdrawfrom_kingrat = 1 | ~ratcatch_warehouse_inside(coord) = false) {
+        %ratcatch_withdrawfrom_kingrat = 1;
+        if (npc_finduid($cat_uid) = true) {
+            npc_setmode(none);
+            npc_telejump(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk));
+            npc_setmode(playerfollow);
+        }
+        npc_finduid($rat_uid);
+        npc_del;
+        return;
+    }
+    if (.npc_finduid($cat_uid) = false) {
+        %ratcatch_withdrawfrom_kingrat = 1;
+        npc_del;
+        return;
+    }
+    // CANDIDATE existing NPC melee rolls; UNKNOWN crush style for the private cat-versus-rat fight.
+    def_int $rat_defence = ~npc_defence_roll_specific(^crush_style);
+    npc_finduid($cat_uid);
+    def_int $cat_attack = ~npc_melee_attack_roll_typeless;
+    def_int $cat_maxhit = ~npc_melee_maxhit;
+    npc_anim(cat_pounce, 0);
+    if (randominc($cat_attack) > randominc($rat_defence)) {
+        def_int $cat_damage = randominc($cat_maxhit);
+        npc_finduid($rat_uid);
+        if ($cat_damage > 0) npc_damage(^hitmark_damage, $cat_damage);
+        else npc_damage(^hitmark_block, 0);
+    } else {
+        npc_finduid($rat_uid);
+        npc_damage(^hitmark_block, 0);
+    }
+    if (npc_stat(hitpoints) <= 0) {
+        %ratcatch_withdrawfrom_kingrat = 0;
+        ~ratcatch_stage(11);
+        if (npc_finduid($cat_uid) = true) {
+            npc_setmode(none);
+            npc_telejump(map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk));
+            npc_setmode(playerfollow);
+            npc_say("Meeeow!");
+        }
+        npc_finduid($rat_uid);
+        npc_del;
+        mes("Your cat defeats the King rat.");
+        return;
+    }
+    def_int $rat_attack = ~npc_melee_attack_roll_typeless;
+    def_int $rat_maxhit = ~npc_melee_maxhit;
+    npc_anim(npc_param(attack_anim), 0);
+    npc_finduid($cat_uid);
+    def_int $cat_defence = ~npc_defence_roll_specific(^crush_style);
+    if (randominc($rat_attack) > randominc($cat_defence)) {
+        def_int $rat_damage = randominc($rat_maxhit);
+        npc_finduid($cat_uid);
+        if ($rat_damage > 0) npc_damage(^hitmark_damage, $rat_damage);
+        else npc_damage(^hitmark_block, 0);
+    } else {
+        npc_finduid($cat_uid);
+        npc_damage(^hitmark_block, 0);
+    }
+    if (npc_stat(hitpoints) <= 0) {
+        ~follower_death;
+        npc_finduid($rat_uid);
+        npc_del;
+        mes("The King rat defeats your cat. You must try again with another kitten or cat.");
+        return;
+    }
+    npc_finduid($rat_uid);
+    npc_settimer(npc_param(attackrate));
+} else if (finduid($owner_uid) = false) {
+    npc_del;
+} else {
+    // Defer while the owner is busy rather than writing protected quest state without access.
+    npc_settimer(npc_param(attackrate));
+}
+
+// Native ladder at (3268,3379); UNKNOWN adjacent walkable arrivals avoid its blocked footprint.
+[oploc1,vc_ladder]
+if (~ratcatch_pit_ladder = true) return;
+if (loc_coord ! 0_51_52_4_51) return;
+p_arrivedelay;
+~climb_ladder(1_51_52_5_51, true);
+
+[oploc1,vc_laddertop]
+if (~ratcatch_pit_ladder = true) return;
+if (loc_coord ! 1_51_52_4_51) return;
+p_arrivedelay;
+~climb_ladder(0_51_52_5_51, true);

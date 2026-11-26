@@ -1,0 +1,3 @@
+// UNKNOWN per-encounter cat identity; server-only NPC state ends with the private King Rat.
+[ratcatch_king_cat_uid]
+type=npc_uid

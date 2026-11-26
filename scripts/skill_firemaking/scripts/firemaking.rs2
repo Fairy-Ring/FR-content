@@ -11,6 +11,10 @@ if (last_useitem = tinderbox) {
 
 // opheldu for logs is handled in fletching
 [opheldu,tinderbox]
+if (last_useitem = ratcatchers_weedpot) {
+    ~ratcatch_light_weedpot;
+    return;
+}
 if (last_useitem = newbielogs) {
     @tut_light_logs_inv(last_useslot);
 } else if(last_useitem = viking_firecracker) {

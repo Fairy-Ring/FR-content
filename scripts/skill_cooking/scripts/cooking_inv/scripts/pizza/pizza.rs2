@@ -19,6 +19,7 @@ switch_obj (last_useitem) {
 };
 
 [opheldu,cheese]
+if (~ratcatch_poison_cheese_hook = true) return;
 switch_obj  (last_useitem) {
     case pizza_base : mes("I should add the tomato first.");
     case incomplete_pizza : @make_uncooked_pizza;

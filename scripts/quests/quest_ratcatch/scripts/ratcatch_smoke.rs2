@@ -1,0 +1,80 @@
+// VERIFIED recipe and cat ambush: Tip.It q127, 27 April 2006, line197.
+// Messages are UNKNOWN plain functional wording, not reconstructed dialogue.
+[proc,ratcatch_joe_hook]()(boolean)
+if (%ratcatch_var < 12 | %ratcatch_var >= ^ratcatch_complete) return(false);
+if (%ratcatch_var >= 15) {
+    mes("Speak to The Face in Port Sarim.");
+    return(true);
+}
+if (%ratcatch_var = 14) {
+    ~ratcatch_stage(15);
+    mes("You have cleared the rats. Speak to The Face in Port Sarim.");
+    return(true);
+}
+mes("Put weeds in a pot and light them with a tinderbox. Use the smouldering pot on the nearby rat hole.");
+return(true);
+
+[opheldu,weeds]
+if (last_useitem = pot_empty) ~ratcatch_make_weedpot;
+
+[proc,ratcatch_make_weedpot]
+if (inv_total(inv, weeds) = 0 | inv_total(inv, pot_empty) = 0) return;
+inv_del(inv, weeds, 1);
+inv_del(inv, pot_empty, 1);
+inv_add(inv, ratcatchers_weedpot, 1);
+mes("You put the weeds in the pot.");
+
+[opheldu,ratcatchers_weedpot]
+if (last_useitem = tinderbox) ~ratcatch_light_weedpot;
+
+[proc,ratcatch_light_weedpot]
+if (inv_total(inv, ratcatchers_weedpot) = 0 | inv_total(inv, tinderbox) = 0) return;
+inv_del(inv, ratcatchers_weedpot, 1);
+inv_add(inv, ratcatchers_smokey_weedpot, 1);
+mes("You light the weeds in the pot.");
+
+[oplocu,ratcatchers_rathole5]
+if (last_useitem ! ratcatchers_smokey_weedpot | inv_total(inv, ratcatchers_smokey_weedpot) = 0) return;
+if (%ratcatch_var ! 12 & %ratcatch_var ! 13) return;
+anim(ratcatcher_create_smoke, 0);
+spotanim_map(ratcatcher_smoke, loc_coord, 0, 0);
+// The tunnel is hidden: a real rat emerges from the opposite original hole.
+def_coord $from = ^ratcatch_joe_south_hole;
+def_coord $to = ^ratcatch_joe_south_exit;
+if (loc_coord = ^ratcatch_joe_south_hole) {
+    $from = ^ratcatch_joe_north_hole;
+    $to = ^ratcatch_joe_north_exit;
+}
+def_npc_uid $rat = ~ratcatch_scene_rat($from, $to);
+p_delay(^ratcatch_scene_delay);
+if (%ratcatch_var = 12) {
+    if (npc_finduid($rat) = true) npc_walk($from);
+    p_delay(^ratcatch_scene_delay);
+    if (npc_finduid($rat) = true) npc_del;
+    ~ratcatch_stage(13);
+    mes("The rats escape through the other hole and return when the smoke clears.");
+    if (~ratcatch_has_cat = true) {
+        %ratcatch_cathas_expressed = 1;
+        mes("Your cat can guard the other hole. Use the pot again when your cat is ready.");
+    }
+    return;
+}
+if (~ratcatch_require_cat = false) return;
+%ratcatch_cathas_expressed = 1;
+%ratcatch_catknowsdrill = 1;
+if (.npc_finduid(%follower_uid) = true) {
+    .npc_setmode(none);
+    .npc_tele($to);
+    .npc_anim(cat_pounce, 0);
+    .npc_setmode(playerfollow);
+}
+if (npc_finduid($rat) = true) npc_del;
+spotanim_map(ratcatcher_smoke_big, loc_coord, 0, 0);
+~ratcatch_stage(14);
+mes("Your cat catches the escaping rats. Return to Smokin' Joe.");
+
+[proc,ratcatch_scene_rat](coord $from, coord $to)(npc_uid)
+npc_add($from, vc_rat, ^ratcatch_scene_rat_lifetime);
+npc_setmode(none);
+npc_walk($to);
+return(npc_uid);
