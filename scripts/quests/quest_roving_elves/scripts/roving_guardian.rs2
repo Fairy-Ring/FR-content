@@ -1,0 +1,29 @@
+// Tip.It 10 Nov 2005 (src.mep1-tipit-88-20051110) describes a combined magic/melee hit
+// and says either protection prayer reduces but does not stop its damage.
+// UNKNOWN: the combined roll/damage formula is not sourced. Use both native style
+// accuracy checks and one native melee damage event; no magic stats are invented.
+[ai_opplayer2,roving_mossgiant]
+~roving_guardian_attack;
+
+[proc,roving_guardian_attack]
+if (~npc_default_attack_ready = false) return;
+def_boolean $melee_hit = ~npc_player_hit_roll(npc_param(damagetype));
+def_boolean $magic_hit = ~npc_player_hit_roll(^magic_style);
+if ($melee_hit = false & $magic_hit = false) {
+    ~playerhit_n_melee(0, npc_param(attackrate));
+    return;
+}
+~npc_meleeattack_hit(~npc_melee_maxhit, 0);
+
+[ai_queue3,roving_mossgiant]
+@roving_guardian_death;
+
+[label,roving_guardian_death]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+if (%roving_elves_quest ! ^roving_get_seed) return;
+if (inv_total(inv, roving_old_consecration_seed) > 0) return;
+if (inv_total(bank, roving_old_consecration_seed) > 0) return;
+obj_add(npc_coord, roving_old_consecration_seed, 1, ^lootdrop_duration);

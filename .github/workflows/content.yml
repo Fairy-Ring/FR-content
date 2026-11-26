@@ -156,6 +156,7 @@ jobs:
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
           run_test tests/devious-minds/test_devious_minds.mjs node --import tsx ../content/tests/devious-minds/test_devious_minds.mjs
           run_test tests/enakhras-lament/test_enakhras_lament.mjs node --import tsx ../content/tests/enakhras-lament/test_enakhras_lament.mjs
+          run_test tests/roving-elves/test_roving_elves.mjs node --import tsx ../content/tests/roving-elves/test_roving_elves.mjs
           run_test tests/mountain-daughter/test_mountain_daughter.mjs node --import tsx ../content/tests/mountain-daughter/test_mountain_daughter.mjs
           run_test tests/between-a-rock/test_between_a_rock.mjs node --import tsx ../content/tests/between-a-rock/test_between_a_rock.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs

@@ -1,0 +1,197 @@
+// Post-quest Ilfeen re-enchantment and crystal weapon charge handling.
+// VERIFIED bounds: RuneHQ (2005-11-17), lines 323-327, says the partly-used
+// reward wears to a seed, first prices are 900,000/750,000, floors are
+// 180,000/150,000, and full gear has 2,500 charges. Intermediate fee steps
+// and per-tier charge counts are UNKNOWN linear defaults; the same source also
+// says the 2/10 reward has 200 uses, while Main's ruling adopts 500 CANDIDATE.
+// UNKNOWN player-facing wording: no retained period transcript for Ilfeen.
+
+[opnpc1,roving_update_female_woodelf] @roving_ilfeen_talk;
+
+[label,roving_ilfeen_talk]
+if (%roving_elves_quest < ^roving_complete) {
+    ~chatnpc("<p,neutral>I can only re-enchant a crystal seed after you have completed your task.");
+    return;
+}
+if (inv_total(inv, crystal_seed_old) < 1) {
+    ~chatnpc("<p,neutral>Bring me a crystal seed and I can re-enchant it.");
+    return;
+}
+
+def_int $enchant_count = max(^roving_ilfeen_fee_count_first, min(%roving_update_ilfeen_chant, ^roving_ilfeen_fee_count_max));
+def_int $bow_fee = ^roving_ilfeen_bow_fee_floor;
+def_int $shield_fee = ^roving_ilfeen_shield_fee_floor;
+if ($enchant_count = ^roving_ilfeen_fee_count_first) {
+    $bow_fee = ^roving_ilfeen_bow_fee_first;
+    $shield_fee = ^roving_ilfeen_shield_fee_first;
+} else if ($enchant_count = ^roving_ilfeen_fee_count_second) {
+    $bow_fee = ^roving_ilfeen_bow_fee_second;
+    $shield_fee = ^roving_ilfeen_shield_fee_second;
+} else if ($enchant_count = ^roving_ilfeen_fee_count_third) {
+    $bow_fee = ^roving_ilfeen_bow_fee_third;
+    $shield_fee = ^roving_ilfeen_shield_fee_third;
+} else if ($enchant_count = ^roving_ilfeen_fee_count_fourth) {
+    $bow_fee = ^roving_ilfeen_bow_fee_fourth;
+    $shield_fee = ^roving_ilfeen_shield_fee_fourth;
+}
+
+~chatnpc("<p,neutral>I can re-enchant that seed into a crystal bow or a crystal shield.");
+~chatnpc("<p,neutral>The bow costs <tostring($bow_fee)> coins; the shield costs <tostring($shield_fee)> coins.");
+def_int $choice = ~p_choice3("Crystal bow", ^roving_ilfeen_choice_bow, "Crystal shield", ^roving_ilfeen_choice_shield, "Not now", ^roving_ilfeen_choice_decline);
+if ($choice ! ^roving_ilfeen_choice_bow & $choice ! ^roving_ilfeen_choice_shield) return;
+
+// Recheck before any change: closing/declining, insufficient coins or a missing
+// seed must never consume either resource.
+if (inv_total(inv, crystal_seed_old) < 1) {
+    ~chatnpc("<p,neutral>You need to have the crystal seed with you.");
+    return;
+}
+def_namedobj $reward = roving_crystal_bow_1000;
+def_int $fee = $bow_fee;
+if ($choice = ^roving_ilfeen_choice_shield) {
+    $reward = roving_crystal_shield_1000;
+    $fee = $shield_fee;
+}
+if (inv_total(inv, coins) < $fee) {
+    ~chatnpc("<p,neutral>You do not have enough coins for that.");
+    return;
+}
+
+// Replace the seed in its existing slot so a full inventory remains safe.
+def_int $seed_count_before = inv_total(inv, crystal_seed_old);
+def_int $reward_count_before = inv_total(inv, $reward);
+inv_changeslot(inv, crystal_seed_old, $reward, 1);
+if (inv_total(inv, crystal_seed_old) ! sub($seed_count_before, 1)
+    | inv_total(inv, $reward) ! add($reward_count_before, 1)) {
+    ~chatnpc("<p,neutral>Please make room in your inventory and try again.");
+    return;
+}
+inv_del(inv, coins, $fee);
+%roving_update_ilfeen_chant = min(^roving_ilfeen_fee_count_max, add($enchant_count, ^roving_count_increment));
+if ($choice = ^roving_ilfeen_choice_bow) ~roving_crystal_reset_bow;
+else ~roving_crystal_reset_shield;
+~chatnpc("<p,happy>Your crystal equipment is ready.");
+
+// This predicate is used by the normal and PvP ranged-ammo paths. Ordinary
+// bows are deliberately not included.
+[proc,roving_crystal_bow_is](obj $bow)(boolean)
+if ($bow = roving_crystal_bow_new) return(true);
+if ($bow = roving_crystal_bow_1000) return(true);
+if ($bow = roving_crystal_bow_900) return(true);
+if ($bow = roving_crystal_bow_800) return(true);
+if ($bow = roving_crystal_bow_700) return(true);
+if ($bow = roving_crystal_bow_600) return(true);
+if ($bow = roving_crystal_bow_500) return(true);
+if ($bow = roving_crystal_bow_400) return(true);
+if ($bow = roving_crystal_bow_300) return(true);
+if ($bow = roving_crystal_bow_200) return(true);
+if ($bow = roving_crystal_bow_100) return(true);
+return(false);
+
+// Parent's player-vs-NPC ranged hook returns the projectile flight duration.
+[proc,roving_crystal_bow_npc](obj $bow)(int)
+if (~roving_crystal_bow_is($bow) = false) return(0);
+spotanim_pl(oc_param($bow, proj_launch), oc_param($bow, proj_height), 0);
+def_int $delay = ~npc_projectile(coord, npc_uid, oc_param($bow, proj_travel), 40, 36, 41, 15, 5, 11, 5);
+~roving_bow_used($bow);
+return($delay);
+
+// Parent's PvP ranged hook has the same return contract as the NPC path.
+[proc,roving_crystal_bow_pvp](obj $bow)(int)
+if (~roving_crystal_bow_is($bow) = false) return(0);
+spotanim_pl(oc_param($bow, proj_launch), oc_param($bow, proj_height), 0);
+def_int $delay = ~player_projectile(coord, .coord, .uid, oc_param($bow, proj_travel), 40, 36, 41, 15, 5, 11, 5);
+~roving_bow_used($bow);
+return($delay);
+
+// The one saved 8-bit counter tracks uses within the currently worn 10% tier.
+// CANDIDATE: ^roving_charge_uses_per_tier interpolates RuneHQ's 2,500 full-charge count.
+[proc,roving_bow_used](obj $bow)
+if (inv_getobj(worn, ^wearpos_rhand) ! $bow) return;
+def_int $uses = getbit_range(%roving_elves_bits, ^roving_bow_use_bits_min, ^roving_bow_use_bits_max);
+if (add($uses, ^roving_count_increment) < ^roving_charge_uses_per_tier) {
+    %roving_elves_bits = setbit_range_toint(%roving_elves_bits, add($uses, ^roving_count_increment), ^roving_bow_use_bits_min, ^roving_bow_use_bits_max);
+    return;
+}
+
+def_namedobj $next = null;
+if ($bow = roving_crystal_bow_new | $bow = roving_crystal_bow_1000) $next = roving_crystal_bow_900;
+else if ($bow = roving_crystal_bow_900) $next = roving_crystal_bow_800;
+else if ($bow = roving_crystal_bow_800) $next = roving_crystal_bow_700;
+else if ($bow = roving_crystal_bow_700) $next = roving_crystal_bow_600;
+else if ($bow = roving_crystal_bow_600) $next = roving_crystal_bow_500;
+else if ($bow = roving_crystal_bow_500) $next = roving_crystal_bow_400;
+else if ($bow = roving_crystal_bow_400) $next = roving_crystal_bow_300;
+else if ($bow = roving_crystal_bow_300) $next = roving_crystal_bow_200;
+else if ($bow = roving_crystal_bow_200) $next = roving_crystal_bow_100;
+else if ($bow = roving_crystal_bow_100) $next = crystal_seed_old;
+if ($next = null) return;
+
+if ($next = crystal_seed_old) {
+    inv_del(worn, $bow, 1);
+    // UNKNOWN overflow: preserve the seed on this player's owned ground tile if inventory is full.
+    if (inv_freespace(inv) > 0) inv_add(inv, crystal_seed_old, 1);
+    else obj_add(coord, crystal_seed_old, 1, ^lootdrop_duration);
+} else {
+    inv_setslot(worn, ^wearpos_rhand, $next, 1);
+}
+~update_all($bow);
+~roving_crystal_reset_bow;
+
+[proc,roving_crystal_shield_is](obj $shield)(boolean)
+if ($shield = roving_crystal_shield_new) return(true);
+if ($shield = roving_crystal_shield_1000) return(true);
+if ($shield = roving_crystal_shield_900) return(true);
+if ($shield = roving_crystal_shield_800) return(true);
+if ($shield = roving_crystal_shield_700) return(true);
+if ($shield = roving_crystal_shield_600) return(true);
+if ($shield = roving_crystal_shield_500) return(true);
+if ($shield = roving_crystal_shield_400) return(true);
+if ($shield = roving_crystal_shield_300) return(true);
+if ($shield = roving_crystal_shield_200) return(true);
+if ($shield = roving_crystal_shield_100) return(true);
+return(false);
+
+// Called before player damage is applied by both NPC combat and PvP hooks.
+// UNKNOWN trigger detail: count one positive-damage hit as one shield use.
+[proc,roving_crystal_shield_use](int $damage)
+if ($damage <= 0) return;
+def_obj $shield = inv_getobj(worn, ^wearpos_lhand);
+if (~roving_crystal_shield_is($shield) = false) return;
+def_int $uses = getbit_range(%roving_elves_bits, ^roving_shield_use_bits_min, ^roving_shield_use_bits_max);
+if (add($uses, ^roving_count_increment) < ^roving_charge_uses_per_tier) {
+    %roving_elves_bits = setbit_range_toint(%roving_elves_bits, add($uses, ^roving_count_increment), ^roving_shield_use_bits_min, ^roving_shield_use_bits_max);
+    return;
+}
+
+def_namedobj $next = null;
+if ($shield = roving_crystal_shield_new | $shield = roving_crystal_shield_1000) $next = roving_crystal_shield_900;
+else if ($shield = roving_crystal_shield_900) $next = roving_crystal_shield_800;
+else if ($shield = roving_crystal_shield_800) $next = roving_crystal_shield_700;
+else if ($shield = roving_crystal_shield_700) $next = roving_crystal_shield_600;
+else if ($shield = roving_crystal_shield_600) $next = roving_crystal_shield_500;
+else if ($shield = roving_crystal_shield_500) $next = roving_crystal_shield_400;
+else if ($shield = roving_crystal_shield_400) $next = roving_crystal_shield_300;
+else if ($shield = roving_crystal_shield_300) $next = roving_crystal_shield_200;
+else if ($shield = roving_crystal_shield_200) $next = roving_crystal_shield_100;
+else if ($shield = roving_crystal_shield_100) $next = crystal_seed_old;
+if ($next = null) return;
+
+if ($next = crystal_seed_old) {
+    inv_del(worn, $shield, 1);
+    // UNKNOWN overflow: preserve the seed on this player's owned ground tile if inventory is full.
+    if (inv_freespace(inv) > 0) inv_add(inv, crystal_seed_old, 1);
+    else obj_add(coord, crystal_seed_old, 1, ^lootdrop_duration);
+} else {
+    inv_setslot(worn, ^wearpos_lhand, $next, 1);
+}
+~update_all($shield);
+~roving_crystal_reset_shield;
+
+// Parent's once-only quest reward calls the matching reset after giving a 2/10
+// item, so an older owned weapon can never donate its partial-use count.
+[proc,roving_crystal_reset_bow]
+%roving_elves_bits = setbit_range_toint(%roving_elves_bits, ^roving_charge_counter_initial, ^roving_bow_use_bits_min, ^roving_bow_use_bits_max);
+
+[proc,roving_crystal_reset_shield]
+%roving_elves_bits = setbit_range_toint(%roving_elves_bits, ^roving_charge_counter_initial, ^roving_shield_use_bits_min, ^roving_shield_use_bits_max);

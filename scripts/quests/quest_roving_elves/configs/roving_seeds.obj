@@ -1,0 +1,27 @@
+// Original 377 client fields unchanged. UNKNOWN default: quest seeds are untradeable.
+[roving_old_consecration_seed]
+name=Consecration seed
+desc=This consecration seed looks grey and dead.
+recol1s=27487
+recol1d=10570
+model=obj_roving_old_consecration_seed
+members=yes
+resizex=80
+resizey=80
+resizez=80
+2dzoom=1450
+weight=14g
+tradeable=no
+
+[roving_new_consecration_seed]
+name=Consecration seed
+desc=This consecration seed glows with a warm light.
+model=obj_roving_old_consecration_seed
+iop1=Plant
+members=yes
+resizex=80
+resizey=80
+resizez=80
+2dzoom=1450
+weight=14g
+tradeable=no

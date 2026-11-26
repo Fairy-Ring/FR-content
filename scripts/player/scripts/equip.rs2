@@ -277,7 +277,7 @@ while ($i < $size) {
     if ($obj ! null) {
         if ($i ! ^wearpos_quiver
             | inv_getobj(worn, ^wearpos_rhand) = null
-            | (oc_category($obj) = arrows & oc_category(inv_getobj(worn, ^wearpos_rhand)) = weapon_bow)
+            | (oc_category($obj) = arrows & oc_category(inv_getobj(worn, ^wearpos_rhand)) = weapon_bow & ~roving_crystal_bow_is(inv_getobj(worn, ^wearpos_rhand)) = false)
             | (oc_category($obj) = bolts & oc_category(inv_getobj(worn, ^wearpos_rhand)) = weapon_crossbow)) {
             $rangebonus = calc($rangebonus + oc_param($obj, rangebonus));
         }
@@ -320,7 +320,7 @@ while ($i < $size) {
     if ($obj ! null) {
         if ($i ! ^wearpos_quiver
             | .inv_getobj(worn, ^wearpos_rhand) = null
-            | (oc_category($obj) = arrows & oc_category(.inv_getobj(worn, ^wearpos_rhand)) = weapon_bow)
+            | (oc_category($obj) = arrows & oc_category(.inv_getobj(worn, ^wearpos_rhand)) = weapon_bow & ~roving_crystal_bow_is(.inv_getobj(worn, ^wearpos_rhand)) = false)
             | (oc_category($obj) = bolts & oc_category(.inv_getobj(worn, ^wearpos_rhand)) = weapon_crossbow)) {
             $rangebonus = calc($rangebonus + oc_param($obj, rangebonus));
         }

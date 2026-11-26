@@ -1,0 +1,43 @@
+// UNKNOWN engineering constants for the post-quest service and charge steps.
+// RuneHQ (2005-11-17) gives 2,500 full charges, but also says the 2/10 reward
+// has 200 uses; Main adopts 500 CANDIDATE for the reward. 250 per 10% tier is
+// the UNKNOWN interpolation used here.
+^roving_charge_uses_per_tier = 250
+
+// UNKNOWN: the saved-use counter starts at zero and advances by one per use.
+^roving_charge_counter_initial = 0
+^roving_count_increment = 1
+
+// UNKNOWN allocation within the Main-approved saved bits of varp 403.
+^roving_bow_use_bits_min = 0
+^roving_bow_use_bits_max = 7
+^roving_shield_use_bits_min = 8
+^roving_shield_use_bits_max = 15
+
+// UNKNOWN: 10-tile attack range uses the cache's longbow range as a functional
+// fallback; no period crystal-bow range is retained.
+^roving_bow_range = 10
+
+// UNKNOWN count indices and intermediate schedule are linearly interpolated.
+// VERIFIED bounds from RuneHQ (2005-11-17): first 900,000/750,000; floors
+// 180,000/150,000. The intermediate fees are engineering defaults.
+^roving_ilfeen_fee_count_first = 0
+^roving_ilfeen_fee_count_second = 1
+^roving_ilfeen_fee_count_third = 2
+^roving_ilfeen_fee_count_fourth = 3
+^roving_ilfeen_fee_count_max = 4
+^roving_ilfeen_bow_fee_first = 900000
+^roving_ilfeen_bow_fee_second = 720000
+^roving_ilfeen_bow_fee_third = 540000
+^roving_ilfeen_bow_fee_fourth = 360000
+^roving_ilfeen_bow_fee_floor = 180000
+^roving_ilfeen_shield_fee_first = 750000
+^roving_ilfeen_shield_fee_second = 600000
+^roving_ilfeen_shield_fee_third = 450000
+^roving_ilfeen_shield_fee_fourth = 300000
+^roving_ilfeen_shield_fee_floor = 150000
+
+// UNKNOWN local dialogue option IDs; kept explicit instead of inlined.
+^roving_ilfeen_choice_bow = 1
+^roving_ilfeen_choice_shield = 2
+^roving_ilfeen_choice_decline = 3

@@ -41275,27 +41275,6 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_woodelf
 
-[roving_mossgiant]
-name=Moss giant
-desc=Bigger than your average moss giant.
-model1=npc_black_knight_titan
-model2=npc_mossgiant
-recol1s=24075
-recol1d=290
-recol2s=21279
-recol2d=9472
-size=2
-walkanim=giant_walk
-readyanim=giant_ready
-op2=Attack
-resizeh=160
-resizev=160
-vislevel=84
-hitpoints=120
-attack=60
-strength=60
-defence=60
-
 [roving_golrie]
 name=Golrie
 desc=No longer locked in his own cage.
@@ -42412,27 +42391,6 @@ hitpoints=6
 attack=1
 strength=1
 defence=1
-
-[roving_update_female_woodelf]
-name=Ilfeen
-desc=A female elf.
-model1=npc_1679i5
-model2=npc_1679
-model3=npc_1679i2
-model4=obj_cape_of_legends_womanwear
-model5=npc_1679i3
-model6=npc_1679i4
-recol1s=17132
-recol1d=15715
-recol2s=14858
-recol2d=18918
-recol3s=32727
-recol3d=24207
-vislevel=hide
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-op1=Talk-to
-head1=npc_1679_head
 
 [wilderness_capeseller_1]
 name=William

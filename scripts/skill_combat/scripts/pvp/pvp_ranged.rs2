@@ -63,6 +63,7 @@ if (%com_attacksound ! null) {
 
 
 [proc,pvp_ranged_use_weapon](obj $rhand, obj $ammo)(int)
+if (~roving_crystal_bow_is($rhand) = true) return(~roving_crystal_bow_pvp($rhand));
 if ($ammo = ogre_arrow) spotanim_pl(oc_param($ammo, proj_launch), 50, 0);
 else spotanim_pl(oc_param($ammo, proj_launch), 96, 0);
 def_int $delay = 30;

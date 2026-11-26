@@ -1,15 +1,46 @@
-// Roving Elves — Islwyn start Talk-to (after Tyras killed).
-// CANDIDATE lines (OSRS Transcript:Roving Elves minus overlay / Eyes-of-Glouphrie
-// / SoE). First write %roving_elves_quest 0 -> 1 (no bit table). Do not open
-// Eluned from this file. No dest / QP / bow. Questlist stays red.
-// At-1: "speak to Eluned" (transcript "Speaking to Islwyn again") — inline.
-// Cite red-19-start-impl-377.md §1.
-
+// Roving Elves. Requirements and rewards: retained Tip.It / RuneHQ 2005.
+// CANDIDATE opener wording retained from the pre-Song of the Elves transcript.
+// UNKNOWN functional reminder/reward wording where no period transcript survives.
 [opnpc1,roving_islwyn]
-if (%roving_elves_quest = 1) {
-    ~chatplayer("<p,neutral>So what do you need to do?");
-    ~chatnpc("<p,neutral>I don't know the consecration process myself. You should speak to Eluned. She is wise in the ways of the ritual.");
-    ~chatplayer("<p,neutral>Will do.");
+if (%roving_elves_quest >= ^roving_complete) {
+    ~chatnpc("<p,happy>Thank you for helping my grandmother rest in peace.");
+    return;
+}
+if (%roving_elves_quest = ^roving_planted) {
+    ~chatplayer("<p,happy>I have planted the consecration seed.");
+    ~chatnpc("<p,happy>Thank you. Please accept a crystal bow or a crystal shield as your reward.");
+    def_int $choice = ~p_choice3("A crystal bow.", 1, "A crystal shield.", 2, "I'll choose later.", 3);
+    if ($choice = 3) {
+        return;
+    }
+    if (inv_freespace(inv) < 1) {
+        ~chatnpc("<p,neutral>Please make room in your inventory first.");
+        return;
+    }
+    def_namedobj $reward = roving_crystal_bow_200;
+    if ($choice = 2) {
+        $reward = roving_crystal_shield_200;
+    }
+    // Commit before the once-only reward. 2/10 is period VERIFIED, 500 uses CANDIDATE.
+    %roving_elves_quest = ^roving_complete;
+    inv_add(inv, $reward, 1);
+    if ($choice = 2) ~roving_crystal_reset_shield;
+    else ~roving_crystal_reset_bow;
+    stat_advance(strength, 100000);
+    session_log(^log_adventure, "Quest complete: Roving Elves");
+    ~send_quest_complete(questlist:roving_elves, $reward, 200, ^roving_questpoints, "You have completed Roving Elves!", "10,000 Strength XP|A partly-used crystal bow or shield");
+    return;
+}
+if (%roving_elves_quest > 0) {
+    if (%roving_elves_quest = ^roving_seed_enchanted) {
+        ~chatnpc("<p,neutral>Plant the consecration seed close to Glarial's remains beneath the waterfall.");
+    } else {
+        ~chatnpc("<p,neutral>I don't know the consecration process myself. You should speak to Eluned. She is wise in the ways of the ritual.");
+    }
+    return;
+}
+if (%regicide_quest < ^regicide_complete | %waterfall_quest < ^waterfall_complete) {
+    ~chatnpc("<p,neutral>You must complete Regicide and the Waterfall Quest before I can ask for your help.");
     return;
 }
 ~chatplayer("<p,neutral>Hello there.");
@@ -23,5 +54,5 @@ if ($go = 2) {
     return;
 }
 ~chatplayer("<p,happy>Deal, what do I need to do?");
-%roving_elves_quest = 1;
-return;
+%roving_elves_quest = ^roving_started;
+~update_questlist;

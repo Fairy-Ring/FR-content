@@ -446,6 +446,7 @@ if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc
     ~ring_of_recoil_lose_charge($recoil_damage);
 }
 p_preventlogout("You can't log out until 10 seconds after the end of combat.", 16);
+~roving_crystal_shield_use($damage);
 ~damage_self($damage);
 
 [proc,npc_retaliate](int $queue_delay)

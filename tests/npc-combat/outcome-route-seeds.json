@@ -2094,6 +2094,15 @@
       "npcVars": {
         "npc_attacking_uid": "target"
       }
+    },
+    {
+      "script": "[ai_opplayer2,roving_mossgiant]",
+      "npc": "roving_mossgiant",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
     }
   ]
 }

@@ -1,0 +1,15 @@
+// UNKNOWN engineering stage integers: preserve the existing opener's 1 and 2.
+^roving_started = 1
+^roving_get_seed = 2
+^roving_seed_enchanted = 3
+^roving_planted = 4
+^roving_complete = 6
+// VERIFIED: Tip.It 10 November 2005 and RuneHQ 17 November 2005.
+^roving_questpoints = 1
+// VERIFIED cache/map: the raised Waterfall room's 2x2 Chalice of Eternity.
+^roving_chalice = 0_40_154_43_54
+// UNKNOWN functional planting bounds and visual timing; not authentic timings.
+^roving_plant_southwest = 0_40_154_42_53
+^roving_plant_northeast = 0_40_154_45_56
+^roving_plant_delay = 2
+^roving_tree_lifetime = 8

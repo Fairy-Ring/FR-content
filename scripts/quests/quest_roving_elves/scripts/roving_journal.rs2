@@ -1,0 +1,17 @@
+// Journal wording: VERIFIED quotations in Tip.It 10 November 2005 where marked.
+// UNKNOWN functional start/completion wording fills the retained journal gaps.
+[if_button,questlist:roving_elves]
+switch_int (%roving_elves_quest) {
+    case 0 :
+        ~quest_journal("Roving Elves", "I can speak to Islwyn in Isafdar after completing Regicide and the Waterfall Quest.");
+    case ^roving_started :
+        ~quest_journal("Roving Elves", "When I offered to help he said I should talk with Eluned, she will tell me how elven consecration is done.");
+    case ^roving_get_seed :
+        ~quest_journal("Roving Elves", "Eluned told me I must acquire the old consecration seed from the guardian spirit in Glarial's old tomb.");
+    case ^roving_seed_enchanted :
+        ~quest_journal("Roving Elves", "I have given the seed to Eluned who has put new life into it by singing to it.");
+    case ^roving_planted :
+        ~quest_journal("Roving Elves", "Planting the seed gave a surprising result as it grew a crystal tree. I should go back to Islwyn to tell him the good news.");
+    case default :
+        ~quest_journal("Roving Elves", "I have completed Roving Elves.");
+}
