@@ -345,6 +345,9 @@
 ~wilderness_enter;
 @music_playbyregion(coord);
 
+[mapzoneexit,0_52_57]
+~wilderness_exit;
+
 [mapzone,0_52_58]
 ~wilderness_enter;
 @music_playbyregion(coord);

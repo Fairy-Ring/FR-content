@@ -9,5 +9,7 @@ set_player_op("Attack", 2, ^false);
 %wilderness = ^true;
 
 [proc,wilderness_exit]
+// %wilderness records warning consumption for this login, not current danger.
+// Keep it set on departure; the overlay and Attack option are location state.
 if_openoverlay(null);
 set_player_op(null, 2, ^false);
