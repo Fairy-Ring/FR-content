@@ -176,6 +176,7 @@ while ($index < ^mep2_list_slots) {
     def_obj $item = ~mep2_dwarf_item($index);
     def_string $text;
     if (~mep2_dwarf_paid($index) = true) {
+        // UNKNOWN functional wording for the three completed variable rows.
         if ($index = 0) $text = "Ticket (received)";
         else if ($index = 1) $text = "Book (received)";
         else if ($index = 2) $text = "Key (received)";
@@ -224,8 +225,8 @@ if (~mep2_dwarf_has_talisman = true) {
     %mourning_dwarf_startedtask = ^mep2_task_reward_complete;
     return;
 }
-// UNKNOWN favourable recovery: a previously satisfied task remains entitled after loss.
-if (%mourning_dwarf_startedtask = ^mep2_task_reward_complete) {
+// UNKNOWN in-quest loss recovery only; completion ends free talisman replacement.
+if (%mourning_dwarf_startedtask = ^mep2_task_reward_complete & %mourning_quest_main < ^mourning2_complete) {
     %mourning_dwarf_startedtask = ^mep2_task_reward_pending;
     ~mep2_dwarf_try_reward;
     return;
@@ -291,3 +292,13 @@ if (~mep2_dwarf_all_paid = true) {
 if (calc(inv_total(inv, mourning_deathalter_list) + inv_total(bank, mourning_deathalter_list)) = 0 & inv_freespace(inv) > 0) {
     inv_add(inv, mourning_deathalter_list, 1);
 }
+
+// VERIFIED 2 May 2006 Tip.It: Prifddinas' history is found in Lletya bookcases.
+[oploc1,elf_village_bookcase_1] ~mep2_lletya_history;
+[oploc1,elf_village_bookcase_2] ~mep2_lletya_history;
+[oploc1,elf_village_bookcase_3] ~mep2_lletya_history;
+
+[proc,mep2_lletya_history]
+if (calc(inv_total(inv, mourning_book1) + inv_total(bank, mourning_book1)) > 0) return;
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, mourning_book1, 1);

@@ -921,6 +921,48 @@ try {
     for (const index of [-1, 50]) assert.equal(integer('mep2_dwarf_item', p, [index]), -1);
   });
 
+  check('all three Lletya bookcases supply the unseeded history needed to complete book-choice-one lists', () => {
+    for (const bookcase of ['elf_village_bookcase_1', 'elf_village_bookcase_2', 'elf_village_bookcase_3']) {
+      const p = fixture(40);
+      p.setVar(varp('varp593_bits'), 1 << 2);
+      assert.equal(integer('mep2_dwarf_item', p, [1]), obj('mourning_book1'));
+      fullInventory(p);
+      operate(p, bookcase);
+      assert.equal(count(p, 'mourning_book1'), 0, 'a full bag cannot lose or replace an item');
+      assert.equal(p.invFreeSpace(inv), 0);
+      del(p, 'spade', 1);
+      operate(p, bookcase);
+      assert.equal(count(p, 'mourning_book1'), 1, `${bookcase}: native Search supplies the requested history`);
+      operate(p, bookcase);
+      assert.equal(count(p, 'mourning_book1'), 1, 'repeated Search cannot duplicate a carried book');
+      // Transfer the natively earned book into bank storage, rather than seeding a source substitute.
+      const earned = count(p, 'mourning_book1');
+      del(p, 'mourning_book1');
+      p.invAdd(bank, obj('mourning_book1'), earned);
+      operate(p, bookcase);
+      assert.equal(count(p, 'mourning_book1'), 0, 'a banked book also prevents duplication');
+      assert.equal(p.invTotal(bank, obj('mourning_book1')), earned);
+      p.invDel(bank, obj('mourning_book1'), earned);
+      operate(p, bookcase);
+      assert.equal(count(p, 'mourning_book1'), 1, 'a lost book is recovered through the same native source');
+      del(p, 'spade');
+      talk(p, 'mourning_deathalter_dwarf_vis');
+      assert(dwarfPaid(p, 1), 'Thorgel accepts the book actually obtained from the bookcase');
+      assert.equal(count(p, 'mourning_book1'), 0);
+      const supplies = [individualizedSupplies[0][0], 'mourning_book1', individualizedSupplies[2][0], ...fixedSupplies];
+      for (const [index, item] of supplies.entries()) {
+        if (index === 1) continue; // This row was earned and handed in above, never seeded.
+        add(p, item);
+        useNpc(p, 'mourning_deathalter_dwarf_vis', item);
+        assert(dwarfPaid(p, index), `${bookcase}: native hand-in accepts ${item}`);
+        assert.equal(count(p, item), 0);
+      }
+      assert(Array.from({ length: 50 }, (_, index) => dwarfPaid(p, index)).every(Boolean));
+      assert.equal(count(p, 'death_talisman'), 1, `${bookcase}: all fifty hand-ins earn the talisman`);
+      assert.equal(stage(p), 40);
+    }
+  });
+
   check('Thorgel records all fifty native partial hand-ins once, preserves puzzle flags, and defers a full-inventory talisman safely', () => {
     const p = fixture(40);
     // A normal final-chamber state: rope/fixed-mirror/first-entry plus two fractured orientations.
@@ -998,6 +1040,11 @@ try {
     talk(p, 'mourning_deathalter_dwarf_vis');
     assert.equal(count(p, 'death_talisman'), 1, 'a lost talisman does not require the fifty supplies again');
     assert.equal(stage(p), 40); preserved();
+    p.setVar(varp('mourning_quest_part2'), 60);
+    del(p, 'death_talisman');
+    for (let repeat = 0; repeat < 2; repeat++) talk(p, 'mourning_deathalter_dwarf_vis');
+    assert.equal(count(p, 'death_talisman'), 0, 'completion ends free tradeable talisman replacement');
+    assert.equal(p.getVarBit(id('VarBitType', 'mourning_dwarf_startedtask')), 3);
   });
 
   check('an already owned Death talisman bypasses the dwarf list without being consumed', () => {
@@ -1009,6 +1056,62 @@ try {
     assert.equal(count(p, 'death_talisman'), 1);
     assert.equal(count(p, 'mourning_deathalter_list'), 0);
     assert.equal(stage(p), 40);
+  });
+
+  check('a closed final light door cannot strand a completed Death-altar visitor behind the native shortcut', () => {
+    const hole = locRows.find(row => row.name === 'mourning_temple_light_wall_with_hole');
+    const tunnel = locRows.find(row => row.name === 'cavewalltunnel_to_temple');
+    assert.deepEqual([hole.level, hole.x, hole.z], [0, 1856, 4638]);
+    assert.deepEqual([tunnel.level, tunnel.x, tunnel.z], [0, 2311, 9792]);
+    const walk = (p, destination) => {
+      const route = [...map.findPath(p.level, p.x, p.z, destination.x, destination.z)];
+      assert(route.length && route.at(-1) === CoordGrid.packCoord(p.level, destination.x, destination.z),
+        'the independent packed-map route reaches the requested operation stand');
+      p.clearInteraction(); p.run = 0; p.queueWaypoints(route);
+      for (let step = 0; step < 64 && (p.x !== destination.x || p.z !== destination.z); step++) {
+        const before = tile(p);
+        p.resetEntity(false); p.updateMovement();
+        assert.notDeepEqual(tile(p), before, 'each native movement cycle advances along clear floor');
+      }
+      assert.deepEqual(tile(p), [destination.level, destination.x, destination.z]);
+    };
+    const enter = (p, target) => {
+      p.resetEntity(false);
+      assert(p.inOperableDistance(target), 'the real tunnel is operable from the reached stand');
+      const visible = visibleLoc(types.LocType.get(target.type), p);
+      // Native teleports rebuild the client's map origin before its next location packet.
+      p.originX = p.x; p.originZ = p.z;
+      assert(locHandler.handle(new OpLoc(1, target.x, target.z, target.type), p));
+      dispatch(p, 'Loc', visible.id); finish(p);
+    };
+    const locked = fixture(20);
+    operate(locked, hole.name);
+    assert.equal(locked.z, 4638, 'a player without chamber access stays beside the closed shortcut');
+    assert.equal(locked.getVarBit(id('VarBitType', 'mourning_light_door_1_c_first_time')), 0);
+    const p = fixture(60, ['death_talisman']);
+    p.setVar(varp('mourning_part2_basevar2'), 0);
+    operate(p, 'mourning_temple_light_wall_lever');
+    assert.equal(p.getVarBit(id('VarBitType', 'mourning_door_1_c')), 0, 'native reset leaves the final barrier closed');
+    useLoc(p, 'deathtemple_ruined', 'death_talisman', row => row.x < 2000);
+    operate(p, 'deathtemple_exit_portal', 1, [], row => row.z > 4800);
+    assert.deepEqual(tile(p), [0, 1862, 4639], 'the actual Death-altar exit starts inside the closed chamber');
+    assert.equal(p.getVarBit(id('VarBitType', 'mourning_door_1_c')), 0);
+    walk(p, { level: hole.level, x: hole.x + 1, z: hole.z });
+    enter(p, loc(p, hole.name));
+    assert.equal(p.getVarBit(id('VarBitType', 'mourning_light_door_1_c_first_time')), 1,
+      'completion opens the reciprocal Underground Pass morph');
+    landing(p, tunnel, 'native Death chamber to Underground Pass shortcut');
+    const returnTunnel = loc(p, tunnel.name);
+    assert.equal(visibleLoc(types.LocType.get(returnTunnel.type), p).debugname, 'cavewalltunnel_to_temple_open');
+    enter(p, returnTunnel);
+    landing(p, hole, 'native Underground Pass return into the Death chamber');
+    for (const target of [loc(p, 'deathtemple_ruined', row => row.x < 2000), npc(p, 'mourning_deathalter_dwarf_vis')]) {
+      const scout = fixture(40); stand(scout, target);
+      walk(p, { level: scout.level, x: scout.x, z: scout.z });
+      assert(p.inOperableDistance(target), 'the native return reaches the altar entrance and Thorgel');
+    }
+    assert.equal(stage(p), 60);
+    assert.equal(p.getVarBit(id('VarBitType', 'mourning_door_1_c')), 0, 'the shortcut does not manufacture an open light door');
   });
 
   check('every original light-door row crosses onto its independently mapped clear side in both directions', () => {

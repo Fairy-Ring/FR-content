@@ -999,6 +999,7 @@ switch_coord (loc_coord) {
 [oploc1,cavewalltunnel_to_temple_open]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 0_36_153_7_0 : ~mep2_tunnel_to_death_chamber;
     case default : @unhandled_stairs(loc_coord);
 }
 

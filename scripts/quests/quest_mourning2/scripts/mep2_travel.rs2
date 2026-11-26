@@ -2,10 +2,6 @@
 // Original placements and collision determine each opposing operation side.
 // UNKNOWN exact landing choice: use a fixed clear stand, never a blocked loc footprint.
 
-[proc,mep2_death_access]()(boolean)
-if (%mourning_quest_main < ^mep2_death_chamber) return (false);
-return (true);
-
 // QuestFlow owns the item consumption and stage-50 write.
 [proc,mep2_mark_black_crystal_restored]
 %mourning_light_temple_safe_guards = 1;
@@ -117,3 +113,14 @@ if (coordx(coord) <= 1919) softtimer(mep2_front_door_watch, 1, coord, 0_30_72_0_
 [zone,0_29_72_56_32]
 if (coordx(coord) > 1917) ~mep2_front_door_gate(movecoord(coord, 1, 0, 0), 0_30_72_0_32);
 if (coordx(coord) <= 1919) softtimer(mep2_front_door_watch, 1, coord, 0_30_72_0_32);
+
+// VERIFIED 2 May 2006 Tip.It: the Death chamber has an Underground Pass shortcut.
+// UNKNOWN exact landings: original clear floor immediately beside each tunnel.
+[oploc1,mourning_temple_light_wall_with_hole]
+if (%mourning_light_door_1_c_first_time = 0 & %mourning_quest_main < ^mourning2_complete) return;
+if (%mourning_quest_main >= ^mourning2_complete) %mourning_light_door_1_c_first_time = 1;
+p_telejump(0_36_153_7_1);
+
+[proc,mep2_tunnel_to_death_chamber]
+if (%mourning_light_door_1_c_first_time = 0) return;
+p_telejump(0_29_72_1_30);
