@@ -8,6 +8,7 @@
 // never-empty / uninterruptible — all SUBTRACT). No dest, no Worship touch.
 
 [opheld1,ectophial]
+if (~teleblock_check = false) return;
 inv_del(inv, ectophial, 1);
 inv_add(inv, ectophial_empty, 1);
 anim(ahoy_ecto_teleport, 0);

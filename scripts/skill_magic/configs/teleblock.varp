@@ -1,0 +1,3 @@
+// Original unused slot 422. Server-only state, cleared on death and logout.
+[teleblock_until]
+scope=temp
