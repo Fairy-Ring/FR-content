@@ -1,0 +1,88 @@
+// VERIFIED supplier mechanism: Tip.It Rogue Trader, capture 15 April 2006.
+// UNKNOWN functional dialogue: the guide describes these exchanges but not their words.
+[opnpc1,ics_little_linen2]
+if (%feud_var < ^feud_complete | %roguetrader_clothes = 0 | %ics_little_var < ^ics_little_complete) return;
+def_int $choice = ~p_choice3("I have three dyes for you.", 1, "I have three matching animal pelts for you.", 2, "Not now.", 3);
+if ($choice = 3) return;
+// UNKNOWN favourable repeat policy: never consume supplies for an unchanged style.
+if ($choice = 1 & %roguetrader_clothes = 4) return;
+if ($choice = 2 & %roguetrader_clothes = 3) return;
+if ($choice = 1) {
+    // VERIFIED: Tip.It 15 April 2006 requires three dyes of ONE colour.
+    def_namedobj $dye = null;
+    if (inv_total(inv, reddye) >= ^roguetrader_supply_count) $dye = reddye;
+    else if (inv_total(inv, yellowdye) >= ^roguetrader_supply_count) $dye = yellowdye;
+    else if (inv_total(inv, bluedye) >= ^roguetrader_supply_count) $dye = bluedye;
+    else if (inv_total(inv, orangedye) >= ^roguetrader_supply_count) $dye = orangedye;
+    else if (inv_total(inv, greendye) >= ^roguetrader_supply_count) $dye = greendye;
+    else if (inv_total(inv, purpledye) >= ^roguetrader_supply_count) $dye = purpledye;
+    if ($dye = null) {
+        ~chatnpc("<p,neutral>I need three dyes of one colour.");
+        return;
+    }
+    inv_del(inv, $dye, ^roguetrader_supply_count);
+    %roguetrader_clothes = 4;
+    %roguetrader_stallvar = 5;
+} else {
+    def_namedobj $pelt = null;
+    if (inv_total(inv, cow_hide) >= ^roguetrader_supply_count) $pelt = cow_hide;
+    else if (inv_total(inv, grey_wolf_fur) >= ^roguetrader_supply_count) $pelt = grey_wolf_fur;
+    else if (inv_total(inv, fur) >= ^roguetrader_supply_count) $pelt = fur;
+    else if (inv_total(inv, wool) >= ^roguetrader_supply_count) $pelt = wool;
+    if ($pelt = null) {
+        ~chatnpc("<p,neutral>I need three pelts of the same animal.");
+        return;
+    }
+    inv_del(inv, $pelt, ^roguetrader_supply_count);
+    %roguetrader_clothes = 3;
+    %roguetrader_stallvar = 3;
+}
+%roguetrader_justchanged_garments = 1;
+~roguetrader_completion;
+~chatnpc("<p,neutral>I will send the clothes to Ali Morrisane.");
+
+[proc,roguetrader_blackjack_supplier]
+if (%roguetrader_bj_urchingloat = 1) {
+    %roguetrader_justchanged_weapons = 2;
+    ~chatnpc("<p,neutral>I will make defensive blackjacks for Ali Morrisane.");
+    return;
+}
+def_int $choice = ~p_choice3("I have a cunning plan.", 1, "Try to knock me out.", 2, "Not now.", 3);
+if ($choice = 3) return;
+if ($choice = 1) {
+    %roguetrader_bjtold_ali = 1;
+    // VERIFIED automatic summons; UNKNOWN functional wording.
+    ~chatnpc_specific("Street urchin", feud_street_urchin, "<p,neutral>I can help with your plan.");
+    return;
+}
+// CANDIDATE two independent Defence rolls, not two combat attacks.
+def_int $hits = 0;
+while ($hits < 2) {
+    // VERIFIED two blows; UNKNOWN functional narration in place of unsourced scene timing.
+    ~mesbox("The blackjack seller strikes you on the head.");
+    if (stat_random(defence, ^roguetrader_blackjack_low, ^roguetrader_blackjack_high) = false) {
+        %roguetrader_bj_outforthecount = 1;
+        ~damage_self(^roguetrader_blackjack_failure_damage);
+        anim(human_unconscious, 0);
+        ~chatnpc("<p,neutral>You were knocked out. You can try again.");
+        anim(null, 0);
+        return;
+    }
+    $hits = calc($hits + 1);
+}
+%roguetrader_bj_outforthecount = 0;
+%roguetrader_justchanged_weapons = 1;
+~chatnpc("<p,neutral>I will make offensive blackjacks for Ali Morrisane.");
+
+[proc,roguetrader_blackjack_urchin]
+if (%roguetrader_bj_urchingloat = 1) return;
+if (inv_total(inv, coins) < ^roguetrader_urchin_price) {
+    ~chatnpc("<p,neutral>I need 100 coins to help with your plan.");
+    return;
+}
+if (~p_choice2("Here are 100 coins.", 1, "Not now.", 2) = 2) return;
+// Charge and durable entitlement are atomic; interruption never loses the payment.
+inv_del(inv, coins, ^roguetrader_urchin_price);
+%roguetrader_bj_urchingloat = 1;
+// VERIFIED theft; UNKNOWN functional narration replaces unsourced scene wording.
+~mesbox("The urchin steals from the blackjack seller.");

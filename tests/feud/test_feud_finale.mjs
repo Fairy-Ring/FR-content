@@ -95,7 +95,7 @@ test('the final report completes stage 28 with one payment, one quest point and 
   ]) assert.equal(text.get(id('Component', `questscroll_death:${component}`)), expected);
   p.closeModal();
   p = relog(p);
-  talk(p, 'feud_ali_m');
+  talk(p, 'feud_ali_m', [1]);
   assert.equal(stage(p), 28);
   assert.equal(count(p, 'coins'), 500, 'saved completion never pays a second reward');
   assert.equal(points(p), 1);
@@ -144,7 +144,7 @@ test('accepting the final wares offer opens the real shop and still commits all 
   assert.equal(p.modalMain, id('Component', 'shop_template'));
   assert.equal(p.getVar(id('VarPlayerType', 'shop')), id('InvType', 'feud_morrisanes'));
   p.closeModal();
-  talk(p, 'feud_ali_m');
+  talk(p, 'feud_ali_m', [1]);
   assert.equal(count(p, 'coins'), 500);
   assert.equal(points(p), 1);
   assert.equal(xp(p), before + expectedXp);

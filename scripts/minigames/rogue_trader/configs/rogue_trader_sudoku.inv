@@ -1,0 +1,13 @@
+// Original server-only inventory IDs. Each player's board and offer are private and temporary.
+[roguetrader_toughsudukuinv]
+scope=temp
+size=81
+
+[roguetrader_alim_runedump]
+scope=temp
+size=9
+
+// Approved single appended server-only inventory: immutable starting clues.
+[roguetrader_sudoku_clueinv]
+scope=temp
+size=81

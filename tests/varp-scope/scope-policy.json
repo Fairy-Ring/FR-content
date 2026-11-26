@@ -2,6 +2,7 @@
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
     "twocats_planted_at": "UNKNOWN engineering timestamp in reserved original slot 326; persists so Unferth's planted potatoes mature across logout without losing four consumed seeds.",
+    "roguetrader_var": "Original transmitted Rogue Trader progress word; permanent supplier agreements and trading rewards survive logout.",
     "ics_little_multi": "UNKNOWN engineering persistence for original Icthlarin jar selection, opened passage, handed-in supplies, Carpenter preparation and quest-visible forms; saving these fields preserves consumed-item progress across logout.",
     "ics_little_multi_extra": "UNKNOWN engineering persistence for the original Icthlarin auxiliary cat-dialogue, chest, spectral-visibility and Sphinx-token flag word; the original cache does not establish its persistence scope.",
     "fightcaves_state": "UNKNOWN engineering storage: reserved original slot 289 saves the current Fight Caves wave across logout. Bits 7..30 hold an online-only instance token, cleared by logout/login; no transmitted field or new varbit.",
@@ -256,6 +257,7 @@
     }
   },
   "deliberatelyTemporary": {
+    "rogue_suduku1": "Original server-only slot 541: temporary Rune Sudoku selector, board size and per-session generation counter in uncovered high bits; board and clue inventories are temporary, and closing or reopening resets interaction state.",
     "fightpits_state": "UNKNOWN engineering session participation and admission combat level in reserved original server-only slot 410; logout removes the participant and login recovers arena coordinates.",
     "tzhaar_fightpit_remaining": "Original transmitted Fight Pits HUD foes count; recomputed during each round.",
     "tzhaar_temp": "Original shared temporary client bit bank; Fight Pits writes only the original orb selector bits 5..7 and preserves all other fields.",
@@ -911,7 +913,7 @@
     "rockthrower": "perm",
     "rogue_suduku1": "temp",
     "roguesden_puzzle": "temp",
-    "roguetrader_var": "temp",
+    "roguetrader_var": "perm",
     "romeo_juliet_multi": "temp",
     "rotten_tomato_delay": "temp",
     "routequest": "perm",
