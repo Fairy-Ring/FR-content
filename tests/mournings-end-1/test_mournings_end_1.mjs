@@ -638,6 +638,30 @@ try {
     }
   });
 
+  check('exact named cooking sources preserve MEP1 heating and original bowl heating', () => {
+    for (const name of ['range', 'scenery_2729', 'scenery_2730', 'scenery_2731']) {
+      const p = fixture(6, ['mourning_toxic_naphtha', 'bowl_water']);
+      useLoc(p, name, 'mourning_toxic_naphtha');
+      assert.equal(count(p, 'mourning_toxic_naphtha'), 0, `${name}: toxic naphtha consumed`);
+      assert.equal(count(p, 'mourning_apple_toxin'), 1, `${name}: powder produced`);
+      useLoc(p, name, 'bowl_water');
+      assert.equal(count(p, 'bowl_water'), 0, `${name}: original bowl consumed`);
+      assert.equal(count(p, 'bowl_hot_water'), 1, `${name}: original hot water produced`);
+      assert.equal(stage(p), 6);
+    }
+    for (const name of ['fireplace', 'grandfireplace', 'grandfireplace_oldbrick', 'fireplacecookingpot', 'fire']) {
+      const p = fixture(6, ['mourning_toxic_naphtha', 'bowl_water']);
+      const hp = p.levels[PlayerStat.HITPOINTS];
+      useLoc(p, name, 'mourning_toxic_naphtha');
+      assert.equal(count(p, 'mourning_toxic_naphtha'), 0, `${name}: explosive naphtha consumed`);
+      assert.equal(count(p, 'mourning_apple_toxin'), 0, `${name}: fire never dries powder`);
+      assert.equal(p.levels[PlayerStat.HITPOINTS], hp - 51, `${name}: native explosion`);
+      useLoc(p, name, 'bowl_water');
+      assert.equal(count(p, 'bowl_hot_water'), 1, `${name}: original bowl heating preserved`);
+      assert.equal(stage(p), 6);
+    }
+  });
+
   check('all six visible grain-sack types dispatch; two real regions, not repeated sacks, complete the poison task', () => {
     const sacks = ['grain_sacks', 'grain_sacks_8802', 'grain_sacks_8803', 'grain_sacks_8804', 'grain_sacks_8805', 'grain_sacks_8806'];
     for (const name of sacks) {
