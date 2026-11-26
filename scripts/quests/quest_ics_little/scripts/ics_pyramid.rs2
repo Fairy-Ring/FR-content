@@ -38,7 +38,7 @@ return(false);
 [oploc1,icthalarins_temple_door]
 if (%ics_little_var ! 2) return;
 %ics_stateofmind = 1;
-settimer(ics_little_traps, 1);
+settimer(ics_little_traps, ^ics_little_trap_interval);
 p_telejump(^ics_little_pyramid_entry);
 
 [oploc3,icthalarins_temple_door]
@@ -49,7 +49,7 @@ if (~ics_little_has_cat = false) {
 }
 %ics_stateofmind = 0;
 if (%ics_little_var = 5 | %ics_little_var = 6) ~ics_little_set_pot_visibility(0);
-settimer(ics_little_traps, 1);
+settimer(ics_little_traps, ^ics_little_trap_interval);
 p_telejump(^ics_little_pyramid_entry);
 
 // The western doorway owns the native tile puzzle. The eastern doorway is the

@@ -2,12 +2,12 @@
 // Original wall-crusher locs supply their real positions. UNKNOWN: the three
 // floor-trigger tiles and one-point trap damage are favourable engineering defaults.
 // Zone timers also re-arm the checks after logging in within a trap corridor.
-[zone,0_51_143_8_16] settimer(ics_little_traps, 1);
-[zone,0_51_143_24_16] settimer(ics_little_traps, 1);
-[zone,0_51_143_32_16] settimer(ics_little_traps, 1);
-[zone,0_51_143_40_16] settimer(ics_little_traps, 1);
-[zone,0_51_143_40_24] settimer(ics_little_traps, 1);
-[zone,0_51_143_32_32] settimer(ics_little_traps, 1);
+[zone,0_51_143_8_16] settimer(ics_little_traps, ^ics_little_trap_interval);
+[zone,0_51_143_24_16] settimer(ics_little_traps, ^ics_little_trap_interval);
+[zone,0_51_143_32_16] settimer(ics_little_traps, ^ics_little_trap_interval);
+[zone,0_51_143_40_16] settimer(ics_little_traps, ^ics_little_trap_interval);
+[zone,0_51_143_40_24] settimer(ics_little_traps, ^ics_little_trap_interval);
+[zone,0_51_143_32_32] settimer(ics_little_traps, ^ics_little_trap_interval);
 
 [timer,ics_little_traps]
 if (~ics_little_in_pyramid(coord) = false) {

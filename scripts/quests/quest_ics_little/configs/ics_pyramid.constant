@@ -31,7 +31,7 @@
 ^ics_little_east_room_max_x = 3312
 ^ics_little_east_room_min_z = 9191
 ^ics_little_east_room_max_z = 9199
-// Original western chamber pot positions; west/east landing tiles above are adjacent floor candidates.
+// Original western chamber pot positions.
 ^ics_little_pot_x = 3286
 ^ics_little_pot_intestines_z = 9193
 ^ics_little_pot_liver_z = 9194
@@ -43,3 +43,7 @@
 ^ics_little_floor_trap_3 = 0_51_143_46_25
 ^ics_little_trap_damage = 1
 ^ics_little_sarcophagus_damage = 1
+
+// UNKNOWN: owned-cat proximity and trap-check interval are engineering values.
+^ics_little_cat_max_range = 15
+^ics_little_trap_interval = 1
