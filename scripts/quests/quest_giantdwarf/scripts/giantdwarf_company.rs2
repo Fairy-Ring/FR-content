@@ -252,6 +252,7 @@ def_int $kind = calc(randominc(7) + 1);
 ~giantdwarf_company_task_offer($company, $kind);
 
 [proc,giantdwarf_company_director](int $company)
+if (~forget_director_talk($company) = true) return;
 def_int $stage = %giantdwarf_quest;
 def_string $company_name = ~giantdwarf_company_name($company);
 if ($stage < 5) {
