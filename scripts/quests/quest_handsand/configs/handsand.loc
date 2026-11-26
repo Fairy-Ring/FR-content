@@ -1,0 +1,100 @@
+[handsand_desk]
+name=Sandy's Desk
+desc=Sandy's desk is piled high with paperwork towers.
+model=handsand_desk
+width=2
+op1=Search
+
+[handsand_coffee_multiloc]
+active=yes
+multivar=handsand_coffee_multi
+multiloc=0,handsand_coffee
+multiloc=1,handsand_table
+
+[handsand_coffee]
+name=Sandy's Coffee Mug
+desc=A large steaming mug of the finest Karamja Coffee.
+model=handsand_coffee
+
+[handsand_table]
+name=Table
+desc=Looks useful for putting things on.
+model=handsand_table
+
+[handsand_wastepaper_bin]
+name=Waste Paper Bin
+desc=A bin full of paper.
+model=handsand_wastepaper_bin
+recol1s=12515
+recol1d=8320
+recol2s=15686
+recol2d=8320
+recol3s=19914
+recol3d=12548
+recol4s=22028
+recol4d=14662
+recol5s=26615
+recol5d=23185
+resizex=80
+resizey=80
+resizez=80
+ambient=20
+
+[handsand_noticeboard]
+model=rimmington_noticeboard
+recol1s=22093
+recol1d=23185
+recol2s=26351
+recol2d=23185
+recol3s=9346
+recol3d=12548
+recol4s=5185
+recol4d=8320
+recol5s=31457
+recol5d=13605
+recol6s=31297
+recol6d=26252
+ambient=30
+
+[handsand_noticeboard2]
+model=rimmington_noticeboard2
+recol1s=22093
+recol1d=23185
+recol2s=26351
+recol2d=23185
+recol3s=9346
+recol3d=12548
+recol4s=5185
+recol4d=8320
+recol5s=31457
+recol5d=13605
+recol6s=31297
+recol6d=26252
+ambient=30
+
+[handsand_counter_multiloc]
+width=2
+active=yes
+multivar=handsand_counter_multi
+multiloc=0,sarim_counter
+multiloc=1,handsand_counter
+
+[handsand_counter]
+name=Counter
+desc=Betty's counter. There is a vial standing on it.
+model=handsand_counter
+blockrange=no
+width=2
+
+[handsand_sandpit_anim]
+name=Sandpit
+desc=It's very sandy.
+model=specimen_tray
+model2=handsand_sandpit_anim
+anim=handsand_sand_magic_static
+width=2
+length=2
+ambient=20
+
+[handsand_shopsign]
+model=handsand_shopsign

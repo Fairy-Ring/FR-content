@@ -401,8 +401,6 @@ scope=perm
 [zamomage]
 scope=perm
 
-[varp271_unused]
-
 [magearena_charge]
 scope=perm
 
@@ -1157,8 +1155,6 @@ transmit=yes
 
 [varp634_bits]
 
-[handsand_transmit]
-transmit=yes
 
 [varp637_bits]
 

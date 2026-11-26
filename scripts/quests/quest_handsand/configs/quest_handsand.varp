@@ -1,2 +1,8 @@
 [handsand]
 scope=perm
+[handsand_transmit]
+transmit=yes
+
+[handsand_last_sand_minutes]
+scope=perm
+transmit=no
