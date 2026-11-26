@@ -371,7 +371,7 @@ if (%soulbane_prog >= ^soulbane_complete) {
 if (%swansong = ^swansong_complete) {
     $questpoints = add($questpoints, ^swansong_questpoints);
 }
-if (%twocats_quest = ^twocats_complete) {
+if (%twocats_quest >= ^twocats_complete) {
     $questpoints = add($questpoints, ^twocats_questpoints);
 }
 if (%zogre >= ^zogre_complete) {
