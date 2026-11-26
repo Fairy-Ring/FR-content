@@ -826,6 +826,13 @@ check('Rod capture uses the native attack dispatch, quarter-health gate, expiry 
   talk(p, npc, [], 2);
   assert.equal(npc.type, id('NpcType', 'burgh_vampire_juve_1'), 'full-health target is not captured');
   assert.equal(count(p, 'burgh_rod_command_final_10', worn), 1, 'failed capture does not spend a charge');
+  npc.levels[NpcStat.HITPOINTS] = Math.floor(hp / 4);
+  p.setVar(id('VarPlayerType', 'sa_energy'), 99);
+  p.setVar(id('VarPlayerType', 'sa_attack'), 1);
+  talk(p, npc, [], 2);
+  assert.equal(npc.type, id('NpcType', 'burgh_vampire_juve_1'), 'less than ten percent cannot capture');
+  assert.equal(count(p, 'burgh_rod_command_final_10', worn), 1);
+  assert.equal(p.getVar(id('VarPlayerType', 'sa_energy')), 99);
   for (let charges = 10; charges > 0; charges--) {
     npc.levels[NpcStat.HITPOINTS] = Math.floor(hp / 4);
     p.setVar(id('VarPlayerType', 'sa_energy'), 1000);
