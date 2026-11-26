@@ -1,0 +1,15 @@
+// VERIFIED: the original varbit is tog_juna_bowl (bits 0..1).
+// UNKNOWN engineering stage mapping: 0=unstarted, 1=started, 2=complete.
+^tog_quest_started = 1
+^tog_quest_complete = 2
+
+// VERIFIED requirements: target-day Tip.It, src.tears-tipit-quest-20060502#15-17.
+^tog_quest_required_questpoints = 43
+^tog_quest_requirement_firemaking = 49
+^tog_quest_requirement_crafting = 20
+^tog_quest_requirement_mining = 20
+// VERIFIED reward: target-day Tip.It, src.tears-tipit-quest-20060502#27-29.
+^tog_questpoints = 1
+
+// VERIFIED reward: 1,000 Crafting XP, expressed in engine tenths.
+^tog_quest_reward_crafting_xp_tenths = 10000

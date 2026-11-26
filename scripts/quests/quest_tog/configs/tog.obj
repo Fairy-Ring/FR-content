@@ -1,0 +1,33 @@
+// Original 377 item records, moved intact from all.obj; tradeability follows quest-item policy (UNKNOWN).
+[tog_stone]
+name=Magic stone
+desc=Doesn't look very special.
+recol1s=15855
+recol1d=14800
+model=obj_uncut_diamond
+2dxof=-5
+2dyof=7
+2dzoom=780
+2dyan=220
+2dzan=1860
+2dxan=368
+members=yes
+cost=1
+weight=5lb
+tradeable=no
+
+[tog_bowl]
+name=Stone bowl
+desc=A magic stone bowl for catching the tears of Guthix.
+model=obj_tog_bowl
+manwear=obj_tog_bowl_manwear,3
+womanwear=obj_tog_bowl_manwear,3
+members=yes
+2dxof=1
+2dzoom=660
+2dyan=68
+2dxan=184
+cost=1
+wearpos=righthand
+weight=4lb
+tradeable=no

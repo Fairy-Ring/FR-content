@@ -1,0 +1,12 @@
+// Original 449 fields retained. Quest/bowl and return-QP bits must survive logout.
+[tog_minigame]
+transmit=yes
+scope=perm
+
+// UNKNOWN engine-limit storage assigned original unused slots 244 and 245.
+// No transmit: the original client/config bytes remain unchanged.
+[tog_last_visit_minute]
+scope=perm
+
+[tog_last_total_level]
+scope=perm

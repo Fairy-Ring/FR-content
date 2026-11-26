@@ -242,8 +242,8 @@
 241=varp241_unused
 242=wanted_white_knight_kills
 243=loc4
-244=varp244_unused
-245=varp245_unused
+244=tog_last_visit_minute
+245=tog_last_total_level
 246=farming_tree_soil
 247=deal_growth_at
 248=varp248_unused

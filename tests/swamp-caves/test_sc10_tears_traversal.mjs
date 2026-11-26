@@ -447,11 +447,13 @@ try {
     assert.equal(q.getVarBit(gas), 0); assert.equal(q.overlay, expected ? id('Component', 'inter_250') : -1);
     unchanged(q, before, { durableOnly: true }); q.onReconnect(); owner(q, expected); finish(q);
   });
-  test('real Juna dialogue HUD survives ledge handoff and outside cave helpers; login remains published partial behavior', () => {
+  test('real post-quest Juna dialogue HUD survives ledge handoff and outside cave helpers; login clears it', () => {
+    World.vars = new Int32Array(types.VarSharedType.count);
     const p = fixture([2, 3244, 9500], []); p.setVar(id('VarPlayerType', 'qp'), 43);
+    p.setVarBit(id('VarBitType', 'tog_juna_bowl'), 2);
     startDialogue('[oploc1,hidey_unbuilt_bush_easy]', p); assert(dialoguePage(p).join(' ').includes('Tell me... a story...'));
     resumeDialogue(p); resumeDialogue(p, 1); resumeDialogue(p); resumeDialogue(p); assert.equal(p.overlay, junaRoot);
-    resumeDialogue(p); resumeDialogue(p); execute('[proc,swamp_cave_start]', p); execute('[proc,swamp_cave_release]', p);
+    execute('[proc,swamp_cave_start]', p); execute('[proc,swamp_cave_release]', p);
     ticks(p, 35); owner(p, false); assert.equal(p.overlay, junaRoot);
     const q = load(p); execute('[login,_]', q); owner(q, false); assert.equal(q.overlay, -1, 'SC-10 ruling 2: no automatic HUD at login'); finish(q);
   });

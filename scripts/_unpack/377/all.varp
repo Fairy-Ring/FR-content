@@ -346,10 +346,6 @@ type=player_uid
 
 [loc4]
 
-[varp244_unused]
-
-[varp245_unused]
-
 [varp248_unused]
 
 [varp249_unused]
@@ -798,9 +794,6 @@ transmit=yes
 [follower_npc]
 
 [varp448_unused]
-
-[tog_minigame]
-transmit=yes
 
 [varp450_unused]
 

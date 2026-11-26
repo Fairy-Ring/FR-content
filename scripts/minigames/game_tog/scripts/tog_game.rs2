@@ -1,0 +1,216 @@
+// Period rules: src.swampcaves-sal-tears (29 April 2006).
+// Engine-limit substitutes and UNKNOWN numeric defaults: tears-of-guthix research.
+[proc,tog_minigame_offer]
+if (%tog_juna_bowl ! 2) return;
+if (~tog_eligible = false) {
+    // UNKNOWN functional wording: the engine cannot read the period 100,000-XP gate.
+    mes("You must wait seven days and gain a Quest Point or a skill level before returning.");
+    return;
+}
+~chatnpc_specific("Juna", tog_juna_dummy, "<p,neutral>Tell me... a story...");
+if (~p_choice2("Okay.", 1, "Not now.", 2) = 2) return;
+~chatplayer("<p,neutral>You tell me a story.");
+~chatnpc_specific("Juna", tog_juna_dummy, "<p,neutral>Your stories have entertained me. I will let you into the cave for a short time.");
+~tog_session_enter;
+
+[proc,tog_eligible]()(boolean)
+if (%tog_juna_bowl ! 2 | %tog_minigame_collecting = 1) return(false);
+if (%tog_last_visit_minute = 0) return(true);
+if (sub(date_minutes, %tog_last_visit_minute) < ^tog_week_minutes) return(false);
+// UNKNOWN engine-limit default: STAT_XP is absent at the pinned engine head.
+// UNKNOWN total-level substitute for the VERIFIED 100,000-XP alternative.
+// The maxed-total escape prevents a normal account from becoming permanently barred.
+if (%qp > %tog_qp_before_return | stat_total > %tog_last_total_level | stat_total >= ^tog_max_total) return(true);
+return(false);
+
+[proc,tog_session_enter]
+// Revalidate after every dialogue pause, before any lockout or item change.
+if (~tog_eligible = false) return;
+if (inv_getobj(worn, ^wearpos_rhand) ! null | inv_getobj(worn, ^wearpos_lhand) ! null) {
+    // UNKNOWN functional wording; no item is removed to clear the player's hands.
+    mes("You need both hands free to hold the bowl.");
+    return;
+}
+%tog_last_visit_minute = date_minutes;
+%tog_last_total_level = stat_total;
+%tog_qp_before_return = %qp;
+%tog_tears_collected = 0;
+%tog_minigame_7_11 = 10;
+%tog_minigame_collecting = 1;
+inv_setslot(worn, ^wearpos_rhand, tog_bowl, 1);
+~bas_set(tog_ready_bowl, tog_ready_bowl, tog_walk_bowl, tog_walk_bowl, tog_walk_bowl, tog_walk_bowl, tog_run_bowl);
+p_teleport(^tog_session_entry);
+~tog_stream_update;
+~tog_hud_enter;
+// CANDIDATE one server tick (0.6 seconds) per QP, not a fixed ninety-second game.
+settimer(tog_session_tick, 1, add(map_clock, %qp), %qp);
+settimer(tog_session_end, %qp);
+
+[proc,tog_inside](coord $position)(boolean)
+// The sealed west corridor behind Juna is part of the packed chamber too.
+if (inzone(2_50_148_55_42, 2_50_148_60_48, $position) = true) return(true);
+return(inzone(2_50_148_53_45, 2_50_148_54_45, $position));
+
+[timer,tog_session_end]
+~tog_session_finish(true, true);
+
+[timer,tog_session_tick](int $deadline, int $duration)
+if (%tog_minigame_collecting = 0) {
+    cleartimer(tog_session_tick);
+    return;
+}
+if (~tog_inside(coord) = false) {
+    // Early walking/teleport exits settle once and retain the external destination.
+    ~tog_session_finish(true, false);
+    return;
+}
+if (inv_getobj(worn, ^wearpos_rhand) ! tog_bowl | inv_getobj(worn, ^wearpos_lhand) ! null) {
+    // UNKNOWN favourable early-exit rule: changing hand equipment ends this visit.
+    ~tog_session_finish(true, true);
+    return;
+}
+if (map_clock >= $deadline) {
+    ~tog_session_finish(true, true);
+    return;
+}
+~tog_stream_update;
+%tog_minigame_7_11 = divide(add(multiply(sub($deadline, map_clock), 10), sub($duration, 1)), $duration);
+settimer(tog_session_tick, 1, $deadline, $duration);
+
+[oploc1,tog_weepingwall]
+if (%tog_minigame_collecting = 0 | ~tog_inside(coord) = false) return;
+facesquare(loc_coord);
+anim(tog_lean_forward_bowl, 0);
+weakqueue*(tog_collect, ^tog_collect_ticks)(loc_coord, coord);
+
+[queue,tog_collect](coord $wall, coord $stand)
+// Real movement/new input cancels the weak continuation. Also validate its anchor.
+if (%tog_minigame_collecting = 0 | coord ! $stand | distance(coord, $wall) > 1) return;
+if (inv_getobj(worn, ^wearpos_rhand) ! tog_bowl | inv_getobj(worn, ^wearpos_lhand) ! null) return;
+// A modal cannot extend collection beyond the absolute session deadline.
+// gettimer returns its start clock; the saved entry QP freezes its duration.
+if (add(gettimer(tog_session_end), %tog_qp_before_return) <= map_clock) return;
+def_int $index = ~tog_wall_index($wall);
+if ($index < 0) return;
+if (testbit(%tog_stream_blue_mask, $index) = ^true) {
+    // UNKNOWN per-collection magnitude; the period guide gives only increase/decrease.
+    %tog_tears_collected = add(%tog_tears_collected, 1);
+} else if (testbit(%tog_stream_green_mask, $index) = ^true) {
+    %tog_tears_collected = max(0, sub(%tog_tears_collected, 1));
+}
+anim(tog_lean_forward_bowl, 0);
+weakqueue*(tog_collect, ^tog_collect_ticks)($wall, $stand);
+
+[proc,tog_wall_index](coord $wall)(int)
+def_int $index = 0;
+while ($index < 9) {
+    if (enum(int, coord, tog_wall_coords, $index) = $wall) return($index);
+    $index = add($index, 1);
+}
+return(-1);
+
+[proc,tog_stream_update]
+// One world controller serves every player. A second player cannot reroll this tick.
+if (map_clock < %tog_stream_next_tick) return;
+%tog_stream_next_tick = add(map_clock, ^tog_stream_ticks);
+%tog_stream_blue_mask = 0;
+%tog_stream_green_mask = 0;
+def_int $count = 0;
+def_int $index = 0;
+while ($count < 6) {
+    // Choose a rank among the remaining positions: bounded, without replacement.
+    def_int $rank = random(sub(9, $count));
+    $index = 0;
+    while ($rank >= 0 & $index < 9) {
+        if (testbit(or(%tog_stream_blue_mask, %tog_stream_green_mask), $index) = ^false) {
+            $rank = sub($rank, 1);
+        }
+        if ($rank >= 0) $index = add($index, 1);
+    }
+    if ($count < 3) {
+        %tog_stream_blue_mask = setbit(%tog_stream_blue_mask, $index);
+    } else {
+        %tog_stream_green_mask = setbit(%tog_stream_green_mask, $index);
+    }
+    $count = add($count, 1);
+}
+$index = 0;
+while ($index < 9) {
+    def_loc $stream = tog_weeping_wall_off_r;
+    def_boolean $mirror = false;
+    if (enum(int, int, tog_wall_mirrored, $index) = 1) $mirror = true;
+    if ($mirror = true) $stream = tog_weeping_wall_off_l;
+    if (testbit(%tog_stream_blue_mask, $index) = ^true) {
+        $stream = tog_weeping_wall_good_r;
+        if ($mirror = true) $stream = tog_weeping_wall_good_l;
+    } else if (testbit(%tog_stream_green_mask, $index) = ^true) {
+        $stream = tog_weeping_wall_bad_r;
+        if ($mirror = true) $stream = tog_weeping_wall_bad_l;
+    }
+    // Original shape-four decoration changes; the placed Collect-from wall remains.
+    .loc_add(enum(int, coord, tog_wall_coords, $index), $stream, enum(int, int, tog_wall_angles, $index), walldecor_straight_nooffset, add(^tog_stream_ticks, 1));
+    $index = add($index, 1);
+}
+
+[proc,tog_lowest_skill]()(stat)
+// UNKNOWN engine-limit tie rule: compare base levels, then original 377 stat order.
+// No Construction, Hunter or later skill exists in this explicit 21-entry table.
+def_stat $lowest = attack;
+def_int $level = 100;
+def_int $index = 0;
+while ($index < 21) {
+    def_stat $skill = enum(int, stat, tog_skills, $index);
+    if (stat_enabled($skill) = 1 & stat_base($skill) < $level) {
+        $lowest = $skill;
+        $level = stat_base($skill);
+    }
+    $index = add($index, 1);
+}
+return($lowest);
+
+[proc,tog_session_finish](boolean $reward, boolean $return)
+if (%tog_minigame_collecting = 0) return;
+def_int $tears = %tog_tears_collected;
+// Commit the spent session before any XP or presentation can suspend or repeat.
+%tog_minigame_collecting = 0;
+%tog_minigame_7_11 = 0;
+%tog_tears_collected = 0;
+cleartimer(tog_session_tick);
+cleartimer(tog_session_end);
+if_openoverlay(null);
+if ($reward = true & $tears > 0) {
+    def_stat $skill = ~tog_lowest_skill;
+    stat_advance($skill, multiply($tears, ~tog_xp_per_tear(stat_base($skill))));
+    // UNKNOWN functional message, not recovered original dialogue.
+    mes("The tears grant you experience in <~stat_name($skill)>.");
+}
+// Reward-derived levels cannot satisfy the next visit's progress requirement.
+%tog_last_total_level = stat_total;
+if ($reward = true & $tears > 0) {
+    anim(tog_drink_bowl, 0);
+    p_delay(sub(^tog_drink_ticks, 1));
+}
+if (inv_total(worn, tog_bowl) > 0) inv_del(worn, tog_bowl, inv_total(worn, tog_bowl));
+if (inv_total(inv, tog_bowl) > 0) inv_del(inv, tog_bowl, inv_total(inv, tog_bowl));
+~update_bas;
+if ($return = true) p_teleport(^tog_session_exit);
+
+[proc,tog_login]
+// Session timers/weak queues do not survive logout. Preserve quest and weekly state.
+// Evacuate the whole sealed chamber even if the session bits were already cleared.
+def_boolean $inside = ~tog_inside(coord);
+if (%tog_minigame_collecting = 1 | $inside = true) {
+    %tog_minigame_collecting = 0;
+    %tog_minigame_7_11 = 0;
+    %tog_tears_collected = 0;
+    cleartimer(tog_session_tick);
+    cleartimer(tog_session_end);
+    if_openoverlay(null);
+    if (inv_total(worn, tog_bowl) > 0) inv_del(worn, tog_bowl, inv_total(worn, tog_bowl));
+    if (inv_total(inv, tog_bowl) > 0) inv_del(inv, tog_bowl, inv_total(inv, tog_bowl));
+    ~update_bas;
+    if ($inside = true) p_teleport(^tog_session_exit);
+}
+
+[proc,tog_xp_per_tear](int $level)(int)
+return(enum(int, int, tog_xp_per_level, $level));

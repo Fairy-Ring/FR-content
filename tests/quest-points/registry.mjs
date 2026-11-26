@@ -56,7 +56,7 @@ function pointsForColour(row) {
   const complete = row.complete.match(/\^(\w+)/)?.[1];
   assert(complete, `unrecognised colour completion ${row.complete}`);
   // These are existing naming differences, not a second quest/reward inventory.
-  const stem = ({ quest_cog_complete: 'cog', mortton_quest_complete: 'mortton', ikov_completed_armadyl: 'ikov', phoenixgang_complete: 'blackarmgang' })[complete]
+  const stem = ({ quest_cog_complete: 'cog', mortton_quest_complete: 'mortton', ikov_completed_armadyl: 'ikov', phoenixgang_complete: 'blackarmgang', tog_quest_complete: 'tog' })[complete]
     ?? complete.replace(/_complete$/, '');
   return `${stem}_questpoints`;
 }
