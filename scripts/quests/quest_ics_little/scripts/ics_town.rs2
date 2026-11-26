@@ -1,6 +1,7 @@
 // VERIFIED mechanics/rewards: Tip.It q97, capture 15 April 2006, lines 53-124.
 // UNKNOWN: functional dialogue and intermediate stage numbers. No modern rewritten lore.
 [opnpc1,ics_little_sphinx]
+if (~twocats_sphinx_hook = true) return;
 if (%ics_little_var >= ^ics_little_complete) {
     if (inv_total(inv, ics_little_amulet_of_catspeak) = 0 & inv_total(worn, ics_little_amulet_of_catspeak) = 0 & inv_total(bank, ics_little_amulet_of_catspeak) = 0) {
         if (inv_freespace(inv) = 0) {
