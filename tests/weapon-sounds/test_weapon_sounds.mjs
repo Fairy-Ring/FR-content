@@ -118,12 +118,13 @@ const synthIds = new Map(readFileSync(path.resolve(here, '../../pack/synth.pack'
 
 function ammoFor(type) {
     if (type.category !== categoryIds.bow && type.category !== categoryIds.crossbow) return null;
+    const compositeOgreBow = type.id === id(ObjType, 'zogre_bow');
     const ammoCategory = type.category === categoryIds.crossbow
         ? categoryIds.bolts
-        : type.id === id(ObjType, 'ogre_bow') ? categoryIds.ogreArrows : categoryIds.arrows;
+        : (type.id === id(ObjType, 'ogre_bow') || compositeOgreBow) ? categoryIds.ogreArrows : categoryIds.arrows;
     const weaponLevel = intParam(type, levelRequirement);
     const ammo = quiverObjects.find(candidate => candidate.category === ammoCategory
-        && intParam(candidate, levelRequirement) <= weaponLevel);
+        && (compositeOgreBow || intParam(candidate, levelRequirement) <= weaponLevel));
     assert(ammo, `${itemName(type)} has compatible packed quiver ammunition`);
     return ammo;
 }
