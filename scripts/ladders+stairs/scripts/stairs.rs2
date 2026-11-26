@@ -950,12 +950,14 @@ switch_coord (loc_coord) {
 [oploc1,dwarf_keldagrim_factory_stairs]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 0_45_159_50_20 : ~bf_enter;
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,blast_furnace_stairs_up]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 0_30_77_19_28 : ~bf_exit;
     case default : @unhandled_stairs(loc_coord);
 }
 
