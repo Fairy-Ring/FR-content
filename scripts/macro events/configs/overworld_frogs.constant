@@ -1,0 +1,10 @@
+// UNKNOWN engineering Frogland return and royal interaction tiles, selected from the 377 map.
+^macro_frogs_cave_landing = 0_38_74_35_35
+^macro_frogs_cave_royal = 0_38_74_32_35
+// UNKNOWN engineering crowd size: one crier and one noncombat frog.
+^macro_frogs_crowd_count = 2
+// UNKNOWN engineering sequence window and auxiliary actor cleanup lifetime.
+^macro_frogs_animation_delay_ticks = 1
+^macro_frogs_crowd_lifetime_ticks = 1000
+^macro_frogs_stage_encounter = 0
+^macro_frogs_stage_cave = 1

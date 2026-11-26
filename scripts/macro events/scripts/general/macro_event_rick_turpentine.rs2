@@ -1,0 +1,90 @@
+[proc,macro_rick_turpentine_spawn]
+%npc_macro_event_target = uid;
+%macro_event = ^macro_rick_turpentine;
+%macro_event_uid = npc_uid;
+%npc_int = 0;
+npc_setmode(playerfollow);
+npc_settimer(1);
+
+[ai_timer,macro_highwayman]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_rick_turpentine) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_rick_turpentine);
+    return;
+}
+if (%npc_int = ^macro_event_attack) {
+    if (~macro_event_lost_hostile = true) {
+        ~macro_overworld_finish(^macro_rick_turpentine);
+        return;
+    }
+    def_int $coins = inv_total(inv, coins);
+    if ($coins > 0) inv_del(inv, coins, $coins);
+    return;
+}
+if (~macro_event_lost = true) {
+    ~macro_overworld_finish(^macro_rick_turpentine);
+    return;
+}
+%npc_int = add(%npc_int, 1);
+// CANDIDATE: four warnings at 10-tick intervals, then 10 ticks before attack.
+if (%npc_int = 10 | %npc_int = 20 | %npc_int = 30 | %npc_int = 40) npc_say("You there! Stand and Deliver!");
+if (%npc_int < ^macro_rick_attention_ticks) return;
+%npc_int = ^macro_event_attack;
+npc_settimer(^macro_rick_theft_ticks);
+%aggressive_npc = npc_uid;
+npc_setmode(applayer2);
+
+[ai_applayer2,macro_highwayman]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_rick_turpentine) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_rick_turpentine);
+    return;
+}
+if (npc_inrange = false) return;
+~npc_rangeattack_outcome(npc_param(max_dealt), false, false);
+
+[opnpc1,macro_highwayman]
+if (uid ! %npc_macro_event_target) return;
+if (~macro_overworld_owned(^macro_rick_turpentine) = false) return;
+~macro_event_rick_turpentine_reward;
+~macro_overworld_finish(^macro_rick_turpentine);
+
+[proc,macro_event_rick_turpentine_reward]
+// CANDIDATE: coin amounts 80, 160, 240, 320, 480, 640. UNKNOWN: equal weights over nine gift categories and among coin amounts.
+def_int $roll = random(^macro_rick_gift_weights);
+if ($roll = 0) {
+    def_int $coin_amount = random(^macro_rick_coin_amount_outcomes);
+    switch_int($coin_amount) {
+        case 0 : inv_add(inv, coins, 80);
+        case 1 : inv_add(inv, coins, 160);
+        case 2 : inv_add(inv, coins, 240);
+        case 3 : inv_add(inv, coins, 320);
+        case 4 : inv_add(inv, coins, 480);
+        case 5 : inv_add(inv, coins, 640);
+    }
+    return;
+}
+switch_int($roll) {
+    case 1 : inv_add(inv, spinach_roll, 1);
+    case 2 : inv_add(inv, uncut_sapphire, 1);
+    case 3 : inv_add(inv, uncut_emerald, 1);
+    case 4 : inv_add(inv, uncut_ruby, 1);
+    case 5 : inv_add(inv, uncut_diamond, 1);
+    case 6 : inv_add(inv, keyhalf1, 1);
+    case 7 : inv_add(inv, keyhalf2, 1);
+    case 8 : inv_add(inv, kebab, 1);
+}

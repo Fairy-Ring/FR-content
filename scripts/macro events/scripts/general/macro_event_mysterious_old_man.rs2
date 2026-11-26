@@ -1,4 +1,4 @@
-//TODO: Update with mime / maze / strangebox
+// Gift encounters can also grant the target-era number-and-shape Strange Box.
 
 [proc,macro_mysterious_old_man_spawn]
 spotanim_map(smokepuff, npc_coord, 124, 0);
@@ -73,8 +73,17 @@ if (%npc_int = ^mysterious_old_man_happy) {
     ~chatnpc("<p,neutral>Goodbye.");
     return;
 }
+if (%macro_event ! ^macro_mysterious_old_man | %macro_event_uid ! npc_uid) return;
 %npc_int = ^mysterious_old_man_happy;
 %macro_event = ^no_macro_event;
+if (inv_freespace(inv) > 0 & random(^macro_mom_box_draw) = 0) {
+    // CANDIDATE period Tip.It: the MOM says this when giving a box.
+    npc_say("Here, take this!");
+    npc_queue(6, 0, 2);
+    npc_settimer(0);
+    ~macro_cube_give;
+    return;
+}
 inv_add(inv, ~macro_mysterious_old_man_reward);
 // dialogue taken from osrs. Neutral is a guess.
 npc_queue(6, 0, 2); // say goodbye to player

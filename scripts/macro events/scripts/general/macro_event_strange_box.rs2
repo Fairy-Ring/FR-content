@@ -1,16 +1,32 @@
-// TODO: Run ~try_add_macro_cube when low / high alching once implemented
+// Login restores only inventory-qualified timers. No elapsed offline replication.
+[proc,macro_cube_login]
+if (inv_total(inv, macro_cube) = 0) {
+    cleartimer(macro_cube_add);
+    cleartimer(macro_cube_split);
+    return;
+}
+if (gettimer(macro_cube_add) ! ^true) {
+    settimer(macro_cube_add, ^macro_cube_replication_ticks);
+}
+if (gettimer(macro_cube_split) ! ^true) {
+    settimer(macro_cube_split, ^macro_cube_split_ticks);
+}
+
+[proc,macro_cube_give]
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, macro_cube, 1);
+~macro_cube_login;
+~objbox(macro_cube, "You have been given a Mysterious box! Click on it and answer the question correctly to get the prize inside!", 200, 0, -16);
 
 [proc,try_add_macro_cube]
 def_int $size = inv_size(inv);
 def_int $i = 0;
 def_int $space = inv_freespace(inv);
 def_int $total = inv_total(inv, macro_cube);
-if($total > 27 | $total = 0) {
+if ($total = 0) {
     return;
 }
-if (gettimer(macro_cube_split) ! ^true) {
-    settimer(macro_cube_split, 16);
-}
+~macro_cube_login;
 if($space > 0) {
     while ($i < $size) {
         def_obj $obj = inv_getobj(inv, $i);
@@ -28,9 +44,6 @@ return;
 def_int $total = inv_total(inv, macro_cube);
 if($total = 0) {
     cleartimer(macro_cube_add);
-    return;
-}
-if($total = 28) {
     return;
 }
 ~try_add_macro_cube;
@@ -160,14 +173,8 @@ switch_int($shape_value) {
 }
 
 [proc,macro_cube_open]
-// TODO: Maybe find out if the timer(s) restarts on login instead of when opening one?
-if (gettimer(macro_cube_add) ! ^true) {
-    settimer(macro_cube_add, 150);
-}
-
-if (gettimer(macro_cube_split) ! ^true) {
-    settimer(macro_cube_split, 16);
-}
+if (inv_total(inv, macro_cube) = 0) return;
+~macro_cube_login;
 
 if_openmain(macro_cube);
 
@@ -292,17 +299,14 @@ if(%macro_transmit = 2) {
 }
 
 [proc,macro_cube_question_fail]
-def_int $total = inv_total(inv, macro_cube);
-if($total = 28) {
-    mes("Oh dear, you have answered the question incorrectly.");
-    return;
-}
+if (inv_total(inv, macro_cube) = 0) return;
 mes("Oh dear, you have answered the question incorrectly and so the cube has");
 mes("replicated.");
 mes("You will need to solve this one too to get the reward.");
 ~try_add_macro_cube;
 
 [proc,macro_cube_success]
+if (inv_total(inv, macro_cube) = 0) return;
 inv_del(inv, macro_cube, 1);
 def_int $total = inv_total(inv, macro_cube);
 if($total > 0) {
@@ -350,15 +354,4 @@ mes("The mystical powers surrounding this cube prevent you from taking it.");
 if (p_finduid(uid) = false) {
     return;
 }
-// https://www.youtube.com/watch?v=39XCOOLY-kM // TODO: Part of MOM spawn
-//You can only get this event if your inv is not full, otherwise he always sends you to a maze (maybe mime too?) on a full inv. 
-//Greetings, playername!
-//Here you go playername, it's all yours!
-inv_add(inv, macro_cube, 1);
-~objbox(macro_cube, "You have been given a Mysterious box! Click on it and answer the question correctly to get the prize inside!", 200, 0, -16);
-mes("You have been given a Mysterious box! Click on it and answer the question");
-mes("correctly to get the prize inside!");
-// https://www.youtube.com/watch?v=VZdOT8VYfXg 90s between too long messages
-settimer(macro_cube_add, 150);
-// https://www.youtube.com/watch?v=4nvDxoeBXlU // unstacks itself every 10s
-settimer(macro_cube_split, 16);
+~macro_cube_give;

@@ -1,0 +1,88 @@
+// VERIFIED: period Tip.It random-events guide, 28 April 2006, item identification.
+// The 377 inter_293 is kept intact, including its original three option buttons.
+[proc,macro_certers_spawn]
+// UNKNOWN engineering actor draw; all three original brothers can appear.
+npc_changetype_keepall(enum(int, npc, macro_certer_actors, random(3)), 1000);
+%macro_event_uid = npc_uid;
+%npc_macro_event_target = uid;
+%npc_int = -1;
+npc_setmode(playerfollow);
+npc_settimer(^macro_overworld_attention_ticks);
+spotanim_map(smokepuff, npc_coord, 124, 0);
+
+[opnpc1,macro_niles] ~macro_certers_talk;
+[opnpc1,macro_miles] ~macro_certers_talk;
+[opnpc1,macro_giles] ~macro_certers_talk;
+
+[proc,macro_certers_talk]
+if (~macro_overworld_owned(^macro_certers) = false) return;
+// UNKNOWN engineering question draw. The objects and their names are original 377.
+def_int $question = random(6);
+def_int $answer = random(3);
+%npc_int = add(add(100, multiply($question, 3)), $answer);
+if_openmain(inter_293);
+if_setobject(inter_293:com_7, enum(int, obj, macro_certer_objects, $question), 400);
+if_setrotation(inter_293:com_7, 0, 8);
+if_settext(inter_293:com_1, "A....<oc_name(enum(int, obj, macro_certer_objects, add($question, sub(3, $answer))))>");
+if_settext(inter_293:com_2, "B....<oc_name(enum(int, obj, macro_certer_objects, add($question, sub(4, $answer))))>");
+if_settext(inter_293:com_3, "C....<oc_name(enum(int, obj, macro_certer_objects, add($question, sub(5, $answer))))>");
+// Replace only the correct option with the displayed object's exact cache name.
+switch_int ($answer) {
+    case 0 : if_settext(inter_293:com_1, "A....<oc_name(enum(int, obj, macro_certer_objects, $question))>");
+    case 1 : if_settext(inter_293:com_2, "B....<oc_name(enum(int, obj, macro_certer_objects, $question))>");
+    case 2 : if_settext(inter_293:com_3, "C....<oc_name(enum(int, obj, macro_certer_objects, $question))>");
+}
+
+[if_button,inter_293:com_9] ~macro_certers_answer(0);
+[if_button,inter_293:com_10] ~macro_certers_answer(1);
+[if_button,inter_293:com_11] ~macro_certers_answer(2);
+
+[proc,macro_certers_answer](int $answer)
+if (%macro_event ! ^macro_certers | npc_finduid(%macro_event_uid) = false) return;
+if (~macro_overworld_owned(^macro_certers) = false | %npc_int < 100) return;
+if_close;
+if (calc((%npc_int - 100) % 3) ! $answer) {
+    ~macro_certers_punish;
+    return;
+}
+// VERIFIED categories: period Tip.It line 135. UNKNOWN equal category weights.
+switch_int (random(3)) {
+    case 0 : inv_add(inv, coins, ^macro_certer_coins);
+    case 1 : inv_add(inv, kebab, 1);
+    case 2 : inv_add(inv, uncut_sapphire, 1);
+}
+// CANDIDATE: retained Niles transcript, same required reward line for each brother.
+npc_say("Thank you, I hope you like your present. I must be leaving now though.");
+~macro_overworld_finish(^macro_certers);
+
+[ai_timer,macro_niles] ~macro_certers_timer;
+[ai_timer,macro_miles] ~macro_certers_timer;
+[ai_timer,macro_giles] ~macro_certers_timer;
+
+[proc,macro_certers_timer]
+if (~macro_event_lost = true) {
+    ~macro_event_disappear;
+    return;
+}
+if (finduid(%npc_macro_event_target) = false) return;
+if (~macro_overworld_owned(^macro_certers) = false) return;
+~macro_certers_punish;
+
+[proc,macro_certers_punish]
+if (~macro_overworld_owned(^macro_certers) = false) return;
+if (p_finduid(uid) = false) return;
+// VERIFIED official April KB: try to convert inventory items into banknotes.
+// UNKNOWN engineering extent: every certable slot, preserving every quantity.
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    def_obj $item = inv_getobj(inv, $slot);
+    if ($item ! null) {
+        def_obj $note = oc_cert($item);
+        if ($note ! $item & $note ! null) {
+            inv_moveitem_cert(inv, inv, $item, inv_total(inv, $item));
+        }
+    }
+    $slot = add($slot, 1);
+}
+if_close;
+~macro_overworld_finish(^macro_certers);

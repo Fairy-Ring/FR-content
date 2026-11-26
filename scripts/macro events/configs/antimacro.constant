@@ -1,3 +1,34 @@
 ^macro_candlelight_unlit = 0
 ^macro_candlelight_lit = 1
 ^macro_candlelight_burnt = 2
+// UNKNOWN: Cap'n Hand attention, attack cadence, and gift-category and coin-amount weights.
+^macro_capn_attention_ticks = 100
+^macro_capn_attack_ticks = 4
+^macro_capn_gift_outcomes = 9
+^macro_capn_coin_amount_outcomes = 2
+
+// CANDIDATE: Rick's attention and crossbow cadence follow the retained Old School schedule.
+^macro_rick_attention_ticks = 50
+^macro_rick_attack_ticks = 4
+// CANDIDATE: coin amounts 80, 160, 240, 320, 480, 640. UNKNOWN: equal weights over nine gift categories and among coin amounts.
+^macro_rick_gift_weights = 9
+^macro_rick_coin_amount_outcomes = 6
+// UNKNOWN: Theft interval.
+^macro_rick_theft_ticks = 6
+
+// UNKNOWN: Jekyll's attention timeout before transformation.
+^macro_jekyll_attention_ticks = 100
+
+// CANDIDATE: Hyde attack cadence; UNKNOWN: bored interval and four-outcome loot realization.
+^macro_hyde_attack_ticks = 4
+^macro_hyde_bored_ticks = 100
+^macro_hyde_drop_outcomes = 4
+
+// UNKNOWN: Chicken attack cadence, departure distance and bored interval.
+^macro_chicken_attack_ticks = 6
+^macro_chicken_vanish_tiles = 15
+^macro_chicken_bored_ticks = 100
+// CANDIDATE feather bounds 50..750; UNKNOWN uniform draw and auxiliary drop counts.
+^macro_chicken_feather_min = 50
+^macro_chicken_feather_span = 700
+

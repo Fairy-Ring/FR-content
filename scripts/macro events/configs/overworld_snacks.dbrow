@@ -1,0 +1,15 @@
+// UNKNOWN engineering food healing while no period quantity survives: six HP.
+[macro_sandwich_food_heal]
+table=consume_table
+data=consumable,baguette
+data=consumable,triangle_sandwich
+data=consumable,square_sandwich
+data=stat_heal,hitpoints,6,0
+data=consume_sound,eat
+
+// UNKNOWN engineering roll healing: one HP.
+[macro_sandwich_roll_heal]
+table=consume_table
+data=consumable,roll
+data=stat_heal,hitpoints,1,0
+data=consume_sound,eat

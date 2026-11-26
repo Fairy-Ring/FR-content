@@ -1,0 +1,23 @@
+// Engineering ownership contract: neither a stale actor nor another player owns a reward.
+[proc,macro_overworld_owned](int $event)(boolean)
+if (uid = %npc_macro_event_target & %macro_event = $event & %macro_event_uid = npc_uid) return(true);
+return(false);
+
+[proc,macro_overworld_finish](int $event)
+if (~macro_overworld_owned($event) = false) return;
+// NPC timers hold only an ordinary player pointer; acquire access before frog-form cleanup.
+if (p_finduid(uid) = false) return;
+npc_settimer(0);
+~macro_event_cleanup($event, npc_uid);
+
+[queue,macro_overworld_death_cleanup](int $event, npc_uid $actor)
+// The NPC is already gone; acquire player access through the native queue.
+~macro_event_cleanup($event, $actor);
+
+[proc,macro_overworld_fail_teleport](int $event)
+if (~macro_overworld_owned($event) = false) return;
+npc_settimer(0);
+// The published queue owns the cleared event token and the exact actor reference.
+%macro_event = ^no_macro_event;
+queue*(macro_event_fail_teleport, 0)(%macro_event, npc_uid);
+~macro_event_disappear;

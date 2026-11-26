@@ -7,6 +7,24 @@
 ^macro_triffidseed = 6
 ^macro_lost_and_found = 7
 
+^macro_capn_hand = 8
+^macro_rick_turpentine = 9
+^macro_jekyll = 10
+^macro_evil_chicken = 11
+^macro_frogs = 12
+^macro_certers = 13
+^macro_sandwich_lady = 14
+
+// UNKNOWN engineering attention window: 100 ticks.
+^macro_overworld_attention_ticks = 100
+// UNKNOWN engineering draw: one of two ordinary MOM gifts is a box.
+^macro_mom_box_draw = 2
+// Published Strange Box video-derived timers, retained as CANDIDATE.
+^macro_cube_replication_ticks = 150
+^macro_cube_split_ticks = 16
+// UNKNOWN engineering reward amount; categories follow period Tip.It.
+^macro_certer_coins = 240
+
 ^macro_bigfish = 6
 
 ^no_macro_event = 0
