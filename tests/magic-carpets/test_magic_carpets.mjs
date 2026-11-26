@@ -158,6 +158,10 @@ function trip(from, to, route, setup = () => {}, fare = 200) {
     assert.equal(animationUpdates[landingIndex - 1], -1, 'clear priority-10 primary before priority-5 landing');
     const airborne = samples.filter(x => x.bas[0] === flying);
     assert.ok(airborne.length > 10, 'journey has many distinct flight ticks, not a single teleport');
+    const [mx, mz] = station(from).map.slice(1).split('_').map(Number);
+    const rugAnchor = fs.readFileSync(path.join(content, 'maps', `${station(from).map}.jm2`), 'utf8').match(/^0 (\d+) (\d+): 7395 10(?: |$)/m);
+    assert.ok(rugAnchor, 'original boarding rug exists');
+    assert.deepEqual(airborne[0].start, [mx * 64 + Number(rugAnchor[1]), mz * 64 + Number(rugAnchor[2])], 'production boarding reaches the real mapped rug under protection');
     assert.ok(airborne.every(x => x.bas.every(seq => seq === flying) && x.destination === to));
     assert.ok(rebuilds >= 1, 'real engine build area recenters during long travel');
     assert.ok(text(p).includes(`The fare is ${fare} coins.`));
