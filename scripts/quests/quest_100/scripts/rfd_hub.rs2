@@ -7,14 +7,14 @@ return(calc(^rfd_step_qp + %hundred_subquest_tally));
 // The map places the frozen bases, not the original multi wrappers. Install the
 // cache wrappers server-side so each player's original visibility bits work.
 // No client field or map placement changes; all guests remain private by varbit.
-if (loc_find(0_29_83_6_9, hundred_dwarf_ambassador_base) = true) loc_change(hundred_dwarf_ambassador_multi, -1);
-if (loc_find(0_29_83_6_13, hundred_goblin1_base) = true) loc_change(hundred_goblin1_multi, -1);
-if (loc_find(0_29_83_6_15, hundred_goblin2_base) = true) loc_change(hundred_goblin2_multi, -1);
-if (loc_find(0_29_83_6_11, hundred_pirate_base) = true) loc_change(hundred_pirate_multi, -1);
-if (loc_find(0_29_83_9_13, hundred_guide_base) = true) loc_change(hundred_guide_multi, -1);
-if (loc_find(0_29_83_9_11, hundred_dave_base) = true) loc_change(hundred_dave_multi, -1);
-if (loc_find(0_29_83_7_16, hundred_ogre_base) = true) loc_change(hundred_ogre_multi, -1);
-if (loc_find(0_29_83_9_9, hundred_varze_base) = true) loc_change(hundred_varze_multi, -1);
+if (loc_find(0_29_83_6_9, hundred_dwarf_ambassador_base) = true) loc_change(hundred_dwarf_ambassador_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_6_13, hundred_goblin1_base) = true) loc_change(hundred_goblin1_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_6_15, hundred_goblin2_base) = true) loc_change(hundred_goblin2_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_6_11, hundred_pirate_base) = true) loc_change(hundred_pirate_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_13, hundred_guide_base) = true) loc_change(hundred_guide_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_11, hundred_dave_base) = true) loc_change(hundred_dave_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_7_16, hundred_ogre_base) = true) loc_change(hundred_ogre_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_9, hundred_varze_base) = true) loc_change(hundred_varze_multi, ^rfd_wrapper_duration);
 
 [opnpc1,hundred_aris_base]
 if (%hundred_main_quest_var < ^rfd_frozen) return;

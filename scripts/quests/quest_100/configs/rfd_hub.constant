@@ -14,3 +14,5 @@
 ^rfd_shop_buy = 1000
 ^rfd_shop_sell = 1000
 ^rfd_shop_haggle = 10
+// UNKNOWN engineering lifetime: use the engine's largest valid positive duration.
+^rfd_wrapper_duration = 2147483647

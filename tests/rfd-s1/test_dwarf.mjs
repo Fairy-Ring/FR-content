@@ -52,12 +52,12 @@ function takeHotCake(p) {
   const selectedStand = stand(p, table);
   if (cakeStand === null) cakeStand = selectedStand;
   assert(p.inOperableDistance(ground), 'a collision-safe tile beside the packed table reaches the cake');
-  const state = capture(p, () => {
+  capture(p, () => {
     assert(takeObject.handle(new OpObj(groundTakeOption, ground.x, ground.z, ground.type), p),
       'production OpObj accepts the cake from beside the table');
+    assert.equal(p.getOpTrigger()?.name, '[opobj3,hundred_dwarf_hot_rockcake]', 'native Take resolves the direct option-3 entry');
     p.processInteraction();
   });
-  assert.equal(state.script.name, '[opobj3,hundred_dwarf_hot_rockcake]', 'native Take dispatches the direct option-3 script');
   assert(ScriptProvider.getByName('[apobj3,hundred_dwarf_hot_rockcake]'), 'native approach option-3 recovery is compiled');
 }
 function killIcefiend(p) {
