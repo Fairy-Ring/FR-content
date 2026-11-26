@@ -1,3 +1,15 @@
 [forget_main_var]
 scope=perm
 transmit=yes
+
+[forget_puzzle_var]
+scope=perm
+transmit=yes
+
+[forget_puzzle_var2]
+scope=perm
+transmit=yes
+
+
+[forget_clock]
+scope=perm

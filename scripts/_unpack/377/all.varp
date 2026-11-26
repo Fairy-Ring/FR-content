@@ -409,8 +409,6 @@ scope=perm
 [dragonresist]
 scope=perm
 
-[varp278_unused]
-
 [awarded_points]
 
 [varp280_unused]
@@ -931,12 +929,6 @@ transmit=yes
 [varp522_unused]
 
 [varp523_unused]
-
-[forget_puzzle_var]
-transmit=yes
-
-[forget_puzzle_var2]
-transmit=yes
 
 [varp526_unused]
 
