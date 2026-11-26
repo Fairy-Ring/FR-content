@@ -304,11 +304,14 @@ def main() -> int:
     must_not_contain(stairs, r"fenk_on_gameplay_teleport", "stairs p_teleport must not be teleport-loss")
     must_contain(mem, r"~fenk_on_gameplay_teleport", "memorial loc tele cleanup")
 
-    # --- F3 Garden seam (no Garden port) ---
+    # --- F3 Garden seam: only the quiz activates the ring ---
     garden_el = read(ROOT / "scripts/quests/quest_garden/scripts/garden_ellamaria.rs2")
     garden_be = read(ROOT / "scripts/quests/quest_garden/scripts/garden_bernald.rs2")
-    must_not_contain(garden_el, r"charos|fenk_", "Garden ellamaria has no Charos unlock")
-    must_not_contain(garden_be, r"charos|fenk_", "Garden bernald has no Charos unlock")
+    for garden_body, garden_name in ((garden_el, "ellamaria"), (garden_be, "bernald")):
+        must_not_contain(garden_body, r"(?:^|[;{}])\s*%fenk_charos_unlocked\s*=",
+                         f"Garden {garden_name} must not write the Charos unlock state", re.M)
+        must_not_contain(garden_body, r"\binv_add\s*\([^,]*,\s*ring_of_charos_unlocked\b",
+                         f"Garden {garden_name} must not grant the activated ring")
     must_contain(follower_varp, r"scripts/quests/quest_garden/", "Garden seam path on mem varp")
     must_contain(tower, r"inv_total\s*\(\s*bank\s*,\s*ring_of_charos", "F3 bank base")
     must_contain(tower, r"inv_total\s*\(\s*worn\s*,\s*ring_of_charos", "F3 worn base")
