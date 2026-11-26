@@ -1,0 +1,173 @@
+[proc,macro_prison_pete_start]
+if (~macro_arena_enter(^macro_prison_pete, 0_32_69_48_20, true) = false) return;
+~macro_prison_pete_set(0, ^macro_prison_pete_not_briefed);
+
+// The temporary online word is authoritative while inventory tools use the shared client varps.
+[proc,macro_prison_pete_set](int $accepted, int $target)
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+%macro_arena_clock = add(multiply($accepted, ^macro_prison_pete_state_stride), $target);
+~macro_prison_pete_sync;
+
+[proc,macro_prison_pete_sync]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+%macro_transmit = divide(%macro_arena_clock, ^macro_prison_pete_state_stride);
+%xplamp = modulo(%macro_arena_clock, ^macro_prison_pete_state_stride);
+
+[proc,macro_prison_pete_count]()(int)
+return(divide(%macro_arena_clock, ^macro_prison_pete_state_stride));
+
+[proc,macro_prison_pete_target]()(int)
+return(modulo(%macro_arena_clock, ^macro_prison_pete_state_stride));
+
+[proc,macro_prison_pete_login]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_set(%macro_transmit, %xplamp);
+if (~macro_prison_pete_target < ^macro_prison_pete_balloon_count) ~macro_prison_pete_show_target;
+
+[proc,macro_prison_pete_cleanup]
+if_close;
+def_int $keys = inv_total(inv, prisonpete_key);
+if ($keys > 0) inv_del(inv, prisonpete_key, $keys);
+
+[opnpc1,prisonpete_pete]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_sync;
+if (~macro_prison_pete_count >= ^macro_prison_pete_keys_needed) {
+    mes("Open the unlocked door to leave.");
+    return;
+}
+if (~macro_prison_pete_target = ^macro_prison_pete_not_briefed) {
+    ~macro_prison_pete_set(0, ^macro_prison_pete_no_target);
+} else if (inv_total(inv, prisonpete_key) > 0) {
+    inv_del(inv, prisonpete_key, 1);
+    ~macro_prison_pete_set(add(~macro_prison_pete_count, 1), ^macro_prison_pete_no_target);
+    if (~macro_prison_pete_count >= ^macro_prison_pete_keys_needed) {
+        mes("The door is unlocked. Open it to leave.");
+        return;
+    }
+}
+if (~macro_prison_pete_target < ^macro_prison_pete_balloon_count) ~macro_prison_pete_show_target;
+else mes("Pull the lever, then pop the matching balloon and bring me its key.");
+
+[oploc1,prisonpete_lever]
+p_arrivedelay;
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_choose_target;
+
+[proc,macro_prison_pete_choose_target]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_sync;
+if (~macro_prison_pete_count >= ^macro_prison_pete_keys_needed) return;
+if (~macro_prison_pete_target = ^macro_prison_pete_not_briefed) {
+    mes("Speak with Prison Pete first.");
+    return;
+}
+if (inv_total(inv, prisonpete_key) > 0) {
+    mes("Give the key to Prison Pete first.");
+    return;
+}
+if (~macro_prison_pete_target >= ^macro_prison_pete_balloon_count) {
+    ~macro_prison_pete_set(~macro_prison_pete_count, random(^macro_prison_pete_balloon_count));
+}
+~macro_prison_pete_show_target;
+
+[proc,macro_prison_pete_show_target]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_sync;
+if (~macro_prison_pete_target >= ^macro_prison_pete_balloon_count) return;
+def_int $model = enum(int, int, macro_prison_pete_balloon_models, ~macro_prison_pete_target);
+if_setmodel(balloon_animal:com_0, $model);
+if_setmodel(balloon_animal:com_4, $model);
+if_settext(balloon_animal:com_2, "Pop the matching balloon.");
+if_openmain(balloon_animal);
+
+[if_button,balloon_animal:com_1]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+if_close;
+
+[opnpc1,prisonpete_balloon1] ~macro_prison_pete_pop(0);
+[opnpc1,prisonpete_balloon2] ~macro_prison_pete_pop(1);
+[opnpc1,prisonpete_balloon3] ~macro_prison_pete_pop(2);
+[opnpc1,prisonpete_balloon4] ~macro_prison_pete_pop(3);
+
+[proc,macro_prison_pete_pop](int $shape)
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_sync;
+if (~macro_prison_pete_count >= ^macro_prison_pete_keys_needed) return;
+if (~macro_prison_pete_target >= ^macro_prison_pete_balloon_count) {
+    mes("Speak with Pete and pull the lever to reveal an animal first.");
+    return;
+}
+if (inv_total(inv, prisonpete_key) > 0) {
+    mes("Give the key to Prison Pete first.");
+    return;
+}
+if ($shape = ~macro_prison_pete_target & inv_itemspace(inv, prisonpete_key, 1, inv_size(inv)) = false) {
+    mes("Make room for a key, then pop the matching balloon again.");
+    return;
+}
+if (.finduid(%npc_macro_event_target) = true) return;
+def_npc_uid $balloon = npc_uid;
+def_int $target = ~macro_prison_pete_target;
+%npc_macro_event_target = uid;
+npc_setmode(none);
+npc_anim(balloon_pop, 0);
+p_delay(^macro_prison_pete_pop_ticks);
+if (npc_finduid($balloon) = false) return;
+if (%npc_macro_event_target ! uid) return;
+%npc_macro_event_target = null;
+// Native removal respawns the original static NPC using its unchanged configuration.
+npc_del;
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+if ($shape = $target) {
+    if (inv_itemspace(inv, prisonpete_key, 1, inv_size(inv)) = false) {
+        mes("Make room for a key, then try another matching balloon.");
+        return;
+    }
+    inv_add(inv, prisonpete_key, 1);
+    mes("Take the key to Prison Pete.");
+} else {
+    mes("That is the wrong shape. Pull the lever to try again.");
+}
+~macro_prison_pete_set(~macro_prison_pete_count, ^macro_prison_pete_no_target);
+if_close;
+
+[oploc1,prisonpete_fakedoor_r] ~macro_prison_pete_exit;
+[oploc1,prisonpete_fakedoor_l] ~macro_prison_pete_exit;
+
+[proc,macro_prison_pete_exit]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+~macro_prison_pete_sync;
+if (~macro_prison_pete_count < ^macro_prison_pete_keys_needed) {
+    mes("Prison Pete needs three keys before the door can be opened.");
+    return;
+}
+mes("The door opens.");
+~macro_arena_return(^macro_prison_pete);
+~macro_prison_pete_reward;
+
+[oplocu,prisonpete_fakedoor_r] ~macro_prison_pete_key_door;
+[oplocu,prisonpete_fakedoor_l] ~macro_prison_pete_key_door;
+
+[proc,macro_prison_pete_key_door]
+if (~macro_arena_active(^macro_prison_pete) = false) return;
+mes("Give the keys to Prison Pete.");
+
+[proc,macro_prison_pete_reward]
+def_int $roll = random(^macro_prison_pete_reward_draw_bound);
+switch_int($roll) {
+    case 0 : ~macro_arena_reward(coins, ^macro_prison_pete_reward_coins);
+    case 1 : {
+        def_namedobj $gem = enum(int, namedobj, macro_prison_pete_reward_gems, random(^macro_prison_pete_reward_gem_draw_bound));
+        ~macro_arena_reward($gem, ^macro_prison_pete_reward_gem_amount);
+    }
+    case 2 : ~macro_arena_reward(airrune, ^macro_prison_pete_reward_airrune_amount);
+    case 3 : ~macro_arena_reward(kebab, ^macro_prison_pete_reward_kebab_amount);
+    case 4 : {
+        if (map_members() = ^true) {
+            ~macro_arena_reward(unidentified_guam, ^macro_prison_pete_reward_guam_amount);
+        } else {
+            ~macro_arena_reward(coins, ^macro_prison_pete_reward_coins);
+        }
+    }
+}

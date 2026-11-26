@@ -1,0 +1,6 @@
+// CANDIDATE reward grouping inferred from the period guide's seven-performance/full-set statement.
+^macro_mime_reward_group_count = 7
+// UNKNOWN engineering performance length; one successful routine is three copied actions.
+^macro_mime_steps = 3
+// UNKNOWN engineering pause so the copied player animation can be seen before the next prompt.
+^macro_mime_action_ticks = 2

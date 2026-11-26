@@ -1,0 +1,24 @@
+// VERIFIED native cache: four original prisonpete_balloon NPC shapes.
+^macro_prison_pete_balloon_count = 4
+// UNKNOWN internal no-target sentinel; not a client or historical value.
+^macro_prison_pete_no_target = 4
+// UNKNOWN historical key count; the assigned event contract requires three.
+^macro_prison_pete_keys_needed = 3
+// CANDIDATE source categories; UNKNOWN equal-weight engineering draw.
+^macro_prison_pete_reward_draw_bound = 5
+// UNKNOWN engineering draw bound; uniform across four selected gem types.
+^macro_prison_pete_reward_gem_draw_bound = 4
+// UNKNOWN engineering amount; parent-approved five-slot reward table.
+^macro_prison_pete_reward_coins = 500
+// UNKNOWN quantity; parent-approved one noted gem.
+^macro_prison_pete_reward_gem_amount = 1
+// UNKNOWN rune denomination and quantity; parent-approved 20 air runes.
+^macro_prison_pete_reward_airrune_amount = 20
+// UNKNOWN quantity; parent-approved one kebab.
+^macro_prison_pete_reward_kebab_amount = 1
+// UNKNOWN quantity; parent-approved one unidentified guam on members worlds.
+^macro_prison_pete_reward_guam_amount = 1
+// UNKNOWN engineering state encoding and minimum pause for the native pop animation.
+^macro_prison_pete_state_stride = 8
+^macro_prison_pete_not_briefed = 5
+^macro_prison_pete_pop_ticks = 1

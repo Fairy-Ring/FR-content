@@ -26217,46 +26217,6 @@ op1=Open
 model=loc_3627
 sharelight=yes
 
-[macro_maze_walllow]
-name=Wall
-desc=It looks very sturdy.
-model=loc_3628
-recol1s=9513
-recol1d=15855
-op1=Open
-
-[macro_maze_walllow_safe1]
-name=Wall
-desc=It looks very sturdy.
-model=loc_3628
-recol1s=9513
-recol1d=15855
-op1=Open
-
-[macro_maze_walllow_safe2]
-name=Wall
-desc=It looks very sturdy.
-model=loc_3628
-recol1s=9513
-recol1d=15855
-op1=Open
-
-[macro_maze_walllow_safe3]
-name=Wall
-desc=It looks very sturdy.
-model=loc_3628
-recol1s=9513
-recol1d=15855
-op1=Open
-
-[macor_maze_walllow_safe4]
-name=Wall
-desc=It looks very sturdy.
-model=loc_3628
-recol1s=9513
-recol1d=15855
-op1=Open
-
 [macro_maze_wallinactive]
 model=loc_3628
 recol1s=9513

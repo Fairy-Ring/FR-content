@@ -1,0 +1,24 @@
+// VERIFIED 377 model.pack ids for the two native variants in each category.
+[macro_quiz_item_models]
+inputtype=int
+outputtype=int
+val=0,8830
+val=1,8831
+val=2,8837
+val=3,8828
+val=4,8834
+val=5,8833
+val=6,8836
+val=7,8838
+val=8,8835
+val=9,8832
+
+// CANDIDATE pre-target Tip.It: a valuable uncut gem may appear in the box.
+// The four-species selection and equal draw are UNKNOWN engineering defaults.
+[macro_quiz_box_gems]
+inputtype=int
+outputtype=namedobj
+val=0,uncut_sapphire
+val=1,uncut_emerald
+val=2,uncut_ruby
+val=3,uncut_diamond

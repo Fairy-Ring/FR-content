@@ -228,11 +228,16 @@ function cleared(p) {
 const admissionStates = ['free', 'npc combat', 'multiple attackers', 'pvp combat', 'modal', 'delayed', 'unavailable', 'another event active'];
 function admissionEffects(kind, root = '[timer,general_macro_events]') {
   const p = player(), attackers = [];
-  const random = JavaRandom.nextDouble, enabled = Environment.NODE_RANDOM_EVENTS;
+  const random = JavaRandom.nextDouble, selectorRandom = ScriptRunner.HANDLERS[op.RANDOM], enabled = Environment.NODE_RANDOM_EVENTS;
   // Labelled packed-only readiness/state boundaries. Enable AFK_EVENT only in
   // this process and fix the existing selector's RNG to Genie, not its result.
   Environment.NODE_RANDOM_EVENTS = true;
   JavaRandom.nextDouble = () => 0.2;
+  ScriptRunner.HANDLERS[op.RANDOM] = state => {
+    if (state.script.name !== '[proc,macro_event_set_random]') return selectorRandom(state);
+    state.popInt();
+    state.pushInt(1);
+  };
   try {
     if (kind === 'npc combat' || kind === 'multiple attackers') {
       p.setVar(v('lastcombat'), World.currentTick);
@@ -263,6 +268,7 @@ function admissionEffects(kind, root = '[timer,general_macro_events]') {
     return result;
   } finally {
     JavaRandom.nextDouble = random; Environment.NODE_RANDOM_EVENTS = enabled;
+    ScriptRunner.HANDLERS[op.RANDOM] = selectorRandom;
     for (const n of [...World.npcs]) if (n.isActive && (attackers.includes(n) || n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0))) World.removeNpc(n, -1);
   }
 }

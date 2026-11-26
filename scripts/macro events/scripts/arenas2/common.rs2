@@ -1,0 +1,124 @@
+// Engineering lifecycle: one persistent event owns one departure and one puzzle.
+[proc,macro_arena_enter](int $event, coord $destination, boolean $walking_required)(boolean)
+if (~macro_event_allowed = false | ~macro_arena_allowed = false) return(false);
+if ($event < ^macro_maze | $event > ^macro_quiz) return(false);
+// Walking arenas require clear terrain; the native Quiz room is a fixed-seat scene.
+if ($walking_required = true & map_blocked($destination) = true) return(false);
+%macro_event_origin_coord = coord;
+%macro_event_target_coord = $destination;
+%macro_event_uid = null;
+%macro_event = $event;
+%macro_transmit = 0;
+%xplamp = 0;
+%macro_arena_clock = 0;
+if_close;
+p_stopaction;
+// Maze keeps its original visible tabs; the other dedicated puzzles own the screen.
+if ($event ! ^macro_maze) ~macro_events_hide_tabs;
+if ($event = ^macro_prison_pete) if_settab(inventory, 3);
+p_telejump($destination);
+softtimer(macro_arena_guard, 1);
+return(true);
+
+[proc,macro_arena_combat_allowed]()(boolean)
+// U01 F8 still permits non-teleport followers during combat.
+if (%lastcombat > 0 & sub(map_clock, %lastcombat) < ^macro_arena_combat_ticks) return(false);
+if (%lastcombat_pvp > 0 & sub(map_clock, %lastcombat_pvp) < ^macro_arena_combat_ticks) return(false);
+return(true);
+
+[proc,macro_arena_active](int $event)(boolean)
+if (%macro_event ! $event | $event < ^macro_maze | $event > ^macro_quiz) return(false);
+if (%macro_event_target_coord = null) return(false);
+if (coordy(coord) ! coordy(%macro_event_target_coord)) return(false);
+if ($event = ^macro_pillory) {
+    if (coord = %macro_event_target_coord) return(true);
+    return(false);
+}
+if (calc(coordx(coord) / 64) = calc(coordx(%macro_event_target_coord) / 64) & calc(coordz(coord) / 64) = calc(coordz(%macro_event_target_coord) / 64)) return(true);
+return(false);
+
+[proc,macro_event_arenas2_dispatch]()(boolean)
+if (%macro_event < ^macro_maze | %macro_event > ^macro_quiz) return(false);
+if (~macro_arena_active(%macro_event) = false) {
+    ~macro_event_cleanup(%macro_event, %macro_event_uid);
+    return(true);
+}
+softtimer(macro_arena_guard, 1);
+if (%macro_event ! ^macro_maze) ~macro_events_hide_tabs;
+if (%macro_event = ^macro_prison_pete) if_settab(inventory, 3);
+switch_int (%macro_event) {
+    case ^macro_maze : ~macro_maze_login;
+    case ^macro_mime : ~macro_mime_login;
+    case ^macro_pillory : ~macro_pillory_login;
+    case ^macro_prison_pete : ~macro_prison_pete_login;
+    case ^macro_quiz : ~macro_quiz_login;
+}
+return(true);
+
+[proc,macro_event_arenas2_cleanup](int $event)
+switch_int ($event) {
+    case ^macro_maze : ~macro_maze_cleanup;
+    case ^macro_mime : ~macro_mime_cleanup;
+    case ^macro_pillory : ~macro_pillory_cleanup;
+    case ^macro_prison_pete : ~macro_prison_pete_cleanup;
+    case ^macro_quiz : ~macro_quiz_cleanup;
+}
+clearsofttimer(macro_arena_guard);
+%macro_transmit = 0;
+%xplamp = 0;
+%macro_arena_clock = 0;
+if_close;
+if_openoverlay(null);
+~initalltabs;
+
+[softtimer,macro_arena_guard]
+if (%macro_event < ^macro_maze | %macro_event > ^macro_quiz) {
+    clearsofttimer(macro_arena_guard);
+    return;
+}
+// A real escape or ordinary death aborts the task, never grants a completion reward.
+if (~macro_arena_active(%macro_event) = false) {
+    clearsofttimer(macro_arena_guard);
+    queue*(macro_arena_escape, 0)(%macro_event);
+}
+
+[queue,macro_arena_escape](int $event)
+if (%macro_event = $event & ~macro_arena_active($event) = false) ~macro_event_cleanup($event, %macro_event_uid);
+
+[proc,macro_arena_return](int $event)
+if (~macro_arena_active($event) = false) return;
+def_coord $destination = %macro_event_origin_coord;
+if ($destination = null | $destination = 0_0_0_0_0) {
+    $destination = 0_50_50_21_18;
+    mes("Your departure is unavailable. You return to Lumbridge.");
+}
+if (map_blocked($destination) = true) {
+    $destination = map_findsquare($destination, 1, 2, ^map_findsquare_lineofwalk);
+    mes("Your departure is blocked. You return to a nearby clear tile.");
+}
+if ($destination = null) {
+    $destination = 0_50_50_21_18;
+    mes("No nearby tile is clear. You return to Lumbridge.");
+}
+~macro_event_cleanup($event, %macro_event_uid);
+p_telejump($destination);
+
+[proc,macro_arena_reward](namedobj $item, int $amount)
+if ($amount <= 0) return;
+// UNKNOWN favourable delivery policy: full inventories never destroy a reward.
+if (inv_itemspace(inv, $item, $amount, inv_size(inv)) = true) {
+    inv_add(inv, $item, $amount);
+} else if (inv_itemspace(bank, $item, $amount, inv_size(bank)) = true) {
+    inv_add(bank, $item, $amount);
+    mes("Your reward was placed in your bank.");
+} else {
+    obj_add(coord, $item, $amount, 1000);
+    mes("Your inventory and bank are full. Your reward is on the ground.");
+}
+
+[proc,macro_arena_allowed]()(boolean)
+// Pillory is period members-only. The other four arenas await a server-only
+// F2P map override: changing free2play.csv also changes authentic client bytes.
+if (map_members = ^false) return(false);
+if (~macro_arena_combat_allowed = false) return(false);
+return(true);

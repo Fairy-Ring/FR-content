@@ -1,0 +1,4 @@
+// CANDIDATE finished donor 254 Maze low-wall server binding.
+[approach_direction]
+type=int
+default=0

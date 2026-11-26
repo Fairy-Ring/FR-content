@@ -1,0 +1,6 @@
+// UNKNOWN engineering decay step; matches the cited four-minute endpoint at 400 ticks.
+^macro_maze_decay_ticks = 4
+// CANDIDATE finished-274 public shared-chest respawn.
+^macro_maze_chest_ticks = 100
+// UNKNOWN engineering chance for the period guide's otherwise-unspecified fourth roll.
+^macro_maze_extra_item_policy = 50

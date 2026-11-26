@@ -1,0 +1,21 @@
+// IDs 15..19 belong to the arenas1 integration registry.
+^macro_maze = 20
+^macro_mime = 21
+^macro_pillory = 22
+^macro_prison_pete = 23
+^macro_quiz = 24
+// UNKNOWN engineering admission cooldown. Existing overworld combat admission is unchanged.
+^macro_arena_combat_ticks = 16
+// UNKNOWN engineering Pillory draws, coin amount and harmless tomato cadence.
+^macro_pillory_shapes = 3
+^macro_pillory_initial_locks = 3
+// VERIFIED period official KB: five maximum locks and 15 seconds between attempts after a wrong key.
+^macro_pillory_max_locks = 5
+^macro_pillory_retry_ticks = 25
+^macro_pillory_coins = 240
+^macro_pillory_tomato_ticks = 10
+// UNKNOWN harmless projectile presentation; no damage roll or NPC timer is added.
+^macro_pillory_tomato_height = 40
+^macro_pillory_tomato_target_height = 30
+^macro_pillory_tomato_flight = 30
+^macro_pillory_tomato_peak = 15

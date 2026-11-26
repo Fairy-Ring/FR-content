@@ -1,0 +1,50 @@
+// Original 377 client fields are unchanged. CANDIDATE server bindings: finished donor 65b754f, 254 all.loc:70-118.
+[macro_maze_walllow]
+name=Wall
+desc=It looks very sturdy.
+model=loc_3628
+recol1s=9513
+recol1d=15855
+op1=Open
+param=approach_direction,0
+category=macro_maze_wall_door
+
+[macro_maze_walllow_safe1]
+name=Wall
+desc=It looks very sturdy.
+model=loc_3628
+recol1s=9513
+recol1d=15855
+op1=Open
+param=approach_direction,1
+category=macro_maze_wall_door
+
+[macro_maze_walllow_safe2]
+name=Wall
+desc=It looks very sturdy.
+model=loc_3628
+recol1s=9513
+recol1d=15855
+op1=Open
+param=approach_direction,2
+category=macro_maze_wall_door
+
+[macro_maze_walllow_safe3]
+name=Wall
+desc=It looks very sturdy.
+model=loc_3628
+recol1s=9513
+recol1d=15855
+op1=Open
+param=approach_direction,2
+category=macro_maze_wall_door
+
+[macor_maze_walllow_safe4]
+name=Wall
+desc=It looks very sturdy.
+model=loc_3628
+recol1s=9513
+recol1d=15855
+op1=Open
+param=approach_direction,1
+category=macro_maze_wall_door

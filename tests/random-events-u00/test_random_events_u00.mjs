@@ -170,7 +170,7 @@ function refusal(p, name, options = {}) {
   assert.deepEqual(snap(p), before, 'refusal changes no variable, inventory, NPC, modal or position');
   assert(p.messages.some(m => String(m.msg ?? '').includes('[staff fixture]')), 'staff fixture diagnostic is present');
 }
-for (const name of ['not-built', '2', 'genie somebody', 'maze', '', player().username, '1234567', '0_50_53_13_32']) check(`unknown/refused ${JSON.stringify(name)}`, () => refusal(player(), name));
+for (const name of ['not-built', '2', 'genie somebody', 'unbuilt-arena', '', player().username, '1234567', '0_50_53_13_32']) check(`unknown/refused ${JSON.stringify(name)}`, () => refusal(player(), name));
 for (let index = 7; index <= 19; index++) check(`missing prerequisite ${names[index - 1]}`, () => refusal(player([0, 2000, 2000]), names[index - 1]));
 // Genuine targets remain present in every prerequisite regression. Each has a
 // same-target positive control, so dropping a prerequisite cannot hide behind reach.

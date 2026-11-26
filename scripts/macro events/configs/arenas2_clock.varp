@@ -1,0 +1,5 @@
+// UNKNOWN engineering per-session work word in assigned original slot 432.
+// Holds Maze/Pillory time or private Pete state; permanent client mirrors survive logout.
+[macro_arena_clock]
+scope=temp
+protect=no

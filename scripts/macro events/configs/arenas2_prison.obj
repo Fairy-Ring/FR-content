@@ -1,0 +1,14 @@
+[prisonpete_key]
+name=Prison key
+desc=A key to the prison.
+recol1s=31393
+recol1d=4226
+model=obj_ikov_shinykey
+2dxof=-3
+2dyof=5
+2dzoom=700
+2dyan=20
+2dxan=328
+weight=10g
+// UNKNOWN favourable quest/event-item policy; server-only, not a client field.
+tradeable=no

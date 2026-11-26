@@ -27,6 +27,19 @@ if (afk_event = ^true) {
 if (~macro_event_allowed = false) { 
     return;
 }
+if ($event >= ^macro_maze & $event <= ^macro_quiz) {
+    if (~macro_arena_allowed = false) return;
+}
+// Registry dispatch precedes follower-square acquisition: arenas have no follower actor.
+switch_int ($event) {
+    case ^macro_maze : { ~macro_maze_start; return; }
+    case ^macro_mime : { ~macro_mime_start; return; }
+    case ^macro_pillory : { ~macro_pillory_start; return; }
+    case ^macro_prison_pete : { ~macro_prison_pete_start; return; }
+    case ^macro_quiz : { ~macro_quiz_start; return; }
+    // Integration seam: arenas1 registers IDs 15..19 here and in macro_registry_*.
+}
+if (~macro_event_npc($event) = null) return;
 def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
 if ($event_coord = null) {
     return;
@@ -38,6 +51,7 @@ if ($event = ^macro_frogs) %macro_event_origin_coord = coord;
 // The actor must exist before either encounter token is published.
 [proc,macro_event_general_create](int $event, coord $event_coord)
 def_npc $event_npc = ~macro_event_npc($event);
+if ($event_npc = null) return;
 npc_add($event_coord, $event_npc, 1000);
 %macro_event = $event;
 %macro_event_uid = npc_uid;
@@ -64,7 +78,7 @@ switch_int ($event) {
 if (~in_duel_arena($coord) = true) {
     return(false);
 }
-if (~inzone_coord_pair_table(gnomeball_zones, coord) = true) {
+if (~inzone_coord_pair_table(gnomeball_zones, $coord) = true) {
     return(false);
 }
 if (~inzone_coord_pair_table(trawler_game_zones, $coord) = true | ~inzone_coord_pair_table(trawler_wreck_zones, $coord) = true) { // allowed on boat in pre-game https://youtu.be/7-gUR40Nr8M
@@ -75,11 +89,31 @@ if (~in_tutorial_island($coord) = true) {
 }
 return(true);
 
+// Admission-only exclusions. Following into Castle Wars retains the accepted U01 fault.
+[proc,macro_event_target_area](coord $where)(boolean)
+if (region_findbycoord($where) = true) return(false);
+if (~macro_event_area($where) = false) return(false);
+// UNKNOWN admission policy: concrete private scenes, not a blanket underground band.
+if (~inzone_coord_pair_table(macro_arena_protected_scenes, $where) = true) return(false);
+if (~mta_room_at($where) ! 0) return(false);
+if (~barrows_inside($where) = true | ~tog_inside($where) = true) return(false);
+if (~inzone_coord_pair_table(games_room_zones, $where) = true) return(false);
+if (~inzone_coord_pair_table(mining_camp_zones, $where) = true) return(false);
+if (~inzone_coord_pair_table(mage_arena, $where) = true) return(false);
+if (~in_castlewars_game($where) = true | ~in_castlewars_waitingroom($where) = true) return(false);
+if (~fightpits_in_waiting($where) = true | ~fightpits_in_arena($where) = true) return(false);
+if (~roguesden_maze_inside($where) = true) return(false);
+return(true);
+
 // this proc is only used for spawning randoms
 [proc,macro_event_allowed]()(boolean)
-if (~macro_event_area(coord) = false) {
+if (~macro_event_target_area(coord) = false) {
     return(false);
 }
+// Original cutscene/transformation state is never a random-event admission point.
+if (%cutscene_var ! 0 | %mm_cutscene_part ! 0 | p_gettransmogrify ! null) return(false);
+if (inv_total(inv, thanainabarrel) > 0 | inv_total(inv, mm_monkey_in_backpack) > 0) return(false);
+if (~champions_in_arena = true | ~bf_inside = true | ~tbw_in_village = true) return(false);
 if (~inzone_coord_pair_table(random_event_mime_zones, coord) = true |
     ~inzone_coord_pair_table(random_event_maze_zones, coord) = true |
     ~inzone_coord_pair_table(random_event_lost_and_found_zones, coord) = true) {
@@ -102,6 +136,8 @@ return(true);
 if (%macro_event ! ^no_macro_event & %macro_event_origin_coord = 0_0_0_0_0) {
     %macro_event_origin_coord = null;
 }
+// All arena lifecycle work remains in one integration hook.
+if (~macro_event_arenas2_dispatch = true) return;
 // DECISION: a task's identity, departure and intended destination are persistent.
 if (%macro_event = ^macro_lost_and_found) {
     if (~inzone_coord_pair_table(random_event_lost_and_found_zones, coord) = true) {
@@ -142,6 +178,10 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
 }
 
 [proc,macro_event_logout]
+if (%macro_event = ^macro_maze) ~macro_maze_logout;
+if (%macro_event = ^macro_mime) ~macro_mime_cleanup;
+if (%macro_event = ^macro_prison_pete) ~macro_prison_pete_sync;
+if (%macro_event >= ^macro_maze & %macro_event <= ^macro_quiz) return;
 if (%macro_event = ^macro_frogs) ~macro_frogs_cleanup;
 if (npc_finduid(%macro_event_uid) = true) {
     if (%npc_macro_event_target = uid) {
@@ -168,18 +208,17 @@ if (map_members = ^true) {
 return($event_npc);
 
 [proc,macro_event_set_random]()(int)
-if (map_members = ^true) {
-    return(~random_range(1, enum_getoutputcount(general_macro_events_members)));
-} else {
-    return(~random_range(1, enum_getoutputcount(general_macro_events_free)));
-}
+def_enum $pool = ~macro_event_pool;
+return(enum(int, int, $pool, add(random(enum_getoutputcount($pool)), 1)));
 
 // used for skilling random events
 [proc,macro_event_general_count]()(int)
-if (map_members = ^true) {
-    return(enum_getoutputcount(general_macro_events_members));
-}
-return(enum_getoutputcount(general_macro_events_free));
+return(enum_getoutputcount(~macro_event_pool));
+
+[proc,macro_event_pool]()(enum)
+if (map_members = ^false) return(macro_registry_free);
+if (~macro_arena_combat_allowed = false) return(macro_registry_members_combat);
+return(macro_registry_members);
 
 // teleports the player to a random location, using the coords in configs/macro_events_teleports.enum
 [queue,macro_event_fail_teleport](int $event, npc_uid $actor)
@@ -196,12 +235,16 @@ if (map_members = ^true) {
 }
 // https://youtu.be/MS7ADB-hh18
 // doesnt if_close
-%macro_event = ^no_macro_event;
 p_delay(1);
 // A delay is another boundary: never move a newer encounter.
 if (%macro_event ! $event | %macro_event_uid ! $actor) {
     return;
 }
+if ($event >= ^macro_maze & $event <= ^macro_quiz) ~macro_event_cleanup($event, $actor);
+%macro_event = ^no_macro_event;
+%macro_event_uid = null;
+%macro_event_target_coord = null;
+%macro_event_origin_coord = null;
 // https://youtu.be/g5k3XuXxyYQ?list=PLn23LiLYLb1Y3P9S9qZbijcJihiD416jT&t=37
 spotanim_map(smokepuff, coord, 124, 0);
 sound_synth(smokepuff2, 1, 0);
@@ -309,6 +352,7 @@ if ($event = ^no_macro_event | %macro_event ! $event | %macro_event_uid ! $actor
     return;
 }
 if ($event = ^macro_frogs) ~macro_frogs_cleanup;
+if ($event >= ^macro_maze & $event <= ^macro_quiz) ~macro_event_arenas2_cleanup($event);
 if (npc_finduid($actor) = true) {
     if (%npc_macro_event_target = uid) {
         npc_del;

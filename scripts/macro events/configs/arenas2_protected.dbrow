@@ -1,0 +1,28 @@
+// UNKNOWN admission policy: original private puzzle and quest scene footprints.
+// This is server-only data; ordinary underground and essence-mine maps stay eligible.
+[macro_arena_protected_scenes]
+table=coord_pair_table
+data=coord_pair,0_45_71_0_0,0_45_71_63_63
+data=coord_pair,1_45_71_0_0,1_45_71_63_63
+data=coord_pair,2_45_71_0_0,2_45_71_63_63
+data=coord_pair,3_45_71_0_0,3_45_71_63_63
+data=coord_pair,0_31_74_0_0,0_31_74_63_63
+data=coord_pair,1_31_74_0_0,1_31_74_63_63
+data=coord_pair,2_31_74_0_0,2_31_74_63_63
+data=coord_pair,3_31_74_0_0,3_31_74_63_63
+data=coord_pair,0_32_69_0_0,0_32_69_63_63
+data=coord_pair,1_32_69_0_0,1_32_69_63_63
+data=coord_pair,2_32_69_0_0,2_32_69_63_63
+data=coord_pair,3_32_69_0_0,3_32_69_63_63
+data=coord_pair,0_30_74_0_0,0_30_74_63_63
+data=coord_pair,1_30_74_0_0,1_30_74_63_63
+data=coord_pair,2_30_74_0_0,2_30_74_63_63
+data=coord_pair,3_30_74_0_0,3_30_74_63_63
+data=coord_pair,0_38_77_0_0,0_38_77_63_63
+data=coord_pair,1_38_77_0_0,1_38_77_63_63
+data=coord_pair,2_38_77_0_0,2_38_77_63_63
+data=coord_pair,3_38_77_0_0,3_38_77_63_63
+data=coord_pair,0_29_83_0_0,0_29_83_63_63
+data=coord_pair,1_29_83_0_0,1_29_83_63_63
+data=coord_pair,2_29_83_0_0,2_29_83_63_63
+data=coord_pair,3_29_83_0_0,3_29_83_63_63

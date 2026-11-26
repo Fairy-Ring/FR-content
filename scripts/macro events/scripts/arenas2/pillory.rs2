@@ -1,0 +1,106 @@
+// VERIFIED period task: Tip.It 28 April 2006, Pillory section.
+// VERIFIED: wrong key adds locks up to five and enforces 15 seconds (pre-target official KB).
+// UNKNOWN functional wording, uniform shape/cage/reward draws and native model pairing.
+[proc,macro_pillory_start]
+if (map_members = ^false) return;
+def_coord $cage;
+switch_int (random(3)) {
+    case 0 : $cage = 0_50_53_26_15;
+    case 1 : $cage = 0_41_54_57_33;
+    case 2 : $cage = 0_40_48_44_33;
+}
+if (~macro_arena_enter(^macro_pillory, $cage, true) = false) return;
+%xplamp = add(multiply(^macro_pillory_initial_locks, 10), random(^macro_pillory_shapes));
+// Period KB: the prisoner operates the original cage's Unlock option.
+softtimer(macro_pillory_tomato, ^macro_pillory_tomato_ticks);
+
+[proc,macro_pillory_login]
+if (~macro_arena_active(^macro_pillory) = false) return;
+// UNKNOWN reconnect policy: a pending penalty restarts its full online wait.
+if (%xplamp >= 100) %macro_arena_clock = add(map_clock, ^macro_pillory_retry_ticks);
+~macro_pillory_show;
+softtimer(macro_pillory_tomato, ^macro_pillory_tomato_ticks);
+
+[oploc1,cage]
+if (~macro_arena_active(^macro_pillory) = false) return;
+~macro_pillory_show;
+
+[proc,macro_pillory_next]
+%xplamp = add(multiply(divide(%xplamp, 10), 10), random(^macro_pillory_shapes));
+~macro_pillory_show;
+
+[proc,macro_pillory_show]
+if (~macro_arena_active(^macro_pillory) = false) return;
+if_openmain(inter_134);
+// Original large-lock model 9753 and adjacent two variants, original key models 9749..9751.
+if_setmodel(inter_134:com_1, add(9753, calc(%xplamp % 10)));
+def_int $needed = modulo(divide(%xplamp, 10), 10);
+if ($needed >= 4) if_sethide(inter_134:com_12, false);
+else if_sethide(inter_134:com_12, true);
+if ($needed >= 5) if_sethide(inter_134:com_13, false);
+else if_sethide(inter_134:com_13, true);
+if_sethide(inter_134:com_14, true);
+
+[if_button,inter_134:com_5] ~macro_pillory_answer(0);
+[if_button,inter_134:com_6] ~macro_pillory_answer(1);
+[if_button,inter_134:com_7] ~macro_pillory_answer(2);
+
+[proc,macro_pillory_answer](int $shape)
+if (~macro_arena_active(^macro_pillory) = false) return;
+if (%xplamp >= 100) {
+    if (map_clock < %macro_arena_clock) {
+        mes("You must wait 15 seconds before another attempt.");
+        return;
+    }
+    %xplamp = sub(%xplamp, 100);
+}
+def_int $needed = divide(%xplamp, 10);
+if ($shape ! calc(%xplamp % 10)) {
+    %macro_transmit = 0;
+    if ($needed < ^macro_pillory_max_locks) $needed = add($needed, 1);
+    %xplamp = add(100, multiply($needed, 10));
+    %macro_arena_clock = add(map_clock, ^macro_pillory_retry_ticks);
+    mes("Wrong key. Your progress resets. Wait 15 seconds.");
+    ~macro_pillory_next;
+    return;
+}
+%macro_transmit = add(%macro_transmit, 1);
+if (%macro_transmit < $needed) {
+    ~macro_pillory_next;
+    return;
+}
+~macro_arena_return(^macro_pillory);
+switch_int (random(5)) {
+    case 0 : ~macro_arena_reward(uncut_sapphire, 1);
+    case 1 : ~macro_arena_reward(uncut_emerald, 1);
+    case 2 : ~macro_arena_reward(uncut_ruby, 1);
+    case 3 : ~macro_arena_reward(uncut_diamond, 1);
+    case 4 : ~macro_arena_reward(coins, ^macro_pillory_coins);
+}
+
+[softtimer,macro_pillory_tomato]
+if (~macro_arena_active(^macro_pillory) = false) {
+    clearsofttimer(macro_pillory_tomato);
+    return;
+}
+// Player-owned timer only: preserve every map-spawned NPC's RNG and idle behaviour.
+def_coord $home = movecoord(coord, 2, 0, -5);
+if (coord = 0_50_53_26_15) $home = movecoord(coord, 2, 0, 5);
+def_int $dx = -8;
+while ($dx <= 8) {
+    def_int $dz = -8;
+    while ($dz <= 8) {
+        npc_findallzone(movecoord($home, $dx, 0, $dz));
+        while (npc_findnext = true) {
+            if (npc_type = pillory_tramp_thrower_varrock | npc_type = pillory_tramp_thrower_seers | npc_type = pillory_tramp_thrower_yanille) {
+                projanim_pl(npc_coord, uid, rotten_tomato_travel, ^macro_pillory_tomato_height, ^macro_pillory_tomato_target_height, 0, ^macro_pillory_tomato_flight, ^macro_pillory_tomato_peak, 0);
+                return;
+            }
+        }
+        $dz = add($dz, 8);
+    }
+    $dx = add($dx, 8);
+}
+
+[proc,macro_pillory_cleanup]
+clearsofttimer(macro_pillory_tomato);

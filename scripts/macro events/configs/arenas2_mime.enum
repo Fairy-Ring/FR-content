@@ -1,0 +1,11 @@
+[macro_mime_actions]
+inputtype=int
+outputtype=seq
+val=0,emote_cry
+val=1,emote_think
+val=2,emote_laugh
+val=3,emote_dance
+val=4,emote_climbing_rope
+val=5,emote_mime_lean
+val=6,emote_glass_wall
+val=7,emote_glass_box

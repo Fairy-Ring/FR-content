@@ -1,0 +1,58 @@
+// UNKNOWN equal weights within each eligible world pool, not recovered historical odds.
+// Main adds arenas1 event IDs 15..19 here after their entry procs land.
+// Lost and Found belongs to teleport routing; Pillory belongs to Thieving only.
+[macro_registry_members]
+inputtype=int
+outputtype=int
+val=1,^macro_swarm
+val=2,^macro_geni
+val=3,^macro_dwarf
+val=4,^macro_mysterious_old_man
+val=5,^macro_candlelight
+val=6,^macro_triffidseed
+val=7,^macro_capn_hand
+val=8,^macro_rick_turpentine
+val=9,^macro_jekyll
+val=10,^macro_evil_chicken
+val=11,^macro_frogs
+val=12,^macro_certers
+val=13,^macro_sandwich_lady
+val=14,^macro_maze
+val=15,^macro_mime
+val=16,^macro_prison_pete
+val=17,^macro_quiz
+
+[macro_registry_free]
+inputtype=int
+outputtype=int
+val=1,^macro_swarm
+val=2,^macro_geni
+val=3,^macro_dwarf
+val=4,^macro_mysterious_old_man
+val=5,^macro_candlelight
+val=6,^macro_capn_hand
+val=7,^macro_rick_turpentine
+val=8,^macro_evil_chicken
+val=9,^macro_frogs
+val=10,^macro_certers
+val=11,^macro_sandwich_lady
+
+// Teleport arenas belong only in the ordinary members pool until the engine's
+// server-only free-map override is available. New non-teleport followers join
+// this pool too; adding an arena never depends on registry ordering or a count offset.
+[macro_registry_members_combat]
+inputtype=int
+outputtype=int
+val=1,^macro_swarm
+val=2,^macro_geni
+val=3,^macro_dwarf
+val=4,^macro_mysterious_old_man
+val=5,^macro_candlelight
+val=6,^macro_triffidseed
+val=7,^macro_capn_hand
+val=8,^macro_rick_turpentine
+val=9,^macro_jekyll
+val=10,^macro_evil_chicken
+val=11,^macro_frogs
+val=12,^macro_certers
+val=13,^macro_sandwich_lady
