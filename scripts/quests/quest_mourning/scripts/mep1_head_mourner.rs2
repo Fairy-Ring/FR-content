@@ -11,7 +11,7 @@ if (~mep1_disguised = false) {
     return;
 }
 if (%mourning_quest >= ^mourning_complete) {
-    ~chatnpc("<p,neutral>That will be all for now.");
+    ~mep2_head_mourner;
     return;
 }
 if (%mourning_quest = ^mep1_food_poisoned) {

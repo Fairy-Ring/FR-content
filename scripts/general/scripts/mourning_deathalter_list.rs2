@@ -1,5 +1,4 @@
-// Leftover mourning_deathalter 6028. Read obj mourning_deathalter_list 6648.
-// Leftover “List of needed items:” + 50 debug slugs stay. Do not invent MEP2 fills.
+// Original revision-377 interface; the quest owns its durable fifty-item checklist.
 
 [opheld1,mourning_deathalter_list]
-if_openmain(mourning_deathalter);
+~mep2_death_list_open;
