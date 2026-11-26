@@ -10,6 +10,7 @@ import {
 } from '../regicide-travel/runtime.mjs';
 const load = async file => import(pathToFileURL(path.join(engine, 'src', file)).href);
 const { PlayerStat } = await load('engine/entity/PlayerStat.ts');
+const { ActiveRegion } = await load('engine/script/ScriptPointer.ts');
 const IfButton = (await load('network/game/client/model/IfButton.ts')).default;
 const buttons = new (await load('network/game/client/handler/IfButtonHandler.ts')).default();
 const pauses = new ResumePauseButtonHandler();
@@ -372,7 +373,12 @@ for (const interrupted of [false, true]) {
   run(q, '[proc,cat_spawn]', [id('NpcType', 'kittenpet1')]);
   const followerUid = q.getVar(v('follower_uid')), follower = World.getNpc(followerUid & 0xffff);
   assert(follower && follower.x === q.x && follower.z === q.z, 'real follower is inside the private scene');
-  run(q, '[proc,twocats_scene_actor]', [16, 12, id('NpcType', 'twocats_robert_cutscene')]);
+  // This internal proc inherits the native region pointer from scene_begin.
+  const actorState = ScriptRunner.init(ScriptProvider.getByName('[proc,twocats_scene_actor]'), q, null,
+    [16, 12, id('NpcType', 'twocats_robert_cutscene')]);
+  actorState._activeRegion = begun._activeRegion; actorState._activeRegionUid = begun._activeRegionUid;
+  actorState.pointerAdd(ActiveRegion[0]);
+  q.executeScript(actorState, true, true); finish(q, actorState);
   const actor = [...World.npcs].find(npc => npc.type === id('NpcType', 'twocats_robert_cutscene') &&
     npc.level === q.level && npc.x === q.x && npc.z === q.z + 2);
   assert(actor, 'the same scene contains a quest-owned actor');
@@ -381,7 +387,8 @@ for (const interrupted of [false, true]) {
   } else run(q, '[proc,twocats_scene_end]', [scene, origin]);
   assert.deepEqual(tile(q), before); assert.equal(stage(q), 40);
   assert.equal(q.getVar(v('follower_uid')), followerUid, 'cleanup preserves the actual follower UID');
-  assert.equal(World.getNpc(follower.nid), follower, 'cleanup does not delete the follower');
+  assert(World.getNpc(follower.nid) === follower, 'cleanup does not delete the follower');
+  assert.deepEqual(tile(follower), before, 'follower leaves before private-region reclamation');
   assert(!World.getNpc(actor.nid), 'cleanup removes its own actor');
   assert.equal(q.timers.get(ScriptProvider.getByName('[softtimer,twocats_scene_watch]').id), undefined);
 }

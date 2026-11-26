@@ -68,7 +68,13 @@ if (region_findbyuid($scene) = true) {
 if_close;
 cam_reset;
 minimap_toggle(0);
-if ($inside = true & $origin ! null) p_telejump($origin);
+if ($inside = true & $origin ! null) {
+    // Move the pet before the last player's departure reclaims the private region.
+    if (npc_finduid(%follower_uid) = true) {
+        if (%npc_attacking_uid = uid) npc_tele($origin);
+    }
+    p_telejump($origin);
+}
 ~initalltabs;
 
 [proc,twocats_memory]
