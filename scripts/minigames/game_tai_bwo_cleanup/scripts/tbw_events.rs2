@@ -1,0 +1,29 @@
+// CANDIDATE: retained pre-June-2025 Cleanup table, one common 100-entry roll.
+[proc,tbw_jungle_event]()(boolean)
+if (random(^tbw_event_roll_size) >= %eventchance) return (false);
+def_int $roll = random(100);
+%eventchance = 0;
+if ($roll >= 85 & $roll < 90) {
+    loc_change(village_gem_rock1, ^tbw_find_lifetime);
+    return (true);
+}
+if ($roll = 99) {
+    loc_change(village_gout_tuber, ^tbw_find_lifetime);
+    return (true);
+}
+def_npc $enemy;
+if ($roll < 22) $enemy = tbwcu_jungle_spider;
+else if ($roll < 43) $enemy = tbwcu_tribesman;
+else if ($roll < 64) $enemy = tbwcu_village_snake;
+else if ($roll < 72) $enemy = tbwcu_mosquito_single;
+else if ($roll < 79) $enemy = tbwcu_mosquito_swarm3;
+else if ($roll < 85) $enemy = tbwcu_mosquito_swarm5;
+else if ($roll < 94) $enemy = tbwcu_broodoo_combat;
+else if ($roll < 97) $enemy = tbwcu_broodoo_poison;
+else $enemy = tbwcu_broodoo_disease;
+// Use a walkable square reachable from the hacker, never the blocked bush tile.
+def_coord $spawn = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($spawn = null) return (false);
+npc_add($spawn, $enemy, ^tbw_mosquito_lifetime);
+npc_setmode(opplayer2);
+return (true);

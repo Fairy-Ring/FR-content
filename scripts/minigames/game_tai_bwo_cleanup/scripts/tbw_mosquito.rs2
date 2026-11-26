@@ -1,26 +1,3 @@
-// CANDIDATE: OSRS Light Jungle 15203654 and Cleanup 15359755.
-// The pre-4 June 2025 table has 1% gout and 8/7/6% mosquito forms.
-// Only mosquito outcomes belong to this unit. Other event outcomes are not built.
-[proc,tbw_jungle_mosquito_event]()(boolean)
-if (random(^tbw_event_roll_size) >= %eventchance) return (false);
-def_int $roll = random(100);
-%eventchance = 0;
-def_npc $mosquito = null;
-if ($roll >= 64 & $roll < 72) {
-    $mosquito = tbwcu_mosquito_single;
-} else if ($roll >= 72 & $roll < 79) {
-    $mosquito = tbwcu_mosquito_swarm3;
-} else if ($roll >= 79 & $roll < 85) {
-    $mosquito = tbwcu_mosquito_swarm5;
-}
-if ($mosquito = null) return (false);
-// Use a walkable square reachable from the hacker, never the blocked bush tile.
-def_coord $spawn = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
-if ($spawn = null) return (false);
-npc_add($spawn, $mosquito, ^tbw_mosquito_lifetime);
-npc_setmode(opplayer2);
-return (true);
-
 [ai_queue3,tbwcu_mosquito_single] @tbw_mosquito_death(1, 175);
 [ai_queue3,tbwcu_mosquito_swarm3] @tbw_mosquito_death(3, 350);
 [ai_queue3,tbwcu_mosquito_swarm5] @tbw_mosquito_death(5, 750);

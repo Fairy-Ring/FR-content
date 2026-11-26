@@ -87,7 +87,7 @@ test('original twelve Hack dispatches advance through four sections without chan
   assert.equal(get(p, 'vill_comm_points'), 3); assert.equal(get(p, 'eventchance'), 1);
   assert(World.getLoc(loc.x, loc.z, loc.level, id('LocType', 'tai_bwo_jungle_vegetation_easy_2')));
 });
-test('natural event roll is counter/101, capped at seven; only the sourced 8/7/6 mosquito slots spawn', () => {
+test('the sourced 8/7/6 mosquito windows retain natural counter rolls and reachable spawns', () => {
   const p = fixture(); set(p, 'cleanup_progress', 1);
   assert(!map.isMapBlocked(p.x, p.z, p.level), 'the natural Murcaily fixture tile is walkable');
   const seeds = new Map();
@@ -98,11 +98,11 @@ test('natural event roll is counter/101, capped at seven; only the sourced 8/7/6
   }
   assert.equal(seeds.size, 100, 'cover every table entry with the native generator');
   const spawned = [0, 0, 0];
-  for (let roll = 0; roll < 100; roll++) {
+  for (let roll = 64; roll < 85; roll++) {
     set(p, 'eventchance', 7); JavaRandom.setSeed(seeds.get(roll));
-    const result = value('tbw_jungle_mosquito_event', p); World.processNpcEventQueue();
-    const expected = roll >= 64 && roll < 72 ? 0 : roll < 79 && roll >= 72 ? 1 : roll < 85 && roll >= 79 ? 2 : -1;
-    assert.equal(result, Number(expected >= 0)); assert.equal(get(p, 'eventchance'), 0);
+    const result = value('tbw_jungle_event', p); World.processNpcEventQueue();
+    const expected = roll < 72 ? 0 : roll < 79 ? 1 : 2;
+    assert.equal(result, 1); assert.equal(get(p, 'eventchance'), 0);
     const npcs = activeMosquitoes(); assert.equal(npcs.length, expected >= 0 ? 1 : 0);
     if (expected >= 0) {
       const n = npcs[0]; assert.equal(n.type, mosquitoIds[expected]); spawned[expected]++;
@@ -117,7 +117,7 @@ test('natural event roll is counter/101, capped at seven; only the sourced 8/7/6
   for (let counter = 0; counter <= 7; counter++) {
     const seed = seedFor((first, second) => first === counter && second === 64);
     set(p, 'eventchance', counter); JavaRandom.setSeed(seed);
-    assert.equal(value('tbw_jungle_mosquito_event', p), 0, 'counter boundary fails without a spawn');
+    assert.equal(value('tbw_jungle_event', p), 0, 'counter boundary fails without a spawn');
     assert.equal(get(p, 'eventchance'), counter);
   }
 });
@@ -125,7 +125,7 @@ test('all three actual mosquito deaths give the killer 1/3/5 obtainable probosci
   for (let index = 0; index < 3; index++) {
     const p = fixture(); set(p, 'cleanup_progress', 1); set(p, 'eventchance', 7);
     JavaRandom.setSeed(seedFor((first, second) => first === 0 && second === [64, 72, 79][index]));
-    assert.equal(value('tbw_jungle_mosquito_event', p), 1); World.processNpcEventQueue();
+    assert.equal(value('tbw_jungle_event', p), 1); World.processNpcEventQueue();
     const n = activeMosquitoes()[0], type = types.NpcType.get(n.type);
     assert.equal(type.stats[3], [3, 9, 15][index]);
     assert.equal(type.params.get(id('ParamType', 'attackrate')), [4, 2, 2][index]);
@@ -229,7 +229,7 @@ test('repellent is reusable, halves all combat stats to a floor of one and pause
   for (let index = 0; index < 3; index++) {
     const p = fixture(); set(p, 'eventchance', 7); p.invAdd(inv, obj('insect_repellent'), 1);
     JavaRandom.setSeed(seedFor((first, second) => first === 0 && second === [64, 72, 79][index]));
-    value('tbw_jungle_mosquito_event', p); World.processNpcEventQueue();
+    value('tbw_jungle_event', p); World.processNpcEventQueue();
     const n = activeMosquitoes()[0], affected = [0, 1, 2, 4, 5], before = affected.map(stat => n.levels[stat]);
     const script = ScriptProvider.getByTrigger(ServerTriggerType.OPNPCU, n.type, types.NpcType.get(n.type).category);
     p.lastUseItem = obj('insect_repellent'); execute(script.name, p, [], { target: n });

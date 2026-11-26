@@ -1,0 +1,27 @@
+// VERIFIED Sal's Realm period guide: jungle spiders rarely poison; snakes and tribesmen poison more often.
+// UNKNOWN favourable implementation: one successful spider hit in ten poisons; the source gives no rate.
+^tbw_spider_poison_denominator = 10
+// UNKNOWN favourable severity; the guide establishes rare poisoning, not its strength.
+^tbw_spider_poison_severity = 10
+// UNKNOWN favourable severity; period guidance gives relative frequency only.
+^tbw_snake_poison_severity = 10
+// CANDIDATE: 377 Tribesman analogue uses poison_severity=55; period guide says tribesmen poison more often than spiders.
+^tbw_tribesman_poison_severity = 55
+// UNKNOWN favourable poison severity for the green Broodoo victim.
+^tbw_broodoo_poison_severity = 10
+// CANDIDATE OSRS Broodoo offensive max hit and Magic level; not the player's normal damage cap.
+^tbw_broodoo_maxhit = 7
+^tbw_broodoo_magic_level = 60
+// UNKNOWN favourable implementation: correct balm/antipoison/food deals 20 against the existing 100 HP.
+^tbw_broodoo_weakness_damage = 20
+// UNKNOWN engineering magic attack bonus; no retained 377 bonus.
+^tbw_broodoo_magicattack = 50
+// UNKNOWN favourable disease drain, patterned on the shared Curse stat-change scale.
+^tbw_broodoo_disease_drain = 1
+^tbw_broodoo_disease_percent = 5
+// CANDIDATE later OSRS favour: snake 1%, spider/tribesman 1-2%, Broodoo about 3%.
+// UNKNOWN choice of the 1% lower bound for spider/tribesman; no period numeric awards.
+^tbw_favour_spider = 10
+^tbw_favour_snake = 10
+^tbw_favour_tribesman = 10
+^tbw_favour_broodoo = 30

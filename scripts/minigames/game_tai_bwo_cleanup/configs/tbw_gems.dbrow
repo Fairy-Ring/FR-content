@@ -1,0 +1,12 @@
+// CANDIDATE ordinary gem-rock level/XP; UNKNOWN reuse for a Tai Bwo find.
+// UNKNOWN engineering reuse: 28/70 success inputs and a 1,000-tick stage lifetime.
+[tbw_gem_rock]
+table=mining_table
+data=rock,village_gem_rock1
+data=rock,village_gem_rock2
+data=rock,village_gem_rock3
+data=ore_name,gems
+data=rock_level,40
+data=rock_exp,650
+data=rock_successchance,28,70
+data=rock_respawnrate,1000

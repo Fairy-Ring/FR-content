@@ -1,0 +1,104 @@
+[ai_opplayer2,tbwcu_jungle_spider] ~tbw_spider_attack;
+[ai_opplayer2,tbwcu_broodoo_poison] @tbw_broodoo_attack(false);
+[ai_opplayer2,tbwcu_broodoo_disease] @tbw_broodoo_attack(true);
+[ai_opplayer2,tbwcu_broodoo_combat] @tbw_broodoo_attack(false);
+
+[ai_queue3,tbwcu_village_snake] @tbw_encounter_death(^tbw_favour_snake);
+[ai_queue3,tbwcu_jungle_spider] @tbw_encounter_death(^tbw_favour_spider);
+[ai_queue3,tbwcu_tribesman] @tbw_encounter_death(^tbw_favour_tribesman);
+[ai_queue3,tbwcu_broodoo_poison] @tbw_encounter_death(^tbw_favour_broodoo);
+[ai_queue3,tbwcu_broodoo_disease] @tbw_encounter_death(^tbw_favour_broodoo);
+[ai_queue3,tbwcu_broodoo_combat] @tbw_encounter_death(^tbw_favour_broodoo);
+
+[opnpcu,tbwcu_broodoo_disease] @tbw_broodoo_weakness(0);
+[opnpcu,tbwcu_broodoo_poison] @tbw_broodoo_weakness(1);
+[opnpcu,tbwcu_broodoo_combat] @tbw_broodoo_weakness(2);
+
+[proc,tbw_spider_attack]
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_default_attack_outcome(~npc_melee_maxhit, 0, false);
+if ($attempted = true & $accuracy = 1) {
+    if (random(^tbw_spider_poison_denominator) = 0) {
+        queue(poison_player, 0, ^tbw_spider_poison_severity);
+    }
+}
+
+[label,tbw_broodoo_attack](boolean $disease)
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_cast_spell_outcome(^fire_strike, npc_param(attackrate), ^tbw_broodoo_maxhit, false, false);
+if ($attempted = true & $accuracy = 1) {
+    if ($disease = true) {
+        // VERIFIED victims weaken players; UNKNOWN yellow-only allocation and drain magnitude.
+        // The pinned engine has no disease hitmark 3: use honest stat drain, not poison or extra HP damage.
+        stat_sub(attack, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
+        stat_sub(strength, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
+        stat_sub(defence, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
+        stat_sub(magic, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
+        stat_sub(ranged, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
+        // UNKNOWN functional feedback; no retained period message.
+        mes("You feel weakened.");
+    }
+}
+
+[label,tbw_encounter_death](int $favour)
+gosub(npc_death);
+if (npc_findhero = ^true) {
+    def_namedobj $drop = npc_param(death_drop);
+    if ($drop ! null) obj_add(npc_coord, $drop, 1, ^lootdrop_duration);
+    // Match mosquito rewards: the greatest-damage hero is the killer, and only in the village after Cleanup starts.
+    if (p_finduid(uid) = true) {
+        if (~tbw_in_village = true & %cleanup_progress > 0) {
+            ~tbw_add_favour($favour);
+        }
+    }
+}
+
+[label,tbw_broodoo_weakness](int $kind)
+if (npc_stat(hitpoints) = 0) return;
+def_boolean $valid = false;
+if ($kind = 0) {
+    if (last_useitem = relicyms_balm1 | last_useitem = relicyms_balm2 | last_useitem = relicyms_balm3 | last_useitem = relicyms_balm4) $valid = true;
+} else if ($kind = 1) {
+    // CANDIDATE later OSRS accepts antipoison potions; reuse the 377 items' existing cure flag.
+    if (oc_category(last_useitem) = potion & oc_param(last_useitem, cures_poison) = true) $valid = true;
+} else if (~tbw_encounter_is_food(last_useitem) = true) {
+    $valid = true;
+}
+if ($valid = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if ($kind = 2) {
+    inv_del(inv, last_useitem, 1);
+} else {
+    def_namedobj $next = oc_param(last_useitem, next_obj_stage);
+    inv_del(inv, last_useitem, 1);
+    inv_add(inv, $next, 1);
+}
+def_int $damage = min(npc_stat(hitpoints), ^tbw_broodoo_weakness_damage);
+// CANDIDATE later OSRS: two Cooking/Herblore XP per actual damage; XP commands use tenths.
+if ($kind = 2) {
+    stat_advance(cooking, multiply($damage, 20));
+} else if (%druidquest = ^druid_complete) {
+    stat_advance(herblore, multiply($damage, 20));
+}
+npc_heropoints($damage);
+~npc_default_damage($damage);
+
+[proc,tbw_encounter_is_food](obj $item)(boolean)
+def_category $category = oc_category($item);
+if ($category = meat | $category = category_58 | $category = category_59 | $category = category_86 | $category = category_120 | $category = category_129 | $category = category_130 | $category = category_131 | $category = category_132 | $category = gnome_crunchies | $category = gnome_unf_odd_crunchies | $category = gnome_batta | $category = gnome_unf_odd_batta | $category = gnome_bowl | $category = gnome_unf_odd_bowl | $category = gnome_premade_and_toadlegs_kingworm) {
+    return(true);
+}
+if ($item = tbwt_sliced_banana | $item = kebab | $item = ugthanki_kebab_bad | $item = ugthanki_kebab | $item = mort_slimey_eel_cooked | $item = snail_corpse_cooked1 | $item = snail_corpse_cooked2 | $item = snail_corpse_cooked3 | $item = mm_monkey_nuts | $item = mm_monkey_bar | $item = mm_banana_stew | $item = curry | $item = stew) {
+    return(true);
+}
+return(false);
