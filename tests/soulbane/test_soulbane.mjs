@@ -4715,8 +4715,8 @@ function testTolnaCompletionProgression(p, label = 'native Tolna completion prog
   assert.equal(stage(reloaded), TOLNA_COMPLETE_STAGE, `${label}: stage-13 rift use does not reopen the quest`);
   assert.equal(instanceUid(reloaded), 0, `${label}: completed account cannot create a postquest instance`);
   assert.equal(tolnaActorsFor(reloaded).length, 0, `${label}: no postquest final actors are accessible`);
-  assert.deepEqual(tile(reloaded), oldSurface,
-    `${label}: refused postquest access leaves the account at its surface tile`);
+  assert.deepEqual(tile(reloaded), [0, 3296, 9823],
+    `${label}: completed-quest access reaches the original shared training dungeon beside its rope`);
   console.log(`Tolna native finale ${JSON.stringify({ geometry, introOverheads: intro.overheads.length, intervals, ordinaryMeleeKills: meleeKills, stage: stage(reloaded), rewardXp: 5000, coins: groundCoins.count })}`);
   return reloaded;
 }
