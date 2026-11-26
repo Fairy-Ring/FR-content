@@ -3,8 +3,15 @@
 [if_button,glidermap:com_28] @gnomeglider_fly(^sindarpos);
 [if_button,glidermap:com_29] @gnomeglider_fly(^lemanto_andra);
 [if_button,glidermap:com_30] @gnomeglider_fly(^kar_hewo);
+[if_button,glidermap:com_31] @gnomeglider_fly(^lemantolly_undri);
 
 [label,gnomeglider_fly](coord $dest)
+// VERIFIED period reward: Feldip Hills access follows One Small Favour.
+if ($dest = ^lemantolly_undri & (%grandtree < ^grandtree_complete | %onesmallfavour < ^onesmallfavour_complete)) {
+    // UNKNOWN pre-unlock wording; reuse the existing network refusal.
+    mes("You can't go there at the moment.");
+    return;
+}
 // glider npcs don't stand still and the players coord isn't going to be consistent so we need to inzone this
 def_coord $start_pos = ~calc_gliderstart;
 if($start_pos = $dest) {
@@ -33,6 +40,8 @@ if(inzone(movecoord(^ta_quir_priw, -8, 0, -8), movecoord(^ta_quir_priw, 8, 0, 8)
     return (^kar_hewo);
 }  else if(inzone(movecoord(^sindarpos, -8, 0, -8), movecoord(^sindarpos, 8, 0, 8), coord) = true) {
     return (^sindarpos);
+} else if(inzone(movecoord(^lemantolly_undri, -8, 0, -8), movecoord(^lemantolly_undri, 8, 0, 8), coord) = true) {
+    return (^lemantolly_undri);
 }
 return (^ta_quir_priw);
 
@@ -51,6 +60,12 @@ if($start_pos = ^ta_quir_priw & $dest = ^sindarpos) {
     return (6);
 } else if($start_pos = ^ta_quir_priw & $dest = ^gandius) {
     return (7);
+} else if($start_pos = ^ta_quir_priw & $dest = ^lemantolly_undri) {
+    // VERIFIED 377 glidermap:com_41 selects pilot_journey 8.
+    return (8);
+} else if($start_pos = ^lemantolly_undri & $dest = ^ta_quir_priw) {
+    // VERIFIED 377 glidermap:com_40 selects pilot_journey 9.
+    return (9);
 }
 return (-1);
 
