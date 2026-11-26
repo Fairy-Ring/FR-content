@@ -106,9 +106,9 @@ const OWNER_PREDICATES = [
         // CANDIDATE assignment reconstruction: Drezel grants Morytania access at 61, after completion at 60.
         gate: { variable: 'priestperil', threshold: 61 }
     },
-    { proc: 'slayer_horror_unlocked', categories: ['slayer_dagannoth'] },
-    { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'] },
-    { proc: 'slayer_deserttreasure_unlocked', categories: ['slayer_dustdevil'] },
+    { proc: 'slayer_horror_unlocked', categories: ['slayer_dagannoth'], gate: { variable: 'deephorror', threshold: 10 } },
+    { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'], gate: { variable: 'regicide_quest', threshold: 2 } },
+    { proc: 'slayer_deserttreasure_unlocked', categories: ['slayer_dustdevil'], gate: { variable: 'deserttreasuremain', threshold: 1 } },
     { proc: 'slayer_mourning2_unlocked', categories: ['slayer_darkbeast'], gate: { variable: 'mourning_quest_part2', threshold: 5 } },
     {
         proc: 'slayer_skippy_unlocked',
@@ -1117,8 +1117,11 @@ function testChaeldarRetargets() {
     const elf = Number(ORACLE.constants.get('slayer_elf'));
     const cockatrice = Number(ORACLE.constants.get('slayer_cockatrice'));
     applyFixture(player, { ...FIXTURES.get('chaeldar:high'), questValues: completedQuestValues() });
-    assert.equal(runInt(player, '[proc,slayer_regicide_unlocked]').value, 0, 'unfinished Regicide proc must stay false');
-    assert.equal(runInt(player, '[proc,validate_slayer_target]', npc, [elf]).value, 0, 'retargeted elves must remain excluded by their real packed gate');
+    for (const stage of [0, 1, 2, 3]) {
+        player.setVar(QUEST_VAR_IDS.regicide_quest, stage);
+        assert.equal(runInt(player, '[proc,slayer_regicide_unlocked]').value, Number(stage >= 2), `Regicide stage ${stage}: Lathas briefing unlocks elves`);
+        assert.equal(runInt(player, '[proc,validate_slayer_target]', npc, [elf]).value, Number(stage >= 2), `retargeted elves use their real packed gate at stage ${stage}`);
+    }
     const thresholds = [];
     for (const baseSlayer of [24, 25, 26]) {
         applyFixture(player, { ...fixture, baseSlayer, currentSlayer: 1 });
@@ -1127,7 +1130,7 @@ function testChaeldarRetargets() {
         assert.equal(accepted, baseSlayer >= 25 ? 1 : 0, 'cockatrice uses base Slayer25, not current Slayer');
         thresholds.push({ baseSlayer, currentSlayer: 1, accepted: accepted === 1 });
     }
-    return { mappings, elfGate: 'unfinished exclusion; no true mock', thresholds, endpoints: drawLiveRowEndpoints('chaeldar', 'cockatrice', fixture) };
+    return { mappings, elfGate: 'CANDIDATE: Regicide Lathas briefing at stage 2', thresholds, endpoints: drawLiveRowEndpoints('chaeldar', 'cockatrice', fixture) };
 }
 
 function testDuradelTables() {
@@ -1406,10 +1409,7 @@ function testOwnerPredicateDispatch() {
             assert(!expectedRoutes.has(target), `category ^${category} has multiple owner predicates`);
             expectedRoutes.set(target, owner.proc);
         }
-        if (!owner.gate) {
-            const body = extractProcSource(ORACLE.taskSource, owner.proc).replace(/\/\/[^\n]*/g, '').replace(/\s+/g, '');
-            assert.equal(body, `[proc,${owner.proc}]()(boolean)return(false);`, `${owner.proc} must remain an unfinished false body`);
-        }
+        assert(owner.gate, `${owner.proc} has an explicit owner gate`);
     }
     assert.equal(ORACLE.ownerProcByTarget.size, expectedRoutes.size, 'validator source must route exactly the six planned owner contracts');
     for (const [target, proc] of expectedRoutes) {

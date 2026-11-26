@@ -114,14 +114,19 @@ if (%priestperil < ^priestperil_access_holy_barrier) {
 }
 return (true);
 
-// Unfinished exclusions. Each quest owner supplies its authentic predicate.
+// CANDIDATE: completion opens the normal Lighthouse dungeon, not the quest cave.
 [proc,slayer_horror_unlocked]()(boolean)
+if (%horrorquest >= ^horror_complete) return (true);
 return (false);
 
+// CANDIDATE: Lathas's briefing opens the Underground Pass route to Tirannwn.
 [proc,slayer_regicide_unlocked]()(boolean)
+if (%regicide_quest >= ^regicide_spoken_lathas) return (true);
 return (false);
 
+// CANDIDATE: started Desert Treasure; the published Smoke well itself is ungated.
 [proc,slayer_deserttreasure_unlocked]()(boolean)
+if (%deserttreasure >= ^dt_stage_etchings_received) return (true);
 return (false);
 
 [proc,slayer_mourning2_unlocked]()(boolean)
