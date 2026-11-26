@@ -4,6 +4,10 @@
 ^draughts_room_tele_coord = 0_34_77_20_12
 ^runelink_room_tele_coord = 0_34_77_43_12
 
+// UNKNOWN: engineering result landings at the original additional-game rank-zone centers.
+^runesquares_room_tele_coord = 0_34_77_12_20
+^runeversi_room_tele_coord = 0_34_77_52_20
+
 ^draughts_room_start_coord = 0_34_77_16_8
 ^draughts_room_end_coord = 0_34_77_23_15
 

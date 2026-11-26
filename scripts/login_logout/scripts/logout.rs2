@@ -1,4 +1,5 @@
 [logout,_]
+if (%boardgames_ingame = 1) ~boardgames_logout;
 if (~champions_current > 0) ~champions_leave;
 if (%darkness_level ! 0) ~swamp_cave_release;
 ~set_pk_skull_logout;

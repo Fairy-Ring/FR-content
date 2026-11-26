@@ -1,0 +1,16 @@
+// VERIFIED: original revision-377 RuneSquares interface is an 8x8 square board.
+^runesquares_board_side = 8
+^runesquares_square_count = 64
+^runesquares_edge_count = 56
+^runesquares_total_edges = 112
+
+// VERIFIED: shared challenge selection assigns RuneSquares game id 2.
+^runesquares_game_id = 2
+
+// UNKNOWN engineering eligibility: require four valid moves, matching Draughts.
+^runesquares_ranked_move_threshold = 4
+
+// UNKNOWN internal close-reason values; these are not shown to players.
+^runesquares_end_fullboard = 1
+^runesquares_end_draw_agreed = 2
+^runesquares_end_resigned = 3

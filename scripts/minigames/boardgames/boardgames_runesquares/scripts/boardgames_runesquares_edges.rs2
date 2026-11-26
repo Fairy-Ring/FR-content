@@ -1,0 +1,449 @@
+// Original 377 visible edge rectangles and their transparent large hit targets share this mapping.
+[if_button,boardgames_runesquares:com_128]
+~runesquares_try_move(0, 0);
+[if_button,boardgames_runesquares:com_129]
+~runesquares_try_move(0, 1);
+[if_button,boardgames_runesquares:com_130]
+~runesquares_try_move(0, 2);
+[if_button,boardgames_runesquares:com_131]
+~runesquares_try_move(0, 3);
+[if_button,boardgames_runesquares:com_132]
+~runesquares_try_move(0, 4);
+[if_button,boardgames_runesquares:com_133]
+~runesquares_try_move(0, 5);
+[if_button,boardgames_runesquares:com_134]
+~runesquares_try_move(0, 6);
+[if_button,boardgames_runesquares:com_135]
+~runesquares_try_move(0, 7);
+[if_button,boardgames_runesquares:com_136]
+~runesquares_try_move(0, 8);
+[if_button,boardgames_runesquares:com_137]
+~runesquares_try_move(0, 9);
+[if_button,boardgames_runesquares:com_138]
+~runesquares_try_move(0, 10);
+[if_button,boardgames_runesquares:com_139]
+~runesquares_try_move(0, 11);
+[if_button,boardgames_runesquares:com_140]
+~runesquares_try_move(0, 12);
+[if_button,boardgames_runesquares:com_141]
+~runesquares_try_move(0, 13);
+[if_button,boardgames_runesquares:com_142]
+~runesquares_try_move(0, 14);
+[if_button,boardgames_runesquares:com_143]
+~runesquares_try_move(0, 15);
+[if_button,boardgames_runesquares:com_144]
+~runesquares_try_move(0, 16);
+[if_button,boardgames_runesquares:com_145]
+~runesquares_try_move(0, 17);
+[if_button,boardgames_runesquares:com_146]
+~runesquares_try_move(0, 18);
+[if_button,boardgames_runesquares:com_147]
+~runesquares_try_move(0, 19);
+[if_button,boardgames_runesquares:com_148]
+~runesquares_try_move(0, 20);
+[if_button,boardgames_runesquares:com_149]
+~runesquares_try_move(0, 21);
+[if_button,boardgames_runesquares:com_150]
+~runesquares_try_move(0, 22);
+[if_button,boardgames_runesquares:com_151]
+~runesquares_try_move(0, 23);
+[if_button,boardgames_runesquares:com_152]
+~runesquares_try_move(0, 24);
+[if_button,boardgames_runesquares:com_153]
+~runesquares_try_move(0, 25);
+[if_button,boardgames_runesquares:com_154]
+~runesquares_try_move(0, 26);
+[if_button,boardgames_runesquares:com_155]
+~runesquares_try_move(0, 27);
+[if_button,boardgames_runesquares:com_156]
+~runesquares_try_move(0, 28);
+[if_button,boardgames_runesquares:com_157]
+~runesquares_try_move(0, 29);
+[if_button,boardgames_runesquares:com_158]
+~runesquares_try_move(0, 30);
+[if_button,boardgames_runesquares:com_159]
+~runesquares_try_move(0, 31);
+[if_button,boardgames_runesquares:com_160]
+~runesquares_try_move(0, 32);
+[if_button,boardgames_runesquares:com_161]
+~runesquares_try_move(0, 33);
+[if_button,boardgames_runesquares:com_162]
+~runesquares_try_move(0, 34);
+[if_button,boardgames_runesquares:com_163]
+~runesquares_try_move(0, 35);
+[if_button,boardgames_runesquares:com_164]
+~runesquares_try_move(0, 36);
+[if_button,boardgames_runesquares:com_165]
+~runesquares_try_move(0, 37);
+[if_button,boardgames_runesquares:com_166]
+~runesquares_try_move(0, 38);
+[if_button,boardgames_runesquares:com_167]
+~runesquares_try_move(0, 39);
+[if_button,boardgames_runesquares:com_168]
+~runesquares_try_move(0, 40);
+[if_button,boardgames_runesquares:com_169]
+~runesquares_try_move(0, 41);
+[if_button,boardgames_runesquares:com_170]
+~runesquares_try_move(0, 42);
+[if_button,boardgames_runesquares:com_171]
+~runesquares_try_move(0, 43);
+[if_button,boardgames_runesquares:com_172]
+~runesquares_try_move(0, 44);
+[if_button,boardgames_runesquares:com_173]
+~runesquares_try_move(0, 45);
+[if_button,boardgames_runesquares:com_174]
+~runesquares_try_move(0, 46);
+[if_button,boardgames_runesquares:com_175]
+~runesquares_try_move(0, 47);
+[if_button,boardgames_runesquares:com_176]
+~runesquares_try_move(0, 48);
+[if_button,boardgames_runesquares:com_177]
+~runesquares_try_move(0, 49);
+[if_button,boardgames_runesquares:com_178]
+~runesquares_try_move(0, 50);
+[if_button,boardgames_runesquares:com_179]
+~runesquares_try_move(0, 51);
+[if_button,boardgames_runesquares:com_180]
+~runesquares_try_move(0, 52);
+[if_button,boardgames_runesquares:com_181]
+~runesquares_try_move(0, 53);
+[if_button,boardgames_runesquares:com_182]
+~runesquares_try_move(0, 54);
+[if_button,boardgames_runesquares:com_183]
+~runesquares_try_move(0, 55);
+[if_button,boardgames_runesquares:com_184]
+~runesquares_try_move(1, 0);
+[if_button,boardgames_runesquares:com_185]
+~runesquares_try_move(1, 1);
+[if_button,boardgames_runesquares:com_186]
+~runesquares_try_move(1, 2);
+[if_button,boardgames_runesquares:com_187]
+~runesquares_try_move(1, 3);
+[if_button,boardgames_runesquares:com_188]
+~runesquares_try_move(1, 4);
+[if_button,boardgames_runesquares:com_189]
+~runesquares_try_move(1, 5);
+[if_button,boardgames_runesquares:com_190]
+~runesquares_try_move(1, 6);
+[if_button,boardgames_runesquares:com_191]
+~runesquares_try_move(1, 7);
+[if_button,boardgames_runesquares:com_192]
+~runesquares_try_move(1, 8);
+[if_button,boardgames_runesquares:com_193]
+~runesquares_try_move(1, 9);
+[if_button,boardgames_runesquares:com_194]
+~runesquares_try_move(1, 10);
+[if_button,boardgames_runesquares:com_195]
+~runesquares_try_move(1, 11);
+[if_button,boardgames_runesquares:com_196]
+~runesquares_try_move(1, 12);
+[if_button,boardgames_runesquares:com_197]
+~runesquares_try_move(1, 13);
+[if_button,boardgames_runesquares:com_198]
+~runesquares_try_move(1, 14);
+[if_button,boardgames_runesquares:com_199]
+~runesquares_try_move(1, 15);
+[if_button,boardgames_runesquares:com_200]
+~runesquares_try_move(1, 16);
+[if_button,boardgames_runesquares:com_201]
+~runesquares_try_move(1, 17);
+[if_button,boardgames_runesquares:com_202]
+~runesquares_try_move(1, 18);
+[if_button,boardgames_runesquares:com_203]
+~runesquares_try_move(1, 19);
+[if_button,boardgames_runesquares:com_204]
+~runesquares_try_move(1, 20);
+[if_button,boardgames_runesquares:com_205]
+~runesquares_try_move(1, 21);
+[if_button,boardgames_runesquares:com_206]
+~runesquares_try_move(1, 22);
+[if_button,boardgames_runesquares:com_207]
+~runesquares_try_move(1, 23);
+[if_button,boardgames_runesquares:com_208]
+~runesquares_try_move(1, 24);
+[if_button,boardgames_runesquares:com_209]
+~runesquares_try_move(1, 25);
+[if_button,boardgames_runesquares:com_210]
+~runesquares_try_move(1, 26);
+[if_button,boardgames_runesquares:com_211]
+~runesquares_try_move(1, 27);
+[if_button,boardgames_runesquares:com_212]
+~runesquares_try_move(1, 28);
+[if_button,boardgames_runesquares:com_213]
+~runesquares_try_move(1, 29);
+[if_button,boardgames_runesquares:com_214]
+~runesquares_try_move(1, 30);
+[if_button,boardgames_runesquares:com_215]
+~runesquares_try_move(1, 31);
+[if_button,boardgames_runesquares:com_216]
+~runesquares_try_move(1, 32);
+[if_button,boardgames_runesquares:com_217]
+~runesquares_try_move(1, 33);
+[if_button,boardgames_runesquares:com_218]
+~runesquares_try_move(1, 34);
+[if_button,boardgames_runesquares:com_219]
+~runesquares_try_move(1, 35);
+[if_button,boardgames_runesquares:com_220]
+~runesquares_try_move(1, 36);
+[if_button,boardgames_runesquares:com_221]
+~runesquares_try_move(1, 37);
+[if_button,boardgames_runesquares:com_222]
+~runesquares_try_move(1, 38);
+[if_button,boardgames_runesquares:com_223]
+~runesquares_try_move(1, 39);
+[if_button,boardgames_runesquares:com_224]
+~runesquares_try_move(1, 40);
+[if_button,boardgames_runesquares:com_225]
+~runesquares_try_move(1, 41);
+[if_button,boardgames_runesquares:com_226]
+~runesquares_try_move(1, 42);
+[if_button,boardgames_runesquares:com_227]
+~runesquares_try_move(1, 43);
+[if_button,boardgames_runesquares:com_228]
+~runesquares_try_move(1, 44);
+[if_button,boardgames_runesquares:com_229]
+~runesquares_try_move(1, 45);
+[if_button,boardgames_runesquares:com_230]
+~runesquares_try_move(1, 46);
+[if_button,boardgames_runesquares:com_231]
+~runesquares_try_move(1, 47);
+[if_button,boardgames_runesquares:com_232]
+~runesquares_try_move(1, 48);
+[if_button,boardgames_runesquares:com_233]
+~runesquares_try_move(1, 49);
+[if_button,boardgames_runesquares:com_234]
+~runesquares_try_move(1, 50);
+[if_button,boardgames_runesquares:com_235]
+~runesquares_try_move(1, 51);
+[if_button,boardgames_runesquares:com_236]
+~runesquares_try_move(1, 52);
+[if_button,boardgames_runesquares:com_237]
+~runesquares_try_move(1, 53);
+[if_button,boardgames_runesquares:com_238]
+~runesquares_try_move(1, 54);
+[if_button,boardgames_runesquares:com_239]
+~runesquares_try_move(1, 55);
+[if_button,boardgames_runesquares:com_293]
+~runesquares_try_move(0, 0);
+[if_button,boardgames_runesquares:com_294]
+~runesquares_try_move(0, 1);
+[if_button,boardgames_runesquares:com_295]
+~runesquares_try_move(0, 2);
+[if_button,boardgames_runesquares:com_296]
+~runesquares_try_move(0, 3);
+[if_button,boardgames_runesquares:com_297]
+~runesquares_try_move(0, 4);
+[if_button,boardgames_runesquares:com_298]
+~runesquares_try_move(0, 5);
+[if_button,boardgames_runesquares:com_299]
+~runesquares_try_move(0, 6);
+[if_button,boardgames_runesquares:com_300]
+~runesquares_try_move(0, 7);
+[if_button,boardgames_runesquares:com_301]
+~runesquares_try_move(0, 8);
+[if_button,boardgames_runesquares:com_302]
+~runesquares_try_move(0, 9);
+[if_button,boardgames_runesquares:com_303]
+~runesquares_try_move(0, 10);
+[if_button,boardgames_runesquares:com_304]
+~runesquares_try_move(0, 11);
+[if_button,boardgames_runesquares:com_305]
+~runesquares_try_move(0, 12);
+[if_button,boardgames_runesquares:com_306]
+~runesquares_try_move(0, 13);
+[if_button,boardgames_runesquares:com_307]
+~runesquares_try_move(0, 14);
+[if_button,boardgames_runesquares:com_308]
+~runesquares_try_move(0, 15);
+[if_button,boardgames_runesquares:com_309]
+~runesquares_try_move(0, 16);
+[if_button,boardgames_runesquares:com_310]
+~runesquares_try_move(0, 17);
+[if_button,boardgames_runesquares:com_311]
+~runesquares_try_move(0, 18);
+[if_button,boardgames_runesquares:com_312]
+~runesquares_try_move(0, 19);
+[if_button,boardgames_runesquares:com_313]
+~runesquares_try_move(0, 20);
+[if_button,boardgames_runesquares:com_314]
+~runesquares_try_move(0, 21);
+[if_button,boardgames_runesquares:com_315]
+~runesquares_try_move(0, 22);
+[if_button,boardgames_runesquares:com_316]
+~runesquares_try_move(0, 23);
+[if_button,boardgames_runesquares:com_317]
+~runesquares_try_move(0, 24);
+[if_button,boardgames_runesquares:com_318]
+~runesquares_try_move(0, 25);
+[if_button,boardgames_runesquares:com_319]
+~runesquares_try_move(0, 26);
+[if_button,boardgames_runesquares:com_320]
+~runesquares_try_move(0, 27);
+[if_button,boardgames_runesquares:com_321]
+~runesquares_try_move(0, 28);
+[if_button,boardgames_runesquares:com_322]
+~runesquares_try_move(0, 29);
+[if_button,boardgames_runesquares:com_323]
+~runesquares_try_move(0, 30);
+[if_button,boardgames_runesquares:com_324]
+~runesquares_try_move(0, 31);
+[if_button,boardgames_runesquares:com_325]
+~runesquares_try_move(0, 32);
+[if_button,boardgames_runesquares:com_326]
+~runesquares_try_move(0, 33);
+[if_button,boardgames_runesquares:com_327]
+~runesquares_try_move(0, 34);
+[if_button,boardgames_runesquares:com_328]
+~runesquares_try_move(0, 35);
+[if_button,boardgames_runesquares:com_329]
+~runesquares_try_move(0, 36);
+[if_button,boardgames_runesquares:com_330]
+~runesquares_try_move(0, 37);
+[if_button,boardgames_runesquares:com_331]
+~runesquares_try_move(0, 38);
+[if_button,boardgames_runesquares:com_332]
+~runesquares_try_move(0, 39);
+[if_button,boardgames_runesquares:com_333]
+~runesquares_try_move(0, 40);
+[if_button,boardgames_runesquares:com_334]
+~runesquares_try_move(0, 41);
+[if_button,boardgames_runesquares:com_335]
+~runesquares_try_move(0, 42);
+[if_button,boardgames_runesquares:com_336]
+~runesquares_try_move(0, 43);
+[if_button,boardgames_runesquares:com_337]
+~runesquares_try_move(0, 44);
+[if_button,boardgames_runesquares:com_338]
+~runesquares_try_move(0, 45);
+[if_button,boardgames_runesquares:com_339]
+~runesquares_try_move(0, 46);
+[if_button,boardgames_runesquares:com_340]
+~runesquares_try_move(0, 47);
+[if_button,boardgames_runesquares:com_341]
+~runesquares_try_move(0, 48);
+[if_button,boardgames_runesquares:com_342]
+~runesquares_try_move(0, 49);
+[if_button,boardgames_runesquares:com_343]
+~runesquares_try_move(0, 50);
+[if_button,boardgames_runesquares:com_344]
+~runesquares_try_move(0, 51);
+[if_button,boardgames_runesquares:com_345]
+~runesquares_try_move(0, 52);
+[if_button,boardgames_runesquares:com_346]
+~runesquares_try_move(0, 53);
+[if_button,boardgames_runesquares:com_347]
+~runesquares_try_move(0, 54);
+[if_button,boardgames_runesquares:com_348]
+~runesquares_try_move(0, 55);
+[if_button,boardgames_runesquares:com_349]
+~runesquares_try_move(1, 0);
+[if_button,boardgames_runesquares:com_350]
+~runesquares_try_move(1, 1);
+[if_button,boardgames_runesquares:com_351]
+~runesquares_try_move(1, 2);
+[if_button,boardgames_runesquares:com_352]
+~runesquares_try_move(1, 3);
+[if_button,boardgames_runesquares:com_353]
+~runesquares_try_move(1, 4);
+[if_button,boardgames_runesquares:com_354]
+~runesquares_try_move(1, 5);
+[if_button,boardgames_runesquares:com_355]
+~runesquares_try_move(1, 6);
+[if_button,boardgames_runesquares:com_356]
+~runesquares_try_move(1, 7);
+[if_button,boardgames_runesquares:com_357]
+~runesquares_try_move(1, 8);
+[if_button,boardgames_runesquares:com_358]
+~runesquares_try_move(1, 9);
+[if_button,boardgames_runesquares:com_359]
+~runesquares_try_move(1, 10);
+[if_button,boardgames_runesquares:com_360]
+~runesquares_try_move(1, 11);
+[if_button,boardgames_runesquares:com_361]
+~runesquares_try_move(1, 12);
+[if_button,boardgames_runesquares:com_362]
+~runesquares_try_move(1, 13);
+[if_button,boardgames_runesquares:com_363]
+~runesquares_try_move(1, 14);
+[if_button,boardgames_runesquares:com_364]
+~runesquares_try_move(1, 15);
+[if_button,boardgames_runesquares:com_365]
+~runesquares_try_move(1, 16);
+[if_button,boardgames_runesquares:com_366]
+~runesquares_try_move(1, 17);
+[if_button,boardgames_runesquares:com_367]
+~runesquares_try_move(1, 18);
+[if_button,boardgames_runesquares:com_368]
+~runesquares_try_move(1, 19);
+[if_button,boardgames_runesquares:com_369]
+~runesquares_try_move(1, 20);
+[if_button,boardgames_runesquares:com_370]
+~runesquares_try_move(1, 21);
+[if_button,boardgames_runesquares:com_371]
+~runesquares_try_move(1, 22);
+[if_button,boardgames_runesquares:com_372]
+~runesquares_try_move(1, 23);
+[if_button,boardgames_runesquares:com_373]
+~runesquares_try_move(1, 24);
+[if_button,boardgames_runesquares:com_374]
+~runesquares_try_move(1, 25);
+[if_button,boardgames_runesquares:com_375]
+~runesquares_try_move(1, 26);
+[if_button,boardgames_runesquares:com_376]
+~runesquares_try_move(1, 27);
+[if_button,boardgames_runesquares:com_377]
+~runesquares_try_move(1, 28);
+[if_button,boardgames_runesquares:com_378]
+~runesquares_try_move(1, 29);
+[if_button,boardgames_runesquares:com_379]
+~runesquares_try_move(1, 30);
+[if_button,boardgames_runesquares:com_380]
+~runesquares_try_move(1, 31);
+[if_button,boardgames_runesquares:com_381]
+~runesquares_try_move(1, 32);
+[if_button,boardgames_runesquares:com_382]
+~runesquares_try_move(1, 33);
+[if_button,boardgames_runesquares:com_383]
+~runesquares_try_move(1, 34);
+[if_button,boardgames_runesquares:com_384]
+~runesquares_try_move(1, 35);
+[if_button,boardgames_runesquares:com_385]
+~runesquares_try_move(1, 36);
+[if_button,boardgames_runesquares:com_386]
+~runesquares_try_move(1, 37);
+[if_button,boardgames_runesquares:com_387]
+~runesquares_try_move(1, 38);
+[if_button,boardgames_runesquares:com_388]
+~runesquares_try_move(1, 39);
+[if_button,boardgames_runesquares:com_389]
+~runesquares_try_move(1, 40);
+[if_button,boardgames_runesquares:com_390]
+~runesquares_try_move(1, 41);
+[if_button,boardgames_runesquares:com_391]
+~runesquares_try_move(1, 42);
+[if_button,boardgames_runesquares:com_392]
+~runesquares_try_move(1, 43);
+[if_button,boardgames_runesquares:com_393]
+~runesquares_try_move(1, 44);
+[if_button,boardgames_runesquares:com_394]
+~runesquares_try_move(1, 45);
+[if_button,boardgames_runesquares:com_395]
+~runesquares_try_move(1, 46);
+[if_button,boardgames_runesquares:com_396]
+~runesquares_try_move(1, 47);
+[if_button,boardgames_runesquares:com_397]
+~runesquares_try_move(1, 48);
+[if_button,boardgames_runesquares:com_398]
+~runesquares_try_move(1, 49);
+[if_button,boardgames_runesquares:com_399]
+~runesquares_try_move(1, 50);
+[if_button,boardgames_runesquares:com_400]
+~runesquares_try_move(1, 51);
+[if_button,boardgames_runesquares:com_401]
+~runesquares_try_move(1, 52);
+[if_button,boardgames_runesquares:com_402]
+~runesquares_try_move(1, 53);
+[if_button,boardgames_runesquares:com_403]
+~runesquares_try_move(1, 54);
+[if_button,boardgames_runesquares:com_404]
+~runesquares_try_move(1, 55);

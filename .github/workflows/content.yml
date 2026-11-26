@@ -165,6 +165,7 @@ jobs:
           run_test tests/between-a-rock/test_between_a_rock.mjs node --import tsx ../content/tests/between-a-rock/test_between_a_rock.mjs
           run_test tests/tog/test_tog.mjs node --import tsx ../content/tests/tog/test_tog.mjs
           run_test tests/pest-control/test_pest_control.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/pest-control/test_pest_control.mjs
+          run_test tests/boardgames/test_boardgames.mjs node --import tsx ../content/tests/boardgames/test_boardgames.mjs
           run_test tests/giant-dwarf/test_giant_dwarf.mjs node --import tsx ../content/tests/giant-dwarf/test_giant_dwarf.mjs
           run_test tests/forgettable-tale/test_forgettable_tale.mjs node --import tsx ../content/tests/forgettable-tale/test_forgettable_tale.mjs
           run_test tests/brewing/test_brewing.mjs node --import tsx ../content/tests/brewing/test_brewing.mjs
