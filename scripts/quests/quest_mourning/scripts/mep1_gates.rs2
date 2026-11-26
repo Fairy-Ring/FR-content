@@ -1,0 +1,30 @@
+// UNKNOWN: Engineering handler reuses the shared paired-gate swing and collision pattern.
+[oploc1,mourning_orchard_fencegate_l] ~open_gate;
+[oploc1,mourning_orchard_fencegate_r] ~open_outer_gate;
+[oploc1,mourning_orchard_fencegate_open_l] ~close_gate;
+[oploc1,mourning_orchard_fencegate_open_r]
+def_coord $orig_coord = loc_coord;
+loc_findallzone(~get_pair_coord($orig_coord, loc_angle, true));
+while (loc_findnext = true) {
+    if (distance($orig_coord, loc_coord) <= 1 & loc_category = gate_main_open) {
+        ~close_gate;
+        return;
+    }
+}
+
+// UNKNOWN: Favorable entry rule requires MEP1 stage 1, but exit is always allowed.
+// UNKNOWN: Functional refusal wording has no sourced period line.
+[oploc1,elf_village_treegate]
+def_boolean $from_outside = coordx(coord) < 2306;
+if ($from_outside = true & %mourning_quest < ^mep1_escorted) {
+    mes("The mourners must reach Lletya before I can enter.");
+    return;
+}
+def_coord $gate_coord = loc_coord;
+loc_change(elf_village_treegate_open, 3);
+p_delay(0);
+if ($from_outside = true) {
+    p_teleport(movecoord($gate_coord, 1, 0, 0));
+} else {
+    p_teleport(movecoord($gate_coord, -1, 0, 0));
+}

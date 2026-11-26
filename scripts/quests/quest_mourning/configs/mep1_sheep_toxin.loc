@@ -80,6 +80,9 @@ active=yes
 blockrange=no
 raiseobject=no
 
+category=gate_main_closed
+param=next_loc_stage,mourning_orchard_fencegate_open_l
+
 [mourning_orchard_fencegate_r]
 name=Gate
 desc=A wooden gate.
@@ -89,3 +92,28 @@ op1=Open
 active=yes
 blockrange=no
 raiseobject=no
+category=gate_outer_closed
+param=next_loc_stage,mourning_orchard_fencegate_open_r
+
+[mourning_orchard_fencegate_open_l]
+name=Gate
+desc=A wooden gate.
+model=plaguesheep_gatel
+op1=Close
+active=yes
+blockrange=no
+raiseobject=no
+category=gate_main_open
+param=next_loc_stage,mourning_orchard_fencegate_l
+
+[mourning_orchard_fencegate_open_r]
+name=Gate
+desc=A wooden gate.
+model=plaguesheep_gatel
+mirror=yes
+op1=Close
+active=yes
+blockrange=no
+raiseobject=no
+category=gate_outer_open
+param=next_loc_stage,mourning_orchard_fencegate_r

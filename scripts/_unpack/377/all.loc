@@ -53092,20 +53092,6 @@ mirror=yes
 op1=Open
 hillskew=yes
 
-[elf_village_treegate]
-name=Tree
-desc=An odd looking tree.
-model=elf_village_treegate
-length=4
-op1=Pass
-anim=treegate_close
-
-[elf_village_treegate_open]
-name=Tree
-desc=An odd looking tree.
-model=elf_village_treegate
-length=4
-
 [elf_village_ladder]
 name=ladder
 desc=I can climb this.
@@ -53558,24 +53544,6 @@ model=arena_guard_chest_shut
 op1=Open
 forceapproach=north
 
-[mourning_orchard_fencegate_open_l]
-name=Gate
-desc=A wooden gate.
-model=plaguesheep_gatel
-op1=Close
-active=yes
-blockrange=no
-raiseobject=no
-
-[mourning_orchard_fencegate_open_r]
-name=Gate
-desc=A wooden gate.
-model=plaguesheep_gatel
-mirror=yes
-op1=Close
-active=yes
-blockrange=no
-raiseobject=no
 
 [mourning_normal_bed]
 name=Bed
