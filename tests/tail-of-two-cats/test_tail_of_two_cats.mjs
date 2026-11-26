@@ -364,13 +364,25 @@ for (const [at, label] of [[[0, 1896, 4522], 'Dragonkin castle'], [[0, 3298, 278
   [[0, 2272, 4698], 'King Black Dragon lair'], [[1, 1886, 4825], 'trawler deck']]) {
   assert(floorTiles.has(at.join()), `${label} has native floor data`); escape(at, label);
 }
-// An interrupted private scene returns to the original stand without earning its stage.
-{
-  const q = player(); q.setVarBit(b('twocats_quest'), 40);
+// Normal and interrupted cleanup remove only scene actors, never the player's follower.
+for (const interrupted of [false, true]) {
+  const q = player({ cat: false }); q.setVarBit(b('twocats_quest'), 40);
   const before = tile(q); const begun = run(q, '[proc,twocats_scene_begin]', [(29 * 64 + 24) * 16384 + 70 * 64 + 32, 16, 10]);
   const origin = begun.popInt(), scene = begun.popInt(); assert.notDeepEqual(tile(q), before);
-  q.closeModal(); run(q, '[softtimer,twocats_scene_watch]', [scene, origin]);
+  run(q, '[proc,cat_spawn]', [id('NpcType', 'kittenpet1')]);
+  const followerUid = q.getVar(v('follower_uid')), follower = World.getNpc(followerUid & 0xffff);
+  assert(follower && follower.x === q.x && follower.z === q.z, 'real follower is inside the private scene');
+  run(q, '[proc,twocats_scene_actor]', [16, 12, id('NpcType', 'twocats_robert_cutscene')]);
+  const actor = [...World.npcs].find(npc => npc.type === id('NpcType', 'twocats_robert_cutscene') &&
+    npc.level === q.level && npc.x === q.x && npc.z === q.z + 2);
+  assert(actor, 'the same scene contains a quest-owned actor');
+  if (interrupted) {
+    q.closeModal(); run(q, '[softtimer,twocats_scene_watch]', [scene, origin]);
+  } else run(q, '[proc,twocats_scene_end]', [scene, origin]);
   assert.deepEqual(tile(q), before); assert.equal(stage(q), 40);
+  assert.equal(q.getVar(v('follower_uid')), followerUid, 'cleanup preserves the actual follower UID');
+  assert.equal(World.getNpc(follower.nid), follower, 'cleanup does not delete the follower');
+  assert(!World.getNpc(actor.nid), 'cleanup removes its own actor');
   assert.equal(q.timers.get(ScriptProvider.getByName('[softtimer,twocats_scene_watch]').id), undefined);
 }
 console.log('PASS A Tail of Two Cats: end-to-end 0→70, five chores, visible forms, packed-map approaches/returns, recovery, once-only 2 QP and rewards, lamps and shared services');
