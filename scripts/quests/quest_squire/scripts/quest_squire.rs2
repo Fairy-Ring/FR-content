@@ -111,6 +111,10 @@ if(%squire = ^squire_given_pie) {
 }
 
 [label,reldo_imcando_dwaves]
+if (%giantdwarf_quest = 3 & %squire ! ^squire_started) {
+    ~giantdwarf_reldo_imcando;
+    return;
+}
 ~chatplayer("<p,quiz>What do you know about the Imcando dwarves?");
 ~chatnpc("<p,neutral>The Imcando dwarves, you say?");
 ~chatnpc("<p,neutral>Ah yes... for many hundreds of years they were the world's most skilled smiths. They used secret smithing knowledge passed down from generation to generation.");

@@ -38,6 +38,10 @@ if ($choice = 1) {
 ~openshop_activenpc;
 
 [opnpc1,dwarf_city_shop_weapons]
+if (%giantdwarf_quest >= 3 & %giantdwarf_quest <= 5) {
+    ~giantdwarf_santiri;
+    return;
+}
 ~chatnpc("<p,neutral>Welcome, human, to the Quality Weapons Shop! Can I interest you in a purchase?");
 def_int $choice = ~p_choice2("Yes, I'm looking for some weapons.", 1, "No thanks.", 2);
 if ($choice = 1) {
@@ -51,6 +55,10 @@ if ($choice = 1) {
 ~openshop_activenpc;
 
 [opnpc1,dwarf_city_shop_armour]
+if (%giantdwarf_quest >= 3 & %giantdwarf_quest <= 5) {
+    ~giantdwarf_saro;
+    return;
+}
 ~chatnpc("<p,neutral>Welcome to my store, human! Are you interested in buying anything?");
 def_int $choice = ~p_choice2("Yes, I'm looking for some armour.", 1, "No thanks.", 2);
 if ($choice = 1) {
@@ -187,6 +195,10 @@ if ($choice = 2) {
 ~openshop_activenpc;
 
 [opnpc1,dwarf_city_shop_cloth_poor]
+if (%giantdwarf_quest >= 3 & %giantdwarf_quest <= 5) {
+    ~giantdwarf_vermundi;
+    return;
+}
 ~chatnpc("<p,neutral>Welcome to my clothes stall, can I help you with anything?");
 def_int $choice = ~p_choice2("Yes, what clothes do you have in stock?", 1, "No, I'm just browsing.", 2);
 if ($choice = 1) {

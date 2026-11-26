@@ -46,6 +46,10 @@ if ($choice = 2) {
 ~chatplayer("<p,neutral>Thanks, but I don't think your services are required.");
 
 [opnpc1,dwarf_city_excentric_dwarf]
+if (%giantdwarf_quest = 3) {
+    ~giantdwarf_dromund;
+    return;
+}
 ~chatnpc("<p,angry>Get out of my house!");
 ~chatplayer("<p,neutral>Alright, alright, I was just leaving!");
 
@@ -276,6 +280,7 @@ if (testbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked) = ^false) {
 
 [label,keldagrim_west_boatmen_menu]
 def_int $menu_stage = %giantdwarf_quest;
+if ($menu_stage >= 3) @giantdwarf_brothers_menu;
 def_int $choice = 0;
 if ($menu_stage = 0) {
     if (%forget_quest = 1) {

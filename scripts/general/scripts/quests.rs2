@@ -384,6 +384,9 @@ if (%wanted_main = ^wanted_complete) {
 if (~rag_stage >= ^rag_complete) {
     $questpoints = add($questpoints, ^rag_questpoints);
 }
+if (%giantdwarf_quest >= ^giantdwarf_complete) {
+    $questpoints = add($questpoints, ^giantdwarf_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -482,6 +485,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:fairy_farmers, %fairy_farmers_quest, ^fairy_farmers_complete);
 ~send_quest_progress_colour(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
 ~send_quest_progress_colour(questlist:dwarfrock, %dwarfrock_quest, ^dwarfrock_complete);
+~send_quest_progress_colour(questlist:giantdwarf, %giantdwarf_quest, ^giantdwarf_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

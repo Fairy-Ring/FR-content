@@ -15,7 +15,6 @@ if (~p_choice2("Yes, please take me.", 1, "What, on your ship? No way.", 2) = 2)
 if (~p_choice2("Yes, please take me.", 1, "What, on your ship! No thanks!", 2) = 2) {
     ~chatplayer("<p,neutral>What, on your ship? No thanks! I don't want to crash into any more things!");
     ~chatnpc("<p,neutral>Hey now, it was only a slight accident!");
-    // The quest currently implements only its opening stages, not completion.
     ~chatplayer("<p,neutral>A slight accident?? Thanks to you I have to rebuild this statue you so carelessly knocked over!");
     ~chatnpc("<p,neutral>Calm down, calm down! You got what you paid for the trip, didn't you?");
     return;
