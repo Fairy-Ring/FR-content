@@ -28,6 +28,14 @@ if(testbit(%barcrawl, ^risingsun_index) = ^false & last_useitem = barcrawl_card)
 }
 
 [label,falador_bar_dialogue]
+if (%hundred_dwarf_quest = ^rfd_dwarf_father_spoken & (inv_total(inv, coins) >= ^rfd_dwarf_recipe_cost | inv_total(worn, ring_of_charos_unlocked) > 0)) {
+    // UNKNOWN functional topic choice; declining retains the ordinary bar service.
+    if (~p_choice2("About the Mountain Dwarf...", 1, "Hi, what ales are you serving?", 2) = 1) {
+        @rfd_dwarf_barmaid;
+        return;
+    }
+}
+
 if(testbit(%barcrawl, ^risingsun_index) = ^false & inv_total(inv, barcrawl_card) > 0) {
     @risingsun_barmaid_barcrawl_dialogue;
 }

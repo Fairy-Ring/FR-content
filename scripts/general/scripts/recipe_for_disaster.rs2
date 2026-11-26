@@ -12,8 +12,59 @@ inv_setslot(rfd_journal_icons, 5, 100_journal_head_monkey, 1);
 inv_setslot(rfd_journal_icons, 6, 100_journal_head_sir, 1);
 inv_setslot(rfd_journal_icons, 7, 100_journal_head_skrach, 1);
 inv_transmit(rfd_journal_icons, recipe_for_disaster:com_11);
+// UNKNOWN functional journal wording, not a recovered period transcript.
+if (%hundred_main_quest_var = 0) {
+    if_settext(recipe_for_disaster:com_14, "Speak to the Cook in Lumbridge Castle to begin.");
+} else if (%hundred_main_quest_var = 1) {
+    if_settext(recipe_for_disaster:com_14, "Bring the Cook his four requested ingredients.");
+} else if (%hundred_main_quest_var = ^rfd_feast_ready) {
+    if_settext(recipe_for_disaster:com_14, "Enter the dining room from Lumbridge Castle's kitchen.");
+} else {
+    if_settext(recipe_for_disaster:com_14, "Guests rescued: <tostring(%hundred_subquest_tally)> of 8.");
+}
+~send_quest_progress_colour(recipe_for_disaster:com_2, %hundred_dwarf_quest, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_3, %100goblin, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_4, %100_pirate_quest_var, ^rfd_guest_complete);
 if_openmain(recipe_for_disaster);
 
 [if_close,recipe_for_disaster]
 inv_stoptransmit(recipe_for_disaster:com_11);
 inv_clear(rfd_journal_icons);
+
+// UNKNOWN functional guest journals; prerequisite and reward values follow the period guide.
+[if_button,recipe_for_disaster:com_2]
+def_string $text;
+if (%hundred_dwarf_quest = ^rfd_guest_complete) {
+    $text = "@str@I freed the Mountain Dwarf with a cooled Dwarven rock cake.|@red@GUEST RESCUED!";
+} else if (%hundred_dwarf_quest = 0) {
+    $text = "I should inspect the frozen Mountain Dwarf in the banquet room.|I must first complete Fishing Contest.";
+} else {
+    $text = "I need a cooled Dwarven rock cake for the Mountain Dwarf.|Rohak in the passage beneath White Wolf Mountain can make it.|I should ask about his son and bring the ingredients he requests.|Ice gloves will protect my hands when I collect the hot cake.";
+}
+~quest_journal("Freeing the Mountain Dwarf", $text);
+
+[if_button,recipe_for_disaster:com_3]
+def_string $text;
+if (%100goblin = ^rfd_guest_complete) {
+    $text = "@str@I freed Wartface and Bentnoze with Slop of Compromise.|@red@GUESTS RESCUED!";
+} else if (%100goblin = 0) {
+    $text = "I should inspect the frozen Goblin Generals in the banquet room.|I must first complete Goblin Diplomacy.";
+} else {
+    $text = "I should speak to the cook beneath Goblin Village.|Wartface and Bentnoze need food they can both accept.|I need dyed orange slices, spicy maggots and soggy bread.";
+}
+~quest_journal("Freeing the Goblin Generals", $text);
+
+[if_button,recipe_for_disaster:com_4]
+def_string $text;
+if (%100_pirate_quest_var = ^rfd_guest_complete) {
+    $text = "@str@I freed Pirate Pete with a fishcake.|@red@GUEST RESCUED!";
+} else if (%100_pirate_quest_var = 0) {
+    $text = "I should inspect frozen Pirate Pete in the banquet room.|I need level 31 Cooking.";
+} else if (%100_pirate_quest_var = ^rfd_pete_inspected) {
+    $text = "I should ask the Lumbridge Cook how to make Pete's fishcake.";
+} else if (%100_pirate_quest_var < ^rfd_pete_pen_access) {
+    $text = "Murphy at Port Khazard can help me dive for the ingredients.|I need a fishbowl, and must wear both pieces of diving equipment.|I must weigh no more than 27kg and leave my cat behind.|Underwater, Nung needs five mudskipper hides, then three bronze|wires and a needle. Five rocks will weigh me down in the cavern.";
+} else {
+    $text = "I need breadcrumbs, ground cod, ground kelp and ground crab meat.|I can grind the cod, kelp and crab meat with a pestle and mortar,|and cut bread with a knife. I should combine all four ingredients,|cook the raw fishcake on a range, then use it on Pirate Pete.";
+}
+~quest_journal("Freeing Pirate Pete", $text);

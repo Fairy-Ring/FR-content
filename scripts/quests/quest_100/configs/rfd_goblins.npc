@@ -1,0 +1,54 @@
+[goblin_cook]
+name=Goblin Cook
+desc=He's got funky socks, but he's still an ugly green creature.
+model1=npc_3413
+model2=npc_3413i2
+model3=npc_goblini3
+model4=npc_3413i3
+model5=npc_3413i4
+recol1s=10240
+recol1d=12615
+op1=Talk-to
+walkanim=goblin_walk
+readyanim=goblin_ready
+vislevel=hide
+head1=npc_3413_head
+
+[goblin_cook_charred]
+name=Goblin Cook
+desc=More like a goblin cooked.
+model1=npc_3414
+model2=npc_3414i2
+model3=npc_3414i3
+model4=npc_3414i4
+model5=npc_3413i4
+recol1s=10466
+recol1d=5285
+recol2s=9442
+recol2d=7366
+walkanim=goblin_walk
+readyanim=goblin_ready
+op1=Talk-to
+vislevel=hide
+head1=npc_3414_head
+
+[goblin_cook_on_wall]
+name=Goblin Cook
+desc=Half way up the wall is maybe not a naturally tenable position for a goblin.
+model1=npc_3414
+model2=npc_3414i2
+model3=npc_3414i3
+model4=npc_3414i4
+model5=npc_3413i4
+recol1s=10466
+recol1d=5285
+recol2s=9442
+recol2d=7366
+walkanim=100_goblin_on_wall
+readyanim=100_goblin_on_wall
+turnspeed=1024
+vislevel=hide
+head1=npc_3414_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none

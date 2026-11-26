@@ -1,0 +1,216 @@
+// VERIFIED mechanism: RuneHQ 15 April 2006. UNKNOWN plain functional wording,
+// engineering stages and map-derived landing tiles; no historical dialogue claim.
+[label,rfd_pete_cook_talk]
+if (%100_pirate_quest_var = ^rfd_pete_inspected) %100_pirate_quest_var = ^rfd_pete_recipe;
+~chatnpc("<p,neutral>A fishcake needs ground cod, ground kelp, ground giant crab meat and breadcrumbs. Grind with a pestle and mortar, cut bread with a knife, combine the ingredients and cook the fishcake on a range.");
+~chatnpc("<p,neutral>Murphy at Port Khazard can help you reach the kelp and giant crabs. Bring him an empty fishbowl.");
+%hundred_pirate_meat_intro = 1;
+%hundred_pirate_kelp_intro = 1;
+%hundred_pirate_crumb_intro = 1;
+%hundred_pirate_cod_intro = 1;
+
+[label,rfd_pete_murphy]
+def_int $topic = ~p_choice2("Help me dive for Pirate Pete.", 1, "Fishing Trawler", 2);
+if ($topic = 2) @rfd_pete_murphy_trawler;
+if (%100_pirate_quest_var < ^rfd_pete_recipe) {
+    ~chatnpc("<p,neutral>Ask the cook about Pirate Pete's fishcake first.");
+    return;
+}
+if (inv_total(worn, hundred_pirate_diving_helmet) = 0 | inv_total(worn, hundred_pirate_diving_backpack) = 0) {
+    // Lost equipment is replaceable throughout and after the subquest.
+    if (~obj_gettotal(hundred_pirate_diving_helmet) = 0) {
+        if (inv_total(inv, fishbowl_empty) = 0) {
+            ~chatnpc("<p,neutral>Bring me an empty fishbowl for your diving helmet.");
+            return;
+        }
+        if (inv_freespace(inv) < 1 & ~obj_gettotal(hundred_pirate_diving_backpack) = 0) {
+            mes("You need another free inventory space.");
+            return;
+        }
+        inv_del(inv, fishbowl_empty, 1);
+        inv_add(inv, hundred_pirate_diving_helmet, 1);
+    }
+    if (~obj_gettotal(hundred_pirate_diving_backpack) = 0) {
+        if (inv_freespace(inv) = 0) {
+            mes("You need a free inventory space.");
+            return;
+        }
+        inv_add(inv, hundred_pirate_diving_backpack, 1);
+    }
+    if (%100_pirate_quest_var < ^rfd_pete_gear) %100_pirate_quest_var = ^rfd_pete_gear;
+    ~chatnpc("<p,neutral>Wear your fishbowl helmet and diving apparatus, then speak to me again to dive.");
+    return;
+}
+if (weight > ^rfd_pete_max_weight) {
+    ~chatnpc("<p,neutral>You cannot dive while carrying more than 27 kilograms.");
+    return;
+}
+if (~rfd_pete_has_cat = true) {
+    ~chatnpc("<p,neutral>You cannot take a cat underwater.");
+    return;
+}
+%hundred_pirate_first_dive = 1;
+%hundred_pirate_underwater_onfloor = 0;
+walkanim(human_real_swimming);
+runanim(human_real_swimming);
+readyanim(human_real_swimming_ready);
+p_telejump(^rfd_pete_dive);
+
+[proc,rfd_pete_has_cat]()(boolean)
+if (%follower_obj ! null) return(true);
+if (inv_totalcat(inv, kitten) > 0 | inv_totalcat(inv, cat) > 0 | inv_totalcat(inv, overgrown) > 0) return(true);
+return(false);
+
+[oploc1,anchor_middle]
+// Both mapped anchor copies are exit routes, even if equipment was lost.
+%hundred_pirate_underwater_onfloor = 0;
+~update_bas;
+p_telejump(^rfd_pete_surface);
+
+[oploc1,kelp_pickingpoint]
+if (%100_pirate_quest_var < ^rfd_pete_recipe) return;
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space.");
+    return;
+}
+inv_add(inv, hundred_pirate_kelp, 1);
+mes("You pick some kelp.");
+
+[oploc1,seabed2_cavewall_mudskipper_caveentrancel] @rfd_pete_enter_cavern;
+[oploc1,seabed2_cavewall_mudskipper_caveentrancer] @rfd_pete_enter_cavern;
+[label,rfd_pete_enter_cavern]
+if (inv_total(inv, hundred_pirate_rock) < ^rfd_pete_rocks) {
+    mes("You need five rocks to weigh yourself down.");
+    return;
+}
+%hundred_pirate_underwater_onfloor = 1;
+p_telejump(^rfd_pete_cavern);
+
+[oploc1,seabed2_cavewall_mudskipper_caveexitl] @rfd_pete_leave_cavern;
+[oploc1,seabed2_cavewall_mudskipper_caveexitr] @rfd_pete_leave_cavern;
+[label,rfd_pete_leave_cavern]
+%hundred_pirate_underwater_onfloor = 0;
+p_telejump(^rfd_pete_seabed);
+
+[opnpc1,100_pirate_mogre_nung]
+if (%100_pirate_quest_var < ^rfd_pete_gear) return;
+if (%100_pirate_quest_var = ^rfd_pete_gear) {
+    %100_pirate_quest_var = ^rfd_pete_nung_hides;
+    ~chatnpc("<p,neutral>Bring me five mudskipper hides if you want to get into the crab pen.");
+    return;
+}
+if (%100_pirate_quest_var = ^rfd_pete_nung_hides) {
+    def_int $hides = min(inv_total(inv, hundred_pirate_mudskipper_hide), calc(^rfd_pete_hides - %hundred_pirate_number_of_hides));
+    if ($hides > 0) {
+        inv_del(inv, hundred_pirate_mudskipper_hide, $hides);
+        %hundred_pirate_number_of_hides = add(%hundred_pirate_number_of_hides, $hides);
+    }
+    if (%hundred_pirate_number_of_hides < ^rfd_pete_hides) {
+        ~chatnpc("<p,neutral>I still need <tostring(calc(^rfd_pete_hides - %hundred_pirate_number_of_hides))> mudskipper hides.");
+        return;
+    }
+    %100_pirate_quest_var = ^rfd_pete_nung_wire;
+    ~chatnpc("<p,neutral>Now bring me three bronze wires and a needle.");
+    return;
+}
+if (%100_pirate_quest_var = ^rfd_pete_nung_wire) {
+    if (inv_total(inv, bronzecraftwire) < ^rfd_pete_wire | inv_total(inv, needle) = 0) {
+        ~chatnpc("<p,neutral>I need three bronze wires and a needle.");
+        return;
+    }
+    inv_del(inv, bronzecraftwire, ^rfd_pete_wire);
+    inv_del(inv, needle, 1);
+    %100_pirate_quest_var = ^rfd_pete_pen_access;
+}
+~chatnpc("<p,neutral>You can use the crab pen.");
+
+[opnpc1,100_pirate_mogre_guard]
+~chatnpc("<p,neutral>Speak to Nung about the crab pen.");
+%hundred_pirate_spoken_to_guards = 1;
+
+[oploc1,pen_wall_doorl] @rfd_pete_pen;
+[oploc1,pen_wall_doorr] @rfd_pete_pen;
+[aploc1,pen_wall_doorl] @rfd_pete_pen_approach;
+[aploc1,pen_wall_doorr] @rfd_pete_pen_approach;
+[label,rfd_pete_pen_approach]
+// UNKNOWN engineering approach for the original one-sided wall doors.
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_pete_pen;
+
+[label,rfd_pete_pen]
+if (coordz(coord) >= 9515) {
+    p_telejump(^rfd_pete_pen_outside);
+    return;
+}
+if (%100_pirate_quest_var < ^rfd_pete_pen_access) {
+    mes("Speak to Nung to get access to the crab pen.");
+    return;
+}
+p_telejump(^rfd_pete_pen_inside);
+
+[opheldu,raw_cod]
+if (last_useitem = pestle_and_mortar & %100_pirate_quest_var >= ^rfd_pete_recipe) {
+    inv_del(inv, raw_cod, 1);
+    inv_add(inv, hundred_pirate_ground_cod, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,hundred_pirate_kelp]
+if (last_useitem = pestle_and_mortar) {
+    inv_del(inv, hundred_pirate_kelp, 1);
+    inv_add(inv, hundred_pirate_ground_kelp, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,hundred_pirate_giant_crab_meat]
+if (last_useitem = pestle_and_mortar) {
+    inv_del(inv, hundred_pirate_giant_crab_meat, 1);
+    inv_add(inv, hundred_pirate_ground_giant_crab_meat, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,rfd_pete_breadcrumbs]
+if (%100_pirate_quest_var < ^rfd_pete_recipe) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, bread, 1);
+inv_add(inv, hundred_pirate_breadcrumbs, 1);
+
+[opheldu,hundred_pirate_ground_kelp] @rfd_pete_mix;
+[opheldu,hundred_pirate_ground_cod] @rfd_pete_mix;
+[opheldu,hundred_pirate_ground_giant_crab_meat] @rfd_pete_mix;
+[opheldu,hundred_pirate_breadcrumbs] @rfd_pete_mix;
+[label,rfd_pete_mix]
+if (last_useitem ! hundred_pirate_ground_kelp & last_useitem ! hundred_pirate_ground_cod & last_useitem ! hundred_pirate_ground_giant_crab_meat & last_useitem ! hundred_pirate_breadcrumbs) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%100_pirate_quest_var < ^rfd_pete_recipe | stat(cooking) < ^rfd_pete_cooking) return;
+if (inv_total(inv, hundred_pirate_ground_kelp) = 0 | inv_total(inv, hundred_pirate_ground_cod) = 0 | inv_total(inv, hundred_pirate_ground_giant_crab_meat) = 0 | inv_total(inv, hundred_pirate_breadcrumbs) = 0) {
+    mes("You need ground kelp, ground cod, ground giant crab meat and breadcrumbs.");
+    return;
+}
+inv_del(inv, hundred_pirate_ground_kelp, 1);
+inv_del(inv, hundred_pirate_ground_cod, 1);
+inv_del(inv, hundred_pirate_ground_giant_crab_meat, 1);
+inv_del(inv, hundred_pirate_breadcrumbs, 1);
+inv_add(inv, hundred_pirate_raw_fishcake, 1);
+mes("You make a raw fishcake.");
+
+[label,rfd_pete_cook]
+if (%100_pirate_quest_var < ^rfd_pete_recipe | stat(cooking) < ^rfd_pete_cooking) {
+    mes("You need a Cooking level of 31 and the fishcake recipe.");
+    return;
+}
+// UNKNOWN favourable default: no unsupported burn roll or extra preparation XP.
+anim(human_potterywheel, 0);
+inv_del(inv, hundred_pirate_raw_fishcake, 1);
+inv_add(inv, hundred_pirate_fishcake, 1);
+mes("You cook the fishcake.");

@@ -1,0 +1,57 @@
+// Original 377 object blocks moved from all.obj; client fields retained, quest items untradeable.
+[hundred_dwarf_asgarnian_ale]
+name=Asgarnian ale (g)
+desc=There appears to be a coin in the bottom. Liked by dwarves.
+recol1s=25025
+recol1d=20801
+recol2s=31367
+recol2d=24995
+recol3s=32735
+recol3d=31405
+cost=2
+iop1=Drink
+model=obj_hundred_dwarf_asgarnian_ale
+2dxof=-3
+2dyof=2
+2dzoom=660
+2dyan=1904
+2dxan=140
+members=yes
+weight=550g
+tradeable=no
+
+[hundred_dwarf_hot_rockcake]
+name=Dwarven rock cake
+desc=Red hot and glowing, ouch! Only for dwarf consumption.
+cost=1
+model=obj_hundred_dwarf_hot_rockcake
+2dxof=-1
+2dyof=12
+2dzoom=400
+2dyan=1412
+2dxan=273
+manwear=obj_hundred_dwarf_hot_rockcake_manwear,0
+womanwear=obj_hundred_dwarf_hot_rockcake_manwear,6
+iop1=Eat
+members=yes
+weight=1lb
+tradeable=no
+
+[hundred_dwarf_cool_rockcake]
+name=Dwarven rock cake
+desc=Cool and heavy as a brick. Only for dwarf consumption.
+recol1s=23013
+recol1d=13671
+recol2s=18756
+recol2d=11558
+cost=1
+model=obj_hundred_dwarf_hot_rockcake
+2dxof=-1
+2dyof=12
+2dzoom=400
+2dyan=1412
+2dxan=273
+iop1=Eat
+members=yes
+weight=1lb
+tradeable=no

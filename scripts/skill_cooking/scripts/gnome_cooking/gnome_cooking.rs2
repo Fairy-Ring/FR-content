@@ -65,7 +65,15 @@ switch_obj(last_useitem) {
 }
 
 [opheldu,lemon_slices] @finish_cocktail(last_useitem, last_item);
-[opheldu,orange_slices] @finish_cocktail(last_useitem, last_item);
+[opheldu,orange_slices]
+switch_obj(last_useitem) {
+    case bluedye : ~rfd_goblins_dye_orange_slices(bluedye);
+    case greendye : ~rfd_goblins_dye_orange_slices(greendye);
+    case purpledye : ~rfd_goblins_dye_orange_slices(purpledye);
+    // UNKNOWN favourable case: pink dye existed in 377; the guide excludes only orange, red and yellow.
+    case handsand_pink_dye : ~rfd_goblins_dye_orange_slices(handsand_pink_dye);
+    case default : @finish_cocktail(last_useitem, last_item);
+}
 [opheldu,lime_slices] @finish_cocktail(last_useitem, last_item);
 [opheldu,lemon_chunks]
 switch_int(oc_param(last_useitem, gnome_cooking_type)) {

@@ -1,5 +1,9 @@
 [opnpc1,general_wartface]
 if (~losttribe_general_hook = true) return;
+if (%hundred_main_quest_var >= ^rfd_frozen & %goblinquest = ^gobdip_complete & %100goblin > 0 & %100goblin < ^rfd_guest_complete) {
+    @rfd_goblins_village_general;
+    return;
+}
 switch_int (%goblinquest) {
     case 6 : @goblin_diplomacy_completed;
     case default : @goblin_diplomacy_greet_general_wartface;

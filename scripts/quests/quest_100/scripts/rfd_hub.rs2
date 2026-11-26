@@ -1,0 +1,101 @@
+// VERIFIED route/rewards: RuneHQ, captured 15 April 2006. UNKNOWN plain functional wording.
+[proc,rfd_questpoints]()(int)
+if (%hundred_main_quest_var < ^rfd_feast_ready) return(0);
+return(calc(^rfd_step_qp + %hundred_subquest_tally));
+
+[proc,rfd_prepare_banquet]
+// The map places the frozen bases, not the original multi wrappers. Install the
+// cache wrappers server-side so each player's original visibility bits work.
+// No client field or map placement changes; all guests remain private by varbit.
+if (loc_find(0_29_83_6_9, hundred_dwarf_ambassador_base) = true) loc_change(hundred_dwarf_ambassador_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_6_13, hundred_goblin1_base) = true) loc_change(hundred_goblin1_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_6_15, hundred_goblin2_base) = true) loc_change(hundred_goblin2_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_6_11, hundred_pirate_base) = true) loc_change(hundred_pirate_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_13, hundred_guide_base) = true) loc_change(hundred_guide_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_11, hundred_dave_base) = true) loc_change(hundred_dave_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_7_16, hundred_ogre_base) = true) loc_change(hundred_ogre_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_9, hundred_varze_base) = true) loc_change(hundred_varze_multi, ^rfd_wrapper_duration);
+
+[opnpc1,hundred_aris_base]
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+if (%hundred_dwarf_quest = 1) {
+    if (~p_choice2("About the Mountain Dwarf...", 1, "About the banquet...", 2) = 1) @rfd_dwarf_aris;
+}
+~chatnpc("<p,neutral>The guests are frozen in time. Their favourite foods will free them from the Culinaromancer's spell.");
+def_int $choice = ~p_choice3("The Culinaromancer", 1, "The chest", 2, "My progress", 3);
+if ($choice = 1) {
+    ~chatnpc("<p,neutral>The Culinaromancer attacked the banquet. I stopped time to protect the guests. Inspect each guest to find out how to help.");
+    %hundred_timebubble_exposition = 1;
+} else if ($choice = 2) {
+    ~chatnpc("<p,neutral>The Culinaromancer's Chest is in the castle cellar. You can bank there and buy food and equipment. Freeing guests improves its stock.");
+    %hundred_chest_exposition = 1;
+} else {
+    ~chatnpc("<p,neutral>You have freed <tostring(%hundred_subquest_tally)> of the eight guests.");
+}
+
+[proc,rfd_guest_reward](int $guest)
+// The completion stage is written by the native food-use handler before this
+// once-only visibility latch. The latch prevents a repeated reward call too.
+if ($guest = 1) {
+    if (%hundred_dwarf_quest ! ^rfd_guest_complete | %100dwarfvisible = 0) return;
+    %100dwarfvisible = 0;
+    stat_advance(slayer, ^rfd_guest_xp);
+} else if ($guest = 2) {
+    if (%100goblin ! ^rfd_guest_complete | %100goblinsvisible = 0) return;
+    %100goblinsvisible = 0;
+    stat_advance(farming, ^rfd_guest_xp);
+    stat_advance(crafting, ^rfd_guest_xp);
+} else if ($guest = 3) {
+    if (%100_pirate_quest_var ! ^rfd_guest_complete | %100piratevisible = 0) return;
+    %100piratevisible = 0;
+    stat_advance(crafting, ^rfd_guest_xp);
+    stat_advance(fishing, ^rfd_guest_xp);
+    stat_advance(smithing, ^rfd_guest_xp);
+} else {
+    return;
+}
+stat_advance(cooking, ^rfd_guest_xp);
+%hundred_subquest_tally = add(%hundred_subquest_tally, 1);
+~update_questpoints;
+~send_quest_progress_colour(questlist:hundred_main, %hundred_main_quest_var, ^rfd_complete);
+mes("You have freed a banquet guest. Your access to the Culinaromancer's Chest has increased.");
+
+[oploc1,hundred_goodchest_base]
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+@openbank;
+
+[oploc2,hundred_goodchest_base]
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+~openshop(~rfd_food_shop, ^rfd_shop_buy, ^rfd_shop_sell, ^rfd_shop_haggle, "Culinaromancer's Chest");
+
+[oploc3,hundred_goodchest_base]
+if (%hundred_main_quest_var < ^rfd_frozen) return;
+~openshop(~rfd_item_shop, ^rfd_shop_buy, ^rfd_shop_sell, ^rfd_shop_haggle, "Culinaromancer's Chest");
+
+[proc,rfd_food_shop]()(inv)
+switch_int(%hundred_subquest_tally) {
+    case 0 : return(hundred_foodchest1);
+    case 1 : return(hundred_foodchest2);
+    case 2 : return(hundred_foodchest3);
+    case 3 : return(hundred_foodchest4);
+    case 4 : return(hundred_foodchest5);
+    case 5 : return(hundred_foodchest6);
+    case 6 : return(hundred_foodchest7);
+    case 7 : return(hundred_foodchest8);
+}
+if (%hundred_main_quest_var >= ^rfd_complete) return(hundred_foodchest10);
+return(hundred_foodchest9);
+
+[proc,rfd_item_shop]()(inv)
+switch_int(%hundred_subquest_tally) {
+    case 0 : return(hundred_rewardchest1);
+    case 1 : return(hundred_rewardchest2);
+    case 2 : return(hundred_rewardchest3);
+    case 3 : return(hundred_rewardchest4);
+    case 4 : return(hundred_rewardchest5);
+    case 5 : return(hundred_rewardchest6);
+    case 6 : return(hundred_rewardchest7);
+    case 7 : return(hundred_rewardchest8);
+}
+if (%hundred_main_quest_var >= ^rfd_complete) return(hundred_rewardchest10);
+return(hundred_rewardchest9);

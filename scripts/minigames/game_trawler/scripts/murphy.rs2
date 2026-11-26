@@ -27,6 +27,10 @@ if(~has_sextant_clue = true) {
         return;
     }
 }
+if (%100_pirate_quest_var > 0) @rfd_pete_murphy;
+@rfd_pete_murphy_trawler;
+
+[label,rfd_pete_murphy_trawler]
 if (%trawler = 0) {
     ~chatplayer("<p,happy>Good day to you Sir.");
     ~chatnpc("<p,happy>Well hello my brave adventurer.");
