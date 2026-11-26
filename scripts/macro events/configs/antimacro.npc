@@ -1761,8 +1761,11 @@ resizeh=30
 resizev=30
 vislevel=3
 
-//TODO: Evil chicken stats and drops
 [macro_evil_chicken_1]
+defaultmode=wander
+timer=1
+wanderrange=0
+moverestrict=nomove
 name=Evil Chicken
 desc=A fowl beast.
 model1=rd_chicken_normal_8
@@ -1773,8 +1776,29 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=19
+// CANDIDATE: Chicken 1 HP/max hit; UNKNOWN core-level fallback and reach.
+hitpoints=19
+attack=10
+strength=1
+defence=10
+magic=10
+ranged=1
+attackrange=5
+maxrange=4
+param=attackrate,^macro_chicken_attack_ticks
+param=macro_overworld_maxhit,1
+param=damagetype,^magic_style
+param=magicattack_anim,roostermagic
+param=attack_anim,roosterattack
+param=defend_anim,roosterparry
+param=death_anim,roosterdeath
+param=death_drop,null
 
 [macro_evil_chicken_2]
+defaultmode=wander
+timer=1
+wanderrange=0
+moverestrict=nomove
 name=Evil Chicken
 desc=A fowl beast.
 model1=rd_chicken_normal_8
@@ -1785,8 +1809,29 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=38
+// CANDIDATE: Chicken 2 HP/max hit; UNKNOWN core-level fallback and reach.
+hitpoints=40
+attack=20
+strength=1
+defence=20
+magic=20
+ranged=1
+attackrange=5
+maxrange=4
+param=attackrate,^macro_chicken_attack_ticks
+param=macro_overworld_maxhit,1
+param=damagetype,^magic_style
+param=magicattack_anim,roostermagic
+param=attack_anim,roosterattack
+param=defend_anim,roosterparry
+param=death_anim,roosterdeath
+param=death_drop,null
 
 [macro_evil_chicken_3]
+defaultmode=wander
+timer=1
+wanderrange=0
+moverestrict=nomove
 name=Evil Chicken
 desc=A fowl beast.
 model1=rd_chicken_normal_8
@@ -1797,8 +1842,29 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=69
+// CANDIDATE: Chicken 3 HP/max hit; UNKNOWN core-level fallback and reach.
+hitpoints=60
+attack=40
+strength=1
+defence=40
+magic=40
+ranged=1
+attackrange=5
+maxrange=4
+param=attackrate,^macro_chicken_attack_ticks
+param=macro_overworld_maxhit,2
+param=damagetype,^magic_style
+param=magicattack_anim,roostermagic
+param=attack_anim,roosterattack
+param=defend_anim,roosterparry
+param=death_anim,roosterdeath
+param=death_drop,null
 
 [macro_evil_chicken_4]
+defaultmode=wander
+timer=1
+wanderrange=0
+moverestrict=nomove
 name=Evil Chicken
 desc=A fowl beast.
 model1=rd_chicken_normal_8
@@ -1809,8 +1875,29 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=81
+// CANDIDATE: Chicken 4 HP/max hit; UNKNOWN core-level fallback and reach.
+hitpoints=80
+attack=60
+strength=1
+defence=60
+magic=60
+ranged=1
+attackrange=5
+maxrange=4
+param=attackrate,^macro_chicken_attack_ticks
+param=macro_overworld_maxhit,3
+param=damagetype,^magic_style
+param=magicattack_anim,roostermagic
+param=attack_anim,roosterattack
+param=defend_anim,roosterparry
+param=death_anim,roosterdeath
+param=death_drop,null
 
 [macro_evil_chicken_5]
+defaultmode=wander
+timer=1
+wanderrange=0
+moverestrict=nomove
 name=Evil Chicken
 desc=A fowl beast.
 model1=rd_chicken_normal_8
@@ -1821,8 +1908,29 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=121
+// CANDIDATE: Chicken 5 HP/max hit; UNKNOWN core-level fallback and reach.
+hitpoints=105
+attack=90
+strength=1
+defence=90
+magic=90
+ranged=1
+attackrange=5
+maxrange=4
+param=attackrate,^macro_chicken_attack_ticks
+param=macro_overworld_maxhit,4
+param=damagetype,^magic_style
+param=magicattack_anim,roostermagic
+param=attack_anim,roosterattack
+param=defend_anim,roosterparry
+param=death_anim,roosterdeath
+param=death_drop,null
 
 [macro_evil_chicken_6]
+defaultmode=wander
+timer=1
+wanderrange=0
+moverestrict=nomove
 name=Evil Chicken
 desc=A fowl beast.
 model1=rd_chicken_normal_8
@@ -1833,129 +1941,23 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=159
-
-[macro_frog_royal]
-name=Frog
-desc=A frog.
-model1=npc_2469
-model2=npc_2469i2
-resizeh=64
-resizev=64
-walkanim=giant_frog_walk
-readyanim=giant_frog_ready
-ambient=20
-vislevel=hide
-op1=Talk-to
-alwaysontop=yes
-head1=npc_2469_head
-
-[macro_frog_sulking]
-name=Frog
-desc=A frog.
-model1=npc_2469
-model2=npc_2469i2
-resizeh=64
-resizev=64
-walkanim=giant_frog_walk
-readyanim=giant_frog_ready
-ambient=20
-vislevel=hide
-op1=Talk-to
-head1=npc_2469_head
-
-[macro_frog_noncombat]
-name=Frog
-desc=A frog.
-model1=npc_2471
-model2=npc_2469
-resizeh=64
-resizev=64
-walkanim=giant_frog_walk
-readyanim=giant_frog_ready
-vislevel=hide
-ambient=75
-op1=Talk-to
-head1=npc_2471_head
-
-[macro_frog_crier]
-name=Frog
-desc=A frog.
-model1=npc_2472
-model2=npc_2469
-resizeh=64
-resizev=64
-walkanim=giant_frog_walk
-readyanim=giant_frog_ready
-vislevel=hide
-ambient=70
-op1=Talk-to
-head1=npc_2472_head
-
-[macro_frog_nohat]
-name=Frog
-desc=Eek! You're a frog!
-model1=npc_1828
-resizeh=64
-resizev=64
-walkanim=giant_frog_walk
-readyanim=giant_frog_ready
-vislevel=hide
-ambient=70
-head1=npc_2473_head
-
-[macro_frog_prince]
-name=Frog prince
-desc=What a handsome man!
-model1=npc_2474
-model2=idk_man_hair_cropped
-model3=obj_macro_prince_torso_manwear
-model4=obj_viking_top_darkbrown_manwear
-model5=npc_macro_ent_dead_tree2
-model6=npc_2334
-model7=obj_cert_drill_top_manwear3
-model8=idk_man_jaw_none
-recol1s=14724
-recol1d=6163
-recol2s=4160
-recol2d=5249
-recol3s=7328
-recol3d=5249
-recol4s=2340
-recol4d=32767
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-vislevel=hide
-head1=idk_man_hair_cropped_head
-head2=npc_2474_head
-
-[macro_frog_princess]
-name=Frog princess
-desc=What a nice dress!
-model1=npc_2475
-model2=idk_woman_hair_long
-model3=obj_macro_prince_torso_womanwear
-model4=obj_macro_prince_torso_womanwear2
-model5=obj_macro_prince_legs_womanwear
-model6=idk_80
-model7=obj_cert_drill_top_womanwear3
-model8=obj_amulet_of_ghostspeak_womanwear
-recol1s=14724
-recol1d=32767
-recol2s=6144
-recol2d=32767
-recol3s=2340
-recol3d=24575
-recol4s=7298
-recol4d=32767
-recol5s=6273
-recol5d=31657
-recol6s=15854
-recol6d=24075
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-vislevel=hide
-head1=obj_pickpocket_guide_warrior
-head2=npc_2475_head
+// CANDIDATE: Chicken 6 HP/max hit; UNKNOWN core-level fallback and reach.
+hitpoints=120
+attack=120
+strength=1
+defence=120
+magic=120
+ranged=1
+attackrange=5
+maxrange=4
+param=attackrate,^macro_chicken_attack_ticks
+param=macro_overworld_maxhit,5
+param=damagetype,^magic_style
+param=magicattack_anim,roostermagic
+param=attack_anim,roosterattack
+param=defend_anim,roosterparry
+param=death_anim,roosterdeath
+param=death_drop,null
 
 [macro_magneson]
 name=Quiz Master
@@ -2077,7 +2079,6 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_warrior
 
-//TODO: stats
 [macro_highwayman]
 name=Rick Turpentine
 desc=A Masked Highwayman.
@@ -2111,6 +2112,25 @@ op1=Talk-to
 head1=obj_pickpocket_guide_man
 head2=obj_highwaymanmask_manhead
 head3=npc_master_fisher_head
+// UNKNOWN: combat stats, ranged reach and max hit are implementation defaults.
+hitpoints=30
+attack=20
+strength=20
+defence=20
+magic=1
+ranged=20
+attackrange=5
+maxrange=4
+param=attackrate,^macro_rick_attack_ticks
+param=max_dealt,3
+param=damagetype,^ranged_style
+param=attack_anim,human_crossbow
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+param=rangeattack_sound,crossbow
+param=death_drop,null
 
 [macro_niles]
 name=Niles
@@ -2235,6 +2255,25 @@ op1=Talk-to
 head1=idk_man_hair_long_head
 head2=idk_man_jaw_long_head
 head3=obj_piratehat_manhead
+// UNKNOWN: combat stats, ranged reach and max hit are implementation defaults.
+hitpoints=30
+attack=20
+strength=20
+defence=20
+magic=1
+ranged=20
+attackrange=5
+maxrange=4
+param=attackrate,^macro_capn_attack_ticks
+param=max_dealt,3
+param=damagetype,^ranged_style
+param=attack_anim,human_crossbow
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+param=rangeattack_sound,crossbow
+param=death_drop,null
 
 [macro_jekyll]
 name=Dr Jekyll
@@ -2264,8 +2303,9 @@ head1=npc_drunk1_head
 head2=npc_doctor_orbon_head
 head3=idk_man_jaw_goatee_head
 
-//todo: stats -- same as other randoms? 
 [macro_hyde_1]
+defaultmode=wander
+timer=1
 name=Mr Hyde
 desc=This is not a good time to be examining him!
 model1=npc_2541
@@ -2289,8 +2329,27 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=14
+// CANDIDATE: Hyde 1 historical stat table. UNKNOWN: one-tile unarmed reach and crush style.
+hitpoints=25
+attack=9
+strength=9
+defence=9
+magic=1
+ranged=1
+attackrange=1
+// UNKNOWN: pursuit leash, distinct from the one-tile melee reach.
+maxrange=5
+param=attackrate,^macro_hyde_attack_ticks
+param=macro_overworld_maxhit,2
+param=damagetype,^crush_style
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=death_drop,null
 
 [macro_hyde_2]
+defaultmode=wander
+timer=1
 name=Mr Hyde
 desc=This is not a good time to be examining him!
 model1=npc_2541
@@ -2314,8 +2373,27 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=29
+// CANDIDATE: Hyde 2 historical stat table. UNKNOWN: one-tile unarmed reach and crush style.
+hitpoints=40
+attack=22
+strength=22
+defence=22
+magic=1
+ranged=1
+attackrange=1
+// UNKNOWN: pursuit leash, distinct from the one-tile melee reach.
+maxrange=5
+param=attackrate,^macro_hyde_attack_ticks
+param=macro_overworld_maxhit,4
+param=damagetype,^crush_style
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=death_drop,null
 
 [macro_hyde_3]
+defaultmode=wander
+timer=1
 name=Mr Hyde
 desc=This is not a good time to be examining him!
 model1=npc_2541
@@ -2339,8 +2417,27 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=49
+// CANDIDATE: Hyde 3 historical stat table. UNKNOWN: one-tile unarmed reach and crush style.
+hitpoints=60
+attack=38
+strength=38
+defence=38
+magic=1
+ranged=1
+attackrange=1
+// UNKNOWN: pursuit leash, distinct from the one-tile melee reach.
+maxrange=5
+param=attackrate,^macro_hyde_attack_ticks
+param=macro_overworld_maxhit,5
+param=damagetype,^crush_style
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=death_drop,null
 
 [macro_hyde_4]
+defaultmode=wander
+timer=1
 name=Mr Hyde
 desc=This is not a good time to be examining him!
 model1=npc_2541
@@ -2364,8 +2461,27 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=79
+// CANDIDATE: Hyde 4 historical stat table. UNKNOWN: one-tile unarmed reach and crush style.
+hitpoints=85
+attack=65
+strength=65
+defence=65
+magic=1
+ranged=1
+attackrange=1
+// UNKNOWN: pursuit leash, distinct from the one-tile melee reach.
+maxrange=5
+param=attackrate,^macro_hyde_attack_ticks
+param=macro_overworld_maxhit,7
+param=damagetype,^crush_style
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=death_drop,null
 
 [macro_hyde_5]
+defaultmode=wander
+timer=1
 name=Mr Hyde
 desc=This is not a good time to be examining him!
 model1=npc_2541
@@ -2389,8 +2505,27 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=120
+// CANDIDATE: Hyde 5 historical stat table. UNKNOWN: one-tile unarmed reach and crush style.
+hitpoints=120
+attack=100
+strength=100
+defence=100
+magic=1
+ranged=1
+attackrange=1
+// UNKNOWN: pursuit leash, distinct from the one-tile melee reach.
+maxrange=5
+param=attackrate,^macro_hyde_attack_ticks
+param=macro_overworld_maxhit,11
+param=damagetype,^crush_style
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=death_drop,null
 
 [macro_hyde_6]
+defaultmode=wander
+timer=1
 name=Mr Hyde
 desc=This is not a good time to be examining him!
 model1=npc_2541
@@ -2414,6 +2549,23 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=159
+// CANDIDATE: Hyde 6 historical stat table. UNKNOWN: one-tile unarmed reach and crush style.
+hitpoints=170
+attack=130
+strength=130
+defence=130
+magic=1
+ranged=1
+attackrange=1
+// UNKNOWN: pursuit leash, distinct from the one-tile melee reach.
+maxrange=5
+param=attackrate,^macro_hyde_attack_ticks
+param=macro_overworld_maxhit,14
+param=damagetype,^crush_style
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=death_drop,null
 
 [macro_doctor]
 name=Dr Ford

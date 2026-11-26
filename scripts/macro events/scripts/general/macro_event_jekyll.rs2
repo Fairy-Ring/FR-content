@@ -1,0 +1,223 @@
+[proc,macro_jekyll_spawn]
+%npc_macro_event_target = uid;
+%macro_event = ^macro_jekyll;
+%macro_event_uid = npc_uid;
+%npc_int = 0;
+npc_setmode(playerfollow);
+npc_settimer(1);
+
+[ai_timer,macro_jekyll]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_jekyll) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_jekyll);
+    return;
+}
+if (~macro_event_lost = true) {
+    ~macro_overworld_finish(^macro_jekyll);
+    return;
+}
+%npc_int = add(%npc_int, 1);
+if (%npc_int < ^macro_jekyll_attention_ticks) return;
+
+def_int $tier = ~macro_event_combat_level;
+def_npc $hyde = macro_hyde_1;
+switch_int($tier) {
+    case ^macro_event_cmb_29 : $hyde = macro_hyde_2;
+    case ^macro_event_cmb_49 : $hyde = macro_hyde_3;
+    case ^macro_event_cmb_79 : $hyde = macro_hyde_4;
+    case ^macro_event_cmb_120 : $hyde = macro_hyde_5;
+    case ^macro_event_cmb_159 : $hyde = macro_hyde_6;
+}
+npc_changetype($hyde, ^max_32bit_int);
+%macro_event_uid = npc_uid;
+%npc_int = map_clock;
+npc_settimer(1);
+%aggressive_npc = npc_uid;
+npc_setmode(opplayer2);
+
+[opnpc1,macro_jekyll]
+if (uid ! %npc_macro_event_target) return;
+if (~macro_overworld_owned(^macro_jekyll) = false) return;
+def_namedobj $herb;
+def_namedobj $potion;
+$herb = null;
+$potion = null;
+// VERIFIED: period four-dose herb mappings; UNKNOWN: first-listed possessed herb wins when several are present.
+if ($herb = null & inv_total(inv, guam_leaf) > 0) {
+    $herb = guam_leaf;
+    $potion = strength4;
+}
+if ($herb = null & inv_total(inv, marentill) > 0) {
+    $herb = marentill;
+    $potion = 4doseantipoison;
+}
+if ($herb = null & inv_total(inv, tarromin) > 0) {
+    $herb = tarromin;
+    $potion = 4dose1attack;
+}
+if ($herb = null & inv_total(inv, harralander) > 0) {
+    $herb = harralander;
+    $potion = 4dosestatrestore;
+}
+if ($herb = null & inv_total(inv, ranarr_weed) > 0) {
+    $herb = ranarr_weed;
+    $potion = 4dose1energy;
+}
+if ($herb = null & inv_total(inv, toadflax) > 0) {
+    $herb = toadflax;
+    $potion = 4dose1defense;
+}
+if ($herb = null & inv_total(inv, irit_leaf) > 0) {
+    $herb = irit_leaf;
+    $potion = 4dose1agility;
+}
+if ($herb = null & inv_total(inv, avantoe) > 0) {
+    $herb = avantoe;
+    $potion = 4dose2strength;
+}
+if ($herb = null & inv_total(inv, kwuarm) > 0) {
+    $herb = kwuarm;
+    $potion = 4dose2energy;
+}
+if ($herb = null & inv_total(inv, snapdragon) > 0) {
+    $herb = snapdragon;
+    $potion = 4dose2strength;
+}
+if ($herb = null & inv_total(inv, cadantine) > 0) {
+    $herb = cadantine;
+    $potion = 4dose2restore;
+}
+if ($herb = null & inv_total(inv, lantadyme) > 0) {
+    $herb = lantadyme;
+    $potion = 4dose2defense;
+}
+if ($herb = null & inv_total(inv, dwarf_weed) > 0) {
+    $herb = dwarf_weed;
+    $potion = 4dose1magic;
+}
+def_namedobj $request = $herb;
+if ($request = null) $request = guam_leaf;
+// UNKNOWN functional captions; the requested herb's name comes from the original cache.
+def_int $choice = ~p_choice2("Give <oc_name($request)>", 1, "Decline", 2);
+if (finduid(%npc_macro_event_target) = false) return;
+if (~macro_overworld_owned(^macro_jekyll) = false) return;
+if (npc_type ! macro_jekyll) return;
+if ($choice = 2) {
+    inv_add(inv, 2dose1strength, 1);
+    ~macro_overworld_finish(^macro_jekyll);
+    return;
+}
+if ($herb = null) {
+    inv_add(inv, 2dose1strength, 1);
+} else {
+    inv_del(inv, $herb, 1);
+    inv_add(inv, $potion, 1);
+}
+~macro_overworld_finish(^macro_jekyll);
+
+[ai_timer,macro_hyde_1]
+~macro_event_hyde_tick;
+[ai_timer,macro_hyde_2]
+~macro_event_hyde_tick;
+[ai_timer,macro_hyde_3]
+~macro_event_hyde_tick;
+[ai_timer,macro_hyde_4]
+~macro_event_hyde_tick;
+[ai_timer,macro_hyde_5]
+~macro_event_hyde_tick;
+[ai_timer,macro_hyde_6]
+~macro_event_hyde_tick;
+
+[ai_opplayer2,macro_hyde_1]
+~macro_event_hyde_attack;
+[ai_opplayer2,macro_hyde_2]
+~macro_event_hyde_attack;
+[ai_opplayer2,macro_hyde_3]
+~macro_event_hyde_attack;
+[ai_opplayer2,macro_hyde_4]
+~macro_event_hyde_attack;
+[ai_opplayer2,macro_hyde_5]
+~macro_event_hyde_attack;
+[ai_opplayer2,macro_hyde_6]
+~macro_event_hyde_attack;
+
+[ai_queue3,macro_hyde_1]
+~macro_event_hyde_death;
+[ai_queue3,macro_hyde_2]
+~macro_event_hyde_death;
+[ai_queue3,macro_hyde_3]
+~macro_event_hyde_death;
+[ai_queue3,macro_hyde_4]
+~macro_event_hyde_death;
+[ai_queue3,macro_hyde_5]
+~macro_event_hyde_death;
+[ai_queue3,macro_hyde_6]
+~macro_event_hyde_death;
+
+[proc,macro_event_hyde_tick]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_jekyll) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_jekyll);
+    return;
+}
+if (~macro_event_lost_hostile = true) {
+    ~macro_overworld_finish(^macro_jekyll);
+    return;
+}
+if (npc_getmode = wander & map_clock > add(%npc_int, ^macro_hyde_bored_ticks)) {
+    ~macro_overworld_finish(^macro_jekyll);
+}
+
+[proc,macro_event_hyde_attack]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_jekyll) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_jekyll);
+    return;
+}
+if (npc_inrange = false) return;
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $damage;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $damage, $ticks = ~npc_default_attack_outcome(npc_param(macro_overworld_maxhit), 0, false);
+if ($attempted = true) %npc_int = map_clock;
+
+[proc,macro_event_hyde_death]
+// npc_death despawns this actor and invalidates npc_uid; retain the live token first.
+def_npc_uid $actor = npc_uid;
+def_int $owner_killed = 0;
+if (npc_findhero = ^true & ~macro_overworld_owned(^macro_jekyll) = true) $owner_killed = 1;
+gosub(npc_death);
+if (finduid(%npc_macro_event_target) = false) return;
+if (%macro_event ! ^macro_jekyll | %macro_event_uid ! $actor) return;
+if ($owner_killed = 1) {
+    obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+    // UNKNOWN: exact drop rates/dose realization; Super energy(1) uses the recorded 1/4 engineering chance.
+    def_int $roll = random(^macro_hyde_drop_outcomes);
+    if ($roll = 0) obj_add(npc_coord, 1dose2energy, 1, ^lootdrop_duration);
+    else if ($roll = 1) obj_add(npc_coord, 1dosestatrestore, 1, ^lootdrop_duration);
+    else if ($roll = 2) obj_add(npc_coord, 1dose1strength, 1, ^lootdrop_duration);
+}
+queue*(macro_overworld_death_cleanup, 0)(%macro_event, $actor);

@@ -1,0 +1,319 @@
+// VERIFIED: frogs existed by August 2005. CANDIDATE: the overhead lines below are from 10 July 2006.
+// UNKNOWN: the interaction labels and crowd size are functional engineering choices.
+
+[proc,macro_frogs_in_frogland](coord $where)(boolean)
+if (coordy($where) ! 0) {
+    return(false);
+}
+if (coordx($where) < 2432 | coordx($where) > 2495 | coordz($where) < 4736 | coordz($where) > 4799) {
+    return(false);
+}
+return(true);
+
+[proc,macro_frogs_owned_type](npc $type)(boolean)
+if ($type = macro_frog_royal | $type = macro_frog_sulking | $type = macro_frog_noncombat | $type = macro_frog_crier | $type = macro_frog_nohat | $type = macro_frog_prince | $type = macro_frog_princess) {
+    return(true);
+}
+return(false);
+
+[proc,macro_frogs_cleanup_zone_scan](coord $zone)
+def_npc_uid $main_actor = %macro_event_uid;
+npc_findallzone($zone);
+while (npc_findnext = true) {
+    if (npc_uid ! $main_actor & %npc_macro_event_target = uid & ~macro_frogs_owned_type(npc_type) = true) {
+        npc_del;
+    }
+}
+
+[proc,macro_frogs_cleanup_zone](coord $center)
+if (%macro_event ! ^macro_frogs) {
+    return;
+}
+def_npc_uid $main_actor = %macro_event_uid;
+// Crowd placement stays within two tiles; scan all adjacent 8×8 zones.
+def_int $offset_x = -8;
+def_int $offset_z = -8;
+while ($offset_x < 9) {
+    $offset_z = -8;
+    while ($offset_z < 9) {
+        ~macro_frogs_cleanup_zone_scan(movecoord($center, $offset_x, 0, $offset_z));
+        $offset_z = add($offset_z, 8);
+    }
+    $offset_x = add($offset_x, 8);
+}
+if (npc_finduid($main_actor) = false) return;
+
+// Removes only this player's auxiliary frogs. Core cleanup or logout owns the main actor token and saved coordinates.
+[proc,macro_frogs_cleanup]
+if (%macro_event ! ^macro_frogs) {
+    return;
+}
+if (p_gettransmogrify = macro_frog_nohat) {
+    p_transmogrify(null);
+    p_animprotect(^false);
+}
+~macro_frogs_cleanup_zone(%macro_event_origin_coord);
+if (%macro_event_target_coord ! %macro_event_origin_coord) {
+    ~macro_frogs_cleanup_zone(%macro_event_target_coord);
+}
+if (npc_finduid(%macro_event_uid) = true) {
+    if (~macro_overworld_owned(^macro_frogs) = true) {
+        npc_settimer(^macro_overworld_attention_ticks);
+    }
+}
+
+// Called after generic macro-event login has restored this event's actor.
+[proc,macro_frogs_login]
+if (%macro_event ! ^macro_frogs | ~macro_frogs_in_frogland(coord) = false) {
+    return;
+}
+if (npc_finduid(%macro_event_uid) = false) {
+    return;
+}
+if (~macro_overworld_owned(^macro_frogs) = false | npc_type ! macro_frog_sulking | %npc_int ! ^macro_frogs_stage_cave) {
+    return;
+}
+if (p_gettransmogrify ! null & p_gettransmogrify ! macro_frog_nohat) {
+    return;
+}
+p_transmogrify(macro_frog_nohat);
+p_animprotect(^true);
+
+[proc,macro_frogs_spawn_crowd](coord $center)
+def_npc_uid $main_actor = %macro_event_uid;
+if ($main_actor = null) {
+    return;
+}
+def_coord $last_coord = null;
+def_int $index = 0;
+while ($index < ^macro_frogs_crowd_count) {
+    def_npc $crowd_type = macro_frog_crier;
+    def_coord $search = movecoord($center, -1, 0, 0);
+    if ($index > 0) {
+        $crowd_type = macro_frog_noncombat;
+        $search = movecoord($center, 1, 0, 0);
+    }
+    def_coord $spawn = map_findsquare($search, 1, 1, ^map_findsquare_lineofwalk);
+    if ($spawn = null | $spawn = $center | $spawn = $last_coord) {
+        $spawn = map_findsquare(movecoord($center, 0, 0, 1), 1, 1, ^map_findsquare_lineofwalk);
+    }
+    if ($spawn = null | $spawn = $center | $spawn = $last_coord) {
+        $spawn = map_findsquare(movecoord($center, 0, 0, -1), 1, 1, ^map_findsquare_lineofwalk);
+    }
+    if ($spawn ! null & $spawn ! $center & $spawn ! $last_coord) {
+        npc_add($spawn, $crowd_type, ^macro_frogs_crowd_lifetime_ticks);
+        %npc_macro_event_target = uid;
+        %npc_int = ^macro_frogs;
+        npc_setmode(none);
+        if ($crowd_type = macro_frog_crier) {
+            if (gender = ^gender_male) {
+                // CANDIDATE wording-frogs-54, gated to the UNKNOWN male-to-princess selection.
+                npc_say("<displayname>, the frog princess desires your attention!");
+            }
+        }
+        $last_coord = $spawn;
+    }
+    if (npc_finduid($main_actor) = false) {
+        return;
+    }
+    $index = add($index, 1);
+}
+
+[proc,macro_frogs_spawn]
+if (%macro_event ! ^macro_frogs | %macro_event_uid ! npc_uid) {
+    return;
+}
+%npc_macro_event_target = uid;
+def_boolean $resume_cave = false;
+if (~macro_frogs_in_frogland(coord) = true & ~macro_frogs_in_frogland(%macro_event_origin_coord) = false) {
+    $resume_cave = true;
+}
+if ($resume_cave = true) {
+    npc_changetype(macro_frog_sulking, ^max_32bit_int);
+    %macro_event_uid = npc_uid;
+    %npc_macro_event_target = uid;
+    %npc_int = ^macro_frogs_stage_cave;
+    npc_setmode(none);
+    npc_settimer(0);
+    npc_tele(^macro_frogs_cave_royal);
+    %macro_event_target_coord = ^macro_frogs_cave_royal;
+    ~macro_frogs_spawn_crowd(^macro_frogs_cave_royal);
+    return;
+}
+%npc_int = ^macro_frogs_stage_encounter;
+npc_setmode(playerfollow);
+npc_settimer(^macro_overworld_attention_ticks);
+%macro_event_uid = npc_uid;
+%macro_event_target_coord = npc_coord;
+npc_say("Hello, <displayname>.");
+~macro_frogs_spawn_crowd(npc_coord);
+
+[opnpc1,macro_frog_royal]
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_encounter) {
+    return;
+}
+def_int $choice = ~p_choice2("Kiss the frog", 1, "Refuse", 0);
+if ($choice = 1) {
+    ~macro_frogs_accept;
+} else {
+    if (~macro_frogs_punish_prepare = false) {
+        return;
+    }
+    p_delay(^macro_frogs_animation_delay_ticks);
+    ~macro_frogs_punish_finish;
+}
+
+[ai_timer,macro_frog_royal]
+if (~macro_event_lost = true) {
+    if (finduid(%npc_macro_event_target) = true) {
+        if (~macro_overworld_owned(^macro_frogs) = true) {
+            ~macro_overworld_finish(^macro_frogs);
+        } else {
+            ~macro_event_disappear;
+        }
+    } else {
+        ~macro_event_disappear;
+    }
+    return;
+}
+if (finduid(%npc_macro_event_target) = false) return;
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_encounter) {
+    return;
+}
+npc_settimer(0);
+npc_say("That's it, you're a frog!");
+// The player queue owns protection and its animation delay, including while the player is busy.
+queue*(macro_frogs_punish, 0)(npc_uid);
+
+[queue,macro_frogs_punish](npc_uid $actor)
+if (%macro_event ! ^macro_frogs | %macro_event_uid ! $actor | npc_finduid($actor) = false) return;
+if (~macro_frogs_punish_prepare = false) return;
+p_delay(^macro_frogs_animation_delay_ticks);
+~macro_frogs_punish_finish;
+
+[ai_timer,macro_frog_sulking]
+if (~macro_event_lost = true) {
+    ~macro_event_disappear;
+}
+
+[proc,macro_frogs_accept]
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_encounter) {
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    // Keep the event open until its non-stackable token fits.
+    return;
+}
+npc_settimer(0);
+npc_anim(giant_frog_kiss, 0);
+anim(human_frog_kiss, 0);
+p_delay(^macro_frogs_animation_delay_ticks);
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_encounter) {
+    return;
+}
+npc_anim(frog_change_into_human, 0);
+// VERIFIED: period Tip.It gives a princess for male players and a prince for female players.
+if (gender = ^gender_male) {
+    npc_changetype(macro_frog_princess, ^max_32bit_int);
+} else {
+    npc_changetype(macro_frog_prince, ^max_32bit_int);
+}
+%macro_event_uid = npc_uid;
+%npc_macro_event_target = uid;
+p_delay(^macro_frogs_animation_delay_ticks);
+if (~macro_overworld_owned(^macro_frogs) = false) {
+    return;
+}
+inv_add(inv, macro_frog_token, 1);
+~macro_overworld_finish(^macro_frogs);
+
+[proc,macro_frogs_punish_prepare]()(boolean)
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_encounter) {
+    return(false);
+}
+npc_settimer(0);
+~macro_frogs_cleanup_zone(%macro_event_origin_coord);
+anim(human_change_into_frog, 0);
+p_transmogrify(macro_frog_nohat);
+p_animprotect(^true);
+return(true);
+
+[proc,macro_frogs_punish_finish]
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_encounter) {
+    return;
+}
+~p_telejump_safe(^macro_frogs_cave_landing);
+if (coord ! ^macro_frogs_cave_landing | ~macro_overworld_owned(^macro_frogs) = false) {
+    return;
+}
+npc_changetype(macro_frog_sulking, ^max_32bit_int);
+%macro_event_uid = npc_uid;
+%npc_macro_event_target = uid;
+%npc_int = ^macro_frogs_stage_cave;
+npc_setmode(none);
+npc_settimer(0);
+npc_tele(^macro_frogs_cave_royal);
+%macro_event_target_coord = ^macro_frogs_cave_royal;
+~macro_frogs_spawn_crowd(^macro_frogs_cave_royal);
+
+[opnpc1,macro_frog_sulking]
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_cave | ~macro_frogs_in_frogland(coord) = false) {
+    return;
+}
+def_int $choice = ~p_choice2("Apologize and return", 1, "Stay", 0);
+if ($choice = 1) {
+    if_close;
+    ~macro_frogs_return;
+}
+
+
+[proc,macro_frogs_return]
+if (~macro_overworld_owned(^macro_frogs) = false | %npc_int ! ^macro_frogs_stage_cave | ~macro_frogs_in_frogland(coord) = false) {
+    return;
+}
+def_coord $return = %macro_event_origin_coord;
+if (p_gettransmogrify = macro_frog_nohat) {
+    anim(frog_change_into_human, 0);
+    p_delay(^macro_frogs_animation_delay_ticks);
+}
+if (~macro_overworld_owned(^macro_frogs) = false) {
+    return;
+}
+if (p_gettransmogrify = macro_frog_nohat) {
+    p_transmogrify(null);
+    p_animprotect(^false);
+}
+~p_telejump_safe($return);
+if (coord ! $return) {
+    return;
+}
+~macro_overworld_finish(^macro_frogs);
+
+// UNKNOWN functional menu labels. Tip.It verifies mask or costume redemption, not these captions.
+[proc,macro_frogs_exchange]()(boolean)
+if (inv_total(inv, macro_frog_token) < 1) {
+    return(false);
+}
+def_int $choice = ~p_choice3("Frog mask", 1, "Frog costume", 2, "No thanks", 0);
+if ($choice = 1) {
+    inv_del(inv, macro_frog_token, 1);
+    inv_add(inv, macro_frog_mask, 1);
+    return(true);
+}
+if ($choice = 2) {
+    if (inv_freespace(inv) < 1) {
+        // Keep the token until the selected outfit fits.
+        return(false);
+    }
+    inv_del(inv, macro_frog_token, 1);
+// UNKNOWN gender mapping from random-events.overworld-frog-outfit-selection-1126.
+    if (gender = ^gender_male) {
+        inv_add(inv, macro_prince_torso, 1);
+        inv_add(inv, macro_prince_legs, 1);
+    } else {
+        inv_add(inv, macro_princess_torso, 1);
+        inv_add(inv, macro_princess_legs, 1);
+    }
+    return(true);
+}
+return(false);

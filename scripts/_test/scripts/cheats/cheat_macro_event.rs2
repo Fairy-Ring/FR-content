@@ -48,6 +48,13 @@ switch_int ($event) {
     case 18 : return("watchman");
     case 19 : return("poisonous-gas");
     case 20 : return("lost-and-found");
+    case 21 : return("capn-hand");
+    case 22 : return("rick-turpentine");
+    case 23 : return("jekyll");
+    case 24 : return("evil-chicken");
+    case 25 : return("frogs");
+    case 26 : return("certers");
+    case 27 : return("sandwich-lady");
 }
 return("");
 
@@ -58,6 +65,12 @@ if (~macro_event_allowed = false) {
 }
 if (p_finduid(uid) = false) {
     mes("[staff fixture] Refused: player unavailable.");
+    return;
+}
+if ($event >= 21 & $event <= 27) {
+    if_close;
+    mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+    ~macro_event_general_spawn(sub($event, 13));
     return;
 }
 if ($event <= 6) {

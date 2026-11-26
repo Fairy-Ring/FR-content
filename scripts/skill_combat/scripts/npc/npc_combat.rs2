@@ -162,6 +162,7 @@ return(npc_hasop(2));
 
 // Existing op2 truthiness policy, except for the named noncombat multi bases.
 [proc,npc_is_attackable]()(boolean)
+if (~macro_overworld_hostile_npc = true) return(~macro_overworld_hostile_attack_allowed);
 if (~ics_little_encounter_attackable = false) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);
 if (~swan_combat_npc = true) return(~swan_attackable);
@@ -287,6 +288,7 @@ return (false);
 
 // this proc is used for magic (TODO 377: re-enable later!!)
 [proc,npc_is_attackable_opt]()(boolean)
+if (~macro_overworld_hostile_npc = true) return(~macro_overworld_hostile_attack_allowed);
 if (~ics_little_encounter_attackable = false) return(false);
 if (~ics_little_guardian = true) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);
@@ -396,6 +398,7 @@ return (false);
 // Area scans call this only after multiway admits the secondary NPC tile.
 // Dialogue-specific refusal branches are absent because their maps are single-combat.
 [proc,npc_is_attackable_opt_quiet]()(boolean)
+if (~macro_overworld_hostile_npc = true) return(~macro_overworld_hostile_attack_allowed);
 if (~ics_little_encounter_attackable = false) return(false);
 if (~ics_little_guardian = true) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);

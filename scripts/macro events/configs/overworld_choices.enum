@@ -1,0 +1,35 @@
+[macro_certer_actors]
+inputtype=int
+outputtype=npc
+val=0,macro_niles
+val=1,macro_miles
+val=2,macro_giles
+
+[macro_certer_objects]
+inputtype=int
+outputtype=obj
+val=0,bronze_med_helm
+val=1,bronze_dagger
+val=2,leather_boots
+val=3,logs
+val=4,gold_ring
+val=5,lobster
+val=6,bronze_med_helm
+val=7,bronze_dagger
+val=8,leather_boots
+val=9,logs
+val=10,gold_ring
+val=11,lobster
+
+// CANDIDATE seven original foods. Equal weights subtract the 2022 stale-baguette change.
+// Order follows the original tray model identities, not a replacement interface.
+[macro_sandwich_foods]
+inputtype=int
+outputtype=namedobj
+val=0,chocolate_bar
+val=1,square_sandwich
+val=2,roll
+val=3,triangle_sandwich
+val=4,baguette
+val=5,meat_pie
+val=6,kebab

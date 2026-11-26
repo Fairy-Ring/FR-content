@@ -1,6 +1,7 @@
 // source: https://www.youtube.com/watch?v=VK_A2Vf9VE8
 
 [opnpc1,thessalia]
+if (~macro_frogs_exchange = true) return;
 if (%bunny_ears_unlocked = 0 & %scythe_unlocked = 0) { // player has not unlocked bunny_ears or scythe
     @thessalia_want_to_buy;
 } else if (%bunny_ears_unlocked = 1 & %scythe_unlocked = 1) { // player unlocked both

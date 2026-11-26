@@ -1,0 +1,130 @@
+[proc,macro_evil_chicken_spawn]
+%npc_macro_event_target = uid;
+%macro_event = ^macro_evil_chicken;
+%macro_event_uid = npc_uid;
+def_int $tier = ~macro_event_combat_level;
+def_npc $chicken = macro_evil_chicken_1;
+switch_int($tier) {
+    case ^macro_event_cmb_29 : $chicken = macro_evil_chicken_2;
+    case ^macro_event_cmb_49 : $chicken = macro_evil_chicken_3;
+    case ^macro_event_cmb_79 : $chicken = macro_evil_chicken_4;
+    case ^macro_event_cmb_120 : $chicken = macro_evil_chicken_5;
+    case ^macro_event_cmb_159 : $chicken = macro_evil_chicken_6;
+}
+npc_changetype($chicken, ^max_32bit_int);
+%macro_event_uid = npc_uid;
+%npc_int = map_clock;
+npc_settimer(1);
+%aggressive_npc = npc_uid;
+npc_setmode(applayer2);
+
+[ai_timer,macro_evil_chicken_1]
+~macro_event_evil_chicken_tick;
+[ai_timer,macro_evil_chicken_2]
+~macro_event_evil_chicken_tick;
+[ai_timer,macro_evil_chicken_3]
+~macro_event_evil_chicken_tick;
+[ai_timer,macro_evil_chicken_4]
+~macro_event_evil_chicken_tick;
+[ai_timer,macro_evil_chicken_5]
+~macro_event_evil_chicken_tick;
+[ai_timer,macro_evil_chicken_6]
+~macro_event_evil_chicken_tick;
+
+[ai_applayer2,macro_evil_chicken_1]
+~macro_event_evil_chicken_attack;
+[ai_applayer2,macro_evil_chicken_2]
+~macro_event_evil_chicken_attack;
+[ai_applayer2,macro_evil_chicken_3]
+~macro_event_evil_chicken_attack;
+[ai_applayer2,macro_evil_chicken_4]
+~macro_event_evil_chicken_attack;
+[ai_applayer2,macro_evil_chicken_5]
+~macro_event_evil_chicken_attack;
+[ai_applayer2,macro_evil_chicken_6]
+~macro_event_evil_chicken_attack;
+
+[ai_queue3,macro_evil_chicken_1]
+~macro_event_evil_chicken_death;
+[ai_queue3,macro_evil_chicken_2]
+~macro_event_evil_chicken_death;
+[ai_queue3,macro_evil_chicken_3]
+~macro_event_evil_chicken_death;
+[ai_queue3,macro_evil_chicken_4]
+~macro_event_evil_chicken_death;
+[ai_queue3,macro_evil_chicken_5]
+~macro_event_evil_chicken_death;
+[ai_queue3,macro_evil_chicken_6]
+~macro_event_evil_chicken_death;
+
+[proc,macro_event_evil_chicken_tick]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_evil_chicken) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_evil_chicken);
+    return;
+}
+if (coordy(npc_coord) ! coordy(coord) | npc_range(coord) > ^macro_chicken_vanish_tiles) {
+    ~macro_overworld_finish(^macro_evil_chicken);
+    return;
+}
+if (npc_getmode = wander & map_clock > add(%npc_int, ^macro_chicken_bored_ticks)) {
+    ~macro_overworld_finish(^macro_evil_chicken);
+}
+
+[proc,macro_event_evil_chicken_attack]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (~macro_overworld_owned(^macro_evil_chicken) = false) {
+    npc_del;
+    return;
+}
+if (stat(hitpoints) = 0 | ~macro_event_area(coord) = false) {
+    ~macro_overworld_finish(^macro_evil_chicken);
+    return;
+}
+if (npc_inrange = false) return;
+// CANDIDATE: Wind Strike presentation; period evidence verifies a magic attack, not its named spell.
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $damage;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $damage, $ticks = ~npc_cast_spell_outcome(^wind_strike, npc_param(attackrate), npc_param(macro_overworld_maxhit), false, false);
+if ($attempted = true) %npc_int = map_clock;
+
+[proc,macro_event_evil_chicken_death]
+// npc_death despawns this actor and invalidates npc_uid; retain the live token first.
+def_npc_uid $actor = npc_uid;
+def_int $owner_killed = 0;
+if (npc_findhero = ^true & ~macro_overworld_owned(^macro_evil_chicken) = true) $owner_killed = 1;
+gosub(npc_death);
+if (finduid(%npc_macro_event_target) = false) return;
+if (%macro_event ! ^macro_evil_chicken | %macro_event_uid ! $actor) return;
+if ($owner_killed = 1) {
+    obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+    obj_add(npc_coord, raw_chicken, 1, ^lootdrop_duration);
+    obj_add(npc_coord, egg, 1, ^lootdrop_duration);
+    // CANDIDATE feather bounds; UNKNOWN uniform draw and the unverified quantity for each auxiliary item.
+    def_int $feathers = add(^macro_chicken_feather_min, randominc(^macro_chicken_feather_span));
+    obj_add(npc_coord, feather, $feathers, ^lootdrop_duration);
+}
+queue*(macro_overworld_death_cleanup, 0)(%macro_event, $actor);
+
+[proc,macro_overworld_hostile_npc]()(boolean)
+if (npc_type = macro_hyde_1 | npc_type = macro_hyde_2 | npc_type = macro_hyde_3 | npc_type = macro_hyde_4 | npc_type = macro_hyde_5 | npc_type = macro_hyde_6) return(true);
+if (npc_type = macro_evil_chicken_1 | npc_type = macro_evil_chicken_2 | npc_type = macro_evil_chicken_3 | npc_type = macro_evil_chicken_4 | npc_type = macro_evil_chicken_5 | npc_type = macro_evil_chicken_6) return(true);
+return(false);
+
+[proc,macro_overworld_hostile_attack_allowed]()(boolean)
+if (npc_type = macro_hyde_1 | npc_type = macro_hyde_2 | npc_type = macro_hyde_3 | npc_type = macro_hyde_4 | npc_type = macro_hyde_5 | npc_type = macro_hyde_6) return(~macro_overworld_owned(^macro_jekyll));
+if (npc_type = macro_evil_chicken_1 | npc_type = macro_evil_chicken_2 | npc_type = macro_evil_chicken_3 | npc_type = macro_evil_chicken_4 | npc_type = macro_evil_chicken_5 | npc_type = macro_evil_chicken_6) return(~macro_overworld_owned(^macro_evil_chicken));
+return(false);

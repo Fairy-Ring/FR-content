@@ -31,6 +31,8 @@ def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk)
 if ($event_coord = null) {
     return;
 }
+// A fresh frog admission writes its departure; login recreates without changing it.
+if ($event = ^macro_frogs) %macro_event_origin_coord = coord;
 ~macro_event_general_create($event, $event_coord);
 
 // The actor must exist before either encounter token is published.
@@ -48,6 +50,13 @@ switch_int ($event) {
     case ^macro_geni : ~macro_geni_spawn;
     case ^macro_mysterious_old_man : ~macro_mysterious_old_man_spawn;
     case ^macro_candlelight : ~macro_candlelight_spawn;
+    case ^macro_capn_hand : ~macro_capn_hand_spawn;
+    case ^macro_rick_turpentine : ~macro_rick_turpentine_spawn;
+    case ^macro_jekyll : ~macro_jekyll_spawn;
+    case ^macro_evil_chicken : ~macro_evil_chicken_spawn;
+    case ^macro_frogs : ~macro_frogs_spawn;
+    case ^macro_certers : ~macro_certers_spawn;
+    case ^macro_sandwich_lady : ~macro_sandwich_lady_spawn;
 }
 
 // this proc is used for random events teleing to follow the player
@@ -118,12 +127,14 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
     }
     if (npc_finduid(%macro_event_uid) = true) {
         if (%npc_macro_event_target = uid) {
+            if (%macro_event = ^macro_frogs) ~macro_frogs_login;
             return;
         }
     }
     def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
     if ($event_coord ! null) {
         ~macro_event_general_create(%macro_event, $event_coord);
+        if (%macro_event = ^macro_frogs) ~macro_frogs_login;
     }
 } else {
     // Preserve published non-restoring event login: clear only the identity.
@@ -131,6 +142,7 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
 }
 
 [proc,macro_event_logout]
+if (%macro_event = ^macro_frogs) ~macro_frogs_cleanup;
 if (npc_finduid(%macro_event_uid) = true) {
     if (%npc_macro_event_target = uid) {
         %npc_macro_event_target = null;
@@ -138,6 +150,15 @@ if (npc_finduid(%macro_event_uid) = true) {
 }
 
 [proc,macro_event_npc](int $event)(npc)
+switch_int ($event) {
+    case ^macro_capn_hand : return(macro_pirate);
+    case ^macro_rick_turpentine : return(macro_highwayman);
+    case ^macro_jekyll : return(macro_jekyll);
+    case ^macro_evil_chicken : return(macro_evil_chicken_1);
+    case ^macro_frogs : return(macro_frog_royal);
+    case ^macro_certers : return(macro_niles);
+    case ^macro_sandwich_lady : return(macro_sandwich_lady_npc);
+}
 def_npc $event_npc;
 if (map_members = ^true) {
     $event_npc = enum(int, npc, general_macro_events_members, $event);
@@ -287,6 +308,7 @@ if_settab(null, 12);
 if ($event = ^no_macro_event | %macro_event ! $event | %macro_event_uid ! $actor) {
     return;
 }
+if ($event = ^macro_frogs) ~macro_frogs_cleanup;
 if (npc_finduid($actor) = true) {
     if (%npc_macro_event_target = uid) {
         npc_del;

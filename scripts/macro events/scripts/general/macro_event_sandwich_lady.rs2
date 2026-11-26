@@ -1,0 +1,62 @@
+// VERIFIED: April 2006 KB/Tip.It requested snack; CANDIDATE near-target knockout.
+[proc,macro_sandwich_lady_spawn]
+%npc_macro_event_target = uid;
+%npc_int = random(7);
+npc_setmode(playerfollow);
+// UNKNOWN engineering attention deadline, shared with the other overworld visitors.
+npc_settimer(^macro_overworld_attention_ticks);
+spotanim_map(smokepuff, npc_coord, 124, 0);
+
+[opnpc1,macro_sandwich_lady_npc]
+if (~macro_overworld_owned(^macro_sandwich_lady) = false) return;
+if_openmain(sandwich_tray);
+// The requested food is its original cache name, not an invented dialogue line.
+if_settext(sandwich_tray:com_9, oc_name(enum(int, namedobj, macro_sandwich_foods, %npc_int)));
+// Original 377 food models, at the original tray's seven button positions.
+if_setobject(sandwich_tray:com_1, enum(int, namedobj, macro_sandwich_foods, 0), 500);
+if_setobject(sandwich_tray:com_2, enum(int, namedobj, macro_sandwich_foods, 1), 500);
+if_setobject(sandwich_tray:com_3, enum(int, namedobj, macro_sandwich_foods, 2), 500);
+if_setobject(sandwich_tray:com_4, enum(int, namedobj, macro_sandwich_foods, 3), 500);
+if_setobject(sandwich_tray:com_5, enum(int, namedobj, macro_sandwich_foods, 4), 500);
+if_setobject(sandwich_tray:com_6, enum(int, namedobj, macro_sandwich_foods, 5), 500);
+if_setobject(sandwich_tray:com_7, enum(int, namedobj, macro_sandwich_foods, 6), 500);
+
+[if_button,sandwich_tray:com_1] ~macro_sandwich_answer(0);
+[if_button,sandwich_tray:com_2] ~macro_sandwich_answer(1);
+[if_button,sandwich_tray:com_3] ~macro_sandwich_answer(2);
+[if_button,sandwich_tray:com_4] ~macro_sandwich_answer(3);
+[if_button,sandwich_tray:com_5] ~macro_sandwich_answer(4);
+[if_button,sandwich_tray:com_6] ~macro_sandwich_answer(5);
+[if_button,sandwich_tray:com_7] ~macro_sandwich_answer(6);
+
+[proc,macro_sandwich_answer](int $answer)
+if (%macro_event ! ^macro_sandwich_lady | npc_finduid(%macro_event_uid) = false) return;
+if (~macro_overworld_owned(^macro_sandwich_lady) = false) return;
+if_close;
+if ($answer ! %npc_int) {
+    ~macro_sandwich_punish;
+    return;
+}
+inv_add(inv, enum(int, namedobj, macro_sandwich_foods, $answer), 1);
+~macro_overworld_finish(^macro_sandwich_lady);
+
+[ai_timer,macro_sandwich_lady_npc]
+if (~macro_event_lost = true) {
+    ~macro_event_disappear;
+    return;
+}
+if (finduid(%npc_macro_event_target) = true) ~macro_sandwich_punish;
+
+[proc,macro_sandwich_punish]
+if (~macro_overworld_owned(^macro_sandwich_lady) = false) return;
+if_close;
+npc_anim(macro_sandwich_lady_attack, 0);
+anim(macro_sandwich_lady_knockout, 0);
+// UNKNOWN engineering zero damage avoids inventing a lethal punishment.
+~macro_overworld_fail_teleport(^macro_sandwich_lady);
+
+// These four 377 snacks were cache-only. Use the standard eating pipeline.
+[opheld1,baguette] @player_consume_item(consume_effect_stat, 2, 3);
+[opheld1,triangle_sandwich] @player_consume_item(consume_effect_stat, 2, 3);
+[opheld1,square_sandwich] @player_consume_item(consume_effect_stat, 2, 3);
+[opheld1,roll] @player_consume_item(consume_effect_stat, 2, 3);

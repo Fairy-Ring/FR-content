@@ -2521,6 +2521,126 @@
       "playerVars": { "myreque_2_quest": 150, "myreque2_extravar": 32768 },
       "npcVars": { "npc_aggressive_player": "target", "npc_attacking_uid": "target" },
       "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,macro_pirate]",
+      "npc": "macro_pirate",
+      "style": "ranged",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 8 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_highwayman]",
+      "npc": "macro_highwayman",
+      "style": "ranged",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 9 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,macro_hyde_1]",
+      "npc": "macro_hyde_1",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 10 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,macro_hyde_2]",
+      "npc": "macro_hyde_2",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 10 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,macro_hyde_3]",
+      "npc": "macro_hyde_3",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 10 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,macro_hyde_4]",
+      "npc": "macro_hyde_4",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 10 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,macro_hyde_5]",
+      "npc": "macro_hyde_5",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 10 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,macro_hyde_6]",
+      "npc": "macro_hyde_6",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 10 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_evil_chicken_1]",
+      "npc": "macro_evil_chicken_1",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 11 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_evil_chicken_2]",
+      "npc": "macro_evil_chicken_2",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 11 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_evil_chicken_3]",
+      "npc": "macro_evil_chicken_3",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 11 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_evil_chicken_4]",
+      "npc": "macro_evil_chicken_4",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 11 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_evil_chicken_5]",
+      "npc": "macro_evil_chicken_5",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 11 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_applayer2,macro_evil_chicken_6]",
+      "npc": "macro_evil_chicken_6",
+      "style": "magic",
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 },
+      "playerVars": { "macro_event": 11 },
+      "npcVars": { "npc_macro_event_target": "target" },
+      "activeNpcVar": "macro_event_uid"
     }
   ]
 }

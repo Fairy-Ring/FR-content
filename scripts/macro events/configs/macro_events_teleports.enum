@@ -12,8 +12,8 @@ inputtype=int
 outputtype=coord
 // Jolly boar inn
 val=0,1_51_54_14_44
-// upstairs in morgans house (draynor). Coord seems to be slightly off
-val=1,1_48_51_25_4
+// UNKNOWN: upstairs in Morgan's house; one tile north of the inherited blocked landing.
+val=1,1_48_51_25_5
 // falador general store tower
 val=2,2_46_52_10_60
 // varrock palace, south east tower
@@ -64,8 +64,8 @@ inputtype=int
 outputtype=coord
 // Jolly boar inn
 val=0,1_51_54_14_44
-// upstairs in morgans house (draynor). Coord seems to be slightly off
-val=1,1_48_51_25_4
+// UNKNOWN: upstairs in Morgan's house; one tile north of the inherited blocked landing.
+val=1,1_48_51_25_5
 // falador general store tower
 val=2,2_46_52_10_60
 // varrock palace, south east tower
@@ -84,9 +84,8 @@ val=8,1_39_53_23_34
 val=9,2_42_53_12_11
 // South-west Yanille walls
 val=10,1_39_48_40_4
-// The Outpost, Ardougne. Outpost doesnt exist for us, but the tele here seems to make sense
-// its in the middle of nowhere
-val=11,0_38_52_2_18
+// UNKNOWN: Outpost landing one tile west of the inherited blocked tile.
+val=11,0_38_52_1_18
 // Camelot, north-east outside the topiary
 val=12,0_43_54_35_59
 // East Ardougne, above the general store
