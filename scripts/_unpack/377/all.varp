@@ -348,9 +348,7 @@ type=player_uid
 
 [varp248_unused]
 
-[varp251_unused]
 
-[varp252_unused]
 
 [gnome_course_progress]
 scope=perm
@@ -994,9 +992,6 @@ protect=no
 
 [prayer_drain_resistance]
 protect=no
-
-[garden_varp_2]
-transmit=yes
 
 [varp555_bits]
 

@@ -1,0 +1,26 @@
+// UNKNOWN engineering trolley bounds. Period guides attest a time limit, not its value.
+^garden_trolley_ticks = 500
+// CANDIDATE: retained transcript pushes one tile, Big-push four tiles.
+^garden_big_push_tiles = 4
+// UNKNOWN route thresholds/drop-off tiles, selected on the original packed map.
+^garden_falador_exit_z = 3399
+^garden_lumbridge_exit_x = 3241
+^garden_saradomin_dropoff = 0_50_54_28_33
+^garden_king_dropoff = 0_50_54_32_33
+^garden_saradomin_plinth = 0_50_54_29_23
+^garden_king_plinth = 0_50_54_33_31
+// Handler 11..14 belong to the shared tree families.
+^garden_growth_handler = 15
+
+// Trade bundles: Elstan and Kragen VERIFIED period guides; the rest CANDIDATE OSRS List.
+// UNKNOWN engineering: planting consumes one complete corresponding bundle.
+^garden_delphinium_bundle = 4
+^garden_orchid_bundle = 3
+^garden_snowdrop_bundle = 4
+^garden_vine_bundle = 4
+^garden_rose_bundle = 3
+
+// CANDIDATE OSRS White tree fruit oldid=15318045; exact period amounts UNKNOWN.
+^garden_fruit_farming_xp = 120
+^garden_fruit_heal = 3
+^garden_fruit_energy = 1000

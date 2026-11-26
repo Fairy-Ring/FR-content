@@ -335,7 +335,7 @@ if (%fever_quest >= ^fever_complete) {
 if (%forget_quest >= ^forget_complete) {
     $questpoints = add($questpoints, ^forget_questpoints);
 }
-if (%garden_quest = ^garden_complete) {
+if (%garden_quest >= ^garden_complete) {
     $questpoints = add($questpoints, ^garden_questpoints);
 }
 if (%handsand_quest >= ^handsand_complete) {
@@ -502,6 +502,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:lost_tribe, %lost_tribe_quest, ^lost_tribe_complete);
 ~send_quest_progress_colour(questlist:zogre, %zogre, ^zogre_complete);
 ~send_quest_progress_colour(questlist:handsand, %handsand_quest, ^handsand_complete);
+~send_quest_progress_colour(questlist:garden, %garden_quest, ^garden_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

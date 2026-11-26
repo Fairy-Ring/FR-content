@@ -1,22 +1,173 @@
-// Garden of Tranquillity — Bernald first Talk-to. No vine op. No 988 write.
-// CANDIDATE last-resort 2007-base (OSRS Talking to Bernald minus Charm /
-// stronger-cure / Alain / RS3 Taverley). Hunt 289? no.
-// Cite garden-bernald-talk-product-377.md.
+// Garden of Tranquillity — Bernald's diseased vines and Burthorpe seeds.
+// Dialogue is CANDIDATE; the existing 3-bit varbit also drives the vine loc.
+// 0 not accepted, 1 cure agreed, 2 weak cure tried, 3 Alain lead given,
+// 4 cured (loc stages 4/5 are the healthy forms).
 
 [opnpc1,bernald]
 if (%garden_quest < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-~chatnpc("<p,quiz>Do you know anything about grapevine diseases?");
-~chatplayer("<p,neutral>I might - what's the problem?");
-~chatnpc("<p,sad>You see those grapevines over there?");
-~chatplayer("<p,neutral>Yes. They don't look too happy at the moment.");
-~chatnpc("<p,sad>They've come down with some strange disease that I've never encountered before. I've tried everything with them, but nothing seems to work. If it carries on like this I will lose all this year's crops.");
-~chatplayer("<p,neutral>I could probably help you with that, but I'd need something in return.");
-~chatnpc("<p,happy>Anything, you just need to ask!");
-~chatplayer("<p,quiz>Well, I'd like a supply of Burthorpe Vine seeds.");
-~chatnpc("<p,sad>I'm afraid I can't do that.");
-~chatplayer("<p,angry>I thought you said anything!");
-~chatnpc("<p,sad>I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
+if (%garden_bernald_varbit = 0) {
+    @garden_bernald_intro;
+    return;
+}
+if (%garden_bernald_varbit = 2) {
+    @garden_bernald_after_weak_cure;
+    return;
+}
+if (%garden_bernald_varbit = 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%garden_bernald_varbit >= 4) {
+    @garden_bernald_seeds;
+    return;
+}
+~displaymessage(^dm_default);
 return;
+
+[label,garden_bernald_intro]
+~chatnpc("Do you know anything about grapevine diseases?");
+~chatplayer("I might - what's the problem?");
+~chatnpc("You see those grapevines over there?");
+~chatplayer("Yes. They don't look too happy at the moment.");
+~chatnpc("They've come down with some strange disease that I've never encountered before. I've tried everything with them, but nothing seems to work. If it carries on like this I will lose all this year's crops.");
+~chatplayer("I could probably help you with that, but I'd need something in return.");
+~chatnpc("Anything, you just need to ask!");
+~chatplayer("Well, I'd like a supply of Burthorpe Vine seeds.");
+~chatnpc("I'm afraid I can't do that.");
+if (inv_total(worn, ring_of_charos_unlocked) < 1) {
+    ~chatplayer("I thought you said anything!");
+    ~chatnpc("I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
+    return;
+}
+def_int $deal = ~p_choice2("I thought you said anything!", 1, "But it is the only way that these vines will be cured.", 2);
+if ($deal = 1) {
+    ~chatplayer("I thought you said anything!");
+    ~chatnpc("I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
+    return;
+}
+~chatplayer("But it is the only way that these vines will be cured.");
+~chatnpc("Hmm, you may be right. If I lose these crops what use are more seeds to me, when I have gone out of business? Very well then, this is the deal - cure my vines and I will give you some Burthorpe Vine seeds.");
+// UNKNOWN acceptance placement: the transcript omits the accept row's wording.
+// Accept the preceding sourced appeal without inventing more dialogue.
+%garden_bernald_varbit = 1;
+return;
+
+[oplocu,garden_burthorpe_vines_diseased]
+if (%garden_quest < 1 | last_useitem ! plant_cure & last_useitem ! plant_cure_strong) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = plant_cure & %garden_bernald_varbit = 1) {
+    // UNKNOWN engineering: the failed cure is consumed as used.
+    inv_del(inv, plant_cure, 1);
+    %garden_bernald_varbit = 2;
+    mes("You treat the diseased grapevines with plant cure ...");
+    mes("... but it doesn't seem to make any difference.");
+    return;
+}
+if (last_useitem = plant_cure_strong & %garden_bernald_varbit = 3) {
+    inv_del(inv, plant_cure_strong, 1);
+    %garden_bernald_varbit = 4;
+    mes("You treat the diseased grapevines with strong plant cure ...");
+    mes("... and they blossom with new found life!");
+    return;
+}
+~displaymessage(^dm_default);
+return;
+
+[label,garden_bernald_after_weak_cure]
+~chatnpc("Plant cure not doing the trick, eh?");
+~chatplayer("I don't understand - it's worked with everything else.");
+~chatnpc("That grapevine disease must be much stronger than the usual. You'll need something a bit more potent to cut out that infection.");
+~chatplayer("Do you know of any stronger cures?");
+~chatnpc("No, I don't - but I know of a man who might. Not far from here there's a druid gardener who goes by the name of Alain. He's an expert on things like this, so they tell me.");
+~chatplayer("Why didn't you just go and ask him yourself?");
+~chatnpc("These vines are very precious indeed. I could not hazard the risk that someone would steal my grapes while I was away - they may be diseased, but they still contain Burthorpe Vine seeds.");
+%garden_bernald_varbit = 3;
+
+[label,garden_alain_trade]
+if (%garden_quest < 1 | %garden_bernald_varbit < 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("I need to ask you about strong plant cures.");
+~chatnpc("Well, you have come to the right person, then - I researched exotic plant diseases as part of my druidic training. What is the affliction that you need to cure?");
+~chatplayer("Bernald up in Burthorpe has got some seriously diseased grapevines. I tried plant cure on them, but it didn't seem to have any positive effect.");
+~chatnpc("Ah, so is this the famous Burthorpe Vine?");
+~chatplayer("The very one.");
+~chatnpc("I'm afraid that my researches did not extend to Burthorpe Vine. Bernald and his ancestors have always closely guarded their heritage, that vine. In fact, I'm surprised that he has involved you.");
+~chatplayer("Er, I did have some ... assistance there.");
+~chatnpc("I see. Well, if it involves some unnatural power I would rather not know. I prefer the use of power that can be brought forth from the plants around us.");
+def_int $secret = ~p_choice2("Are you sure there's nothing you can suggest?", 1, "You're hiding something from me.", 2);
+if ($secret = 2) {
+    ~chatplayer("You're hiding something from me.");
+    ~chatnpc("This is the power you are abusing!! I feel it now - it emanates from the ring you wear, a festering fountain of corruption that appalls my very soul!!!");
+    ~chatplayer("Oh, sorry. I forgot that it only works on the weak- minded.");
+    ~chatnpc("You, <displayname>, are the one who must be weak- minded, if you consider using such a dreadful weapon. Beware - it may one day be your downfall.");
+    return;
+}
+~chatplayer("Are you sure there's nothing you can suggest?");
+~chatnpc("Well...");
+~chatnpc("There is one thing you could try. One of the most potent cures I have discovered involves using the natural power held within a very special mineral, but it is a very closely guarded secret.");
+~chatplayer("Do you mean the rune essence?");
+~chatnpc("You know of that?!? Then I can do no further harm here. You can make a potent plant cure by mixing some crumbled rune essence into a normal plant cure. This may possibly cure Bernald's vines.");
+~chatplayer("Thank you Alain, I will try it out immediately!");
+
+[opheldu,blankrune] @garden_essence_use;
+[opheldu,rune_shards] @garden_shards_use;
+[opheldu,plant_cure] @garden_cure_use;
+
+[label,garden_essence_use]
+if (%garden_bernald_varbit < 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = pestle_and_mortar) {
+    mes("The rune essence is too big to grind. You might want to break it up into shards first.");
+    return;
+}
+if (last_useitem ! hammer & last_useitem ! chisel) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, blankrune, 1);
+inv_add(inv, rune_shards, 1);
+mes("You break up the rune essence into shards.");
+
+[label,garden_shards_use]
+if (%garden_bernald_varbit < 3 | last_useitem ! pestle_and_mortar) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, rune_shards, 1);
+inv_add(inv, rune_dust, 1);
+mes("You break up the rune essence shards into dust.");
+
+[label,garden_cure_use]
+if (%garden_bernald_varbit < 3 | last_useitem ! rune_dust) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, rune_dust, 1);
+inv_del(inv, plant_cure, 1);
+inv_add(inv, plant_cure_strong, 1);
+mes("You mix the rune dust into the plant cure.");
+
+[label,garden_bernald_seeds]
+def_int $missing = ~garden_bundle_missing(garden_vine_seed, ^garden_vine_bundle);
+if ($missing <= 0) {
+    ~chatplayer("How are your grapes coming along?");
+    ~chatnpc("Marvellously, thanks to your help, <displayname>!");
+    return;
+}
+def_int $slots = ~garden_bundle_slots(garden_vine_seed, $missing);
+~chatnpc("My vines are cured! You have worked a wonder here, <displayname>! Here, you can have those seeds like I promised.");
+if (inv_freespace(inv) < $slots) {
+    ~chatnpc("I would give you some, but you don't appear to have room to carry them.");
+    return;
+}
+~chatnpc("Yes, here you go - I hope they grow for you.");
+inv_add(inv, garden_vine_seed, $missing);

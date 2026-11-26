@@ -1,3 +1,18 @@
 [garden_varp_1]
 scope=perm
 transmit=yes
+
+[garden_varp_2]
+scope=perm
+transmit=yes
+protect=no
+
+// Reserved original 377 slots. Live trolley identity and clock reset on logout.
+[garden_trolley_uid]
+type=npc_uid
+protect=no
+scope=temp
+
+[garden_trolley_deadline]
+protect=no
+scope=temp

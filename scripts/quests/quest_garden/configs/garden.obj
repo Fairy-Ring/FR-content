@@ -1,0 +1,383 @@
+// Original 377 fields retained. UNKNOWN quest-item trade restriction: operator default.
+[garden_rosebush_seed_white]
+tradeable=no
+name=White rose seed
+desc=A white rosebush seed.
+recol1s=19724
+recol1d=29557
+recol2s=28214
+recol2d=29531
+model=obj_garden_rosebush_seed_white
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=rose_seed_white_2,2
+count2=rose_seed_white_3,3
+count3=rose_seed_white_4,4
+count4=rose_seed_white_5,5
+weight=1g
+
+[garden_rosebush_seed_red]
+tradeable=no
+name=Red rose seed
+desc=A red rosebush seed.
+recol1s=28214
+recol1d=21998
+recol2s=19724
+recol2d=14466
+model=obj_garden_rosebush_seed_white
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=rose_seed_red_2,2
+count2=rose_seed_red_3,3
+count3=rose_seed_red_4,4
+count4=rose_seed_red_5,5
+weight=1g
+
+[garden_rosebush_seed_pink]
+tradeable=no
+name=Pink rose seed
+desc=A pink rosebush seed.
+model=obj_garden_rosebush_seed_white
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=rose_seed_pink_2,2
+count2=rose_seed_pink_3,3
+count3=rose_seed_pink_4,4
+count4=rose_seed_pink_5,5
+weight=1g
+
+[garden_vine_seed]
+tradeable=no
+name=Vine seed
+desc=A grapevine seed.
+recol1s=24208
+recol1d=7556
+recol2s=18957
+recol2d=13801
+model=obj_barley_seed
+2dyof=6
+2dzoom=660
+2dyan=1996
+2dxan=276
+members=yes
+iop5=Destroy
+stackable=yes
+count1=vine_seed_2,2
+count2=vine_seed_3,3
+count3=vine_seed_4,4
+count4=vine_seed_5,5
+weight=1g
+
+[garden_delphinium_seed]
+tradeable=no
+name=Delphinium seed
+desc=A delphinium seed.
+recol1s=19724
+recol1d=10847
+recol2s=28214
+recol2d=5499
+model=obj_garden_rosebush_seed_white
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=delphinium_seed_2,2
+count2=delphinium_seed_3,3
+count3=delphinium_seed_4,4
+count4=delphinium_seed_5,5
+weight=1g
+
+[garden_orchid_pink_seed]
+tradeable=no
+name=Orchid seed
+desc=A pink orchid seed.
+recol1s=24379
+recol1d=26100
+recol2s=21174
+recol2d=21805
+recol3s=15947
+recol3d=11719
+model=obj_garden_orchid_pink_seed
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=orchid_seed_pink_2,2
+count2=orchid_seed_pink_3,3
+count3=orchid_seed_pink_4,4
+count4=orchid_seed_pink_5,5
+weight=1g
+
+[garden_orchid_yellow_seed]
+tradeable=no
+name=Orchid seed
+desc=A yellow orchid seed.
+recol1s=24379
+recol1d=31553
+recol2s=21174
+recol2d=30401
+recol3s=15947
+recol3d=11719
+model=obj_garden_orchid_pink_seed
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=orchid_seed_yellow_2,2
+count2=orchid_seed_yellow_3,3
+count3=orchid_seed_yellow_4,4
+count4=orchid_seed_yellow_5,5
+weight=1g
+
+[garden_snowdrop_seed]
+tradeable=no
+name=Snowdrop seed
+desc=A snowdrop seed.
+model=obj_garden_orchid_pink_seed
+2dxof=-8
+2dyof=7
+2dzoom=1260
+2dyan=2008
+2dxan=280
+members=yes
+iop5=Destroy
+stackable=yes
+count1=snowdrop_seed_2,2
+count2=snowdrop_seed_3,3
+count3=snowdrop_seed_4,4
+count4=snowdrop_seed_5,5
+weight=1g
+
+[garden_white_tree_shoot]
+tradeable=no
+name=White tree shoot
+desc=A shoot that has been cut from a dying White Tree.
+recol1s=18129
+recol1d=32667
+recol2s=19154
+recol2d=30553
+recol3s=21236
+recol3d=30520
+recol4s=26323
+recol4d=21106
+model=obj_garden_white_tree_shoot
+2dxof=-2
+2dyof=76
+2dzoom=500
+2dyan=1912
+2dxan=244
+members=yes
+iop5=Destroy
+weight=1g
+
+[garden_white_tree_plantpot_shoot]
+tradeable=no
+name=White tree shoot
+desc=A shoot that has been cut from a dying White Tree.
+recol1s=8353
+recol1d=7296
+recol2s=18129
+recol2d=32667
+recol3s=19154
+recol3d=30553
+recol4s=21236
+recol4d=30520
+recol5s=26323
+recol5d=21106
+model=obj_garden_white_tree_plantpot_shoot
+2dzoom=1630
+2dyan=2032
+2dxan=120
+members=yes
+iop5=Destroy
+weight=2lb
+
+[garden_white_tree_plantpot_shoot_watered]
+tradeable=no
+name=White tree shoot
+desc=This shoot from a White Tree has been watered and will soon grow.
+recol1s=8353
+recol1d=7296
+recol2s=18129
+recol2d=32667
+recol3s=19154
+recol3d=30553
+recol4s=21236
+recol4d=30520
+recol5s=26323
+recol5d=21106
+model=obj_garden_white_tree_plantpot_shoot
+2dzoom=1630
+2dyan=2032
+2dxan=120
+members=yes
+iop5=Destroy
+weight=2lb
+
+[garden_white_tree_plantpot_sapling]
+tradeable=no
+name=White tree sapling
+desc=A young White Tree sapling.
+recol1s=8353
+recol1d=7296
+recol2s=18129
+recol2d=32667
+recol3s=19154
+recol3d=30553
+recol4s=21236
+recol4d=30520
+recol5s=26323
+recol5d=21106
+model=obj_garden_white_tree_plantpot_sapling
+2dzoom=2120
+2dyan=80
+2dxan=160
+members=yes
+iop5=Destroy
+weight=2lb
+
+[ring_of_charos_unlocked]
+tradeable=no
+name=Ring of charos(u)
+desc=The power within this ring has been unlocked.
+recol1s=18820
+recol1d=30441
+recol2s=11626
+recol2d=29222
+members=yes
+model=obj_ring_of_charos
+iop2=Wear
+iop5=Destroy
+2dzoom=350
+2dxan=1436
+weight=5g
+wearpos=ring
+
+[rune_shards]
+tradeable=no
+name=Rune shards
+desc=A rune essence chip that has been broken into shards.
+members=yes
+model=obj_rune_shards
+2dyof=-20
+2dzoom=1730
+2dyan=164
+2dxan=180
+weight=1lb
+
+[rune_dust]
+tradeable=no
+name=Rune dust
+desc=Crushed rune essence.
+recol1s=21140
+recol1d=20015
+members=yes
+model=obj_unicorn_horn_dust
+2dxof=-6
+2dzoom=1210
+2dyan=1892
+2dxan=264
+weight=2g
+
+[plant_cure_strong]
+tradeable=no
+name=Plant cure
+desc=This plant cure emits potency.
+recol1s=15855
+recol1d=7623
+model=obj_strength4
+2dyof=-1
+2dzoom=550
+2dyan=1996
+2dxan=84
+manwear=obj_holy_water_manwear,0
+womanwear=obj_holy_water_manwear,0
+members=yes
+weight=35g
+
+[garden_white_tree_fruit]
+tradeable=no
+name=White tree fruit
+desc=Looks delicious.
+recol1s=25395
+recol1d=29494
+recol2s=12811
+recol2d=19154
+model=obj_garden_white_tree_fruit
+2dyof=-2
+2dzoom=730
+2dyan=204
+2dxan=204
+iop1=Eat
+ambient=15
+members=yes
+weight=1oz
+
+[garden_trolley_obj]
+tradeable=no
+name=Trolley
+desc=I can use this to move heavy objects.
+recol1s=9476
+recol1d=7362
+recol2s=10533
+recol2d=8419
+recol3s=12647
+recol3d=10533
+recol4s=13704
+recol4d=11590
+model=obj_garden_trolley_obj
+2dyof=-2
+2dzoom=1890
+2dyan=1596
+2dxan=224
+members=yes
+iop5=Destroy
+weight=80g
+
+[garden_list]
+tradeable=no
+name=List
+desc=A list of things that I must collect for Queen Ellamaria.
+recol1s=29494
+recol1d=13640
+members=yes
+model=obj_scrawled_note1
+iop1=Read
+2dxof=-3
+2dyof=5
+2dzoom=700
+2dyan=20
+2dxan=328
+iop5=Destroy
+weight=1g
+

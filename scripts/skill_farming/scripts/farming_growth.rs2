@@ -51,6 +51,7 @@ switch_int ($handler) {
     case ^farming_handler_fruit_tree : ~farming_fruit_tree_advance_all($steps, $window);
     case ^farming_handler_calquat : ~farming_special_tree_advance_all(1, $steps, $window);
     case ^farming_handler_spirit_tree : ~farming_special_tree_advance_all(0, $steps, $window);
+    case ^garden_growth_handler : ~garden_patch_advance_all($steps, $window);
 }
 
 [proc,farming_login]

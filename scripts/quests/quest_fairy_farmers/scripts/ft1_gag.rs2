@@ -47,9 +47,22 @@ if ($opt = 5) {
 }
 ~chatplayer("<p,quiz>Are you a member of the Group of Advanced Gardeners?");
 ~chatnpc("<p,quiz>Why, yes I am. Why do you ask?");
-// Garden of Tranquillity pay — share this Talk-to. Offer beside GAG so
-// FT1 chase stays reachable. CANDIDATE N=1. Cite spine-17 §7.
+// Garden conversations share the GAG Talk-to without changing the chase.
+// The original GAG branch remains the fall-through.
 if (%garden_quest >= 1) {
+    if (npc_type = farming_gardener_tree_1) {
+        if (%fairy_farmers_quest >= 1) {
+            def_int $gopt = ~p_choice2("I need to ask you about strong plant cures.", 1, "Martin sent me about the failing crops.", 2);
+            if ($gopt = 1) {
+                @garden_pay_branch;
+                return;
+            }
+        } else {
+            ~chatplayer("<p,neutral>I need to ask you about strong plant cures.");
+            @garden_pay_branch;
+            return;
+        }
+    }
     if (npc_type = elstan | npc_type = lyra | npc_type = kragen | npc_type = dantaera) {
         if (%fairy_farmers_quest >= 1) {
             def_int $gopt = ~p_choice2("Queen Ellamaria sent me about some seeds.", 1, "Martin sent me about the failing crops.", 2);
@@ -58,6 +71,7 @@ if (%garden_quest >= 1) {
                 return;
             }
         } else {
+            ~chatplayer("<p,neutral>Queen Ellamaria sent me about some seeds.");
             @garden_pay_branch;
             return;
         }
@@ -140,50 +154,28 @@ return;
 %fairy_farmers_quest = 6;
 return;
 
-// Garden pay — four list farmers. N=1 CANDIDATE. Already-paid does not
-// give a second seed. Ask lines only when the crop is missing.
+// Garden trade/Alain dispatch; the Fairy Farmers chase above and below stays separate.
 [label,garden_pay_branch]
-~chatplayer("<p,neutral>Queen Ellamaria sent me about some seeds.");
 if (npc_type = elstan) {
-    if (%garden_elstan_varbit = 1) {
-        return;
-    }
-    if (inv_total(inv, marigold) > 0) {
-        inv_del(inv, marigold, 1);
-        %garden_elstan_varbit = 1;
-        inv_add(inv, garden_delphinium_seed, 1);
-        return;
-    }
-    ~chatnpc("<p,neutral>Grow me some marigolds and I will see what I can do.");
+    @garden_elstan_trade;
     return;
 }
 if (npc_type = lyra) {
-    if (%garden_lyra_varbit = 1) {
-        return;
-    }
-    if (inv_total(inv, onion) > 0) {
-        inv_del(inv, onion, 1);
-        %garden_lyra_varbit = 1;
-        inv_add(inv, garden_orchid_pink_seed, 1);
-        return;
-    }
-    ~chatnpc("<p,neutral>I could use some onions.");
+    @garden_lyra_trade;
     return;
 }
 if (npc_type = kragen) {
-    if (%garden_kragen_varbit = 1) {
-        return;
-    }
-    if (inv_total(inv, cabbage) > 0) {
-        inv_del(inv, cabbage, 1);
-        %garden_kragen_varbit = 1;
-        inv_add(inv, garden_snowdrop_seed, 1);
-        return;
-    }
-    ~chatnpc("<p,neutral>Bring me a cabbage.");
+    @garden_kragen_trade;
     return;
 }
-~chatnpc("<p,neutral>You will need a shoot from the dying White Tree.");
+if (npc_type = dantaera) {
+    @garden_dantaera_trade;
+    return;
+}
+if (npc_type = farming_gardener_tree_1) {
+    @garden_alain_trade;
+    return;
+}
 return;
 
 [proc,ft1_gardener_index](npc $gardener)(int)

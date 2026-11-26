@@ -1,0 +1,519 @@
+// Garden of Tranquillity palace patches: cache forms 9165-9240.
+// VERIFIED stage identities: garden-of-tranquillity.loc-patches and patch-* facts.
+// UNKNOWN engineering growth: one original stage per shared five-minute Farming
+// window, capped at the cache's mature/fruit forms. No disease or death is added.
+// Call farming_reconcile before planting/watering so earlier windows cannot
+// advance a crop or shoot which did not yet exist in that state.
+
+// Patch kind ids are private to this script: 1 delphinium, 2 white rose,
+// 3 red rose, 4 pink rose, 5 pink orchid, 6 yellow orchid, 7 snowdrop,
+// 8 White Tree, 9 vine.
+[proc,garden_patch_kind]()(int)
+def_coord $coord = loc_coord;
+def_int $x = coordx($coord);
+def_int $z = coordz($coord);
+// Shared rose children (seedling and first growth) and orchid pot children
+// cannot identify their parent from the visible child id. Use the map tile.
+if ($z >= 3471 & $z <= 3472) {
+    if ($x >= 3226 & $x <= 3227) return(4);
+    if ($x >= 3229 & $x <= 3230) return(3);
+    if ($x >= 3232 & $x <= 3233) return(2);
+}
+if ($z = 3486) {
+    if ($x = 3229) return(5);
+    if ($x = 3231) return(6);
+}
+switch_loc (loc_type) {
+    case garden_delphinium_patch : return(1);
+    case garden_delphiniums_weeds_3 : return(1);
+    case garden_delphiniums_weeds_2 : return(1);
+    case garden_delphiniums_weeds_1 : return(1);
+    case garden_delphiniums_weeded : return(1);
+    case garden_delphiniums_seed : return(1);
+    case garden_delphiniums_1 : return(1);
+    case garden_delphiniums_2 : return(1);
+    case garden_delphiniums_fullygrown : return(1);
+    case garden_rosebush_patch_white : return(2);
+    case garden_rosebush_white_weeds_3 : return(2);
+    case garden_rosebush_white_weeds_2 : return(2);
+    case garden_rosebush_white_weeds_1 : return(2);
+    case garden_rosebush_white_weeded : return(2);
+    case garden_rosebush_white_2 : return(2);
+    case garden_rosebush_white_fullygrown : return(2);
+    case garden_rosebush_patch_red : return(3);
+    case garden_rosebush_red_weeds_3 : return(3);
+    case garden_rosebush_red_weeds_2 : return(3);
+    case garden_rosebush_red_weeds_1 : return(3);
+    case garden_rosebush_red_weeded : return(3);
+    case garden_rosebush_red_2 : return(3);
+    case garden_rosebush_red_fullygrown : return(3);
+    case garden_rosebush_patch_pink : return(4);
+    case garden_rosebush_pink_weeds_3 : return(4);
+    case garden_rosebush_pink_weeds_2 : return(4);
+    case garden_rosebush_pink_weeds_1 : return(4);
+    case garden_rosebush_pink_weeded : return(4);
+    case garden_rosebush_pink_2 : return(4);
+    case garden_rosebush_pink_fullygrown : return(4);
+    case garden_orchid_pink_patch : return(5);
+    case garden_orchids_seed : return(5);
+    case garden_orchids_1 : return(5);
+    case garden_orchids_2 : return(5);
+    case garden_orchids_fullygrown : return(5);
+    case garden_orchid_yellow_patch : return(6);
+    case garden_orchids_seed_yellow : return(6);
+    case garden_orchids_1_yellow : return(6);
+    case garden_orchids_2_yellow : return(6);
+    case garden_orchids_fullygrown_yellow : return(6);
+    case garden_snowdrop_patch : return(7);
+    case garden_snowdrops_weeds_3 : return(7);
+    case garden_snowdrops_weeds_2 : return(7);
+    case garden_snowdrops_weeds_1 : return(7);
+    case garden_snowdrops_weeded : return(7);
+    case garden_snowdrops_seed : return(7);
+    case garden_snowdrops_1 : return(7);
+    case garden_snowdrops_2 : return(7);
+    case garden_snowdrops_fullygrown : return(7);
+    case garden_white_tree_patch : return(8);
+    case garden_white_tree_weeds_3 : return(8);
+    case garden_white_tree_weeds_2 : return(8);
+    case garden_white_tree_weeds_1 : return(8);
+    case garden_white_tree_weeded : return(8);
+    case garden_white_tree_seedling : return(8);
+    case garden_white_tree_1 : return(8);
+    case garden_white_tree_2 : return(8);
+    case garden_white_tree_3 : return(8);
+    case garden_white_tree_fullygrown : return(8);
+    case garden_white_tree_fruit_1 : return(8);
+    case garden_white_tree_fruit_2 : return(8);
+    case garden_white_tree_fruit_3 : return(8);
+    case garden_white_tree_fruit_4 : return(8);
+    case garden_vine_patch : return(9);
+    case garden_vines_weeds_3 : return(9);
+    case garden_vines_weeds_2 : return(9);
+    case garden_vines_weeds_1 : return(9);
+    case garden_vines_weeded : return(9);
+    case garden_vines_seed : return(9);
+    case garden_vines_1 : return(9);
+    case garden_vines_2 : return(9);
+    case garden_vines_fullygrown : return(9);
+    case default : return(-1);
+}
+
+[proc,garden_patch_stage](int $kind)(int)
+switch_int ($kind) {
+    case 1 : return(%garden_delphiniums_varbit);
+    case 2 : return(%garden_rosebush_white_varbit);
+    case 3 : return(%garden_rosebush_red_varbit);
+    case 4 : return(%garden_rosebush_pink_varbit);
+    case 5 : return(%garden_orchids_pink_varbit);
+    case 6 : return(%garden_orchids_yellow_varbit);
+    case 7 : return(%garden_snowdrops_varbit);
+    case 8 : return(%garden_white_tree_varbit);
+    case 9 : return(%garden_vines_varbit);
+}
+return(-1);
+
+[proc,garden_patch_set_stage](int $kind, int $stage)
+switch_int ($kind) {
+    case 1 : %garden_delphiniums_varbit = $stage;
+    case 2 : %garden_rosebush_white_varbit = $stage;
+    case 3 : %garden_rosebush_red_varbit = $stage;
+    case 4 : %garden_rosebush_pink_varbit = $stage;
+    case 5 : %garden_orchids_pink_varbit = $stage;
+    case 6 : %garden_orchids_yellow_varbit = $stage;
+    case 7 : %garden_snowdrops_varbit = $stage;
+    case 8 : %garden_white_tree_varbit = $stage;
+    case 9 : %garden_vines_varbit = $stage;
+}
+
+[proc,garden_patch_seed_kind](obj $seed)(int)
+switch_obj ($seed) {
+    case garden_delphinium_seed : return(1);
+    case garden_rosebush_seed_white : return(2);
+    case garden_rosebush_seed_red : return(3);
+    case garden_rosebush_seed_pink : return(4);
+    case garden_orchid_pink_seed : return(5);
+    case garden_orchid_yellow_seed : return(6);
+    case garden_snowdrop_seed : return(7);
+    case garden_vine_seed : return(9);
+}
+return(0);
+
+[proc,garden_patch_seed_count](int $kind)(int)
+// UNKNOWN engineering full-bundle costs are shared with the quest trade config.
+if ($kind = 1) return(^garden_delphinium_bundle);
+if ($kind = 2 | $kind = 3 | $kind = 4) return(^garden_rose_bundle);
+if ($kind = 5 | $kind = 6) return(^garden_orchid_bundle);
+if ($kind = 7) return(^garden_snowdrop_bundle);
+if ($kind = 9) return(^garden_vine_bundle);
+return(0);
+
+
+// Called by the shared Farming growth DB row (handler 15, period 5).
+[proc,garden_patch_advance_all](int $steps, int $window)
+if ($steps <= 0) return;
+def_int $kind = 1;
+while ($kind <= 9) {
+    def_int $stage = ~garden_patch_stage($kind);
+    if ($kind = 8) {
+        // White Tree: 4 sapling, 5-7 growing, 8 mature, 9-12 fruit.
+        if ($stage >= 4 & $stage < 8) {
+            def_int $needed = sub(8, $stage);
+            if ($steps >= $needed) {
+                $stage = 8;
+                def_int $fruit_steps = sub($steps, $needed);
+                if ($fruit_steps > 0) $stage = add(8, min($fruit_steps, 4));
+            } else {
+                $stage = add($stage, $steps);
+            }
+            ~garden_patch_set_stage($kind, $stage);
+        } else if ($stage >= 8 & $stage < 12) {
+            $stage = add($stage, min($steps, sub(12, $stage)));
+            ~garden_patch_set_stage($kind, $stage);
+        }
+    } else if ($stage >= 4 & $stage < 7) {
+        if ($steps >= sub(7, $stage)) {
+            $stage = 7;
+        } else {
+            $stage = add($stage, $steps);
+        }
+        ~garden_patch_set_stage($kind, $stage);
+    }
+    $kind = add($kind, 1);
+}
+// A watered White Tree shoot in a pot becomes a sapling after one eligible
+// five-minute window; its inventory object persists across logout.
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    if (inv_getobj(inv, $slot) = garden_white_tree_plantpot_shoot_watered) {
+        inv_setslot(inv, $slot, garden_white_tree_plantpot_sapling, 1);
+    }
+    $slot = add($slot, 1);
+}
+
+[proc,garden_all_grown]()(boolean)
+if (~garden_patch_stage(1) ! 7) return(false);
+if (~garden_patch_stage(2) ! 7) return(false);
+if (~garden_patch_stage(3) ! 7) return(false);
+if (~garden_patch_stage(4) ! 7) return(false);
+if (~garden_patch_stage(5) ! 7) return(false);
+if (~garden_patch_stage(6) ! 7) return(false);
+if (~garden_patch_stage(7) ! 7) return(false);
+def_int $tree_stage = ~garden_patch_stage(8);
+if ($tree_stage < 8 | $tree_stage > 12) return(false);
+if (~garden_patch_stage(9) ! 7) return(false);
+return(true);
+
+// Rake: each click starts the original three weed stages; the pending op3
+// continues at the shared Farming two-tick cadence (UNKNOWN engineering).
+[oplocu,garden_delphinium_patch] @garden_patch_use;
+[oplocu,garden_delphiniums_weeds_3] @garden_patch_use;
+[oplocu,garden_delphiniums_weeds_2] @garden_patch_use;
+[oplocu,garden_delphiniums_weeds_1] @garden_patch_use;
+[oploc3,garden_delphiniums_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_delphiniums_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_delphiniums_weeds_1] @garden_patch_rake_continue;
+[oplocu,garden_delphiniums_weeded] @garden_patch_use;
+[oplocu,garden_delphiniums_seed] @garden_patch_use;
+[oplocu,garden_delphiniums_1] @garden_patch_use;
+[oplocu,garden_delphiniums_2] @garden_patch_use;
+[oplocu,garden_delphiniums_fullygrown] @garden_patch_use;
+
+[oplocu,garden_rosebush_patch_white] @garden_patch_use;
+[oplocu,garden_rosebush_patch_red] @garden_patch_use;
+[oplocu,garden_rosebush_patch_pink] @garden_patch_use;
+[oplocu,garden_rosebush_white_weeds_3] @garden_patch_use;
+[oplocu,garden_rosebush_white_weeds_2] @garden_patch_use;
+[oplocu,garden_rosebush_white_weeds_1] @garden_patch_use;
+[oplocu,garden_rosebush_white_weeded] @garden_patch_use;
+[oplocu,garden_rosebush_red_weeds_3] @garden_patch_use;
+[oplocu,garden_rosebush_red_weeds_2] @garden_patch_use;
+[oplocu,garden_rosebush_red_weeds_1] @garden_patch_use;
+[oplocu,garden_rosebush_red_weeded] @garden_patch_use;
+[oplocu,garden_rosebush_pink_weeds_3] @garden_patch_use;
+[oplocu,garden_rosebush_pink_weeds_2] @garden_patch_use;
+[oplocu,garden_rosebush_pink_weeds_1] @garden_patch_use;
+[oplocu,garden_rosebush_pink_weeded] @garden_patch_use;
+[oplocu,garden_rosebush_seedling] @garden_patch_use;
+[oplocu,garden_rosebush_1] @garden_patch_use;
+[oplocu,garden_rosebush_white_2] @garden_patch_use;
+[oplocu,garden_rosebush_white_fullygrown] @garden_patch_use;
+[oplocu,garden_rosebush_red_2] @garden_patch_use;
+[oplocu,garden_rosebush_red_fullygrown] @garden_patch_use;
+[oplocu,garden_rosebush_pink_2] @garden_patch_use;
+[oplocu,garden_rosebush_pink_fullygrown] @garden_patch_use;
+[oploc3,garden_rosebush_white_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_white_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_white_weeds_1] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_red_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_red_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_red_weeds_1] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_pink_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_pink_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_rosebush_pink_weeds_1] @garden_patch_rake_continue;
+
+[oplocu,garden_orchid_pink_patch] @garden_patch_use;
+[oplocu,garden_orchid_yellow_patch] @garden_patch_use;
+[oplocu,garden_orchids_plantpot_empty] @garden_patch_use;
+[oplocu,garden_orchids_plantpot_soil] @garden_patch_use;
+[oplocu,garden_orchids_seed] @garden_patch_use;
+[oplocu,garden_orchids_1] @garden_patch_use;
+[oplocu,garden_orchids_2] @garden_patch_use;
+[oplocu,garden_orchids_fullygrown] @garden_patch_use;
+[oplocu,garden_orchids_seed_yellow] @garden_patch_use;
+[oplocu,garden_orchids_1_yellow] @garden_patch_use;
+[oplocu,garden_orchids_2_yellow] @garden_patch_use;
+[oplocu,garden_orchids_fullygrown_yellow] @garden_patch_use;
+
+[oplocu,garden_snowdrop_patch] @garden_patch_use;
+[oplocu,garden_snowdrops_weeded] @garden_patch_use;
+[oplocu,garden_snowdrops_weeds_3] @garden_patch_use;
+[oplocu,garden_snowdrops_weeds_2] @garden_patch_use;
+[oplocu,garden_snowdrops_weeds_1] @garden_patch_use;
+[oplocu,garden_snowdrops_seed] @garden_patch_use;
+[oplocu,garden_snowdrops_1] @garden_patch_use;
+[oplocu,garden_snowdrops_2] @garden_patch_use;
+[oplocu,garden_snowdrops_fullygrown] @garden_patch_use;
+[oploc3,garden_snowdrops_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_snowdrops_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_snowdrops_weeds_1] @garden_patch_rake_continue;
+
+[oplocu,garden_vine_patch] @garden_patch_use;
+[oplocu,garden_vines_weeded] @garden_patch_use;
+[oplocu,garden_vines_weeds_3] @garden_patch_use;
+[oplocu,garden_vines_weeds_2] @garden_patch_use;
+[oplocu,garden_vines_weeds_1] @garden_patch_use;
+[oplocu,garden_vines_seed] @garden_patch_use;
+[oplocu,garden_vines_1] @garden_patch_use;
+[oplocu,garden_vines_2] @garden_patch_use;
+[oplocu,garden_vines_fullygrown] @garden_patch_use;
+[oploc3,garden_vines_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_vines_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_vines_weeds_1] @garden_patch_rake_continue;
+
+[oplocu,garden_white_tree_patch] @garden_patch_use;
+[oplocu,garden_white_tree_weeded] @garden_patch_use;
+[oplocu,garden_white_tree_weeds_3] @garden_patch_use;
+[oplocu,garden_white_tree_weeds_2] @garden_patch_use;
+[oplocu,garden_white_tree_weeds_1] @garden_patch_use;
+[oplocu,garden_white_tree_seedling] @garden_patch_use;
+[oplocu,garden_white_tree_1] @garden_patch_use;
+[oplocu,garden_white_tree_2] @garden_patch_use;
+[oplocu,garden_white_tree_3] @garden_patch_use;
+[oplocu,garden_white_tree_fullygrown] @garden_patch_use;
+[oplocu,garden_white_tree_fruit_1] @garden_patch_use;
+[oplocu,garden_white_tree_fruit_2] @garden_patch_use;
+[oplocu,garden_white_tree_fruit_3] @garden_patch_use;
+[oplocu,garden_white_tree_fruit_4] @garden_patch_use;
+[oploc3,garden_white_tree_weeds_3] @garden_patch_rake_continue;
+[oploc3,garden_white_tree_weeds_2] @garden_patch_rake_continue;
+[oploc3,garden_white_tree_weeds_1] @garden_patch_rake_continue;
+[oploc1,garden_white_tree_fruit_1] @garden_white_tree_pick;
+[oploc1,garden_white_tree_fruit_2] @garden_white_tree_pick;
+[oploc1,garden_white_tree_fruit_3] @garden_white_tree_pick;
+[oploc1,garden_white_tree_fruit_4] @garden_white_tree_pick;
+
+[label,garden_patch_use]
+def_int $kind = ~garden_patch_kind;
+if ($kind < 1 | $kind > 9) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~garden_patch_stage($kind);
+if (%garden_quest < 1 | %garden_quest >= 60) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = rake) {
+    ~garden_patch_rake($kind, false);
+    return;
+}
+if (oc_category(last_useitem) = watering_can) {
+    // CANDIDATE transcript: palace soil is fertile; no can dose is spent.
+    mes("These don't really need watering - the soil seems to be extremely fertile.");
+    return;
+}
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    if ($kind = 5 | $kind = 6) {
+        if ($stage ! 0) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        // UNKNOWN mapping: both orchid colours share the cache's post-fill form.
+        inv_setslot(inv, last_useslot, bucket_empty, 1);
+        ~garden_patch_set_stage($kind, 1);
+        return;
+    }
+    // CANDIDATE transcript: all non-orchid palace soil needs no compost.
+    mes("This patch doesn't really need treating with compost - the soil seems to be extremely fertile.");
+    return;
+}
+if (last_useitem = plantpot_compost | last_useitem = plantpot_supercompost) {
+    if ($kind = 5 | $kind = 6) {
+        // CANDIDATE transcript: the Orchid pots take compost, not soil.
+        mes("You need to fill it with compost rather than soil.");
+    } else {
+        ~displaymessage(^dm_default);
+    }
+    return;
+}
+def_obj $seed = last_useitem;
+def_int $seed_kind = ~garden_patch_seed_kind($seed);
+if ($seed_kind > 0) {
+    if (($kind = 5 | $kind = 6) & ($seed_kind = 5 | $seed_kind = 6) & $seed_kind ! $kind) {
+        // CANDIDATE transcript: the two colours belong in different pots.
+        mes("These seeds need to be planted in the other plantpot.");
+        return;
+    }
+    if ($seed_kind ! $kind) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if ($kind = 5 | $kind = 6) {
+        if ($stage = 0) {
+            // CANDIDATE transcript; seeds do not consume the empty pot.
+            mes("This plantpot needs some compost in it first.");
+            return;
+        }
+        if ($stage ! 1) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+    } else if ($stage ! 3) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, dibber) < 1) {
+        ~displaymessage(^dm_farming_dibber);
+        return;
+    }
+    def_int $count = ~garden_patch_seed_count($kind);
+    if (inv_total(inv, $seed) < $count) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    ~farming_reconcile(false);
+    anim(farming_seed_dibbing, 0);
+    inv_del(inv, $seed, $count);
+    ~garden_patch_set_stage($kind, 4);
+    return;
+}
+if (last_useitem = garden_white_tree_plantpot_sapling) {
+    if ($kind ! 8 | $stage ! 3) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, garden_white_tree_plantpot_sapling) < 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    ~farming_reconcile(false);
+    inv_del(inv, garden_white_tree_plantpot_sapling, 1);
+    ~garden_patch_set_stage(8, 4);
+    return;
+}
+~displaymessage(^dm_default);
+return;
+
+[label,garden_patch_rake_continue]
+def_int $kind = ~garden_patch_kind;
+if ($kind >= 1 & $kind <= 9) ~garden_patch_rake($kind, true);
+return;
+
+[proc,garden_patch_rake](int $kind, boolean $repeat)
+if (%garden_quest < 1 | %garden_quest >= 60) return;
+def_int $stage = ~garden_patch_stage($kind);
+if ($stage < 0 | $stage > 2 | inv_total(inv, rake) < 1) return;
+if ($repeat = true & %action_delay > map_clock) {
+    p_oploc(3);
+    return;
+}
+anim(farming_raking, 0);
+def_int $next = add($stage, 1);
+~garden_patch_set_stage($kind, $next);
+if ($next < 3) {
+    %action_delay = calc(map_clock + ^farming_rake_step_ticks);
+    p_oploc(3);
+}
+
+// White Tree shoot → empty pot → watered pot → sapling.
+[opheldu,plantpot_empty] @garden_white_tree_pot;
+[opheldu,garden_white_tree_shoot] @garden_white_tree_pot;
+[opheldu,garden_white_tree_plantpot_shoot] @garden_white_tree_water;
+
+[label,garden_white_tree_pot]
+if (%garden_quest < 1 | %garden_quest >= 60) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $pot_slot = last_slot;
+def_int $shoot_slot = last_useslot;
+if (last_item = garden_white_tree_shoot) {
+    $pot_slot = last_useslot;
+    $shoot_slot = last_slot;
+}
+if (inv_getobj(inv, $pot_slot) ! plantpot_empty | inv_getobj(inv, $shoot_slot) ! garden_white_tree_shoot) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~farming_reconcile(false);
+inv_setslot(inv, $pot_slot, garden_white_tree_plantpot_shoot, 1);
+inv_del(inv, garden_white_tree_shoot, 1);
+return;
+
+[label,garden_white_tree_water]
+if (%garden_quest < 1 | %garden_quest >= 60) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_obj $can = last_useitem;
+def_int $can_slot = last_useslot;
+def_int $pot_slot = last_slot;
+if (oc_category($can) ! watering_can | $can = watering_can_0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_getobj(inv, $pot_slot) ! garden_white_tree_plantpot_shoot) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_namedobj $next_can = oc_param($can, next_obj_stage);
+if ($next_can = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~farming_reconcile(false);
+anim(farming_watering, 0);
+inv_setslot(inv, $pot_slot, garden_white_tree_plantpot_shoot_watered, 1);
+inv_setslot(inv, $can_slot, $next_can, 1);
+return;
+
+
+[label,garden_white_tree_pick]
+if (%garden_quest ! 60) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~garden_patch_stage(8);
+if ($stage < 9 | $stage > 12) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, garden_white_tree_fruit, 1);
+stat_advance(farming, ^garden_fruit_farming_xp);
+~garden_patch_set_stage(8, sub($stage, 1));
+return;
+
+[opheld1,garden_white_tree_fruit]
+mes("You eat the <lowercase(oc_name(last_item))>.");
+sound_synth(eat, 1, 0);
+anim(human_eat, 0);
+inv_delslot(inv, last_slot);
+// CANDIDATE OSRS fruit effects; exact period healing is UNKNOWN.
+stat_heal(hitpoints, ^garden_fruit_heal, 0);
+healenergy(^garden_fruit_energy);
+return;

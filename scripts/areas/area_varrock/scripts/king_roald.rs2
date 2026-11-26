@@ -34,6 +34,13 @@ if(inv_total(inv, arravshield1) > 0 & inv_total(inv, arravshield2) > 0) {
     ~chatnpc("<p,neutral>If you get the authenticity of the shield verified|by the curator at the museum|and then return here with authentication,|I will grant you your reward.");
     return;
 }
+if (%garden_quest = 50) {
+    if (%priestperil < ^priestperil_complete) {
+        if (~p_choice2("Queen Ellamaria asked me to bring you.", 1, "About the temple east of here...", 2) = 1) { @garden_roald_invitation; }
+    } else {
+        @garden_roald_invitation;
+    }
+}
 // No members check as F2P players can start Priest in Peril until 2013:
 // https://runescape.wiki/w/Update:Patch_Notes_(13_August_2013) (Free-to-play players can no longer start the Priest in Peril.)
 if (%priestperil >= ^priestperil_not_started & %priestperil < ^priestperil_complete) {
