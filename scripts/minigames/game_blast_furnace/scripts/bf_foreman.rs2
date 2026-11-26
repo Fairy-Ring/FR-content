@@ -34,9 +34,11 @@ return(true);
 
 [proc,bf_enter]
 p_arrivedelay;
-p_telejump(0_30_77_19_27);
+// UNKNOWN landing at the original stair's walkable northern foot, not the southern wall.
+p_telejump(0_30_77_19_30);
 
 [proc,bf_exit]
 p_arrivedelay;
 %blast_furnace_access_until = 0;
-p_telejump(0_45_159_50_18);
+// UNKNOWN landing chosen on the packed map; the tile southwest is an enclosed pocket.
+p_telejump(0_45_159_51_19);
