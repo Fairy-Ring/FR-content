@@ -11,6 +11,7 @@ p_delay(3);
 %death = ^false;
 
 [queue,player_death_default]
+~teleblock_clear;
 if (~champions_current > 0) ~champions_player_death;
 if (~roguesden_active = true) { ~roguesden_death; return; }
 // Only Lost and Found receives this death cleanup; followers keep their published logic.

@@ -717,8 +717,6 @@ scope=perm
 [favour_key_ring]
 scope=perm
 
-[varp422_unused]
-
 [varp424_unused]
 
 [varp426_unused]

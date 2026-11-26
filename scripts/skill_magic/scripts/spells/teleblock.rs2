@@ -1,0 +1,56 @@
+// Tele Block uses the published PvP accuracy, rune, XP and aggression pipeline.
+// Historical labels and the named defaults are recorded in tele-block facts.
+[applayert,magic:com_531]
+def_dbrow $spell_data = ~get_spell_data(^tele_block);
+if (~pvp_combat_spell_checks($spell_data) = false) return;
+// The original spell was Wilderness-only, not a Duel Arena/Castle Wars spell.
+if (~wilderness_level(coord) < 1 | ~wilderness_level(.coord) < 1) {
+    mes("You can't attack players who aren't in the Wilderness.");
+    return;
+}
+if (.%teleblock_until > 0 & map_clock < add(.%teleblock_until, ^teleblock_immunity)) {
+    // UNKNOWN Tele Block wording: reuse the published hold-spell refusal.
+    mes("Your target is currently immune to that spell.");
+    return;
+}
+~pvp_spell_cast($spell_data);
+// UNKNOWN trajectory defaults, shared with published standard-spell projectiles.
+def_int $duration = ~player_projectile(coord, .coord, .uid, ballista_special,
+    ^teleblock_projectile_startheight, ^teleblock_projectile_endheight,
+    ^teleblock_projectile_delay, ^teleblock_projectile_angle,
+    ^teleblock_projectile_length, ^teleblock_projectile_offset, ^teleblock_projectile_step);
+// A successful non-damaging hit returns zero; a splash returns null.
+if (~pvp_spell_victim($spell_data, $duration) ! null) {
+    .queue*(teleblock_hit, calc($duration / 30 + 1))();
+}
+
+// The original client offers NPC targeting, but the spell is players-only.
+// No retained source supplies an NPC-refusal string.
+[apnpct,magic:com_531]
+p_stopaction;
+
+[queue,teleblock_hit]
+if (stat(hitpoints) = 0 | %death = ^true) return;
+// A second projectile must not refresh a block or its post-expiry immunity.
+if (%teleblock_until > 0 & map_clock < add(%teleblock_until, ^teleblock_immunity)) return;
+def_int $duration = ^teleblock_duration;
+if (~check_protect_prayer(^magic_style) = true) {
+    $duration = ^teleblock_protected_duration;
+}
+%teleblock_until = add(map_clock, $duration);
+
+[proc,teleblock_active]()(boolean)
+if (map_clock < %teleblock_until) return(true);
+return(false);
+
+[proc,teleblock_check]()(boolean)
+if (~teleblock_active = true) {
+    // UNKNOWN Tele Block wording: reuse the published teleport refusal.
+    mes("A mysterious force blocks your teleport spell!");
+    return(false);
+}
+return(true);
+
+[proc,teleblock_clear]
+%teleblock_until = 0;
+clearqueue(teleblock_hit);

@@ -198,8 +198,10 @@ if (%damagestyle = ^style_melee_defensive) { // check varp directly
     $damagestyle = ^style_magic_defensive; // casting a spell with defensive on gives mage + def xp
 }
 def_synth $sound = db_getfield($spell_data, magic_spell_table:sound_hit, 0);
-sound_synth($sound, 0, 0);
-.sound_synth($sound, 0, 0);
+if ($sound ! null) {
+    sound_synth($sound, 0, 0);
+    .sound_synth($sound, 0, 0);
+}
 
 if ($maxhit = null) {
     ~.pvp_damage(calc($duration / 30 + 1), null); // delayed an extra tick: https://youtu.be/eEdE0mvglM4?t=62
@@ -238,7 +240,14 @@ sound_synth(spellfail, 1, 0);
 ~give_spell_xp($spell_data);
 
 // spell anim
-anim(db_getfield($spell_data, magic_spell_table:anim, 0), 0);
+def_seq $cast_anim = db_getfield($spell_data, magic_spell_table:anim, 0);
+if (db_getfield($spell_data, magic_spell_table:spell, 0) = ^tele_block) {
+    def_obj $cast_weapon = inv_getobj(worn, ^wearpos_rhand);
+    if ($cast_weapon ! null & oc_category($cast_weapon) = weapon_staff) {
+        $cast_anim = human_casting_tele_block_staff;
+    }
+}
+anim($cast_anim, 0);
 // player spell visual effect
 if (db_getfieldcount($spell_data, magic_spell_table:spotanim_origin) > 0) {
     spotanim_pl(db_getfield($spell_data, magic_spell_table:spotanim_origin, 0), 92, 0);

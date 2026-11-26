@@ -156,6 +156,7 @@ jobs:
           run_test 'tests/varp-morph-transmit/test_varp_morph_transmit.mjs + tests/varp-morph-transmit/test_ernest_scene.mjs' node --import tsx --test ../content/tests/varp-morph-transmit/test_varp_morph_transmit.mjs ../content/tests/varp-morph-transmit/test_ernest_scene.mjs
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/wildpvp/test_wildpvp.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/wildpvp/test_wildpvp.mjs
+          run_test tests/teleblock/test_teleblock.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/teleblock/test_teleblock.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
           run_test tests/devious-minds/test_devious_minds.mjs node --import tsx ../content/tests/devious-minds/test_devious_minds.mjs
           run_test tests/lost-tribe/test_lost_tribe.mjs node --import tsx ../content/tests/lost-tribe/test_lost_tribe.mjs

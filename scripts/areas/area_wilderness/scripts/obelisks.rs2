@@ -38,6 +38,7 @@ while (huntnext = true) {
 }
 
 [queue,wilderness_obelisk_teleport_after_timer](coord $destination)
+if (~teleblock_check = false) return;
 anim(human_teleport_other_impact, 0);
 spotanim_pl(teleport_other_impact, 92, 0);
 sound_synth(teleport_all, 1, 0);

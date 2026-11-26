@@ -1,0 +1,18 @@
+// Authored spell-table selector, not a revision-377 component id.
+^tele_block = 531
+
+// VERIFIED five-minute duration; CANDIDATE prayer halving. See the vault's tele-block subject.
+^teleblock_duration = 500
+^teleblock_protected_duration = 250
+// VERIFIED introduction rule retained under Main's historical-default ruling.
+^teleblock_immunity = 100
+
+// UNKNOWN presentation values: reuse the published standard-spell trajectory.
+^teleblock_projectile_startheight = 36
+^teleblock_projectile_endheight = 31
+^teleblock_projectile_delay = 51
+^teleblock_projectile_angle = 16
+^teleblock_projectile_length = -5
+^teleblock_projectile_offset = 64
+^teleblock_projectile_step = 10
+^teleblock_impact_height = 124

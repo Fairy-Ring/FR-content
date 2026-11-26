@@ -1,0 +1,12 @@
+[magic_spell_tele_block]
+table=magic_spell_table
+data=spell,^tele_block
+data=spellcom,magic:com_531
+data=name,Tele Block
+data=members,true
+data=levelrequired,85
+data=runesrequired,lawrune,1,chaosrune,1,deathrune,1,null,null
+data=experience,800
+data=anim,human_casting_tele_block
+data=spotanim_target,tele_block_impact,^teleblock_impact_height
+data=continue_by_autocast,false
