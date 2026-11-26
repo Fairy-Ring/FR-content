@@ -1,0 +1,365 @@
+// Giant Dwarf company errands and director access.
+//
+// CANDIDATE company IDs follow the 377 company-secretary type order and the
+// `dwarf_stat_head_multi` values 1..7: Purple Pewter, Yellow Fortune, Blue
+// Opal, Green Gemstone, White Chisel, Silver Cog, Brown Engine. 0 is the king.
+// Source: 377 all.npc/all.loc. The 2006 Tip.It guide backs 5-10 secretary jobs,
+// choosing any company, director jobs before joining, and Yellow/Brown gender
+// restrictions. Director threshold, delivery quantities, deadline and refusal
+// penalty are named UNKNOWN defaults in giantdwarf.constant. Wording comes from
+// src.gd-osrs-transcript-1104, including its explicit pre-2022 gender branches.
+//
+// giantdwarf_company_work (perm varp 250) layout:
+// bits 0-3 secretary jobs complete; 4-7 secretary target (0 until initialized);
+// 8-11 director jobs complete; 12-14 company for director-job progress;
+// 15-18 active job kind (1-8 ore, 9-14 bars); 19-24 quantity; 25-27 job company;
+// 28-29 consecutive explicit refusals; 30-31 unused. No quest varbits added.
+
+[proc,giantdwarf_company_name](int $company)(string)
+switch_int($company) {
+    case 0 : return("the king");
+    case 1 : return("Purple Pewter");
+    case 2 : return("Yellow Fortune");
+    case 3 : return("Blue Opal");
+    case 4 : return("Green Gemstone");
+    case 5 : return("White Chisel");
+    case 6 : return("Silver Cog");
+    case 7 : return("Brown Engine");
+}
+return("the company");
+
+[proc,giantdwarf_company_eligible](int $company)(boolean)
+if ($company = 2) {
+    if (gender ! ^gender_female) { return(false); }
+}
+if ($company = 7) {
+    if (gender = ^gender_female) { return(false); }
+}
+return(true);
+
+[proc,giantdwarf_company_task_obj](int $kind)(obj)
+switch_int($kind) {
+    case 1 : return(copper_ore);
+    case 2 : return(tin_ore);
+    case 3 : return(clay);
+    case 4 : return(iron_ore);
+    case 5 : return(silver_ore);
+    case 6 : return(coal);
+    case 7 : return(gold_ore);
+    case 8 : return(mithril_ore);
+    case 9 : return(bronze_bar);
+    case 10 : return(iron_bar);
+    case 11 : return(steel_bar);
+    case 12 : return(silver_bar);
+    case 13 : return(gold_bar);
+    case 14 : return(mithril_bar);
+}
+return(null);
+
+[proc,giantdwarf_company_task_ensure_timer]
+if (getbit_range(%giantdwarf_company_work, 15, 18) = 0) { return; }
+// The assignment is durable. A logout discards only this timer; the next
+// company interaction resumes its full UNKNOWN ten-minute online deadline.
+if (getqueue(giantdwarf_company_task_expire) = 0) {
+    longqueue(giantdwarf_company_task_expire, ^giantdwarf_company_deadline_ticks, 0, ^discard);
+}
+
+[queue,giantdwarf_company_task_expire](int $unused)
+def_int $work = %giantdwarf_company_work;
+if (getbit_range($work, 15, 18) = 0) { return; }
+$work = setbit_range_toint($work, 0, 15, 18);
+$work = setbit_range_toint($work, 0, 19, 24);
+$work = setbit_range_toint($work, 0, 25, 27);
+%giantdwarf_company_work = $work;
+
+[proc,giantdwarf_company_task_refuse](int $kind, int $company)
+def_int $work = %giantdwarf_company_work;
+def_int $refusals = getbit_range($work, 28, 29);
+$refusals = calc($refusals + 1);
+if ($refusals >= ^giantdwarf_company_refusal_limit) {
+    $refusals = 0;
+    if (%giantdwarf_quest = 5) {
+        if ($kind <= 8) {
+            def_int $secretary_progress = getbit_range($work, 0, 3);
+            if ($secretary_progress > 0) {
+                $secretary_progress = calc($secretary_progress - ^giantdwarf_company_refusal_cost);
+                $work = setbit_range_toint($work, $secretary_progress, 0, 3);
+            }
+        } else {
+            if (getbit_range($work, 12, 14) = $company) {
+                def_int $director_progress = getbit_range($work, 8, 11);
+                if ($director_progress > 0) {
+                    $director_progress = calc($director_progress - ^giantdwarf_company_refusal_cost);
+                    $work = setbit_range_toint($work, $director_progress, 8, 11);
+                }
+            }
+        }
+        ~chatnpc("<p,neutral>That does not reflect well on you.");
+    }
+}
+$work = setbit_range_toint($work, $refusals, 28, 29);
+%giantdwarf_company_work = $work;
+
+[proc,giantdwarf_company_task_offer](int $company, int $kind)
+def_int $quantity = ^giantdwarf_company_ore_quantity;
+if ($kind >= 9) { $quantity = ^giantdwarf_company_bar_quantity; }
+def_int $minutes = ^giantdwarf_company_deadline_minutes;
+switch_int($kind) {
+    case 1 : ~chatnpc("<p,neutral>We need <quantity> pieces of copper ore in the next <minutes> minutes.");
+    case 2 : ~chatnpc("<p,neutral>We need <quantity> pieces of tin ore in the next <minutes> minutes.");
+    case 3 : ~chatnpc("<p,neutral>We need <quantity> pieces of clay in the next <minutes> minutes.");
+    case 4 : ~chatnpc("<p,neutral>We need <quantity> pieces of iron ore in the next <minutes> minutes.");
+    case 5 : ~chatnpc("<p,neutral>We need <quantity> pieces of silver ore in the next <minutes> minutes.");
+    case 6 : ~chatnpc("<p,neutral>We need <quantity> pieces of coal in the next <minutes> minutes.");
+    case 7 : ~chatnpc("<p,neutral>We need <quantity> pieces of gold ore in the next <minutes> minutes.");
+    case 8 : ~chatnpc("<p,neutral>We need <quantity> pieces of mithril ore in the next <minutes> minutes.");
+    case 9 : ~chatnpc("<p,neutral>We need <quantity> bars of bronze in the next <minutes> minutes.");
+    case 10 : ~chatnpc("<p,neutral>We need <quantity> bars of iron in the next <minutes> minutes.");
+    case 11 : ~chatnpc("<p,neutral>We need <quantity> bars of steel in the next <minutes> minutes.");
+    case 12 : ~chatnpc("<p,neutral>We need <quantity> bars of silver in the next <minutes> minutes.");
+    case 13 : ~chatnpc("<p,neutral>We need <quantity> bars of gold in the next <minutes> minutes.");
+    case 14 : ~chatnpc("<p,neutral>We need <quantity> bars of mithril in the next <minutes> minutes.");
+}
+def_int $choice = ~p_choice2("I'll take it.", 1, "No thanks.", 2);
+if ($choice = 1) {
+    def_int $work = %giantdwarf_company_work;
+    if ($kind >= 9) {
+        if (%giantdwarf_quest = 5) {
+            if (getbit_range($work, 12, 14) ! $company) {
+                $work = setbit_range_toint($work, 0, 8, 11);
+                $work = setbit_range_toint($work, $company, 12, 14);
+            }
+        }
+    }
+    $work = setbit_range_toint($work, $kind, 15, 18);
+    $work = setbit_range_toint($work, $quantity, 19, 24);
+    $work = setbit_range_toint($work, $company, 25, 27);
+    $work = setbit_range_toint($work, 0, 28, 29);
+    %giantdwarf_company_work = $work;
+    clearqueue(giantdwarf_company_task_expire);
+    longqueue(giantdwarf_company_task_expire, ^giantdwarf_company_deadline_ticks, 0, ^discard);
+    ~chatplayer("<p,neutral>I'll take it.");
+    ~chatnpc("<p,neutral>The clock is ticking, please hurry back.");
+} else if ($choice = 2) {
+    ~chatplayer("<p,neutral>No thanks.");
+    ~chatnpc("<p,neutral>That's unfortunate to hear.");
+    ~giantdwarf_company_task_refuse($kind, $company);
+}
+
+[proc,giantdwarf_company_task_turn_in](int $company, int $task_class)(boolean)
+def_int $work = %giantdwarf_company_work;
+def_int $kind = getbit_range($work, 15, 18);
+if ($kind = 0) { return(false); }
+~giantdwarf_company_task_ensure_timer;
+if (getbit_range($work, 25, 27) ! $company) {
+    ~chatnpc("<p,neutral>I'm busy, please leave.");
+    return(true);
+}
+if ($task_class = 1) {
+    if ($kind >= 9) {
+        ~chatnpc("<p,neutral>You should speak directly to the director.");
+        return(true);
+    }
+} else {
+    if ($kind <= 8) {
+        ~chatnpc("<p,neutral>Talk to my secretary, I don't have time to deal with you.");
+        return(true);
+    }
+}
+def_obj $item = ~giantdwarf_company_task_obj($kind);
+def_int $quantity = getbit_range($work, 19, 24);
+if (inv_total(inv, $item) < $quantity) {
+    ~chatnpc("<p,neutral>Then please, hurry up before time runs out.");
+    return(true);
+}
+inv_del(inv, $item, $quantity);
+clearqueue(giantdwarf_company_task_expire);
+if (%giantdwarf_quest = 5) {
+    if ($kind <= 8) {
+        def_int $secretary_progress = getbit_range($work, 0, 3);
+        if ($secretary_progress < 15) {
+            $secretary_progress = calc($secretary_progress + 1);
+            $work = setbit_range_toint($work, $secretary_progress, 0, 3);
+        }
+    } else {
+        if (getbit_range($work, 12, 14) = $company) {
+            def_int $director_progress = getbit_range($work, 8, 11);
+            if ($director_progress < 15) {
+                $director_progress = calc($director_progress + 1);
+                $work = setbit_range_toint($work, $director_progress, 8, 11);
+            }
+        }
+    }
+}
+$work = setbit_range_toint($work, 0, 15, 18);
+$work = setbit_range_toint($work, 0, 19, 24);
+$work = setbit_range_toint($work, 0, 25, 27);
+$work = setbit_range_toint($work, 0, 28, 29);
+%giantdwarf_company_work = $work;
+if ($kind <= 8) {
+    ~chatplayer("<p,neutral>I've completed your task! Here is your ore!");
+    ~chatnpc("<p,happy>That's good to hear, thanks.");
+} else {
+    ~chatplayer("<p,neutral>I've completed your task! Here are your bars!");
+    ~chatnpc("<p,happy>I will get my secretary to send this to the trade floor at once!");
+}
+return(true);
+
+[proc,giantdwarf_company_secretary](int $company)
+def_int $stage = %giantdwarf_quest;
+if ($stage < 5) {
+    // Preserve the existing pre-quest secretary greeting and keep stages 0-2 unchanged.
+    ~chatnpc("<p,neutral>What can I do for you, human?");
+    return;
+}
+if (~giantdwarf_company_eligible($company) = false) {
+    if ($company = 2) {
+        ~chatnpc("<p,neutral>The Yellow Fortune does not employ the services of men.");
+    } else {
+        ~chatnpc("<p,neutral>The Brown Engine is a gentleman only society, I'm afraid.");
+    }
+    return;
+}
+if ($stage = 6) {
+    ~chatnpc("<p,neutral>You should speak directly to the director.");
+    return;
+}
+if ($stage = 7) {
+    ~mesbox("Now would be a good time to visit Veldaban of the Black Guard, in the west of Keldagrim.");
+    return;
+}
+def_int $work = %giantdwarf_company_work;
+def_int $target = getbit_range($work, 4, 7);
+if ($stage = 5 & $target = 0) {
+    $target = calc(5 + randominc(5));
+    $work = setbit_range_toint($work, $target, 4, 7);
+    %giantdwarf_company_work = $work;
+}
+~giantdwarf_company_task_ensure_timer;
+def_int $active_kind = getbit_range(%giantdwarf_company_work, 15, 18);
+if ($active_kind ! 0) {
+    ~giantdwarf_company_task_turn_in($company, 1);
+    return;
+}
+if ($stage = 5) {
+    def_int $progress = getbit_range(%giantdwarf_company_work, 0, 3);
+    if ($progress >= $target) {
+        ~chatnpc("<p,neutral>You should speak directly to the director.");
+        return;
+    }
+}
+def_int $kind = calc(randominc(7) + 1);
+~giantdwarf_company_task_offer($company, $kind);
+
+[proc,giantdwarf_company_director](int $company)
+def_int $stage = %giantdwarf_quest;
+def_string $company_name = ~giantdwarf_company_name($company);
+if ($stage < 5) {
+    ~chatnpc("<p,neutral>Talk to my secretary, I don't have time to deal with you.");
+    return;
+}
+if ($stage = 7) {
+    ~mesbox("Now would be a good time to visit Veldaban of the Black Guard, in the west of Keldagrim.");
+    return;
+}
+if ($stage = 5) {
+    def_int $active_kind = getbit_range(%giantdwarf_company_work, 15, 18);
+    if ($active_kind ! 0) {
+        ~giantdwarf_company_task_turn_in($company, 2);
+        return;
+    }
+    def_int $work = %giantdwarf_company_work;
+    def_int $secretary_target = getbit_range($work, 4, 7);
+    def_int $secretary_progress = getbit_range($work, 0, 3);
+    if ($secretary_target = 0) {
+        ~chatnpc("<p,neutral>Talk to my secretary, I don't have time to deal with you.");
+        return;
+    }
+    if ($secretary_progress < $secretary_target) {
+        ~chatnpc("<p,neutral>Talk to my secretary, I don't have time to deal with you.");
+        return;
+    }
+    def_int $director_company = getbit_range($work, 12, 14);
+    def_int $director_progress = getbit_range($work, 8, 11);
+    if ($director_company ! $company) { $director_progress = 0; }
+    if ($director_progress < ^giantdwarf_company_director_tasks) {
+        def_int $kind = calc(randominc(5) + 9);
+        ~giantdwarf_company_task_offer($company, $kind);
+        return;
+    }
+    if (~giantdwarf_company_eligible($company) = false) {
+        if ($company = 2) {
+            ~chatnpc("<p,neutral>The Yellow Fortune does not employ the services of men.");
+        } else {
+            ~chatnpc("<p,neutral>The Brown Engine is a gentleman only society, I'm afraid.");
+        }
+        return;
+    }
+    ~chatnpc("<p,neutral>Come, <displayname>, let us converse a while on your future with us.");
+    def_int $join_choice = ~p_choice2("I'd like to officially join your company.", 1, "Thank you for your time.", 2);
+    if ($join_choice = 1) {
+        %giantdwarf_current_company = $company;
+        if (%giantdwarf_quest = 5) { %giantdwarf_quest = 6; }
+        ~chatnpc("<p,happy>It is agreed then! You are now a 'trusted associate' of the <company_name>. Welcome!");
+        ~chatplayer("<p,neutral>I will not disappoint you!");
+    }
+    return;
+}
+if ($stage = 6) {
+    if (%giantdwarf_current_company ! $company) {
+        if (~giantdwarf_company_eligible($company) = false) {
+            if ($company = 2) {
+                ~chatnpc("<p,neutral>The Yellow Fortune does not employ the services of men.");
+            } else {
+                ~chatnpc("<p,neutral>The Brown Engine is a gentleman only society, I'm afraid.");
+            }
+            return;
+        }
+        ~chatnpc("<p,neutral>Come, <displayname>, let us converse a while on your future with us.");
+        def_int $switch_choice = ~p_choice2("I'd like to officially join your company.", 1, "Thank you for your time.", 2);
+        if ($switch_choice = 1) {
+            %giantdwarf_current_company = $company;
+            ~chatnpc("<p,neutral>It is agreed then! You are now a 'trusted associate' of the <company_name>. Welcome!");
+        }
+        return;
+    }
+    ~chatnpc("<p,neutral>So what do you say, will you speak out for me at the next meeting, so that they will base the head of the statue on me?");
+    def_int $bid_choice = ~p_choice2("Yes! Long live the <company_name>!", 1, "I need to have a think about that.", 2);
+    if ($bid_choice = 1) {
+        if (%giantdwarf_original_company = 0) {
+            %giantdwarf_original_company = $company;
+        }
+        if (%giantdwarf_quest = 6) { %giantdwarf_quest = 7; }
+        ~chatplayer("<p,neutral>Yes! Long live the <company_name>!");
+        ~chatnpc("<p,happy>Hurrah!");
+        ~mesbox("Now would be a good time to visit Veldaban of the Black Guard, in the west of Keldagrim.");
+    }
+    return;
+}
+if ($stage >= ^giantdwarf_complete) {
+    def_int $active_kind = getbit_range(%giantdwarf_company_work, 15, 18);
+    if ($active_kind ! 0) {
+        ~giantdwarf_company_task_turn_in($company, 2);
+        return;
+    }
+    if (%giantdwarf_current_company ! $company) {
+        if (~giantdwarf_company_eligible($company) = false) {
+            if ($company = 2) {
+                ~chatnpc("<p,neutral>The Yellow Fortune does not employ the services of men.");
+            } else {
+                ~chatnpc("<p,neutral>The Brown Engine is a gentleman only society, I'm afraid.");
+            }
+            return;
+        }
+        ~chatnpc("<p,neutral>Come, <displayname>, let us converse a while on your future with us.");
+        def_int $postquest_switch_choice = ~p_choice2("I'd like to officially join your company.", 1, "Thank you for your time.", 2);
+        if ($postquest_switch_choice = 1) {
+            %giantdwarf_current_company = $company;
+            ~chatnpc("<p,neutral>It is agreed then! You are now a 'trusted associate' of the <company_name>. Welcome!");
+        }
+        return;
+    }
+    def_int $kind = calc(randominc(5) + 9);
+    ~chatnpc("<p,neutral>You don't need to do this anymore, you know?");
+    ~giantdwarf_company_task_offer($company, $kind);
+}

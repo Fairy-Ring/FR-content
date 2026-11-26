@@ -1,0 +1,16 @@
+// UNKNOWN internal stage ladder after the retained intro, not historical integers.
+^giantdwarf_complete = 50
+// VERIFIED: Tip.It capture 2 May 2006, guide updated 16 April 2006.
+^giantdwarf_questpoints = 2
+// UNKNOWN company-work defaults: favourable small deliveries and one lost task.
+^giantdwarf_company_director_tasks = 3
+^giantdwarf_company_ore_quantity = 5
+^giantdwarf_company_bar_quantity = 2
+^giantdwarf_company_deadline_minutes = 10
+^giantdwarf_company_deadline_ticks = 1000
+^giantdwarf_company_refusal_limit = 3
+^giantdwarf_company_refusal_cost = 1
+// UNKNOWN: nearby visibility radius for the source's boot-stealing watch check.
+^giantdwarf_boots_watch_range = 8
+// UNKNOWN return landing: reuse the existing safe Keldagrim arrival.
+^giantdwarf_thurgo_return = 0_44_159_11_39

@@ -1,0 +1,7 @@
+// Blasidar owns the statue-repair instructions; other shared NPC hooks are gated.
+[opnpc1,dwarf_city_shop_sculpture]
+~giantdwarf_blasidar;
+
+// Changed model forms fall back to the placed parent multi's interaction.
+[opnpc1,dwarf_city_shop_sculpture_model_multi]
+~giantdwarf_riki;
