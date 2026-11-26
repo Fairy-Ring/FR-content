@@ -652,7 +652,10 @@ function testQuestFlow(targets) {
   assert.equal(completedScrolls(p), scrollsBefore + 1, 'repeat Islwyn talk does not reopen the completion scroll');
   assertQuestColour(p, rovingComplete);
 
+  setVar(p, varp('chompybird'), globalQuestConstant('chompybird_complete'));
+  setVar(p, varp('sheepherderquest'), globalQuestConstant('sheepherder_complete'));
   startNpc(p, targets.eluned, '[opnpc1,roving_female_woodelf]', [2]);
+  assert.equal(p.getVar(varp('mourning_quest')), 0, 'declining Eluned does not start Mourning’s Ends Part 1');
   assert.equal(stage(p), rovingComplete, 'completed Eluned interaction falls through to the original MEP dialogue');
   assert.equal(count(p, 'roving_crystal_bow_200'), 1, 'completed Eluned fallback does not grant another reward');
   assert.equal(completedScrolls(p), scrollsBefore + 1, 'completed Eluned fallback does not replay the scroll');
