@@ -11,6 +11,7 @@ switch_obj(last_useitem) {
     case big_bones : $bone = 4;
     case babydragon_bones : $bone = 5;
     case dragon_bones : $bone = 6;
+    case silver_bar : if (%myreque_2_quest >= ^myreque_2_complete) $bone = 7;
 }
 if ($bone = 0) { ~displaymessage(^dm_default); return; }
 inv_del(inv, last_useitem, 1);
@@ -41,6 +42,7 @@ switch_int(%ahoy_varbits_1_0_5) {
     case 4 : $meal = pot_bonemeal_big;
     case 5 : $meal = pot_bonemeal_babydragon;
     case 6 : $meal = pot_bonemeal_dragon;
+    case 7 : $meal = silver_dust;
 }
 inv_del(inv, pot_empty, 1);
 inv_add(inv, $meal, 1);

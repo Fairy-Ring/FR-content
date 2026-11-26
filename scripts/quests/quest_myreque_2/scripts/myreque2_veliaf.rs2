@@ -1,15 +1,34 @@
-// In Aid of the Myreque — Veliaf Hurtz (hideout) start later-case label.
-// Jumped from the existing [opnpc1,route_veliaf_hurtz] once
-// %routequest >= ^routequest_complete (live header ends at saved_myreque).
-// CANDIDATE lines (OSRS Transcript:In Aid of the Myreque minus overlay).
-// First write %myreque_2_quest 0 -> 1. Chat + write only — no Burgh dest,
-// no Florin bind, no Temple Trekking, no Rod dest. No %routequest rewrite.
-// Cite red-19-start-impl-377.md §15.
+// UNKNOWN: plain functional start dialogue; period wording was not recovered.
+// Requirements and rewards: VERIFIED Tip.It guide, capture 20060409210819.
+// Other functional dialogue is UNKNOWN reconstruction, not an authentic transcript.
 
 [label,myreque2_veliaf_start]
-~chatnpc("<p,neutral>You're back. Any luck in Canifis?");
-~chatplayer("<p,neutral>I went back to the place where I first met Vanstrom. He was gone though.");
-~chatnpc("<p,neutral>Anyway, now that you're back, there was something I was hoping you'd help us with.");
+~myreque2_reclaim_hammer;
+if (%routequest < ^routequest_complete | %druidspirit < ^druidspirit_complete) {
+    ~mesbox("You must complete In Search of the Myreque and Nature Spirit first.");
+    return;
+}
+if (%myreque_2_quest >= ^myreque2_tithe_won) {
+    if (%myreque_2_quest = ^myreque2_tithe_won) {
+        %myreque_2_quest = ^myreque2_relocate;
+        ~myreque2_escort_reset;
+        ~chatnpc("<p,neutral>Tell Radigad and Polmafi to move to Burgh de Rott. Please take Ivan to Drezel at Paterdomus.");
+    } else if (%myreque_2_quest < ^myreque2_ivan_safe) {
+        ~chatnpc("<p,neutral>Speak to Radigad, Polmafi and Ivan before leaving with Ivan.");
+    } else {
+        ~chatnpc("<p,neutral>Meet me in the basement of the Burgh de Rott inn.");
+    }
+    return;
+}
+if (%myreque_2_quest > 0) {
+    ~chatnpc("<p,neutral>Find a new base in Burgh de Rott, south of Mort'ton. Help the villagers there.");
+    return;
+}
+if (stat(crafting) < 25 | stat(mining) < 15 | stat(magic) < 7) {
+    ~mesbox("You need 25 Crafting, 15 Mining and 7 Magic to help.");
+    return;
+}
+~chatnpc("<p,neutral>We need a new base. Can you help?");
 def_int $go = ~p_choice2("What do you need?", 1, "Sorry. I'm not interested.", 2);
 if ($go = 2) {
     ~chatplayer("<p,neutral>Sorry. I'm not interested.");
@@ -17,5 +36,43 @@ if ($go = 2) {
     return;
 }
 ~chatplayer("<p,neutral>What do you need?");
-~chatnpc("<p,neutral>Now that our base of operations is no longer safe, we're going to need to relocate before the vyrewatch descend on us.");
-%myreque_2_quest = 1;
+~chatnpc("<p,neutral>Please help the villagers in Burgh de Rott so we can move there.");
+%myreque_2_quest = ^myreque2_started;
+~send_quest_progress(questlist:myreque_2, %myreque_2_quest, ^myreque_2_complete);
+~chatnpc("<p,neutral>Look for a new base in Burgh de Rott, south of Mort'ton.");
+
+[opnpc1,burgh_rescue_veliaf_hurtz_talk]
+~myreque2_reclaim_hammer;
+if (%myreque_2_quest < ^myreque2_tithe_won) {
+    ~chatnpc("<p,neutral>We must deal with Gadderanks and the vampyres.");
+    return;
+}
+if (coordz(npc_coord) < 9000) {
+    ~chatnpc("<p,neutral>I will return to the old hideout. Meet me there.");
+    %blood_tithe_visible = 3;
+    return;
+}
+if (%myreque_2_quest < ^myreque2_ivan_safe) {
+    ~chatnpc("<p,neutral>Ivan must reach Paterdomus safely.");
+    return;
+}
+if (%myreque_2_quest >= ^myreque_2_complete) {
+    ~chatnpc("<p,neutral>You can make another Rod of Ivandis using the mould and the blessed well.");
+    return;
+}
+if (%myreque_2_quest < ^myreque2_rod | ~myreque2_has_rod = false) {
+    ~chatnpc("<p,neutral>Ask Drezel about Ivandis. Bring me the finished rod.");
+    return;
+}
+// Commit before granting XP: repeated conversations cannot grant rewards twice.
+%myreque_2_quest = ^myreque_2_complete;
+stat_advance(attack, 20000);
+stat_advance(strength, 20000);
+stat_advance(defence, 20000);
+stat_advance(crafting, 20000);
+session_log(^log_adventure, "Quest complete: In Aid of the Myreque");
+~send_quest_complete(questlist:myreque_2, burgh_rod_command_final_10, 200, ^myreque_2_questpoints, "'In Aid of the Myreque' completed.", "2,000 Attack, Strength XP|2,000 Defence, Crafting XP|Burgh de Rott services|Rod of Ivandis and Guthix balance");
+
+[proc,myreque2_has_rod]()(boolean)
+if (inv_total(inv, burgh_rod_command_final_10) > 0 | inv_total(worn, burgh_rod_command_final_10) > 0) return(true);
+return(false);

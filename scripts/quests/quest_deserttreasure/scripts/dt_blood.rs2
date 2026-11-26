@@ -208,6 +208,7 @@ if (%fdvw_subquest < ^dt_blood_substate_blood_drawn) %fdvw_subquest = ^dt_blood_
 ~chatnpc("<p,neutral>Come and speak to me again when you have managed to kill Dessous.");
 
 [opheldu,garlic]
+if (%myreque_2_quest >= ^myreque_2_complete & (last_useitem = 4dosestatrestore | last_useitem = 3dosestatrestore | last_useitem = 2dosestatrestore | last_useitem = 1dosestatrestore)) @myreque2_balance_mix;
 if (last_useitem ! pestle_and_mortar) {
     ~displaymessage(^dm_default);
     return;

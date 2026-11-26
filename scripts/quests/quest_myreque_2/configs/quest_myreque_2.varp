@@ -1,2 +1,9 @@
 [myreque2_multivar]
 scope=perm
+[myreque_2_main_var]
+transmit=yes
+scope=perm
+
+[myreque2_extravar]
+scope=perm
+

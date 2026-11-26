@@ -1,0 +1,8 @@
+// UNKNOWN: no supported period stock list survives; do not invent starting shop stock.
+[myreque2_shop]
+scope=shared
+// UNKNOWN engineering inventory capacity; 40 follows the established general-shop pattern.
+size=40
+restock=yes
+stackall=yes
+allstock=yes

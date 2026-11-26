@@ -1,0 +1,137 @@
+// VERIFIED sequence/recipe: retained Tip.It In Aid guide, 9 April 2006.
+// UNKNOWN: functional explanatory wording and travel animation timing.
+[label,myreque2_drezel]
+if (%myreque_2_quest < ^myreque2_ivan_safe) return;
+if (%myreque_2_quest < ^myreque2_library) %myreque_2_quest = ^myreque2_library;
+~chatnpc("<p,neutral>Thank you for bringing Ivan here. The library holds the history of Ivandis and the warrior priests.");
+if (~obj_gettotal(burgh_key) = 0) {
+    if (inv_freespace(inv) = 0) {
+        ~mesbox("You need a free inventory space for the library key.");
+        return;
+    }
+    inv_add(inv, burgh_key, 1);
+}
+~chatnpc("<p,neutral>Use this key in the keyhole to the east. Read the books in the library.");
+
+[oploc1,burgh_library_keyhole]
+~mesbox("There is a small keyhole in the wall.");
+
+[oplocu,burgh_library_keyhole]
+if (last_useitem ! burgh_key | %myreque_2_quest < ^myreque2_library) {
+    ~displaymessage(^dm_default);
+    return;
+}
+%burgh_temple_trapdoor = 1;
+mes("You unlock the library trapdoor.");
+
+[oploc1,burgh_temple_library_trapdoor_open]
+if (%burgh_temple_trapdoor = 0 | %myreque_2_quest < ^myreque2_library) return;
+p_arrivedelay;
+p_teleport(2_53_154_22_11);
+
+[oploc1,burgh_temple_library_ladder_up]
+p_arrivedelay;
+p_teleport(0_53_154_48_43);
+
+[oploc1,burgh_library_bookcase_ivandis]
+~myreque2_take_book(burgh_book_sevenwarriors);
+
+[oploc1,burgh_library_bookcase_history]
+if (%myreque_2_quest < ^myreque2_library) return;
+def_int $book = ~p_choice2("Battered tome", 1, "Leather book", 2);
+if ($book = 1) ~myreque2_take_book(burgh_book_historiesofhallowland);
+else ~myreque2_take_book(burgh_book_moderndaymorytania);
+
+[proc,myreque2_take_book](namedobj $book)
+if (%myreque_2_quest < ^myreque2_library) return;
+if (inv_total(inv, $book) > 0) {
+    mes("You already have this book.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space.");
+    return;
+}
+inv_add(inv, $book, 1);
+mes("You find <oc_name($book)>.");
+
+[opheld1,burgh_book_sevenwarriors] ~myreque2_read_book(10);
+[opheld1,burgh_book_historiesofhallowland] ~myreque2_read_book(11);
+[opheld1,burgh_book_moderndaymorytania] ~myreque2_read_book(12);
+
+[proc,myreque2_read_book](int $bit)
+if (%myreque_2_quest < ^myreque2_library) return;
+// Original 706 varbits occupy 0..9 only. No raw client reader is declared.
+%myreque2_extravar = setbit(%myreque2_extravar, $bit);
+if ($bit = 10) ~mesbox("Ivandis was one of the seven warrior priests. His tomb lies behind boards in the tunnels beneath Canifis.");
+if ($bit = 11) ~mesbox("A mould taken from the tomb can shape a rod of mithril and silver, crowned with a sapphire.");
+if ($bit = 12) ~mesbox("Enchant the silvthrill rod, then lower it into the blessed well with a rope.");
+if (getbit_range(%myreque2_extravar, 10, 12) = 7 & %myreque_2_quest < ^myreque2_books) %myreque_2_quest = ^myreque2_books;
+
+[oplocu,burgh_ivandis_boardedupdoor]
+if (last_useitem ! hammer | %myreque_2_quest < ^myreque2_books) {
+    ~displaymessage(^dm_default);
+    return;
+}
+%ivandis_tomb_boards = 1;
+mes("You remove the boards from the entrance.");
+
+[oploc1,burgh_ivandis_tomb_entrance]
+if (%ivandis_tomb_boards = 0 | %myreque_2_quest < ^myreque2_books) {
+    mes("The entrance is boarded up.");
+    return;
+}
+p_arrivedelay;
+// UNKNOWN exact landing: the original L2 exit is at 5,30; its walkable chamber side is south.
+p_teleport(2_54_153_5_29);
+
+[oploc1,burgh_ivandis_tomb_exit]
+p_arrivedelay;
+// UNKNOWN exact landing: return west of the original L0 cave entrance, not into its east wall.
+p_teleport(0_54_153_27_40);
+
+[oploc1,burgh_ancient_coffin]
+~mesbox("The tomb bears the shape of Ivandis's rod. Soft clay could take an impression.");
+
+[oplocu,burgh_ancient_coffin]
+if (last_useitem ! softclay | %myreque_2_quest < ^myreque2_books) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, softclay, 1);
+inv_add(inv, burgh_rod_clay, 1);
+if (%myreque_2_quest < ^myreque2_mould) %myreque_2_quest = ^myreque2_mould;
+mes("You take a clay impression of the rod.");
+
+[label,myreque2_cast_rod]
+if (%myreque_2_quest < ^myreque2_mould | inv_total(inv, burgh_rod_clay) = 0) return;
+if (stat(crafting) < 25) {
+    mes("You need 25 Crafting to make the rod.");
+    return;
+}
+if (inv_total(inv, mithril_bar) = 0 | inv_total(inv, silver_bar) = 0 | inv_total(inv, sapphire) = 0) {
+    mes("You need a mithril bar, a silver bar and a cut sapphire.");
+    return;
+}
+inv_del(inv, mithril_bar, 1);
+inv_del(inv, silver_bar, 1);
+inv_del(inv, sapphire, 1);
+inv_add(inv, burgh_rod_command1, 1);
+anim(human_furnace, 0);
+mes("You cast a silvthrill rod.");
+
+[label,myreque2_bless_rod]
+if (%myreque_2_quest < ^myreque2_mould | last_useitem ! burgh_rod_command2) return;
+if (inv_total(inv, rope) = 0) {
+    mes("You need a rope to lower the rod into the well.");
+    return;
+}
+inv_del(inv, burgh_rod_command2, 1);
+inv_add(inv, burgh_rod_command_final_10, 1);
+if (%myreque_2_quest < ^myreque2_rod) %myreque_2_quest = ^myreque2_rod;
+mes("You lower the rod into the blessed well, then draw up a charged Rod of Ivandis.");
+
+[opheld1,burgh_rod_command1]
+~mesbox("A silvthrill rod. It needs a level-one enchantment.");
+[opheld1,burgh_rod_command2]
+~mesbox("An enchanted silvthrill rod. It must be lowered into the blessed well using a rope.");

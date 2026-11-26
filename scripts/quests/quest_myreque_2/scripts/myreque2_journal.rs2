@@ -1,0 +1,33 @@
+// UNKNOWN: concise functional journal wording reconstructed from Tip.It 20060409.
+[if_button,questlist:myreque_2]
+def_string $text;
+if (%myreque_2_quest = 0) {
+    $text = "I can start by speaking to Veliaf Hurtz in the Myreque hideout.||I need In Search of the Myreque, Nature Spirit, 25 Crafting, 15 Mining and 7 Magic.";
+} else if (%myreque_2_quest < ^myreque2_admitted) {
+    $text = "Veliaf needs a new base. I should visit Burgh de Rott, south of Mort'ton, and help Florin.";
+} else if (%myreque_2_quest < ^myreque2_hideout) {
+    $text = "I should clear the rubble from the inn and its basement, using a pickaxe, buckets and a spade or pot.";
+} else if (%myreque_2_quest < ^myreque2_store) {
+    $text = "Aurel needs the general store repaired and stocked. I need planks, nails and a hammer.";
+} else if (%myreque_2_quest < ^myreque2_bank) {
+    $text = "I should repair the bank booth and wall, then ask Cornelius to become the banker.";
+} else if (%myreque_2_quest < ^myreque2_furnace) {
+    $text = "The furnace needs two steel bars, coal, a hammer and a tinderbox.";
+} else if (%myreque_2_quest < ^myreque2_tithe_won) {
+    $text = "Gadderanks and the vampyres threaten the villagers. I should speak to everyone in the store and fight with my blessed silver sickle.";
+} else if (%myreque_2_quest < ^myreque2_relocate) {
+    $text = "I should tell Veliaf to return to the old hideout, then meet him there.";
+} else if (%myreque_2_quest < ^myreque2_ivan_safe) {
+    $text = "I should tell Radigad and Polmafi to move, then escort Ivan to Paterdomus. Ivan can take food, steel armour and a silver sickle.";
+} else if (%myreque_2_quest < ^myreque2_books) {
+    $text = "Drezel can give me a library key. I should unlock the trapdoor and read all three books.";
+} else if (%myreque_2_quest < ^myreque2_mould) {
+    $text = "I should remove the boards in the tunnels beneath Canifis with a hammer, then take a soft-clay impression of the tomb.";
+} else if (%myreque_2_quest < ^myreque2_rod) {
+    $text = "I need the mould, a mithril bar, a silver bar and a cut sapphire at a furnace. Then I must enchant the rod and lower it into Drezel's well using a rope.";
+} else if (%myreque_2_quest < ^myreque_2_complete) {
+    $text = "I should show the finished Rod of Ivandis to Veliaf beneath the Burgh de Rott inn.";
+} else {
+    $text = "@str@I helped the Myreque establish a new base in Burgh de Rott, escorted Ivan to safety and made the Rod of Ivandis.||@red@QUEST COMPLETE!";
+}
+~quest_journal("In Aid of the Myreque", $text);

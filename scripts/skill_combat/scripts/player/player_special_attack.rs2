@@ -38,6 +38,7 @@ p_opnpc(2);
     case rune_claws : @pvm_rune_claws_sa;
     case dragon_scimitar : @pvm_dragon_scimitar_sa;
     case darklight : @agrith_darklight_special;
+    case burgh_rod_command_final_10, burgh_rod_command_final_9, burgh_rod_command_final_8, burgh_rod_command_final_7, burgh_rod_command_final_6, burgh_rod_command_final_5, burgh_rod_command_final_4, burgh_rod_command_final_3, burgh_rod_command_final_2, burgh_rod_command_final_1 : @myreque2_rod_capture;
     case default :
         // UNKNOWN engineering safeguard: a weapon with a special bar and no special handler attacks normally with the special turned off.
         %sa_attack = ^false;

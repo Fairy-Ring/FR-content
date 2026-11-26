@@ -1,0 +1,5 @@
+// UNKNOWN: transient server-only capture state, never player-save/client state.
+[myreque2_capture_form]
+type=npc
+
+[myreque2_capture_until]

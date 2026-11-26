@@ -1205,11 +1205,6 @@ transmit=yes
 
 [mcannon_world_basevar]
 
-[myreque_2_main_var]
-transmit=yes
-
-[myreque2_extravar]
-
 [varp707_unused]
 
 [varp708_bits]

@@ -5,6 +5,7 @@ if (loc_type = viking_furnace | loc_type = viking_furnace2) {
         return;
     }
 }
+if ((last_useitem = mithril_bar | last_useitem = burgh_rod_clay | (last_useitem = silver_bar & inv_total(inv, mithril_bar) > 0 & inv_total(inv, sapphire) > 0)) & %myreque_2_quest >= ^myreque2_mould & inv_total(inv, burgh_rod_clay) > 0) @myreque2_cast_rod;
 switch_obj (last_useitem)
 {
     case gold_bar, perfect_gold_bar :

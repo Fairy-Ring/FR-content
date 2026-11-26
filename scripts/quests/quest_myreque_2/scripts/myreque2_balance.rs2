@@ -1,0 +1,149 @@
+// VERIFIED: Tip.It 20060409 gives the restore+garlic+silver-dust recipe,
+// quarter-health capture, ten rod charges and the three potion outcomes.
+[opheldu,4dosestatrestore] @myreque2_restore_used;
+[opheldu,3dosestatrestore] @myreque2_restore_used;
+[opheldu,2dosestatrestore] @myreque2_restore_used;
+[opheldu,1dosestatrestore] @myreque2_restore_used;
+[label,myreque2_restore_used]
+if (last_useitem = garlic & %myreque_2_quest >= ^myreque_2_complete) @myreque2_balance_mix;
+if (oc_category(last_useitem) = potion) @decant_potion(last_item, last_useitem);
+~displaymessage(^dm_default);
+
+[opheldu,silver_dust] @myreque2_balance_mix;
+[opheldu,burgh_unfinished_guthix_balance_4] @myreque2_balance_mix;
+[opheldu,burgh_unfinished_guthix_balance_3] @myreque2_balance_mix;
+[opheldu,burgh_unfinished_guthix_balance_2] @myreque2_balance_mix;
+[opheldu,burgh_unfinished_guthix_balance_1] @myreque2_balance_mix;
+[label,myreque2_balance_mix]
+if (%myreque_2_quest < ^myreque_2_complete) { ~displaymessage(^dm_default); return; }
+def_obj $potion = last_item;
+def_obj $ingredient = last_useitem;
+if ($potion = garlic | $potion = silver_dust) {
+    $potion = last_useitem;
+    $ingredient = last_item;
+}
+def_namedobj $result = ~myreque2_balance_result($potion, $ingredient);
+if ($result = null) { ~displaymessage(^dm_default); return; }
+inv_del(inv, $potion, 1);
+inv_del(inv, $ingredient, 1);
+inv_add(inv, $result, 1);
+// UNKNOWN: functional mixing feedback.
+mes("You mix the potion.");
+
+[proc,myreque2_balance_result](obj $potion, obj $ingredient)(namedobj)
+if ($ingredient = garlic) {
+    switch_obj($potion) {
+        case 4dosestatrestore : return(burgh_unfinished_guthix_balance_4);
+        case 3dosestatrestore : return(burgh_unfinished_guthix_balance_3);
+        case 2dosestatrestore : return(burgh_unfinished_guthix_balance_2);
+        case 1dosestatrestore : return(burgh_unfinished_guthix_balance_1);
+    }
+} else if ($ingredient = silver_dust) {
+    switch_obj($potion) {
+        case burgh_unfinished_guthix_balance_4 : return(burgh_guthix_balance_4);
+        case burgh_unfinished_guthix_balance_3 : return(burgh_guthix_balance_3);
+        case burgh_unfinished_guthix_balance_2 : return(burgh_guthix_balance_2);
+        case burgh_unfinished_guthix_balance_1 : return(burgh_guthix_balance_1);
+    }
+}
+return(null);
+
+[proc,myreque2_capture_target]()(boolean)
+switch_npc(npc_type) {
+    case burgh_vampire_juve_1, burgh_vampire_juve_2, burgh_vampire_juve_3, burgh_vampire_juve_4, burgh_vampire_juvenile_1, burgh_vampire_juvenile_2, burgh_vampire_juvenile_3 : return(true);
+}
+return(false);
+
+[label,myreque2_rod_capture]
+%sa_attack = ^false;
+if (%myreque_2_quest < ^myreque_2_complete | ~myreque2_capture_target = false) {
+    mes("The rod cannot hold this creature.");
+    return;
+}
+if (multiply(npc_stat(hitpoints), 4) > npc_basestat(hitpoints)) {
+    mes("The vampyre is too strong for the rod to hold.");
+    return;
+}
+def_obj $rod = inv_getobj(worn, ^wearpos_rhand);
+def_namedobj $next = ~myreque2_rod_next($rod);
+if ($next = null) return;
+~set_sa_vars(oc_param($rod, sa_energy));
+if ($next = burgh_rod_command_dust) {
+    inv_delslot(worn, ^wearpos_rhand);
+    if (inv_freespace(inv) > 0) inv_add(inv, burgh_rod_command_dust, 1);
+    else obj_add(coord, burgh_rod_command_dust, 1, ^lootdrop_duration);
+} else inv_setslot(worn, ^wearpos_rhand, $next, 1);
+~update_all($rod);
+%myreque2_capture_form = npc_type;
+%npc_aggressive_player = uid;
+// UNKNOWN: 50 cycles of holding time; no period duration was found.
+%myreque2_capture_until = add(map_clock, 50);
+def_npc $held = burgh_vampire_juve_held;
+if (npc_type = burgh_vampire_juvenile_1 | npc_type = burgh_vampire_juvenile_2 | npc_type = burgh_vampire_juvenile_3) $held = burgh_vampire_juvenile_held;
+npc_changetype_keepall($held, ^max_32bit_int);
+npc_setmode(none);
+npc_settimer(1);
+anim(burgh_human_holding_cast, 0);
+p_stopaction;
+mes("The rod holds the vampyre. You can use Guthix balance on it.");
+
+[proc,myreque2_rod_next](obj $rod)(namedobj)
+switch_obj($rod) {
+    case burgh_rod_command_final_10 : return(burgh_rod_command_final_9);
+    case burgh_rod_command_final_9 : return(burgh_rod_command_final_8);
+    case burgh_rod_command_final_8 : return(burgh_rod_command_final_7);
+    case burgh_rod_command_final_7 : return(burgh_rod_command_final_6);
+    case burgh_rod_command_final_6 : return(burgh_rod_command_final_5);
+    case burgh_rod_command_final_5 : return(burgh_rod_command_final_4);
+    case burgh_rod_command_final_4 : return(burgh_rod_command_final_3);
+    case burgh_rod_command_final_3 : return(burgh_rod_command_final_2);
+    case burgh_rod_command_final_2 : return(burgh_rod_command_final_1);
+    case burgh_rod_command_final_1 : return(burgh_rod_command_dust);
+}
+return(null);
+
+[ai_timer,burgh_vampire_juve_held] ~myreque2_capture_timer;
+[ai_timer,burgh_vampire_juvenile_held] ~myreque2_capture_timer;
+[proc,myreque2_capture_timer]
+if (map_clock < %myreque2_capture_until) return;
+npc_changetype_keepall(%myreque2_capture_form, ^max_32bit_int);
+npc_settimer(0);
+npc_setmode(none);
+
+[opnpcu,burgh_vampire_juve_held] @myreque2_balance_pour;
+[opnpcu,burgh_vampire_juvenile_held] @myreque2_balance_pour;
+[label,myreque2_balance_pour]
+if (%myreque_2_quest < ^myreque_2_complete | %npc_aggressive_player ! uid | map_clock >= %myreque2_capture_until) return;
+def_namedobj $remainder;
+switch_obj(last_useitem) {
+    case burgh_guthix_balance_4 : $remainder = burgh_guthix_balance_3;
+    case burgh_guthix_balance_3 : $remainder = burgh_guthix_balance_2;
+    case burgh_guthix_balance_2 : $remainder = burgh_guthix_balance_1;
+    case burgh_guthix_balance_1 : $remainder = vial_empty;
+    case default : ~displaymessage(^dm_default); return;
+}
+inv_setslot(inv, last_useslot, $remainder, 1);
+anim(burgh_human_capture_pour, 0);
+npc_settimer(0);
+// UNKNOWN: equal weighting; the source specifies outcomes, not probabilities.
+switch_int(random(3)) {
+    case 0 :
+        npc_changetype_keepall(burgh_turned_vampyre_male_ben, 100);
+        npc_setmode(none);
+        mes("The vampyre becomes human. Speak to him.");
+    case 1 :
+        spotanim_npc(burgh_vampire_dust, 0, 0);
+        ~npc_default_damage(npc_stat(hitpoints));
+    case 2 :
+        npc_changetype_keepall(burgh_vampire_juve_angry, 100);
+        npc_setmode(opplayer2);
+        mes("The potion turns the creature into an angry vampyre.");
+}
+
+[opnpc1,burgh_turned_vampyre_male_ben]
+if (%npc_aggressive_player ! uid) return;
+if (inv_freespace(inv) = 0) { mes("You need an inventory space for the gift."); return; }
+// UNKNOWN: one noted silver bar, a favourable minor reward; period gift table absent.
+inv_add(inv, cert_silver_bar, 1);
+mes("The rescued human gives you a small gift.");
+npc_del;
