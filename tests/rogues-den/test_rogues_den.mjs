@@ -11,6 +11,8 @@ const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).defau
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const OpNpcU = (await engineModule('network/game/client/model/OpNpcU.ts')).default;
 const npcUseHandler = new (await engineModule('network/game/client/handler/OpNpcUHandler.ts')).default();
+const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
+const locOpHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
 const mapsquares = [[46, 78], [46, 79], [47, 78], [47, 79], [47, 77], [45, 55]];
@@ -79,15 +81,31 @@ function operation(p, target, option, kind = 'loc', choices = []) {
   const config = types[kind === 'loc' ? 'LocType' : 'NpcType'].get(target.type);
   const index = typeof option === 'number' ? option - 1 : config.op.findIndex(value => value?.toLowerCase() === option.toLowerCase());
   assert(index >= 0, `${config.debugname} exposes ${option}`);
-  p.target = target; p.targetOp = ServerTriggerType[`AP${kind.toUpperCase()}${index + 1}`];
+  if (kind === 'loc') {
+    p.originX = p.x; p.originZ = p.z;
+    assert(locOpHandler.handle(new OpLoc(index + 1, target.x, target.z, target.type), p), `${config.debugname} native packet accepted`);
+  } else {
+    p.target = target; p.targetOp = ServerTriggerType[`AP${kind.toUpperCase()}${index + 1}`];
+  }
   const script = requireBoundHandler(p,
     p.inOperableDistance(target) ? (p.getOpTrigger() ?? p.getApTrigger()) : p.getApTrigger(),
     `${config.debugname} native ${option}`);
   const action = mazeTrace && { kind, name: config.debugname, x: target.x, z: target.z, level: target.level, option: config.op[index], choices };
   if (action) mazeTrace.push(action);
-  const state = ScriptRunner.init(script, p, target);
-  p.executeScript(state, true, true);
-  finish(p, state, choices);
+  let state;
+  if (kind === 'loc') {
+    assert((p.inOperableDistance(target) && p.getOpTrigger() === script) ||
+      (p.inApproachDistance(p.apRange, target) && p.getApTrigger() === script),
+      `${config.debugname} native reach admits its bound handler`);
+    p.processInteraction();
+    state = p.activeScript;
+    if (state) finish(p, state, choices);
+    else assert.equal(choices.length, 0, 'instant native operation has no pending dialogue choices');
+  } else {
+    state = ScriptRunner.init(script, p, target);
+    p.executeScript(state, true, true);
+    finish(p, state, choices);
+  }
   if (action) action.landing = tile(p);
   return state;
 }
@@ -588,6 +606,28 @@ for (let choice = 1; choice <= 4; choice++) {
 }
 assert.deepEqual([...kitTools].sort(), ['chisel', 'rope', 'spade', 'tinderbox']);
 console.log('PASS all lobby loot buckets, original maze rewards, completion XP, safe failure branches and four kit conversions');
+
+{
+  const p = enter(fixture());
+  p.teleport(2957, 5068, 1); // Independent first across-passage admission fixture.
+  const passage = location('roguesden_passage_across', 2957, 5069);
+  assert(p.inOperableDistance(passage), 'the original wall passage is operable from its real approach');
+  assert.equal(p.inApproachDistance(10, passage), false, 'the same original wall blocks APLOC sight');
+  operation(p, passage, 'Enter');
+  sameTile(p, { x: 2957, z: 5072, level: 1 });
+  heldAction(p, 'roguesden_gem', 1); clean(p);
+}
+console.log('PASS native loc packet and blocked-sight wall-passage operable reach');
+
+for (const row of placements.filter(row => row.name === 'roguesden_gallery_door' && row.level === 1)) {
+  const p = enter(fixture()), [dx, dz] = [[-1, 0], [0, 1], [1, 0], [0, -1]][row.angle];
+  p.teleport(row.x, row.z, row.level); // Independent original passage/ladders branch.
+  operation(p, location('roguesden_passage_up', row.x - dx, row.z - dz), 'Enter');
+  sameTile(p, { x: row.x - dx * 3, z: row.z - dz * 3, level: row.level });
+  operation(p, location('roguesden_passage_down', row.x - dx * 2, row.z - dz * 2), 'Climb-Down');
+  clean(p);
+}
+console.log('PASS native operative gallery passages and approach-reachable ladder returns');
 
 // Each gallery entry is exercised from its maze-facing side. The raw map's
 // plane-two viewing floor and ladders are bridge-adjusted to effective plane one.

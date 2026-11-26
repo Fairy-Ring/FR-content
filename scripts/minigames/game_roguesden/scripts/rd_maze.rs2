@@ -161,7 +161,7 @@ if (~roguesden_maze_trap_key = ~roguesden_maze_tile_key(loc_coord)) {
 ~roguesden_maze_trap_arm;
 [aploc5,roguesden_trap_floor_springtile]
 ~roguesden_maze_trap_arm;
-[aploc5,roguesden_trap_wall_crusher]
+[oploc5,roguesden_trap_wall_crusher]
 ~roguesden_maze_trap_arm;
 
 // Result: zero means no contact; -1 a fatal trap; -2 the last crossed
@@ -347,19 +347,21 @@ def_coord $other = movecoord(loc_coord, $nx, 0, $nz);
 if (distance(coord, loc_coord) < distance(coord, $other)) ~roguesden_cross_to($other, 0);
 else ~roguesden_cross_to(loc_coord, 0);
 
-[aploc1,roguesden_obstacle_magic_door]
+// Wall contacts use operable reach. APLOC also requires sight through the wall,
+// so an adjacent player on its blocked face would get the default operation.
+[oploc1,roguesden_obstacle_magic_door]
 ~roguesden_open_maze_door;
-[aploc1,roguesden_puzzle_door_rotation]
+[oploc1,roguesden_puzzle_door_rotation]
 // UNKNOWN favourable optional-door rule: the original dial is its reusable key.
 if (inv_total(inv, roguesden_puzzle_rotation) < 1) return;
 ~roguesden_open_maze_door;
-[aploc1,roguesden_puzzle_door_gears]
+[oploc1,roguesden_puzzle_door_gears]
 // UNKNOWN favourable optional-door rule: carrying all six original gears opens it.
 if (inv_total(inv, roguesden_gear1) < 1 | inv_total(inv, roguesden_gear2) < 1 |
     inv_total(inv, roguesden_gear3) < 1 | inv_total(inv, roguesden_gear4) < 1 |
     inv_total(inv, roguesden_gear5) < 1 | inv_total(inv, roguesden_gear6) < 1) return;
 ~roguesden_open_maze_door;
-[aploc1,roguesden_puzzle_door_mosaic]
+[oploc1,roguesden_puzzle_door_mosaic]
 if (~roguesden_active = false) return;
 if (distance(coord, loc_coord) > 1) {
     p_aprange(1);
@@ -371,14 +373,14 @@ def_int $choice = ~p_choice4("Top-left tile", 1, "Top-right tile", 2, "Bottom-le
 if ($choice ! 4 | inv_total(inv, roguesden_puzzle_mosaic_tile4) < 1) return;
 inv_del(inv, roguesden_puzzle_mosaic_tile4, 1);
 ~roguesden_open_maze_door;
-[aploc1,roguesden_obstacle_door]
+[oploc1,roguesden_obstacle_door]
 if (stat_base(thieving) < 80) return;
 // CANDIDATE: the 80 Thieving shortcut stays off the required 50/50 route.
 ~roguesden_open_maze_door;
-[aploc1,roguesden_obstacle_blocking_door_enter]
+[oploc1,roguesden_obstacle_blocking_door_enter]
 ~roguesden_open_maze_door;
 
-[aploc1,roguesden_gallery_door]
+[oploc1,roguesden_gallery_door]
 ~roguesden_gallery_enter;
 
 [proc,roguesden_gallery_enter]
@@ -407,9 +409,9 @@ if (distance(coord, $approach) > 0) {
 // passage_up/down bridge directly to the real raised gallery side, never via teleport.
 ~roguesden_cross_to($landing, 0);
 
-[aploc1,roguesden_passage_across]
+[oploc1,roguesden_passage_across]
 ~roguesden_cross_passage(roguesden_passage_across);
-[aploc1,roguesden_passage_up]
+[oploc1,roguesden_passage_up]
 ~roguesden_passage_up;
 [aploc1,roguesden_passage_down]
 ~roguesden_passage_down;
