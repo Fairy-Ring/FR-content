@@ -82,6 +82,7 @@ if (~player_autocast_enabled = false & ~inzone_coord_pair_table(mage_arena, coor
     mes("Kolodion allows only magical combat within the arena."); // osrs
     return(false);
 }
+return(true);
 
 // Area scans call this only after map_multiway admits the secondary target tile.
 // Duel Arena regions have no multiway rows, so their published checks cannot run here.
@@ -102,12 +103,21 @@ if (~in_duel_arena(coord) = true) {
     }
     return(true); // important!! Duel arena doesnt have normal pvp rules
 }
+if (~in_castlewars_game(coord) = true) {
+    if (%castlewars_team = .%castlewars_team) {
+        if (%castlewars_team = ^castlewars_team_saradomin) mes("Saradomin won't let you attack your allies!");
+        else mes("Zamorak wants you to kill your enemies!");
+        return(false);
+    }
+    return(true);
+}
 if (~pvp_level_check = false) {
     return(false);
 }
 if (~pvp_in_combat_check = false) {
     return(false);
 }
+return(true);
 
 [proc,pvp_in_combat_check]()(boolean)
 // if multi, return true
