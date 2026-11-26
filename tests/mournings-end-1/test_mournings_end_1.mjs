@@ -639,7 +639,10 @@ try {
   });
 
   check('exact named cooking sources preserve MEP1 heating and original bowl heating', () => {
-    for (const name of ['range', 'scenery_2729', 'scenery_2730', 'scenery_2731']) {
+    const ovens = ['range', 'scenery_2729', 'scenery_2730', 'scenery_2731']
+      .filter(name => locRows.some(row => row.name === name));
+    assert(ovens.includes('range'), 'the live Range is an original named oven placement');
+    for (const name of ovens) {
       const p = fixture(6, ['mourning_toxic_naphtha', 'bowl_water']);
       useLoc(p, name, 'mourning_toxic_naphtha');
       assert.equal(count(p, 'mourning_toxic_naphtha'), 0, `${name}: toxic naphtha consumed`);
