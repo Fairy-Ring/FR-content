@@ -281,6 +281,7 @@ if ($maxhit ! null) {
     def_int $damage_capped = min($damage, npc_stat(hitpoints));
     ~give_combat_experience($damagestyle, $damage_capped, %npc_combat_xp_multiplier);
     npc_heropoints($damage_capped);
+    ~pest_hit_activity($damage_capped);
 }
 // spell visual
 if (db_getfieldcount($spell_data, magic_spell_table:sound_hit) > 0) {
