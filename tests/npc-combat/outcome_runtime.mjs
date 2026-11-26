@@ -104,7 +104,7 @@ export async function runtime(engine, pack) {
     player.wrappedMessageGame = player.messageGame;
     World.players[1] = player; World.playerLoop.add(player.hash64, player);
     const config = NpcType.getByName(type); assert(config, type);
-    const npc = new Npc(0, player.x + distance, player.z, config.size, config.size, EntityLifeCycle.RESPAWN, 1, config.id, config.blockwalk);
+    const npc = new Npc(player.level, player.x + distance, player.z, config.size, config.size, EntityLifeCycle.RESPAWN, 1, config.id, config.blockwalk);
     World.addNpc(npc, -1); npc.lastMovement = -100;
     npc.setVar(id(VarNpcType, 'npc_aggressive_player'), player.uid);
     applyVariant({ player, npc }, variant, style);
