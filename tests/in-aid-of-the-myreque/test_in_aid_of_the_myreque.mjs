@@ -1445,7 +1445,7 @@ check('native member order, optional provisions, actual escort kills, following 
   assert(Math.max(Math.abs(follower.x - p.x), Math.abs(follower.z - p.z)) <= 1, 'Ivan actually reaches the exit approach');
   clickLoc(p, exit, [], 2);
   landing(p, [3440, 9899, 0], 'original Paterdomus lower floor beside Drezel');
-  assert.deepEqual([follower.x, follower.z, follower.level], [3439, 9899, 0]);
+  landing(follower, [3439, 9899, 0], 'owned Ivan beside the original Paterdomus arrival');
   place(p, 3439, 9895);
   const drezel = spawn(p, 'priestperiltrappedmonk2');
   talk(p, drezel);
