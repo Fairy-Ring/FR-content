@@ -2641,6 +2641,462 @@
       "playerVars": { "macro_event": 11 },
       "npcVars": { "npc_macro_event_target": "target" },
       "activeNpcVar": "macro_event_uid"
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_ghast_vis_1]",
+      "npc": "templetrek_ghast_vis_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 1,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 1
+      },
+      "prelude": "templetrek-ghasts",
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_ghast_vis_2]",
+      "npc": "templetrek_ghast_vis_2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 2,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 1
+      },
+      "prelude": "templetrek-ghasts",
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_ghast_vis_3]",
+      "npc": "templetrek_ghast_vis_3",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 1
+      },
+      "prelude": "templetrek-ghasts",
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_vampire_1]",
+      "npc": "templetrek_vampire_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 1,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 2
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_vampire_2]",
+      "npc": "templetrek_vampire_2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 2,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 2
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_vampire_3]",
+      "npc": "templetrek_vampire_3",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 2
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_shade_1]",
+      "npc": "templetrek_shade_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 1,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 3
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "33_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_shade_2]",
+      "npc": "templetrek_shade_2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 2,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 3
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "33_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_shade_3]",
+      "npc": "templetrek_shade_3",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 3
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "33_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_snake_1]",
+      "npc": "templetrek_snake_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 1,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 4
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_snake_2]",
+      "npc": "templetrek_snake_2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 2,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 4
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_snake_3]",
+      "npc": "templetrek_snake_3",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 4
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_applayer2,templetrek_giantsnail_1]",
+      "npc": "templetrek_giantsnail_1",
+      "style": "ranged",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 1,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 5
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_applayer2,templetrek_giantsnail_2]",
+      "npc": "templetrek_giantsnail_2",
+      "style": "ranged",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 2,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 5
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_applayer2,templetrek_giantsnail_3]",
+      "npc": "templetrek_giantsnail_3",
+      "style": "ranged",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 5
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "31_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_tentacle_arm]",
+      "npc": "templetrek_tentacle_arm",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 6
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "32_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_tentacle_head]",
+      "npc": "templetrek_tentacle_head",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 3,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 6
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "32_78",
+          "54_50"
+        ]
+      }
+    },
+    {
+      "script": "[ai_opplayer2,templetrek_zombie]",
+      "npc": "templetrek_zombie",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "myreque_2_quest": 421,
+        "templetrek_temp_var_0_6": 100,
+        "templetrek_temp_var_11_12": 1,
+        "templetrek_temp_var_22_24": 1,
+        "templetrek_temp_var_25_25": 1,
+        "templetrek_last_event": 7
+      },
+      "privateRegion": {
+        "enter": "[proc,templetrek_create_room]",
+        "leave": "[proc,templetrek_logout]",
+        "maps": [
+          "32_78",
+          "54_50"
+        ]
+      }
     }
   ]
 }

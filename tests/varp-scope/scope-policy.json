@@ -2,6 +2,7 @@
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
     "magic_carpet_var": "UNKNOWN engineering recovery: original transmitted rug selector slot 499 saves the paid destination 1..8 until landing or login/logout recovery, then resets to zero.",
+    "templetrek_main_var": "Original slot 700 retains an earned reward token's point value across logout; transient route, selection and visibility fields are reset or derived on login.",
     "twocats_planted_at": "UNKNOWN engineering timestamp in reserved original slot 326; persists so Unferth's planted potatoes mature across logout without losing four consumed seeds.",
     "roguetrader_var": "Original transmitted Rogue Trader progress word; permanent supplier agreements and trading rewards survive logout.",
     "varp575_bits": "UNKNOWN engineering persistence for the original Temple of Light pillar orientations and inserted pieces; retain the player's puzzle setup across logout.",
@@ -281,6 +282,7 @@
   },
   "deliberatelyTemporary": {
     "dt_stranger_uid": "Original server-only slot 420 holds only the active owned Stranger NPC UID. Logout removes that actor and discards this session token, without changing any diamond or quest progress.",
+    "templetrek_temp_var": "Original slot 702 holds only the owned run's route, companion health, obstacle and encounter counters. Logout, death, escape and committed teleport end the run; native instance saves use a safe surface exit.",
     "rogue_suduku1": "Original server-only slot 541: temporary Rune Sudoku selector, board size and per-session generation counter in uncovered high bits; board and clue inventories are temporary, and closing or reopening resets interaction state.",
     "fightpits_state": "UNKNOWN engineering session participation and admission combat level in reserved original server-only slot 410; logout removes the participant and login recovers arena coordinates.",
     "teleblock_until": "UNKNOWN engineering session-only expiry tick in reserved original server-only slot 422. Target death or logout clears it; no durable progress is stored.",
@@ -1010,7 +1012,7 @@
     "temple_resources_p": "temp",
     "temple_sanctity": "temp",
     "temple_sanctity_p": "temp",
-    "templetrek_main_var": "temp",
+    "templetrek_main_var": "perm",
     "templetrek_temp_var": "temp",
     "the_thing_sheared": "perm",
     "thieving_stall_timer": "perm",
@@ -1232,6 +1234,8 @@
     "blast_furnace_access_until": "perm"
   },
   "declarationReasons": {
+    "templetrek_main_var": "Earned reward-token points persist until the original token is redeemed at Burgh de Rott's repaired bank booth.",
+    "templetrek_temp_var": "Session-only owned Temple Trekking health, route, obstacle and combat state; every departure clears the run and repeat entry rebuilds it.",
     "ahoy_puzzle_state": "Reserved original slot stores permanent model flag dyes, pending ecto-tokens and the crone manual hand-in.",
     "ahoy_last_signer": "Reserved original slot holds the previous petition signer UID across NPC movement; no earned progress is stored here.",
     "varp413_bits": "The original score components read bits 0-11; unused bits 12-21 and 30-31 hold the unpaid bag and held flags.",

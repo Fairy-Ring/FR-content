@@ -76,6 +76,7 @@ if (%macro_event = ^macro_lost_and_found &
 if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside($coord) = false) ~swamp_cave_release;
 if (%soulbane_instance > 0) ~soulbane_teleport_release($coord);
 ~mta_teleport_release($coord);
+~templetrek_teleport_release($coord);
 p_telejump($coord);
 cam_reset;
 anim(null, 0);

@@ -1,9 +1,6 @@
-// Temple Trekking — Talk-to a Burgh escort opens the route map (choose_a_route 341).
-// All six escort concretes (children of multis 3623–3633 on m54_50) open it:
-// 2007-base "speaking to one of the NPCs standing nearby" in Burgh de Rott.
-// Chrome-only: no route dests / evade math / instance rooms / tokens / In Aid gate.
-// Visibility (templetrek_main_var bit 0) is a harness toy, not set here.
-// Cite residual-if-341-trek-start-377.md + temple-trekking-first-product-slice-377.md.
+// VERIFIED release gate: In Aid of the Myreque completed.
+// CANDIDATE start surface: original six Burgh escorts, original route map341.
+// UNKNOWN functional refusal wording. No post-2006 Escort option or noticeboard.
 
 [opnpc1,templetrek_child_hard] @templetrek_start_open;
 [opnpc1,templetrek_oldman_hard] @templetrek_start_open;
@@ -13,4 +10,33 @@
 [opnpc1,templetrek_retired_man_easy] @templetrek_start_open;
 
 [label,templetrek_start_open]
+if (~templetrek_owned = true) {
+    // The owned companion does not open a new run while crossing the swamp.
+    mes("Keep your companion safe until you reach the temple.");
+    return;
+}
+if (%myreque_2_quest < ^myreque_2_complete) {
+    mes("You must complete In Aid of the Myreque before guiding a traveller.");
+    return;
+}
+def_int $escort = 0;
+if (npc_type = templetrek_retired_soldier_easy) $escort = 1;
+if (npc_type = templetrek_retired_man_easy) $escort = 2;
+if (npc_type = templetrek_woman_med) $escort = 3;
+if (npc_type = templetrek_man_med) $escort = 4;
+if (npc_type = templetrek_oldman_hard) $escort = 5;
+if (npc_type = templetrek_child_hard) $escort = 6;
+%templetrek_debug_room_id = $escort;
+%templetrek_button_control = 1;
 if_openmain(choose_a_route);
+
+[if_button,choose_a_route:com_2]
+%templetrek_button_control = 0;
+if_close;
+
+[if_button,choose_a_route:com_21]
+~templetrek_begin(1);
+[if_button,choose_a_route:com_25]
+~templetrek_begin(2);
+[if_button,choose_a_route:com_29]
+~templetrek_begin(3);

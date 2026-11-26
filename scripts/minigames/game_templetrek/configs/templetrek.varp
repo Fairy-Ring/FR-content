@@ -1,0 +1,8 @@
+// Original slots700/702 and all original client fields retained.
+// Points belong to the outstanding token; visibility is the original multi gate.
+[templetrek_main_var]
+transmit=yes
+scope=perm
+
+// Temporary run health, obstacle progress, route, hostiles, stage and companion.
+[templetrek_temp_var]

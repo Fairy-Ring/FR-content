@@ -1,0 +1,216 @@
+// CANDIDATE Tip.It 28 March 2007: three logs/planks repair the bridge; cutting
+// gives 2-4 bog branches, soft patches catch them, and three vines make a swing.
+// Original 377 assets decide scope: no later lumberjacks or hungry-person event.
+// UNKNOWN engineering: exact puzzle layout/step count, feedback wording,
+// hammer alternative and 500-point obstacle credit. Original maps stay unchanged.
+[proc,templetrek_puzzle_spawn]
+if (%templetrek_last_event = 7) {
+    ~templetrek_bridge_zombie_spawn;
+}
+if (%templetrek_last_event = 8) {
+    // Original bog floor is deliberately blocked: Stand-on is forced movement,
+    // not an ordinary walk or recovery landing. Five rows offer two choices.
+    def_int $row = 0;
+    while ($row < 5) {
+        def_int $column = 0;
+        while ($column < 2) {
+            // VERIFIED original model suffix _0: this marker is a ground decoration.
+            loc_add(~templetrek_room_coord(movecoord(0_32_78_11_13, $column, 0, $row)), templetrek_route_direction, 0, grounddecor, 0);
+            $column = add($column, 1);
+        }
+        $row = add($row, 1);
+    }
+}
+if (%templetrek_last_event = 9) {
+    // Original map has the abandoned backpack model, but no placed instance.
+    loc_add(~templetrek_room_coord(0_32_78_44_15), templetrek_swing_rucksack, 0, centrepiece_straight, 0);
+}
+if (%templetrek_last_event = 10) ~templetrek_abidor_spawn;
+
+[oploc1,templetrek_bridge_broken] @templetrek_bridge_search;
+[oploc1,templetrek_bridge_fixed_1] @templetrek_bridge_search;
+[oploc1,templetrek_bridge_fixed_2] @templetrek_bridge_search;
+[label,templetrek_bridge_search]
+if (~templetrek_owned = false | %templetrek_last_event ! 7) return;
+mes("Use logs on the bridge to repair it.");
+
+[oplocu,templetrek_bridge_broken] @templetrek_bridge_repair;
+[oplocu,templetrek_bridge_fixed_1] @templetrek_bridge_repair;
+[oplocu,templetrek_bridge_fixed_2] @templetrek_bridge_repair;
+[label,templetrek_bridge_repair]
+if (~templetrek_owned = false | %templetrek_last_event ! 7) return;
+if ((last_useitem ! logs & last_useitem ! woodplank) | inv_total(inv, last_useitem) = 0) return;
+def_obj $axe = null;
+if (inv_total(inv, hammer) = 0) $axe = ~woodcutting_axe_checker(false);
+if (inv_total(inv, hammer) = 0 & ($axe = null | inv_getobj(worn, ^wearpos_rhand) ! $axe)) {
+    mes("You need a hammer or a wielded axe to repair the bridge.");
+    return;
+}
+if (%templetrek_temp_var_7_10 >= 3) return;
+inv_del(inv, last_useitem, 1);
+%templetrek_temp_var_7_10 = add(%templetrek_temp_var_7_10, 1);
+if (%templetrek_temp_var_7_10 = 1) loc_change(templetrek_bridge_fixed_1, 0);
+if (%templetrek_temp_var_7_10 = 2) loc_change(templetrek_bridge_fixed_2, 0);
+if (%templetrek_temp_var_7_10 = 3) loc_change(templetrek_bridge_fixed_3, 0);
+mes("You repair part of the bridge.");
+
+[oploc1,templetrek_bridge_fixed_3]
+if (~templetrek_owned = true & %templetrek_last_event = 7) mes("The bridge is repaired.");
+
+[oploc2,templetrek_bridge_fixed_3]
+if (~templetrek_owned = false | %templetrek_last_event ! 7) return;
+if (%templetrek_temp_var_7_10 ! 3) return;
+// The upper bridge is rendered at level1, but its bridge flags put actors at0.
+p_telejump(~templetrek_room_coord(0_32_78_48_47));
+~templetrek_puzzle_complete;
+
+[oplocu,templetrek_leaflessbush]
+if (~templetrek_owned = false | %templetrek_last_event ! 8) return;
+if (last_useitem ! knife & oc_param(last_useitem, slashattack) <= 0) {
+    mes("Use a knife or a slashing weapon to cut a branch.");
+    return;
+}
+def_int $space = inv_freespace(inv);
+if ($space = 0) {
+    mes("You need room for a branch.");
+    return;
+}
+// UNKNOWN full-bag edge: give only branches that fit, never discard an item.
+inv_add(inv, templetrek_swamptree_branch, min($space, add(random(3), 2)));
+mes("You cut branches from the bush.");
+
+[oplocu,templetrek_route_direction] @templetrek_bog_probe;
+[oplocu,templetrek_bog_grass] @templetrek_bog_probe;
+[aplocu,templetrek_route_direction] @templetrek_bog_probe;
+[aplocu,templetrek_bog_grass] @templetrek_bog_probe;
+[label,templetrek_bog_probe]
+if (~templetrek_owned = false | %templetrek_last_event ! 8) return;
+// Original bog tiles block walking. Native approach reaches the bank first;
+// the next forced step/probe is permitted only within the obstacle's reach.
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
+if (last_useitem ! templetrek_swamptree_branch | inv_total(inv, templetrek_swamptree_branch) = 0) return;
+anim(templetrek_bog_prodding, 0);
+if (~templetrek_bog_safe(loc_coord) = true) {
+    mes("The ground feels firm.");
+} else {
+    mes("The ground feels soft.");
+}
+// CANDIDATE: another branch catches in the same soft patch, not a fresh roll.
+if (~templetrek_bog_safe(loc_coord) = false) {
+    inv_del(inv, templetrek_swamptree_branch, 1);
+    mes("The branch sticks in the bog.");
+}
+
+[proc,templetrek_bog_safe](coord $tile)(boolean)
+def_int $row = sub(coordz($tile), coordz(~templetrek_room_coord(0_32_78_11_13)));
+if ($row < 0 | $row >= 5) return(false);
+// UNKNOWN engineering geometry: one fixed column on the unchanged bog floor.
+if (coordx($tile) = coordx(~templetrek_room_coord(0_32_78_11_13))) return(true);
+return(false);
+
+[oploc1,templetrek_route_direction] @templetrek_bog_step;
+[oploc1,templetrek_bog_grass] @templetrek_bog_step;
+[aploc1,templetrek_route_direction] @templetrek_bog_step;
+[aploc1,templetrek_bog_grass] @templetrek_bog_step;
+[label,templetrek_bog_step]
+if (~templetrek_owned = false | %templetrek_last_event ! 8) return;
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
+if (%templetrek_temp_var_7_10 >= 5) return;
+def_coord $tile = loc_coord;
+def_int $row = sub(coordz($tile), coordz(~templetrek_room_coord(0_32_78_11_13)));
+// Soft ground beside a reached step still sinks the player; only firm steps
+// require forward progress. This also keeps lost-branch recovery reachable.
+if (~templetrek_bog_safe($tile) = false) {
+    anim(templetrek_sinking_anim, 0);
+    p_delay(2);
+    %templetrek_temp_var_7_10 = 0;
+    p_telejump(~templetrek_room_coord(0_32_78_12_11));
+    mes("You sink into the bog and scramble back to the bank.");
+    return;
+}
+if ($row ! %templetrek_temp_var_7_10) {
+    mes("You must test your way across one step at a time.");
+    return;
+}
+// Fixed movement positions inside the obstacle, never logout/rescue landings.
+p_telejump($tile);
+%templetrek_temp_var_7_10 = add(%templetrek_temp_var_7_10, 1);
+if (%templetrek_temp_var_7_10 = 5) {
+    p_telejump(~templetrek_room_coord(0_32_78_12_20));
+    ~templetrek_puzzle_complete;
+}
+
+[oploc1,templetrek_swing_rucksack]
+if (~templetrek_owned = false | %templetrek_last_event ! 9) return;
+if (inv_total(inv, knife) > 0) {
+    mes("You already have a knife.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need room for a knife.");
+    return;
+}
+inv_add(inv, knife, 1);
+mes("You find a knife in the backpack.");
+
+[oplocu,templetrek_swamptree_small_vines] @templetrek_cut_vine;
+[oplocu,templetrek_swamptree_small_1] @templetrek_cut_vine;
+[oplocu,templetrek_swamptree_small_2] @templetrek_cut_vine;
+[oplocu,templetrek_swamptree_small_empty] @templetrek_cut_vine;
+[label,templetrek_cut_vine]
+if (~templetrek_owned = false | %templetrek_last_event ! 9) return;
+if (last_useitem ! knife | inv_total(inv, knife) = 0) return;
+if (inv_freespace(inv) = 0) {
+    mes("You need room for a vine.");
+    return;
+}
+inv_add(inv, templetrek_short_vine, 1);
+// UNKNOWN engineering recovery: the emptied tree regrows after a minute.
+if (loc_type = templetrek_swamptree_small_vines) loc_change(templetrek_swamptree_small_1, 100);
+else if (loc_type = templetrek_swamptree_small_1) loc_change(templetrek_swamptree_small_2, 100);
+else if (loc_type = templetrek_swamptree_small_2) loc_change(templetrek_swamptree_small_empty, 100);
+else loc_change(templetrek_swamptree_small_1, 100);
+mes("You cut a short vine.");
+
+[opheldu,templetrek_short_vine]
+if (last_useitem ! templetrek_short_vine) return;
+if (inv_total(inv, templetrek_short_vine) < 3) {
+    mes("You need three short vines to make a long vine.");
+    return;
+}
+inv_del(inv, templetrek_short_vine, 3);
+inv_add(inv, templetrek_long_vine, 1);
+anim(templetrek_making_vine_rope, 0);
+mes("You wind the vines together.");
+
+[oplocu,templetrek_swamptree_branch]
+if (~templetrek_owned = false | %templetrek_last_event ! 9) return;
+if (last_useitem ! templetrek_long_vine | inv_total(inv, templetrek_long_vine) = 0) return;
+if (%templetrek_temp_var_7_10 ! 0) return;
+inv_del(inv, templetrek_long_vine, 1);
+anim(templetrek_rope_lasso, 0);
+loc_change(templetrek_swamptree_branch_vine, 0);
+%templetrek_temp_var_7_10 = 1;
+mes("The vine catches on the branch.");
+
+[oploc2,templetrek_swamptree_branch_vine]
+if (~templetrek_owned = false | %templetrek_last_event ! 9) return;
+if (%templetrek_temp_var_7_10 ! 1) return;
+p_telejump(~templetrek_room_coord(0_32_78_44_26));
+~templetrek_puzzle_complete;
+
+[proc,templetrek_puzzle_complete]
+if (%templetrek_temp_var_7_10 = 15) return;
+%templetrek_temp_var_7_10 = 15;
+~templetrek_credit(500);
+// Move the real owned companion to the completed bank without resetting health.
+def_coord $bank = coord;
+if (npc_finduid(~templetrek_companion_uid) = true) {
+    npc_tele(map_findsquare($bank, 1, 2, ^map_findsquare_lineofwalk));
+}

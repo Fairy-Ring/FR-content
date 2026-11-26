@@ -35,3 +35,11 @@ if (npc_find(loc_coord, fever_banker_01, 2, 0) = true) {
 }
 
 [oploc2,fever_bankbooth] @openbank;
+
+// CANDIDATE period Tip.It: use the original token on Burgh de Rott's booth.
+[oplocu,burgh_bankbooth_repaired]
+if (last_useitem = templetrek_blue_token | last_useitem = templetrek_yellow_token | last_useitem = templetrek_red_token) {
+    ~templetrek_redeem(last_useitem);
+    return;
+}
+~displaymessage(^dm_default);

@@ -1,0 +1,186 @@
+// Temple Trekking token and tome operations.
+// CANDIDATE reward bounds: Tip.It, 28 March 2007, used only for forward Temple Trekking.
+// UNKNOWN: category odds and quantity/XP distributions are engineering defaults.
+
+[proc,templetrek_has_token]()(boolean)
+if (inv_total(inv, templetrek_blue_token) > 0 | inv_total(inv, templetrek_yellow_token) > 0 | inv_total(inv, templetrek_red_token) > 0) return(true);
+if (inv_total(bank, templetrek_blue_token) > 0 | inv_total(bank, templetrek_yellow_token) > 0 | inv_total(bank, templetrek_red_token) > 0) return(true);
+return(false);
+
+[proc,templetrek_award]()(boolean)
+if (~templetrek_owned = false | ~templetrek_has_token = true | inv_freespace(inv) < 1) return(false);
+def_namedobj $token = null;
+if (%templetrek_temp_var_11_12 = 1) $token = templetrek_blue_token;
+if (%templetrek_temp_var_11_12 = 2) $token = templetrek_yellow_token;
+if (%templetrek_temp_var_11_12 = 3) $token = templetrek_red_token;
+if ($token = null) return(false);
+inv_add(inv, $token, 1);
+return(true);
+
+[proc,templetrek_token_route](obj $token)(int)
+if ($token = templetrek_blue_token) return(1);
+if ($token = templetrek_yellow_token) return(2);
+if ($token = templetrek_red_token) return(3);
+return(0);
+
+// The shared item-on-loc dispatcher calls this only for Burgh de Rott's bank booth.
+// Its caller owns the location check; no direct token-use or selection UI is added.
+[proc,templetrek_redeem](obj $token)(boolean)
+if (inv_total(inv, $token) < 1) return(false);
+def_int $route = ~templetrek_token_route($token);
+if ($route < 1 | $route > 3) return(false);
+// The largest result is two distinct noted stacks; the token's own slot plus one free slot covers every roll.
+// Check before rolling so a full-bag refusal neither consumes the token nor rerolls the reward.
+if (inv_freespace(inv) < 1) return(false);
+def_int $points = %templetrek_npc_point_value;
+def_int $reward_type = random(8);
+def_namedobj $first = null;
+def_namedobj $second = null;
+def_int $first_count = 0;
+def_int $second_count = 0;
+switch_int ($reward_type) {
+    case 0 :
+        $first = cert_coal;
+        $second = cert_iron_ore;
+        $first_count = ~templetrek_reward_amount(5, 145, $points, $route);
+        $second_count = ~templetrek_reward_amount(5, 72, $points, $route);
+    case 1 :
+        $first = cert_bow_string;
+        $first_count = ~templetrek_reward_amount(9, 242, $points, $route);
+    case 2 :
+        $first = cert_silver_bar;
+        $first_count = ~templetrek_reward_amount(6, 153, $points, $route);
+    case 3 :
+        if (random(2) = 0) $first = cert_blankrune;
+        else $first = cert_blankrune_high;
+        $first_count = ~templetrek_reward_amount(27, 666, $points, $route);
+    case 4 :
+        $first = wildblood_hop_seed;
+        $first_count = ~templetrek_reward_amount(3, 79, $points, $route);
+    case 5 :
+        $first = cert_raw_lobster;
+        $first_count = ~templetrek_reward_amount(3, 80, $points, $route);
+    case 6 :
+        if (random(4) = 0) $first = cert_unidentified_toadflax;
+        else if (random(2) = 0) $first = cert_unidentified_harralander;
+        else $first = cert_unidentified_tarromin;
+        $first_count = ~templetrek_reward_amount(4, 101, $points, $route);
+    case 7 :
+        $first = ~templetrek_random_tome($route);
+        $first_count = 1;
+}
+if ($first = null | $first_count < 1 | ($second ! null & $second_count < 1)) return(false);
+inv_del(inv, $token, 1);
+inv_add(inv, $first, $first_count);
+if ($second ! null) inv_add(inv, $second, $second_count);
+%templetrek_npc_point_value = 0;
+return(true);
+
+// UNKNOWN default: the 2007 guide gives aggregate bounds and qualitative route/event effects,
+// not a point formula. This linear cap keeps amounts within those bounds and increases by route/points.
+[proc,templetrek_reward_amount](int $minimum, int $maximum, int $points, int $route)(int)
+def_int $point_cap = 8000;
+def_int $bounded_points = $points;
+if ($bounded_points < 0) $bounded_points = 0;
+if ($bounded_points > $point_cap) $bounded_points = $point_cap;
+def_int $range = sub($maximum, $minimum);
+def_int $ceiling = add($minimum, divide(multiply($range, multiply($bounded_points, $route)), multiply($point_cap, 3)));
+return(add($minimum, random(add(sub($ceiling, $minimum), 1))));
+
+// UNKNOWN default: uniform selection among the seven source-listed tome skills.
+[proc,templetrek_random_tome](int $route)(namedobj)
+def_int $skill = random(7);
+switch_int ($skill) {
+    case 0 :
+        if ($route = 1) return(templetrek_tome_agility_level_1);
+        if ($route = 2) return(templetrek_tome_agility_level_2);
+        return(templetrek_tome_agility_level_3);
+    case 1 :
+        if ($route = 1) return(templetrek_tome_firemaking_level_1);
+        if ($route = 2) return(templetrek_tome_firemaking_level_2);
+        return(templetrek_tome_firemaking_level_3);
+    case 2 :
+        if ($route = 1) return(templetrek_tome_fishing_level_1);
+        if ($route = 2) return(templetrek_tome_fishing_level_2);
+        return(templetrek_tome_fishing_level_3);
+    case 3 :
+        if ($route = 1) return(templetrek_tome_mining_level_1);
+        if ($route = 2) return(templetrek_tome_mining_level_2);
+        return(templetrek_tome_mining_level_3);
+    case 4 :
+        if ($route = 1) return(templetrek_tome_slayer_level_1);
+        if ($route = 2) return(templetrek_tome_slayer_level_2);
+        return(templetrek_tome_slayer_level_3);
+    case 5 :
+        if ($route = 1) return(templetrek_tome_thieving_level_1);
+        if ($route = 2) return(templetrek_tome_thieving_level_2);
+        return(templetrek_tome_thieving_level_3);
+    case 6 :
+        if ($route = 1) return(templetrek_tome_woodcutting_level_1);
+        if ($route = 2) return(templetrek_tome_woodcutting_level_2);
+        return(templetrek_tome_woodcutting_level_3);
+}
+return(templetrek_tome_agility_level_1);
+
+[proc,templetrek_read_tome](obj $tome, stat $skill, int $level)
+if (inv_total(inv, $tome) < 1) return;
+def_int $minimum = 0;
+def_int $maximum = 0;
+if ($level = 1) {
+    $minimum = 550;
+    $maximum = 1100;
+} else if ($level = 2) {
+    $minimum = 990;
+    $maximum = 2035;
+} else if ($level = 3) {
+    $minimum = 990;
+    $maximum = 4015;
+}
+if ($minimum = 0) return;
+// UNKNOWN distribution: uniform integer XP within the candidate 2007 bounds.
+def_int $experience = add($minimum, random(add(sub($maximum, $minimum), 1)));
+inv_del(inv, $tome, 1);
+stat_advance($skill, multiply($experience, 10));
+
+[opheld1,templetrek_tome_agility_level_1]
+~templetrek_read_tome(templetrek_tome_agility_level_1, agility, 1);
+[opheld1,templetrek_tome_agility_level_2]
+~templetrek_read_tome(templetrek_tome_agility_level_2, agility, 2);
+[opheld1,templetrek_tome_agility_level_3]
+~templetrek_read_tome(templetrek_tome_agility_level_3, agility, 3);
+[opheld1,templetrek_tome_firemaking_level_1]
+~templetrek_read_tome(templetrek_tome_firemaking_level_1, firemaking, 1);
+[opheld1,templetrek_tome_firemaking_level_2]
+~templetrek_read_tome(templetrek_tome_firemaking_level_2, firemaking, 2);
+[opheld1,templetrek_tome_firemaking_level_3]
+~templetrek_read_tome(templetrek_tome_firemaking_level_3, firemaking, 3);
+[opheld1,templetrek_tome_fishing_level_1]
+~templetrek_read_tome(templetrek_tome_fishing_level_1, fishing, 1);
+[opheld1,templetrek_tome_fishing_level_2]
+~templetrek_read_tome(templetrek_tome_fishing_level_2, fishing, 2);
+[opheld1,templetrek_tome_fishing_level_3]
+~templetrek_read_tome(templetrek_tome_fishing_level_3, fishing, 3);
+[opheld1,templetrek_tome_mining_level_1]
+~templetrek_read_tome(templetrek_tome_mining_level_1, mining, 1);
+[opheld1,templetrek_tome_mining_level_2]
+~templetrek_read_tome(templetrek_tome_mining_level_2, mining, 2);
+[opheld1,templetrek_tome_mining_level_3]
+~templetrek_read_tome(templetrek_tome_mining_level_3, mining, 3);
+[opheld1,templetrek_tome_slayer_level_1]
+~templetrek_read_tome(templetrek_tome_slayer_level_1, slayer, 1);
+[opheld1,templetrek_tome_slayer_level_2]
+~templetrek_read_tome(templetrek_tome_slayer_level_2, slayer, 2);
+[opheld1,templetrek_tome_slayer_level_3]
+~templetrek_read_tome(templetrek_tome_slayer_level_3, slayer, 3);
+[opheld1,templetrek_tome_thieving_level_1]
+~templetrek_read_tome(templetrek_tome_thieving_level_1, thieving, 1);
+[opheld1,templetrek_tome_thieving_level_2]
+~templetrek_read_tome(templetrek_tome_thieving_level_2, thieving, 2);
+[opheld1,templetrek_tome_thieving_level_3]
+~templetrek_read_tome(templetrek_tome_thieving_level_3, thieving, 3);
+[opheld1,templetrek_tome_woodcutting_level_1]
+~templetrek_read_tome(templetrek_tome_woodcutting_level_1, woodcutting, 1);
+[opheld1,templetrek_tome_woodcutting_level_2]
+~templetrek_read_tome(templetrek_tome_woodcutting_level_2, woodcutting, 2);
+[opheld1,templetrek_tome_woodcutting_level_3]
+~templetrek_read_tome(templetrek_tome_woodcutting_level_3, woodcutting, 3);

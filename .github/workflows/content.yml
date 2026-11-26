@@ -412,6 +412,7 @@ jobs:
           run_test tests/giant-mole/test_giant_mole.mjs node --import tsx ../content/tests/giant-mole/test_giant_mole.mjs
           run_test tests/soulbane/test_soulbane.mjs node --import tsx ../content/tests/soulbane/test_soulbane.mjs
           run_test tests/soulbane-postquest/test_soulbane_postquest.mjs node --import tsx ../content/tests/soulbane-postquest/test_soulbane_postquest.mjs
+          run_test tests/temple-trekking/test_temple_trekking.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/temple-trekking/test_temple_trekking.mjs
           run_test tests/keldagrim-townsfolk/test_keldagrim_townsfolk.mjs node --import tsx ../content/tests/keldagrim-townsfolk/test_keldagrim_townsfolk.mjs
           exit "$failed"
 
