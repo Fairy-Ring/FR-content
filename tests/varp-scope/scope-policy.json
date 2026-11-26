@@ -21,7 +21,13 @@
     "magictraining6": "Original MTA bit bank includes the permanent Bones to Peaches spell entitlement; room counters are reset on entry and exit.",
     "varp625_bits": "MTA completed-maze streak survives leaving and logout, as the 15 April 2006 official guide requires.",
     "varp626_bits": "MTA deposited-coin bank rewards remain owed until leaving or login recovery; transient cupboard rotation fields are reset on entry and cleanup.",
-    "handsand_last_sand_minutes": "UNKNOWN engineering storage in reserved original slot 271 stores the last daily sand delivery, so logout cannot reset the service."
+    "handsand_last_sand_minutes": "UNKNOWN engineering storage in reserved original slot 271 stores the last daily sand delivery, so logout cannot reset the service.",
+    "blast_furnace_access_until": "UNKNOWN engineering persistence for the fee deadline in reserved original slot 411; save it so the Foreman's paid access does not reset at logout.",
+    "blast_furnace_1": "Original per-player bar and ore stock must survive logout; the cached transmitted varp stores unclaimed bars and deposited ore.",
+    "blast_furnace_2": "Original per-player bar and ore stock must survive logout; the cached transmitted varp stores unclaimed bars and deposited ore.",
+    "blast_furnace_3": "Original per-player bar and ore stock must survive logout; the cached transmitted varp stores unclaimed bars and deposited ore.",
+    "blast_furnace_4": "Original per-player bar and ore stock must survive logout; the cached transmitted varp stores unclaimed bars and deposited ore.",
+    "blast_furnace_5": "Original per-player bar and ore stock plus passive-cooling remainder must survive logout; the cached transmitted varp stores pending production state."
   },
   "inheritedPermanent": [
     "bunny_ears_unlocked",
@@ -418,7 +424,8 @@
     "temple_sanctity": "The drain timer does not survive logout, so a saved pool would remain undrained. Period logout behaviour is UNKNOWN. Keep the temporary scope as an engineering choice.",
     "ghast_delay": "This timestamp is meaningful only in the current map-clock/session and the delay rebuilds naturally; persisting it across logout would retain a stale cooldown rather than preserve lasting progress.",
     "mortmyre": "This flag only prevents starting duplicate active decay timers and is cleared by the timer; it is transient runtime state, not a quest or reward record.",
-    "handsand_transmit": "Original transmitted bits 0..3 control temporary Sandy, coffee, and counter morphs. Sandy distraction resets on logout; quest stage 635 remains saved, and the required view can rebuild. Cosmetic coffee and counter states can reset."
+    "handsand_transmit": "Original transmitted bits 0..3 control temporary Sandy, coffee, and counter morphs. Sandy distraction resets on logout; quest stage 635 remains saved, and the required view can rebuild. Cosmetic coffee and counter states can reset.",
+    "blast_furnace_readings": "The values are derived machine readings and a session-only gauge-open bit; logout may clear them because the machine refresh reconstructs the readings and permanent stocks/cooling determine hot-bar state."
   },
   "declarationScopes": {
     "100_ogre": "perm",
@@ -471,11 +478,11 @@
     "bioerrand": "perm",
     "biohazard": "perm",
     "blackarmgang": "perm",
-    "blast_furnace_1": "temp",
-    "blast_furnace_2": "temp",
-    "blast_furnace_3": "temp",
-    "blast_furnace_4": "temp",
-    "blast_furnace_5": "temp",
+    "blast_furnace_1": "perm",
+    "blast_furnace_2": "perm",
+    "blast_furnace_3": "perm",
+    "blast_furnace_4": "perm",
+    "blast_furnace_5": "perm",
     "blast_furnace_readings": "temp",
     "boardgames_draughts_rank": "perm",
     "boardgames_drop_warning": "temp",
@@ -1027,7 +1034,6 @@
     "varp396_bits": "temp",
     "varp409_bits": "temp",
     "fightpits_state": "temp",
-    "varp411_unused": "temp",
     "varp412_bits": "temp",
     "varp413_bits": "temp",
     "brewing_clock": "perm",
@@ -1189,7 +1195,8 @@
     "zombie_ogre": "perm",
     "zombiequeen": "perm",
     "zq_map_mechanisms": "perm",
-    "zq_rash_timer": "temp"
+    "zq_rash_timer": "temp",
+    "blast_furnace_access_until": "perm"
   },
   "declarationReasons": {
     "ahoy_puzzle_state": "Reserved original slot stores permanent model flag dyes, pending ecto-tokens and the crone manual hand-in.",
@@ -1457,6 +1464,13 @@
     "mortmyre": "Active swamp-decay timer flag in the Mort Myre area. This flag only prevents starting duplicate active decay timers and is cleared by the timer; it is transient runtime state, not a quest or reward record.",
     "druidspirit": "Nature Spirit quest stage through the nature/spirit stones and ritual. The stage gates the stone and ritual handoffs; clearing it would undo completed items and quest credit.",
     "druidspirit_bits": "Nature Spirit bit flags for obtaining the nature stone and spirit stone. The bits record quest stones already collected and are read by the journal and ritual; clearing them would erase completed item steps and block the ritual.",
-    "mourning_quest_part2": "Mourning’s End Part II main quest stage. The stage gates the Mourner/Temple route and completion state; clearing it would undo the player’s completed quest progress and access."
+    "mourning_quest_part2": "Mourning's End Part II main quest stage. The stage gates the Mourner/Temple route and completion state; clearing it would undo the player's completed quest progress and access.",
+    "blast_furnace_access_until": "Reserved original slot 411 stores the Foreman's ten-minute access deadline, so the paid service remains valid across logout.",
+    "blast_furnace_1": "Original transmitted per-player bar and ore storage; saving preserves unclaimed stock and deposited investment across logout.",
+    "blast_furnace_2": "Original transmitted per-player bar and ore storage; saving preserves unclaimed stock and deposited investment across logout.",
+    "blast_furnace_3": "Original transmitted per-player bar and ore storage; saving preserves unclaimed stock and deposited investment across logout.",
+    "blast_furnace_4": "Original transmitted per-player bar and ore storage; saving preserves unclaimed stock and deposited investment across logout.",
+    "blast_furnace_5": "Original transmitted per-player bar and ore storage plus passive-cooling remainder; saving preserves stock and unfinished cooling across logout.",
+    "blast_furnace_readings": "Original transmitted derived readings and session-only gauge-open bit; the machine refresh rebuilds readings and hot-bar state is derived from permanent stock/cooling."
   }
 }

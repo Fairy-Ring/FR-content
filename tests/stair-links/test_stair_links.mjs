@@ -118,6 +118,11 @@ const jiggigLinks = new Map([
   ['ogre_stairs_down:2_38_147_11_9:1', { destination: [0, 2443, 9416], counterpart: { name: 'ogre_stairs', coord: '0_38_147_11_9', angle: 1 } }],
   ['ogre_stairs:0_38_147_11_9:1', { destination: [2, 2443, 9420], counterpart: { name: 'ogre_stairs_down', coord: '2_38_147_11_9', angle: 1 } }]
 ]);
+// The native factory and cellar stairs connect two level-zero map regions.
+const blastFurnaceLinks = new Map([
+  ['blast_furnace_stairs_up:0_30_77_19_28:2', { destination: [0, 2931, 10195], counterpart: { name: 'dwarf_keldagrim_factory_stairs', coord: '0_45_159_50_20', angle: 1 } }],
+  ['dwarf_keldagrim_factory_stairs:0_45_159_50_20:1', { destination: [0, 1939, 4958], counterpart: { name: 'blast_furnace_stairs_up', coord: '0_30_77_19_28', angle: 2 } }]
+]);
 const failures = [];
 const counts = { inherited: 0, new: 0, fallback: 0, roundTrips: 0 };
 for (const entry of manifest) {
@@ -150,7 +155,12 @@ for (const entry of manifest) {
       const region = regionExceptions.get(executionKey(entry));
       const collision = collisionExceptions.get(executionKey(entry));
       const jiggig = jiggigLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
-      if (jiggig) {
+      const blastFurnace = blastFurnaceLinks.get(`${entry.name}:${entry.coord}:${entry.angle}`);
+      if (blastFurnace) {
+        assert.deepEqual(result.destination, blastFurnace.destination, 'Blast Furnace has the exact packed landing and level');
+        assert.deepEqual(entry.counterpart, blastFurnace.counterpart, 'Blast Furnace uses its exact native counterpart');
+        assert.equal(result.destination[0], decode(blastFurnace.counterpart.coord)[0], 'Blast Furnace arrives on its native counterpart level');
+      } else if (jiggig) {
         assert.deepEqual(result.destination, jiggig.destination, 'Jiggig has the exact packed landing and level');
         assert.deepEqual(entry.counterpart, jiggig.counterpart, 'Jiggig uses its exact native counterpart');
         assert.equal(result.destination[0], decode(jiggig.counterpart.coord)[0], 'Jiggig arrives on its native counterpart level');

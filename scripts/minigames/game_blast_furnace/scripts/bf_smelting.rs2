@@ -1,0 +1,138 @@
+// VERIFIED recipes/iron success: Tip.It, 4 Nov 2005. Levels/XP reuse smithing structs.
+[oploc1,blast_furnace_conveyer_belt_clickable]
+p_arrivedelay;
+// UNKNOWN plain functional menu wording; the period guide describes this offer.
+if (~p_choice2("Put all ores on the conveyor belt.", 1, "Cancel.", 2) = 2) return;
+if_close;
+~bf_load(coal, 28);
+~bf_load(copper_ore, 28);
+~bf_load(tin_ore, 28);
+~bf_load(iron_ore, 28);
+~bf_load(silver_ore, 28);
+~bf_load(gold_ore, 28);
+~bf_load(mithril_ore, 28);
+~bf_load(adamantite_ore, 28);
+~bf_load(runite_ore, 28);
+
+[oplocu,blast_furnace_conveyer_belt_clickable]
+def_obj $used = last_useitem;
+p_arrivedelay;
+~bf_load($used, inv_total(inv, $used));
+
+[proc,bf_load](obj $ore, int $requested)
+if (~bf_ore_supported($ore) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~bf_access = false) return;
+if ($requested < 1 | inv_total(inv, $ore) < 1) return;
+def_int $capacity = sub(^bf_ore_capacity, ~bf_primary_count);
+if ($ore = coal) {
+    $capacity = sub(^bf_coal_capacity, %blast_furnace_coal);
+} else {
+    def_namedobj $bar = oc_param($ore, smeltsto);
+    // Perfect gold has cache leftovers, but is a quest material, not ordinary ore.
+    if ($bar = null | $ore = perfect_gold_ore) return;
+    def_struct $recipe = oc_param($bar, smelting_struct);
+    if (stat(smithing) < struct_param($recipe, levelrequired)) {
+        mes(struct_param($recipe, levelfailure));
+        return;
+    }
+}
+def_int $count = min($requested, min(inv_total(inv, $ore), $capacity));
+if ($count < 1) {
+    mes("There is no room for more ore."); // UNKNOWN functional wording.
+    return;
+}
+inv_del(inv, $ore, $count);
+~bf_store($ore, add(~bf_count($ore), $count));
+%blast_furnace_5 = setbit(%blast_furnace_5, ^bf_belt_bit);
+~bf_update_readings;
+mes("You put the ore on the conveyor belt."); // UNKNOWN functional wording.
+
+[proc,bf_ore_supported](obj $ore)(boolean)
+switch_obj ($ore) {
+    case coal, copper_ore, tin_ore, iron_ore, silver_ore, gold_ore, mithril_ore, adamantite_ore, runite_ore : return(true);
+}
+return(false);
+
+[proc,bf_primary_count]()(int)
+return(calc(%blast_furnace_copper_ore + %blast_furnace_tin_ore + %blast_furnace_iron_ore + %blast_furnace_silver_ore + %blast_furnace_gold_ore + %blast_furnace_mithril_ore + %blast_furnace_adamantite_ore + %blast_furnace_runite_ore));
+
+[proc,bf_bar_count]()(int)
+return(calc(%blast_furnace_bronze_bars + %blast_furnace_iron_bars + %blast_furnace_steel_bars + %blast_furnace_silver_bars + %blast_furnace_gold_bars + %blast_furnace_mithril_bars + %blast_furnace_adamantite_bars + %blast_furnace_runite_bars));
+
+[proc,bf_count](obj $item)(int)
+switch_obj ($item) {
+    case coal : return(%blast_furnace_coal);
+    case copper_ore : return(%blast_furnace_copper_ore);
+    case tin_ore : return(%blast_furnace_tin_ore);
+    case iron_ore : return(%blast_furnace_iron_ore);
+    case silver_ore : return(%blast_furnace_silver_ore);
+    case gold_ore : return(%blast_furnace_gold_ore);
+    case mithril_ore : return(%blast_furnace_mithril_ore);
+    case adamantite_ore : return(%blast_furnace_adamantite_ore);
+    case runite_ore : return(%blast_furnace_runite_ore);
+    case bronze_bar : return(%blast_furnace_bronze_bars);
+    case iron_bar : return(%blast_furnace_iron_bars);
+    case steel_bar : return(%blast_furnace_steel_bars);
+    case silver_bar : return(%blast_furnace_silver_bars);
+    case gold_bar : return(%blast_furnace_gold_bars);
+    case mithril_bar : return(%blast_furnace_mithril_bars);
+    case adamantite_bar : return(%blast_furnace_adamantite_bars);
+    case runite_bar : return(%blast_furnace_runite_bars);
+}
+return(0);
+
+[proc,bf_store](obj $item, int $count)
+switch_obj ($item) {
+    case coal : %blast_furnace_coal = $count;
+    case copper_ore : %blast_furnace_copper_ore = $count;
+    case tin_ore : %blast_furnace_tin_ore = $count;
+    case iron_ore : %blast_furnace_iron_ore = $count;
+    case silver_ore : %blast_furnace_silver_ore = $count;
+    case gold_ore : %blast_furnace_gold_ore = $count;
+    case mithril_ore : %blast_furnace_mithril_ore = $count;
+    case adamantite_ore : %blast_furnace_adamantite_ore = $count;
+    case runite_ore : %blast_furnace_runite_ore = $count;
+    case bronze_bar : %blast_furnace_bronze_bars = $count;
+    case iron_bar : %blast_furnace_iron_bars = $count;
+    case steel_bar : %blast_furnace_steel_bars = $count;
+    case silver_bar : %blast_furnace_silver_bars = $count;
+    case gold_bar : %blast_furnace_gold_bars = $count;
+    case mithril_bar : %blast_furnace_mithril_bars = $count;
+    case adamantite_bar : %blast_furnace_adamantite_bars = $count;
+    case runite_bar : %blast_furnace_runite_bars = $count;
+}
+
+[proc,bf_smelt]
+if (~bf_working = false | testbit(%blast_furnace_5, ^bf_belt_bit) = 1) return;
+def_int $before = ~bf_bar_count;
+~bf_make(bronze_bar, copper_ore, min(%blast_furnace_copper_ore, %blast_furnace_tin_ore), 0);
+if (stat(smithing) >= 30 & %blast_furnace_coal > 0) {
+    ~bf_make(steel_bar, iron_ore, %blast_furnace_iron_ore, 1);
+} else {
+    ~bf_make(iron_bar, iron_ore, %blast_furnace_iron_ore, 0);
+}
+~bf_make(silver_bar, silver_ore, %blast_furnace_silver_ore, 0);
+~bf_make(gold_bar, gold_ore, %blast_furnace_gold_ore, 0);
+~bf_make(mithril_bar, mithril_ore, %blast_furnace_mithril_ore, 2);
+~bf_make(adamantite_bar, adamantite_ore, %blast_furnace_adamantite_ore, 3);
+~bf_make(runite_bar, runite_ore, %blast_furnace_runite_ore, 4);
+if (~bf_bar_count > $before) {
+    %blast_furnace_bars_hot = 2;
+    %blast_furnace_5 = setbit_range_toint(%blast_furnace_5, ^bf_cooling_ticks, ^bf_cooling_start, ^bf_cooling_end);
+    mes("Your bars are ready in the dispenser, but they are still hot."); // UNKNOWN wording.
+}
+~bf_update_readings;
+
+[proc,bf_make](namedobj $bar, obj $ore, int $count, int $coal)
+def_struct $recipe = oc_param($bar, smelting_struct);
+if (stat(smithing) < struct_param($recipe, levelrequired)) return;
+$count = min($count, sub(255, ~bf_count($bar)));
+if ($coal > 0) $count = min($count, divide(%blast_furnace_coal, $coal));
+if ($count < 1) return;
+~bf_store($ore, sub(~bf_count($ore), $count));
+if ($bar = bronze_bar) %blast_furnace_tin_ore = sub(%blast_furnace_tin_ore, $count);
+%blast_furnace_coal = sub(%blast_furnace_coal, multiply($count, $coal));
+~bf_store($bar, add(~bf_count($bar), $count));

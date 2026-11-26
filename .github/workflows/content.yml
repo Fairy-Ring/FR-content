@@ -291,6 +291,7 @@ jobs:
           run_test tests/fenkenstrain-completion/test_fenk_s1.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s1.py
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
           run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
+          run_test tests/blast-furnace/test_blast_furnace.mjs node --import tsx ../content/tests/blast-furnace/test_blast_furnace.mjs
           run_test tests/smelt-batch/test_smelt_batch.mjs node --import tsx ../content/tests/smelt-batch/test_smelt_batch.mjs
           run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
           run_test tests/tan-snake/test_tan_snake.mjs node --import tsx ../content/tests/tan-snake/test_tan_snake.mjs

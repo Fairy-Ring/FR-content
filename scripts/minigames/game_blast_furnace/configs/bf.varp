@@ -1,0 +1,38 @@
+// Reserved original 377 slot 411: UNKNOWN persistent engineering fee deadline.
+[blast_furnace_access_until]
+type=int
+scope=perm
+
+// Original transmitted readings are derived; gauge-open bit 30 is temporary.
+// Hot-bar state is reconstructed from permanent stock and the cooling counter.
+// Shared room timer updates private stocks/readings atomically, including while a worker reads a modal gauge.
+[blast_furnace_readings]
+protect=no
+transmit=yes
+scope=temp
+
+// Original transmitted per-player ore/bar storage must survive logout.
+[blast_furnace_1]
+protect=no
+transmit=yes
+scope=perm
+
+[blast_furnace_2]
+protect=no
+transmit=yes
+scope=perm
+
+[blast_furnace_3]
+protect=no
+transmit=yes
+scope=perm
+
+// Server-only ore counts; no 377 client reader reads blast_furnace_4.
+[blast_furnace_4]
+protect=no
+scope=perm
+
+[blast_furnace_5]
+protect=no
+transmit=yes
+scope=perm
