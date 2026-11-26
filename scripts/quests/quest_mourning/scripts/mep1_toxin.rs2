@@ -10,18 +10,40 @@
 [oplocu,grain_sacks_8805] @mep1_poison_m39;
 [oplocu,grain_sacks_8806] @mep1_poison_m38;
 
+// UNKNOWN functional dialogue; wording is practical, not period-authentic.
 [label,mep1_elena]
 if (%mourning_quest = ^mep1_toxin_task) {
-    if (inv_total(inv, applebarrel_full) < 1) return;
+    if (inv_total(inv, applebarrel_full) < 1) {
+        ~chatnpc("<p,neutral>Please bring me a barrel of rotten apples from the orchard north of Ardougne.");
+        return;
+    }
+    ~chatplayer("<p,happy>I have the barrel of rotten apples.");
     if (inv_total(inv, mourning_sieve) < 1) {
-        if (inv_freespace(inv) < 1) return;
+        if (inv_freespace(inv) < 1) {
+            ~chatnpc("<p,neutral>Make room in your inventory so I can give you a sieve, then speak to me again.");
+            return;
+        }
         inv_add(inv, mourning_sieve, 1);
+        ~chatnpc("<p,neutral>Take this sieve.");
     }
     %mourning_quest = ^mep1_toxin_recipe;
+    ~chatnpc("<p,neutral>Mash the apples in the empty barrel in the orchard north of Ardougne, then mix the mash with naphtha.");
+    ~chatnpc("<p,neutral>Sieve the mixture and heat it on a range, not an open fire.");
+    ~chatnpc("<p,neutral>Use the poison on the grain sacks in West Ardougne.");
     return;
 }
-if (%mourning_quest >= ^mep1_toxin_recipe & %mourning_quest < ^mourning_complete & inv_total(inv, mourning_sieve) < 1 & inv_freespace(inv) > 0) {
-    inv_add(inv, mourning_sieve, 1);
+if (%mourning_quest >= ^mep1_toxin_recipe & %mourning_quest < ^mourning_complete) {
+    if (inv_total(inv, mourning_sieve) < 1) {
+        if (inv_freespace(inv) < 1) {
+            ~chatnpc("<p,neutral>Make room in your inventory and speak to me again for a replacement sieve.");
+        } else {
+            inv_add(inv, mourning_sieve, 1);
+            ~chatnpc("<p,neutral>Here is a replacement sieve.");
+        }
+    }
+    ~chatnpc("<p,neutral>Mash rotten apples in the orchard barrel, mix in naphtha, sieve it, then heat it on a range, not an open fire.");
+    ~chatnpc("<p,neutral>Use the poison on the grain sacks in West Ardougne.");
+    return;
 }
 
 [label,mep1_take_apples]
