@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   World, PlayerStat, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, types,
   nativeLoc, nativeLocRows, nativeNpc, locFor, stand, operate, talk, useItems, useLoc,
-  run, player, give, count, bit, setBit, setVar, id, worn, bank, remove, clear, load, capture
+  run, player, give, count, bit, setBit, setVar, id, worn, bank, remove, clear, load, capture, text
 } from './runtime.mjs';
 
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -113,7 +113,7 @@ talk(p, dad);
 assert.equal(bit(p, 'hundred_dwarf_quest'), stage('rfd_dwarf_father_spoken'));
 assert.equal(bit(p, 'hundred_dwarf_multi_dad'), 1, 'the original multi changes to Rohak');
 const barmaid = nativeNpc('risingsun_barmaid');
-talk(p, barmaid);
+talk(p, barmaid, [1]);
 assert.equal(bit(p, 'hundred_dwarf_quest'), stage('rfd_dwarf_recipe_paid'));
 assert.equal(count(p, 'coins'), 112, 'barmaid charges the verified 200-coin recipe fee');
 for (let ale = 0; ale < 4; ale++) {
@@ -205,16 +205,40 @@ const poor = player();
 setBit(poor, 'hundred_dwarf_quest', stage('rfd_dwarf_father_spoken'));
 give(poor, 'coins', 199);
 give(poor, 'ring_of_charos_unlocked');
-talk(poor, barmaid);
+talk(poor, barmaid, [4]);
 assert.equal(bit(poor, 'hundred_dwarf_quest'), stage('rfd_dwarf_father_spoken'), 'an unworn ring does not waive an unaffordable recipe fee');
 assert.equal(count(poor, 'coins'), 199, 'a rejected recipe purchase consumes no coins');
+assert.match(text(poor), /what ales are you serving/i, 'an unaffordable recipe does not block the normal bar menu');
+talk(poor, barmaid, [1]);
+assert.equal(count(poor, 'asgarnian_ale'), 1, 'a poor player can still buy an ordinary ale');
+assert.equal(count(poor, 'coins'), 197);
+assert.equal(bit(poor, 'hundred_dwarf_quest'), stage('rfd_dwarf_father_spoken'));
+
+for (const affordable of [false, true]) {
+  const barcrawl = player();
+  setBit(barcrawl, 'hundred_dwarf_quest', stage('rfd_dwarf_father_spoken'));
+  give(barcrawl, 'coins', affordable ? 312 : 199);
+  give(barcrawl, 'barcrawl_card');
+  talk(barcrawl, barmaid, affordable ? [2, 2] : [2]);
+  assert.notEqual(barcrawl.getVar(id('VarPlayerType', 'barcrawl')), 0, 'the normal Barcrawl branch still signs the card');
+  assert.equal(count(barcrawl, 'coins'), (affordable ? 312 : 199) - 70, 'Barcrawl charges only its original price');
+  assert.equal(bit(barcrawl, 'hundred_dwarf_quest'), stage('rfd_dwarf_father_spoken'), 'Barcrawl does not purchase the Dwarf recipe');
+}
+
+const declined = player();
+setBit(declined, 'hundred_dwarf_quest', stage('rfd_dwarf_father_spoken'));
+give(declined, 'coins', 312);
+talk(declined, barmaid, [2, 1]);
+assert.equal(count(declined, 'asgarnian_ale'), 1, 'declining the Dwarf topic reaches the ordinary ale menu');
+assert.equal(count(declined, 'coins'), 310, 'declining the topic does not charge the recipe fee');
+assert.equal(bit(declined, 'hundred_dwarf_quest'), stage('rfd_dwarf_father_spoken'));
 
 // The worn ring waives only the separate recipe fee; it is not a purchase or inventory check.
 const ringCase = player();
 setBit(ringCase, 'hundred_dwarf_quest', stage('rfd_dwarf_father_spoken'));
 give(ringCase, 'ring_of_charos_unlocked', 1, worn);
 give(ringCase, 'coins', 17);
-talk(ringCase, barmaid);
+talk(ringCase, barmaid, [1]);
 assert.equal(bit(ringCase, 'hundred_dwarf_quest'), stage('rfd_dwarf_recipe_paid'));
 assert.equal(count(ringCase, 'coins'), 17);
 
