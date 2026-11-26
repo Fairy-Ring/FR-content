@@ -8,7 +8,7 @@ if (%feud_var = ^feud_mayor_reveal) {
     @feud_ali_m_report;
 }
 if (%feud_var >= ^feud_complete) {
-    ~openshop_activenpc;
+    ~roguetrader_ali;
     return;
 }
 if (%feud_var > ^feud_not_started) {

@@ -17,7 +17,7 @@ const shopRoot = id('Component', 'shop_template');
 
 function open(p) {
   const money = count(p, 'coins'), before = inventory(p), messages = p.messages.length;
-  talk(p, 'feud_ali_m', stage(p) === 0 ? [2] : stage(p) < 28 ? [2] : []);
+  talk(p, 'feud_ali_m', stage(p) === 0 ? [2] : stage(p) < 28 ? [2] : [1]);
   assert.equal(p.modalMain, shopRoot, 'real Morrisane dialogue opens basic stock');
   assert.deepEqual(inventory(p), before, 'viewing stock alone transfers nothing');
   assert.equal(count(p, 'coins'), money);
