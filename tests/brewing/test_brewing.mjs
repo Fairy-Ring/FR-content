@@ -312,7 +312,7 @@ try {
   }
   // Ordinary range cooking and knife dispatch remain functional alongside malt/kegs.
   JavaRandom.nextDouble = randomDouble; // Do not constrain unrelated Cooking RNG.
-  const p = player(); give(p, 'barley', 2);
+  const p = player(); p.stats[PlayerStat.COOKING] = 130344310; give(p, 'barley', 2);
   itemLoc(p, 'barley', 'rimmington_poor_range'); itemLoc(p, 'barley', 'rimmington_poor_range');
   assert.equal(count(p, 'barley_malt'), 2);
   for (const reverse of [false, true]) {
