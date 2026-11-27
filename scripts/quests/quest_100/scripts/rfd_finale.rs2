@@ -124,14 +124,20 @@ if (npc_type = hundred_minion2) {
     if (p_finduid(%npc_attacking_uid) = true) ~rfd_finale_disarm;
     return;
 }
+def_npc $next;
 switch_npc(npc_type) {
-    case hundred_minion5_air : npc_changetype(hundred_minion5_water, ^rfd_finale_lifetime);
-    case hundred_minion5_water : npc_changetype(hundred_minion5_melee, ^rfd_finale_lifetime);
-    case hundred_minion5_melee : npc_changetype(hundred_minion5_earth, ^rfd_finale_lifetime);
-    case hundred_minion5_earth : npc_changetype(hundred_minion5_fire, ^rfd_finale_lifetime);
-    case hundred_minion5_fire : npc_changetype(hundred_minion5_ranged, ^rfd_finale_lifetime);
-    case hundred_minion5_ranged : npc_changetype(hundred_minion5_air, ^rfd_finale_lifetime);
+    case hundred_minion5_air : $next = hundred_minion5_water;
+    case hundred_minion5_water : $next = hundred_minion5_melee;
+    case hundred_minion5_melee : $next = hundred_minion5_earth;
+    case hundred_minion5_earth : $next = hundred_minion5_fire;
+    case hundred_minion5_fire : $next = hundred_minion5_ranged;
+    case hundred_minion5_ranged : $next = hundred_minion5_air;
+    case default : return;
 }
+def_npc_uid $old_uid = npc_uid;
+npc_changetype($next, ^rfd_finale_lifetime);
+// The native type-encoded UID changes; keep only this existing combat opponent.
+if (%aggressive_npc = $old_uid) %aggressive_npc = npc_uid;
 
 [proc,rfd_finale_disarm]
 if (inv_getobj(worn, ^wearpos_hands) = ice_gloves) return;

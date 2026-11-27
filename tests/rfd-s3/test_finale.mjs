@@ -230,8 +230,16 @@ for (let wave = 0; wave < expected.length; wave++) {
       setVar(p, 'damagetype', value(phase.endsWith('ranged') ? 'ranged_style' : 'crush_style'));
       assert.equal(result(p, '[proc,npc_max_dealt]', [maximum, spell], actor), maximum, `${phase} accepts the period weakness`);
       assert.equal(result(p, '[proc,npc_max_dealt]', [maximum, 41], actor), 0, `${phase} rejects an unrelated spell before XP`);
+      const tracked = phase !== 'hundred_minion5_water';
+      setVar(p, 'aggressive_npc', tracked ? actor.uid : -1);
+      setVar(p, 'lastcombat', World.currentTick);
+      assert.equal(result(p, '[proc,player_in_combat_check]', [], actor), 1, 'the owned opponent is admitted before its colour changes');
+      const previousUid = actor.uid;
       npcRun(p, actor, 'AI_TIMER');
       assert.equal(actor.levels[NpcStat.HITPOINTS], type.stats[NpcStat.HITPOINTS] - 5, 'native colour changes preserve damage');
+      assert.notEqual(actor.uid, previousUid, 'native type changes also change the encoded NPC UID');
+      assert.equal(variable(p, 'aggressive_npc'), tracked ? actor.uid : -1, 'colour change preserves this opponent only, not a cleared combat target');
+      assert.equal(result(p, '[proc,player_in_combat_check]', [], actor), 1, 'the real single-combat guard does not mistake the next colour for another opponent');
     }
   }
   // Authored death-queue vector: real portal spawn, native lethal damage queue,
