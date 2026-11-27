@@ -340,7 +340,7 @@ if(inv_total(inv, asgarnian_ale) > 0) {
 ~chatplayer("<p,confused>I've lost the IOU you gave me.");
 def_string $mesanim = "<p,sad>";
 if(testbit(%death_bits, ^harold_verydrunk) = ^true) $mesanim = "<p,drunk>";
-~chatnpc("<$mesanim>Oh dear.");
+~chatnpc("<p,neutral><$mesanim>Oh dear.");
 if(%death_equiproom >= ^death_found_combo) {
     inv_add(inv, death_combination, 1);
     mes("Harold has given you the IOU, which you know is the combination.");

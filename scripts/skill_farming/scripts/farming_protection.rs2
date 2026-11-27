@@ -171,7 +171,7 @@ return(true);
 // CANDIDATE dialogue: Taria and each allotment gardener's retained transcript.
 // The charge numbers/items above are VERIFIED by the pre-cache Tip.It guide.
 [label,farming_gardener_pay]
-~chatplayer("Would you look after my crops for me?");
+~chatplayer("<p,quiz>Would you look after my crops for me?");
 def_int $patch = ~farming_gardener_patch;
 if ($patch >= 16 & ~farming_trees_can_clear($patch) = true) {
     @farming_trees_gardener_pay;
@@ -179,12 +179,12 @@ if ($patch >= 16 & ~farming_trees_can_clear($patch) = true) {
 }
 if ($patch = -1) {
     // This NPC has no supported paid-care patch.
-    ~chatnpc("You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
+    ~chatnpc("<p,neutral>You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
     return;
 }
 if ($patch < 8) {
-    if (npc_type = kragen) ~chatnpc("I might - which one were you thinking of?");
-    else ~chatnpc("I might. Which one were you thinking of?");
+    if (npc_type = kragen) ~chatnpc("<p,quiz>I might - which one were you thinking of?");
+    else ~chatnpc("<p,quiz>I might. Which one were you thinking of?");
     def_string $north = "The north-western allotment.";
     def_string $south = "The south-eastern allotment.";
     switch_npc (npc_type) {
@@ -193,43 +193,43 @@ if ($patch < 8) {
             $south = "The southern allotment.";
     }
     def_int $option = ~p_choice2($north, 1, $south, 2);
-    if ($option = 1) ~chatplayer($north);
+    if ($option = 1) ~chatplayer(append("<p,neutral>", $north));
     else {
-        ~chatplayer($south);
+        ~chatplayer(append("<p,neutral>", $south));
         $patch = add($patch, 1);
     }
 }
 if (~farming_protection_watched($patch) = true) {
-    ~chatnpc("I don't know what you're talking about - I'm already looking after that patch for you.");
-    ~chatplayer("Oh sorry, I forgot.");
+    ~chatnpc("<p,neutral>I don't know what you're talking about - I'm already looking after that patch for you.");
+    ~chatplayer("<p,neutral>Oh sorry, I forgot.");
     return;
 }
 def_int $stage = ~farming_protection_stage($patch);
 if ($patch >= 16) {
     if (~farming_trees_is_dead($patch, $stage) = true) {
-        ~chatnpc("That patch is dead - it's too late for me to do anything about it now.");
+        ~chatnpc("<p,neutral>That patch is dead - it's too late for me to do anything about it now.");
         return;
     }
     if (~farming_trees_is_diseased($patch, $stage) = true) {
-        ~chatnpc("That patch is diseased - you should cure it before asking me to be responsible for it!");
+        ~chatnpc("<p,neutral>That patch is diseased - you should cure it before asking me to be responsible for it!");
         return;
     }
 } else if ($patch >= 12) {
     if (~farming_bush_is_dead($stage) = true) {
-        ~chatnpc("That patch is dead - it's too late for me to do anything about it now.");
+        ~chatnpc("<p,neutral>That patch is dead - it's too late for me to do anything about it now.");
         return;
     }
     if (~farming_bush_is_diseased($stage) = true) {
-        ~chatnpc("That patch is diseased - you should cure it before asking me to be responsible for it!");
+        ~chatnpc("<p,neutral>That patch is diseased - you should cure it before asking me to be responsible for it!");
         return;
     }
 } else {
     if ($stage >= ^farming_dead_offset) {
-        ~chatnpc("That patch is dead - it's too late for me to do anything about it now.");
+        ~chatnpc("<p,neutral>That patch is dead - it's too late for me to do anything about it now.");
         return;
     }
     if ($stage >= ^farming_diseased_offset) {
-        ~chatnpc("That patch is diseased - you should cure it before asking me to be responsible for it!");
+        ~chatnpc("<p,neutral>That patch is diseased - you should cure it before asking me to be responsible for it!");
         return;
     }
 }
@@ -238,16 +238,16 @@ def_int $first;
 def_int $mature;
 $crop, $first, $mature = ~farming_protection_crop($patch);
 if ($crop = null) {
-    ~chatnpc("You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
+    ~chatnpc("<p,neutral>You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
     return;
 }
 if ($patch >= 12) {
     if ($stage >= $mature) {
-        ~chatnpc("That patch is already fully grown! I don't know what you want me to do with it!");
+        ~chatnpc("<p,neutral>That patch is already fully grown! I don't know what you want me to do with it!");
         return;
     }
 } else if (modulo($stage, ^farming_watered_offset) >= $mature) {
-    ~chatnpc("That patch is already fully grown! I don't know what you want me to do with it!");
+    ~chatnpc("<p,neutral>That patch is already fully grown! I don't know what you want me to do with it!");
     return;
 }
 def_obj $payment;
@@ -257,25 +257,25 @@ def_string $payment_name = ~farming_protection_payment_name($payment);
 def_string $amount;
 if ($quantity = 1) $amount = "one";
 else $amount = tostring($quantity);
-~chatnpc("If you like, but I want <$amount> <$payment_name> for that.");
+~chatnpc("<p,neutral>If you like, but I want <$amount> <$payment_name> for that.");
 def_int $available = inv_total(inv, $payment);
 def_obj $noted = oc_cert($payment);
 if ($noted ! $payment) $available = add($available, inv_total(inv, $noted));
 if ($available < $quantity) {
-    if ($available = 0) ~chatplayer("I'm afraid I don't have any of those at the moment.");
-    else ~chatplayer("I'm afraid I don't have enough of those at the moment.");
-    ~chatnpc("Well, I'm not wasting my time for free.");
+    if ($available = 0) ~chatplayer("<p,neutral>I'm afraid I don't have any of those at the moment.");
+    else ~chatplayer("<p,neutral>I'm afraid I don't have enough of those at the moment.");
+    ~chatnpc("<p,neutral>Well, I'm not wasting my time for free.");
     return;
 }
 def_int $confirm = ~p_choice2("Okay, it's a deal.", 1, "No, that's too much.", 2);
 if ($confirm = 2) {
-    ~chatplayer("No, that's too much.");
-    ~chatnpc("Well, I'm not wasting my time for free.");
+    ~chatplayer("<p,neutral>No, that's too much.");
+    ~chatnpc("<p,neutral>Well, I'm not wasting my time for free.");
     return;
 }
-~chatplayer("Okay, it's a deal.");
+~chatplayer("<p,neutral>Okay, it's a deal.");
 if (~farming_protection_hire($patch) = true) {
-    ~chatnpc("That'll do nicely, <text_gender("sir", "madam")>. Leave it with me - I'll make sure that patch grows for you.");
+    ~chatnpc("<p,neutral>That'll do nicely, <text_gender("sir", "madam")>. Leave it with me - I'll make sure that patch grows for you.");
 } else {
     // UNKNOWN engineering fallback: the crop can cease to be hireable while confirmation is open.
     ~displaymessage(^dm_default);

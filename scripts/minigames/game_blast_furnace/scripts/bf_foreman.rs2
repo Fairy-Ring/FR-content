@@ -3,14 +3,14 @@
 [opnpc1,blast_furnace_instructor]
 p_arrivedelay;
 if (stat(smithing) >= 60) {
-    ~chatnpc("With a Smithing level of 60 you can use the furnace for free.");
+    ~chatnpc("<p,neutral>With a Smithing level of 60 you can use the furnace for free.");
     return;
 }
 if (%blast_furnace_access_until > date_minutes) {
-    ~chatnpc("You have paid to use the furnace.");
+    ~chatnpc("<p,neutral>You have paid to use the furnace.");
     return;
 }
-~chatnpc("Using the furnace costs 2,500 coins below level 60 Smithing.");
+~chatnpc("<p,neutral>Using the furnace costs 2,500 coins below level 60 Smithing.");
 if (~p_choice2("Pay 2,500 coins.", 1, "No thanks.", 2) = 1) {
     if_close;
     if (~bf_pay = true) mes("You may now use the furnace.");

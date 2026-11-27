@@ -160,7 +160,7 @@ if($last_useitem = mortmyremushroom) {
     return;
 }
 mes("You try to place the item onto the stone, but it just moves off.");
-if(npc_findexact(0_53_52_48_8, filliman_tarlock_spirit) = true) ~chatnpc("Hmm, that doesn't seem quite right.");
+if(npc_findexact(0_53_52_48_8, filliman_tarlock_spirit) = true) ~chatnpc("<p,neutral>Hmm, that doesn't seem quite right.");
 
 [oploc5,stonedisc_ds_spirit]
 if(testbit(%druidspirit_bits, ^druidspirit_spirit_stone) = ^true | %druidspirit >= ^druidspirit_performed_ritual) {
@@ -192,7 +192,7 @@ if($last_useitem = used_bloom_spell) {
     mes("The stone seems to absorb the used spell scroll.");
     return;
 }
-if(npc_findexact(0_53_52_48_8, filliman_tarlock_spirit) = true) ~chatnpc("Hmm, that doesn't seem quite right.");
+if(npc_findexact(0_53_52_48_8, filliman_tarlock_spirit) = true) ~chatnpc("<p,neutral>Hmm, that doesn't seem quite right.");
 
 [opheld1,bloom_spell]
 def_int $slot = last_slot;

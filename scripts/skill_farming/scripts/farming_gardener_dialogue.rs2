@@ -1,36 +1,36 @@
 // CANDIDATE: later Taria advice transcript. Excludes post-target location advice.
 [label,farming_gardener_dialogue]
-~chatplayer("Can you give me any farming advice?");
+~chatplayer("<p,quiz>Can you give me any farming advice?");
 // UNKNOWN engineering selection: the transcript gives no weights for these lines.
 def_int $advice = add(random(15), 1);
 if ($advice = 1) {
-    ~chatnpc("The only way to cure a bush or tree of disease is to prune away the diseased leaves with a pair of secateurs. For all other crops I would just apply some plant-cure.");
+    ~chatnpc("<p,neutral>The only way to cure a bush or tree of disease is to prune away the diseased leaves with a pair of secateurs. For all other crops I would just apply some plant-cure.");
 } else if ($advice = 2) {
-    ~chatnpc("Tree seeds must be grown in a plantpot of soil into a sapling, and then transferred to a tree patch to continue growing to adulthood.");
+    ~chatnpc("<p,neutral>Tree seeds must be grown in a plantpot of soil into a sapling, and then transferred to a tree patch to continue growing to adulthood.");
 } else if ($advice = 3) {
-    ~chatnpc("You can put up to ten potatoes, cabbages or onions in vegetable sacks, although you can't have a mix in the same sack.");
+    ~chatnpc("<p,neutral>You can put up to ten potatoes, cabbages or onions in vegetable sacks, although you can't have a mix in the same sack.");
 } else if ($advice = 4) {
-    ~chatnpc("You can buy all the farming tools from farming shops, which can be found close to the allotments.");
+    ~chatnpc("<p,neutral>You can buy all the farming tools from farming shops, which can be found close to the allotments.");
 } else if ($advice = 5) {
-    ~chatnpc("Bittercap mushrooms can only be grown in a special patch in Morytania, near the Mort Myre swamp. There the ground is especially dank and suited to growing poisonous fungii.");
+    ~chatnpc("<p,neutral>Bittercap mushrooms can only be grown in a special patch in Morytania, near the Mort Myre swamp. There the ground is especially dank and suited to growing poisonous fungii.");
 } else if ($advice = 6) {
-    ~chatnpc("Supercompost is far better than normal compost, but more expensive to make.");
+    ~chatnpc("<p,neutral>Supercompost is far better than normal compost, but more expensive to make.");
 } else if ($advice = 7) {
-    ~chatnpc("There is a special patch for growing Belladonna - I believe that it is somewhere near Draynor Manor, where the ground is a tad 'unblessed'.");
+    ~chatnpc("<p,neutral>There is a special patch for growing Belladonna - I believe that it is somewhere near Draynor Manor, where the ground is a tad 'unblessed'.");
 } else if ($advice = 8) {
-    ~chatnpc("Applying compost to a patch will not only reduce the chance that your crops will get diseased, but you will also grow more crops to harvest.");
+    ~chatnpc("<p,neutral>Applying compost to a patch will not only reduce the chance that your crops will get diseased, but you will also grow more crops to harvest.");
 } else if ($advice = 9) {
-    ~chatnpc("You can fill plantpots with soil from any empty patch, if you have a gardening trowel.");
+    ~chatnpc("<p,neutral>You can fill plantpots with soil from any empty patch, if you have a gardening trowel.");
 } else if ($advice = 10) {
-    ~chatnpc("Hops are good for brewing ales. I believe there's a brewery up in Keldagrim somewhere, and I've heard rumours that a place called Phasmatys used to be good for that type of thing. 'Fore they all died, of course.");
+    ~chatnpc("<p,neutral>Hops are good for brewing ales. I believe there's a brewery up in Keldagrim somewhere, and I've heard rumours that a place called Phasmatys used to be good for that type of thing. 'Fore they all died, of course.");
 } else if ($advice = 11) {
-    ~chatnpc("Vegetables, hops and flowers need constant watering - if you ignore my advice, you will sooner or later find yourself in possession of a dead farming patch.");
+    ~chatnpc("<p,neutral>Vegetables, hops and flowers need constant watering - if you ignore my advice, you will sooner or later find yourself in possession of a dead farming patch.");
 } else if ($advice = 12) {
-    ~chatnpc("You can put up to five tomatoes, strawberries, apples, bananas or oranges into a fruit basket, although you can't have a mix in the same basket.");
+    ~chatnpc("<p,neutral>You can put up to five tomatoes, strawberries, apples, bananas or oranges into a fruit basket, although you can't have a mix in the same basket.");
 } else if ($advice = 13) {
-    ~chatnpc("Don't just throw away your weeds after you've raked a patch - put them in a compost bin and make some compost.");
+    ~chatnpc("<p,neutral>Don't just throw away your weeds after you've raked a patch - put them in a compost bin and make some compost.");
 } else if ($advice = 14) {
-    ~chatnpc("If you want to make your own sacks and baskets you'll need to use the loom that's near the Farming shop in Falador. If you're a good enough <text_gender("craftsman", "craftswoman")>, that is.");
+    ~chatnpc("<p,neutral>If you want to make your own sacks and baskets you'll need to use the loom that's near the Farming shop in Falador. If you're a good enough <text_gender("craftsman", "craftswoman")>, that is.");
 } else if ($advice = 15) {
-    ~chatnpc("You don't have to buy all your plantpots you know, you can make them yourself on a pottery wheel. If you're a good enough <text_gender("craftsman", "craftswoman")>, that is.");
+    ~chatnpc("<p,neutral>You don't have to buy all your plantpots you know, you can make them yourself on a pottery wheel. If you're a good enough <text_gender("craftsman", "craftswoman")>, that is.");
 }

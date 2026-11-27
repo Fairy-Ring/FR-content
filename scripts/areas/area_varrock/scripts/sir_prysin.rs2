@@ -231,7 +231,7 @@ else{
         ~chatnpc("<p,angry>Yes, news of your carelessness is as widespread as |news of your victory. Fortunately for you, Silverlight| has come back into my possession.");
         $option = ~p_choice2("Phew, that's a relief!", 1, "Is there any chance of me borrowing it again?", 2);
         if ($option = 1){
-            ~chatplayer("<p, neutral> Phew, that's a relief!");
+            ~chatplayer("<p,neutral> Phew, that's a relief!");
         }
         else if ($option = 2){
             ~chatplayer("<p,neutral>Is there any change of me borrowing it again?");
@@ -260,7 +260,7 @@ else{
 if (inv_total(inv, coins) >= 500){
     inv_del(inv, coins, 500);
     inv_add(inv, silverlight, 1);
-    ~chatnpc("May you make good use of it.");
+    ~chatnpc("<p,neutral>May you make good use of it.");
 }
 else{
     // Inauthentic what should happen here

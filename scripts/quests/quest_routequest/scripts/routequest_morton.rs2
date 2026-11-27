@@ -110,7 +110,7 @@ if(%routequest = ^routequest_not_started) {
 @multi5("Oh come on, you can tell me!", cyreg_you_can_tell_me, "Well, I guess they'll just die without weapons.", cyreg_persuade, "I'll give you some cash if you tell me.", cyreg_bribe, "I just want to help them, I think they need help", cyreg_just_want_help, "Ok, thanks.", cyreg_exit);
 
 [label,cyreg_exit]
-~chatplayer("Ok, thanks.");
+~chatplayer("<p,happy>Ok, thanks.");
 
 [label,cyreg_you_can_tell_me]
 ~chatplayer("<p,neutral>Oh come on, you can tell me!");

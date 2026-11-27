@@ -113,6 +113,7 @@ jobs:
       # tests/drop-tables/: CI — compiled KQ ScriptRunner outcomes, no server.
       # tests/priestperil-completion/: CI — compiled completion queue, Prayer reward in tenths, no server.
       # tests/string-charset/: CI — client-visible strings stay within the Client-Java 377 byte/font character set.
+      # tests/test_chathead_animations.mjs: CI — checks chathead animation prefixes against .mesanim sections.
       # tests/combo-runes/: CI — all 122 original spell buttons versus compiled rune checks, and every existing row's payment.
       # tests/slayer-selector/: CI — deterministic packed cases and reduced seeded distribution, no server.
       # tests/ape-agility/: CI — compiled packed obstacle handlers, entry matrix and recovery checkpoints; no server.
@@ -149,6 +150,7 @@ jobs:
 
           run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
+          run_test tests/test_chathead_animations.mjs node --test ../content/tests/test_chathead_animations.mjs
           run_test tests/varp-scope/test_varp_scope.mjs node --import tsx ../content/tests/varp-scope/test_varp_scope.mjs
           run_test tests/instance-collision/test_instance_collision.mjs node --import tsx ../content/tests/instance-collision/test_instance_collision.mjs
           run_test tests/fight-caves/test_fight_caves.mjs node --import tsx ../content/tests/fight-caves/test_fight_caves.mjs

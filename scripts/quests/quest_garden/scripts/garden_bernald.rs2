@@ -28,28 +28,28 @@ if (%garden_bernald_varbit >= 4) {
 return;
 
 [label,garden_bernald_intro]
-~chatnpc("Do you know anything about grapevine diseases?");
-~chatplayer("I might - what's the problem?");
-~chatnpc("You see those grapevines over there?");
-~chatplayer("Yes. They don't look too happy at the moment.");
-~chatnpc("They've come down with some strange disease that I've never encountered before. I've tried everything with them, but nothing seems to work. If it carries on like this I will lose all this year's crops.");
-~chatplayer("I could probably help you with that, but I'd need something in return.");
-~chatnpc("Anything, you just need to ask!");
-~chatplayer("Well, I'd like a supply of Burthorpe Vine seeds.");
-~chatnpc("I'm afraid I can't do that.");
+~chatnpc("<p,quiz>Do you know anything about grapevine diseases?");
+~chatplayer("<p,quiz>I might - what's the problem?");
+~chatnpc("<p,quiz>You see those grapevines over there?");
+~chatplayer("<p,neutral>Yes. They don't look too happy at the moment.");
+~chatnpc("<p,neutral>They've come down with some strange disease that I've never encountered before. I've tried everything with them, but nothing seems to work. If it carries on like this I will lose all this year's crops.");
+~chatplayer("<p,neutral>I could probably help you with that, but I'd need something in return.");
+~chatnpc("<p,neutral>Anything, you just need to ask!");
+~chatplayer("<p,neutral>Well, I'd like a supply of Burthorpe Vine seeds.");
+~chatnpc("<p,neutral>I'm afraid I can't do that.");
 if (inv_total(worn, ring_of_charos_unlocked) < 1) {
-    ~chatplayer("I thought you said anything!");
-    ~chatnpc("I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
+    ~chatplayer("<p,neutral>I thought you said anything!");
+    ~chatnpc("<p,neutral>I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
     return;
 }
 def_int $deal = ~p_choice2("I thought you said anything!", 1, "But it is the only way that these vines will be cured.", 2);
 if ($deal = 1) {
-    ~chatplayer("I thought you said anything!");
-    ~chatnpc("I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
+    ~chatplayer("<p,neutral>I thought you said anything!");
+    ~chatnpc("<p,neutral>I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
     return;
 }
-~chatplayer("But it is the only way that these vines will be cured.");
-~chatnpc("Hmm, you may be right. If I lose these crops what use are more seeds to me, when I have gone out of business? Very well then, this is the deal - cure my vines and I will give you some Burthorpe Vine seeds.");
+~chatplayer("<p,neutral>But it is the only way that these vines will be cured.");
+~chatnpc("<p,quiz>Hmm, you may be right. If I lose these crops what use are more seeds to me, when I have gone out of business? Very well then, this is the deal - cure my vines and I will give you some Burthorpe Vine seeds.");
 // UNKNOWN acceptance placement: the transcript omits the accept row's wording.
 // Accept the preceding sourced appeal without inventing more dialogue.
 %garden_bernald_varbit = 1;
@@ -79,13 +79,13 @@ if (last_useitem = plant_cure_strong & %garden_bernald_varbit = 3) {
 return;
 
 [label,garden_bernald_after_weak_cure]
-~chatnpc("Plant cure not doing the trick, eh?");
-~chatplayer("I don't understand - it's worked with everything else.");
-~chatnpc("That grapevine disease must be much stronger than the usual. You'll need something a bit more potent to cut out that infection.");
-~chatplayer("Do you know of any stronger cures?");
-~chatnpc("No, I don't - but I know of a man who might. Not far from here there's a druid gardener who goes by the name of Alain. He's an expert on things like this, so they tell me.");
-~chatplayer("Why didn't you just go and ask him yourself?");
-~chatnpc("These vines are very precious indeed. I could not hazard the risk that someone would steal my grapes while I was away - they may be diseased, but they still contain Burthorpe Vine seeds.");
+~chatnpc("<p,quiz>Plant cure not doing the trick, eh?");
+~chatplayer("<p,confused>I don't understand - it's worked with everything else.");
+~chatnpc("<p,neutral>That grapevine disease must be much stronger than the usual. You'll need something a bit more potent to cut out that infection.");
+~chatplayer("<p,quiz>Do you know of any stronger cures?");
+~chatnpc("<p,neutral>No, I don't - but I know of a man who might. Not far from here there's a druid gardener who goes by the name of Alain. He's an expert on things like this, so they tell me.");
+~chatplayer("<p,quiz>Why didn't you just go and ask him yourself?");
+~chatnpc("<p,neutral>These vines are very precious indeed. I could not hazard the risk that someone would steal my grapes while I was away - they may be diseased, but they still contain Burthorpe Vine seeds.");
 %garden_bernald_varbit = 3;
 
 [label,garden_alain_trade]
@@ -93,28 +93,28 @@ if (%garden_quest < 1 | %garden_bernald_varbit < 3) {
     ~displaymessage(^dm_default);
     return;
 }
-~chatplayer("I need to ask you about strong plant cures.");
-~chatnpc("Well, you have come to the right person, then - I researched exotic plant diseases as part of my druidic training. What is the affliction that you need to cure?");
-~chatplayer("Bernald up in Burthorpe has got some seriously diseased grapevines. I tried plant cure on them, but it didn't seem to have any positive effect.");
-~chatnpc("Ah, so is this the famous Burthorpe Vine?");
-~chatplayer("The very one.");
-~chatnpc("I'm afraid that my researches did not extend to Burthorpe Vine. Bernald and his ancestors have always closely guarded their heritage, that vine. In fact, I'm surprised that he has involved you.");
-~chatplayer("Er, I did have some ... assistance there.");
-~chatnpc("I see. Well, if it involves some unnatural power I would rather not know. I prefer the use of power that can be brought forth from the plants around us.");
+~chatplayer("<p,neutral>I need to ask you about strong plant cures.");
+~chatnpc("<p,quiz>Well, you have come to the right person, then - I researched exotic plant diseases as part of my druidic training. What is the affliction that you need to cure?");
+~chatplayer("<p,neutral>Bernald up in Burthorpe has got some seriously diseased grapevines. I tried plant cure on them, but it didn't seem to have any positive effect.");
+~chatnpc("<p,quiz>Ah, so is this the famous Burthorpe Vine?");
+~chatplayer("<p,neutral>The very one.");
+~chatnpc("<p,shock>I'm afraid that my researches did not extend to Burthorpe Vine. Bernald and his ancestors have always closely guarded their heritage, that vine. In fact, I'm surprised that he has involved you.");
+~chatplayer("<p,neutral>Er, I did have some ... assistance there.");
+~chatnpc("<p,neutral>I see. Well, if it involves some unnatural power I would rather not know. I prefer the use of power that can be brought forth from the plants around us.");
 def_int $secret = ~p_choice2("Are you sure there's nothing you can suggest?", 1, "You're hiding something from me.", 2);
 if ($secret = 2) {
-    ~chatplayer("You're hiding something from me.");
-    ~chatnpc("This is the power you are abusing!! I feel it now - it emanates from the ring you wear, a festering fountain of corruption that appalls my very soul!!!");
-    ~chatplayer("Oh, sorry. I forgot that it only works on the weak- minded.");
-    ~chatnpc("You, <displayname>, are the one who must be weak- minded, if you consider using such a dreadful weapon. Beware - it may one day be your downfall.");
+    ~chatplayer("<p,neutral>You're hiding something from me.");
+    ~chatnpc("<p,neutral>This is the power you are abusing!! I feel it now - it emanates from the ring you wear, a festering fountain of corruption that appalls my very soul!!!");
+    ~chatplayer("<p,neutral>Oh, sorry. I forgot that it only works on the weak- minded.");
+    ~chatnpc("<p,neutral>You, <displayname>, are the one who must be weak- minded, if you consider using such a dreadful weapon. Beware - it may one day be your downfall.");
     return;
 }
-~chatplayer("Are you sure there's nothing you can suggest?");
-~chatnpc("Well...");
-~chatnpc("There is one thing you could try. One of the most potent cures I have discovered involves using the natural power held within a very special mineral, but it is a very closely guarded secret.");
-~chatplayer("Do you mean the rune essence?");
-~chatnpc("You know of that?!? Then I can do no further harm here. You can make a potent plant cure by mixing some crumbled rune essence into a normal plant cure. This may possibly cure Bernald's vines.");
-~chatplayer("Thank you Alain, I will try it out immediately!");
+~chatplayer("<p,quiz>Are you sure there's nothing you can suggest?");
+~chatnpc("<p,neutral>Well...");
+~chatnpc("<p,neutral>There is one thing you could try. One of the most potent cures I have discovered involves using the natural power held within a very special mineral, but it is a very closely guarded secret.");
+~chatplayer("<p,quiz>Do you mean the rune essence?");
+~chatnpc("<p,quiz>You know of that?!? Then I can do no further harm here. You can make a potent plant cure by mixing some crumbled rune essence into a normal plant cure. This may possibly cure Bernald's vines.");
+~chatplayer("<p,happy>Thank you Alain, I will try it out immediately!");
 
 [opheldu,blankrune] @garden_essence_use;
 [opheldu,rune_shards] @garden_shards_use;
@@ -159,15 +159,15 @@ mes("You mix the rune dust into the plant cure.");
 [label,garden_bernald_seeds]
 def_int $missing = ~garden_bundle_missing(garden_vine_seed, ^garden_vine_bundle);
 if ($missing <= 0) {
-    ~chatplayer("How are your grapes coming along?");
-    ~chatnpc("Marvellously, thanks to your help, <displayname>!");
+    ~chatplayer("<p,quiz>How are your grapes coming along?");
+    ~chatnpc("<p,happy>Marvellously, thanks to your help, <displayname>!");
     return;
 }
 def_int $slots = ~garden_bundle_slots(garden_vine_seed, $missing);
-~chatnpc("My vines are cured! You have worked a wonder here, <displayname>! Here, you can have those seeds like I promised.");
+~chatnpc("<p,neutral>My vines are cured! You have worked a wonder here, <displayname>! Here, you can have those seeds like I promised.");
 if (inv_freespace(inv) < $slots) {
-    ~chatnpc("I would give you some, but you don't appear to have room to carry them.");
+    ~chatnpc("<p,neutral>I would give you some, but you don't appear to have room to carry them.");
     return;
 }
-~chatnpc("Yes, here you go - I hope they grow for you.");
+~chatnpc("<p,neutral>Yes, here you go - I hope they grow for you.");
 inv_add(inv, garden_vine_seed, $missing);

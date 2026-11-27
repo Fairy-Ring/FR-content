@@ -22,5 +22,5 @@ if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substa
 mes("A chunk of ice falls away from the cave entrance.");
 
 [opnpc1,i_troll_guard]
-~chatnpc("Hur hur hur! Well look here, a puny fleshy human!");
-~chatnpc("You should beware of the icy wind that runs through this valley, it will bring a fleshy like you to a cold end indeed!");
+~chatnpc("<p,neutral>Hur hur hur! Well look here, a puny fleshy human!");
+~chatnpc("<p,neutral>You should beware of the icy wind that runs through this valley, it will bring a fleshy like you to a cold end indeed!");

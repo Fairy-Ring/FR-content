@@ -3,8 +3,8 @@
 // 2 May 2006 Tip.It answer to Q3 and the transcript's 6/7 candidate threshold.
 
 [label,garden_wom_quiz]
-~chatnpc("Greetings, <displayname>.");
-~chatplayer("Queen Ellamaria has sent me to seek your guidance.");
+~chatnpc("<p,neutral>Greetings, <displayname>.");
+~chatplayer("<p,neutral>Queen Ellamaria has sent me to seek your guidance.");
 @garden_wom_quiz_selected;
 return;
 
@@ -13,44 +13,44 @@ if (inv_total(inv, ring_of_charos_unlocked) > 0 | inv_total(worn, ring_of_charos
     return;
 }
 [label,garden_wom_quiz_selected]
-~chatnpc("Ellamaria? Well, if you're in her service my guidance is this: do the fastest run that you can off the shortest pier you can find.");
-~chatplayer("You know Queen Ellamaria?");
-~chatnpc("Oh yes, we go way back, long before she married that fool the King of Varrock. She wasn't always royal you know.");
-~chatplayer("Really?");
-~chatnpc("No, in her youth she was a barmaid at the Blue Moon inn. All that fancy talk, that's just for show. No, the Ellamaria I knew was as common as muck, until she lucked onto good King Roald.");
-~chatplayer("I'll certainly look at her in a different light when I return to Varrock.");
-~chatnpc("So what sort of guidance has Little-Miss-Hoity-Toity sent you to seek?");
-~chatplayer("I am supposed to gain some knowledge of diplomacy and persuasion from you.");
-~chatnpc("That is an area that - luckily for you, young <displayname> - I have studied. Have you heard of the diplomat known as Charos?");
-~chatplayer("Charos? I must say the name rings a bell...");
-~chatplayer("Charos...");
-~chatplayer("Yes, I remember! Once, during my travels to Morytania, I came upon an item of magical jewellery called the Ring of Charos.");
+~chatnpc("<p,quiz>Ellamaria? Well, if you're in her service my guidance is this: do the fastest run that you can off the shortest pier you can find.");
+~chatplayer("<p,quiz>You know Queen Ellamaria?");
+~chatnpc("<p,neutral>Oh yes, we go way back, long before she married that fool the King of Varrock. She wasn't always royal you know.");
+~chatplayer("<p,quiz>Really?");
+~chatnpc("<p,neutral>No, in her youth she was a barmaid at the Blue Moon inn. All that fancy talk, that's just for show. No, the Ellamaria I knew was as common as muck, until she lucked onto good King Roald.");
+~chatplayer("<p,neutral>I'll certainly look at her in a different light when I return to Varrock.");
+~chatnpc("<p,quiz>So what sort of guidance has Little-Miss-Hoity-Toity sent you to seek?");
+~chatplayer("<p,neutral>I am supposed to gain some knowledge of diplomacy and persuasion from you.");
+~chatnpc("<p,quiz>That is an area that - luckily for you, young <displayname> - I have studied. Have you heard of the diplomat known as Charos?");
+~chatplayer("<p,quiz>Charos? I must say the name rings a bell...");
+~chatplayer("<p,neutral>Charos...");
+~chatplayer("<p,neutral>Yes, I remember! Once, during my travels to Morytania, I came upon an item of magical jewellery called the Ring of Charos.");
 if (inv_total(inv, ring_of_charos) < 1 & inv_total(worn, ring_of_charos) < 1) {
-    ~chatplayer("Yes, I have it stored somewhere. Is it important, then?");
-    ~chatnpc("Important?!? This ring possesses hidden power beyond belief! Go and get it, and I will tell you its secrets.");
+    ~chatplayer("<p,quiz>Yes, I have it stored somewhere. Is it important, then?");
+    ~chatnpc("<p,quiz>Important?!? This ring possesses hidden power beyond belief! Go and get it, and I will tell you its secrets.");
     return;
 }
 @garden_wom_ring_checked;
 return;
 
 [label,garden_wom_ring_checked]
-~chatnpc("The Ring of Charos? What's that?");
-~chatplayer("I thought you told me to-");
-~chatnpc("Just joking, <displayname> - good good, I will now tell you what this ring is capable of.");
-~chatnpc("Charos rose to power under the rule of Lord Drakan of Morytania, his only living servant. The Vampyre Lord suffered the existence of Charos because of the talents that this sophisticated diplomat had to offer.");
-~chatplayer("The art of persuasion?");
-~chatnpc("Indeed. Charos had many uses - spy, assassin, negotiator - because he could convince anyone to do his wishes. These talents were in some part Charos's own, but greatly enhanced by the ring that he fashioned.");
-~chatplayer("The Ring of Charos.");
-~chatnpc("Exactly. One who wears the ring must possess some innate ability of their own, which the ring enhances so that the wearer can convince all but the most strong- minded to do their bidding.");
-~chatplayer("What happened to Charos? And why did Fenkenstrain have the ring?");
-~chatnpc("Charos had a castle built on the northern coast of Morytania, where he dwelt for many years in service to Drakan. None really know what became of him, but some say that he became too certain of his abilities,");
-~chatnpc("and turned them on his master. This would have been his ultimate downfall, for the ring's power would have had little or no effect upon Drakan.");
-~chatnpc("Fenkenstrain probably found the ring many years later, buried somewhere within the depths of Charos's castle.");
-~chatplayer("So what you are telling me is that nobody really knows what happened to Charos? That he could still be alive? And if he is still alive...");
-~chatnpc("...he would naturally come looking for the ring that is his by right. But I don't believe that you should worry about that - it has been many years since his disappearance, and the likelyhood is that he is dead.");
-~chatplayer("Still - it doesn't inspire me with much confidence.");
-~chatnpc("I could activate the power within this ring for you, but for me to do that I must know that you will use it wisely. To do that I must ask you a few questions, to see how good a diplomat you can be.");
-~chatplayer("Okay, go ahead...");
+~chatnpc("<p,quiz>The Ring of Charos? What's that?");
+~chatplayer("<p,neutral>I thought you told me to-");
+~chatnpc("<p,neutral>Just joking, <displayname> - good good, I will now tell you what this ring is capable of.");
+~chatnpc("<p,neutral>Charos rose to power under the rule of Lord Drakan of Morytania, his only living servant. The Vampyre Lord suffered the existence of Charos because of the talents that this sophisticated diplomat had to offer.");
+~chatplayer("<p,quiz>The art of persuasion?");
+~chatnpc("<p,neutral>Indeed. Charos had many uses - spy, assassin, negotiator - because he could convince anyone to do his wishes. These talents were in some part Charos's own, but greatly enhanced by the ring that he fashioned.");
+~chatplayer("<p,neutral>The Ring of Charos.");
+~chatnpc("<p,neutral>Exactly. One who wears the ring must possess some innate ability of their own, which the ring enhances so that the wearer can convince all but the most strong- minded to do their bidding.");
+~chatplayer("<p,quiz>What happened to Charos? And why did Fenkenstrain have the ring?");
+~chatnpc("<p,neutral>Charos had a castle built on the northern coast of Morytania, where he dwelt for many years in service to Drakan. None really know what became of him, but some say that he became too certain of his abilities,");
+~chatnpc("<p,neutral>and turned them on his master. This would have been his ultimate downfall, for the ring's power would have had little or no effect upon Drakan.");
+~chatnpc("<p,neutral>Fenkenstrain probably found the ring many years later, buried somewhere within the depths of Charos's castle.");
+~chatplayer("<p,quiz>So what you are telling me is that nobody really knows what happened to Charos? That he could still be alive? And if he is still alive...");
+~chatnpc("<p,neutral>...he would naturally come looking for the ring that is his by right. But I don't believe that you should worry about that - it has been many years since his disappearance, and the likelyhood is that he is dead.");
+~chatplayer("<p,neutral>Still - it doesn't inspire me with much confidence.");
+~chatnpc("<p,neutral>I could activate the power within this ring for you, but for me to do that I must know that you will use it wisely. To do that I must ask you a few questions, to see how good a diplomat you can be.");
+~chatplayer("<p,neutral>Okay, go ahead...");
 
 def_int $score = 0;
 while ($score < 6) {
@@ -69,33 +69,33 @@ while ($score < 6) {
     if ($answer = 2) $score = add($score, 1);
     $answer = ~p_choice3("No, especially not that wise old man, who doesn't look at all suspicious.", 1, "If I do I'll let you know.", 2, "Yes, that wise old man over there looks incredibly dodgy.", 3);
     if ($answer = 2) $score = add($score, 1);
-    ~chatplayer("Okay, I've answered your questions - what's the verdict?");
-    ~chatnpc("Mmmm, it was close but..");
+    ~chatplayer("<p,quiz>Okay, I've answered your questions - what's the verdict?");
+    ~chatnpc("<p,neutral>Mmmm, it was close but..");
     if ($score >= 6) {
-        ~chatnpc("... Congratulations! You have clearly got what it takes to use the Ring of Charos. Wait a moment, <displayname>...");
-        ~chatnpc("The Ring of Charos has now been opened to you, <displayname>. You may use its power to charm the weak-minded, but it will only work whilst you are wearing it.");
+        ~chatnpc("<p,neutral>... Congratulations! You have clearly got what it takes to use the Ring of Charos. Wait a moment, <displayname>...");
+        ~chatnpc("<p,neutral>The Ring of Charos has now been opened to you, <displayname>. You may use its power to charm the weak-minded, but it will only work whilst you are wearing it.");
         ~garden_wom_unlock_ring();
         def_int $thanks = ~p_choice2("Thanks for your help, wise old man.", 1, "I think you wanted to give me a thousand coins...", 2);
         if ($thanks = 1) {
-            ~chatplayer("Thanks for your help, Wise Old Man.");
-            ~chatnpc("Funny, I thought you would take the chance to test the power of the ring on me! No matter - leave me be now, I have important surveillance duties to carry out.");
+            ~chatplayer("<p,happy>Thanks for your help, Wise Old Man.");
+            ~chatnpc("<p,neutral>Funny, I thought you would take the chance to test the power of the ring on me! No matter - leave me be now, I have important surveillance duties to carry out.");
         } else {
-            ~chatplayer("I think you wanted to give me a thousand coins...");
-            ~chatnpc("Ha ha! I thought you might try that!! But remember, <displayname> - the power of the Ring of Charos will not work with everybody, especially not a wise old bird like me!");
+            ~chatplayer("<p,neutral>I think you wanted to give me a thousand coins...");
+            ~chatnpc("<p,laugh>Ha ha! I thought you might try that!! But remember, <displayname> - the power of the Ring of Charos will not work with everybody, especially not a wise old bird like me!");
         }
         return;
     }
-    ~chatnpc("... but I'm afraid that you don't seem to have the aptitude. To you, the Ring of Charos is but a worthless trinket.");
+    ~chatnpc("<p,neutral>... but I'm afraid that you don't seem to have the aptitude. To you, the Ring of Charos is but a worthless trinket.");
     def_int $retry = ~p_choice2("I can't believe that - can I have another go?", 1, "Oh well, that's that I suppose.", 2);
     if ($retry = 2) {
-        ~chatplayer("Oh well, that's that I suppose.");
-        ~chatnpc("Now look, don't start making me feel sorry for you...");
-        ~chatplayer("No, I'm just a dull-headed moron, you're right about that.");
-        ~chatnpc("I didn't say that - look, if you want another try, come back and speak to me again.");
+        ~chatplayer("<p,neutral>Oh well, that's that I suppose.");
+        ~chatnpc("<p,neutral>Now look, don't start making me feel sorry for you...");
+        ~chatplayer("<p,neutral>No, I'm just a dull-headed moron, you're right about that.");
+        ~chatnpc("<p,neutral>I didn't say that - look, if you want another try, come back and speak to me again.");
         return;
     }
-    ~chatplayer("I can't believe that - can I have another go?");
-    ~chatnpc("Well, if you think it will do any good ... here goes then-");
+    ~chatplayer("<p,shock>I can't believe that - can I have another go?");
+    ~chatnpc("<p,neutral>Well, if you think it will do any good ... here goes then-");
 }
 
 [proc,garden_wom_unlock_ring]
@@ -118,20 +118,20 @@ if (%garden_quest < 1) {
     return;
 }
 if (inv_total(worn, ring_of_charos_unlocked) < 1) {
-    ~chatplayer("Can I have some rosebush seeds, please?");
-    ~chatnpc("No, I think not. These bushes are my pride and joy, and I will not give them away so cheaply.");
+    ~chatplayer("<p,quiz>Can I have some rosebush seeds, please?");
+    ~chatnpc("<p,neutral>No, I think not. These bushes are my pride and joy, and I will not give them away so cheaply.");
     return;
 }
 def_int $rose = ~p_choice2("Can I have some rosebush seeds, please?", 1, "These are the most beautiful rosebushes I've ever seen.", 2);
 if ($rose = 1) {
-    ~chatplayer("Can I have some rosebush seeds, please?");
-    ~chatnpc("No, I think not. These bushes are my pride and joy, and I will not give them away so cheaply.");
+    ~chatplayer("<p,quiz>Can I have some rosebush seeds, please?");
+    ~chatnpc("<p,neutral>No, I think not. These bushes are my pride and joy, and I will not give them away so cheaply.");
     return;
 }
-~chatplayer("These are the most beautiful rosebushes I've ever seen.");
-~chatnpc("Nice of you to say so, but I sense the use of some unnatural power underneath your fine words. You are concealing something of great evil, an evil that cannot touch someone of my purity.");
-~chatplayer("Oh ... no, that's not true ...");
-~chatnpc("Nonsense, you reek of this evil power! I suggest that you throw whatever dark talisman it is that you are using down the Edgeville well, and never think of it again! Either that or just simply destroy it!");
+~chatplayer("<p,neutral>These are the most beautiful rosebushes I've ever seen.");
+~chatnpc("<p,neutral>Nice of you to say so, but I sense the use of some unnatural power underneath your fine words. You are concealing something of great evil, an evil that cannot touch someone of my purity.");
+~chatplayer("<p,neutral>Oh ... no, that's not true ...");
+~chatnpc("<p,neutral>Nonsense, you reek of this evil power! I suggest that you throw whatever dark talisman it is that you are using down the Edgeville well, and never think of it again! Either that or just simply destroy it!");
 %garden_althric_varbit = max(%garden_althric_varbit, 1);
 
 [oplocu,well]
@@ -211,7 +211,7 @@ if (inv_freespace(inv) < $slots) {
 }
 if (%garden_althric_varbit = 1) {
     ~chatnpc_specific("Brother Althric", brother_althric, "<p,neutral>Are you messing about with my rosebushes again?");
-    ~chatplayer("Er ... no ... I was just admiring them.");
+    ~chatplayer("<p,neutral>Er ... no ... I was just admiring them.");
     ~chatnpc_specific("Brother Althric", brother_althric, "<p,neutral>Ah, I sense that you speak so without the use of the evil power you carried before. That is good. As you have taken the road back towards the light, you may take any seeds that you wish.");
     %garden_althric_varbit = 2;
 }
@@ -221,7 +221,7 @@ mes("You take some seeds from the rosebush.");
 
 [label,garden_althric_warn]
 ~chatnpc_specific("Brother Althric", brother_althric, "<p,neutral>Are you messing about with my rosebushes again?");
-~chatplayer("Er ... no ... I was just admiring them.");
+~chatplayer("<p,neutral>Er ... no ... I was just admiring them.");
 ~chatnpc_specific("Brother Althric", brother_althric, "<p,neutral>Nonsense, you reek of this evil power! I suggest that you throw whatever dark talisman it is that you are using down the Edgeville well, and never think of it again! Either that or just simply destroy it!");
 %garden_althric_varbit = max(%garden_althric_varbit, 1);
 
@@ -239,56 +239,56 @@ if (%garden_quest < 1) {
 }
 if (%garden_dantaera_varbit = 1) {
     if (~garden_has_white_tree_shoot = false & ~garden_patch_stage(8) < 4) {
-        ~chatplayer("I have lost the cutting from the White Tree.");
-        ~chatnpc("I do not believe what I am hearing, after everything you said to me before!");
-        ~chatplayer("Er, yes I know ... sorry ...");
-        ~chatnpc("Maybe - just maybe - there might be another shoot somewhere on the Tree that you can take as a cutting. Go and have a look, before she dies without offspring!");
+        ~chatplayer("<p,neutral>I have lost the cutting from the White Tree.");
+        ~chatnpc("<p,neutral>I do not believe what I am hearing, after everything you said to me before!");
+        ~chatplayer("<p,neutral>Er, yes I know ... sorry ...");
+        ~chatnpc("<p,neutral>Maybe - just maybe - there might be another shoot somewhere on the Tree that you can take as a cutting. Go and have a look, before she dies without offspring!");
     } else {
         ~displaymessage(^dm_default);
     }
     return;
 }
-~chatplayer("Do you know how I could grow a White Tree?");
-~chatnpc("There are no more White Trees left in the world - they have all been chopped down, and their beauty has forever left this world.");
+~chatplayer("<p,quiz>Do you know how I could grow a White Tree?");
+~chatnpc("<p,neutral>There are no more White Trees left in the world - they have all been chopped down, and their beauty has forever left this world.");
 if (inv_total(worn, ring_of_charos_unlocked) < 1) {
-    ~chatplayer("Then my quest is over - I cannot grow a White Tree.");
-    ~chatnpc("Even if there were a White Tree somewhere I would not tell you, for as soon as it would grow then it would be slaughtered in its prime. Man's hunger for fire is greater than his admiration of beauty.");
+    ~chatplayer("<p,neutral>Then my quest is over - I cannot grow a White Tree.");
+    ~chatnpc("<p,neutral>Even if there were a White Tree somewhere I would not tell you, for as soon as it would grow then it would be slaughtered in its prime. Man's hunger for fire is greater than his admiration of beauty.");
     return;
 }
 def_int $secret = ~p_choice2("Then my quest is over - I cannot grow a White Tree.", 1, "I think that there is something that you are not telling me.", 2);
 if ($secret = 1) {
-    ~chatplayer("Then my quest is over - I cannot grow a White Tree.");
-    ~chatnpc("Even if there were a White Tree somewhere I would not tell you, for as soon as it would grow then it would be slaughtered in its prime. Man's hunger for fire is greater than his admiration of beauty.");
+    ~chatplayer("<p,neutral>Then my quest is over - I cannot grow a White Tree.");
+    ~chatnpc("<p,neutral>Even if there were a White Tree somewhere I would not tell you, for as soon as it would grow then it would be slaughtered in its prime. Man's hunger for fire is greater than his admiration of beauty.");
     return;
 }
-~chatplayer("I think that there is something that you are not telling me.");
-~chatnpc("Am I so transparent? You have seen through me; there is something I would rather not tell you.");
+~chatplayer("<p,neutral>I think that there is something that you are not telling me.");
+~chatnpc("<p,quiz>Am I so transparent? You have seen through me; there is something I would rather not tell you.");
 def_int $burden = ~p_choice2("You need to chill out and stop taking yourself so seriously.", 1, "A secret is a dreadful burden to have to keep to yourself.", 2);
 if ($burden = 1) {
-    ~chatplayer("You need to chill out and stop taking yourself so seriously.");
-    ~chatnpc("Leave me in peace then, if you are so unable to understand my grief.");
+    ~chatplayer("<p,neutral>You need to chill out and stop taking yourself so seriously.");
+    ~chatnpc("<p,neutral>Leave me in peace then, if you are so unable to understand my grief.");
     return;
 }
-~chatplayer("A secret is a dreadful burden to have to keep to yourself.");
-~chatnpc("It is not hard to keep this secret - to give it away would cause me great sorrow.");
-~chatplayer("I don't see how. Tell me your secret, and I will keep it as well as you have done.");
-~chatnpc("Very well - I feel deep trust in you for some reason. It is the White Tree, last survivor of a race of Trees that have disappeared from our landscape. Once they covered the land; now there is only one.");
-~chatplayer("What happened to them?");
-~chatnpc("Man desired the wood of the White Tree, because of its wood of pure white. Need I tell you more?");
-~chatplayer("I can fill in the rest. So where is the remaining White Tree?");
-~chatnpc("She stands atop Ice Mountain, alone and sorrowful; and, I fear, that she is dying.");
-~chatplayer("If I took a cutting from ... her ... then I could grow another one.");
-~chatnpc("Yes, but she only has life enough to produce one shoot. Cut this shoot, and she will die, last of her kind gone forever. If you failed to grow this shoot, there would be no more White Trees.");
+~chatplayer("<p,neutral>A secret is a dreadful burden to have to keep to yourself.");
+~chatnpc("<p,sad>It is not hard to keep this secret - to give it away would cause me great sorrow.");
+~chatplayer("<p,neutral>I don't see how. Tell me your secret, and I will keep it as well as you have done.");
+~chatnpc("<p,neutral>Very well - I feel deep trust in you for some reason. It is the White Tree, last survivor of a race of Trees that have disappeared from our landscape. Once they covered the land; now there is only one.");
+~chatplayer("<p,quiz>What happened to them?");
+~chatnpc("<p,quiz>Man desired the wood of the White Tree, because of its wood of pure white. Need I tell you more?");
+~chatplayer("<p,quiz>I can fill in the rest. So where is the remaining White Tree?");
+~chatnpc("<p,sad>She stands atop Ice Mountain, alone and sorrowful; and, I fear, that she is dying.");
+~chatplayer("<p,neutral>If I took a cutting from ... her ... then I could grow another one.");
+~chatnpc("<p,neutral>Yes, but she only has life enough to produce one shoot. Cut this shoot, and she will die, last of her kind gone forever. If you failed to grow this shoot, there would be no more White Trees.");
 def_int $permission = ~p_choice2("You should get out a bit more and quit worrying about trees.", 1, "Unless you allow me to do this she will die anyway.", 2);
 if ($permission = 1) {
-    ~chatplayer("You should get out a bit more and quit worrying about trees.");
-    ~chatnpc("No, I am afraid I cannot do that. She is the last White Tree, and I am the last to care about her. I will not let her pass away alone and unloved.");
+    ~chatplayer("<p,neutral>You should get out a bit more and quit worrying about trees.");
+    ~chatnpc("<p,neutral>No, I am afraid I cannot do that. She is the last White Tree, and I am the last to care about her. I will not let her pass away alone and unloved.");
     return;
 }
-~chatplayer("Unless you allow me to do this she will die anyway.");
-~chatnpc("I know, but I try not to think about that. She does not have much time left.");
-~chatplayer("Then will you allow me to take this cutting?");
-~chatnpc("Do so with my blessing. I wish you good fortune, <displayname>. Go now, and save the beauty of the White Tree.");
+~chatplayer("<p,neutral>Unless you allow me to do this she will die anyway.");
+~chatnpc("<p,neutral>I know, but I try not to think about that. She does not have much time left.");
+~chatplayer("<p,quiz>Then will you allow me to take this cutting?");
+~chatnpc("<p,neutral>Do so with my blessing. I wish you good fortune, <displayname>. Go now, and save the beauty of the White Tree.");
 %garden_dantaera_varbit = 1;
 
 [oplocu,garden_white_tree_dead]
@@ -297,13 +297,13 @@ if (%garden_quest < 1 | %garden_dantaera_varbit < 1 | last_useitem ! secateurs) 
     return;
 }
 if (~garden_has_white_tree_shoot = true | ~garden_patch_stage(8) >= 4) {
-    ~chatplayer("I have already cut the shoot from the White Tree. I should quickly grow a new tree in Queen Ellamaria's garden.");
+    ~chatplayer("<p,neutral>I have already cut the shoot from the White Tree. I should quickly grow a new tree in Queen Ellamaria's garden.");
     return;
 }
 if (inv_freespace(inv) < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-~chatplayer("Here is the shoot that Dantaera spoke of. Everything she told me is true - this tree will die once I cut this shoot. Well, here goes...");
+~chatplayer("<p,neutral>Here is the shoot that Dantaera spoke of. Everything she told me is true - this tree will die once I cut this shoot. Well, here goes...");
 mes("You cut a shoot from the White Tree.");
 inv_add(inv, garden_white_tree_shoot, 1);

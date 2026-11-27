@@ -36,12 +36,12 @@ switch_int(%skippy_state) {
     case ^skippy_drunk : @skippy_intro;
     case ^skippy_damp :
         ~skippy_damp_greeting;
-        ~chatplayer("No real reason. I just thought I would check up on you is all.");
-        ~chatnpc("Well, I'm still wet, still cold and still waiting on that nettle tea.");
+        ~chatplayer("<p,neutral>No real reason. I just thought I would check up on you is all.");
+        ~chatnpc("<p,neutral>Well, I'm still wet, still cold and still waiting on that nettle tea.");
     case ^skippy_hungover :
         ~skippy_hungover_greeting;
-        ~chatplayer("I just came back to ask you something.");
-        ~chatnpc("What?");
+        ~chatplayer("<p,neutral>I just came back to ask you something.");
+        ~chatnpc("<p,quiz>What?");
         @multi2("How do I make that hangover cure again?", skippy_recipe_again, "Why do they call you 'Skippy'?", skippy_name);
     case ^skippy_complete : @skippy_reminder;
 }
@@ -49,181 +49,181 @@ switch_int(%skippy_state) {
 [label,skippy_sober_up]
 if (%skippy_state ! ^skippy_drunk) @skippy_sober_enough;
 if (inv_total(inv, bucket_water) = 0) {
-    ~chatplayer("You know, I could shock him out of it if I could find some cold water...");
+    ~chatplayer("<p,neutral>You know, I could shock him out of it if I could find some cold water...");
     return;
 }
-~chatplayer("Well, I could dump this bucket of water over him. That would sober him up a little...");
+~chatplayer("<p,neutral>Well, I could dump this bucket of water over him. That would sober him up a little...");
 @multi2("Throw the water!", skippy_water, "I think I'll leave it for now.", skippy_leave);
 
 [label,skippy_leave]
-~chatplayer("I think I'll leave it for now.");
+~chatplayer("<p,neutral>I think I'll leave it for now.");
 
 [label,skippy_sober_enough]
-~chatplayer("I think he's sober enough. And I don't want to use another bucket of water.");
+~chatplayer("<p,neutral>I think he's sober enough. And I don't want to use another bucket of water.");
 
 [label,skippy_water]
 if (%skippy_state ! ^skippy_drunk | inv_total(inv, bucket_water) = 0) return;
-~chatplayer("Hey, Skippy!");
-~chatnpc("What?");
+~chatplayer("<p,neutral>Hey, Skippy!");
+~chatnpc("<p,quiz>What?");
 inv_del(inv, bucket_water, 1);
 // UNKNOWN container settlement: retain the player's empty water bucket.
 inv_add(inv, bucket_empty, 1);
 %skippy_state = ^skippy_damp;
-~chatnpc("Ahhhhhhhhhhgh! That's cold! Are you trying to kill me?");
-~chatplayer("Nope, just sober you up. Memory coming back yet?");
-~chatnpc("No. But I could do with a bowl of tea to warm myself up a bit. Go grab me one and we'll talk.");
-~chatplayer("Any particular type of tea?");
-~chatnpc("Nettle for preference. Just make sure it's hot.");
-~chatnpc("And don't throw it at me!");
-~chatplayer("What's your problem? You're all clean now.");
+~chatnpc("<p,quiz>Ahhhhhhhhhhgh! That's cold! Are you trying to kill me?");
+~chatplayer("<p,quiz>Nope, just sober you up. Memory coming back yet?");
+~chatnpc("<p,neutral>No. But I could do with a bowl of tea to warm myself up a bit. Go grab me one and we'll talk.");
+~chatplayer("<p,quiz>Any particular type of tea?");
+~chatnpc("<p,neutral>Nettle for preference. Just make sure it's hot.");
+~chatnpc("<p,neutral>And don't throw it at me!");
+~chatplayer("<p,quiz>What's your problem? You're all clean now.");
 
 [proc,skippy_damp_greeting]
-~chatplayer("Hey, Skippy!");
-~chatnpc("Gaah! Don't drench me again!");
-~chatplayer("Hey! I only did that once! Try not to be such a big baby!");
-~chatnpc("So what are you here for then?");
+~chatplayer("<p,neutral>Hey, Skippy!");
+~chatnpc("<p,neutral>Gaah! Don't drench me again!");
+~chatplayer("<p,neutral>Hey! I only did that once! Try not to be such a big baby!");
+~chatnpc("<p,quiz>So what are you here for then?");
 
 [label,skippy_tea]
 if (%skippy_state ! ^skippy_damp | inv_total(inv, bowl_nettletea) = 0) return;
 ~skippy_damp_greeting;
-~chatplayer("I've come to give you your tea.");
-~chatnpc("Excellent! I was thinking I was going to freeze out here!");
+~chatplayer("<p,neutral>I've come to give you your tea.");
+~chatnpc("<p,happy>Excellent! I was thinking I was going to freeze out here!");
 inv_del(inv, bowl_nettletea, 1);
 %skippy_state = ^skippy_hungover;
 ~objbox(bowl_nettletea, "Skippy drinks the tea and clutches his forehead in pain.", 250, 0, 0);
-~chatnpc("Ohhhhh...");
-~chatplayer("What? What's wrong?");
-~chatnpc("Not so loud...I think I have a hangover...");
-~chatplayer("Great...Well, I doubt you can remember anything through a hangover. What a waste of nettle tea...");
-~chatnpc("Hey! A little sympathy here?");
-~chatnpc("Owwowwoww... must remember not to shout...");
-~chatnpc("Look, I do know a hangover cure. If you can get me a bucket of the stuff I think I'll be ok.");
+~chatnpc("<p,neutral>Ohhhhh...");
+~chatplayer("<p,quiz>What? What's wrong?");
+~chatnpc("<p,neutral>Not so loud...I think I have a hangover...");
+~chatplayer("<p,happy>Great...Well, I doubt you can remember anything through a hangover. What a waste of nettle tea...");
+~chatnpc("<p,quiz>Hey! A little sympathy here?");
+~chatnpc("<p,neutral>Owwowwoww... must remember not to shout...");
+~chatnpc("<p,neutral>Look, I do know a hangover cure. If you can get me a bucket of the stuff I think I'll be ok.");
 if (%elenaquest >= ^quest_elena_spoke_to_bravek) {
-    ~chatplayer("Wait... is this cure a bucket of chocolate milk and snape grass?");
-    ~chatnpc("Yes! That's the stuff!");
-    ~chatplayer("Ahhh. Yes, I've made some of that stuff before. I should be able to get you some, no problem.");
+    ~chatplayer("<p,quiz>Wait... is this cure a bucket of chocolate milk and snape grass?");
+    ~chatnpc("<p,neutral>Yes! That's the stuff!");
+    ~chatplayer("<p,neutral>Ahhh. Yes, I've made some of that stuff before. I should be able to get you some, no problem.");
 } else {
-    ~chatplayer("So what is it you need?");
-    ~chatnpc("A bucket of milk with chocolate ground into it, with a handful of snape grass thrown in on top.");
-    ~chatplayer("What? Run that past me again?");
-    ~chatnpc("Take a bucket of milk, a bar of chocolate and some snape grass.");
-    ~chatnpc("Grind the chocolate with a mortar and pestle.");
+    ~chatplayer("<p,quiz>So what is it you need?");
+    ~chatnpc("<p,neutral>A bucket of milk with chocolate ground into it, with a handful of snape grass thrown in on top.");
+    ~chatplayer("<p,quiz>What? Run that past me again?");
+    ~chatnpc("<p,neutral>Take a bucket of milk, a bar of chocolate and some snape grass.");
+    ~chatnpc("<p,neutral>Grind the chocolate with a mortar and pestle.");
     ~skippy_recipe;
-    ~chatnpc("The end, and we all live happily ever after. Got it?");
+    ~chatnpc("<p,quiz>The end, and we all live happily ever after. Got it?");
 }
 
 [proc,skippy_recipe]
-~chatnpc("Add the chocolate powder to the milk, then add the snape grass.");
-~chatnpc("Then bring it here and I will drink it.");
+~chatnpc("<p,neutral>Add the chocolate powder to the milk, then add the snape grass.");
+~chatnpc("<p,neutral>Then bring it here and I will drink it.");
 
 [label,skippy_recipe_again]
-~chatplayer("How do I make that hangover cure again?");
-~chatnpc("Give me strength...Here's what you do. Pay attention!");
-~chatnpc("You take a bucket of milk, a bar of chocolate and some snape grass.");
-~chatnpc("Grind the chocolate with a pestle and mortar.");
+~chatplayer("<p,quiz>How do I make that hangover cure again?");
+~chatnpc("<p,neutral>Give me strength...Here's what you do. Pay attention!");
+~chatnpc("<p,neutral>You take a bucket of milk, a bar of chocolate and some snape grass.");
+~chatnpc("<p,neutral>Grind the chocolate with a pestle and mortar.");
 ~skippy_recipe;
-~chatnpc("Are you likely to remember that or should I go get some crayons and draw you a picture?");
-~chatplayer("Hey! I remember it now, ok! See you in a bit.");
+~chatnpc("<p,quiz>Are you likely to remember that or should I go get some crayons and draw you a picture?");
+~chatplayer("<p,neutral>Hey! I remember it now, ok! See you in a bit.");
 
 [label,skippy_name]
-~chatplayer("Why do they call you Skippy?");
-~chatnpc("I think it may have something to do with my near- constant raving about mudskippers.");
-~chatnpc("That or it's something to do with that time with the dress and the field full of daisies...");
+~chatplayer("<p,quiz>Why do they call you Skippy?");
+~chatnpc("<p,neutral>I think it may have something to do with my near- constant raving about mudskippers.");
+~chatnpc("<p,neutral>That or it's something to do with that time with the dress and the field full of daisies...");
 
 [proc,skippy_hungover_greeting]
-~chatplayer("Hey, Skippy!");
-~chatnpc("Egad! Don't you know not to shout around a guy with a hangover?");
-~chatnpc("Ahhhhhg...No more shouting for me...");
-~chatnpc("What is it anyway?");
+~chatplayer("<p,neutral>Hey, Skippy!");
+~chatnpc("<p,quiz>Egad! Don't you know not to shout around a guy with a hangover?");
+~chatnpc("<p,neutral>Ahhhhhg...No more shouting for me...");
+~chatnpc("<p,quiz>What is it anyway?");
 
 [label,skippy_cure]
 if (%skippy_state ! ^skippy_hungover | inv_total(inv, hangover_cure) = 0) return;
 ~skippy_hungover_greeting;
-~chatplayer("Well Skippy, you will no doubt be glad to hear that I got you your hangover cure!");
-~chatnpc("Gimme!");
+~chatplayer("<p,neutral>Well Skippy, you will no doubt be glad to hear that I got you your hangover cure!");
+~chatnpc("<p,neutral>Gimme!");
 inv_del(inv, hangover_cure, 1);
 %skippy_state = ^skippy_complete;
 ~mesbox("Skippy chugs the hangover cure... very impressive.");
-~chatnpc("Ahhhhhhhhhhhhhhh...");
-~chatnpc("Much better...");
-~chatplayer("Feeling better?");
-~chatnpc("Considerably.");
-~chatplayer("Then tell me where the mudskippers are!");
-~chatnpc("I wish you wouldn't go looking for them. Those vicious killers will tear you apart.");
-~chatnpc("It's all becoming clear to me now...");
-~chatnpc("I was fishing using a Fishing Explosive...");
-~chatplayer("A Fishing Explosive?");
-~chatnpc("Well, Slayer Masters sell these highly volatile potions for killing underwater creatures.");
-~chatnpc("If you don't feel like lobbing a net about all day you can use them to fish with...");
-~chatnpc("But this time I was startled by what I thought was a giant mudskipper.");
-~chatnpc("What it was, infact, was a...");
-~chatnpc("Dramatic Pause...");
-~chatnpc("A Mogre!");
-~chatplayer("What exactly is a Mogre?");
-~chatnpc("A Mogre is a type of Ogre that spends most of its time underwater.");
-~chatnpc("They hunt giant mudskippers by wearing their skins and swimming close until they can attack them.");
-~chatnpc("When I used the Fishing Explosive I scared off all the fish, and so the Mogre got out of the water to express its extreme displeasure.");
-~chatnpc("With an iron mace.");
-~chatplayer("I take it the head injury is responsible for the staggering and yelling?");
-~chatnpc("No, no.");
-~chatnpc("My addiction to almost-lethal alcohol did that.");
-~chatnpc("But if you are set on finding these Mogres just head south from here until you find Mudskipper Point.");
-~chatplayer("The mudskipper-eating monsters are to be found at Mudskipper point?");
-~chatplayer("Shock!");
-~chatplayer("Thanks. I'll be careful.");
+~chatnpc("<p,neutral>Ahhhhhhhhhhhhhhh...");
+~chatnpc("<p,neutral>Much better...");
+~chatplayer("<p,quiz>Feeling better?");
+~chatnpc("<p,neutral>Considerably.");
+~chatplayer("<p,neutral>Then tell me where the mudskippers are!");
+~chatnpc("<p,neutral>I wish you wouldn't go looking for them. Those vicious killers will tear you apart.");
+~chatnpc("<p,neutral>It's all becoming clear to me now...");
+~chatnpc("<p,neutral>I was fishing using a Fishing Explosive...");
+~chatplayer("<p,quiz>A Fishing Explosive?");
+~chatnpc("<p,neutral>Well, Slayer Masters sell these highly volatile potions for killing underwater creatures.");
+~chatnpc("<p,neutral>If you don't feel like lobbing a net about all day you can use them to fish with...");
+~chatnpc("<p,neutral>But this time I was startled by what I thought was a giant mudskipper.");
+~chatnpc("<p,neutral>What it was, infact, was a...");
+~chatnpc("<p,neutral>Dramatic Pause...");
+~chatnpc("<p,neutral>A Mogre!");
+~chatplayer("<p,quiz>What exactly is a Mogre?");
+~chatnpc("<p,neutral>A Mogre is a type of Ogre that spends most of its time underwater.");
+~chatnpc("<p,neutral>They hunt giant mudskippers by wearing their skins and swimming close until they can attack them.");
+~chatnpc("<p,neutral>When I used the Fishing Explosive I scared off all the fish, and so the Mogre got out of the water to express its extreme displeasure.");
+~chatnpc("<p,neutral>With an iron mace.");
+~chatplayer("<p,quiz>I take it the head injury is responsible for the staggering and yelling?");
+~chatnpc("<p,neutral>No, no.");
+~chatnpc("<p,neutral>My addiction to almost-lethal alcohol did that.");
+~chatnpc("<p,neutral>But if you are set on finding these Mogres just head south from here until you find Mudskipper Point.");
+~chatplayer("<p,quiz>The mudskipper-eating monsters are to be found at Mudskipper point?");
+~chatplayer("<p,neutral>Shock!");
+~chatplayer("<p,happy>Thanks. I'll be careful.");
 
 [label,skippy_reminder]
-~chatplayer("Hey, Skippy.");
-~chatnpc("Hey you!");
-~chatplayer("How do I annoy the Mogres again?");
-~chatnpc("Go south to Mudskipper Point and lob a Fishing Explosive into the sea. You can grab them from the Slayer masters.");
-~chatplayer("Thanks! So, what are you going to do now?");
-~chatnpc("Well, I was planning on continuing my hobby of wandering up and down this bit of coastline, bellowing random threats and throwing bottles.");
-~chatnpc("And you?");
-~chatplayer("I was planning on wandering up and down the landscape, bugging people to see if they had mindblowingly dangerous quests for me to undertake.");
-~chatnpc("Well, good luck with that!");
-~chatplayer("You too!");
-~chatnpc("Weirdo...");
-~chatplayer("Loony...");
+~chatplayer("<p,neutral>Hey, Skippy.");
+~chatnpc("<p,neutral>Hey you!");
+~chatplayer("<p,quiz>How do I annoy the Mogres again?");
+~chatnpc("<p,neutral>Go south to Mudskipper Point and lob a Fishing Explosive into the sea. You can grab them from the Slayer masters.");
+~chatplayer("<p,happy>Thanks! So, what are you going to do now?");
+~chatnpc("<p,neutral>Well, I was planning on continuing my hobby of wandering up and down this bit of coastline, bellowing random threats and throwing bottles.");
+~chatnpc("<p,quiz>And you?");
+~chatplayer("<p,neutral>I was planning on wandering up and down the landscape, bugging people to see if they had mindblowingly dangerous quests for me to undertake.");
+~chatnpc("<p,neutral>Well, good luck with that!");
+~chatplayer("<p,neutral>You too!");
+~chatnpc("<p,neutral>Weirdo...");
+~chatplayer("<p,neutral>Loony...");
 
 [label,skippy_intro]
-~chatplayer("Are you all right? You seem a little...incoherent.");
-~chatnpc("Inc'hearnt? Inc'herant! You...you...with yer fancy book- lernin' words. You'd be more than inc'herant if youd seen...");
-~chatnpc("(Dramatic pause)");
-~chatnpc("THEM!");
+~chatplayer("<p,quiz>Are you all right? You seem a little...incoherent.");
+~chatnpc("<p,quiz>Inc'hearnt? Inc'herant! You...you...with yer fancy book- lernin' words. You'd be more than inc'herant if youd seen...");
+~chatnpc("<p,neutral>(Dramatic pause)");
+~chatnpc("<p,neutral>THEM!");
 @multi2("I'm sure I would as well.", skippy_goodbye, "Who are (Dramatic pause) THEY?", skippy_story);
 
 [label,skippy_goodbye]
-~chatplayer("I'm sure I would as well.");
-~chatplayer("I'm going over here to talk to non-crazy people now.");
-~chatnpc("Yeah? Yeah? Well when THEY come floppin' into your house and eat your furniture you'll be sorry!");
+~chatplayer("<p,neutral>I'm sure I would as well.");
+~chatplayer("<p,neutral>I'm going over here to talk to non-crazy people now.");
+~chatnpc("<p,quiz>Yeah? Yeah? Well when THEY come floppin' into your house and eat your furniture you'll be sorry!");
 
 [label,skippy_story]
-~chatplayer("Who are");
-~chatplayer("(Dramatic pause)");
-~chatplayer("THEY?");
-~chatnpc("They! Those bloodthirsty, flesh-tearing devils! They are the reason I'm out here every day hurlin' bottles into the sea!");
-~chatnpc("They are the reason I've lost everything, except the horrifying memory of what THEY look like...");
-~chatplayer("And what do THEY look like?");
-~chatnpc("Mudskippers!");
-~chatplayer("Mudskippers?");
-~chatnpc("Aye, Mudskippers! Those ferocious, ravening, evil, beady-eyed terrors of the deep!");
-~chatplayer("I...see...");
-~chatnpc("I was ambushed by them way back, see. They got the drop on me...I can't remember where, somewhere around here though.");
-~chatplayer("These would be the mudskippers, right?");
-~chatnpc("Aye! The mudskippers! Huge they were! Ten feet of glistening, muddy flesh floppin' towards me with white foam flying from their gnashing fangs!");
-~chatnpc("I fought them up and down the beach, with the tide rising and more of them leaping towards me with cutlasses drawn!");
-~chatplayer("This is fascinating, but I have to be...");
-~chatnpc("Shut yer' word-hole and listen! I can't remember all the details, as I'm sure they must have hit me quite hard, but the last thing I remember before it all went black...");
-~chatnpc("...was one of those devils rearing over me, its eyes glowin' red with the fires of hell!");
-~chatplayer("Fires of hell...right. I believe you.");
-~chatnpc("No you don't! You think I'm crazy, like all the rest! Well, if I'm crazy, how did I get these?");
-~chatplayer("Get what?");
+~chatplayer("<p,neutral>Who are");
+~chatplayer("<p,neutral>(Dramatic pause)");
+~chatplayer("<p,quiz>THEY?");
+~chatnpc("<p,neutral>They! Those bloodthirsty, flesh-tearing devils! They are the reason I'm out here every day hurlin' bottles into the sea!");
+~chatnpc("<p,neutral>They are the reason I've lost everything, except the horrifying memory of what THEY look like...");
+~chatplayer("<p,quiz>And what do THEY look like?");
+~chatnpc("<p,neutral>Mudskippers!");
+~chatplayer("<p,quiz>Mudskippers?");
+~chatnpc("<p,neutral>Aye, Mudskippers! Those ferocious, ravening, evil, beady-eyed terrors of the deep!");
+~chatplayer("<p,neutral>I...see...");
+~chatnpc("<p,neutral>I was ambushed by them way back, see. They got the drop on me...I can't remember where, somewhere around here though.");
+~chatplayer("<p,quiz>These would be the mudskippers, right?");
+~chatnpc("<p,neutral>Aye! The mudskippers! Huge they were! Ten feet of glistening, muddy flesh floppin' towards me with white foam flying from their gnashing fangs!");
+~chatnpc("<p,neutral>I fought them up and down the beach, with the tide rising and more of them leaping towards me with cutlasses drawn!");
+~chatplayer("<p,neutral>This is fascinating, but I have to be...");
+~chatnpc("<p,neutral>Shut yer' word-hole and listen! I can't remember all the details, as I'm sure they must have hit me quite hard, but the last thing I remember before it all went black...");
+~chatnpc("<p,neutral>...was one of those devils rearing over me, its eyes glowin' red with the fires of hell!");
+~chatplayer("<p,neutral>Fires of hell...right. I believe you.");
+~chatnpc("<p,quiz>No you don't! You think I'm crazy, like all the rest! Well, if I'm crazy, how did I get these?");
+~chatplayer("<p,quiz>Get what?");
 ~mesbox("Skippy shows you what appears to be massive bite scars on his legs. You're no expert, but they look like... giant mudskipper bites!");
-~chatplayer("Giant mudskipper bites! Where did you get those?");
-~chatnpc("I can't remember... I've been drinking to forget the horror, and all I seem to have forgotten is where it all happened...");
-~chatplayer("Hmmm...I suppose if I sober you up you may well start to recall.");
-~chatnpc("You'll have a job. I've been drinking this for a week.");
-~chatplayer("'Captain Braindeath's Extra Strength Rum/Drain Cleaner. Now 50% more debilitating'?");
-~chatnpc("It's the extra sheep tranquilizers that gives it that added kick!");
-~chatplayer("Stay here and I'll be right back. Try not to move. Or go near any open flames.");
+~chatplayer("<p,quiz>Giant mudskipper bites! Where did you get those?");
+~chatnpc("<p,neutral>I can't remember... I've been drinking to forget the horror, and all I seem to have forgotten is where it all happened...");
+~chatplayer("<p,neutral>Hmmm...I suppose if I sober you up you may well start to recall.");
+~chatnpc("<p,neutral>You'll have a job. I've been drinking this for a week.");
+~chatplayer("<p,quiz>'Captain Braindeath's Extra Strength Rum/Drain Cleaner. Now 50% more debilitating'?");
+~chatnpc("<p,neutral>It's the extra sheep tranquilizers that gives it that added kick!");
+~chatplayer("<p,neutral>Stay here and I'll be right back. Try not to move. Or go near any open flames.");

@@ -146,7 +146,7 @@ switch_int(%itwatchtower) {
                 ~chatnpc("<p,neutral>Talk to them face to face|and don't show any fear.|Make sure you are rested and well fed,|and fight the good fight!");
             case 2 :
                 ~chatplayer("<p,happy>I have everything under control.");
-                ~chatnpc("Good, good! I will expect the crystals back shortly then...");
+                ~chatnpc("<p,neutral>Good, good! I will expect the crystals back shortly then...");
             case 3 :
                 ~chatplayer("<p,sad>I have lost something the ogres gave to me.");
                 ~chatnpc("<p,neutral>Oh, deary me!|Well, there's nothing I can do about it.|You will have to go back to them, I'm afraid.");

@@ -5,16 +5,16 @@ def_int $reaction = random(^n620_camel_reactions);
 def_string $reply = "";
 if ($reaction = 0) {
     ~chatplayer("<p,neutral>That beast would probably bite my fingers off if I tried to pet it.");
-    $reply = "If you want me to bite your fingers off, you're going the right way about it!";
+    $reply = "<p,angry>If you want me to bite your fingers off, you're going the right way about it!";
 } else if ($reaction = 1) {
     ~chatplayer("<p,neutral>I'm not going to pet that! It will probably bite my hand off, that filthy beast.");
-    $reply = "Watch who you're calling a filthy beast, human.";
+    $reply = "<p,angry>Watch who you're calling a filthy beast, human.";
 } else if ($reaction = 2) {
     ~chatplayer("<p,neutral>Mmmm... you'd make a tasty kebab.");
-    $reply = "And you'd make an excellent spit bucket! Pchoo!";
+    $reply = "<p,angry>And you'd make an excellent spit bucket! Pchoo!";
 } else {
     ~chatplayer("<p,neutral>I'm not going to pet that nasty creature! I might get fleas... or worse!");
-    $reply = "You're fairly nasty yourself, human. When was the last time you took a shower?";
+    $reply = "<p,angry>You're fairly nasty yourself, human. When was the last time you took a shower?";
 }
 if (inv_total(worn, camulet) > 0) {
     ~chatnpc($reply);

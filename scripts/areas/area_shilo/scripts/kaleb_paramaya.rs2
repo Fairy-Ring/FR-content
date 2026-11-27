@@ -1,6 +1,6 @@
 [oploc1,paramayaladderup]
 if(inv_total(inv, paramayaticket) = 0) {
-    ~chatnpc_specific(nc_name(shiloinnowner), shiloinnowner, "You can buy a ticket to the dormitory from me. And have a lovely night's rest.");
+    ~chatnpc_specific(nc_name(shiloinnowner), shiloinnowner, "<p,neutral>You can buy a ticket to the dormitory from me. And have a lovely night's rest.");
     return;
 }
 ~mesbox("The barman takes your ticket and allows you up to the dormitory.");

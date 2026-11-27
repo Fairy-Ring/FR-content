@@ -21,7 +21,7 @@ if (last_useitem ! fishing_explosive) {
     return;
 }
 if (~slayer_skippy_unlocked = false) {
-    ~chatplayer("Sinister as that fishing spot is, why would I want to explode it?");
+    ~chatplayer("<p,quiz>Sinister as that fishing spot is, why would I want to explode it?");
     return;
 }
 if (stat(slayer) < enum(int, int, slayer_req, ^slayer_mogre)) {
@@ -29,7 +29,7 @@ if (stat(slayer) < enum(int, int, slayer_req, ^slayer_mogre)) {
     return;
 }
 if (distance(coord, loc_coord) <= ^mogre_unsafe_range) {
-    ~chatplayer("If this thing explodes, I think I should stand a liiiiittle further away...");
+    ~chatplayer("<p,neutral>If this thing explodes, I think I should stand a liiiiittle further away...");
     return;
 }
 if (inv_total(inv, fishing_explosive) < 1) return;

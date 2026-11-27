@@ -6,7 +6,7 @@
 
 [opnpc1,ahoy_ghost_innkeeper]
 if (~ahoy_can_speak = false) {
-    ~chatnpc("Woooo wooo wooooo woooo");
+    ~chatnpc("<p,neutral>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
     return;
 }
@@ -14,16 +14,16 @@ if (%ahoy_questvar < 4 | %ahoy_questvar >= 8) {
     ~displaymessage(^dm_default);
     return;
 }
-~chatplayer("Hello there!");
-~chatnpc("Greetings, traveller. Welcome to 'The Green Ghost' Tavern. What can I do you for?");
+~chatplayer("<p,happy>Hello there!");
+~chatnpc("<p,quiz>Greetings, traveller. Welcome to 'The Green Ghost' Tavern. What can I do you for?");
 def_int $job = ~p_choice2("Do you have any jobs I can do?", 1, "Nothing, thanks.", 2);
 if ($job = 2) {
-    ~chatplayer("Nothing, thanks.");
+    ~chatplayer("<p,happy>Nothing, thanks.");
     return;
 }
-~chatplayer("Do you have any jobs I can do?");
+~chatplayer("<p,quiz>Do you have any jobs I can do?");
 if (inv_total(inv, ahoy_bedsheet) > 0 | inv_total(inv, ahoy_bedsheetgreen) > 0 | inv_total(worn, ahoy_bedsheet) > 0 | inv_total(worn, ahoy_bedsheetgreen) > 0) {
-    ~chatnpc("Well, you could take that bedsheet through to Robin like I asked.");
+    ~chatnpc("<p,neutral>Well, you could take that bedsheet through to Robin like I asked.");
     return;
 }
 if (%ahoy_requested_sheet = 1) {
@@ -31,29 +31,29 @@ if (%ahoy_requested_sheet = 1) {
     @ahoy_innkeeper_give_sheet;
     return;
 }
-~chatnpc("Yes, actually, I do. We have a very famous Master Bowman named Robin staying with us at the moment. Could you take him some clean bed linen for me?");
+~chatnpc("<p,quiz>Yes, actually, I do. We have a very famous Master Bowman named Robin staying with us at the moment. Could you take him some clean bed linen for me?");
 def_int $accept = ~p_choice2("Yes, I'd be delighted.", 1, "No, I didn't mean a job like that.", 2);
 if ($accept = 2) {
-    ~chatplayer("No, I didn't mean a job like that.");
+    ~chatplayer("<p,neutral>No, I didn't mean a job like that.");
     return;
 }
-~chatplayer("Yes, I'd be delighted.");
+~chatplayer("<p,neutral>Yes, I'd be delighted.");
 @ahoy_innkeeper_give_sheet;
 return;
 
 [label,ahoy_innkeeper_give_sheet]
 if (inv_freespace(inv) = 0) {
-    ~chatnpc("I'd give you a bedsheet, but you look like you're carrying too much already.");
+    ~chatnpc("<p,neutral>I'd give you a bedsheet, but you look like you're carrying too much already.");
     return;
 }
 inv_add(inv, ahoy_bedsheet, 1);
 %ahoy_requested_sheet = 1;
-~chatnpc("Oh, thank you. Be careful with that Robin, though - he's far too full of himself, that one.");
+~chatnpc("<p,happy>Oh, thank you. Be careful with that Robin, though - he's far too full of himself, that one.");
 return;
 
 [opnpc1,ahoy_ghost_protestor]
 if (~ahoy_can_speak = false) {
-    ~chatnpc("Woooo wooo wooooo woooo");
+    ~chatnpc("<p,neutral>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
     return;
 }
@@ -72,58 +72,58 @@ if (inv_total(inv, ahoy_petition) = 0) {
 def_int $signatures = min(10, %ahoy_signaturecounter);
 %ahoy_signaturecounter = $signatures;
 if ($signatures >= 10) {
-    ~chatnpc("You've got them all! Now go and present it to Necrovarus!!");
+    ~chatnpc("<p,neutral>You've got them all! Now go and present it to Necrovarus!!");
     return;
 }
 if ($signatures = 0) {
-    ~chatnpc("Come on - you haven't even started yet! You need 10 more signatures.");
+    ~chatnpc("<p,neutral>Come on - you haven't even started yet! You need 10 more signatures.");
 } else if ($signatures = 1) {
-    ~chatnpc("Well, that's a start I suppose You need 9 more signatures.");
+    ~chatnpc("<p,neutral>Well, that's a start I suppose You need 9 more signatures.");
 } else if ($signatures >= 4 & $signatures <= 6) {
     def_int $needed = sub(10, $signatures);
-    ~chatnpc("Not doing bad I see! You need <tostring($needed)> more signatures.");
+    ~chatnpc("<p,neutral>Not doing bad I see! You need <tostring($needed)> more signatures.");
 } else if ($signatures = 7 | $signatures = 8) {
     def_int $needed = sub(10, $signatures);
-    ~chatnpc("Are you sure you haven't done this type of thing before? You need <tostring($needed)> more signatures.");
+    ~chatnpc("<p,quiz>Are you sure you haven't done this type of thing before? You need <tostring($needed)> more signatures.");
 } else if ($signatures = 9) {
-    ~chatnpc("Very nearly there!! Only 1 more signature to go.");
+    ~chatnpc("<p,neutral>Very nearly there!! Only 1 more signature to go.");
 } else {
     // UNKNOWN functional wording for transcript counts 2-3.
     def_int $needed = sub(10, $signatures);
-    ~chatnpc("You still need <tostring($needed)> more signatures.");
+    ~chatnpc("<p,neutral>You still need <tostring($needed)> more signatures.");
 }
 return;
 
 [label,ahoy_gravingas_request_petition]
-~chatnpc("Will you join with me and protest against the evil desires of Necrovarus and his disciples?");
+~chatnpc("<p,quiz>Will you join with me and protest against the evil desires of Necrovarus and his disciples?");
 def_int $join = ~p_choice2("After hearing Velorina's story I will be happy to help out.", 1, "I'm sorry, I don't really think I should get involved.", 2);
 if ($join = 2) {
-    ~chatplayer("I'm sorry, I don't really think I should get involved.");
+    ~chatplayer("<p,neutral>I'm sorry, I don't really think I should get involved.");
     return;
 }
-~chatplayer("After hearing Velorina's story I will be happy to help out.");
+~chatplayer("<p,neutral>After hearing Velorina's story I will be happy to help out.");
 if (inv_freespace(inv) = 0) {
-    ~chatnpc("I'd give you a petition form, but you look like you're carrying too much already.");
+    ~chatnpc("<p,neutral>I'd give you a petition form, but you look like you're carrying too much already.");
     return;
 }
 inv_add(inv, ahoy_petition, 1);
-~chatnpc("Excellent, excellent!! Here - take this petition form, and try and get 10 signatures from the townsfolk.");
+~chatnpc("<p,happy>Excellent, excellent!! Here - take this petition form, and try and get 10 signatures from the townsfolk.");
 return;
 
 [label,ahoy_gravingas_replace_petition]
-~chatplayer("I'm sorry, I seem to have lost my petition form.");
+~chatplayer("<p,neutral>I'm sorry, I seem to have lost my petition form.");
 if (inv_freespace(inv) = 0) {
-    ~chatnpc("I'd give you another petition form, but you look like you're carrying too much already.");
+    ~chatnpc("<p,neutral>I'd give you another petition form, but you look like you're carrying too much already.");
     return;
 }
 // UNKNOWN favourable recovery: preserve the signature counter on replacement.
 inv_add(inv, ahoy_petition, 1);
-~chatnpc("Here is another petition form. Your signatures are still recorded.");
+~chatnpc("<p,neutral>Here is another petition form. Your signatures are still recorded.");
 return;
 
 [opnpc1,ahoy_ghost_villager]
 if (~ahoy_can_speak = false) {
-    ~chatnpc("Woooo wooo wooooo woooo");
+    ~chatnpc("<p,neutral>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
     return;
 }
@@ -132,23 +132,23 @@ if (%ahoy_questvar ! 4 | inv_total(inv, ahoy_petition) = 0) {
     return;
 }
 if (%ahoy_signaturecounter >= 10) {
-    ~chatplayer("Thank you for your kind support.");
+    ~chatplayer("<p,happy>Thank you for your kind support.");
     return;
 }
 // UNKNOWN favourable session identity: an NPC UID remains stable while the
 // villager wanders. Logout clears this repeat guard, not the earned signatures.
 if (%ahoy_last_signer = npc_uid) {
-    ~chatnpc("You only just asked me the same thing! Leave me alone - I've had my say!");
+    ~chatnpc("<p,neutral>You only just asked me the same thing! Leave me alone - I've had my say!");
     return;
 }
 %ahoy_last_signer = npc_uid;
 if (inv_total(worn, ahoy_bedsheetgreen) = 0) {
     if (inv_total(worn, ahoy_bedsheet) > 0) {
-        ~chatplayer("Would you sign this petition form, please?");
-        ~chatnpc("Why are you wearing that bedsheet? If you're trying to pretend to be one of us, you're not fooling anybody - you're not even green!!");
+        ~chatplayer("<p,quiz>Would you sign this petition form, please?");
+        ~chatnpc("<p,quiz>Why are you wearing that bedsheet? If you're trying to pretend to be one of us, you're not fooling anybody - you're not even green!!");
     } else {
-        ~chatplayer("Would you sign this petition form, please?");
-        ~chatnpc("I'm sorry, but it's hard to believe that a mortal could be interested in helping us.");
+        ~chatplayer("<p,quiz>Would you sign this petition form, please?");
+        ~chatnpc("<p,neutral>I'm sorry, but it's hard to believe that a mortal could be interested in helping us.");
     }
     return;
 }
@@ -156,42 +156,42 @@ if (inv_total(worn, ahoy_bedsheetgreen) = 0) {
 def_int $roll = random(100);
 if ($roll < 70) {
     def_int $reply = random(4);
-    if ($reply = 0) ~chatnpc("Most certainly, I will.");
-    if ($reply = 1) ~chatnpc("I'll do anything that annoys Necrovarus.");
-    if ($reply = 2) ~chatnpc("Yes! It's about time somebody did something about Necrovarus.");
-    if ($reply = 3) ~chatnpc("Yes, of course.");
+    if ($reply = 0) ~chatnpc("<p,neutral>Most certainly, I will.");
+    if ($reply = 1) ~chatnpc("<p,neutral>I'll do anything that annoys Necrovarus.");
+    if ($reply = 2) ~chatnpc("<p,neutral>Yes! It's about time somebody did something about Necrovarus.");
+    if ($reply = 3) ~chatnpc("<p,neutral>Yes, of course.");
     @ahoy_petition_add_signature;
     return;
 }
 if ($roll < 90) {
     def_int $bribe_reply = random(3);
-    if ($bribe_reply = 0) ~chatnpc("It'll cost you...");
-    if ($bribe_reply = 1) ~chatnpc("I will if you make it worth my while...");
-    if ($bribe_reply = 2) ~chatnpc("You scratch my back and I'll scratch yours...");
-    ~chatplayer("How much?");
+    if ($bribe_reply = 0) ~chatnpc("<p,neutral>It'll cost you...");
+    if ($bribe_reply = 1) ~chatnpc("<p,neutral>I will if you make it worth my while...");
+    if ($bribe_reply = 2) ~chatnpc("<p,neutral>You scratch my back and I'll scratch yours...");
+    ~chatplayer("<p,quiz>How much?");
     def_int $price = add(random(3), 1);
-    ~chatnpc("Oh, it'll cost you <tostring($price)> ecto-tokens.");
+    ~chatnpc("<p,neutral>Oh, it'll cost you <tostring($price)> ecto-tokens.");
     if (inv_total(inv, ectotoken) < $price) {
-        ~chatplayer("I don't have that many on me.");
-        ~chatnpc("No tokens, no signature.");
+        ~chatplayer("<p,neutral>I don't have that many on me.");
+        ~chatnpc("<p,neutral>No tokens, no signature.");
         return;
     }
     def_int $pay = ~p_choice2("Okay, if you insist.", 1, "There's no way I'm giving in to corruption.", 2);
     if ($pay = 2) {
-        ~chatplayer("There's no way I'm giving in to corruption.");
-        ~chatnpc("Suit yourself.");
+        ~chatplayer("<p,neutral>There's no way I'm giving in to corruption.");
+        ~chatnpc("<p,neutral>Suit yourself.");
         return;
     }
-    ~chatplayer("Okay, if you insist.");
+    ~chatplayer("<p,neutral>Okay, if you insist.");
     inv_del(inv, ectotoken, $price);
     @ahoy_petition_add_signature;
     return;
 }
 def_int $oppose_reply = random(4);
-if ($oppose_reply = 0) ~chatnpc("I will have you know that I am a fervent supporter of Necrovarus.");
-if ($oppose_reply = 1) ~chatnpc("How dare you accost me in the street?");
-if ($oppose_reply = 2) ~chatnpc("Get lost.");
-if ($oppose_reply = 3) ~chatnpc("I don't have time for this nonsense.");
+if ($oppose_reply = 0) ~chatnpc("<p,neutral>I will have you know that I am a fervent supporter of Necrovarus.");
+if ($oppose_reply = 1) ~chatnpc("<p,angry>How dare you accost me in the street?");
+if ($oppose_reply = 2) ~chatnpc("<p,angry>Get lost.");
+if ($oppose_reply = 3) ~chatnpc("<p,angry>I don't have time for this nonsense.");
 return;
 
 [label,ahoy_petition_add_signature]

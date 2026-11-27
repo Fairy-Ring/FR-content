@@ -2,8 +2,8 @@
 // its original transmitted bits are shared with the Fight Pits and client morphs.
 [opnpc1,tzhaar_fightcave_master]
 // UNKNOWN functional wording. No retained period transcript supplies these lines.
-~chatnpc("Fight the creatures in the cave. If you die, you keep your items. The further you get, the more Tokkul you earn.");
-~chatnpc("Defeat all 63 waves and you earn a fire cape and 8,032 Tokkul.");
+~chatnpc("<p,neutral>Fight the creatures in the cave. If you die, you keep your items. The further you get, the more Tokkul you earn.");
+~chatnpc("<p,neutral>Defeat all 63 waves and you earn a fire cape and 8,032 Tokkul.");
 
 [oploc1,cave_entrance_9356]
 ~fightcaves_enter;

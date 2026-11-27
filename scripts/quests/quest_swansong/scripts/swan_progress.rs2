@@ -4,7 +4,7 @@
 // the original 377 multi-NPC selectors; completion 200 is CANDIDATE.
 [label,swan_herman_colony]
 if (%swansong = ^swansong_complete) {
-    ~chatnpc("The Colony is safe. Thank you for your help.");
+    ~chatnpc("<p,happy>The Colony is safe. Thank you for your help.");
     return;
 }
 if (%swansong = 180) { ~swan_finish; return; }
@@ -14,7 +14,7 @@ if (%swansong = 150) {
 }
 if (%swansong = 140) {
     if (inv_total(inv, swan_army) = 0) {
-        ~chatnpc("Bring the bone seeds from Malignius Mortifer.");
+        ~chatnpc("<p,neutral>Bring the bone seeds from Malignius Mortifer.");
         return;
     }
     inv_del(inv, swan_army, 1);
@@ -24,32 +24,32 @@ if (%swansong = 140) {
     return;
 }
 if (%swansong >= 100) {
-    ~chatnpc("Ask Wizard Frumscone in the Wizards' Guild for an army to defend the Colony.");
+    ~chatnpc("<p,neutral>Ask Wizard Frumscone in the Wizards' Guild for an army to defend the Colony.");
     return;
 }
 if (%swansong = 60) {
     %swansong = 65;
     ~send_quest_progress(questlist:swansong, %swansong, ^swansong_complete);
-    ~chatnpc("Help Franklin repair our walls and Arnold replenish our food stocks.");
+    ~chatnpc("<p,neutral>Help Franklin repair our walls and Arnold replenish our food stocks.");
     return;
 }
 if (%swansong = 65) {
     if (%swansong_franklin = 4 & %swansong_arnold = 6) {
         if (stat(magic) < 66) {
-            ~chatnpc("You need level 66 Magic to seek help from the Wizards' Guild.");
+            ~chatnpc("<p,neutral>You need level 66 Magic to seek help from the Wizards' Guild.");
             return;
         }
         %swansong = 100;
-        ~chatnpc("We need an army. Speak to Wizard Frumscone in the basement of the Wizards' Guild in Yanille.");
+        ~chatnpc("<p,neutral>We need an army. Speak to Wizard Frumscone in the basement of the Wizards' Guild in Yanille.");
     } else {
-        ~chatnpc("Franklin needs the five wall sections repaired. Arnold needs five cooked fresh monkfish.");
+        ~chatnpc("<p,neutral>Franklin needs the five wall sections repaired. Arnold needs five cooked fresh monkfish.");
     }
 }
 
 [proc,swan_finish]
 if (%swansong ! 180) return;
 if (inv_itemspace(inv, coins, 25000, inv_size(inv)) = false) {
-    ~chatnpc("Make room for your 25,000 coins first.");
+    ~chatnpc("<p,neutral>Make room for your 25,000 coins first.");
     return;
 }
 // VERIFIED exact Reward lines: 15,000 Magic, 10,000 Prayer, 10,000 Fishing,

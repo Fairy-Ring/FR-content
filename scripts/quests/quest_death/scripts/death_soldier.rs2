@@ -92,7 +92,7 @@ switch_int(random(25)) {
     case 2 : ~chatnpc("<p,neutral>Mihi ignosce. Cum homine de cane debeo congredi.");
     case 3 : ~chatnpc("<p,neutral>Carpe Diem!");
     case 4 : ~chatnpc("<p,angry>Vacca foeda.");
-    case 5 : ~chatnpc("<p,worried>Di! Ecce hora! Uxor mea me necabit!");
+    case 5 : ~chatnpc("<p,scared>Di! Ecce hora! Uxor mea me necabit!");
     case 6 : ~chatnpc("<p,confused>Te audire non possum. Musa sapientum fixa est in aure.");
     case 7 : ~chatnpc("<p,neutral>Nemo dat quod non habet.");
     case 8 : ~chatnpc("<p,neutral>Die dulci fruere.");

@@ -225,12 +225,12 @@ return (0_54_153_50_45);
 [proc,route_cutscene_say_macro](string $expression, string $text)
 npc_say($text);
 mes("<npc_name> : <$text>");
-~chatnpc_specific(npc_name, npc_type, "<$expression><$text>");
+~chatnpc_specific(npc_name, npc_type, "<p,neutral><$expression><$text>");
 
 [proc,.route_cutscene_say_macro](string $expression, string $text)
 .npc_say($text);
 mes("<.npc_name> : <$text>");
-~chatnpc_specific(.npc_name, .npc_type, "<$expression><$text>");
+~chatnpc_specific(.npc_name, .npc_type, "<p,neutral><$expression><$text>");
 
 [proc,bailout_route_cutscene](int $offset_x, int $offset_z)
 cam_reset();

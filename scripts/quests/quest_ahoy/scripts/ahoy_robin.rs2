@@ -15,8 +15,8 @@ if (%ahoy_questvar < 4) {
     return;
 }
 if (inv_total(inv, ahoy_bedsheet) > 0 | inv_total(worn, ahoy_bedsheet) > 0) {
-    ~chatplayer("I've brought you a clean bedsheet, Robin.");
-    ~chatnpc("Well it's about time. Run along now, I need some Robin time.");
+    ~chatplayer("<p,neutral>I've brought you a clean bedsheet, Robin.");
+    ~chatnpc("<p,neutral>Well it's about time. Run along now, I need some Robin time.");
     return;
 }
 if (%ahoy_subquest_bow = 5) {
@@ -26,13 +26,13 @@ if (%ahoy_subquest_bow = 5) {
             ~ahoy_robin_sign_bow();
             mes("Robin signs the oak longbow for you.");
         } else {
-            ~chatnpc("Bring an oak longbow and I will sign it.");
+            ~chatnpc("<p,neutral>Bring an oak longbow and I will sign it.");
         }
         return;
     }
-    ~chatplayer("So, still here then?");
-    ~chatnpc("Do you want another game of Runedraw?");
-    ~chatplayer("No!");
+    ~chatplayer("<p,quiz>So, still here then?");
+    ~chatnpc("<p,quiz>Do you want another game of Runedraw?");
+    ~chatplayer("<p,neutral>No!");
     return;
 }
 if (%ahoy_subquest_bow >= 4) {
@@ -40,39 +40,39 @@ if (%ahoy_subquest_bow >= 4) {
         @ahoy_robin_sign_bow_dialog;
     }
     // UNKNOWN functional reminder when the player has not brought an oak longbow.
-    ~chatplayer("I've won four games. Robin owes me 100 gold coins. I need an oak longbow for him to sign.");
-    ~chatnpc("Bring an oak longbow and I will sign it.");
+    ~chatplayer("<p,neutral>I've won four games. Robin owes me 100 gold coins. I need an oak longbow for him to sign.");
+    ~chatnpc("<p,neutral>Bring an oak longbow and I will sign it.");
     return;
 }
 
-~chatnpc("Hey you, why don't you have a game of Runedraw with me? If you've got 25 gold pieces I've got a bag of runes we can use.");
+~chatnpc("<p,quiz>Hey you, why don't you have a game of Runedraw with me? If you've got 25 gold pieces I've got a bag of runes we can use.");
 if (inv_total(inv, coins) < 25) {
-    ~chatplayer("I don't have enough money on me for a game of Runedraw at the moment.");
+    ~chatplayer("<p,neutral>I don't have enough money on me for a game of Runedraw at the moment.");
     return;
 }
 def_int $choice = ~p_choice3("Yes, I'll give you a game.", 1, "How do you play Runedraw?", 2, "No, that doesn't sound fun.", 3);
 if ($choice = 3) {
-    ~chatplayer("No, that doesn't sound fun.");
+    ~chatplayer("<p,neutral>No, that doesn't sound fun.");
     return;
 }
 if ($choice = 2) {
-    ~chatplayer("How do you play Runedraw?");
-    ~chatnpc("Two players take turns to draw a rune from a bag, which contains ten runes in total. Each rune has a different value: an air rune is worth one point, up to a Nature rune which is worth nine points.");
-    ~chatnpc("If a player draws the Death rune then the game is over, and they have lost.");
-    ~chatnpc("A player can choose to hold if they wish and not draw any more runes, but this runs the risk of the other player drawing more runes until they have a greater points total and win.");
+    ~chatplayer("<p,quiz>How do you play Runedraw?");
+    ~chatnpc("<p,neutral>Two players take turns to draw a rune from a bag, which contains ten runes in total. Each rune has a different value: an air rune is worth one point, up to a Nature rune which is worth nine points.");
+    ~chatnpc("<p,neutral>If a player draws the Death rune then the game is over, and they have lost.");
+    ~chatnpc("<p,neutral>A player can choose to hold if they wish and not draw any more runes, but this runs the risk of the other player drawing more runes until they have a greater points total and win.");
     def_int $play = ~p_choice2("Yes, I'll give you a game.", 1, "No, that doesn't sound fun.", 2);
     if ($play = 2) {
-        ~chatplayer("No, that doesn't sound fun.");
+        ~chatplayer("<p,neutral>No, that doesn't sound fun.");
         return;
     }
 }
 @ahoy_runedraw_start;
 
 [label,ahoy_robin_sign_bow_dialog]
-~chatplayer("I've had enough of you not paying up - you owe me 100 gold coins. I'm going to tell the ghosts what you're doing.");
-~chatnpc("Please don't do that!!! They will suck the life from my bones!!!");
-~chatplayer("How about you signing my longbow then?");
-~chatnpc("Yes, anything!!!");
+~chatplayer("<p,neutral>I've had enough of you not paying up - you owe me 100 gold coins. I'm going to tell the ghosts what you're doing.");
+~chatnpc("<p,neutral>Please don't do that!!! They will suck the life from my bones!!!");
+~chatplayer("<p,quiz>How about you signing my longbow then?");
+~chatnpc("<p,neutral>Yes, anything!!!");
 ~ahoy_robin_sign_bow();
 mes("Robin signs the oak longbow for you.");
 return;

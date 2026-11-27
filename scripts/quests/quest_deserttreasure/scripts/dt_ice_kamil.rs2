@@ -89,4 +89,4 @@ queue(dt_ice_kamil_defeated, 0, 0);
 if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_dead ! 0) return;
 %fd_icewarrior_dead = 1;
 %fd_icewarrior_subquest = ^dt_ice_substate_kamil_dead;
-~chatplayer("Well, that must have been the 'bad man' that the troll kid was on about... His parents must be up ahead somewhere.");
+~chatplayer("<p,neutral>Well, that must have been the 'bad man' that the troll kid was on about... His parents must be up ahead somewhere.");

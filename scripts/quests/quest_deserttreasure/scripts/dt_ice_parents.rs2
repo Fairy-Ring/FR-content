@@ -62,8 +62,8 @@ if (%fd_icewarrior_dead ! 0 & %fd_icewarrior_subquest = ^dt_ice_substate_kamil_d
 
 [proc,dt_ice_parent_talk](boolean $dad)
 if (%fd_icewarrior_subquest >= ^dt_ice_substate_family_returned) {
-    if ($dad = true) ~chatnpc_specific("Troll father", fd_troll_dad, "Thanks again for freeing me from that ice block! I might be a troll, but it was real uncomfortable in there!");
-    else ~chatnpc_specific("Troll mother", fd_troll_mum, "Thanks again for freeing me from that ice block! I don't know what my little snookums would have done without us!");
+    if ($dad = true) ~chatnpc_specific("Troll father", fd_troll_dad, "<p,happy>Thanks again for freeing me from that ice block! I might be a troll, but it was real uncomfortable in there!");
+    else ~chatnpc_specific("Troll mother", fd_troll_mum, "<p,happy>Thanks again for freeing me from that ice block! I don't know what my little snookums would have done without us!");
     return;
 }
 if (($dad = true & %fd_icewarrior_dadfree = 0) | ($dad = false & %fd_icewarrior_mumfree = 0)) {
@@ -71,24 +71,24 @@ if (($dad = true & %fd_icewarrior_dadfree = 0) | ($dad = false & %fd_icewarrior_
     return;
 }
 if (%fd_icewarrior_dadfree = 0 | %fd_icewarrior_mumfree = 0) {
-    if ($dad = true) ~chatnpc_specific("Troll father", fd_troll_dad, "Oh thank you! It was really cold in there! But please, you must free my wife as well! Our son is depending on us!");
-    else ~chatnpc_specific("Troll mother", fd_troll_mum, "Wow, thanks for breaking me out of that ice! But please, my husband is still trapped in there!");
+    if ($dad = true) ~chatnpc_specific("Troll father", fd_troll_dad, "<p,happy>Oh thank you! It was really cold in there! But please, you must free my wife as well! Our son is depending on us!");
+    else ~chatnpc_specific("Troll mother", fd_troll_mum, "<p,happy>Wow, thanks for breaking me out of that ice! But please, my husband is still trapped in there!");
     return;
 }
 if (%fd_icewarrior_subquest ! ^dt_ice_substate_parents_freed) return;
-~chatnpc_specific("Troll father", fd_troll_dad, "Phew! Am I glad to be out of that big ice cube! Are you okay too darling?");
-~chatnpc_specific("Troll mother", fd_troll_mum, "Yes, I thought we were done for! Why ever did that nasty Kamil freeze us up there anyway?");
-~chatplayer("He must have been trying to protect his Diamond...");
-~chatnpc_specific("Troll father", fd_troll_dad, "You mean that diamond I found the other day belonged to him? But why didn't he just ask for it back? It's not like I really want it or anything!");
-~chatnpc_specific("Troll father", fd_troll_dad, "And how did you know we had that diamond anyway, fleshy?");
-~chatplayer("Your son told me. That's why I rescued you, it is very important that I have that diamond...");
-~chatnpc_specific("Troll mother", fd_troll_mum, "Ooohhhhh, my poor baby! He must have been so worried about us...");
-~chatnpc_specific("Troll father", fd_troll_dad, "Yes, but he certainly inherited his Dad's smarts!");
-~chatnpc_specific("Troll father", fd_troll_dad, "If he'd told this fleshy that he had the Diamond and not us, we might never have been rescued!");
-~chatplayer("Wait... what? That stupid little troll kid had the diamond all along?");
-~chatnpc_specific("Troll mother", fd_troll_mum, "Don't you talk about my baby like that!");
-~chatnpc_specific("Troll father", fd_troll_dad, "Now, now dear, all's well that ends well. We've been freed and this fleshy has certainly earned himself that diamond.");
-~chatnpc_specific("Troll father", fd_troll_dad, "Let's get out of this terrible place and see our son!");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,happy>Phew! Am I glad to be out of that big ice cube! Are you okay too darling?");
+~chatnpc_specific("Troll mother", fd_troll_mum, "<p,quiz>Yes, I thought we were done for! Why ever did that nasty Kamil freeze us up there anyway?");
+~chatplayer("<p,neutral>He must have been trying to protect his Diamond...");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,quiz>You mean that diamond I found the other day belonged to him? But why didn't he just ask for it back? It's not like I really want it or anything!");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,quiz>And how did you know we had that diamond anyway, fleshy?");
+~chatplayer("<p,neutral>Your son told me. That's why I rescued you, it is very important that I have that diamond...");
+~chatnpc_specific("Troll mother", fd_troll_mum, "<p,sad>Ooohhhhh, my poor baby! He must have been so worried about us...");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,neutral>Yes, but he certainly inherited his Dad's smarts!");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,neutral>If he'd told this fleshy that he had the Diamond and not us, we might never have been rescued!");
+~chatplayer("<p,quiz>Wait... what? That stupid little troll kid had the diamond all along?");
+~chatnpc_specific("Troll mother", fd_troll_mum, "<p,neutral>Don't you talk about my baby like that!");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,neutral>Now, now dear, all's well that ends well. We've been freed and this fleshy has certainly earned himself that diamond.");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,neutral>Let's get out of this terrible place and see our son!");
 %fd_icewarrior_subquest = ^dt_ice_substate_family_returned;
 // UNKNOWN engineering arrival: original family spawn, not a shortcut around the rescue route.
 p_teleport(^dt_ice_family_return);

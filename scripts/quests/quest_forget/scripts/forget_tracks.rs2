@@ -484,14 +484,14 @@ def_npc_uid $gnome = npc_uid;
 npc_add(^forget_tracks_final_chaos, forget_cutscene_chaos_dwarf, ^forget_tracks_scene_lifetime);
 def_npc_uid $chaos = npc_uid;
 ~chatnpc_specific("Red Axe Director", forget_redaxe_director_cutscene, "<p,angry>Behold the power of Zamorak!");
-~chatplayer("<p,surprised>Chaos dwarves!!!");
-~chatplayer("<p,surprised>I must tell Veldaban!!!");
+~chatplayer("<p,shock>Chaos dwarves!!!");
+~chatplayer("<p,shock>I must tell Veldaban!!!");
 npc_add(^forget_tracks_final_shaman, forget_redaxe_shaman2_cutscene, ^forget_tracks_scene_lifetime);
 def_npc_uid $shaman = npc_uid;
 ~chatnpc_specific("Grunsh", forget_redaxe_shaman2_cutscene, "<p,neutral>Lookings likes we's finding da spying creatures'ies!");
 // UNKNOWN spell effect; the source establishes memory loss and a fade to the station.
 if (npc_finduid($shaman) = true) npc_anim(giant_casting, 0);
-~chatplayer("<p,surprised>Nooooooo!");
+~chatplayer("<p,shock>Nooooooo!");
 if (npc_finduid($director) = true) npc_del;
 if (npc_finduid($henchman) = true) npc_del;
 if (npc_finduid($gnome) = true) npc_del;

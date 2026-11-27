@@ -18,12 +18,12 @@ if ($option = 1) {
     ~chatnpc("<p,happy>I'm canoeing on the river! It's enormous fun! Would you like to know how?");
     def_int $teach = ~p_choice2("Yes", 1, "No", 2);
     if ($teach = 1) {
-        @n619_tarquin_teach("Could you teach me about canoes?");
+        @n619_tarquin_teach("<p,quiz>Could you teach me about canoes?");
     } else {
         ~chatplayer("<p,bored>No thanks, not right now.");
     }
 } else {
-    @n619_tarquin_teach("Can you teach me about canoes?");
+    @n619_tarquin_teach("<p,quiz>Can you teach me about canoes?");
 }
 
 [label,n619_tarquin_teach](string $question)

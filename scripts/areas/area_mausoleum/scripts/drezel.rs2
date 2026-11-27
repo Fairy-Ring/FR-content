@@ -155,7 +155,7 @@ if (%priestperil < ^priestperil_complete) {
 [label,reclaim_wolfbane_dagger]
 // https://runescape.wiki/w/Transcript:Priest_in_Peril#Post-Quest_Dialogue doesn't seem to contain this dialogue.
 // Indio fetched from OSRS (Thank you Indio <3): https://github.com/LostCityRS/Content/pull/156#discussion_r2345035025
-~chatplayer("I've lost my wolfbane dagger.");
+~chatplayer("<p,neutral>I've lost my wolfbane dagger.");
 inv_add(inv, dagger_wolfbane, 1);
 ~chatnpc("<p,neutral>Yes, I know! Luckily for you it washed up on the banks of the Salve earlier! Here, take it again, but please try and be more careful this time.");
 ~chatnpc("<p,neutral>It's a family heirloom after all!");

@@ -9,9 +9,9 @@ if (%deserttreasure < ^dt_stage_hunts) {
 }
 if (%fd_icewarrior_subquest >= ^dt_ice_substate_awarded) {
     if (~obj_gettotal(fd_icediamond) = 0 & %fd_column_ice = 0) {
-        ~chatplayer("I lost that diamond of Ice you gave me...");
+        ~chatplayer("<p,neutral>I lost that diamond of Ice you gave me...");
         if (~dt_ice_give_diamond = true) {
-            ~chatnpc("That's okay, it blew back on an icy wind... It's almost like it wants to stay here! Here, take it back, you've earned it.");
+            ~chatnpc("<p,neutral>That's okay, it blew back on an icy wind... It's almost like it wants to stay here! Here, take it back, you've earned it.");
         }
     }
     return;
@@ -21,39 +21,39 @@ if (%fd_icewarrior_subquest = ^dt_ice_substate_family_returned) {
     return;
 }
 if (%fd_icewarrior_subquest >= ^dt_ice_substate_agreed) {
-    ~chatnpc("You didn't free my mommy and daddy yet?");
-    ~chatplayer("Not yet...");
-    ~chatnpc("Please try harder! I love my mommy and daddy!");
+    ~chatnpc("<p,quiz>You didn't free my mommy and daddy yet?");
+    ~chatplayer("<p,neutral>Not yet...");
+    ~chatnpc("<p,neutral>Please try harder! I love my mommy and daddy!");
     return;
 }
 if (%fd_trollchild_intro = 0) {
     ~dt_ice_child_crying;
     return;
 }
-~chatplayer("Hello there.");
-~chatnpc("-sniff- H-hello there.");
-~chatplayer("Why so sad, little troll?");
-~chatnpc("It was the bad man! He hurt my mommy and daddy! He made them all freezey!");
-~chatplayer("Bad man...?");
-~chatnpc("He said it was because they stole his diamond! But they never did! They found it, and didn't know who it belonged to!");
-~chatnpc("My mommy always told me stealing is wrong, they would never steal from someone!");
-~chatnpc("Then he did some wavey hand thing and my mommy and daddy got frozified!");
-~chatplayer("A diamond you say? Listen, I think I might be able to help your parents, but I need that Diamond in return.");
-~chatnpc("-sniff- I don't think they really wanted it anyway, they would have given it back to the bad man if he'd asked before freezifying them...");
-~chatnpc("I give you my promise, that if you unfreeze my mommy and daddy, you can have the stupid diamond.");
-~chatnpc("Do we have a deal?");
+~chatplayer("<p,happy>Hello there.");
+~chatnpc("<p,neutral>-sniff- H-hello there.");
+~chatplayer("<p,quiz>Why so sad, little troll?");
+~chatnpc("<p,neutral>It was the bad man! He hurt my mommy and daddy! He made them all freezey!");
+~chatplayer("<p,quiz>Bad man...?");
+~chatnpc("<p,neutral>He said it was because they stole his diamond! But they never did! They found it, and didn't know who it belonged to!");
+~chatnpc("<p,neutral>My mommy always told me stealing is wrong, they would never steal from someone!");
+~chatnpc("<p,neutral>Then he did some wavey hand thing and my mommy and daddy got frozified!");
+~chatplayer("<p,quiz>A diamond you say? Listen, I think I might be able to help your parents, but I need that Diamond in return.");
+~chatnpc("<p,neutral>-sniff- I don't think they really wanted it anyway, they would have given it back to the bad man if he'd asked before freezifying them...");
+~chatnpc("<p,neutral>I give you my promise, that if you unfreeze my mommy and daddy, you can have the stupid diamond.");
+~chatnpc("<p,quiz>Do we have a deal?");
 def_int $choice = ~p_choice2("Yes", 1, "No", 2);
 if ($choice = 1) {
-    ~chatplayer("Absolutely. Don't worry kid, I'll get your parents back to you safe and sound.");
+    ~chatplayer("<p,neutral>Absolutely. Don't worry kid, I'll get your parents back to you safe and sound.");
     %fd_icewarrior_subquest = ^dt_ice_substate_agreed;
 } else {
-    ~chatplayer("Sorry, I can't make any promises about that, and I don't think I have the time to waste trying to defrost some stupid ice trolls.");
-    ~chatnpc("Waaaaaaa!");
+    ~chatplayer("<p,neutral>Sorry, I can't make any promises about that, and I don't think I have the time to waste trying to defrost some stupid ice trolls.");
+    ~chatnpc("<p,neutral>Waaaaaaa!");
 }
 
 [proc,dt_ice_child_crying]
-~chatplayer("Hello there.");
-~chatnpc("Waaaaaaa!");
+~chatplayer("<p,happy>Hello there.");
+~chatnpc("<p,neutral>Waaaaaaa!");
 mes("This troll seems very upset about something. Maybe some sweet food would take his mind off things?");
 
 [opnpcu,fourdiamonds_troll_child_crying] ~dt_ice_child_offer;
@@ -68,12 +68,12 @@ def_obj $sweet = last_useitem;
 switch_obj ($sweet) {
     case cake, partial_cake, cake_slice, chocolate_cake, partial_chocolate_cake, chocolate_slice, chocolate_bar :
         if (inv_total(inv, $sweet) = 0) return;
-        ~chatplayer("Hey there little troll... Take this and dry those tears...");
+        ~chatplayer("<p,neutral>Hey there little troll... Take this and dry those tears...");
         inv_del(inv, $sweet, 1);
         %fd_trollchild_intro = 1;
-        ~chatnpc("(sniff)");
+        ~chatnpc("<p,neutral>(sniff)");
     case default :
-        ~chatnpc("WAAAAAAAA!");
+        ~chatnpc("<p,neutral>WAAAAAAAA!");
         mes("It doesn't look like that will cheer him up at all...");
 }
 
@@ -85,12 +85,12 @@ return(true);
 
 [proc,dt_ice_family_reward]
 if (%fd_icewarrior_subquest ! ^dt_ice_substate_family_returned | %fd_icewarrior_dadfree = 0 | %fd_icewarrior_mumfree = 0) return;
-~chatnpc("Mommy! Daddy!  You're free!");
-~chatnpc_specific("Troll father", fd_troll_dad, "That's right son, and it's all thanks to this brave adventurer here. Now, make sure you hand over that diamond he was looking for.");
-~chatnpc_specific("Troll father", fd_troll_dad, "It has been nothing but trouble for us, let's just get back to our cave and have dinner.");
-~chatnpc_specific("Troll mother", fd_troll_mum, "That's right son, it's your favorite tonight too! A big plate of raw mackerel!");
-~chatnpc("RAW MACKEREL! YUMMY!");
+~chatnpc("<p,neutral>Mommy! Daddy!  You're free!");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,happy>That's right son, and it's all thanks to this brave adventurer here. Now, make sure you hand over that diamond he was looking for.");
+~chatnpc_specific("Troll father", fd_troll_dad, "<p,neutral>It has been nothing but trouble for us, let's just get back to our cave and have dinner.");
+~chatnpc_specific("Troll mother", fd_troll_mum, "<p,neutral>That's right son, it's your favorite tonight too! A big plate of raw mackerel!");
+~chatnpc("<p,neutral>RAW MACKEREL! YUMMY!");
 if (~dt_ice_give_diamond = false) return;
 %fd_icewarrior_subquest = ^dt_ice_substate_awarded;
-~chatnpc("Here ya go! Thanks for getting my mom and dad away from the bad man!");
-~chatplayer("Don't worry about it, just as long as I don't have to go back into that blizzard.");
+~chatnpc("<p,happy>Here ya go! Thanks for getting my mom and dad away from the bad man!");
+~chatplayer("<p,neutral>Don't worry about it, just as long as I don't have to go back into that blizzard.");

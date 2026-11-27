@@ -232,7 +232,7 @@ return;
 [label,rfd_another_cooks_feast_nag]
 if (%hundred_main_quest_var >= ^rfd_frozen) {
     // UNKNOWN functional post-feast acknowledgement.
-    ~chatnpc("The banquet guests still need your help. Ask me if you need Pete's fishcake recipe.");
+    ~chatnpc("<p,neutral>The banquet guests still need your help. Ask me if you need Pete's fishcake recipe.");
     return;
 }
 ~chatplayer("<p,quiz>How's that banquet going?");

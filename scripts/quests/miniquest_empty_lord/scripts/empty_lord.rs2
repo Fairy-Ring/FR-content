@@ -44,7 +44,7 @@ if (testbit(%dagganoth_area_project, $story_bit) = ^true) {
 }
 ~empty_lord_intro($stage);
 if (~p_choice2("Tell me your story", 1, "Goodbye then", 2) = 2) {
-    ~chatplayer("Well, that's all fascinating, but I just don't particularly care. Bye-bye.");
+    ~chatplayer("<p,neutral>Well, that's all fascinating, but I just don't particularly care. Bye-bye.");
     return;
 }
 if ($stage = 1 & $route = 0) {
