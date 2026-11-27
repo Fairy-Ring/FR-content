@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { advance, check, coord, count, draws, Environment, environmentTick, finish, id, O, op, player, run, ScriptRunner, ServerTriggerType, tile, types, useLoc, v, World } from './runtime.mjs';
+import { advance, check, CollisionType, coord, count, draws, Environment, environmentTick, finish, id, map, O, op, player, run, ScriptRunner, ServerTriggerType, tile, types, useLoc, v, World } from './runtime.mjs';
 
 const event = 23;
 const targetProc = '[proc,macro_prison_pete_choose_target]';
@@ -112,6 +112,30 @@ function logoutLogin(p) {
   run(p, '[queue,macro_event_login]');
   assert.equal(p.getVar(v('macro_event')), event);
 }
+
+check('Prison Pete native entry reaches Pete, all four balloon shapes, lever and both exit doors', () => {
+  const p = enter();
+  assert(!map.isMapBlocked(p.x, p.z, p.level));
+  const tiles = [[p.x, p.z]], visited = new Set([`${p.x},${p.z}`]);
+  for (let index = 0; index < tiles.length; index++) {
+    const [x, z] = tiles[index];
+    for (const [dx, dz] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+      const nx = x + dx, nz = z + dz, key = `${nx},${nz}`;
+      if (Math.floor(nx / 64) !== sceneRegion.x || Math.floor(nz / 64) !== sceneRegion.z || visited.has(key)) continue;
+      if (!map.canTravel(p.level, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+      visited.add(key); tiles.push([nx, nz]);
+    }
+  }
+  for (const name of ['prisonpete_pete', ...Array.from({ length: 4 }, (_, index) => balloonName(index))]) {
+    const npc = nearestNpc(p, name);
+    assert(tiles.some(([x, z]) => map.reachedEntity(p.level, x, z, npc.x, npc.z, npc.width, npc.length, 1)), `collision-connected approach to ${name}`);
+  }
+  for (const name of ['prisonpete_lever', 'prisonpete_fakedoor_l', 'prisonpete_fakedoor_r']) {
+    const loc = nearestLoc(p, [name]), type = types.LocType.get(loc.type);
+    assert(tiles.some(([x, z]) => map.reachedLoc(p.level, x, z, loc.x, loc.z, type.width, type.length, 1, loc.angle, loc.shape, type.forceapproach)), `collision-connected approach to ${name}`);
+  }
+  run(p, '[proc,macro_arena_return]', [event]);
+});
 
 check('Prison Pete target one renders its native animal model after the required speech', () => {
   const p = enter();

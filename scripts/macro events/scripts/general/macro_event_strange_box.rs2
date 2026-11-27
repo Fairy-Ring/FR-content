@@ -5,10 +5,10 @@ if (inv_total(inv, macro_cube) = 0) {
     cleartimer(macro_cube_split);
     return;
 }
-if (gettimer(macro_cube_add) ! ^true) {
+if (gettimer(macro_cube_add) = -1) {
     settimer(macro_cube_add, ^macro_cube_replication_ticks);
 }
-if (gettimer(macro_cube_split) ! ^true) {
+if (gettimer(macro_cube_split) = -1) {
     settimer(macro_cube_split, ^macro_cube_split_ticks);
 }
 

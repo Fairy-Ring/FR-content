@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
 import { player, run, draws, check, tile, O, coord, v, result, World, Environment, inventory, inv, obj, id, map, types, ScriptRunner, op, environmentTick } from './runtime.mjs';
 const memberPool = [1,2,3,4,5,6,8,9,10,11,12,13,14,20,21,23,24,15,16,17,18,19];
+check('random-event tab policy retains Logout and Options while hiding gameplay tabs', () => {
+  const p = player(), before = [...p.tabs];
+  run(p, '[proc,macro_events_hide_tabs]');
+  for (const tab of [0,1,2,3,4,5,6,12]) assert.equal(p.tabs[tab], -1, `gameplay tab ${tab} is hidden`);
+  for (const tab of [8,9,10,11,13]) {
+    assert.notEqual(before[tab], -1, `native utility tab ${tab} is initialized`);
+    assert.equal(p.tabs[tab], before[tab], `utility tab ${tab} remains accessible`);
+  }
+});
 const freePool = memberPool.filter(event => event < 15 && ![6,10].includes(event));
 const memberCombatPool = memberPool.filter(event => event <= 15);
 for (const members of [false, true]) check(`${members ? 'members' : 'free'} registry exact eligible event set and equal selector slots`, () => {

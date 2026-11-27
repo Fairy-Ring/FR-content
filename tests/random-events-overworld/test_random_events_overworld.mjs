@@ -609,13 +609,23 @@ check('old Sandwich Lady queue cannot move a newer private event', () => {
   assert.deepEqual(snapshot(p), before);
   owned(p, current, 13); cleanup(p);
 });
-check('Strange Box qualified login restores both timers and unqualified login clears both', () => {
+check('Strange Box login restores only missing timers and clears them without a box', () => {
   const p = player(); give(p, 'macro_cube');
+  const startTick = World.currentTick;
   run(p, '[proc,macro_cube_login]');
-  for (const name of ['macro_cube_add', 'macro_cube_split']) assert(p.timers.has(packed(`[timer,${name}]`).id), `${name} restored`);
-  const timers = [...p.timers.entries()];
+  const timers = ['macro_cube_add', 'macro_cube_split'].map(name => {
+    const timerId = packed(`[timer,${name}]`).id;
+    const timer = p.timers.get(timerId);
+    assert(timer, `${name} is restored`);
+    assert.equal(timer.clock, startTick, `${name} starts at the first login tick`);
+    return [timerId, timer];
+  });
+  World.currentTick = startTick + 5;
   run(p, '[proc,macro_cube_login]');
-  assert.deepEqual([...p.timers.entries()], timers, 'a second login qualification does not reset existing countdowns');
+  for (const [timerId, timer] of timers) {
+    assert.strictEqual(p.timers.get(timerId), timer, 'a present timer is not replaced or postponed');
+    assert.equal(timer.clock, startTick);
+  }
   p.invDel(inv, obj('macro_cube'), 1);
   run(p, '[proc,macro_cube_login]');
   for (const name of ['macro_cube_add', 'macro_cube_split']) assert(!p.timers.has(packed(`[timer,${name}]`).id));

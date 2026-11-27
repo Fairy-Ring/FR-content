@@ -504,6 +504,30 @@ export default function register() {
     assert.equal(p.stats[PlayerStat.MAGIC], 6500);
   });
 
+
+  check('Bob map-square exit releases progress and removes event-owned items without reward', () => {
+    const p = player();
+    startBob(p);
+    const eventItems = [
+      'evil_bob_net',
+      'evil_bob_cooked_fish_correct',
+      'evil_bob_cooked_fish_incorrect',
+      'evil_bob_uncooked_fish_correct',
+      'evil_bob_uncooked_fish_incorrect'
+    ];
+    for (const name of eventItems) p.invAdd(inv, id(types.ObjType, name), 1);
+    position(p, ...origin);
+    run(p, '[mapzoneexit,0_39_74]');
+    assert.equal(p.getVar(v('macro_event')), 0);
+    assert.equal(p.getVar(v('macro_event_uid')), -1);
+    assert.equal(p.getVar(v('macro_event_origin_coord')), -1);
+    assert.equal(p.getVar(v('macro_event_target_coord')), -1);
+    assert.equal(p.getVar(v('macro_transmit')), 0);
+    for (const name of eventItems) assert.equal(count(p, name), 0, `${name} is removed on escape`);
+    assert.equal(p.stats[PlayerStat.FISHING], 0);
+    assert.equal(p.stats[PlayerStat.MAGIC], 0);
+    assert.equal(p.tabs[3], id(types.Component, 'inventory'));
+  });
   check('Leo native graves/headstones, item-model inspection, wrong-layout failure, relog at completion modal and successful return', () => {
     let p = player();
     const result = solveLeo(p, { inspect: true, reconnectAfterTwo: true, verifyWrongLayout: true, relogAtCompletionModal: true });
