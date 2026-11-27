@@ -4,3 +4,5 @@
 ^macro_mime_steps = 3
 // UNKNOWN engineering pause so the copied player animation can be seen before the next prompt.
 ^macro_mime_action_ticks = 2
+// UNKNOWN engineering pause between complete demonstrations; not period timing.
+^macro_mime_replay_pause_ticks = 2

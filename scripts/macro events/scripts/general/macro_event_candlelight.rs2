@@ -132,6 +132,7 @@ if (npc_finduid(%macro_event_uid) = true) {
     npc_del;
     %macro_event_uid = null;
 }
+cam_reset;
 
 [proc,extinguish_if_lit](int $candle_state)(int)
 if ($candle_state = ^macro_candlelight_lit) {
@@ -225,14 +226,8 @@ cam_lookat(movecoord(coord, -2, 0, 0), 315, 10, 10);
 
 [if_button,macro_candlelight_lighter:light_button]
 if (npc_finduid(%macro_event_uid) = true) {
-    loc_findallzone(movecoord(coord, -3, 0, 0));
-    while (loc_findnext = true) {
-        if(loc_coord = movecoord(coord, -3, 0, 0)) {
-            ~macro_candlelight_check_pillar(loc_coord);
-            return;
-        }
-    }
-    mes("There is nothing to light here.");
+    // Native decorative pillars are inactive and absent from the server loc iterator.
+    ~macro_candlelight_check_pillar(movecoord(coord, -3, 0, 0));
 } else {
     %macro_transmit = 2;
     mes("Your lighter seems to have been extinguished. Talk to Pete for a new one.");
@@ -251,7 +246,7 @@ switch_coord($loc_coord) {
     case 0_30_78_47_13 : %macro_candlelight_9 = ~try_light_candle(%macro_candlelight_9);
     case 0_30_78_48_14 : %macro_candlelight_10 = ~try_light_candle(%macro_candlelight_10);
     case 0_30_78_47_15 : %macro_candlelight_11 = ~try_light_candle(%macro_candlelight_11);
-    case default : return;
+    case default : mes("There is nothing to light here."); return;
 }
 
 [proc,try_light_candle](int $candle_state)(int)

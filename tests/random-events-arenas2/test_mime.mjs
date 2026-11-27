@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
-import { advance, button, check, count, draws, environmentTick, id, player, run, ScriptState, tile, v, World, PlayerStat, ScriptRunner, op, types } from './runtime.mjs';
+import { advance, button, check, coord, count, draws, environmentTick, id, map, O, player, run, ScriptState, tile, v, World, PlayerStat, ScriptRunner, op, types, engineModule } from './runtime.mjs';
+
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveHandler = new ((await engineModule('network/game/client/handler/MoveClickHandler.ts')).default)();
+const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
+const closeHandler = new ((await engineModule('network/game/client/handler/CloseModalHandler.ts')).default)();
+const { ModalState } = await engineModule('engine/entity/ModalState.ts');
 
 const event = 21;
 const actionComponent = index => `macro_mime_emotes:com_${index + 2}`;
@@ -34,6 +40,8 @@ check('Mime copies a three-step native interface routine and grants one missing 
   assert.equal(p.getVar(v('macro_event')), 0);
   assert.equal(p.getVar(v('macro_event_origin_coord')), -1);
   assert.equal(count(p, 'macro_mime_mask'), 1);
+  assert.equal(p.modalTutorial, -1, 'completion clears the sticky prompt');
+  assert.equal(p.modalState & ModalState.TUT, 0);
 });
 
 check('Mime wrong action restarts the performance without invented damage or teleport', () => {
@@ -63,6 +71,8 @@ check('Mime login preserves copied-action progress and completes exactly once', 
     run(p, '[proc,macro_event_logout]');
     p.closeModal(); p.timers.clear();
     World.currentTick += 1000;
+    assert.equal(p.modalTutorial, -1, 'logout explicitly closes the sticky prompt');
+    assert.equal(p.modalState & ModalState.TUT, 0);
     run(p, '[queue,macro_event_login]');
     assert.equal(p.getVar(v('macro_event')), event);
     assert.equal(p.getVar(v('xplamp')), 1);
@@ -139,6 +149,77 @@ for (const [index, [label, sequence]] of mimeActions.entries()) check(`Mime nati
     run(p, '[proc,macro_arena_return]', [event]);
     assert(!World.getNpcByUid(replacement)?.isActive, 'return removes the replacement without orphaning an NPC');
   } finally { ScriptRunner.HANDLERS[op.ANIM] = playerAnim; ScriptRunner.HANDLERS[op.NPC_ANIM] = npcAnim; }
+});
+
+check('Mime viewport movement and client close cannot dismiss the answer buttons', () => {
+  const p = player();
+  draws({ '[proc,macro_mime_choose_action]': [0, 1] }, () => {
+    run(p, '[proc,macro_event_general_spawn]', [event]);
+    const prompt = id('Component', 'macro_mime_emotes');
+    assert.equal(p.modalTutorial, prompt);
+    assert.equal(p.modalChat, -1);
+    assert(p.canAccess(), 'the sticky prompt does not make the player busy');
+    const destination = { x: p.x + 1, z: p.z };
+    assert(!map.isMapBlocked(destination.x, destination.z, p.level));
+    assert(moveHandler.handle(new MoveClick([destination], 0, false), p));
+    assert(closeHandler.handle(new CloseModal(), p));
+    environmentTick(p);
+    for (let tick = 0; p.x !== destination.x && tick < 4; tick++) environmentTick(p);
+    assert.equal(p.x, destination.x, 'the real viewport move actually walks across the stage');
+    assert.equal(p.modalTutorial, prompt);
+    assert.equal(p.modalState & ModalState.TUT, ModalState.TUT);
+    answer(p, 0);
+    assert.equal(p.getVar(v('xplamp')), 1);
+    assert.equal(p.modalTutorial, prompt, 'the next delayed round also stays sticky');
+  });
+  run(p, '[proc,macro_arena_return]', [event]);
+  assert.equal(p.modalTutorial, -1);
+  assert.equal(p.modalState & ModalState.TUT, 0);
+  assert(!button(p, actionComponent(1)), 'closed native buttons cannot replay the task');
+});
+
+check('Mime replays the same complete demonstration after an arbitrary map-loading wait', () => {
+  const p = player();
+  draws({ '[proc,macro_mime_choose_action]': [7] }, () => run(p, '[proc,macro_event_general_spawn]', [event]));
+  const actor = World.getNpcByUid(p.getVar(v('macro_event_uid')));
+  assert(actor?.isActive);
+  const sequence = id('SeqType', 'emote_glass_box');
+  assert(actor.timerInterval > Math.ceil(types.SeqType.get(sequence).duration / 30), 'replays never truncate the native sequence');
+  const vars = [...p.vars], packetCount = p.packets.length;
+  const npcAnim = ScriptRunner.HANDLERS[op.NPC_ANIM];
+  let replays = 0;
+  ScriptRunner.HANDLERS[op.NPC_ANIM] = state => {
+    assert.equal(state.intStack[state.isp - 2], sequence);
+    replays++;
+    npcAnim(state);
+  };
+  try {
+    const wait = actor.timerInterval * 3;
+    for (let tick = 0; tick < wait; tick++) {
+      World.currentTick++;
+      actor.turn();
+    }
+  } finally { ScriptRunner.HANDLERS[op.NPC_ANIM] = npcAnim; }
+  assert.equal(replays, 3, 'the player can observe the demonstration after loading, without a new answer');
+  assert.deepEqual([...p.vars], vars, 'replay does not reroll or reset progress');
+  assert.equal(p.packets.length, packetCount, 'replay does not spam or cover the sticky interface');
+  run(p, '[proc,macro_arena_return]', [event]);
+  assert(!actor.isActive);
+});
+
+check('Mime ordinary escape clears its sticky prompt and owned performer without a reward', () => {
+  const p = player();
+  run(p, '[proc,macro_event_general_spawn]', [event]);
+  const actor = World.getNpcByUid(p.getVar(v('macro_event_uid')));
+  run(p, '[proc,p_telejump_safe]', [coord(O)]);
+  run(p, '[softtimer,macro_arena_guard]');
+  environmentTick(p);
+  assert.equal(p.getVar(v('macro_event')), 0);
+  assert.equal(p.modalTutorial, -1);
+  assert.equal(p.modalState & ModalState.TUT, 0);
+  assert(!actor.isActive);
+  assert.equal(count(p, 'coins'), 0);
+  assert.deepEqual(tile(p), O);
 });
 
 console.log('Mime compiled checks passed');

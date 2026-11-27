@@ -160,3 +160,7 @@ inv_del(bank, evil_bob_cooked_fish_correct, ^max_32bit_int);
 inv_del(bank, evil_bob_cooked_fish_incorrect, ^max_32bit_int);
 inv_del(bank, evil_bob_uncooked_fish_correct, ^max_32bit_int);
 inv_del(bank, evil_bob_uncooked_fish_incorrect, ^max_32bit_int);
+
+// UNKNOWN lifecycle policy: leaving the native arena mapsquare releases the task without reward.
+[mapzoneexit,0_39_74]
+if (%macro_event = ^macro_bob) ~macro_event_cleanup(^macro_bob, %macro_event_uid);

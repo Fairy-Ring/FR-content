@@ -2,13 +2,14 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { Npc, EntityLifeCycle, Player, ResumePauseButtonHandler, ResumePauseButton, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, World, engine, pack, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
+import { Npc, EntityLifeCycle, Player, ResumePauseButtonHandler, ResumePauseButton, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, World, engine, pack, packed, requiredId, types, nativeLocRows, map } from '../regicide-travel/runtime.mjs';
 
 const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
 const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/script/ScriptOpcode.ts`).href);
 const { default: IfButtonHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/IfButtonHandler.ts`).href);
 const { default: IfButton } = await import(pathToFileURL(`${engine}/src/network/game/client/model/IfButton.ts`).href);
 const { PlayerStat } = await import(pathToFileURL(`${engine}/src/engine/entity/PlayerStat.ts`).href);
+const { CollisionType } = await import(pathToFileURL(`${engine}/src/engine/routefinder/index.ts`).href);
 const { default: JavaRandom } = await import(pathToFileURL(`${engine}/src/util/JavaRandom.ts`).href);
 const { default: Environment } = await import(pathToFileURL(`${engine}/src/util/Environment.ts`).href);
 const inv = requiredId(types.InvType, 'inv');
@@ -336,7 +337,7 @@ check('genuine task entry keeps O/D and survives logout/login without overwrite'
   for (let id = 0; id < p.vars.length; id++) if (types.VarPlayerType.get(id).scope === types.VarPlayerType.SCOPE_PERM) reconnected.vars[id] = p.vars[id];
   run(reconnected, '[queue,macro_event_login]');
   assert.deepEqual([reconnected.getVar(v('macro_event')), reconnected.getVar(v('macro_event_origin_coord')), reconnected.getVar(v('macro_event_target_coord')), reconnected.getVar(v('macro_transmit'))], identity);
-  for (const tab of [0, 1, 2, 3, 4, 5, 6, 11, 12]) assert.equal(reconnected.tabs[tab], -1);
+  for (const tab of [0, 1, 2, 3, 4, 5, 6, 12]) assert.equal(reconnected.tabs[tab], -1);
   const before = snapshot(reconnected);
   run(reconnected, '[proc,macro_event_general_spawn]', [2], { protect: false });
   run(reconnected, '[proc,macro_laf_start]', [coord(1, 3000, 3000)], { protect: false });
@@ -374,6 +375,24 @@ function completeCandlelight(p) {
     assert.equal(completion.execution, ScriptState.FINISHED);
   } finally { JavaRandom.nextDouble = nextRandom; }
 }
+function talkCandlelightPete(p) {
+  const pete = [...World.npcs].find(n => n.isActive && n.type === requiredId(types.NpcType, 'macro_pious_pete'));
+  assert(pete, 'Pete is a real static NPC');
+  const conversation = ScriptRunner.init(packed('[opnpc1,macro_pious_pete]'), p, pete);
+  p.executeScript(conversation, true);
+  for (let page = 0; conversation.execution === ScriptState.PAUSEBUTTON; page++) {
+    assert(page < 12, 'Pete dialogue remains bounded');
+    assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), p));
+  }
+  assert.equal(conversation.execution, ScriptState.FINISHED);
+}
+
+function spawnCandlelight(p) {
+  const nextRandom = JavaRandom.nextDouble;
+  JavaRandom.nextDouble = () => 0;
+  try { run(p, '[proc,macro_event_general_spawn]', [5], { protect: false }); }
+  finally { JavaRandom.nextDouble = nextRandom; }
+}
 
 check('Candlelight zero HP during spawn delay cleans up the priest and restores admission', () => {
   const p = player();
@@ -403,24 +422,48 @@ check('Candlelight zero HP during spawn delay cleans up the priest and restores 
   assert.equal(admission.intStack[admission.isp - 1], 1, 'random-event admission is restored');
 });
 
-check('Candlelight relog preserves identity, hides tabs and deletes the owned taper', () => {
+check('Candlelight logout preserves its puzzle and resets camera; Pete and viewport close both recover', () => {
   const p = player();
-  run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });
+  spawnCandlelight(p);
   assert.equal(p.getVar(v('macro_event')), 5);
   assert.equal(p.getVar(v('macro_event_target_coord')), coord(...O));
+  talkCandlelightPete(p);
+  for (let i = 1; i <= 11; i++) p.setVarBit(requiredId(types.VarBitType, `macro_candlelight_${i}`), 1);
+  p.setVarBit(requiredId(types.VarBitType, 'macro_candlelight_6'), 0);
+  p.setVarBit(requiredId(types.VarBitType, 'macro_candlelight_7'), 2);
+  const initialTaperUid = p.getVar(v('macro_event_uid'));
+  assert(World.getNpcByUid(initialTaperUid), 'the real Pete conversation creates the owned taper');
+  const logoutPacketStart = p.messages.length;
   run(p, '[proc,macro_event_logout]');
+  for (let i = 1; i <= 11; i++) assert.equal(p.getVarBit(requiredId(types.VarBitType, `macro_candlelight_${i}`)), i === 6 ? 0 : i === 7 ? 2 : 1, 'logout preserves the saved puzzle');
+  assert.equal(World.getNpcByUid(initialTaperUid), null, 'logout deletes the exact taper');
+  assert.equal(p.getVar(v('macro_event_uid')), -1);
+  assert(p.messages.slice(logoutPacketStart).some(packet => packet.constructor.name === 'CamReset'), 'logout resets the camera');
   let reconnected = player([p.level, p.x, p.z]);
   for (let id = 0; id < p.vars.length; id++) if (types.VarPlayerType.get(id).scope === types.VarPlayerType.SCOPE_PERM) reconnected.vars[id] = p.vars[id];
   run(reconnected, '[queue,macro_event_login]');
   assert.equal(reconnected.getVar(v('macro_event')), 5);
   assert.equal(reconnected.getVar(v('macro_event_target_coord')), coord(...O));
-  for (const tab of [0, 1, 2, 3, 4, 5, 6, 11, 12]) assert.equal(reconnected.tabs[tab], -1, 'relogin inside church hides the Magic tab');
-  const start = run(reconnected, '[proc,macro_candlelight_start]');
-  if (start.execution === ScriptState.PAUSEBUTTON) assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), reconnected));
-  assert.equal(start.execution, ScriptState.FINISHED);
-  const taperUid = reconnected.getVar(v('macro_event_uid'));
-  const taper = World.getNpcByUid(taperUid);
-  assert(taper, 'Candlelight start creates the real owned taper');
+  for (const tab of [0, 1, 2, 3, 4, 5, 6, 12]) assert.equal(reconnected.tabs[tab], -1, 'relogin inside church hides gameplay tabs');
+  assert(reconnected.messages.some(packet => packet.constructor.name === 'CamReset'), 'login clears any stale camera presentation');
+  talkCandlelightPete(reconnected);
+  assert.equal(reconnected.modalMain, requiredId(types.Component, 'macro_candlelight_lighter'));
+  let taperUid = reconnected.getVar(v('macro_event_uid'));
+  let taper = World.getNpcByUid(taperUid);
+  assert(taper, 'Pete creates the real owned taper after relog');
+  assert.equal(taper.type, requiredId(types.NpcType, 'macro_candle_taper'));
+  assert.equal(taper.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), reconnected.uid | 0);
+  const closePacketStart = reconnected.messages.length;
+  reconnected.closeModal();
+  assert.equal(reconnected.modalMain, -1, 'viewport close releases the lighter modal');
+  assert.equal(World.getNpcByUid(taperUid), null, 'close deletes the exact taper');
+  assert.equal(reconnected.getVar(v('macro_event_uid')), -1);
+  assert.equal(reconnected.getVar(v('macro_event')), 5, 'closing the lighter keeps the active encounter');
+  assert(reconnected.messages.slice(closePacketStart).some(packet => packet.constructor.name === 'CamReset'), 'viewport close resets the camera');
+  talkCandlelightPete(reconnected);
+  taperUid = reconnected.getVar(v('macro_event_uid'));
+  taper = World.getNpcByUid(taperUid);
+  assert(taper, 'Pete interaction reopens the owned taper after a viewport close');
   assert.equal(taper.type, requiredId(types.NpcType, 'macro_candle_taper'));
   assert.equal(taper.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), reconnected.uid | 0);
   run(reconnected, '[proc,macro_event_logout]');
@@ -432,13 +475,100 @@ check('Candlelight relog preserves identity, hides tabs and deletes the owned ta
   run(reconnected, '[queue,macro_event_login]');
   assert.equal(reconnected.getVar(v('macro_event')), 5);
   assert.equal(reconnected.getVar(v('macro_event_target_coord')), coord(...O));
-  for (const tab of [0, 1, 2, 3, 4, 5, 6, 11, 12]) assert.equal(reconnected.tabs[tab], -1);
+  for (const tab of [0, 1, 2, 3, 4, 5, 6, 12]) assert.equal(reconnected.tabs[tab], -1);
+  assert(reconnected.messages.some(packet => packet.constructor.name === 'CamReset'), 'second login again resets camera presentation');
   completeCandlelight(reconnected);
   assert.deepEqual([reconnected.level, reconnected.x, reconnected.z], O);
   assert.equal(reconnected.invTotal(inv, requiredId(types.ObjType, 'uncut_sapphire')), 1);
   cleared(reconnected);
   cleanup(p); cleanup(loggedOut);
 });
+check('Candlelight lights all eleven inactive native pillars using real lighter controls', () => {
+  const p = player();
+  spawnCandlelight(p);
+  assert(!map.isMapBlocked(p.x, p.z, p.level), 'the church entry is walkable');
+  const pete = [...World.npcs].find(npc => npc.isActive && npc.type === requiredId(types.NpcType, 'macro_pious_pete'));
+  assert(pete, 'the real Pete is present');
+  const tiles = [[p.x, p.z]], visited = new Set([`${p.x},${p.z}`]);
+  for (let index = 0; index < tiles.length; index++) {
+    const [x, z] = tiles[index];
+    for (const [dx, dz] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+      const nx = x + dx, nz = z + dz, key = `${nx},${nz}`;
+      if (Math.floor(nx / 64) !== 30 || Math.floor(nz / 64) !== 78 || visited.has(key)) continue;
+      if (!map.canTravel(p.level, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+      visited.add(key); tiles.push([nx, nz]);
+    }
+  }
+  assert(tiles.some(([x, z]) => map.reachedEntity(p.level, x, z, pete.x, pete.z, pete.width, pete.length, 1)), 'the native entry can reach Pete to obtain or replace a lighter');
+  talkCandlelightPete(p);
+  const handler = new IfButtonHandler();
+  const press = suffix => assert(handler.handle(new IfButton(requiredId(types.Component, `macro_candlelight_lighter:${suffix}_button`)), p), `native lighter ${suffix} button`);
+  press('right');
+  const emptyTilePackets = p.messages.length;
+  press('light');
+  assert(p.messages.slice(emptyTilePackets).some(packet => packet.msg === 'There is nothing to light here.'));
+  press('left');
+  for (let index = 1; index <= 11; index++) {
+    const name = `macro_candlelight_pillar${index}`;
+    const row = nativeLocRows(name).find(candidate => candidate.mx === 30 && candidate.mz === 78);
+    assert(row, `native placement exists for ${name}`);
+    assert.equal(types.LocType.get(requiredId(types.LocType, name)).active, 0, 'decorative pillars have no active server loc');
+    assert.equal(World.getLoc(row.x, row.z, row.level, row.id), null);
+    const targetX = row.x + 3, targetZ = row.z;
+    const xButton = targetX < p.x ? 'up' : 'down';
+    for (let step = 0, count = Math.abs(targetX - p.x); step < count; step++) press(xButton);
+    const zButton = targetZ < p.z ? 'left' : 'right';
+    for (let step = 0, count = Math.abs(targetZ - p.z); step < count; step++) press(zButton);
+    assert.deepEqual([p.level, p.x, p.z], [row.level, targetX, targetZ]);
+    assert(!map.isMapBlocked(p.x, p.z, p.level), 'each native candle control position is walkable');
+    const candle = requiredId(types.VarBitType, `macro_candlelight_${index}`);
+    assert.equal(p.getVarBit(candle), 0, 'deterministic initial layout leaves this candle unlit');
+    press('light');
+    assert.equal(p.getVarBit(candle), 1, 'the real light button advances the candle without a server loc');
+    press('light');
+    assert.equal(p.getVarBit(candle), 1, 'an already-lit candle is not a failure');
+    assert.equal(p.getVar(v('macro_transmit')), 1);
+  }
+  p.closeModal();
+  talkCandlelightPete(p);
+  assert.deepEqual([p.level, p.x, p.z], O, 'Pete returns the player after real button-produced completion');
+  cleared(p);
+});
+check('Candlelight burnt-candle failure resets camera and remains closable/restartable', () => {
+  const p = player();
+  spawnCandlelight(p);
+  talkCandlelightPete(p);
+  for (let i = 1; i <= 11; i++) p.setVarBit(requiredId(types.VarBitType, `macro_candlelight_${i}`), 1);
+  p.setVarBit(requiredId(types.VarBitType, 'macro_candlelight_6'), 2);
+  assert.deepEqual([p.level, p.x, p.z], [0, 1971, 5002], 'the real lighter starts opposite native candle six');
+  assert.equal(types.LocType.get(requiredId(types.LocType, 'macro_candlelight_pillar6')).active, 0, 'native decorative candle six is not a server loc');
+  assert.equal(p.getVarBit(requiredId(types.VarBitType, 'macro_candlelight_6')), 2);
+  const lighter = requiredId(types.Component, 'macro_candlelight_lighter');
+  const taperUid = p.getVar(v('macro_event_uid'));
+  const packetStart = p.messages.length;
+  const light = requiredId(types.Component, 'macro_candlelight_lighter:light_button');
+  assert(new IfButtonHandler().handle(new IfButton(light), p), 'the real lighter light button is visible');
+  assert.equal(p.modalMain, lighter, 'failure leaves a closable modal, not a trapped player');
+  assert.equal(p.getVar(v('macro_event')), 5);
+  assert.equal(p.getVar(v('macro_transmit')), 2, `burnt-candle failure packets: ${JSON.stringify(p.messages.slice(packetStart))}`);
+  assert.equal(World.getNpcByUid(taperUid), null, 'failure deletes the exact taper');
+  assert.equal(p.getVar(v('macro_event_uid')), -1);
+  for (let i = 1; i <= 11; i++) assert.equal(p.getVarBit(requiredId(types.VarBitType, `macro_candlelight_${i}`)), i === 6 ? 2 : 0);
+  assert(p.messages.slice(packetStart).some(packet => packet.constructor.name === 'CamReset'), 'failure resets camera presentation');
+  const closePacketStart = p.messages.length;
+  p.closeModal();
+  assert.equal(p.modalMain, -1);
+  assert(p.messages.slice(closePacketStart).some(packet => packet.constructor.name === 'CamReset'), 'closing after failure leaves no camera effect');
+  talkCandlelightPete(p);
+  const retryUid = p.getVar(v('macro_event_uid'));
+  const retry = World.getNpcByUid(retryUid);
+  assert(retry, 'Pete gives a new taper after a failed attempt');
+  assert.equal(retry.type, requiredId(types.NpcType, 'macro_candle_taper'));
+  assert.equal(p.modalMain, lighter);
+  cleanup(p);
+  cleared(p);
+});
+
 check('Candlelight relog outside the church cleans the stranded event', () => {
   const p = player();
   run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });

@@ -329,4 +329,39 @@ export default function register() {
     assert(ownedDrop, 'death queue drops the requested good carcass privately to its player');
     assert.deepEqual(combatSkills.map(skill => p.stats[skill]), xpBefore, 'pheasant Attack grants no combat experience');
   });
+
+  check('Drill map-square exit releases the active task without a reward', () => {
+    const p = player();
+    startDrill(p);
+    position(p, ...origin);
+    run(p, '[mapzoneexit,0_49_75]');
+    assert.equal(p.getVar(v('macro_event')), 0);
+    assert.equal(p.getVar(v('macro_event_uid')), -1);
+    assert.equal(p.getVar(v('macro_event_origin_coord')), -1);
+    assert.equal(p.getVar(v('macro_event_target_coord')), -1);
+    assert.equal(p.getVar(v('macro_transmit')), 0);
+    assert.equal(p.getVar(v('macro_digger_var_4')), 0);
+    assert.equal(total(p, DRILL_OUTFIT), 0);
+    assert.equal(count(p, 'coins'), 0);
+    assert.equal(p.tabs[3], id(types.Component, 'inventory'));
+  });
+
+  check('Forester map-square exit removes the active task and carcasses without reward', () => {
+    const p = player();
+    startForester(p);
+    give(p, 'raw_macro_pheasant_good');
+    give(p, 'raw_macro_pheasant_bad');
+    position(p, ...origin);
+    run(p, '[mapzoneexit,0_40_74]');
+    assert.equal(p.getVar(v('macro_event')), 0);
+    assert.equal(p.getVar(v('macro_event_uid')), -1);
+    assert.equal(p.getVar(v('macro_event_origin_coord')), -1);
+    assert.equal(p.getVar(v('macro_event_target_coord')), -1);
+    assert.equal(p.getVar(v('macro_transmit')), 0);
+    assert.equal(count(p, 'raw_macro_pheasant_good'), 0);
+    assert.equal(count(p, 'raw_macro_pheasant_bad'), 0);
+    assert.equal(total(p, FORESTER_OUTFIT), 0);
+    assert.equal(count(p, 'coins'), 0);
+    assert.equal(p.tabs[3], id(types.Component, 'inventory'));
+  });
 }

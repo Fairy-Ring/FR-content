@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
-import { advance, button, check, coord, count, draws, environmentTick, held, id, obj, player, run, tile, v, O } from './runtime.mjs';
+import { advance, button, check, coord, count, draws, environmentTick, held, id, obj, player, run, tile, v, O, engineModule } from './runtime.mjs';
+
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveHandler = new ((await engineModule('network/game/client/handler/MoveClickHandler.ts')).default)();
+const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
+const closeHandler = new ((await engineModule('network/game/client/handler/CloseModalHandler.ts')).default)();
+const { ModalState } = await engineModule('engine/entity/ModalState.ts');
 
 const event = 24;
 const questionProc = '[proc,macro_quiz_choose_question]';
@@ -12,7 +18,7 @@ function enter(drawsForQuestion) {
   draws({ [questionProc]: [...drawsForQuestion] }, () => run(p, '[proc,macro_event_general_spawn]', [event]));
   assert.equal(p.getVar(v('macro_event')), event);
   assert.deepEqual(tile(p), [0, 1952, 4769], 'Quiz Master entry reaches the assigned native scene tile');
-  assert.equal(p.modalChat, id('Component', 'pick_the_odd_one_out'));
+  assert.equal(p.modalTutorial, id('Component', 'pick_the_odd_one_out'));
   return p;
 }
 function renderedModels(p) {
@@ -98,11 +104,13 @@ check('Quiz relog preserves round/question, then four correct answers choose the
     run(p, '[proc,macro_event_logout]');
     p.closeModal();
     p.timers.clear();
+    assert.equal(p.modalTutorial, -1, 'logout clears the sticky interface before restoring the question');
+    assert.equal(p.modalState & ModalState.TUT, 0);
     run(p, '[queue,macro_event_login]');
     assert.equal(p.getVar(v('macro_event')), event);
     assert.equal(p.getVar(v('macro_transmit')), 1);
     assert.equal(p.getVar(v('xplamp')), packed);
-    assert.equal(p.modalChat, id('Component', 'pick_the_odd_one_out'));
+    assert.equal(p.modalTutorial, id('Component', 'pick_the_odd_one_out'));
     assert.deepEqual(renderedModels(p), models);
     answerCurrent(p);
     answerCurrent(p);
@@ -115,6 +123,8 @@ check('Quiz relog preserves round/question, then four correct answers choose the
   assert.equal(p.getVar(v('macro_event')), 0);
   assert.deepEqual(tile(p), O);
   assert.equal(count(p, 'macro_quiz_mystery_box'), 1);
+  assert.equal(p.modalTutorial, -1);
+  assert.equal(p.modalState & ModalState.TUT, 0);
 });
 
 check('Quiz cash choice awards exactly 1000 coins and returns after four correct answers', () => {
@@ -129,12 +139,18 @@ check('Quiz cash choice awards exactly 1000 coins and returns after four correct
     run(p, '[proc,macro_event_general_spawn]', [event]);
     for (let round = 0; round < 4; round++) answerCurrent(p);
     prizeModels(p);
+    assert(moveHandler.handle(new MoveClick([{ x: p.x, z: p.z }], 0, false), p));
+    assert(closeHandler.handle(new CloseModal(), p));
+    environmentTick(p);
+    assert.equal(p.modalTutorial, id('Component', 'pick_the_odd_one_out'), 'prize choices survive viewport and close packets');
     assert(button(p, 'pick_the_odd_one_out:com_5'), 'native coin prize button is accepted');
   });
   assert.equal(p.getVar(v('macro_event')), 0);
   assert.deepEqual(tile(p), O);
   assert.equal(count(p, 'coins'), 1000);
   assert.equal(count(p, 'macro_quiz_mystery_box'), 0);
+  assert.equal(p.modalTutorial, -1);
+  assert.equal(p.modalState & ModalState.TUT, 0);
 });
 
 const mysteryBoxOutcomes = [
@@ -173,6 +189,32 @@ check('Quiz escape closes the native interface and returns without a prize', () 
   assert.deepEqual(tile(p), O);
   assert.equal(p.modalMain, -1);
   assert.equal(p.modalChat, -1);
+  assert.equal(p.modalTutorial, -1);
+  assert.equal(p.modalState & ModalState.TUT, 0);
+});
+
+check('Quiz viewport and close packets retain all three native model buttons and exact framing', () => {
+  const spec = { odd: 3, offset: 0, oddVariant: 1, commonFirst: 0, commonSecond: 1, correct: 1 };
+  const p = enter(question(spec));
+  const identity = p.getVar(v('xplamp')), models = renderedModels(p);
+  const angles = p.packets.filter(packet => packet.constructor.name === 'IfSetAngle' && components.includes(packet.component)).slice(-3);
+  assert.deepEqual(angles.map(packet => [packet.component, packet.xan, packet.yan, packet.zoom]),
+    components.map((component, index) => [component, 0, 0, index === 2 ? 446 : 400]),
+    'question models restore the cache framing rather than retaining prize object angles');
+  assert(p.canAccess(), 'sticky chat does not block ordinary input');
+  assert(moveHandler.handle(new MoveClick([{ x: p.x, z: p.z }], 0, false), p));
+  assert(closeHandler.handle(new CloseModal(), p));
+  environmentTick(p);
+  assert.equal(p.modalTutorial, id('Component', 'pick_the_odd_one_out'));
+  assert.equal(p.getVar(v('xplamp')), identity);
+  assert.deepEqual(renderedModels(p), models);
+  answer(p, 0);
+  assert.equal(p.getVar(v('macro_transmit')), 0, 'wrong native button still reaches the production handler');
+  answerCurrent(p);
+  assert.equal(p.getVar(v('macro_transmit')), 1, 'the correct native button remains actionable');
+  run(p, '[proc,macro_arena_return]', [event]);
+  assert.equal(p.modalTutorial, -1);
+  assert(!button(p, 'pick_the_odd_one_out:com_5'), 'stale closed buttons are rejected');
 });
 
 console.log('Quiz Master compiled checks passed');

@@ -160,6 +160,7 @@ if (%macro_event = ^no_macro_event) {
 if (%macro_event = ^macro_candlelight) {
     if (~macro_candlelight_inside_church(coord) = true) {
         ~macro_events_hide_tabs;
+        cam_reset;
     } else {
         ~macro_event_cleanup(^macro_candlelight, %macro_event_uid);
     }
@@ -190,6 +191,8 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
 
 [proc,macro_event_logout]
 if (%macro_event = ^macro_candlelight) {
+    // UNKNOWN engineering decision: retain inherited saved candles; remove only taper and camera.
+    cam_reset;
     if (npc_finduid(%macro_event_uid) = true) {
         if (%npc_macro_event_target = uid) npc_del;
     }
@@ -197,6 +200,7 @@ if (%macro_event = ^macro_candlelight) {
 }
 if (%macro_event = ^macro_maze) ~macro_maze_logout;
 if (%macro_event = ^macro_mime) ~macro_mime_cleanup;
+if (%macro_event = ^macro_quiz) ~macro_quiz_cleanup;
 if (%macro_event = ^macro_prison_pete) ~macro_prison_pete_sync;
 if (%macro_event >= ^macro_maze & %macro_event <= ^macro_quiz) return;
 if (%macro_event = ^macro_frogs) ~macro_frogs_cleanup;
@@ -350,6 +354,7 @@ while ($i < 50) {
 return(null);
 
 [proc,macro_events_hide_tabs]
+// Native slots 8/9/10/11/13 retain friends, ignore, Logout, Options and music.
 if_settab(null, 0);
 if_settab(null, 1);
 if_settab(null, 2);
@@ -357,7 +362,6 @@ if_settab(null, 3);
 if_settab(null, 4);
 if_settab(null, 5);
 if_settab(null, 6);
-if_settab(null, 11);
 if_settab(null, 12);
 
 // Existing Candlelight exit caller; it must not erase a different encounter.

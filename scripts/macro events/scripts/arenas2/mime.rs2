@@ -23,6 +23,7 @@ if (npc_finduid(%macro_event_uid) = true) {
     if (%npc_macro_event_target = uid) npc_del;
 }
 %macro_event_uid = null;
+tut_close;
 if_close;
 
 [proc,macro_mime_choose_action]
@@ -31,9 +32,26 @@ if_close;
 [proc,macro_mime_show_action]
 if (~macro_arena_active(^macro_mime) = false) return;
 if (npc_finduid(%macro_event_uid) = true) {
-    npc_anim(enum(int, seq, macro_mime_actions, %macro_transmit), 0);
+    ~macro_mime_perform;
 }
-if_openchat(macro_mime_emotes);
+// TUT_OPEN is the native sticky chat area, independent of walking/ordinary IF_CLOSE.
+tut_open(macro_mime_emotes);
+
+[proc,macro_mime_perform]
+def_seq $action = enum(int, seq, macro_mime_actions, %macro_transmit);
+npc_anim($action, 0);
+// UNKNOWN replay policy: repeat the current demonstration after its complete
+// native sequence and a short pause, including after a slow arena map load.
+npc_settimer(add(calc((seqlength($action) + 29) / 30), ^macro_mime_replay_pause_ticks));
+
+[ai_timer,macro_mime]
+// Logout cleanup owns removal when the performer has no connected owner.
+if (finduid(%npc_macro_event_target) = false) return;
+if (~macro_arena_active(^macro_mime) = false | %macro_event_uid ! npc_uid) {
+    npc_del;
+    return;
+}
+~macro_mime_perform;
 
 [if_button,macro_mime_emotes:com_2] ~macro_mime_answer(0);
 [if_button,macro_mime_emotes:com_3] ~macro_mime_answer(1);
@@ -47,13 +65,13 @@ if_openchat(macro_mime_emotes);
 [proc,macro_mime_answer](int $answer)
 if (~macro_arena_active(^macro_mime) = false) return;
 if ($answer ! %macro_transmit) {
-    if_close;
+    tut_close;
     %xplamp = 0;
     ~macro_mime_choose_action;
     ~macro_mime_show_action;
     return;
 }
-if_close;
+tut_close;
 p_stopaction;
 anim(enum(int, seq, macro_mime_actions, $answer), 20);
 p_delay(^macro_mime_action_ticks);
@@ -64,8 +82,7 @@ if (%xplamp >= ^macro_mime_steps) {
     ~macro_mime_reward;
     return;
 }
-// A resumed delayed script closes its chat on return. Open the next prompt
-// from the ordinary queue after that completion boundary.
+// Open the next prompt after the copied animation's delayed completion.
 queue*(macro_mime_prompt, 0)();
 
 [queue,macro_mime_prompt]

@@ -17,6 +17,7 @@ if (%macro_transmit >= ^macro_quiz_round_count) {
 
 [proc,macro_quiz_cleanup]
 anim(null, 0);
+tut_close;
 if_close;
 
 [proc,macro_quiz_choose_question]
@@ -71,12 +72,16 @@ while ($slot < ^macro_quiz_answer_count) {
     }
     $slot = add($slot, 1);
 }
+// Restore the native question framing after a previous IF_SETOBJECT prize page.
+if_setangle(pick_the_odd_one_out:com_5, 0, 0, 400);
+if_setangle(pick_the_odd_one_out:com_6, 0, 0, 400);
+if_setangle(pick_the_odd_one_out:com_7, 0, 0, 446);
 if_sethide(pick_the_odd_one_out:com_5, ^false);
 if_sethide(pick_the_odd_one_out:com_6, ^false);
 if_sethide(pick_the_odd_one_out:com_7, ^false);
 // UNKNOWN functional prompt; the native interface supplies the screen layout.
 if_settext(pick_the_odd_one_out:com_8, "Pick the odd one out.");
-if_openchat(pick_the_odd_one_out);
+tut_open(pick_the_odd_one_out);
 
 [proc,macro_quiz_show_prize]
 if (~macro_arena_active(^macro_quiz) = false) return;
@@ -87,7 +92,7 @@ if_sethide(pick_the_odd_one_out:com_6, ^false);
 if_sethide(pick_the_odd_one_out:com_7, ^true);
 // UNKNOWN functional prompt; the prize choices are source-backed.
 if_settext(pick_the_odd_one_out:com_8, "Choose a prize.");
-if_openchat(pick_the_odd_one_out);
+tut_open(pick_the_odd_one_out);
 
 [if_button,pick_the_odd_one_out:com_5] ~macro_quiz_button(0);
 [if_button,pick_the_odd_one_out:com_6] ~macro_quiz_button(1);
