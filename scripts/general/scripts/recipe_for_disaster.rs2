@@ -22,7 +22,7 @@ if (%hundred_main_quest_var = 0) {
 } else if (%hundred_main_quest_var >= ^rfd_complete) {
     if_settext(recipe_for_disaster:com_14, "Quest complete. Full access to the Culinaromancer's Chest.");
 } else if (%hundred_main_quest_var = ^rfd_finale_ready) {
-    if_settext(recipe_for_disaster:com_14, "Defeat the Culinaromancer through the kitchen portal.");
+    if_settext(recipe_for_disaster:com_14, "Defeat the Culinaromancer through the portal in the banquet room.");
 } else {
     if_settext(recipe_for_disaster:com_14, "Guests rescued: <tostring(%hundred_subquest_tally)> of 8.");
 }

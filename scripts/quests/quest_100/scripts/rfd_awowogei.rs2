@@ -93,7 +93,7 @@ if (%hundred_ilm_quest = ^rfd_awowogei_started) {
 [label,rfd_awowogei_monkeys]
 if (~rfd_awowogei_active = false) return;
 if (inv_total(worn, mm_amulet_of_monkey_speak) < 1) {
-    ~mesbox("Wear a Monkey speak amulet to understand the Three Monkeys.");
+    ~mesbox("Wear an M'speak amulet to understand the Three Monkeys.");
     return;
 }
 if (~mm_wearing_greegree = false) {
@@ -357,6 +357,7 @@ if (loc_coord = ^rfd_awowogei_chamber_return) {
 }
 
 [proc,rfd_awowogei_prepare_chamber]
+// Keep the shared return available to every visitor, regardless of entry time.
 if (loc_find(^rfd_awowogei_chamber_return, exit_12617) = false) {
     loc_add(^rfd_awowogei_chamber_return, exit_12617, 0, wall_straight, ^rfd_awowogei_return_duration);
 }

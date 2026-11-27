@@ -239,7 +239,7 @@ if (distance(coord, loc_coord) > 1) {
 @rfd_amik_leave_lair;
 
 [label,rfd_amik_leave_lair]
-if (loc_coord ! ^rfd_amik_lair_portal | ~rfd_amik_stage(^rfd_amik_wom_warned) = false | ~rfd_amik_in_lair(coord) = false) {
+if (loc_coord ! ^rfd_amik_lair_portal | ~rfd_amik_in_lair(coord) = false) {
     ~displaymessage(^dm_default);
     return;
 }

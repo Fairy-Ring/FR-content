@@ -342,6 +342,10 @@ assert.equal(kklik.isActive, false, 'successful flambe removes K\'klik in the sa
 // Exit through the original portal, then hand the finished food to Amik through native item-on-loc.
 const portalAt = routeCoord('rfd_amik_lair_portal');
 const portal = nativeLoc('100_portal_chicken', rows => rows.find(row => sameTile(row, portalAt)));
+const lairVisitor = player();
+assert.equal(chickenStage(lairVisitor), 0, 'the exit probe has not started the guest quest');
+operate(lairVisitor, portal);
+assert.deepEqual(tile(lairVisitor), routeCoord('rfd_amik_shrine_return'), 'any player inside can leave through the original portal');
 operate(p, portal);
 assert.deepEqual(tile(p), routeCoord('rfd_amik_shrine_return'), 'original chicken portal returns beside the solid shrine');
 run(p, '[proc,update_questpoints]');

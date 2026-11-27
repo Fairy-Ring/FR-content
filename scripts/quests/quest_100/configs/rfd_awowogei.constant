@@ -14,8 +14,8 @@
 // UNKNOWN engineering delays for the native visual transitions.
 ^rfd_awowogei_cook_delay = 2
 ^rfd_awowogei_pull_delay = 2
-// UNKNOWN bounded return-wrapper lifetime, refreshed after entering or relogging.
-^rfd_awowogei_return_duration = 1000
+// UNKNOWN effectively permanent shared return; recreated on entry or login if absent.
+^rfd_awowogei_return_duration = ^max_32bit_int
 // UNKNOWN map-derived landing tiles. The cache provides no route coordinates.
 ^rfd_awowogei_red_tree = 0_42_43_8_33
 ^rfd_awowogei_nut_bush = 0_47_85_12_17

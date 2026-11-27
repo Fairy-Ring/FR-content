@@ -411,7 +411,7 @@ useItems(p, 'hundred_ilm_sliced_red_banana', 'hundred_ilm_snake_corpse');
 assert.equal(count(p, 'hundred_ilm_correctly_stuffed_snake'), 2, 'paste-first ingredients correctly stuff another snake');
 assert.equal(count(p, 'hundred_ilm_tchiki_monkey_nut_paste'), 0);
 assert.equal(count(p, 'hundred_ilm_sliced_red_banana'), 0);
-// The started quest can enter the temple chamber in ninja form; the temporary return crack repairs after expiry and relog.
+// Shared chamber returns outlast both a long visit and a later visitor's arrival.
 assert.equal(count(p, 'mm_monkey_greegree_for_small_ninja_monkey', worn), 1, 'the chamber entry is tested without zombie form');
 const mainTrapdoor = World.getLoc(trapdoorRow.x, trapdoorRow.z, trapdoorRow.level, trapdoorClosedId);
 assert(mainTrapdoor, 'the native temple trapdoor is closed for the route');
@@ -422,20 +422,41 @@ operate(p, mainOpenTrapdoor, 1);
 assertNear(p, templeBasementTile, 'native Climb-down reaches the basement crack');
 operate(p, templeCrack);
 assert.deepEqual(tile(p), chamberEntryTile, 'the started route enters the chamber through the native basement crack');
-assertGreegreeRetained(p, 'mm_monkey_greegree_for_small_ninja_monkey', 'the Ape cooking chamber');
 const firstReturnCrack = World.getLoc(chamberReturnTile[1], chamberReturnTile[2], chamberReturnTile[0], exit12617Id);
 assert(firstReturnCrack, 'entering the chamber installs its native return crack');
-const returnLifetime = firstReturnCrack.lifecycleTick;
-assert(returnLifetime > 0, 'the chamber return crack has a bounded native lifecycle');
-for (let tick = 0; tick < returnLifetime; tick++) {
+const enteredAt = World.currentTick;
+assert(firstReturnCrack.lifecycleTick > 1005, 'the shared return is not a short-lived wrapper');
+for (let tick = 0; tick < 995; tick++) {
   World.currentTick++;
   World.processZones();
 }
-assert.equal(World.getLoc(chamberReturnTile[1], chamberReturnTile[2], chamberReturnTile[0], exit12617Id) === null, true,
-  'the temporary chamber return crack expires through the native lifecycle countdown');
+assert.equal(World.currentTick - enteredAt, 995, 'Player A remains inside for 995 ticks before Player B enters');
+const chamberVisitor = player();
+setBit(chamberVisitor, 'hundred_ilm_quest', 1);
+operate(chamberVisitor, templeCrack);
+assert.deepEqual(tile(chamberVisitor), chamberEntryTile, 'Player B enters through the same native crack');
+for (let tick = 0; tick < 11; tick++) {
+  World.currentTick++;
+  World.processZones();
+}
+assert(World.currentTick - enteredAt > 1000, 'both visitors remain inside beyond the old expiry');
+const sharedReturnCrack = World.getLoc(chamberReturnTile[1], chamberReturnTile[2], chamberReturnTile[0], exit12617Id);
+assert.equal(sharedReturnCrack, firstReturnCrack, 'the original shared return survives the late visitor and more than 1000 ticks');
+operate(chamberVisitor, sharedReturnCrack);
+assertNear(chamberVisitor, templeCrackTile, 'Player B exits cleanly after the old expiry');
+operate(p, sharedReturnCrack);
+assertNear(p, templeCrackTile, 'Player A also exits cleanly after the long visit');
+World.removeLoc(sharedReturnCrack, 0);
+assert.equal(World.getLoc(chamberReturnTile[1], chamberReturnTile[2], chamberReturnTile[0], exit12617Id), null);
+operate(p, templeCrack);
+assert.deepEqual(tile(p), chamberEntryTile, 'native entry recreates a missing shared return');
+const entryRestoredCrack = World.getLoc(chamberReturnTile[1], chamberReturnTile[2], chamberReturnTile[0], exit12617Id);
+assert(entryRestoredCrack, 'native entry restores the absent return before teleporting');
+assertGreegreeRetained(p, 'mm_monkey_greegree_for_small_ninja_monkey', 'the Ape cooking chamber');
+World.removeLoc(entryRestoredCrack, 0);
 run(p, '[proc,rfd_awowogei_login]');
 const restoredReturnCrack = World.getLoc(chamberReturnTile[1], chamberReturnTile[2], chamberReturnTile[0], exit12617Id);
-assert(restoredReturnCrack, 'the login hook reinstalls an expired chamber return crack');
+assert(restoredReturnCrack, 'the login hook also reinstalls a missing chamber return');
 operate(p, restoredReturnCrack);
 assertNear(p, templeCrackTile, 'the chamber return crack sends the player back beside its basement entry');
 operate(p, templeCrack);

@@ -212,11 +212,28 @@ for (let wave = 0; wave < expected.length; wave++) {
   }
   if (wave === 1) {
     give(p, 'bronze_sword'); equip(p, 'bronze_sword');
+    assert.equal(World.getObj(p.x, p.z, p.level, obj('bronze_sword'), p.hash64), null);
     run(p, '[proc,rfd_finale_disarm]', { target: actor });
-    assert.equal(count(p, 'bronze_sword', worn), 0, 'Flambeed disarm drops the actual equipped weapon');
-    give(p, 'ice_gloves'); equip(p, 'ice_gloves'); give(p, 'bronze_sword'); equip(p, 'bronze_sword');
+    assert.equal(count(p, 'bronze_sword', worn), 0, 'Flambeed removes the actual equipped weapon');
+    assert.equal(count(p, 'bronze_sword'), 1, 'a free inventory slot receives the disarmed weapon');
+    assert.equal(World.getObj(p.x, p.z, p.level, obj('bronze_sword'), p.hash64), null, 'free-space disarm creates no ground drop');
+    equip(p, 'bronze_sword');
+    clear(p); give(p, 'shrimp', p.getInventory(inv).capacity);
+    assert.equal(count(p, 'shrimp'), p.getInventory(inv).capacity, 'the drop fallback starts with a completely full inventory');
+    run(p, '[proc,rfd_finale_disarm]', { target: actor });
+    assert.equal(count(p, 'bronze_sword', worn), 0, 'full-inventory disarm also removes the weapon');
+    assert.equal(count(p, 'bronze_sword'), 0, 'full inventory cannot receive the weapon');
+    const droppedWeapon = World.getObj(p.x, p.z, p.level, obj('bronze_sword'), p.hash64);
+    assert(droppedWeapon, 'full-inventory disarm preserves the weapon as the player-owned native ground drop');
+    assert.equal(droppedWeapon.count, 1);
+    clear(p); give(p, 'ice_gloves'); equip(p, 'ice_gloves'); give(p, 'bronze_sword'); equip(p, 'bronze_sword');
     run(p, '[proc,rfd_finale_disarm]', { target: actor });
     assert.equal(count(p, 'bronze_sword', worn), 1, 'ice gloves preserve the weapon');
+    give(p, 'shrimp', p.getInventory(inv).capacity);
+    run(p, '[proc,rfd_finale_disarm]', { target: actor });
+    assert.equal(count(p, 'bronze_sword', worn), 1, 'ice gloves also prevent full-inventory disarm');
+    assert.equal(World.getObj(p.x, p.z, p.level, obj('bronze_sword'), p.hash64), droppedWeapon, 'ice-glove immunity adds no further ground weapon');
+    clear(p);
   }
   if (wave === 4) {
     const phases = [

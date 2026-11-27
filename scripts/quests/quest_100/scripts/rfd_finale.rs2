@@ -143,6 +143,11 @@ if (%aggressive_npc = $old_uid) %aggressive_npc = npc_uid;
 if (inv_getobj(worn, ^wearpos_hands) = ice_gloves) return;
 def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
 if ($weapon = null) return;
+if (inv_freespace(inv) > 0) {
+    ~unequip(^wearpos_rhand);
+    mes("Flambeed's heat makes you remove your weapon.");
+    return;
+}
 inv_dropslot(worn, coord, ^wearpos_rhand, ^dropslot_duration);
 ~update_all($weapon);
 ~on_unequip($weapon);
