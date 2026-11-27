@@ -1,0 +1,64 @@
+name: Historical accuracy evidence (2006 / rev 377)
+description: Submit period evidence, sources, or corrections to upgrade an UNKNOWN or CANDIDATE detail — no coding required
+title: "accuracy: "
+labels: ["accuracy", "research"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **No RuneScript or coding knowledge required.**
+        Fairy Ring targets **RuneScape revision 377 (~2 May 2006)**. Many playable beta units currently use labelled `UNKNOWN` engineering defaults or `CANDIDATE` 2007-base fallbacks.
+        Dropping a dated 2006 video timestamp, archived guide, screenshot, or specific correction here lets maintainers or contributor agents turn it into a verified PR.
+  - type: input
+    id: subject
+    attributes:
+      label: Quest, NPC, minigame, skill, or fact ID
+      placeholder: "e.g., recipe-for-disaster.s2-guide-quiz-room-unknown, or 'Evil Dave spicy stew smell messages'"
+    validations:
+      required: true
+  - type: textarea
+    id: current_vs_period
+    attributes:
+      label: What currently happens vs what happened in May 2006
+      description: Be as specific as possible (exact wording, location, interface, item, formula, drop rate, or rule).
+      placeholder: |
+        Currently in Fairy Ring: ...
+        In May 2006 (rev 377): ...
+    validations:
+      required: true
+  - type: dropdown
+    id: source_class
+    attributes:
+      label: Strongest source class provided
+      options:
+        - Pre-2 May 2006 guide, Knowledge Base, or Wayback capture (VERIFIED)
+        - Pre-2 May 2006 video, screenshot, or forum post (VERIFIED)
+        - Authentic revision-377 cache / map / interface / Client-Java 377 inspection (VERIFIED)
+        - Earliest Old School Wiki revision / 2007-base behavior (CANDIDATE)
+        - Later wiki / personal recollection / lead to investigate (UNKNOWN until sourced)
+    validations:
+      required: true
+  - type: textarea
+    id: citations
+    attributes:
+      label: Source URLs, dates, timestamps, or screenshots
+      description: Include Wayback dates, YouTube timestamps, wiki revision IDs (oldid), or attach images. Avoid post-rewrite OSRS/RS3 dialogue unless noting the rewrite date.
+      placeholder: |
+        - URL / Wayback link (date):
+        - Exact quote or observed behavior:
+    validations:
+      required: true
+  - type: input
+    id: script_hint
+    attributes:
+      label: Affected content file(s), if known (optional)
+      placeholder: "e.g., scripts/quests/quest_100/scripts/rfd_guide.rs2"
+  - type: dropdown
+    id: filer
+    attributes:
+      label: Filed by
+      options:
+        - Human
+        - Coding agent
+    validations:
+      required: true

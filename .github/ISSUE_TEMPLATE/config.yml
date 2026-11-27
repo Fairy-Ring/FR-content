@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Engine, protocol, compiler, or packer bug (FR-engine)
+    url: https://github.com/Fairy-Ring/FR-engine/issues/new/choose
+    about: File server runtime, packet, RuneScript opcode, collision, or pack bugs in FR-engine.
+  - name: Browser client bug (FR-client-ts)
+    url: https://github.com/Fairy-Ring/FR-client-ts/issues/new/choose
+    about: File pure Java 377 → TypeScript client parity bugs in FR-client-ts.
+  - name: Research context request (fairy-ring-workspace)
+    url: https://github.com/Fairy-Ring/fairy-ring-workspace/issues/new/choose
+    about: Request a scoped research extract or discuss project-wide process/decisions.

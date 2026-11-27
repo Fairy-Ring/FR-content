@@ -1,0 +1,50 @@
+name: Cache & presentation polish
+description: Upgrade a functional beta fallback to authentic 377 interfaces, rooms, models, animations, or stationary NPC configs
+title: "polish: "
+labels: ["polish", "cache-parity"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the authentic 377 assets **already exist in the cache/maps**, and a script currently uses a simplified beta fallback (for example: an inline dialogue instead of an existing `.if` interface, wrong model scale, missing map room teleport, or a seated NPC wandering because `wanderrange=0` is not set).
+  - type: input
+    id: target
+    attributes:
+      label: Feature, quest, or NPC
+      placeholder: "e.g., RFD Lumbridge Guide quiz room & interface, Capt' Arnav lock reel models, seated NPC wandering"
+    validations:
+      required: true
+  - type: textarea
+    id: cache_assets
+    attributes:
+      label: Authentic 377 cache / map / interface assets involved
+      description: List exact `.if` component names, `.loc`/`.npc`/`.obj`/`.seq` debugnames, or `.jm2` map squares and coordinates if known.
+      placeholder: |
+        - Interface / components: ...
+        - Map square / coords: ...
+        - NPC / Loc / Obj / Seq configs: ...
+    validations:
+      required: true
+  - type: textarea
+    id: delta
+    attributes:
+      label: Current fallback vs authentic presentation
+      placeholder: |
+        Current behavior: ...
+        Target authentic behavior (without changing client cache hashes): ...
+    validations:
+      required: true
+  - type: input
+    id: scripts
+    attributes:
+      label: Relevant script / config files (optional)
+      placeholder: "e.g., scripts/quests/quest_100/scripts/rfd_guide.rs2"
+  - type: dropdown
+    id: filer
+    attributes:
+      label: Filed by
+      options:
+        - Human
+        - Coding agent
+    validations:
+      required: true

@@ -1,0 +1,75 @@
+name: In-game content bug
+description: Report a broken, missing, or stranding interaction in a quest, skill, NPC, item, or minigame
+title: "bug: "
+labels: ["bug", "content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for RuneScript / config bugs in **FR-content**.
+        If you hit the bug on the beta server, pasting `::bug` output or your exact coordinates and quest stage makes it much faster for a human or coding agent to reproduce in a compiled test.
+  - type: input
+    id: area
+    attributes:
+      label: Quest, skill, minigame, or area
+      placeholder: "e.g., Recipe for Disaster (Lumbridge Guide), Rat Pits, Thieving stalls, Varrock"
+    validations:
+      required: true
+  - type: textarea
+    id: bug_dump
+    attributes:
+      label: Coordinates, quest stage / varps, or ::bug output
+      description: Paste ::bug output if available, or your tile (x, z, level), open interface, and relevant quest/item state.
+      placeholder: "coord=(3222, 3218, 0), quest stage=4, carrying=..."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Exact steps to reproduce
+      description: Name the exact right-click option, item-on-item pair, NPC, or scenery object.
+      placeholder: |
+        1. Stand at ...
+        2. Right-click <target> -> <option> (or use <item A> on <item B>)
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected vs actual behavior
+      placeholder: |
+        Expected: ...
+        Actual: ...
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: Client used
+      options:
+        - rs2b0t (web client)
+        - 274bot
+        - FR-client-ts (pure browser client)
+        - Compiled test / offline reproduction
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: severity
+    attributes:
+      label: Impact (check all that apply)
+      options:
+        - label: Strands the player or softlocks quest progress
+        - label: Loses items or coins unexpectedly
+        - label: Missing handler / silent no-op on a visible menu option
+        - label: Wrong reward, XP, requirement, or state transition
+  - type: dropdown
+    id: filer
+    attributes:
+      label: Filed by
+      options:
+        - Human
+        - Coding agent
+    validations:
+      required: true
