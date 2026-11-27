@@ -171,7 +171,7 @@ test('spider poisoning is rare; snake and tribesman hits poison more often', () 
   } finally { removeNpc(spider); }
 });
 
-test('Broodoo magic attacks use normal damage and the yellow form drains stats without hitmark 3', () => {
+test('Broodoo magic attacks use normal damage and the yellow form drains stats with hitmark 3', () => {
   for (const [name, disease, severity] of [
     ['tbwcu_broodoo_poison', false, 10],
     ['tbwcu_broodoo_combat', false, 0],
@@ -188,6 +188,8 @@ test('Broodoo magic attacks use normal damage and the yellow form drains stats w
         for (const stat of [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE, PlayerStat.MAGIC, PlayerStat.RANGED]) {
           assert(p.levels[stat] < 20, `yellow Broodoo drains stat ${stat}`);
         }
+        assert.equal(p.hitmarkType, 3, 'yellow Broodoo emits disease hitmark 3');
+        assert.equal(p.levels[PlayerStat.HITPOINTS], hp, 'disease hitmark 3 itself deals no extra HP damage before the magic hit lands');
         assert(p.messages.some(message => String(message).includes('You feel weakened.')));
       }
       settlePlayer(p);

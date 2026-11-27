@@ -37,12 +37,13 @@ $attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_cast_spell_outcome(^fi
 if ($attempted = true & $accuracy = 1) {
     if ($disease = true) {
         // VERIFIED victims weaken players; UNKNOWN yellow-only allocation and drain magnitude.
-        // The pinned engine has no disease hitmark 3: use honest stat drain, not poison or extra HP damage.
+        // VERIFIED yellow disease hitmark 3 (no extra HP damage) in FR-engine 0733c10f+.
         stat_sub(attack, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
         stat_sub(strength, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
         stat_sub(defence, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
         stat_sub(magic, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
         stat_sub(ranged, ^tbw_broodoo_disease_drain, ^tbw_broodoo_disease_percent);
+        damage(uid, ^hitmark_disease, ^tbw_broodoo_disease_drain);
         // UNKNOWN functional feedback; no retained period message.
         mes("You feel weakened.");
     }

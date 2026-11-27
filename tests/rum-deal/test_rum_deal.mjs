@@ -879,11 +879,18 @@ try {
   assert.equal(armedDiseaseTimer.interval, diseaseTicks);
   const attackStat = PlayerStat.ATTACK;
   const attackBeforeDisease = startPlayer.levels[attackStat];
+  const hpBeforeDisease = startPlayer.levels[PlayerStat.HITPOINTS];
+  startPlayer.hitmarkSlot = 0;
+  startPlayer.hitmarkType = -1;
+  startPlayer.hitmarkDamage = -1;
   World.currentTick = armedDiseaseTimer.clock + armedDiseaseTimer.interval;
   startPlayer.processTimers(armedDiseaseTimer.type);
   withRandom(0.01, () => startPlayer.processQueues());
   assert.equal(startPlayer.getVar(diseaseVarp), diseaseSeverity - 1, 'the real disease timer applies one pulse');
   assert.equal(startPlayer.levels[attackStat], attackBeforeDisease - 1, 'the pulse drains a non-HP skill instead of HP');
+  assert.equal(startPlayer.levels[PlayerStat.HITPOINTS], hpBeforeDisease, 'disease hitmark 3 does not subtract hitpoints');
+  assert.equal(startPlayer.hitmarkType, 3, 'disease pulse emits yellow hitmark 3');
+  assert.equal(startPlayer.hitmarkDamage, 1, 'disease pulse displays the stat drain amount');
   add(startPlayer, 'relicyms_balm4');
   drink(startPlayer, 'relicyms_balm4');
   assert.equal(startPlayer.getVar(diseaseVarp), 0, 'the real Relicym held-item handler cures disease');

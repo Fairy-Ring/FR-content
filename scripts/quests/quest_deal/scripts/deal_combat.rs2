@@ -81,7 +81,7 @@ if (%deal_quest = 11) obj_add(npc_coord, deal_spider_body, 1, ^lootdrop_duration
 
 // VERIFIED disease and gloves protection, cure by Relicym: period guide.
 // UNKNOWN favourable engineering severity10, 30-tick pulses and 1-point skill drain.
-// Engine supports hitmarks0..2 only. Do not substitute HP/poison damage for disease.
+// VERIFIED yellow disease hitsplat (hitmark 3, no HP subtraction) in FR-engine 0733c10f+.
 [queue,deal_disease_apply]
 %disease = max(%disease, ^deal_disease_severity);
 if (gettimer(deal_disease) < 1) settimer(deal_disease, ^deal_disease_pulse_ticks);
@@ -118,6 +118,7 @@ switch_int (random(20)) {
     case 19 : $skill = runecraft;
 }
 stat_drain($skill, ^deal_disease_drain, 0);
+damage(uid, ^hitmark_disease, ^deal_disease_drain);
 sound_synth(disease_hitsplat, 1, 0);
 %disease = sub(%disease, 1);
 if (%disease = 0) cleartimer(deal_disease);
