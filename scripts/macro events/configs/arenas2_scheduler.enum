@@ -1,5 +1,5 @@
 // UNKNOWN equal weights within each eligible world pool, not recovered historical odds.
-// Main adds arenas1 event IDs 15..19 here after their entry procs land.
+// Arena1 IDs 15..19 are members-only; Arnav remains eligible during combat.
 // Lost and Found belongs to teleport routing; Pillory belongs to Thieving only.
 [macro_registry_members]
 inputtype=int
@@ -21,6 +21,11 @@ val=14,^macro_maze
 val=15,^macro_mime
 val=16,^macro_prison_pete
 val=17,^macro_quiz
+val=18,^macro_arnav
+val=19,^macro_drill
+val=20,^macro_bob
+val=21,^macro_forester
+val=22,^macro_leo
 
 [macro_registry_free]
 inputtype=int
@@ -56,3 +61,4 @@ val=10,^macro_evil_chicken
 val=11,^macro_frogs
 val=12,^macro_certers
 val=13,^macro_sandwich_lady
+val=14,^macro_arnav

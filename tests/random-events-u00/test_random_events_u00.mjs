@@ -47,6 +47,12 @@ function targetLoc(name, kind = name === 'tree' ? 1 : name === 'chest_10_coins' 
     const loc = locFor(row);
     for (const tile of [[row.level, row.x - 1, row.z], [row.level, row.x + loc.width, row.z], [row.level, row.x, row.z - 1], [row.level, row.x, row.z + loc.length]]) {
       const p = player(tile);
+      const admission = ScriptRunner.init(packed('[proc,macro_event_allowed]'), p, null, []);
+      ScriptRunner.execute(admission);
+      if (admission.execution !== ScriptState.FINISHED || admission.intStack[admission.isp - 1] !== 1) {
+        World.players[p.slot] = null;
+        continue;
+      }
       const state = ScriptRunner.init(packed('[proc,macro_fixture_loc]'), p, null, [kind, kind === 1 ? 10 : kind === 2 ? 19 : 8]);
       give(p, 'bronze_pickaxe'); give(p, 'bronze_axe');
       ScriptRunner.execute(state);

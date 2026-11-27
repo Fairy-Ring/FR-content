@@ -9,3 +9,7 @@
 ^macro_arnav_coins = 240
 // UNKNOWN engineering number of incorrect unlock submissions before dismissal.
 ^macro_arnav_attempts = 3
+// UNKNOWN engineering expiry before the native 1,000-tick NPC despawn.
+^macro_arnav_timeout_ticks = 900
+// UNKNOWN engineering forced cleanup threshold for a busy player.
+^macro_arnav_force_cleanup_ticks = 990

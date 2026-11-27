@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { player, run, draws, check, tile, O, coord, v, result, World, Environment, inventory, inv, obj, id, map, types, ScriptRunner, op, environmentTick } from './runtime.mjs';
-const memberPool = [1,2,3,4,5,6,8,9,10,11,12,13,14,20,21,23,24];
-const freePool = memberPool.filter(event => event < 20 && ![6,10].includes(event));
+const memberPool = [1,2,3,4,5,6,8,9,10,11,12,13,14,20,21,23,24,15,16,17,18,19];
+const freePool = memberPool.filter(event => event < 15 && ![6,10].includes(event));
+const memberCombatPool = memberPool.filter(event => event <= 15);
 for (const members of [false, true]) check(`${members ? 'members' : 'free'} registry exact eligible event set and equal selector slots`, () => {
   const old = Environment.NODE_MEMBERS; Environment.NODE_MEMBERS = members;
   try {
@@ -11,11 +12,69 @@ for (const members of [false, true]) check(`${members ? 'members' : 'free'} regi
     assert.deepEqual(actual, expected);
     assert(!actual.includes(7) && !actual.includes(22), 'teleport-matrix and thieving-only tasks are not generic afk events');
     p.setVar(v('lastcombat'), World.currentTick);
-    const combatPool = expected.filter(event => event < 20);
+    const combatPool = members ? memberCombatPool : freePool;
     assert.equal(result(run(p, '[proc,macro_event_general_count]')), combatPool.length);
     const combatActual = combatPool.map((_, index) => draws({ '[proc,macro_event_set_random]': [index] }, () => result(run(p, '[proc,macro_event_set_random]'))));
-    assert.deepEqual(combatActual, combatPool, 'combat selector retains only the explicitly registered non-teleport actors');
+    assert.deepEqual(combatActual, combatPool, 'combat selector retains only registered non-teleport actors');
+    if (members) assert(combatPool.includes(15), 'Arnav remains eligible during members combat');
   } finally { Environment.NODE_MEMBERS = old; }
+});
+const arena1Starts = [
+  [15, O],
+  [16, [0, 3163, 4817]],
+  [17, [0, 2524, 4778]],
+  [18, [0, 2600, 4774]],
+  [19, [0, 1927, 5003]]
+];
+for (const [event, destination] of arena1Starts) check(`general scheduler dispatches arenas1 event ${event}`, () => {
+  const old = Environment.NODE_MEMBERS; Environment.NODE_MEMBERS = true;
+  try {
+    const p = player();
+    run(p, '[proc,macro_event_general_spawn]', [event]);
+    assert.equal(p.getVar(v('macro_event')), event);
+    assert.deepEqual(tile(p), destination);
+    assert.equal(p.getVar(v('macro_event_target_coord')), coord(destination));
+    run(p, '[proc,macro_event_cleanup]', [event, p.getVar(v('macro_event_uid'))]);
+    assert.equal(p.getVar(v('macro_event')), 0);
+  } finally { Environment.NODE_MEMBERS = old; }
+});
+for (const event of [16, 17, 18, 19]) for (const [label, members] of [['F2P', false], ['recent combat', true]]) {
+  check(`${label} refuses arenas1 event ${event} from scheduler and direct entry`, () => {
+    const old = Environment.NODE_MEMBERS; Environment.NODE_MEMBERS = members;
+    try {
+      const p = player();
+      if (label === 'recent combat') p.setVar(v('lastcombat'), World.currentTick);
+      const before = [...p.vars];
+      run(p, '[proc,macro_event_general_spawn]', [event]);
+      assert.deepEqual([...p.vars], before, 'scheduler guard rejects before admission writes state');
+      const destination = arena1Starts.find(([candidate]) => candidate === event)[1];
+      assert.equal(result(run(p, '[proc,macro_arena1_enter]', [event, coord(destination)])), 0);
+      assert.deepEqual([...p.vars], before, 'direct entry guard rejects before admission writes state');
+      assert.deepEqual(tile(p), O);
+    } finally { Environment.NODE_MEMBERS = old; }
+  });
+}
+check('members combat admits Arnav while excluding teleport arenas', () => {
+  const old = Environment.NODE_MEMBERS; Environment.NODE_MEMBERS = true;
+  try {
+    const p = player(); p.setVar(v('lastcombat'), World.currentTick);
+    const index = memberCombatPool.indexOf(15);
+    assert.notEqual(index, -1);
+    assert.equal(draws({ '[proc,macro_event_set_random]': [index] }, () => result(run(p, '[proc,macro_event_set_random]'))), 15);
+    run(p, '[proc,macro_event_general_spawn]', [15]);
+    assert.equal(p.getVar(v('macro_event')), 15);
+    run(p, '[proc,macro_event_cleanup]', [15, p.getVar(v('macro_event_uid'))]);
+  } finally { Environment.NODE_MEMBERS = old; }
+});
+for (const [label, mapX, mapZ] of [
+  ['Drill', 49, 75], ['Bob', 39, 74], ['Forester', 40, 74], ['Leo', 30, 78]
+]) for (let level = 0; level <= 3; level++) check(`${label} destination scene is protected on plane ${level}`, () => {
+  const at = [level, mapX * 64 + 32, mapZ * 64 + 32];
+  const p = player(at), before = [...p.vars];
+  assert.equal(result(run(p, '[proc,macro_event_allowed]')), 0);
+  run(p, '[proc,macro_event_general_spawn]', [2]);
+  assert.deepEqual([...p.vars], before);
+  assert.deepEqual(tile(p), at);
 });
 for (const enabled of [false, true]) check(`real AFK_EVENT opcode with scheduler flag ${enabled}`, () => {
   const old = Environment.NODE_RANDOM_EVENTS; Environment.NODE_RANDOM_EVENTS = enabled;

@@ -27,17 +27,22 @@ if (afk_event = ^true) {
 if (~macro_event_allowed = false) { 
     return;
 }
-if ($event >= ^macro_maze & $event <= ^macro_quiz) {
+if (($event >= ^macro_drill & $event <= ^macro_leo) |
+    ($event >= ^macro_maze & $event <= ^macro_quiz)) {
     if (~macro_arena_allowed = false) return;
 }
 // Registry dispatch precedes follower-square acquisition: arenas have no follower actor.
 switch_int ($event) {
+    case ^macro_arnav : { ~macro_arnav_start; return; }
+    case ^macro_drill : { ~macro_drill_start; return; }
+    case ^macro_bob : { ~macro_bob_start(fishing); return; } // UNKNOWN general-spawn skill default.
+    case ^macro_forester : { ~macro_forester_start; return; }
+    case ^macro_leo : { ~macro_leo_start; return; }
     case ^macro_maze : { ~macro_maze_start; return; }
     case ^macro_mime : { ~macro_mime_start; return; }
     case ^macro_pillory : { ~macro_pillory_start; return; }
     case ^macro_prison_pete : { ~macro_prison_pete_start; return; }
     case ^macro_quiz : { ~macro_quiz_start; return; }
-    // Integration seam: arenas1 registers IDs 15..19 here and in macro_registry_*.
 }
 if (~macro_event_npc($event) = null) return;
 def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
@@ -153,6 +158,11 @@ if (%macro_event = ^no_macro_event) {
 // Candlelight owns its church, taper and departure lifecycle (plan U21).
 // Do not treat its priest as a disposable non-restoring follower.
 if (%macro_event = ^macro_candlelight) {
+    if (~macro_candlelight_inside_church(coord) = true) {
+        ~macro_events_hide_tabs;
+    } else {
+        ~macro_event_cleanup(^macro_candlelight, %macro_event_uid);
+    }
     return;
 }
 if (~macro_event_arenas1_dispatch(0) = true) return;
@@ -179,6 +189,12 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
 }
 
 [proc,macro_event_logout]
+if (%macro_event = ^macro_candlelight) {
+    if (npc_finduid(%macro_event_uid) = true) {
+        if (%npc_macro_event_target = uid) npc_del;
+    }
+    %macro_event_uid = null;
+}
 if (%macro_event = ^macro_maze) ~macro_maze_logout;
 if (%macro_event = ^macro_mime) ~macro_mime_cleanup;
 if (%macro_event = ^macro_prison_pete) ~macro_prison_pete_sync;
@@ -356,6 +372,12 @@ if ($event = ^no_macro_event | %macro_event ! $event | %macro_event_uid ! $actor
 if ($event = ^macro_frogs) ~macro_frogs_cleanup;
 if ($event >= ^macro_maze & $event <= ^macro_quiz) ~macro_event_arenas2_cleanup($event);
 if (~macro_event_arenas1_dispatch(2) = true) ~initalltabs;
+if ($event = ^macro_candlelight) {
+    %macro_transmit = 0;
+    if_close;
+    cam_reset;
+    ~initalltabs;
+}
 if (npc_finduid($actor) = true) {
     if (%npc_macro_event_target = uid) {
         npc_del;
