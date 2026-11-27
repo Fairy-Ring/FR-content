@@ -4,7 +4,7 @@
 if (%hundred_main_quest_var ! ^rfd_frozen | %hundred_subquest_tally ! 8) return;
 %hundred_main_quest_var = ^rfd_finale_ready;
 %100culinaromancervisible = 0;
-mes("All eight guests are free. The Culinaromancer has escaped through the portal in Lumbridge Castle's kitchen.");
+mes("All eight guests are free. The Culinaromancer has escaped through the portal in Lumbridge Castle's banquet room.");
 
 [proc,rfd_finale_gate]()(boolean)
 if (%hundred_main_quest_var ! ^rfd_finale_ready | %hundred_subquest_tally ! 8) return(false);

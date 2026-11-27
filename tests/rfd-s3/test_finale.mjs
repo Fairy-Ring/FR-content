@@ -94,10 +94,24 @@ assert.equal(bit(p, 'hundred_main_quest_var'), 4, 'eighth rescue opens the origi
 const portal = nativeLoc('hundred_portal_multi');
 const portalType = types.LocType.get(portal.type);
 assert.equal(portalType.multiloc[4], id('LocType', 'hundred_portal_active'));
+const kitchenApproach = [portal.level, portal.x, portal.z - 1];
+position(p, kitchenApproach);
+assert.equal(p.inOperableDistance(portal), false, 'the original kitchen wall blocks rectangular operation from the native client endpoint');
+const banquetApproach = [portal.level, portal.x - 1, portal.z];
+const feastDoor = nativeLoc('hundred_lumbridge_door', rows => rows.find(row => row.x > 3000));
+for (const stage of [4, 5]) {
+  const visitor = player();
+  setBit(visitor, 'hundred_main_quest_var', stage);
+  operate(visitor, feastDoor, 1, { from: [0, 3207, 3216] });
+  assert.deepEqual(tile(visitor), banquetApproach, `stage${stage} native Open enters the original banquet room beside its portal`);
+  assert(visitor.inOperableDistance(portal), 'the banquet landing permits native portal operation');
+  operate(visitor, feastDoor, 1, { from: [feastDoor.level, feastDoor.x, feastDoor.z + 1] });
+  assert.deepEqual(tile(visitor), [0, 3207, 3216], `stage${stage} native Open also exits the original banquet room`);
+}
 const category = types.NpcType.getByName('hundred_minion1').category;
 function enemies(p) { return [...World.npcs].filter(n => n.isActive && types.NpcType.get(n.type).category === category && n.getVar(nv('npc_attacking_uid')) === p.uid); }
 function enter(p) {
-  operate(p, portal);
+  operate(p, portal, 1, { from: banquetApproach });
   World.processNpcEventQueue();
   assert(variable(p, 'rfd_finale_uid') > 0);
   assert.equal(result(p, '[proc,rfd_finale_inside]'), 1);

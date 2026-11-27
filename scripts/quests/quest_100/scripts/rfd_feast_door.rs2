@@ -17,6 +17,12 @@ if (coordx(coord) < 2000) {
     p_telejump(^rfd_kitchen_landing);
     return;
 }
+if (%hundred_main_quest_var >= ^rfd_finale_ready) {
+    // UNKNOWN engineering crossing into the original room containing the portal.
+    if (coordz(coord) > coordz(loc_coord)) p_telejump(^rfd_kitchen_landing);
+    else p_telejump(^rfd_finale_banquet_landing);
+    return;
+}
 if (%hundred_main_quest_var = ^rfd_feast_ready) {
     %100dwarfvisible = 1;
     %100goblinsvisible = 1;

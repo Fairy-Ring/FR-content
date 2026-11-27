@@ -6,6 +6,7 @@
 // VERIFIED wording: period RuneHQ and later Old School say above/over level 50.
 ^rfd_finale_lamp_level = 51
 // UNKNOWN engineering copy/landing geometry, derived from the original arena map.
+^rfd_finale_banquet_landing = 0_50_50_8_18
 ^rfd_finale_source = 0_29_83_32_32
 ^rfd_finale_copy_levels = 3
 ^rfd_finale_copy_zones = 4
