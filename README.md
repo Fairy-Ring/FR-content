@@ -1,139 +1,80 @@
 # Fairy Ring — Content
 
-**Period game content** (RuneScript configs, scripts, maps, interfaces) for **RuneScape revision 377** (~2 May 2006).
+**Period game content for RuneScape revision 377 (~2 May 2006).** This tree holds the RuneScript configs, scripts, maps, and assets. The engine packs it into the revision-377 client cache.
 
 | | |
 |--|--|
-| **Public brand** | **Fairy Ring** (content tree) |
+| **Public beta** | [www.fairyring.rs](https://www.fairyring.rs/) |
+| **Progress & gaps** | [Progress Chronicle](https://fairy-ring.github.io/) · [Open Accuracy Gaps](https://fairy-ring.github.io/gaps.html) |
 | **Branch** | `rs2-r377` |
-| **Upstream lineage** | [LostCityRS/Content](https://github.com/LostCityRS/Content) **`377-wip`** @ `7d7719693100cc45ff187c12139e5b63b3ab21df` |
-| **Provenance** | [PROVENANCE.md](PROVENANCE.md) — full SHA pin + history note |
-| **Companion workspace** | [Fairy Ring workspace](https://github.com/Fairy-Ring/fairy-ring-workspace) (docs, harness, process) |
+| **Upstream** | [LostCityRS/Content](https://github.com/LostCityRS/Content) |
+| **Engine pin** | [`.github/fr-engine-ref`](.github/fr-engine-ref) |
+| **Provenance** | [PROVENANCE.md](PROVENANCE.md) |
+| **Notices** | [NOTICE.md](NOTICE.md) |
+| **Contributing** | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| **Agent brief** | [AGENTS.md](AGENTS.md) |
 
 ## Derived from Lost City — not Lost City
 
-This repository is a **derivation** of open **Lost City / LostCityRS Content** work and related community ports. We build on those trees under their licenses, with our own residual bar and process.
+Fairy Ring is a fork of [LostCityRS/Content](https://github.com/LostCityRS/Content). It keeps the upstream licenses and attribution described in [NOTICE.md](NOTICE.md).
 
-**Derivation does not mean official.** This is **not** official Lost City / LostCityRS and is **not** endorsed by Jagex Ltd. rs2b0t/rs2b2t patterns may be used as tools; this fork is not their product layer.
+This repository is **not** official Lost City or LostCityRS content, and it is **not** endorsed by Jagex Ltd. Do not present it as official Lost City content.
 
-Do **not** present this repo as “Lost City,” “LC Content,” or official LostCityRS.  
-See [NOTICE.md](NOTICE.md) and the workspace Decision 009 (branding & attribution).
+## AI-assisted development
 
-## AI use (explicit)
+We use AI tools and coding agents openly, alongside human review, compiled tests, and live verification. AI does not lower the authenticity bar:
 
-Development of this fork **uses AI tools and coding agents** (research, thrash, draft patches, residual smokes). Humans own product judgment, authenticity claims, and what ships. Soft thrash and prep cheats live in the **workspace harness**, not as authenticity claims here.
+- Period-accuracy labels (`VERIFIED`, `CANDIDATE`, `UNKNOWN`, `DEVIATION`) mark how each fact is sourced. See [AGENTS.md](AGENTS.md).
+- Humans review and ship every change.
 
-## What this tree is
+## Companion repositories
 
-| Included | Not included |
-|----------|----------------|
-| Configs, RuneScript (`.rs2`), maps/interfaces for the 377 era | Full engine runtime (`Engine-TS` / this project’s engine fork) |
-| Content-side residual fixes for rs2-r377 mid-gates | Browser client source (see client-ts fork) |
-| MIT-licensed **source layout** as upstream | A license to Jagex’s game **assets** (see below) |
+| Repository | Role |
+|------------|------|
+| [FR-engine](https://github.com/Fairy-Ring/FR-engine) | Server, protocol, and pack tool. Pair it with this tree at the commit in `.github/fr-engine-ref`. |
+| [FR-content](https://github.com/Fairy-Ring/FR-content) | This repository: period game content. |
+| [FR-client-ts](https://github.com/Fairy-Ring/FR-client-ts) | Browser client, a TypeScript port of Client-Java 377. |
+| [fairy-ring-workspace](https://github.com/Fairy-Ring/fairy-ring-workspace) | Project overview, documentation index, and public status. |
+| [Fairy-Ring.github.io](https://github.com/Fairy-Ring/Fairy-Ring.github.io) | Public Progress Chronicle and open accuracy-gap tracker. |
 
-Jagex assets that appear in content distributions remain **Jagex IP**. They are **not** covered by MIT. Upstream Lost City includes them for historical preservation; redistributors must follow their own counsel and upstream notices.
+## Getting started
 
-## Companion repos
-
-Public under **Fairy Ring** (separate remotes; **not** a content-complete claim):
-
-| Repo | Role |
-|------|------|
-| [fairy-ring-workspace](https://github.com/Fairy-Ring/fairy-ring-workspace) | Process, harness toys, residual bar docs |
-| [FR-engine](https://github.com/Fairy-Ring/FR-engine) | Server / protocol / pack tools |
-| [FR-client-ts](https://github.com/Fairy-Ring/FR-client-ts) | Pure 1:1 Java 377 → TypeScript browser client |
-
-## Run
-
-You need a matching **engine** (and usually a client). Prefer the workspace runbooks when using the full rs2-r377 stack:
-
-```text
-workspace docs/runbooks/  +  vendor/engine  +  this content tree
-```
-
-Bare Lost City-style layout (for reference):
+Content runs only with the engine commit it is pinned to. Clone the two repositories side by side in one parent folder, then check out the pinned engine commit:
 
 ```sh
-# parent folder
-git clone <this-fork> -b rs2-r377 content
-git clone <engine-fork> -b rs2-r377 engine
-cd engine && npm start   # packs content, serves world
+git clone -b rs2-r377 https://github.com/Fairy-Ring/FR-content.git content
+git clone -b rs2-r377 https://github.com/Fairy-Ring/FR-engine.git engine
+git -C engine checkout "$(tr -d '\r\n' < content/.github/fr-engine-ref)"
 ```
 
-Isolation ports and pack policy for the experiment live in the **workspace** (not assumed identical to Lost City defaults).
+This tree has no build tooling of its own. The engine reads it, so run the build from the engine checkout.
 
-### Fletching choice regression
-
-Knife-on-logs uses the revision-377 `skillmulti2` and `skillmulti3` interfaces.
-They offer Make 1, Make 5, Make 10 and Make X. They do not offer Make All.
-The quantity UI is a period-cache-backed **CANDIDATE** for fletching, not a dated server transcript.
-Normal logs offer shafts, shortbow and longbow. Other supported logs offer the two bows.
-Glass, dragonhide and pre-potlid pottery choices now use the same quantity interface.
-The obsolete single-item wrappers are removed, not hidden from the client menu.
-Jagex's [27 September 2004 news](https://secure.runescape.com/m=news/skills-duels-and-the-kalphite)
-verifies Make 5/10/X for glass, leather crafting and pottery wheels on that date.
-May 2006 continuity and the dragonhide-specific binding remain **CANDIDATE**.
-Original crafting batch timing remains **UNKNOWN**. Queue values follow Lost City,
-not a measured period-server timing claim. Existing recipes and XP are retained.
-Log cuts use an interruptible weak queue with a uniform three-tick repeat interval.
-The first cut runs in the selection tick. Its original 377 delay remains unknown.
-The repeat interval adapts Lost City 289's queue pattern and remains **CANDIDATE**.
-
-After building the matching isolated engine, run the packed-script regressions:
+## Running checks
 
 ```sh
-bash tests/fletching-choice/runtime.sh /absolute/path/to/engine
+cd engine
+npm ci
+npx tsx tools/rs2check.ts --content ../content
+npm run build
+cd ../content
+node tests/check-varp-transmit.mjs
+node tests/test_chathead_animations.mjs
 ```
 
-The suite runs the real script interpreter and input handlers without starting a world server.
-Cadence scenarios process queues once per world tick, after the selection input.
-They check the first repeat and every later repeat for all thirteen products.
-Research labels and the headed live-check list are in evidence request `FLETCH-CHOICE-1106`.
-The suite also checks menu reachability using packed component geometry and
-Java 377's hit-test rules. It exercises the three crafting callers' quantities,
-exhaustion, refusals and interruption. It tests both karambwan choices through
-the real cooking script, plus the pre-teaching default, consumption and recipe XP.
-It also checks every cooking recipe's forward/reverse row lookup and unchanged
-raw-oomlie refusal on ranges and fires.
-Research labels and the follow-up LIVE CHECK list are in evidence request `PRODUCT-FOLLOWUP-1106`.
+- `npx tsx tools/rs2check.ts --content ../content` checks all RuneScript files without writing packs.
+- `npm run build` in the engine reads this tree through its default `BUILD_SRC_DIR` (`../content`).
+- CI for this repository is [`.github/workflows/content.yml`](.github/workflows/content.yml).
 
-### Multinpc trigger regression
+## Accuracy & completeness
 
-NPC interaction triggers bind to the player's resolved visible form, not the placed multinpc root.
-Shared handlers retain one dialogue body. Sheep Herder wrappers pass the canonical sheep identity
-to the existing data-table lookups because the engine's `npc_type` returns the visible child.
-Dialogue, quest stages and rewards are unchanged.
+We do **not** claim this tree is authentic, original, or complete. Work continues under an accuracy bar, and people and agents make mistakes.
 
-After building the matching isolated engine, run:
+- Read [AGENTS.md](AGENTS.md) for the labels and the working rules.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution templates and review expectations.
+- Browse [open accuracy gaps](https://fairy-ring.github.io/gaps.html), use `::bug <message>` in the public beta, or open an issue for period-source questions and 377 cache or interface observations.
 
-```sh
-bash tests/multinpc-triggers/runtime.sh /absolute/path/to/engine
-```
+## License & IP
 
-The suite checks every non-null form slot of the thirteen repaired roots through the real
-player trigger lookup. It executes Juliet's stage-10 dialogue through stage 20 and the message reward.
-It also executes prodding, cattleprod advice and poisoning for all four herder sheep forms.
-Dyed mourning forms have neither a Prod menu nor Sheep Herder bindings.
-Negative lookup cases cover both items at unstarted, active and complete Sheep Herder stages.
-Removing their unsupported item-use bindings is CANDIDATE, not verified historical item-use behavior.
-The source decisions and unexecuted LIVE CHECK list are in evidence request `MULTINPC-TRIGGERS-1106`.
-
-
-
-## Completeness disclaimer
-
-We do **not** claim this tree **is** authentic, original, or complete. Work is ongoing under an accuracy bar; humans and agents make mistakes. **Good-faith contributions from all** are welcome and will not be dismissed without clear rationale (see companion workspace `CONTRIBUTING.md`).
-
-## License
-
-- **Source layout / scripts in this repo:** [MIT](LICENSE) (as upstream).  
-- **Do not relicense** Lost City–originated code as original work of this project.  
-- **Jagex assets:** not MIT; see [NOTICE.md](NOTICE.md).
-
-## Upstream
-
-- Lost City Content: https://github.com/LostCityRS/Content  
-- Lost City forum / ethos (upstream): https://lostcity.rs/  
-
-**Never push experiment work to `LostCityRS/*` without explicit permission.**  
-Push remote (operator): `private` → [Fairy-Ring/FR-content](https://github.com/Fairy-Ring/FR-content).
+- **Scripts, tests, and other source authored here:** [MIT](LICENSE). See the `LICENSE` file for the full text.
+- **Lost City–originated material:** keeps its upstream attribution. Do not relicense it as original work of this project. See [NOTICE.md](NOTICE.md).
+- **Jagex material:** game assets in this tree are derived from the period client. They are Jagex's, are not covered by MIT, and are described in [NOTICE.md](NOTICE.md). RuneScape is a trademark of Jagex Ltd.
