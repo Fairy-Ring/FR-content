@@ -6,6 +6,7 @@ const moveHandler = new ((await engineModule('network/game/client/handler/MoveCl
 const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
 const closeHandler = new ((await engineModule('network/game/client/handler/CloseModalHandler.ts')).default)();
 const { ModalState } = await engineModule('engine/entity/ModalState.ts');
+const TutOpen = (await engineModule('network/game/server/model/TutOpen.ts')).default;
 
 const event = 24;
 const questionProc = '[proc,macro_quiz_choose_question]';
@@ -77,10 +78,18 @@ check('Quiz wrong answers preserve the complete question and a correct answer ad
     run(p, '[proc,macro_event_general_spawn]', [event]);
     const packed = p.getVar(v('xplamp'));
     const models = renderedModels(p);
+    const wrongPacketStart = p.packets.length;
     answer(p, 0);
     assert.equal(p.getVar(v('xplamp')), packed);
     assert.equal(p.getVar(v('macro_transmit')), 0);
     assert.deepEqual(renderedModels(p), models);
+    const retryPackets = p.packets.slice(wrongPacketStart);
+    const textIndex = retryPackets.findIndex(packet => packet.constructor.name === 'IfSetText'
+      && packet.component === id('Component', 'pick_the_odd_one_out:com_8') && packet.text === 'Wrong. Try again.');
+    const repaintIndex = retryPackets.findIndex(packet => packet instanceof TutOpen
+      && packet.component === id('Component', 'pick_the_odd_one_out'));
+    assert(textIndex >= 0, 'the wrong answer updates the native retry text');
+    assert(repaintIndex > textIndex, 'the same sticky root is reopened after its text update to repaint the chatbox');
     answer(p, 2);
     assert.equal(p.getVar(v('macro_transmit')), 1);
     assert.deepEqual(renderedModels(p), expectedModels(second));

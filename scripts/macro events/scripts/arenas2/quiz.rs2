@@ -81,6 +81,7 @@ if_sethide(pick_the_odd_one_out:com_6, ^false);
 if_sethide(pick_the_odd_one_out:com_7, ^false);
 // UNKNOWN functional prompt; the native interface supplies the screen layout.
 if_settext(pick_the_odd_one_out:com_8, "Pick the odd one out.");
+// Sticky chat prevents viewport-click stranding; Java 377 keeps these framed models static.
 tut_open(pick_the_odd_one_out);
 
 [proc,macro_quiz_show_prize]
@@ -104,6 +105,7 @@ if (%macro_transmit >= ^macro_quiz_round_count) return;
 if ($choice ! calc(%xplamp % ^macro_quiz_question_stride)) {
     // UNKNOWN functional retry prompt; preserve the complete question identity.
     if_settext(pick_the_odd_one_out:com_8, "Wrong. Try again.");
+    tut_open(pick_the_odd_one_out);
     return;
 }
 %macro_transmit = add(%macro_transmit, 1);

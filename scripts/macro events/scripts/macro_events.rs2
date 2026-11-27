@@ -354,7 +354,8 @@ while ($i < 50) {
 return(null);
 
 [proc,macro_events_hide_tabs]
-// Native slots 8/9/10/11/13 retain friends, ignore, Logout, Options and music.
+// Native slots 8/9/10/13 retain friends, ignore, Logout and music.
+// UNKNOWN engineering usability choice: retain Options in native slot 11.
 if_settab(null, 0);
 if_settab(null, 1);
 if_settab(null, 2);
