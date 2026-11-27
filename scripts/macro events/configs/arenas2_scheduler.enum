@@ -1,5 +1,5 @@
 // UNKNOWN equal weights within each eligible world pool, not recovered historical odds.
-// Arena1 IDs 15..19 are members-only; Arnav remains eligible during combat.
+// ^macro_arnav is VERIFIED members-only (period guide); IDs 16..19 are UNKNOWN members-only here due to the engine free-map limit (free2play.csv).
 // Lost and Found belongs to teleport routing; Pillory belongs to Thieving only.
 [macro_registry_members]
 inputtype=int

@@ -38,8 +38,8 @@ if (p_finduid(uid) = true) {
     if (~pre_tele_checks(coord) = false) {
         return;
     }
-if (~macro_arena1_teleport($spell_data) = true) return;
-// macro_arena1_teleport consumes afk_event for ordinary teleports.
+    if (~macro_arena1_teleport($spell_data) = true) return;
+    // macro_arena1_teleport consumes afk_event for ordinary teleports.
     // delete runes and give xp
     ~delete_spell_runes($spell_data);
     ~give_spell_xp($spell_data);

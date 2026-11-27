@@ -375,6 +375,34 @@ function completeCandlelight(p) {
   } finally { JavaRandom.nextDouble = nextRandom; }
 }
 
+check('Candlelight zero HP during spawn delay cleans up the priest and restores admission', () => {
+  const p = player();
+  const state = ScriptRunner.init(packed('[proc,macro_event_general_spawn]'), p, null, [5]);
+  p.runScript(state, false);
+  assert.equal(state.execution, ScriptState.SUSPENDED, 'the real spawn is paused at p_delay(2)');
+  assert.equal(p.delayed, true);
+  assert.equal(p.getVar(v('macro_event')), 5);
+  assert.deepEqual([p.level, p.x, p.z], O, 'the player remains at the origin during p_delay(2)');
+  const priestUid = p.getVar(v('macro_event_uid'));
+  const priest = World.getNpcByUid(priestUid);
+  assert(priest, 'the priest exists during the spawn delay');
+  assert.equal(priest.type, requiredId(types.NpcType, 'macro_priest'));
+  assert.equal(priest.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), p.uid | 0);
+
+  p.levels[PlayerStat.HITPOINTS] = 0;
+  p.delayed = false;
+  state.execution = ScriptState.RUNNING;
+  p.runScript(state, true, true);
+
+  assert.equal(state.execution, ScriptState.FINISHED);
+  assert.deepEqual([p.level, p.x, p.z], O, 'zero HP prevents teleporting to the church');
+  assert.equal(World.getNpcByUid(priestUid), null, 'cleanup deletes the priest');
+  assert.equal(p.getVar(v('macro_event')), 0, 'cleanup clears Candlelight');
+  assert.equal(p.getVar(v('macro_event_uid')), -1);
+  const admission = run(p, '[proc,macro_event_allowed]');
+  assert.equal(admission.intStack[admission.isp - 1], 1, 'random-event admission is restored');
+});
+
 check('Candlelight relog preserves identity, hides tabs and deletes the owned taper', () => {
   const p = player();
   run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });

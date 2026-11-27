@@ -20,9 +20,16 @@ if (p_finduid(uid) = true) {
     npc_say("I'm sorry to drag you away from your tasks, but I need a little help with something.");
     %macro_event_target_coord = coord;
     ~macro_candlelight_setup;
-p_delay(2);
-if (%macro_event ! ^macro_candlelight | stat(hitpoints) = 0) return;
-p_teleport(0_30_78_52_11);
+    p_delay(2);
+    if (%macro_event ! ^macro_candlelight) {
+        if (%npc_macro_event_target = uid) npc_del;
+        return;
+    }
+    if (stat(hitpoints) = 0) {
+        ~macro_event_cleanup(^macro_candlelight, %macro_event_uid);
+        return;
+    }
+    p_teleport(0_30_78_52_11);
     %macro_transmit = 0;
     // TODO: Does it "poof" with macro event disappear or not?
     npc_del;
