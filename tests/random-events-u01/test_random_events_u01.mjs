@@ -12,6 +12,7 @@ const { PlayerStat } = await import(pathToFileURL(`${engine}/src/engine/entity/P
 const { default: JavaRandom } = await import(pathToFileURL(`${engine}/src/util/JavaRandom.ts`).href);
 const { default: Environment } = await import(pathToFileURL(`${engine}/src/util/Environment.ts`).href);
 const inv = requiredId(types.InvType, 'inv');
+const bank = requiredId(types.InvType, 'bank');
 const v = name => requiredId(types.VarPlayerType, name);
 const coord = (level, x, z) => (level << 28) | (x << 14) | z;
 const O = [0, 3222, 3218];
@@ -357,30 +358,152 @@ check('configured follower logout restoration preserves origin and excludes anot
   assert.deepEqual(snapshot(p), before);
   cleanup(p); World.removeNpc(old, -1);
 });
-check('Candlelight relog preserves identity and departure and Pete can still complete', () => {
+function completeCandlelight(p) {
+  // Labelled packed-only progress setup reaches the real Pete completion branch.
+  for (let i = 1; i <= 11; i++) p.setVarBit(requiredId(types.VarBitType, `macro_candlelight_${i}`), 1);
+  p.setVar(v('macro_transmit'), 1);
+  const nextRandom = JavaRandom.nextDouble;
+  JavaRandom.nextDouble = () => 0.5;
+  try {
+    const pete = [...World.npcs].find(n => n.isActive && n.type === requiredId(types.NpcType, 'macro_pious_pete'));
+    assert(pete, 'Pete is a real static NPC');
+    const completion = ScriptRunner.init(packed('[opnpc1,macro_pious_pete]'), p, pete);
+    p.executeScript(completion, true);
+    assert.equal(completion.execution, ScriptState.PAUSEBUTTON);
+    assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), p));
+    assert.equal(completion.execution, ScriptState.FINISHED);
+  } finally { JavaRandom.nextDouble = nextRandom; }
+}
+
+check('Candlelight zero HP during spawn delay cleans up the priest and restores admission', () => {
+  const p = player();
+  const state = ScriptRunner.init(packed('[proc,macro_event_general_spawn]'), p, null, [5]);
+  p.runScript(state, false);
+  assert.equal(state.execution, ScriptState.SUSPENDED, 'the real spawn is paused at p_delay(2)');
+  assert.equal(p.delayed, true);
+  assert.equal(p.getVar(v('macro_event')), 5);
+  assert.deepEqual([p.level, p.x, p.z], O, 'the player remains at the origin during p_delay(2)');
+  const priestUid = p.getVar(v('macro_event_uid'));
+  const priest = World.getNpcByUid(priestUid);
+  assert(priest, 'the priest exists during the spawn delay');
+  assert.equal(priest.type, requiredId(types.NpcType, 'macro_priest'));
+  assert.equal(priest.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), p.uid | 0);
+
+  p.levels[PlayerStat.HITPOINTS] = 0;
+  p.delayed = false;
+  state.execution = ScriptState.RUNNING;
+  p.runScript(state, true, true);
+
+  assert.equal(state.execution, ScriptState.FINISHED);
+  assert.deepEqual([p.level, p.x, p.z], O, 'zero HP prevents teleporting to the church');
+  assert.equal(World.getNpcByUid(priestUid), null, 'cleanup deletes the priest');
+  assert.equal(p.getVar(v('macro_event')), 0, 'cleanup clears Candlelight');
+  assert.equal(p.getVar(v('macro_event_uid')), -1);
+  const admission = run(p, '[proc,macro_event_allowed]');
+  assert.equal(admission.intStack[admission.isp - 1], 1, 'random-event admission is restored');
+});
+
+check('Candlelight relog preserves identity, hides tabs and deletes the owned taper', () => {
   const p = player();
   run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });
   assert.equal(p.getVar(v('macro_event')), 5);
   assert.equal(p.getVar(v('macro_event_target_coord')), coord(...O));
   run(p, '[proc,macro_event_logout]');
-  const reconnected = player([p.level, p.x, p.z]);
+  let reconnected = player([p.level, p.x, p.z]);
   for (let id = 0; id < p.vars.length; id++) if (types.VarPlayerType.get(id).scope === types.VarPlayerType.SCOPE_PERM) reconnected.vars[id] = p.vars[id];
   run(reconnected, '[queue,macro_event_login]');
   assert.equal(reconnected.getVar(v('macro_event')), 5);
   assert.equal(reconnected.getVar(v('macro_event_target_coord')), coord(...O));
-  // Labelled packed-only progress setup reaches the unchanged completion branch.
-  // Live N1 must use the real taper controls or retain its exact play blocker.
-  for (let i = 1; i <= 11; i++) reconnected.setVarBit(requiredId(types.VarBitType, `macro_candlelight_${i}`), 1);
-  reconnected.setVar(v('macro_transmit'), 1);
-  const pete = [...World.npcs].find(n => n.isActive && n.type === requiredId(types.NpcType, 'macro_pious_pete'));
-  assert(pete, 'Pete is a real static NPC');
-  const completion = ScriptRunner.init(packed('[opnpc1,macro_pious_pete]'), reconnected, pete);
-  reconnected.executeScript(completion, true);
-  assert.equal(completion.execution, ScriptState.PAUSEBUTTON);
-  assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), reconnected));
-  assert.equal(completion.execution, ScriptState.FINISHED);
+  for (const tab of [0, 1, 2, 3, 4, 5, 6, 11, 12]) assert.equal(reconnected.tabs[tab], -1, 'relogin inside church hides the Magic tab');
+  const start = run(reconnected, '[proc,macro_candlelight_start]');
+  if (start.execution === ScriptState.PAUSEBUTTON) assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), reconnected));
+  assert.equal(start.execution, ScriptState.FINISHED);
+  const taperUid = reconnected.getVar(v('macro_event_uid'));
+  const taper = World.getNpcByUid(taperUid);
+  assert(taper, 'Candlelight start creates the real owned taper');
+  assert.equal(taper.type, requiredId(types.NpcType, 'macro_candle_taper'));
+  assert.equal(taper.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), reconnected.uid | 0);
+  run(reconnected, '[proc,macro_event_logout]');
+  assert.equal(World.getNpcByUid(taperUid), null, 'logout deletes the exact taper');
+  assert.equal(reconnected.getVar(v('macro_event_uid')), -1);
+  const loggedOut = reconnected;
+  reconnected = player([loggedOut.level, loggedOut.x, loggedOut.z]);
+  for (let id = 0; id < loggedOut.vars.length; id++) if (types.VarPlayerType.get(id).scope === types.VarPlayerType.SCOPE_PERM) reconnected.vars[id] = loggedOut.vars[id];
+  run(reconnected, '[queue,macro_event_login]');
+  assert.equal(reconnected.getVar(v('macro_event')), 5);
+  assert.equal(reconnected.getVar(v('macro_event_target_coord')), coord(...O));
+  for (const tab of [0, 1, 2, 3, 4, 5, 6, 11, 12]) assert.equal(reconnected.tabs[tab], -1);
+  completeCandlelight(reconnected);
   assert.deepEqual([reconnected.level, reconnected.x, reconnected.z], O);
-  assert(snapshot(reconnected).inventory.some(Boolean), 'the unchanged Pete branch grants its existing reward');
+  assert.equal(reconnected.invTotal(inv, requiredId(types.ObjType, 'uncut_sapphire')), 1);
+  cleared(reconnected);
+  cleanup(p); cleanup(loggedOut);
+});
+check('Candlelight relog outside the church cleans the stranded event', () => {
+  const p = player();
+  run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });
+  const outside = [0, 30 * 64 + 7, 78 * 64 + 11]; // Leo's west-side graveyard tile, outside the church.
+  [p.level, p.x, p.z] = outside;
+  run(p, '[proc,macro_event_logout]');
+  const reconnected = player(outside);
+  for (let id = 0; id < p.vars.length; id++) if (types.VarPlayerType.get(id).scope === types.VarPlayerType.SCOPE_PERM) reconnected.vars[id] = p.vars[id];
+  run(reconnected, '[queue,macro_event_login]');
+  cleared(reconnected);
+  assert.deepEqual([reconnected.level, reconnected.x, reconnected.z], outside);
+  cleanup(p);
+});
+check('Candlelight map-zone exit clears progress and encounter state', () => {
+  const p = player([0, 1972, 5003]);
+  p.setVar(v('macro_event'), 5);
+  p.setVar(v('macro_event_uid'), -1);
+  p.setVar(v('macro_event_target_coord'), coord(...O));
+  p.setVar(v('macro_event_origin_coord'), coord(...O));
+  p.setVar(v('macro_transmit'), 13);
+  run(p, '[mapzoneexit,0_30_78]');
+  cleared(p);
+});
+for (const [label, missing] of [['null', -1], ['0_0_0_0_0', 0]]) check(`Candlelight ${label} departure recovers to Lumbridge`, () => {
+  const p = player();
+  run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });
+  p.setVar(v('macro_event_target_coord'), missing);
+  completeCandlelight(p);
+  assert.deepEqual([p.level, p.x, p.z], [0, 50 * 64 + 22, 50 * 64 + 18]);
+  cleared(p);
+});
+check('Candlelight full inventory stores its reward in the bank', () => {
+  const p = player();
+  run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });
+  const dagger = requiredId(types.ObjType, 'bronze_dagger');
+  const reward = requiredId(types.ObjType, 'uncut_sapphire');
+  for (let i = 0; i < 28; i++) p.invAdd(inv, dagger, 1);
+  const inventoryBefore = snapshot(p).inventory;
+  assert.equal(inventoryBefore.filter(Boolean).length, 28);
+  completeCandlelight(p);
+  assert.deepEqual(snapshot(p).inventory, inventoryBefore);
+  assert.equal(p.invTotal(bank, reward), 1);
+  assert.deepEqual([p.level, p.x, p.z], O);
+  cleared(p);
+});
+check('Candlelight full inventory and bank drops its reward at the return tile', () => {
+  const p = player();
+  run(p, '[proc,macro_event_general_spawn]', [5], { protect: false });
+  const dagger = requiredId(types.ObjType, 'bronze_dagger');
+  const reward = requiredId(types.ObjType, 'uncut_sapphire');
+  for (let i = 0; i < 28; i++) p.invAdd(inv, dagger, 1);
+  const bankSize = types.InvType.get(bank).size;
+  const fillers = types.ObjType.configs.filter(item => item?.tradeable && item.dummyitem === 0
+    && item.certtemplate === -1 && item.id !== reward).slice(0, bankSize);
+  assert.equal(fillers.length, bankSize, 'packed ordinary item types can fill the native bank');
+  for (const [slot, item] of fillers.entries()) p.invSet(bank, item.id, 1, slot);
+  const inventoryBefore = snapshot(p).inventory;
+  completeCandlelight(p);
+  assert.deepEqual(snapshot(p).inventory, inventoryBefore);
+  assert.equal(p.invTotal(bank, reward), 0);
+  assert.deepEqual([p.level, p.x, p.z], O);
+  const ground = World.getObj(O[1], O[2], O[0], reward, p.hash64);
+  assert(ground, 'the unbankable reward is visible at the return tile');
+  assert.equal(ground.count, 1);
+  cleared(p);
 });
 check('old Genie failure queue cannot clear or move a newer Lost and Found task', () => {
   const p = player(); run(p, '[proc,initalltabs]'); const n = genie(p);

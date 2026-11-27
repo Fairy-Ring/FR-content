@@ -3,6 +3,9 @@
 if (p_finduid(uid) = false) return(false);
 if (~macro_event_allowed = false) return(false);
 if ($event < ^macro_arnav | $event > ^macro_leo) return(false);
+if ($event >= ^macro_drill & $event <= ^macro_leo) {
+    if (~macro_arena_allowed = false) return(false);
+}
 if_close;
 %macro_event_origin_coord = coord;
 %macro_event_target_coord = $destination;

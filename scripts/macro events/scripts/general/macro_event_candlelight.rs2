@@ -4,6 +4,13 @@
 // https://2007rshelp.com/misc.php?id=11
 // https://runescape.wiki/w/Background
 
+// UNKNOWN footprint: the overlay-5 Candlelight church floor on map 30_78.
+[proc,macro_candlelight_inside_church](coord $where)(boolean)
+if (coordy($where) ! 0) return(false);
+if (coordx($where) < 1966 | coordx($where) > 1977) return(false);
+if (coordz($where) < 4996 | coordz($where) > 5008) return(false);
+return(true);
+
 [proc,macro_candlelight_spawn]
 if (p_finduid(uid) = true) {
     %npc_macro_event_target = uid;
@@ -14,6 +21,14 @@ if (p_finduid(uid) = true) {
     %macro_event_target_coord = coord;
     ~macro_candlelight_setup;
     p_delay(2);
+    if (%macro_event ! ^macro_candlelight) {
+        if (%npc_macro_event_target = uid) npc_del;
+        return;
+    }
+    if (stat(hitpoints) = 0) {
+        ~macro_event_cleanup(^macro_candlelight, %macro_event_uid);
+        return;
+    }
     p_teleport(0_30_78_52_11);
     %macro_transmit = 0;
     // TODO: Does it "poof" with macro event disappear or not?
@@ -51,8 +66,14 @@ if(%macro_transmit = 0) {
         ~macro_candlelight_start;
     } else {
         ~chatnpc("<p,happy>Thank you for your help! I'll send you back now.");
-        p_teleport(%macro_event_target_coord);
-        inv_add(inv, ~macro_candlelight_reward);
+        def_coord $return = %macro_event_target_coord;
+        if ($return = null | $return = 0_0_0_0_0) {
+            // UNKNOWN recovery destination when the saved departure is unavailable.
+            $return = 0_50_50_22_18;
+        }
+        ~macro_event_cleanup(^macro_candlelight, %macro_event_uid);
+        p_teleport($return);
+        ~macro_arena1_give(~macro_candlelight_reward);
     }
 }
 
@@ -87,6 +108,7 @@ if(~macro_candlelight_finished_check = true) {
 p_teleport(0_30_78_51_10);
 if_openmain(macro_candlelight_lighter);
 npc_add(movecoord(coord, -2, 0, 0), macro_candle_taper, 500);
+%npc_macro_event_target = uid;
 %macro_event_uid = npc_uid;
 cam_moveto(movecoord(coord, -1, 0, 0), 335, 254, 254);
 cam_lookat(movecoord(coord, -2, 0, 0), 315, 254, 254);

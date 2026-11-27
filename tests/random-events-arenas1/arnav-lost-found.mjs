@@ -223,4 +223,35 @@ export default function register() {
     assert.equal(count(p, 'bronze_dagger'), 28);
     assert.deepEqual(tile(p), origin);
   });
+  check('Arnav frees its actor and event before the native NPC despawn', () => {
+    const p = player(); run(p, '[proc,macro_arnav_start]');
+    const actorUid = p.getVar(v('macro_event_uid'));
+    const actor = World.getNpcByUid(actorUid);
+    assert(actor, 'the owned Arnav actor exists');
+    const npcInt = id(types.VarNpcType, 'npc_int');
+    assert.equal(actor.getVar(npcInt), 0, 'the Arnav lifetime counter starts at zero');
+    actor.setVar(npcInt, 899); // Packed timer boundary fixture, one tick before expiry.
+    run(p, '[ai_timer,macro_combilock_pirate]', [], { npc: actor });
+    assert.equal(p.getVar(v('macro_event')), 0);
+    assert.equal(p.getVar(v('macro_event_uid')), -1);
+    assert.equal(World.getNpcByUid(actorUid), null);
+  });
+  check('Arnav queues exact owner cleanup when a modal blocks the final timeout', () => {
+    const p = player(); run(p, '[proc,macro_arnav_start]');
+    const actorUid = p.getVar(v('macro_event_uid'));
+    const actor = World.getNpcByUid(actorUid);
+    assert(actor, 'the owned Arnav actor exists');
+    p.openMainModal(id(types.Component, 'welcome_screen'));
+    actor.setVar(id(types.VarNpcType, 'npc_int'), 989); // Packed timer boundary fixture, one tick before forced cleanup.
+    run(p, '[ai_timer,macro_combilock_pirate]', [], { npc: actor, protect: false });
+    assert.equal(World.getNpcByUid(actorUid), null, 'the actor is deleted before its native lifetime ends');
+    const queued = p.queue.all().find(q => q.script.name === '[queue,macro_overworld_death_cleanup]');
+    assert(queued, 'the exact owner cleanup waits in the priority queue');
+    assert.deepEqual(queued.args, [15, actorUid]);
+    assert.equal(p.getVar(v('macro_event')), 15, 'modal state delays only the player-side token cleanup');
+    p.closeModal();
+    p.processQueues();
+    assert.equal(p.getVar(v('macro_event')), 0, 'the queued exact token clears Arnav after the modal closes');
+    assert.equal(p.getVar(v('macro_event_uid')), -1);
+  });
 }

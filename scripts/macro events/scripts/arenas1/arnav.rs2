@@ -16,12 +16,14 @@ if (npc_finduid(%macro_event_uid) = true) {
 def_coord $actor = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
 if ($actor = null) return;
 npc_add($actor, macro_combilock_pirate, 1000);
+%npc_int = 0;
 %npc_macro_event_target = uid;
 %macro_event_uid = npc_uid;
 npc_setmode(playerfollow);
 npc_settimer(1);
 
 [ai_timer,macro_combilock_pirate]
+def_int $arnav_event = ^macro_arnav;
 if (finduid(%npc_macro_event_target) = false) {
     npc_del;
     return;
@@ -29,6 +31,19 @@ if (finduid(%npc_macro_event_target) = false) {
 if (~macro_overworld_owned(^macro_arnav) = false) {
     npc_del;
     return;
+}
+%npc_int = add(%npc_int, 1);
+if (%npc_int >= ^macro_arnav_timeout_ticks) {
+    if (p_finduid(uid) = true) {
+        ~macro_overworld_finish(^macro_arnav);
+        return;
+    }
+    if (%npc_int >= ^macro_arnav_force_cleanup_ticks) {
+        queue*(macro_overworld_death_cleanup, 0)($arnav_event, npc_uid);
+        npc_settimer(0);
+        npc_del;
+        return;
+    }
 }
 if (~macro_event_lost = true) ~macro_overworld_finish(^macro_arnav);
 
