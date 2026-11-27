@@ -155,6 +155,7 @@ if (%macro_event = ^no_macro_event) {
 if (%macro_event = ^macro_candlelight) {
     return;
 }
+if (~macro_event_arenas1_dispatch(0) = true) return;
 if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
     if (~macro_event_area(coord) = false |
         ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) {
@@ -183,6 +184,7 @@ if (%macro_event = ^macro_mime) ~macro_mime_cleanup;
 if (%macro_event = ^macro_prison_pete) ~macro_prison_pete_sync;
 if (%macro_event >= ^macro_maze & %macro_event <= ^macro_quiz) return;
 if (%macro_event = ^macro_frogs) ~macro_frogs_cleanup;
+if (~macro_event_arenas1_dispatch(1) = true) return;
 if (npc_finduid(%macro_event_uid) = true) {
     if (%npc_macro_event_target = uid) {
         %npc_macro_event_target = null;
@@ -353,6 +355,7 @@ if ($event = ^no_macro_event | %macro_event ! $event | %macro_event_uid ! $actor
 }
 if ($event = ^macro_frogs) ~macro_frogs_cleanup;
 if ($event >= ^macro_maze & $event <= ^macro_quiz) ~macro_event_arenas2_cleanup($event);
+if (~macro_event_arenas1_dispatch(2) = true) ~initalltabs;
 if (npc_finduid($actor) = true) {
     if (%npc_macro_event_target = uid) {
         npc_del;

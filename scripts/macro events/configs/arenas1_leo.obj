@@ -1,0 +1,137 @@
+// Original 377 client fields. Event coffins and outfit are untradeable.
+[macro_digger_coffin_object_1]
+name=Coffin
+desc=Filled with items. Like a bank, but spookier!
+model=obj_macro_digger_coffin_object_1
+2dzoom=2384
+2dyan=1904
+2dxan=150
+iop1=Check
+weight=3g
+tradeable=no
+
+[macro_digger_coffin_object_2]
+name=Coffin
+desc=Filled with items. Like a bank, but spookier!
+model=obj_macro_digger_coffin_object_1
+2dzoom=2384
+2dyan=1904
+2dxan=150
+iop1=Check
+weight=3g
+tradeable=no
+
+[macro_digger_coffin_object_3]
+name=Coffin
+desc=Filled with items. Like a bank, but spookier!
+model=obj_macro_digger_coffin_object_1
+2dzoom=2384
+2dyan=1904
+2dxan=150
+iop1=Check
+weight=3g
+tradeable=no
+
+[macro_digger_coffin_object_4]
+name=Coffin
+desc=Filled with items. Like a bank, but spookier!
+model=obj_macro_digger_coffin_object_1
+2dzoom=2384
+2dyan=1904
+2dxan=150
+iop1=Check
+weight=3g
+tradeable=no
+
+[macro_digger_coffin_object_5]
+name=Coffin
+desc=Filled with items. Like a bank, but spookier!
+model=obj_macro_digger_coffin_object_1
+2dzoom=2384
+2dyan=1904
+2dxan=150
+iop1=Check
+weight=3g
+tradeable=no
+
+[macro_digger_shirt]
+name=Zombie shirt
+desc=Aside from the braaaains on the lapel, it's still quite good.
+model=obj_macro_digger_shirt
+2dzoom=1360
+2dyan=93
+2dxan=498
+iop2=Wear
+womanwear=obj_macro_digger_shirt_womanwear,0
+manwear=obj_macro_digger_shirt_manwear,0
+weight=3g
+tradeable=no
+wearpos=torso
+
+[macro_digger_legs]
+name=Zombie trousers
+desc=Good for a shamble about town.
+model=obj_macro_digger_legs
+2dyof=2
+2dyan=1997
+2dxan=426
+iop2=Wear
+manwear=obj_macro_digger_legs_manwear,0
+womanwear=obj_macro_digger_legs_womanwear,0
+weight=3g
+tradeable=no
+wearpos=legs
+
+[macro_digger_mask]
+name=Zombie mask
+desc=I look 40,000 years old in this...
+model=obj_macro_digger_mask
+2dxof=-1
+2dyof=4
+2dzoom=720
+2dyan=166
+2dzan=1826
+2dxan=1770
+iop2=Wear
+manwear=obj_macro_digger_mask_manwear,0
+womanwear=obj_macro_digger_mask_womanwear,0
+manhead=obj_macro_digger_mask_manhead
+womanhead=obj_macro_digger_mask_womanhead
+weight=3g
+tradeable=no
+wearpos=hat
+wearpos2=head
+wearpos3=jaw
+
+[macro_digger_gloves]
+name=Zombie gloves
+desc=Smells pretty funky.
+model=obj_macro_digger_gloves
+2dxof=-1
+2dyof=-9
+2dzoom=848
+2dyan=105
+2dxan=522
+iop2=Wear
+manwear=obj_macro_digger_gloves_manwear,0
+womanwear=obj_macro_digger_gloves_womanwear,0
+weight=3g
+tradeable=no
+wearpos=hands
+
+[macro_digger_boots]
+name=Zombie boots
+desc=Thrilling.
+model=obj_macro_digger_boots
+iop2=Wear
+manwear=obj_macro_digger_boots_manwear,0
+womanwear=obj_macro_digger_boots_womanwear,0
+2dxof=-4
+2dyof=-9
+2dzoom=848
+2dyan=1892
+2dxan=132
+weight=3g
+tradeable=no
+wearpos=feet
+

@@ -21,10 +21,11 @@ if (p_finduid(uid) = true) {
 }
 
 [mapzone,0_30_78] 
-~macro_events_hide_tabs;
+if (%macro_event ! ^macro_leo) ~macro_events_hide_tabs;
 @music_playbyregion(coord);
 
 [mapzoneexit,0_30_78]
+if (%macro_event = ^macro_leo) ~macro_event_cleanup(^macro_leo, %macro_event_uid);
 ~macro_events_varps_reset;
 ~initalltabs;
 

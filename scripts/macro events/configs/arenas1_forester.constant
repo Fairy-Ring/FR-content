@@ -1,0 +1,3 @@
+// UNKNOWN engineering distribution: equal request chances for four tail counts.
+// random-events.value-forester-tail-weights.
+^macro_forester_tail_weights = 4

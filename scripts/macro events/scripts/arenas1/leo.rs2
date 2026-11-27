@@ -1,0 +1,362 @@
+// VERIFIED mechanics: five mis-buried coffins, native graves, headstone clues, mausoleum storage, and Leo's check; kb-random-pre.txt#87-94.
+// VERIFIED Miner model group: skull, remains, apron, ore, pickaxe; kb-random-pre.txt#92-94.
+// UNKNOWN engineering shuffle: uniform rotation 0..4 and uniform reversal; each grave starts with the next cyclic coffin.
+// UNKNOWN: use interface_slot_1..5 for clue keys and slots 6..7 for empty/carried counts.
+[proc,macro_leo_start]
+if (~macro_arena1_enter(^macro_leo, 0_30_78_7_11) = false) return;
+%macro_digger_var = 0;
+%macro_digger_var_2 = 0;
+%macro_digger_var_3 = 0;
+%macro_digger_var_4 = 0;
+%macro_digger_coffin_1 = 1;
+%macro_digger_coffin_2 = 2;
+%macro_digger_coffin_3 = 3;
+%macro_digger_coffin_4 = 4;
+%macro_digger_coffin_5 = 5;
+def_int $offset = random(5);
+def_int $reverse = random(2);
+if ($reverse = 0) {
+    %macro_digger_interface_slot_1 = add(modulo($offset, 5), 1);
+    %macro_digger_interface_slot_2 = add(modulo(add($offset, 1), 5), 1);
+    %macro_digger_interface_slot_3 = add(modulo(add($offset, 2), 5), 1);
+    %macro_digger_interface_slot_4 = add(modulo(add($offset, 3), 5), 1);
+    %macro_digger_interface_slot_5 = add(modulo(add($offset, 4), 5), 1);
+} else {
+    %macro_digger_interface_slot_1 = add(modulo($offset, 5), 1);
+    %macro_digger_interface_slot_2 = add(modulo(add($offset, 4), 5), 1);
+    %macro_digger_interface_slot_3 = add(modulo(add($offset, 3), 5), 1);
+    %macro_digger_interface_slot_4 = add(modulo(add($offset, 2), 5), 1);
+    %macro_digger_interface_slot_5 = add(modulo(add($offset, 1), 5), 1);
+}
+%macro_digger_grave_1 = add(modulo(%macro_digger_interface_slot_1, 5), 1);
+%macro_digger_grave_2 = add(modulo(%macro_digger_interface_slot_2, 5), 1);
+%macro_digger_grave_3 = add(modulo(%macro_digger_interface_slot_3, 5), 1);
+%macro_digger_grave_4 = add(modulo(%macro_digger_interface_slot_4, 5), 1);
+%macro_digger_grave_5 = add(modulo(%macro_digger_interface_slot_5, 5), 1);
+
+[proc,macro_leo_coffin_obj](int $coffin)(namedobj)
+switch_int ($coffin) {
+    case 1 : return(macro_digger_coffin_object_1);
+    case 2 : return(macro_digger_coffin_object_2);
+    case 3 : return(macro_digger_coffin_object_3);
+    case 4 : return(macro_digger_coffin_object_4);
+    case 5 : return(macro_digger_coffin_object_5);
+}
+return(macro_digger_coffin_object_1);
+
+[proc,macro_leo_coffin_index](obj $item)(int)
+if ($item = macro_digger_coffin_object_1) return(1);
+if ($item = macro_digger_coffin_object_2) return(2);
+if ($item = macro_digger_coffin_object_3) return(3);
+if ($item = macro_digger_coffin_object_4) return(4);
+if ($item = macro_digger_coffin_object_5) return(5);
+return(0);
+
+[proc,macro_leo_coffin_group](int $coffin)(int)
+switch_int ($coffin) {
+    case 1 : return(%macro_digger_coffin_1);
+    case 2 : return(%macro_digger_coffin_2);
+    case 3 : return(%macro_digger_coffin_3);
+    case 4 : return(%macro_digger_coffin_4);
+    case 5 : return(%macro_digger_coffin_5);
+}
+return(0);
+
+[proc,macro_leo_stone](int $group)(obj)
+switch_int ($group) {
+    case 1 : return(macro_digger_stonemine);
+    case 2 : return(macro_digger_stonecook);
+    case 3 : return(macro_digger_stoneaxe);
+    case 4 : return(macro_digger_stonespade);
+    case 5 : return(macro_digger_stonevase);
+}
+return(macro_digger_stonemine);
+
+[proc,macro_leo_show_item](obj $item)
+~objbox($item, "The coffin contains this item.", 250, 0, 0);
+
+[proc,macro_leo_inspect](int $coffin)
+if (~macro_arena1_owned(^macro_leo) = false) return;
+def_int $group = ~macro_leo_coffin_group($coffin);
+%macro_digger_interface_temp = $coffin;
+if ($group = 1) {
+    ~macro_leo_show_item(macro_digger_skull);
+    ~macro_leo_show_item(macro_digger_bones);
+    ~macro_leo_show_item(macro_digger_apron);
+    ~macro_leo_show_item(macro_digger_nuggets);
+    ~macro_leo_show_item(macro_digger_pick_axe);
+} else if ($group = 2) {
+    ~macro_leo_show_item(macro_digger_bowl_empty);
+    ~macro_leo_show_item(macro_digger_cake);
+    ~macro_leo_show_item(macro_digger_chefshat);
+    ~macro_leo_show_item(macro_digger_kebab);
+    ~macro_leo_show_item(macro_digger_knife);
+} else if ($group = 3) {
+    ~macro_leo_show_item(macro_digger_hatchet);
+    ~macro_leo_show_item(macro_digger_woodlogs);
+} else if ($group = 4) {
+    ~macro_leo_show_item(macro_digger_dibber);
+    ~macro_leo_show_item(macro_digger_potato_seeded);
+    ~macro_leo_show_item(macro_digger_secateurs);
+} else if ($group = 5) {
+    ~macro_leo_show_item(macro_digger_pot_empty);
+    ~macro_leo_show_item(macro_digger_plant_pot_empty);
+}
+%macro_digger_interface_temp = 0;
+
+[proc,macro_leo_read_stone](int $index)
+if (~macro_arena1_owned(^macro_leo) = false) return;
+def_int $group = 0;
+switch_int ($index) {
+    case 1 : $group = %macro_digger_interface_slot_1;
+    case 2 : $group = %macro_digger_interface_slot_2;
+    case 3 : $group = %macro_digger_interface_slot_3;
+    case 4 : $group = %macro_digger_interface_slot_4;
+    case 5 : $group = %macro_digger_interface_slot_5;
+}
+%macro_digger_interface_temp = $index;
+~objbox(~macro_leo_stone($group), "This symbol marks the grave for matching coffin contents.", 250, 0, 0);
+%macro_digger_interface_temp = 0;
+
+[proc,macro_leo_take](int $grave_index)
+if (~macro_arena1_owned(^macro_leo) = false) return;
+if (%macro_digger_interface_checker = 1) return;
+def_int $coffin = 0;
+switch_int ($grave_index) {
+    case 1 : $coffin = %macro_digger_grave_1;
+    case 2 : $coffin = %macro_digger_grave_2;
+    case 3 : $coffin = %macro_digger_grave_3;
+    case 4 : $coffin = %macro_digger_grave_4;
+    case 5 : $coffin = %macro_digger_grave_5;
+}
+if ($coffin = 0) {
+    mes("This grave is empty.");
+    return;
+}
+def_namedobj $item = ~macro_leo_coffin_obj($coffin);
+if (inv_itemspace(inv, $item, 1, inv_size(inv)) = false) {
+    mes("Make space in your inventory or store other items at the mausoleum.");
+    return;
+}
+inv_add(inv, $item, 1);
+switch_int ($grave_index) {
+    case 1 : %macro_digger_grave_1 = 0;
+    case 2 : %macro_digger_grave_2 = 0;
+    case 3 : %macro_digger_grave_3 = 0;
+    case 4 : %macro_digger_grave_4 = 0;
+    case 5 : %macro_digger_grave_5 = 0;
+}
+switch_int ($coffin) {
+    case 1 : %macro_digger_multi_coffin_1 = 1;
+    case 2 : %macro_digger_multi_coffin_2 = 1;
+    case 3 : %macro_digger_multi_coffin_3 = 1;
+    case 4 : %macro_digger_multi_coffin_4 = 1;
+    case 5 : %macro_digger_multi_coffin_5 = 1;
+}
+%macro_digger_interface_slot_6 = add(%macro_digger_interface_slot_6, 1);
+%macro_digger_interface_slot_7 = add(%macro_digger_interface_slot_7, 1);
+
+[proc,macro_leo_recover_coffin](int $coffin)
+if (%macro_digger_grave_1 = $coffin | %macro_digger_grave_2 = $coffin | %macro_digger_grave_3 = $coffin |
+    %macro_digger_grave_4 = $coffin | %macro_digger_grave_5 = $coffin) return;
+def_namedobj $item = ~macro_leo_coffin_obj($coffin);
+if (inv_total(inv, $item) > 0) return;
+if (%macro_digger_grave_1 = 0) {
+    %macro_digger_grave_1 = $coffin;
+} else if (%macro_digger_grave_2 = 0) {
+    %macro_digger_grave_2 = $coffin;
+} else if (%macro_digger_grave_3 = 0) {
+    %macro_digger_grave_3 = $coffin;
+} else if (%macro_digger_grave_4 = 0) {
+    %macro_digger_grave_4 = $coffin;
+} else if (%macro_digger_grave_5 = 0) {
+    %macro_digger_grave_5 = $coffin;
+} else {
+    return;
+}
+switch_int ($coffin) {
+    case 1 : %macro_digger_multi_coffin_1 = 0;
+    case 2 : %macro_digger_multi_coffin_2 = 0;
+    case 3 : %macro_digger_multi_coffin_3 = 0;
+    case 4 : %macro_digger_multi_coffin_4 = 0;
+    case 5 : %macro_digger_multi_coffin_5 = 0;
+}
+
+[proc,macro_leo_recover_missing]
+// UNKNOWN anti-stranding recovery: restore missing coffins without changing clues or rewards.
+~macro_leo_recover_coffin(1);
+~macro_leo_recover_coffin(2);
+~macro_leo_recover_coffin(3);
+~macro_leo_recover_coffin(4);
+~macro_leo_recover_coffin(5);
+def_int $carried = add(add(add(add(%macro_digger_multi_coffin_1, %macro_digger_multi_coffin_2),
+    %macro_digger_multi_coffin_3), %macro_digger_multi_coffin_4), %macro_digger_multi_coffin_5);
+%macro_digger_interface_slot_6 = $carried;
+%macro_digger_interface_slot_7 = $carried;
+
+[proc,macro_leo_all_placed]()(boolean)
+if (%macro_digger_interface_slot_6 ! 0 | %macro_digger_interface_slot_7 ! 0) return(false);
+if (%macro_digger_multi_coffin_1 ! 0 | %macro_digger_multi_coffin_2 ! 0 | %macro_digger_multi_coffin_3 ! 0 |
+    %macro_digger_multi_coffin_4 ! 0 | %macro_digger_multi_coffin_5 ! 0) return(false);
+if (%macro_digger_grave_1 = 0 | %macro_digger_grave_2 = 0 | %macro_digger_grave_3 = 0 |
+    %macro_digger_grave_4 = 0 | %macro_digger_grave_5 = 0) return(false);
+return(true);
+
+[proc,macro_leo_initial_layout]()(boolean)
+if (%macro_digger_grave_1 ! add(modulo(%macro_digger_interface_slot_1, 5), 1) |
+    %macro_digger_grave_2 ! add(modulo(%macro_digger_interface_slot_2, 5), 1) |
+    %macro_digger_grave_3 ! add(modulo(%macro_digger_interface_slot_3, 5), 1) |
+    %macro_digger_grave_4 ! add(modulo(%macro_digger_interface_slot_4, 5), 1) |
+    %macro_digger_grave_5 ! add(modulo(%macro_digger_interface_slot_5, 5), 1)) return(false);
+return(true);
+
+[proc,macro_leo_solved]()(boolean)
+if (~macro_leo_all_placed = false) return(false);
+if (~macro_leo_coffin_group(%macro_digger_grave_1) ! %macro_digger_interface_slot_1) return(false);
+if (~macro_leo_coffin_group(%macro_digger_grave_2) ! %macro_digger_interface_slot_2) return(false);
+if (~macro_leo_coffin_group(%macro_digger_grave_3) ! %macro_digger_interface_slot_3) return(false);
+if (~macro_leo_coffin_group(%macro_digger_grave_4) ! %macro_digger_interface_slot_4) return(false);
+if (~macro_leo_coffin_group(%macro_digger_grave_5) ! %macro_digger_interface_slot_5) return(false);
+return(true);
+
+[proc,macro_leo_owns_clothing](namedobj $item)(boolean)
+if (inv_total(inv, $item) > 0 | inv_total(worn, $item) > 0 | inv_total(bank, $item) > 0) return(true);
+return(false);
+
+[proc,macro_leo_reward]
+
+// CANDIDATE reward order: Zombie Shirt and Boots, Pants and Gloves, then Mask; Sal pre-target#225-231.
+// UNKNOWN engineering policy: award each unowned piece in the next pair together.
+// UNKNOWN engineering fallback: 500 coins after all five clothes and both emotes.
+if (~macro_leo_owns_clothing(macro_digger_shirt) = false | ~macro_leo_owns_clothing(macro_digger_boots) = false) {
+    if (~macro_leo_owns_clothing(macro_digger_shirt) = false) ~macro_arena1_give(macro_digger_shirt, 1);
+    if (~macro_leo_owns_clothing(macro_digger_boots) = false) ~macro_arena1_give(macro_digger_boots, 1);
+    return;
+}
+if (~macro_leo_owns_clothing(macro_digger_legs) = false | ~macro_leo_owns_clothing(macro_digger_gloves) = false) {
+    if (~macro_leo_owns_clothing(macro_digger_legs) = false) ~macro_arena1_give(macro_digger_legs, 1);
+    if (~macro_leo_owns_clothing(macro_digger_gloves) = false) ~macro_arena1_give(macro_digger_gloves, 1);
+    return;
+}
+if (~macro_leo_owns_clothing(macro_digger_mask) = false) {
+    ~macro_arena1_give(macro_digger_mask, 1);
+    return;
+}
+if (%emote_zombie_dance = 0) {
+    %emote_zombie_dance = 1;
+    mes("You unlock a new emote.");
+} else if (%emote_zombie_walk = 0) {
+    %emote_zombie_walk = 1;
+    mes("You unlock a new emote.");
+} else {
+    ~macro_arena1_give(coins, ^macro_leo_coins);
+}
+
+[opnpc1,macro_gravedigger]
+if (~macro_arena1_owned(^macro_leo) = false) return;
+~macro_leo_recover_missing;
+if (%macro_digger_interface_checker = 1) return;
+if (~macro_leo_solved = false) {
+    if (~macro_leo_all_placed = true & ~macro_leo_initial_layout = false) {
+        ~mesbox("Well, that's a good attempt, but it's just not right. Match all five coffins to the symbols above the graves, then speak with Leo again.");
+    } else {
+        ~mesbox("I've put the wrong coffins into these graves. Match all five coffins to the symbols above the graves, then speak with Leo again.");
+    }
+    return;
+}
+~mesbox("Here, I'll take you back to where I found you, and give you your reward.");
+%macro_digger_interface_checker = 1;
+~macro_leo_reward;
+~macro_arena1_return(^macro_leo);
+
+[opheld1,macro_digger_coffin_object_1] ~macro_leo_inspect(1);
+[opheld1,macro_digger_coffin_object_2] ~macro_leo_inspect(2);
+[opheld1,macro_digger_coffin_object_3] ~macro_leo_inspect(3);
+[opheld1,macro_digger_coffin_object_4] ~macro_leo_inspect(4);
+[opheld1,macro_digger_coffin_object_5] ~macro_leo_inspect(5);
+
+[oploc1,mausoleum]
+if (~macro_arena1_owned(^macro_leo) = false) return;
+~mesbox("If you need to free up some space in your inventory then just store things in the mausoleum, and I'll take them to the bank for you.");
+if_openmain(bank_deposit_box);
+if_settab(null, 3);
+if_settab(null, 4);
+inv_transmit(inv, bank_deposit_box:com_62);
+
+[proc,macro_leo_place](int $grave_index)
+if (~macro_arena1_owned(^macro_leo) = false) return;
+if (%macro_digger_interface_checker = 1) return;
+def_int $coffin = ~macro_leo_coffin_index(last_useitem);
+if ($coffin = 0) {
+    mes("Use a coffin on an empty grave.");
+    return;
+}
+def_int $grave = 0;
+switch_int ($grave_index) {
+    case 1 : $grave = %macro_digger_grave_1;
+    case 2 : $grave = %macro_digger_grave_2;
+    case 3 : $grave = %macro_digger_grave_3;
+    case 4 : $grave = %macro_digger_grave_4;
+    case 5 : $grave = %macro_digger_grave_5;
+}
+if ($grave ! 0) {
+    mes("Take the coffin out of this grave first.");
+    return;
+}
+if (%macro_digger_multi_coffin_1 = 0 & $coffin = 1) return;
+if (%macro_digger_multi_coffin_2 = 0 & $coffin = 2) return;
+if (%macro_digger_multi_coffin_3 = 0 & $coffin = 3) return;
+if (%macro_digger_multi_coffin_4 = 0 & $coffin = 4) return;
+if (%macro_digger_multi_coffin_5 = 0 & $coffin = 5) return;
+if (inv_total(inv, last_useitem) = 0) return;
+inv_del(inv, last_useitem, 1);
+switch_int ($grave_index) {
+    case 1 : %macro_digger_grave_1 = $coffin;
+    case 2 : %macro_digger_grave_2 = $coffin;
+    case 3 : %macro_digger_grave_3 = $coffin;
+    case 4 : %macro_digger_grave_4 = $coffin;
+    case 5 : %macro_digger_grave_5 = $coffin;
+}
+switch_int ($coffin) {
+    case 1 : %macro_digger_multi_coffin_1 = 0;
+    case 2 : %macro_digger_multi_coffin_2 = 0;
+    case 3 : %macro_digger_multi_coffin_3 = 0;
+    case 4 : %macro_digger_multi_coffin_4 = 0;
+    case 5 : %macro_digger_multi_coffin_5 = 0;
+}
+%macro_digger_interface_slot_6 = sub(%macro_digger_interface_slot_6, 1);
+%macro_digger_interface_slot_7 = sub(%macro_digger_interface_slot_7, 1);
+
+[oploc1,grave_12721] ~macro_leo_take(1);
+[oploc1,grave_12722] ~macro_leo_take(2);
+[oploc1,grave_12723] ~macro_leo_take(3);
+[oploc1,grave_12724] ~macro_leo_take(4);
+[oploc1,grave_12725] ~macro_leo_take(5);
+
+[oplocu,grave_12721] ~macro_leo_place(1);
+[oplocu,grave_12722] ~macro_leo_place(2);
+[oplocu,grave_12723] ~macro_leo_place(3);
+[oplocu,grave_12724] ~macro_leo_place(4);
+[oplocu,grave_12725] ~macro_leo_place(5);
+
+[oploc1,gravestone] ~macro_leo_read_stone(1);
+[oploc1,gravestone_12717] ~macro_leo_read_stone(2);
+[oploc1,gravestone_12718] ~macro_leo_read_stone(3);
+[oploc1,gravestone_12719] ~macro_leo_read_stone(4);
+[oploc1,gravestone_12720] ~macro_leo_read_stone(5);
+
+[proc,macro_leo_cleanup]
+inv_del(inv, macro_digger_coffin_object_1, ^max_32bit_int);
+inv_del(inv, macro_digger_coffin_object_2, ^max_32bit_int);
+inv_del(inv, macro_digger_coffin_object_3, ^max_32bit_int);
+inv_del(inv, macro_digger_coffin_object_4, ^max_32bit_int);
+inv_del(inv, macro_digger_coffin_object_5, ^max_32bit_int);
+inv_del(bank, macro_digger_coffin_object_1, ^max_32bit_int);
+inv_del(bank, macro_digger_coffin_object_2, ^max_32bit_int);
+inv_del(bank, macro_digger_coffin_object_3, ^max_32bit_int);
+inv_del(bank, macro_digger_coffin_object_4, ^max_32bit_int);
+inv_del(bank, macro_digger_coffin_object_5, ^max_32bit_int);
+%macro_digger_var = 0;
+%macro_digger_var_2 = 0;
+%macro_digger_var_3 = 0;
+%macro_digger_var_4 = 0;

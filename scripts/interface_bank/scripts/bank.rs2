@@ -155,6 +155,12 @@ switch_obj ($obj) {
     case macro_genilamp : return(true); // cant bank xp lamps
     case thosf_reward_lamp : return(true); // OSF leftover Tip.it 2007 cannot bank; mes is live unbankable chrome
     case bloated_toad : return(true); // 289 unbankable — no new param id
+    // CANDIDATE: random-events.arenas1-leo-coffins-unbankable-1126.
+    case macro_digger_coffin_object_1 : return(true);
+    case macro_digger_coffin_object_2 : return(true);
+    case macro_digger_coffin_object_3 : return(true);
+    case macro_digger_coffin_object_4 : return(true);
+    case macro_digger_coffin_object_5 : return(true);
     case default : return(false);
 }
 

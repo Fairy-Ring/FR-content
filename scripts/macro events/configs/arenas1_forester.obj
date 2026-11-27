@@ -1,0 +1,80 @@
+// Original 377 client fields. Quest-only meat and clothing are untradeable.
+[raw_macro_pheasant_good]
+name=Raw pheasant
+desc=I need to cook this first.
+cost=5
+model=obj_enchanted_chicken
+2dxof=-3
+2dzoom=870
+2dyan=1748
+2dxan=88
+weight=10kg
+tradeable=no
+
+[raw_macro_pheasant_bad]
+name=Raw pheasant
+desc=I need to cook this first.
+cost=5
+model=obj_enchanted_chicken
+2dxof=-3
+2dzoom=870
+2dyan=1748
+2dxan=88
+weight=10kg
+tradeable=no
+
+[laderhosen_top]
+name=Lederhosen top
+desc=A leather strapped top.
+recol1s=14724
+recol1d=29590
+model=obj_laderhosen_top
+iop2=Wear
+manwear=obj_laderhosen_top_manwear,0
+manwear2=obj_priest_gown_manwear2
+womanwear=obj_laderhosen_top_womanwear,0
+womanwear2=obj_priest_gown_womanwear2
+2dxof=7
+2dyof=21
+2dzoom=1420
+2dyan=132
+2dxan=348
+wearpos=torso
+wearpos2=arms
+weight=5lb
+tradeable=no
+
+[laderhosen_legs]
+name=Lederhosen shorts
+desc=Brown leather shorts with bright white socks?
+model=obj_laderhosen_legs
+iop2=Wear
+manwear=obj_laderhosen_legs_manwear,0
+womanwear=obj_laderhosen_legs_womanwear,0
+2dxof=11
+2dyof=2
+2dzoom=1760
+2dyan=44
+2dxan=364
+wearpos=legs
+weight=5lb
+tradeable=no
+
+[laderhosen_hat]
+name=Lederhosen hat
+desc=A hat with a goat's hair attached.
+model=obj_laderhosen_hat
+iop2=Wear
+manwear=obj_laderhosen_hat_manwear,0
+womanwear=obj_laderhosen_hat_womanwear,0
+manhead=obj_laderhosen_hat_manhead
+womanhead=obj_laderhosen_hat_womanhead
+2dxof=4
+2dyof=-18
+2dzoom=920
+2dyan=212
+2dxan=196
+wearpos=hat
+weight=5lb
+tradeable=no
+

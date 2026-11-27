@@ -15,9 +15,6 @@ const built = [
   ['dwarf_keldagrim_bankbooth', 2, [0, 1]],
   ['pest_bankbooth', 4, [0, -1], false]
 ];
-const left = [
-  ['mausoleum', 'mausoleum', null, [1]]
-];
 const builtFever = [
   ['fever_plunder_deposit', 'fever_plunder_deposit', null, [1, 2]],
   ['fever_multi_chest', 'fever_chestclosed', 0, [1]],
@@ -260,19 +257,49 @@ for (const placement of rfdChests) {
   }
 }
 console.log('PASS RFD chest: all three native OP handlers, unlock guards and published bank/shop listeners');
-for (const [root, visible, state, options] of left) {
-  const all = natural(root);
-  assert(all.length, `${root} has an original placement`);
-  for (const placement of all) {
-    const loc = locAt(placement), p = fixture(placement);
-    setForm(p, loc, state);
-    assert.equal(p.resolveLocTypeForTrigger(types.LocType.get(loc.type)).id, id('LocType', visible), `${root} fixture shows ${visible}`);
-    for (const option of options) {
-      arm(p, loc, option);
-      assert.equal(p.getApTrigger(), null, `${visible} option ${option} remains unanswered (AP)`);
-      assert.equal(p.getOpTrigger(), null, `${visible} option ${option} remains unanswered (OP)`);
+const mausoleums = natural('mausoleum');
+assert(mausoleums.length, 'mausoleum has its original arena placement');
+assert.deepEqual(types.LocType.get(id('LocType', 'mausoleum')).op.filter(Boolean), ['Deposit'], 'native mausoleum offers only Deposit');
+for (const placement of mausoleums) {
+  const loc = locAt(placement);
+  for (const event of [0, 16, 19]) {
+    const p = fixture(placement, [1, -1]);
+    assert(!map.isMapBlocked(p.x, p.z, p.level), 'native south-side deposit stand is walkable');
+    // Ownership fixture only; the arena suite exercises real Leo admission.
+    p.setVar(id('VarPlayerType', 'macro_event'), event);
+    p.setVar(id('VarPlayerType', 'macro_event_target_coord'),
+      (placement.level << 28) | (placement.x << 14) | placement.z);
+    arm(p, loc, 1);
+    const script = p.getOpTrigger();
+    assert(script, 'native Deposit packet selects the published mausoleum handler');
+    finish(p, script, loc);
+    assert.equal(p.getVar(id('VarPlayerType', 'macro_event')), event, 'deposit does not rewrite encounter ownership');
+    if (event !== 19) {
+      assert.equal(p.modalMain, -1, 'unowned or other-arena state cannot open the mausoleum');
+      continue;
     }
+    const depositCom = component('bank_deposit_box:com_62');
+    assert.equal(p.modalMain, component('bank_deposit_box'), 'owned Leo task opens the published deposit-only interface');
+    assert.equal(p.modalSide, -1, 'mausoleum does not open a full-bank side interface');
+    assert(p.invListeners.some(listener => listener.type === id('InvType', 'inv') && listener.com === depositCom),
+      'deposit interface listens to the player inventory');
+    assert(!p.invListeners.some(listener => listener.type === id('InvType', 'bank')), 'mausoleum exposes no withdrawal listener');
+    p.invAdd(id('InvType', 'inv'), id('ObjType', 'bronze_dagger'), 1);
+    assert(invButton(p, 'bank_deposit_box:com_62', 'bronze_dagger', 1, 0), 'real mausoleum deposit packet is accepted');
+    assert.equal(count(p, 'bronze_dagger'), 0);
+    assert.equal(count(p, 'bronze_dagger', id('InvType', 'bank')), 1, 'ordinary item reaches the bank');
+    const coffins = [1, 2, 3, 4, 5].map(index => `macro_digger_coffin_object_${index}`);
+    for (const coffin of coffins) p.invAdd(id('InvType', 'inv'), id('ObjType', coffin), 1);
+    for (const [slot, coffin] of coffins.entries()) {
+      assert(invButton(p, 'bank_deposit_box:com_62', coffin, 1, slot), 'real coffin deposit packet reaches the bank handler');
+      assert.equal(count(p, coffin), 1, 'required coffin remains available to finish the task');
+      assert.equal(count(p, coffin, id('InvType', 'bank')), 0, 'required coffin cannot be stranded in the bank');
+    }
+    p.closeModal();
+    assert(!p.invListeners.some(listener => listener.com === depositCom), 'closing deposit box stops its listener');
+    assert.equal(p.tabs[3], component('inventory'), 'closing deposit box restores inventory');
+    assert.equal(p.tabs[4], component('wornitems'), 'closing deposit box restores worn items');
   }
-  console.log(`PASS left to its owning unit: ${root} -> ${visible}, options ${options.join(',')}`);
 }
+console.log('PASS Leo mausoleum: native Deposit, ownership, deposit-only listener, real transfer and five coffin refusals');
 process.exit(0);

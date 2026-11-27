@@ -1,7 +1,6 @@
 // Noting here until gas chest macro event is added: 245.2 varp macro_chest_gas_coord is renamed to macro_event_target_coord
 // https://www.youtube.com/watch?v=Pc0gLKWblPQ (aug 2008)
 // https://www.youtube.com/watch?v=BX_WYBKR-MU (june 2007)
-//TODO Add this to teleport spells & ess mine teleportation (to and from?)
 
 [mapzone,0_36_74] 
 if (%macro_event = ^macro_lost_and_found) {
@@ -33,9 +32,10 @@ if (coord ! $target) {
 if (%macro_event ! ^macro_lost_and_found) {
     return;
 }
-mes("There has been a fault in the teleportation matrix.");//no idea where this line break should go... doesn't fit like the video shows
-mes("Please operate the odd appendage out to be forwarded to your destination.");
-~mesbox("There has been a fault in the teleportation matrix. Please operate the|odd appendage out to be forwarded to your destination.");
+// CANDIDATE wording: random-events.wording-lost-and-found-58.
+mes("There has been a fault in the teleportation matrix.");
+mes("Please operate the odd appendage to be forwarded to your destination.");
+~mesbox("There has been a fault in the teleportation matrix. Please operate the|odd appendage to be forwarded to your destination.");
 
 [proc,randomize_appendages]
 def_int $state1 = random(8);
@@ -90,7 +90,8 @@ switch_int ($check) {
         }
 }
 if ($correct = false) {
-    //mes here?
+    // CANDIDATE wording: random-events.wording-lost-and-found-59.
+    mes("You operate the appendage to no good effect.");
     stat_drain(magic, 10, 0);//drains magic by 10, no damage per RSW
     p_delay(0);
     ~randomize_appendages;
@@ -104,10 +105,10 @@ if (%macro_event ! ^macro_lost_and_found |
     return;
 }
 def_coord $destination = %macro_event_target_coord;
+if (stat(hitpoints) = 0) return;
+~macro_arena1_laf_compensation;
 ~player_teleport_normal($destination);
 if (coord ! $destination) {
     return;
 }
-//TODO: Give 2x runes of spell originally casted or 8-14 noted rune essence if teleporting to/from ess mine (based on macro_event_target_coord?)
-//~doubleobjbox(lawrune, airrune, "Abyssal Services apologise for any inconvenience. Please|accept these runes in way of recompense.", 150);
 ~objbox(blankrune, "Abyssal Services apologise for any inconvenience. Please|accept these runes in way of recompense.", 150, 0, divide(^objbox_height, 2));

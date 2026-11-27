@@ -1,0 +1,110 @@
+// VERIFIED task, carcass and rewards: random-events.freaky-forester-task / -rewards.
+// CANDIDATE success, wrong hand-in and saved-origin exit: value-forester-success-origin / -wrong.
+// UNKNOWN equal tail weights, no deadline and no wrong-kill cap. CANDIDATE task wording: wording-freaky-forester-2/5.
+[proc,macro_forester_start]
+if (~macro_arena1_enter(^macro_forester, 0_40_74_40_38) = false) return;
+%macro_transmit = setbit_range_toint(%macro_transmit, random(^macro_forester_tail_weights), 0, 1);
+~macro_forester_status;
+
+[proc,macro_forester_status]
+if (~macro_arena1_owned(^macro_forester) = false) return;
+if (getbit_range(%macro_transmit, 2, 2) = 1) {
+    ~mesbox("Thanks, <displayname()>, you may use the portal to leave the area now.");
+    return;
+}
+switch_int (getbit_range(%macro_transmit, 0, 1)) {
+    case 0 : ~mesbox("Hey there, <displayname()>. Can you kill the one tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+    case 1 : ~mesbox("Hey there, <displayname()>. Can you kill the two tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+    case 2 : ~mesbox("Hey there, <displayname()>. Can you kill the three tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+    case 3 : ~mesbox("Hey there, <displayname()>. Can you kill the four tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+}
+
+
+[opnpc2,macro_pheasant_onetail]
+~macro_forester_pheasant_attack;
+[apnpc2,macro_pheasant_onetail]
+~macro_forester_pheasant_attack;
+[opnpc2,macro_pheasant_twotail]
+~macro_forester_pheasant_attack;
+[apnpc2,macro_pheasant_twotail]
+~macro_forester_pheasant_attack;
+[opnpc2,macro_pheasant_threetail]
+~macro_forester_pheasant_attack;
+[apnpc2,macro_pheasant_threetail]
+~macro_forester_pheasant_attack;
+[opnpc2,macro_pheasant_fourtail]
+~macro_forester_pheasant_attack;
+[apnpc2,macro_pheasant_fourtail]
+~macro_forester_pheasant_attack;
+[opnpc1,macro_forester_m]
+~macro_forester_status;
+
+[opnpcu,macro_forester_m]
+if (~macro_arena1_owned(^macro_forester) = false) return;
+if (getbit_range(%macro_transmit, 2, 2) = 1) {
+    ~macro_forester_status;
+    return;
+}
+if (last_useitem ! raw_macro_pheasant_good & last_useitem ! raw_macro_pheasant_bad) return;
+if (inv_total(inv, last_useitem) = 0) return;
+if (last_useitem = raw_macro_pheasant_bad) {
+    ~macro_arena1_fail(^macro_forester);
+    return;
+}
+inv_del(inv, raw_macro_pheasant_good, 1);
+%macro_transmit = setbit_range_toint(%macro_transmit, 1, 2, 2);
+~macro_forester_status;
+
+[oploc1,portal_8972]
+if (~macro_arena1_owned(^macro_forester) = false) return;
+if (getbit_range(%macro_transmit, 2, 2) = 1) {
+    ~macro_arena1_clothing(laderhosen_top, laderhosen_legs, laderhosen_hat);
+}
+~macro_arena1_return(^macro_forester);
+
+
+[proc,macro_forester_pheasant_attack]
+if (~macro_arena1_owned(^macro_forester) = false) return;
+if (getbit_range(%macro_transmit, 2, 2) = 1) return;
+if (npc_stat(hitpoints) = 0) return;
+if (~player_in_combat_check = false) return;
+if (npc_range(coord) > 1) {
+    p_aprange(1);
+    return;
+}
+p_stopaction;
+if (~npc_is_attackable() = false) return;
+~player_combat_stat;
+anim(%com_attackanim, 0);
+if (%com_attacksound ! null) sound_synth(%com_attacksound, 0, 0);
+npc_heropoints(5);
+npc_damage(^hitmark_damage, 5);
+if (npc_stat(hitpoints) = 0) npc_queue(3, 0, 0);
+[ai_queue3,macro_pheasant_onetail]
+~macro_forester_pheasant_death(0);
+[ai_queue3,macro_pheasant_twotail]
+~macro_forester_pheasant_death(1);
+[ai_queue3,macro_pheasant_threetail]
+~macro_forester_pheasant_death(2);
+[ai_queue3,macro_pheasant_fourtail]
+~macro_forester_pheasant_death(3);
+
+[proc,macro_forester_pheasant_death](int $tail)
+def_coord $drop = npc_coord;
+def_player_uid $hero_uid = null;
+def_int $target = 0;
+if (npc_findhero = ^true) {
+    if (~macro_arena1_owned(^macro_forester) = true & getbit_range(%macro_transmit, 2, 2) = 0) {
+        $hero_uid = uid;
+        $target = getbit_range(%macro_transmit, 0, 1);
+    }
+}
+gosub(npc_death);
+if ($hero_uid = null) return;
+if (p_finduid($hero_uid) = true) {
+    if (~macro_arena1_owned(^macro_forester) = true & getbit_range(%macro_transmit, 2, 2) = 0) {
+        def_namedobj $carcass = raw_macro_pheasant_bad;
+        if ($target = $tail) $carcass = raw_macro_pheasant_good;
+        obj_add($drop, $carcass, 1, ^lootdrop_duration);
+    }
+}

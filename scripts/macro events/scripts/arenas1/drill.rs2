@@ -1,0 +1,111 @@
+// VERIFIED exercise identities: random-events.drill-demon-task; src.random-events-tipit-random-pre#247-249.
+// CANDIDATE count and wrong-mat penalty: random-events.value-drill-count and value-drill-wrong.
+// UNKNOWN bonus-only 100-game-tick scoring window; no forced event exit or NPC timer.
+[proc,macro_drill_start]
+if (~macro_arena1_enter(^macro_drill, 0_49_75_27_17) = false) return;
+
+// UNKNOWN engineering distribution: uniformly shuffle the four exercise signs.
+def_int $first = random(^macro_drill_exercise_weights);
+def_int $second = random(^macro_drill_exercise_weights);
+while ($second = $first) {
+    $second = random(^macro_drill_exercise_weights);
+}
+def_int $third = random(^macro_drill_exercise_weights);
+while ($third = $first | $third = $second) {
+    $third = random(^macro_drill_exercise_weights);
+}
+def_int $fourth = random(^macro_drill_exercise_weights);
+while ($fourth = $first | $fourth = $second | $fourth = $third) {
+    $fourth = random(^macro_drill_exercise_weights);
+}
+%macro_transmit = setbit_range_toint(%macro_transmit, $first, 0, 1);
+%macro_transmit = setbit_range_toint(%macro_transmit, $second, 2, 3);
+%macro_transmit = setbit_range_toint(%macro_transmit, $third, 4, 5);
+%macro_transmit = setbit_range_toint(%macro_transmit, $fourth, 6, 7);
+%macro_transmit = setbit_range_toint(%macro_transmit, random(^macro_drill_exercise_weights), 8, 9);
+%macro_transmit = setbit_range_toint(%macro_transmit, ^macro_drill_required_correct, 10, 29);
+%macro_transmit = setbit_range_toint(%macro_transmit, 0, 30, 30);
+%macro_digger_var_4 = map_clock;
+// CANDIDATE wording: random-events.wording-drill-demon-21.
+mes("Move yourself, Private! Follow my orders and you may, just may, leave here in a fit state for my corps!");
+~macro_drill_status;
+
+[proc,macro_drill_status]
+if (~macro_arena1_owned(^macro_drill) = false) return;
+// CANDIDATE orders: random-events.wording-drill-demon-22..25.
+switch_int (getbit_range(%macro_transmit, 8, 9)) {
+    case 0 : ~mesbox("Get yourself over there and jog on that mat, private!"); return;
+    case 1 : ~mesbox("Get on that mat and give me sit ups, private!"); return;
+    case 2 : ~mesbox("Drop and give me push ups on that mat, private!"); return;
+    case 3 : ~mesbox("I want to see you on that mat doing star jumps, private!"); return;
+}
+
+[opnpc1,macro_drilldemon]
+if (~macro_arena1_owned(^macro_drill) = false) return;
+~macro_drill_status;
+
+[oploc1,exercise_mat]
+~macro_drill_mat(0);
+[oploc1,exercise_mat_10077]
+~macro_drill_mat(1);
+[oploc1,exercise_mat_10078]
+~macro_drill_mat(2);
+[oploc1,exercise_mat_10079]
+~macro_drill_mat(3);
+
+[proc,macro_drill_mat](int $mat)
+if (~macro_arena1_owned(^macro_drill) = false) return;
+if ($mat < 0 | $mat > 3) return;
+
+// Exercise pose follows the sign shown on the selected mat.
+def_int $shift = multiply($mat, 2);
+def_int $shown = getbit_range(%macro_transmit, $shift, add($shift, 1));
+def_int $requested = getbit_range(%macro_transmit, 8, 9);
+def_seq $animation = emote_run_on_spot;
+if ($shown = 1) $animation = emote_situps_5;
+if ($shown = 2) $animation = emote_pushups_5;
+if ($shown = 3) $animation = emote_starjump_5;
+anim($animation, 0);
+// seqlength is in client cycles; p_delay is in server ticks (30 cycles/tick).
+p_delay(calc((seqlength($animation) + 29) / 30));
+if (~macro_arena1_owned(^macro_drill) = false) return;
+def_int $remaining = getbit_range(%macro_transmit, 10, 29);
+if ($shown = $requested) {
+    $remaining = sub($remaining, 1);
+} else {
+    $remaining = add($remaining, 1);
+    %macro_transmit = setbit_range_toint(%macro_transmit, 1, 30, 30);
+}
+%macro_transmit = setbit_range_toint(%macro_transmit, $remaining, 10, 29);
+if ($remaining = 0) {
+    // CANDIDATE wording: random-events.wording-drill-demon-27.
+    mes("Well I'll be, you actually did it, Private. Now take this and get out of my sight.");
+    def_int $missing = 0;
+    if (~obj_gettotal(drill_top) = 0) $missing = add($missing, 1);
+    if (~obj_gettotal(drill_bottoms) = 0) $missing = add($missing, 1);
+    if (~obj_gettotal(drill_helm) = 0) $missing = add($missing, 1);
+
+    if ($missing = 0) {
+        ~macro_arena1_clothing(drill_top, drill_bottoms, drill_helm);
+        ~macro_arena1_return(^macro_drill);
+        return;
+    }
+
+    def_int $reward_pieces = 1;
+    def_int $elapsed = sub(map_clock, %macro_digger_var_4);
+    if ($elapsed >= 0 & $elapsed <= ^macro_drill_timely_ticks) {
+        if (getbit_range(%macro_transmit, 30, 30) = 0) {
+            def_int $reward_roll = random(^macro_drill_reward_weights);
+            if ($reward_roll >= 2) $reward_pieces = $reward_roll;
+        }
+    }
+    $reward_pieces = min($reward_pieces, $missing);
+    while ($reward_pieces > 0) {
+        ~macro_arena1_clothing(drill_top, drill_bottoms, drill_helm);
+        $reward_pieces = sub($reward_pieces, 1);
+    }
+    ~macro_arena1_return(^macro_drill);
+    return;
+}
+%macro_transmit = setbit_range_toint(%macro_transmit, random(^macro_drill_exercise_weights), 8, 9);
+~macro_drill_status;
