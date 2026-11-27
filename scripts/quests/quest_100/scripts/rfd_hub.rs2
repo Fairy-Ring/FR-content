@@ -1,6 +1,7 @@
 // VERIFIED route/rewards: RuneHQ, captured 15 April 2006. UNKNOWN plain functional wording.
 [proc,rfd_questpoints]()(int)
 if (%hundred_main_quest_var < ^rfd_feast_ready) return(0);
+if (%hundred_main_quest_var >= ^rfd_complete) return(calc(^rfd_step_qp + %hundred_subquest_tally + ^rfd_step_qp));
 return(calc(^rfd_step_qp + %hundred_subquest_tally));
 
 [proc,rfd_prepare_banquet]
@@ -15,11 +16,18 @@ if (loc_find(0_29_83_9_13, hundred_guide_base) = true) loc_change(hundred_guide_
 if (loc_find(0_29_83_9_11, hundred_dave_base) = true) loc_change(hundred_dave_multi, ^rfd_wrapper_duration);
 if (loc_find(0_29_83_7_16, hundred_ogre_base) = true) loc_change(hundred_ogre_multi, ^rfd_wrapper_duration);
 if (loc_find(0_29_83_9_9, hundred_varze_base) = true) loc_change(hundred_varze_multi, ^rfd_wrapper_duration);
+if (loc_find(0_29_83_9_7, hundred_monkey_base) = true) loc_change(hundred_monkey_multi, ^rfd_wrapper_duration);
 
 [opnpc1,hundred_aris_base]
 if (%hundred_main_quest_var < ^rfd_frozen) return;
 if (%hundred_dwarf_quest = 1) {
     if (~p_choice2("About the Mountain Dwarf...", 1, "About the banquet...", 2) = 1) @rfd_dwarf_aris;
+}
+if (%chickenquest > 0 & %chickenquest < ^rfd_guest_complete) {
+    if (~p_choice2("About Sir Amik Varze...", 1, "About the banquet...", 2) = 1) @rfd_amik_aris;
+}
+if (%hundred_ilm_quest > 0 & %hundred_ilm_quest < ^rfd_guest_complete) {
+    if (~p_choice2("About King Awowogei...", 1, "About the banquet...", 2) = 1) @rfd_awowogei_aris;
 }
 ~chatnpc("<p,neutral>The guests are frozen in time. Their favourite foods will free them from the Culinaromancer's spell.");
 def_int $choice = ~p_choice3("The Culinaromancer", 1, "The chest", 2, "My progress", 3);
@@ -64,6 +72,14 @@ if ($guest = 1) {
     stat_advance(woodcutting, 15000);
     stat_advance(crafting, 15000);
     stat_advance(ranged, 15000);
+} else if ($guest = 7) {
+    if (%chickenquest ! ^rfd_guest_complete | %100amikvisible = 0) return;
+    %100amikvisible = 0;
+    stat_advance(hitpoints, 40000);
+} else if ($guest = 8) {
+    if (%hundred_ilm_quest ! ^rfd_guest_complete | %100monkeyvisible = 0) return;
+    %100monkeyvisible = 0;
+    stat_advance(agility, 100000);
 } else {
     return;
 }
@@ -73,6 +89,10 @@ if ($guest = 4) {
     stat_advance(cooking, ^rfd_dave_xp);
 } else if ($guest = 6) {
     stat_advance(cooking, 15000);
+} else if ($guest = 7) {
+    stat_advance(cooking, 40000);
+} else if ($guest = 8) {
+    stat_advance(cooking, 100000);
 } else {
     stat_advance(cooking, ^rfd_guest_xp);
 }
@@ -80,6 +100,7 @@ if ($guest = 4) {
 ~update_questpoints;
 ~send_quest_progress_colour(questlist:hundred_main, %hundred_main_quest_var, ^rfd_complete);
 mes("You have freed a banquet guest. Your access to the Culinaromancer's Chest has increased.");
+~rfd_finale_unlock;
 
 [oploc1,hundred_goodchest_base]
 if (%hundred_main_quest_var < ^rfd_frozen) return;

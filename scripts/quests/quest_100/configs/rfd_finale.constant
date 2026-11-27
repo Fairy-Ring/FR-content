@@ -1,0 +1,34 @@
+// VERIFIED: RuneHQ captured 15 April 2006; six fights and 175 Quest Points.
+^rfd_finale_ready = 4
+^rfd_finale_required_qp = 175
+^rfd_finale_fights = 6
+^rfd_finale_lamp_xp = 200000
+// VERIFIED wording: period RuneHQ and later Old School say above/over level 50.
+^rfd_finale_lamp_level = 51
+// UNKNOWN engineering copy/landing geometry, derived from the original arena map.
+^rfd_finale_banquet_landing = 0_50_50_8_18
+^rfd_finale_source = 0_29_83_32_32
+^rfd_finale_copy_levels = 3
+^rfd_finale_copy_zones = 4
+^rfd_finale_entry_x = 12
+^rfd_finale_entry_z = 6
+^rfd_finale_boss_x = 12
+^rfd_finale_boss_z = 14
+^rfd_finale_plane = 2
+// UNKNOWN engineering lifetimes, rates, spell statistics and special magnitudes.
+^rfd_finale_lifetime = 2147483647
+^rfd_finale_attack_ticks = 4
+^rfd_finale_fast_attack_ticks = 2
+^rfd_finale_phase_ticks = 10
+^rfd_finale_magic_level = 100
+^rfd_finale_agrith_magic_max = 16
+^rfd_finale_karamel_magic_max = 5
+^rfd_finale_karamel_freeze_ticks = 10
+^rfd_finale_karamel_stat_drain = 1
+^rfd_finale_karamel_special_drain = 100
+^rfd_finale_dessourt_magic_damage = 5
+^rfd_finale_mother_ranged_max = 12
+^rfd_finale_culinaromancer_magic_max = 25
+^rfd_finale_dessourt_melee_chance = 2
+^rfd_finale_attack_range = 10
+^rfd_finale_leash = 32

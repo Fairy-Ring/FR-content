@@ -1,0 +1,347 @@
+// Recipe for Disaster — Freeing Sir Amik Varze.
+// RuneHQ capture, 15 April 2006: requirements, ingredients, route actions and reward.
+
+[proc,rfd_amik_gate]()(boolean)
+if (map_members = ^false | %hundred_main_quest_var < ^rfd_frozen | %100amikvisible = 0 | %zanaris < ^zanaris_complete | %legendsquest < ^legends_started) {
+    return(false);
+}
+return(true);
+
+[proc,rfd_amik_stage](int $minimum)(boolean)
+if (~rfd_amik_gate() = false | %chickenquest < $minimum | %chickenquest >= ^rfd_guest_complete) {
+    return(false);
+}
+return(true);
+
+[proc,rfd_amik_pair](namedobj $first, namedobj $second)(boolean)
+if ((last_item = $first & last_useitem = $second) | (last_item = $second & last_useitem = $first)) {
+    return(true);
+}
+return(false);
+
+[proc,rfd_amik_in_lair](coord $at)(boolean)
+if (coordy($at) ! coordy(^rfd_amik_lair_min) | coordx($at) < coordx(^rfd_amik_lair_min) | coordx($at) > coordx(^rfd_amik_lair_max) | coordz($at) < coordz(^rfd_amik_lair_min) | coordz($at) > coordz(^rfd_amik_lair_max)) {
+    return(false);
+}
+return(true);
+
+// Shared by the real mill hopper handlers; the route uses the existing flour/bin fields.
+[proc,rfd_amik_sweetcorn_insert]()(boolean)
+if (loc_coord ! ^rfd_amik_hopper_coord | ~rfd_amik_stage(^rfd_amik_cook_spoken) = false | last_useitem ! sweetcorn | %hopper_full = ^true) {
+    return(false);
+}
+%hopper_full = ^true;
+%chickenquest_things_done = 1;
+anim(human_pickuptable, 0);
+inv_delslot(inv, last_useslot);
+mes("You put the sweetcorn in the hopper.");
+return(true);
+
+[proc,rfd_amik_mark_cornflour_ready](coord $hopper)
+if ($hopper ! ^rfd_amik_hopper_coord | ~rfd_amik_stage(^rfd_amik_cook_spoken) = false | %chickenquest_things_done ! 1) {
+    return;
+}
+%chickenquest_things_done = 2;
+
+[proc,rfd_amik_take_cornflour]()(boolean)
+if (loc_coord ! ^rfd_amik_millbase_coord | ~rfd_amik_stage(^rfd_amik_cook_spoken) = false | %chickenquest_things_done ! 2) {
+    return(false);
+}
+if (inv_total(inv, chickenquest_pot_cornflour) > 0 | inv_total(bank, chickenquest_pot_cornflour) > 0) {
+    %chickenquest_things_done = 0;
+    return(true);
+}
+if (inv_total(inv, pot_empty) < 1) {
+    return(false);
+}
+inv_del(inv, pot_empty, 1);
+inv_add(inv, chickenquest_pot_cornflour, 1);
+if (%flour > 1) {
+    %flour = sub(%flour, 1);
+} else {
+    %flour = 0;
+    %millcheck_multi = 0;
+}
+%chickenquest_things_done = 0;
+mes("You fill a pot with cornflour.");
+return(true);
+
+// Called by the existing cakes and Gnome cocktail handlers before their normal cases.
+[proc,rfd_amik_milk_cream]()(boolean)
+if (~rfd_amik_stage(^rfd_amik_cook_spoken) = false | ~rfd_amik_pair(bucket_milk, pot_of_cream) = false) {
+    return(false);
+}
+inv_del(inv, bucket_milk, 1);
+inv_del(inv, pot_of_cream, 1);
+inv_add(inv, chickenquest_milky_mixture, 1);
+if (%chickenquest < ^rfd_amik_milky_mixture) %chickenquest = ^rfd_amik_milky_mixture;
+mes("You make a creamy mixture.");
+return(true);
+
+[proc,rfd_amik_cornflour_mix]()(boolean)
+if (~rfd_amik_stage(^rfd_amik_milky_mixture) = false | ~rfd_amik_pair(chickenquest_pot_cornflour, chickenquest_milky_mixture) = false) {
+    return(false);
+}
+inv_del(inv, chickenquest_pot_cornflour, 1);
+inv_del(inv, chickenquest_milky_mixture, 1);
+inv_add(inv, chickenquest_cornflour_milky_mixture, 1);
+if (%chickenquest < ^rfd_amik_cornflour_mixture) %chickenquest = ^rfd_amik_cornflour_mixture;
+mes("You add the cornflour to the creamy mixture.");
+return(true);
+
+[proc,rfd_amik_vanilla_mix]()(boolean)
+if (~rfd_amik_stage(^rfd_amik_cornflour_mixture) = false | ~rfd_amik_pair(chickenquest_vanilla_pod, chickenquest_cornflour_milky_mixture) = false) {
+    return(false);
+}
+inv_del(inv, chickenquest_vanilla_pod, 1);
+inv_del(inv, chickenquest_cornflour_milky_mixture, 1);
+inv_add(inv, chickenquest_brulee_mixture, 1);
+if (%chickenquest < ^rfd_amik_vanilla_added) %chickenquest = ^rfd_amik_vanilla_added;
+mes("You add the vanilla pod to the mixture.");
+return(true);
+
+[proc,rfd_amik_egg_mix]()(boolean)
+if (~rfd_amik_stage(^rfd_amik_wom_warned) = false | ~rfd_amik_pair(chickenquest_evil_chicken_egg, chickenquest_brulee_mixture) = false) {
+    return(false);
+}
+inv_del(inv, chickenquest_evil_chicken_egg, 1);
+inv_del(inv, chickenquest_brulee_mixture, 1);
+inv_add(inv, chickenquest_brulee_mixture_egg, 1);
+if (%chickenquest < ^rfd_amik_egg_added) %chickenquest = ^rfd_amik_egg_added;
+mes("You add the evil chicken's egg to the mixture.");
+return(true);
+
+[proc,rfd_amik_cinnamon_mix]()(boolean)
+if (~rfd_amik_stage(^rfd_amik_egg_added) = false | ~rfd_amik_pair(chickenquest_cinamon, chickenquest_brulee_mixture_egg) = false) {
+    return(false);
+}
+inv_del(inv, chickenquest_cinamon, 1);
+inv_del(inv, chickenquest_brulee_mixture_egg, 1);
+inv_add(inv, chickenquest_brulee_mixture_cinamon, 1);
+if (%chickenquest < ^rfd_amik_cinnamon_added) %chickenquest = ^rfd_amik_cinnamon_added;
+mes("You add the cinnamon to the brulee.");
+return(true);
+
+[proc,rfd_amik_grind_dramen_branch]()(boolean)
+if (last_useitem ! pestle_and_mortar | ~rfd_amik_stage(^rfd_amik_vanilla_added) = false | inv_total(inv, chickenquest_cinamon) > 0 | inv_total(bank, chickenquest_cinamon) > 0) {
+    return(false);
+}
+inv_del(inv, dramen_branch, 1);
+inv_add(inv, chickenquest_cinamon, 1);
+mes("You grind the Dramen branch into cinnamon.");
+return(true);
+
+[proc,rfd_amik_flambe]()(boolean)
+if (last_useitem ! chickenquest_brulee_mixture_cinamon | ~rfd_amik_stage(^rfd_amik_cinnamon_added) = false | inv_total(inv, chickenquest_brulee_mixture_cinamon) < 1 | inv_total(inv, chickenquest_dragon_coin) < 1 | inv_total(worn, ice_gloves) < 1) {
+    return(false);
+}
+inv_del(inv, chickenquest_dragon_coin, 1);
+inv_del(inv, chickenquest_brulee_mixture_cinamon, 1);
+inv_add(inv, chickenquest_brulee_mixture_supreme, 1);
+mes("K'klik breathes fire on the brulee.");
+npc_del;
+return(true);
+
+[opheldu,chickenquest_milky_mixture]
+if (~rfd_amik_cornflour_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_pot_cornflour]
+if (~rfd_amik_cornflour_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_cornflour_milky_mixture]
+if (~rfd_amik_vanilla_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_vanilla_pod]
+if (~rfd_amik_vanilla_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_brulee_mixture]
+if (~rfd_amik_egg_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_evil_chicken_egg]
+if (~rfd_amik_egg_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_brulee_mixture_egg]
+if (~rfd_amik_cinnamon_mix() = false) ~displaymessage(^dm_default);
+
+[opheldu,chickenquest_cinamon]
+if (~rfd_amik_cinnamon_mix() = false) ~displaymessage(^dm_default);
+
+[opheld1,chickenquest_dragon_coin]
+if (~rfd_amik_stage(^rfd_amik_cinnamon_added) = false) return;
+if (npc_find(coord, chickenquest_fairy_dragon, 8, 0) = true) return;
+def_coord $spawn = map_findsquare(coord, ^rfd_amik_fairy_spawn_min, ^rfd_amik_fairy_spawn_max, ^map_findsquare_lineofsight);
+npc_add($spawn, chickenquest_fairy_dragon, ^rfd_amik_fairy_duration);
+npc_setmode(none);
+
+[opnpcu,chickenquest_fairy_dragon]
+if (~rfd_amik_flambe() = false) ~displaymessage(^dm_default);
+
+[apnpcu,chickenquest_fairy_dragon]
+if (distance(coord, npc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+if (~rfd_amik_flambe() = false) ~displaymessage(^dm_default);
+
+[oploc1,chickenquest_vanilla_plant]
+@rfd_amik_pick_vanilla;
+
+[aploc1,chickenquest_vanilla_plant]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_amik_pick_vanilla;
+
+[label,rfd_amik_pick_vanilla]
+if (~rfd_amik_stage(^rfd_amik_cornflour_mixture) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space.");
+    return;
+}
+inv_add(inv, chickenquest_vanilla_pod, 1);
+mes("You find a vanilla pod.");
+
+
+[oplocu,fairy_chicken_shrine]
+@rfd_amik_enter_lair;
+
+[aplocu,fairy_chicken_shrine]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_amik_enter_lair;
+
+[label,rfd_amik_enter_lair]
+if (loc_coord ! ^rfd_amik_shrine_coord | last_useitem ! raw_chicken | ~rfd_amik_stage(^rfd_amik_wom_warned) = false | %chickenquest_wom_warning ! 1 | inv_total(inv, raw_chicken) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, raw_chicken, 1);
+if (inv_total(inv, chickenquest_evil_chicken_egg) = 0 & inv_total(bank, chickenquest_evil_chicken_egg) = 0 & npc_find(^rfd_amik_chicken_spawn, chickenquest_evil_chicken, 8, 0) = false) {
+    %chickenquest_chicken_dead = 0;
+    npc_add(^rfd_amik_chicken_spawn, chickenquest_evil_chicken, ^rfd_amik_spawn_duration);
+}
+p_teleport(^rfd_amik_lair_entry);
+
+[oploc1,100_portal_chicken]
+@rfd_amik_leave_lair;
+
+[aploc1,100_portal_chicken]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_amik_leave_lair;
+
+[label,rfd_amik_leave_lair]
+if (loc_coord ! ^rfd_amik_lair_portal | ~rfd_amik_in_lair(coord) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+p_teleport(^rfd_amik_shrine_return);
+
+[oploc1,hundred_varze_base]
+@rfd_amik_inspect;
+
+[label,rfd_amik_inspect]
+if (%hundred_main_quest_var < ^rfd_frozen | %100amikvisible = 0 | %chickenquest >= ^rfd_guest_complete) return;
+if (~rfd_amik_gate = false) {
+    ~quest_journal("Freeing Sir Amik Varze", "Requirements: complete Lost City and start Legends' Quest.");
+    return;
+}
+if (%chickenquest = 0) %chickenquest = ^rfd_amik_inspected;
+~rfd_amik_guidance;
+
+[oplocu,hundred_varze_base]
+@rfd_amik_handin;
+
+[aplocu,hundred_varze_base]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@rfd_amik_handin;
+
+[label,rfd_amik_handin]
+if (last_useitem ! chickenquest_brulee_mixture_supreme | ~rfd_amik_stage(^rfd_amik_cinnamon_added) = false | %100amikvisible = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, chickenquest_brulee_mixture_supreme, 1);
+%chickenquest = ^rfd_guest_complete;
+~rfd_guest_reward(7);
+
+[label,rfd_amik_wom_warning]
+if (~rfd_amik_gate = false) return;
+if (%chickenquest = ^rfd_amik_vanilla_added) {
+    %chickenquest_wom_warning = 1;
+    %chickenquest = ^rfd_amik_wom_warned;
+}
+~rfd_amik_guidance;
+
+[ai_queue3,chickenquest_evil_chicken]
+if (npc_findhero = ^true & ~rfd_amik_stage(^rfd_amik_wom_warned) = true & ~rfd_amik_in_lair(npc_coord) = true) {
+    if (inv_total(inv, chickenquest_evil_chicken_egg) = 0 & inv_total(bank, chickenquest_evil_chicken_egg) = 0) {
+        obj_add(npc_coord, chickenquest_evil_chicken_egg, 1, ^lootdrop_duration);
+        queue*(rfd_amik_chicken_credit, 0)();
+    }
+}
+~npc_death;
+
+[label,rfd_amik_aris]
+if (~rfd_amik_gate = false) return;
+if (%chickenquest = ^rfd_amik_inspected) %chickenquest = ^rfd_amik_aris_spoken;
+~rfd_amik_guidance;
+
+[label,rfd_amik_cook_offer]
+if (~rfd_amik_gate = false) return;
+if (%chickenquest = ^rfd_amik_aris_spoken) %chickenquest = ^rfd_amik_cook_spoken;
+~rfd_amik_guidance;
+
+[proc,rfd_amik_guidance]
+def_string $text;
+if (%chickenquest = ^rfd_amik_inspected) {
+    $text = "Speak to Aris in the banquet hall.";
+} else if (%chickenquest = ^rfd_amik_aris_spoken) {
+    $text = "Ask the Cook about creme brulee.";
+} else if (%chickenquest < ^rfd_amik_vanilla_added) {
+    $text = "Mix milk and cream.|Mill sweetcorn in the Lumbridge windmill.|Collect the cornflour in an empty pot and add it.|Search a vanilla plant in the Kharazi Jungle and add a pod.";
+} else if (%chickenquest = ^rfd_amik_vanilla_added) {
+    $text = "Grind a Dramen branch with a pestle and mortar for cinnamon.|Ask the Wise Old Man in Draynor about strange beasts.";
+} else {
+    $text = "Offer raw chicken to the Chicken Shrine in Zanaris.|Defeat the Evil Chicken for its egg and a Black Dragon for a token.|Add the egg, then cinnamon, to the brulee.|Rub the token and use the brulee on K'klik while wearing ice gloves.|Give the Brulee supreme to frozen Sir Amik Varze.";
+}
+~quest_journal("Freeing Sir Amik Varze", $text);
+
+[proc,rfd_amik_dragon_drop]
+if (npc_type ! black_dragon) return;
+if (npc_findhero = ^true) {
+    if (~rfd_amik_stage(^rfd_amik_wom_warned) = false | ~rfd_amik_in_lair(npc_coord) = false) return;
+    if (inv_total(inv, chickenquest_dragon_coin) > 0 | inv_total(bank, chickenquest_dragon_coin) > 0) return;
+    obj_add(npc_coord, chickenquest_dragon_coin, 1, ^lootdrop_duration);
+    queue*(rfd_amik_dragon_credit, 0)();
+}
+
+[ai_opplayer2,chickenquest_evil_chicken]
+@rfd_amik_chicken_attack;
+
+[ai_applayer2,chickenquest_evil_chicken]
+@rfd_amik_chicken_attack;
+
+[label,rfd_amik_chicken_attack]
+if (finduid(%npc_aggressive_player) = false) {
+    npc_setmode(none);
+    return;
+}
+~npc_cast_spell_with_forced_max_hit(^wind_strike, npc_param(attackrate), ^rfd_amik_chicken_maxhit);
+
+[queue,rfd_amik_chicken_credit]
+if (~rfd_amik_stage(^rfd_amik_wom_warned) = true) %chickenquest_chicken_dead = 1;
+
+[queue,rfd_amik_dragon_credit]
+if (~rfd_amik_stage(^rfd_amik_wom_warned) = true) %chickenquest_dragon_drop = 1;

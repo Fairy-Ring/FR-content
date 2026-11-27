@@ -55,6 +55,7 @@
       "[proc,myreque2_escort_attack]",
       "[proc,myreque2_tithe_attack]",
       "[proc,necro_attack]",
+      "[proc,rfd_finale_attack]",
       "[proc,sarawiz_melee_attack]",
       "[proc,soulbane_confusion_npc_attack]",
       "[proc,soulbane_hope_npc_attack]",
@@ -140,6 +141,8 @@
       "[ai_opplayer2,_slayer_infernalmage]",
       "[ai_opplayer2,ikov_firewarrior]",
       "[label,agrith_attack]",
+      "[label,rfd_amik_chicken_attack]",
+      "[proc,rfd_finale_attack]",
       "[proc,swan_npc_attack]"
     ],
     "npc_spell_success": [
@@ -174,6 +177,7 @@
       "[proc,killerwatt_attack]",
       "[proc,npc_druid_entangle]",
       "[proc,npc_zap_attack]",
+      "[proc,rfd_finale_attack]",
       "[proc,roving_guardian_attack]",
       "[proc,waterbirth_prime_attack]",
       "[queue,fightcaves_jad_impact]"

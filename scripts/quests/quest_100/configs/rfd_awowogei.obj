@@ -1,0 +1,182 @@
+// VERIFIED revision-377 client fields from content base; only tradeability is server-overridden.
+[hundred_ilm_red_banana]
+name=Red banana
+desc=Like a banana only redder.
+recol1s=27433
+recol1d=22821
+recol2s=25317
+recol2d=22755
+recol3s=22146
+recol3d=21698
+recol4s=17921
+recol4d=20641
+members=yes
+model=obj_banana
+2dxof=9
+2dyof=10
+2dzoom=930
+2dyan=1944
+2dxan=280
+manwear=obj_banana_left_manwear,0
+womanwear=obj_banana_left_manwear,6
+cost=5
+iop1=Eat
+weight=10g
+wearpos=lefthand
+weight=1oz
+tradeable=no
+
+[hundred_ilm_tchiki_monkey_nuts]
+name=Tchiki monkey nuts
+desc=Like Monkey Nuts only Tchikier.
+recol1s=25161
+recol1d=24075
+recol2s=11392
+recol2d=10336
+members=yes
+cost=5
+model=obj_mm_monkey_nuts
+iop1=Eat
+2dyof=-2
+2dzoom=910
+2dyan=484
+2dxan=384
+weight=10g
+tradeable=no
+
+[hundred_ilm_sliced_red_banana]
+name=Sliced red banana
+desc=Perfect for stuffing snakes.
+recol1s=31201
+recol1d=21698
+recol2s=30646
+recol2d=31511
+members=yes
+cost=5
+model=obj_lemon_slices
+2dzoom=920
+2dxan=232
+iop1=Eat
+weight=8g
+tradeable=no
+
+[hundred_ilm_tchiki_monkey_nut_paste]
+name=Tchiki nut paste
+desc=Mixing this with jam would just be wrong.
+recol1s=21140
+recol1d=23043
+members=yes
+cost=5
+model=obj_unicorn_horn_dust
+2dxof=-6
+2dzoom=1210
+2dyan=1892
+2dxan=264
+iop1=Eat
+weight=8g
+tradeable=no
+
+[hundred_ilm_snake_corpse]
+name=Snake corpse
+desc=Like a snake only not alive.
+members=yes
+cost=1
+model=obj_hundred_ilm_snake_corpse
+2dxof=3
+2dyof=6
+2dzoom=2128
+2dyan=1985
+2dxan=429
+weight=3kg
+tradeable=no
+
+[hundred_ilm_correctly_stuffed_snake]
+name=Raw stuffed snake
+desc=This snake is stuffed right up.
+recol1s=20876
+recol1d=22990
+recol2s=9446
+recol2d=9479
+recol3s=8389
+recol3d=8422
+recol4s=5251
+recol4d=7332
+recol5s=6374
+recol5d=7431
+recol6s=5317
+recol6d=7431
+members=yes
+cost=1
+model=obj_hundred_ilm_correctly_stuffed_snake
+2dxof=3
+2dyof=6
+2dzoom=2128
+2dyan=1985
+2dxan=429
+weight=3kg
+tradeable=no
+
+[hundred_ilm_incorrectly_stuffed_snake]
+name=Odd stuffed snake
+desc=Is this really what you wanted to do?
+members=yes
+cost=1
+model=obj_hundred_ilm_incorrectly_stuffed_snake
+2dxof=3
+2dyof=6
+2dzoom=2128
+2dyan=1985
+2dxan=429
+weight=3kg
+tradeable=no
+
+[hundred_ilm_cooked_stuffed_snake]
+name=Stuffed snake
+desc=Fit for a Monkey King.
+recol1s=9446
+recol1d=8354
+recol2s=8389
+recol2d=7297
+recol3s=5317
+recol3d=5249
+recol4s=20876
+recol4d=5217
+recol5s=6341
+recol5d=6273
+recol6s=6374
+recol6d=8353
+members=yes
+cost=1
+model=obj_hundred_ilm_correctly_stuffed_snake
+2dxof=3
+2dyof=6
+2dzoom=2128
+2dyan=1985
+2dxan=429
+iop1=Eat
+weight=3kg
+tradeable=no
+
+[100_ilm_snake_burnt]
+name=Snake over-cooked
+desc=It's a burnt snake.
+recol1s=9446
+recol1d=3138
+recol2s=8389
+recol2d=3138
+recol3s=6374
+recol3d=3138
+recol4s=6341
+recol4d=3138
+recol5s=20876
+recol5d=3138
+model=obj_hundred_ilm_correctly_stuffed_snake
+members=yes
+cost=1
+2dxof=3
+2dyof=6
+2dzoom=2128
+2dyan=1985
+2dxan=429
+weight=4g
+tradeable=no

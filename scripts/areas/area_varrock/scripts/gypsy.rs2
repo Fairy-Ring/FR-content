@@ -1,4 +1,7 @@
 [opnpc1,aris]
+if (%hundred_main_quest_var >= ^rfd_complete & %hundred_finale_warning_spam = 0) {
+    @rfd_lamp_claim;
+}
 if (%demonstart = ^demon_not_started) {
     @demon_slayer_not_started_aris;
 } else if (%demonstart = ^demon_talked_aris) {

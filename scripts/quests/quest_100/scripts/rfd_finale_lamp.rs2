@@ -1,0 +1,76 @@
+// UNKNOWN anti-stranding recovery and functional UI. The existing warning bit
+// is reused after victory only as a durable, once-only lamp-issued latch.
+[proc,rfd_lamp_give]
+if (%hundred_main_quest_var < ^rfd_complete | %hundred_finale_warning_spam ! 0) return;
+if (inv_freespace(inv) < 1) {
+    mes("Make room in your inventory, then speak to Aris in Varrock to claim your antique lamp.");
+    return;
+}
+inv_add(inv, hundred_rewardlamp, 1);
+%hundred_finale_warning_spam = 1;
+
+[label,rfd_lamp_claim]
+~rfd_lamp_give;
+
+[opheld1,hundred_rewardlamp]
+if (%hundred_main_quest_var < ^rfd_complete | inv_total(inv, hundred_rewardlamp) < 1) return;
+cleartimer(osf_lamp_picker);
+cleartimer(twocats_lamp_picker);
+%xplamp = ^xplamp_none;
+settimer(rfd_lamp_picker, 1000);
+if_openmain(xplamp);
+
+[timer,rfd_lamp_picker]
+return;
+
+[label,rfd_lamp_confirm]
+if (%hundred_main_quest_var < ^rfd_complete | inv_total(inv, hundred_rewardlamp) < 1) {
+    cleartimer(rfd_lamp_picker);
+    if_close;
+    return;
+}
+if (%xplamp = ^xplamp_none) {
+    mes("You need to choose which skill you wish to be advanced.");
+    return;
+}
+def_stat $skill = ~rfd_lamp_stat;
+if (stat_base($skill) < ^rfd_finale_lamp_level) {
+    mes("You must choose a skill with a base level above 50.");
+    return;
+}
+if (map_members = ^false & ~stat_members($skill) = ^true) return;
+if ($skill = herblore & %druidquest ! ^druid_complete) return;
+if ($skill = runecraft & %runemysteries ! ^runemysteries_complete) return;
+cleartimer(rfd_lamp_picker);
+if_close;
+inv_del(inv, hundred_rewardlamp, 1);
+%xplamp = ^xplamp_none;
+stat_advance($skill, ^rfd_finale_lamp_xp);
+sound_synth(found_gem, 1, 0);
+mes("You have been awarded 20,000 experience.");
+
+[proc,rfd_lamp_stat]()(stat)
+switch_int(%xplamp) {
+    case ^xplamp_attack : return(attack);
+    case ^xplamp_strength : return(strength);
+    case ^xplamp_ranged : return(ranged);
+    case ^xplamp_magic : return(magic);
+    case ^xplamp_defence : return(defence);
+    case ^xplamp_hitpoints : return(hitpoints);
+    case ^xplamp_prayer : return(prayer);
+    case ^xplamp_agility : return(agility);
+    case ^xplamp_herblore : return(herblore);
+    case ^xplamp_thieving : return(thieving);
+    case ^xplamp_crafting : return(crafting);
+    case ^xplamp_runecraft : return(runecraft);
+    case ^xplamp_mining : return(mining);
+    case ^xplamp_smithing : return(smithing);
+    case ^xplamp_fishing : return(fishing);
+    case ^xplamp_cooking : return(cooking);
+    case ^xplamp_firemaking : return(firemaking);
+    case ^xplamp_woodcutting : return(woodcutting);
+    case ^xplamp_fletching : return(fletching);
+    case ^xplamp_slayer : return(slayer);
+    case ^xplamp_farming : return(farming);
+}
+return(attack);

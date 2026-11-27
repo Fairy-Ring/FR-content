@@ -1,6 +1,7 @@
 [opheld1,macro_genilamp]
 cleartimer(osf_lamp_picker);
 cleartimer(twocats_lamp_picker);
+cleartimer(rfd_lamp_picker);
 %xplamp = ^xplamp_none;
 if_openmain(xplamp);
 
@@ -29,8 +30,10 @@ if_openmain(xplamp);
 [if_close,xplamp]
 cleartimer(osf_lamp_picker);
 cleartimer(twocats_lamp_picker);
+cleartimer(rfd_lamp_picker);
 
 [if_button,xplamp:confirm]
+if (gettimer(rfd_lamp_picker) > 0) { @rfd_lamp_confirm; }
 if (gettimer(osf_lamp_picker) > 0) {
     @osf_reward_lamp_confirm;
 }

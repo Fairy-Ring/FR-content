@@ -1,0 +1,368 @@
+// VERIFIED route requirements and sequence: RuneHQ capture, 15 April 2006.
+// UNKNOWN stage allocation and map-derived shared route landings.
+
+[proc,rfd_awowogei_active]()(boolean)
+if (%hundred_main_quest_var < ^rfd_frozen | %100monkeyvisible = 0 |
+    %mm_main < ^mm_complete | %hundred_ilm_quest < ^rfd_awowogei_started |
+    %hundred_ilm_quest >= ^rfd_guest_complete) return(false);
+return(true);
+
+[proc,rfd_awowogei_requirements_met]()(boolean)
+if (%mm_main < ^mm_complete) return(false);
+if (stat(cooking) < ^rfd_awowogei_cooking_level | stat_base(agility) < ^rfd_awowogei_agility_level) return(false);
+return(true);
+
+[proc,rfd_awowogei_zombie_form]()(boolean)
+def_npc $form = p_gettransmogrify;
+if ($form = mm_transmogrification_small_zombie_monkey | $form = mm_transmogrification_large_zombie_monkey) return(true);
+return(false);
+
+[proc,rfd_awowogei_gorilla_form]()(boolean)
+def_npc $form = p_gettransmogrify;
+if ($form = mm_transmogrification_normal_gorilla | $form = mm_transmogrification_bearded_gorilla) return(true);
+return(false);
+
+[proc,rfd_awowogei_refresh_stage]
+if (%hundred_ilm_quest < ^rfd_awowogei_first_batch_eaten | %hundred_ilm_quest >= ^rfd_guest_complete) return;
+if (%hundred_ilm_quest < ^rfd_awowogei_second_batch &
+    (inv_total(inv, hundred_ilm_red_banana) > 0 | inv_total(inv, hundred_ilm_sliced_red_banana) > 0 |
+     inv_total(inv, hundred_ilm_tchiki_monkey_nuts) > 0 | inv_total(inv, hundred_ilm_tchiki_monkey_nut_paste) > 0)) {
+    %hundred_ilm_quest = ^rfd_awowogei_second_batch;
+}
+if (%hundred_ilm_quest < ^rfd_awowogei_prepared &
+    inv_total(inv, hundred_ilm_sliced_red_banana) > 0 & inv_total(inv, hundred_ilm_tchiki_monkey_nut_paste) > 0) {
+    %hundred_ilm_quest = ^rfd_awowogei_prepared;
+}
+
+[label,rfd_awowogei_aris]
+if (~rfd_awowogei_active = false) return;
+@rfd_awowogei_status;
+
+[label,rfd_awowogei_status]
+switch_int(%hundred_ilm_quest) {
+    case ^rfd_awowogei_started :
+        ~mesbox("Speak to King Awowogei in the throne room.");
+    case ^rfd_awowogei_king_spoken :
+        ~mesbox("Talk to one of the Three Monkeys to learn the recipe.");
+    case ^rfd_awowogei_recipe_learned :
+        ~mesbox("Show the Three Monkeys a regular banana and monkey nuts.");
+    case ^rfd_awowogei_wrong_food_rejected :
+        ~mesbox("Use a gorilla greegree and rope on the western red banana tree. Tchiki nuts are in the cave beyond the ninja agility course.");
+    case ^rfd_awowogei_first_batch_eaten :
+        ~mesbox("The first pair has been eaten. Gather another red banana and Tchiki nuts, then prepare them.");
+    case ^rfd_awowogei_second_batch :
+        ~mesbox("Use a knife on the red banana and a pestle and mortar on the Tchiki nuts.");
+    case ^rfd_awowogei_prepared :
+        ~mesbox("Defeat a Big Snake in the Crash Island pit and use the prepared ingredients on its corpse.");
+    case ^rfd_awowogei_stuffed :
+        ~mesbox("Wear a zombie greegree. Below Ape Atoll's temple, enter the crack and cook the snake on the long hot rock.");
+    case ^rfd_awowogei_cooked :
+        ~mesbox("Use the cooked stuffed snake on the frozen guest.");
+}
+
+[oploc1,hundred_monkey_base]
+if (%hundred_main_quest_var < ^rfd_frozen | %100monkeyvisible = 0 | %hundred_ilm_quest >= ^rfd_guest_complete) return;
+if (%hundred_ilm_quest > 0) {
+    @rfd_awowogei_status;
+    return;
+}
+if (~rfd_awowogei_requirements_met = false) {
+    ~mesbox("Requirements: completed Monkey Madness, level 70 Cooking and level 48 Agility.");
+    return;
+}
+%hundred_ilm_quest = ^rfd_awowogei_started;
+%hundred_ilm_red_banana_tree = 1;
+~mesbox("Speak to King Awowogei in the throne room to begin.");
+
+[label,rfd_awowogei_king]
+if (~rfd_awowogei_active = false) return;
+if (%hundred_ilm_quest = ^rfd_awowogei_started) {
+    %hundred_ilm_quest = ^rfd_awowogei_king_spoken;
+}
+@rfd_awowogei_status;
+
+[opnpc1,hundred_ilm_mizaru]
+@rfd_awowogei_monkeys;
+
+[opnpc1,hundred_ilm_kikazaru]
+@rfd_awowogei_monkeys;
+
+[opnpc1,hundred_ilm_iwazaru]
+@rfd_awowogei_monkeys;
+
+[label,rfd_awowogei_monkeys]
+if (~rfd_awowogei_active = false) return;
+if (inv_total(worn, mm_amulet_of_monkey_speak) < 1) {
+    ~mesbox("Wear an M'speak amulet to understand the Three Monkeys.");
+    return;
+}
+if (~mm_wearing_greegree = false) {
+    ~mesbox("Wear a Monkey Greegree to speak with the Three Monkeys.");
+    return;
+}
+if (%hundred_ilm_quest < ^rfd_awowogei_king_spoken) {
+    ~mesbox("Speak to King Awowogei first.");
+    return;
+}
+if (%hundred_ilm_quest = ^rfd_awowogei_king_spoken) {
+    %hundred_ilm_quest = ^rfd_awowogei_recipe_learned;
+    @rfd_awowogei_status;
+    return;
+}
+if (%hundred_ilm_quest = ^rfd_awowogei_recipe_learned) {
+    if (inv_total(inv, banana) > 0 & inv_total(inv, mm_monkey_nuts) > 0) {
+        %hundred_ilm_quest = ^rfd_awowogei_wrong_food_rejected;
+        ~mesbox("Those are not the red banana and Tchiki monkey nuts required by the recipe.");
+        return;
+    }
+    @rfd_awowogei_status;
+    return;
+}
+if (%hundred_ilm_quest = ^rfd_awowogei_wrong_food_rejected) {
+    if (inv_total(inv, hundred_ilm_red_banana) < 1 | inv_total(inv, hundred_ilm_tchiki_monkey_nuts) < 1) {
+        @rfd_awowogei_status;
+        return;
+    }
+    inv_del(inv, hundred_ilm_red_banana, 1);
+    inv_del(inv, hundred_ilm_tchiki_monkey_nuts, 1);
+    %hundred_ilm_quest = ^rfd_awowogei_first_batch_eaten;
+    ~mesbox("The Three Monkeys eat the red banana and Tchiki nuts. Gather another pair and prepare it.");
+    return;
+}
+@rfd_awowogei_status;
+
+[oplocu,scenery_12610]
+if (loc_coord ! ^rfd_awowogei_red_tree | last_useitem ! rope) return;
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_wrong_food_rejected) return;
+if (inv_total(inv, rope) < 1) return;
+if (~rfd_awowogei_gorilla_form = false) {
+    ~mesbox("Use a gorilla greegree to pull down the red banana tree.");
+    return;
+}
+if (%hundred_ilm_red_banana_tree = 3) {
+    ~mesbox("The red banana tree is ready for picking.");
+    return;
+}
+if (%hundred_ilm_red_banana_tree ! 1) return;
+%hundred_ilm_red_banana_tree = 2;
+p_animprotect(^false);
+anim(100_ilm_gorilla_banana_tree_pull_down, 0);
+p_delay(^rfd_awowogei_pull_delay);
+%hundred_ilm_red_banana_tree = 3;
+anim(null, 0);
+~update_bas;
+p_animprotect(^true);
+mes("The red bananas are ready to pick.");
+
+[oploc1,red_banana_tree_12609]
+if (loc_coord ! ^rfd_awowogei_red_tree) return;
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_wrong_food_rejected) return;
+if (%hundred_ilm_red_banana_tree ! 3) return;
+if (inv_total(inv, hundred_ilm_red_banana) > 0 | inv_total(inv, hundred_ilm_sliced_red_banana) > 0) {
+    ~mesbox("You already have a red banana or its prepared slices.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    ~mesbox("You need inventory space to pick the red banana.");
+    return;
+}
+inv_add(inv, hundred_ilm_red_banana, 1);
+%hundred_ilm_red_banana_tree = 1;
+~rfd_awowogei_refresh_stage;
+mes("You pick a red banana.");
+
+[oploc1,bush]
+if (loc_coord ! ^rfd_awowogei_nut_bush) return;
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_wrong_food_rejected) return;
+if (inv_total(inv, hundred_ilm_tchiki_monkey_nuts) > 0 | inv_total(inv, hundred_ilm_tchiki_monkey_nut_paste) > 0) {
+    ~mesbox("You already have Tchiki monkey nuts or their prepared paste.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    ~mesbox("You need inventory space to collect the Tchiki monkey nuts.");
+    return;
+}
+inv_add(inv, hundred_ilm_tchiki_monkey_nuts, 1);
+~rfd_awowogei_refresh_stage;
+mes("You collect Tchiki monkey nuts.");
+
+[opheldu,hundred_ilm_red_banana]
+if (last_useitem ! knife) return;
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_first_batch_eaten) return;
+if (inv_total(inv, hundred_ilm_red_banana) < 1 | inv_total(inv, hundred_ilm_sliced_red_banana) > 0) return;
+if (~mm_wearing_greegree = false) anim(100_ilm_human_slicing_banana, 0);
+inv_del(inv, hundred_ilm_red_banana, 1);
+inv_add(inv, hundred_ilm_sliced_red_banana, 1);
+~rfd_awowogei_refresh_stage;
+mes("You slice the red banana.");
+
+[opheldu,hundred_ilm_tchiki_monkey_nuts]
+if (last_useitem ! pestle_and_mortar) return;
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_first_batch_eaten) return;
+if (inv_total(inv, hundred_ilm_tchiki_monkey_nuts) < 1 | inv_total(inv, hundred_ilm_tchiki_monkey_nut_paste) > 0) return;
+inv_del(inv, hundred_ilm_tchiki_monkey_nuts, 1);
+inv_add(inv, hundred_ilm_tchiki_monkey_nut_paste, 1);
+~rfd_awowogei_refresh_stage;
+mes("You grind the Tchiki monkey nuts into paste.");
+
+[opheldu,hundred_ilm_snake_corpse]
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_first_batch_eaten) return;
+if (inv_total(inv, hundred_ilm_snake_corpse) < 1) return;
+if (last_useitem = hundred_ilm_sliced_red_banana | last_useitem = hundred_ilm_tchiki_monkey_nut_paste) {
+    if (inv_total(inv, hundred_ilm_sliced_red_banana) < 1 | inv_total(inv, hundred_ilm_tchiki_monkey_nut_paste) < 1) {
+        ~mesbox("A snake corpse needs both sliced red banana and Tchiki nut paste; nothing is used.");
+        return;
+    }
+    ~rfd_awowogei_refresh_stage;
+    if (%hundred_ilm_quest < ^rfd_awowogei_prepared) return;
+    inv_del(inv, hundred_ilm_snake_corpse, 1);
+    inv_del(inv, hundred_ilm_sliced_red_banana, 1);
+    inv_del(inv, hundred_ilm_tchiki_monkey_nut_paste, 1);
+    inv_add(inv, hundred_ilm_correctly_stuffed_snake, 1);
+    %hundred_ilm_quest = ^rfd_awowogei_stuffed;
+    mes("You stuff the snake corpse with the prepared ingredients.");
+    return;
+}
+if (last_useitem = banana | last_useitem = mm_monkey_nuts |
+    last_useitem = hundred_ilm_red_banana | last_useitem = hundred_ilm_tchiki_monkey_nuts) {
+    if (inv_total(inv, last_useitem) < 1) return;
+    inv_del(inv, hundred_ilm_snake_corpse, 1);
+    inv_del(inv, last_useitem, 1);
+    inv_add(inv, hundred_ilm_incorrectly_stuffed_snake, 1);
+    mes("The snake is incorrectly stuffed with those ingredients.");
+}
+
+[oplocu,scenery_12633]
+if (loc_coord ! ^rfd_awowogei_hot_rock | last_useitem ! hundred_ilm_correctly_stuffed_snake) return;
+@rfd_awowogei_cook;
+
+[label,rfd_awowogei_cook]
+if (~rfd_awowogei_active = false | %hundred_ilm_quest < ^rfd_awowogei_stuffed) return;
+if (inv_total(inv, hundred_ilm_correctly_stuffed_snake) < 1) return;
+if (stat(cooking) < ^rfd_awowogei_cooking_level) {
+    ~mesbox("You need level 70 Cooking to cook the stuffed snake.");
+    return;
+}
+if (~rfd_awowogei_zombie_form = false) {
+    ~mesbox("Wear a zombie monkey greegree to use the hot rock.");
+    return;
+}
+if (%100_ilm_cooking_snake_state ! 0) %100_ilm_cooking_snake_state = 0;
+%100_ilm_cooking_snake_state = 1;
+p_delay(^rfd_awowogei_cook_delay);
+if (inv_total(inv, hundred_ilm_correctly_stuffed_snake) < 1 |
+    %hundred_ilm_quest < ^rfd_awowogei_stuffed | %hundred_ilm_quest >= ^rfd_guest_complete |
+    stat(cooking) < ^rfd_awowogei_cooking_level | ~rfd_awowogei_zombie_form = false) {
+    %100_ilm_cooking_snake_state = 0;
+    return;
+}
+inv_del(inv, hundred_ilm_correctly_stuffed_snake, 1);
+%100_ilm_cooking_snake_state = 3;
+inv_add(inv, hundred_ilm_cooked_stuffed_snake, 1);
+%hundred_ilm_quest = ^rfd_awowogei_cooked;
+p_delay(^rfd_awowogei_cook_delay);
+%100_ilm_cooking_snake_state = 0;
+
+[oplocu,hundred_monkey_base]
+if (last_useitem ! hundred_ilm_cooked_stuffed_snake) return;
+if (%hundred_main_quest_var < ^rfd_frozen | %100monkeyvisible = 0 |
+    %hundred_ilm_quest ! ^rfd_awowogei_cooked | inv_total(inv, hundred_ilm_cooked_stuffed_snake) < 1) return;
+inv_del(inv, hundred_ilm_cooked_stuffed_snake, 1);
+%hundred_ilm_quest = ^rfd_guest_complete;
+~rfd_guest_reward(8);
+
+[oploc1,mm_temple_trapdoor]
+loc_change(mm_temple_trapdoor_open, ^rfd_wrapper_duration);
+
+[oploc1,mm_temple_trapdoor_open]
+p_arrivedelay;
+p_telejump(map_findsquare(^rfd_awowogei_temple_basement, 1, 2, ^map_findsquare_none));
+
+[oploc2,mm_temple_trapdoor_open]
+loc_change(mm_temple_trapdoor, ^rfd_wrapper_duration);
+
+[oploc1,exit_12616]
+p_arrivedelay;
+p_telejump(map_findsquare(^rfd_awowogei_cave_exit, 1, 2, ^map_findsquare_none));
+
+[if_button,magic:com_569]
+@rfd_awowogei_teleport;
+
+[label,rfd_awowogei_teleport]
+if_close;
+if (p_finduid(uid) = false) return;
+if (%alternate_spells ! ^dt_spellbook_standard) {
+    mes("Nothing interesting happens.");
+    return;
+}
+if (%hundred_ilm_quest < ^rfd_guest_complete) {
+    mes("You must free King Awowogei before using this spell.");
+    return;
+}
+if (inv_total(inv, banana) < 1) {
+    mes("You need a banana to cast this spell.");
+    return;
+}
+def_dbrow $spell_data = ~get_spell_data(^rfd_awowogei_spell);
+if (~check_spell_requirements($spell_data) = false) return;
+if (~wilderness_level(coord) > 20) {
+    mes("A mysterious force blocks your teleport spell!");
+    mes("You can't use this teleport after level 20 wilderness.");
+    return;
+}
+if (~pre_tele_checks(coord) = false) return;
+if (afk_event = ^true) {
+    ~macro_event_general_spawn(~macro_event_set_random);
+    return;
+}
+inv_del(inv, banana, 1);
+~delete_spell_runes($spell_data);
+~give_spell_xp($spell_data);
+~player_teleport_normal(map_findsquare(db_getfield($spell_data, magic_spell_table:tele_coord, 0), 0, 2, ^map_findsquare_lineofwalk));
+
+[oploc1,pit]
+if (loc_coord ! ^rfd_awowogei_snake_pit) return;
+p_arrivedelay;
+p_telejump(^rfd_awowogei_snake_entry);
+
+[oploc1,rope_12601]
+if (loc_coord ! ^rfd_awowogei_snake_rope) return;
+p_arrivedelay;
+p_telejump(map_findsquare(^rfd_awowogei_snake_pit, 1, 2, ^map_findsquare_none));
+
+[oploc1,hole_12581]
+if (loc_coord ! ^rfd_awowogei_nut_hole) return;
+if (~ape_atoll_entry = false) {
+    ~mesbox("Use a ninja greegree with level 48 Agility to enter this cave.");
+    return;
+}
+p_arrivedelay;
+p_telejump(map_findsquare(^rfd_awowogei_cave_entry, 1, 2, ^map_findsquare_none));
+
+[oploc1,mm_climbing_rope_bottom_temple]
+p_arrivedelay;
+p_telejump(map_findsquare(^rfd_awowogei_temple_trapdoor, 1, 2, ^map_findsquare_none));
+
+[oploc1,exit_12617]
+if (loc_coord = ^rfd_awowogei_temple_crack) {
+    if (%hundred_ilm_quest < ^rfd_awowogei_started) return;
+    p_arrivedelay;
+    ~rfd_awowogei_prepare_chamber;
+    p_telejump(^rfd_awowogei_chamber_entry);
+    return;
+}
+if (loc_coord = ^rfd_awowogei_chamber_return) {
+    p_arrivedelay;
+    p_telejump(map_findsquare(^rfd_awowogei_temple_crack, 1, 2, ^map_findsquare_none));
+}
+
+[proc,rfd_awowogei_prepare_chamber]
+// Keep the shared return available to every visitor, regardless of entry time.
+if (loc_find(^rfd_awowogei_chamber_return, exit_12617) = false) {
+    loc_add(^rfd_awowogei_chamber_return, exit_12617, 0, wall_straight, ^rfd_awowogei_return_duration);
+}
+%100_ilm_cooking_snake_state = 0;
+
+[proc,rfd_awowogei_login]
+if (inzone(^rfd_awowogei_chamber_min, ^rfd_awowogei_chamber_max, coord) = false) return;
+~rfd_awowogei_prepare_chamber;

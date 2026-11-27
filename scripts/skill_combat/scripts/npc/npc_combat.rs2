@@ -91,6 +91,7 @@ return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
 // "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
 // magic callers (pass spell id or 0). Quest-local ai_queue2 remains secondary.
 [proc,npc_max_dealt](int $maxhit, int $spell)(int)
+if (npc_category = rfd_finale_boss) return(~rfd_finale_max_dealt($maxhit, $spell));
 if (~swan_combat_npc = true & ~swan_attackable = false) return(0);
 if (~zogre_undead = true) return (~zogre_damage_max($maxhit, $spell));
 if (~myreque2_combat_actor = true) return(~myreque2_max_dealt($maxhit, $spell));
@@ -163,6 +164,7 @@ return(npc_hasop(2));
 
 // Existing op2 truthiness policy, except for the named noncombat multi bases.
 [proc,npc_is_attackable]()(boolean)
+if (npc_category = rfd_finale_boss) return(~rfd_finale_attackable);
 if (~macro_overworld_hostile_npc = true) return(~macro_overworld_hostile_attack_allowed);
 if (~ics_little_encounter_attackable = false) return(false);
 if (npc_type = agrith_naar) return(~agrith_attackable);
@@ -289,6 +291,7 @@ return (false);
 
 // this proc is used for magic (TODO 377: re-enable later!!)
 [proc,npc_is_attackable_opt]()(boolean)
+if (npc_category = rfd_finale_boss) return(~rfd_finale_attackable);
 if (~macro_overworld_hostile_npc = true) return(~macro_overworld_hostile_attack_allowed);
 if (~ics_little_encounter_attackable = false) return(false);
 if (~ics_little_guardian = true) return(false);
@@ -399,6 +402,7 @@ return (false);
 // Area scans call this only after multiway admits the secondary NPC tile.
 // Dialogue-specific refusal branches are absent because their maps are single-combat.
 [proc,npc_is_attackable_opt_quiet]()(boolean)
+if (npc_category = rfd_finale_boss) return(~rfd_finale_attackable);
 if (~macro_overworld_hostile_npc = true) return(~macro_overworld_hostile_attack_allowed);
 if (~ics_little_encounter_attackable = false) return(false);
 if (~ics_little_guardian = true) return(false);

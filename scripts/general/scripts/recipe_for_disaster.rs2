@@ -19,6 +19,10 @@ if (%hundred_main_quest_var = 0) {
     if_settext(recipe_for_disaster:com_14, "Bring the Cook his four requested ingredients.");
 } else if (%hundred_main_quest_var = ^rfd_feast_ready) {
     if_settext(recipe_for_disaster:com_14, "Enter the dining room from Lumbridge Castle's kitchen.");
+} else if (%hundred_main_quest_var >= ^rfd_complete) {
+    if_settext(recipe_for_disaster:com_14, "Quest complete. Full access to the Culinaromancer's Chest.");
+} else if (%hundred_main_quest_var = ^rfd_finale_ready) {
+    if_settext(recipe_for_disaster:com_14, "Defeat the Culinaromancer through the portal in the banquet room.");
 } else {
     if_settext(recipe_for_disaster:com_14, "Guests rescued: <tostring(%hundred_subquest_tally)> of 8.");
 }
@@ -28,6 +32,8 @@ if (%hundred_main_quest_var = 0) {
 ~send_quest_progress_colour(recipe_for_disaster:com_5, %100guide_prog, ^rfd_guest_complete);
 ~send_quest_progress_colour(recipe_for_disaster:com_6, %hundred_dave_main, ^rfd_dave_complete);
 ~send_quest_progress_colour(recipe_for_disaster:com_7, %100_ogre_prog, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_8, %chickenquest, ^rfd_guest_complete);
+~send_quest_progress_colour(recipe_for_disaster:com_9, %hundred_ilm_quest, ^rfd_guest_complete);
 if_openmain(recipe_for_disaster);
 
 [if_close,recipe_for_disaster]
@@ -98,3 +104,21 @@ if (%100_ogre_prog = ^rfd_guest_complete) {
     $text = "I should inspect frozen Skrach Uglogwee.|I need Big Chompy Bird Hunting, level 41 Cooking and|level 20 Firemaking. Rantz in Feldip Hills can help.|I need balloon toads to lure a Jubbly, then my ogre bow|to hunt it. I should pluck it and roast it on Rantz's spit.";
 }
 ~quest_journal("Freeing Skrach Uglogwee", $text);
+
+[if_button,recipe_for_disaster:com_8]
+def_string $text;
+if (%chickenquest = ^rfd_guest_complete) {
+    $text = "@str@I freed Sir Amik Varze with Brulee supreme.|@red@GUEST RESCUED!";
+} else {
+    $text = "I should inspect frozen Sir Amik Varze.|I must complete Lost City and start Legends' Quest.|The Cook can explain his creme brulee recipe.|I need milk, cream, cornflour, vanilla, cinnamon ground from|a Dramen branch and the Evil Chicken's egg.|The Wise Old Man in Draynor knows about the Evil Chicken.|Raw chicken on the Zanaris shrine leads to its lair.|A Black dragon drops a token. I should wear ice gloves|and rub the token to have the brulee flambeed.";
+}
+~quest_journal("Freeing Sir Amik Varze", $text);
+
+[if_button,recipe_for_disaster:com_9]
+def_string $text;
+if (%hundred_ilm_quest = ^rfd_guest_complete) {
+    $text = "@str@I freed King Awowogei with a cooked stuffed snake.|@red@GUEST RESCUED!";
+} else {
+    $text = "I should inspect frozen Awowogei.|I need Monkey Madness, level 70 Cooking and level 48 Agility.|Awowogei and the Three Monkeys on Ape Atoll know his food.|I need a giant snake corpse, sliced red banana and Tchiki nut paste.|A guard greegree and rope help collect red bananas.|A ninja greegree helps reach the nuts beyond the agility course.|The monkeys want to taste the first correct ingredients.|A zombie greegree protects me at the temple's lava oven.";
+}
+~quest_journal("Freeing King Awowogei", $text);

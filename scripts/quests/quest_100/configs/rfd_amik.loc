@@ -1,0 +1,7 @@
+[fairy_chicken_shrine]
+name=Chicken Shrine
+desc=A shrine to the evil chicken.
+model=fairy_chicken_shrine
+active=yes
+ambient=20
+anim=chicken_shrine

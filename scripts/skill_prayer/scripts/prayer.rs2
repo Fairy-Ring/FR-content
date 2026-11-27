@@ -1,4 +1,8 @@
 [proc,prayer_checks](dbrow $data)(boolean)
+if (~rfd_finale_inside = true) {
+    mes("Your prayers will not work in this arena.");
+    return(false);
+}
 if (~champions_prayer_check = false) return(false);
 if (~dragon_scimitar_prayer_check($data) = false) return(false);
 if (stat(prayer) < 1) {

@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { runtime } from './outcome_runtime.mjs';
+import { quests as pointQuests, value as pointConstant } from '../quest-points/registry.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const content = path.resolve(here, '../..');
@@ -290,6 +291,38 @@ try {
     assert.equal(invisible.type, visible, 'only native pouch use reveals the route ghast');
     assert.equal(invisible.getVar(rt.id(VarNpcType, 'npc_attacking_uid')) >>> 0, f.player.uid, 'native reveal retains trek ownership');
   }
+  function seedFinaleRoute(f, route) {
+    for (const quest of pointQuests.filter(row => row.component !== 'hundred_main')) {
+      const fixture = quest.component === 'elemental_workshop'
+        ? [[quest.fixture[0][0], 2 ** pointConstant('elemental_workshop_complete')]]
+        : quest.fixture;
+      for (const [name, value] of fixture) {
+        const id = VarPlayerType.getId(name);
+        if (id >= 0) f.player.setVar(id, value);
+        else f.player.setVarBit(rt.id(rt.configs.VarBitType, name), value);
+      }
+    }
+    const wave = route.npc.startsWith('hundred_minion5_') ? 4 : [
+      'hundred_minion1', 'hundred_minion2', 'hundred_minion3', 'hundred_minion4',
+      'hundred_minion5_air', 'hundred_culinaromancer_final'
+    ].indexOf(route.npc);
+    assert(wave >= 0, `${route.script}: known RFD opponent`);
+    f.player.setVarBit(rt.id(rt.configs.VarBitType, 'hundred_minionskilled_tally'), wave);
+  }
+  function advanceFinalePhase(f, route, instance) {
+    const wanted = f.npc.type;
+    rt.World.processNpcEventQueue();
+    f.npc = [...rt.World.npcs].find(npc =>
+      npc.getVar(rt.id(VarNpcType, 'npc_attacking_uid')) === f.player.uid
+      && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
+    assert(f.npc, `${route.script}: native entry spawns the owned opponent`);
+    for (let phase = 0; f.npc.type !== wanted && phase < 6; phase++) {
+      assert(route.npc.startsWith('hundred_minion5_'), 'only Mother phases require native phase advancement');
+      const changed = rt.run('[ai_timer,_rfd_finale_boss]', f);
+      assert.equal(changed.state.execution, rt.State.FINISHED, 'the native Mother phase timer finishes');
+    }
+    assert.equal(f.npc.type, wanted, `${route.script}: native entry and phase timer produce ${route.npc}`);
+  }
   function configureRoute(f, route) {
     for (const stat of [1, 6]) { f.player.levels[stat] = 20; f.player.baseLevels[stat] = 20; }
     if (route.equipment) f.player.invAdd(rt.id(rt.configs.InvType, 'worn'), rt.id(rt.configs.ObjType, route.equipment), 1);
@@ -304,6 +337,7 @@ try {
       if (id >= 0) f.player.setVar(id, value);
       else f.player.setVarBit(rt.id(rt.configs.VarBitType, name), value);
     }
+    if (route.prelude === 'rfd-finale') seedFinaleRoute(f, route);
     let cleanup;
     try {
       if (route.privateRegion) {
@@ -346,6 +380,7 @@ try {
         if (route.prelude === 'soulbane-hope-lives') advanceHopeLives(f, route, instance);
         else if (route.prelude === 'soulbane-tolna-intro') advanceTolnaIntro(f, route, instance, createdInstances, before);
         else if (route.prelude === 'templetrek-ghasts') advanceTrekGhast(f, route, instance);
+        else if (route.prelude === 'rfd-finale') advanceFinalePhase(f, route, instance);
         else assert.equal(route.prelude, undefined, `${route.script}: known native route prelude`);
         if (route.prelude !== 'soulbane-tolna-intro') {
           f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);

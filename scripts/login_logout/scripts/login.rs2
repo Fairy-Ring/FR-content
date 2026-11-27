@@ -85,6 +85,8 @@ if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena 
 // assessment (marker 2) remains available to Tiffy after relog.
 ~rd_lifecycle_login;
 if (%soulbane_prog >= 2 & %soulbane_prog <= ^soulbane_tolna_clear) ~soulbane_login;
+if (%hundred_main_quest_var >= ^rfd_finale_ready) ~rfd_finale_login;
+if (%hundred_ilm_quest > 0) ~rfd_awowogei_login;
 if (%elenaquest >= ^quest_elena_freed_elena) %plaguecity_elena_at_home = 1;
 ~roguesden_login;
 ~templetrek_login;

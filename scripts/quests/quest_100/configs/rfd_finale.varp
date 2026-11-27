@@ -1,0 +1,8 @@
+// UNKNOWN engineering session token in original server-only slot 424.
+[rfd_finale_uid]
+scope=temp
+
+// Original 377 transmitted state; completed recipes and samples survive logout.
+[hundred_ilm_var_1]
+transmit=yes
+scope=perm

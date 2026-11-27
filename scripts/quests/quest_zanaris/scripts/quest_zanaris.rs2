@@ -69,6 +69,7 @@ p_delay(1);
 anim(null, 0);
 
 [opheldu,dramen_branch]
+if (~rfd_amik_grind_dramen_branch() = true) return;
 if(last_useitem = knife) {
     @cut_dramenstaff;
 }

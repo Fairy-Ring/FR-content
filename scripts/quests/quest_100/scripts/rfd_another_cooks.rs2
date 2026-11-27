@@ -98,6 +98,9 @@ inv_add(inv, coins, 100);
 return;
 
 [label,rfd_another_cooks_pointer]
+if (%hundred_main_quest_var >= ^rfd_frozen & %chickenquest > 0 & %chickenquest < ^rfd_guest_complete) {
+    if (~p_choice2("About Sir Amik Varze...", 1, "About the banquet...", 2) = 1) @rfd_amik_cook_offer;
+}
 if (%hundred_main_quest_var >= ^rfd_frozen & %100_pirate_quest_var > 0) {
     def_int $topic = ~p_choice2("About Pirate Pete...", 1, "About the banquet...", 2);
     if ($topic = 1) @rfd_pete_cook_talk;

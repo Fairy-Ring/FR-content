@@ -1,0 +1,198 @@
+[chickenquest_vanilla_pod]
+name=Vanilla pod
+desc=Surprise, it looks like a vanilla pod.
+model=obj_chickenquest_vanilla_pod
+2dxof=-5
+2dyof=-4
+2dzoom=789
+2dyan=69
+2dxan=699
+members=yes
+weight=3g
+tradeable=no
+
+[chickenquest_cornflour]
+name=Cornflour
+desc=It's cornflour.
+recol1s=21140
+recol1d=29492
+model=obj_unicorn_horn_dust
+2dxof=-6
+2dzoom=1210
+2dyan=1892
+2dxan=264
+weight=3g
+tradeable=no
+
+[cert_chickenquest_cornflour]
+certlink=chickenquest_cornflour
+certtemplate=template_for_cert
+tradeable=no
+
+[chickenquest_pot_cornflour]
+name=Pot of cornflour
+desc=It's cornflour in a pot.
+recol1s=32767
+recol1d=29492
+model=obj_pot_flour
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+members=yes
+cost=10
+iop4=Empty
+weight=3lb
+tradeable=no
+
+[cert_chickenquest_pot_cornflour]
+certlink=chickenquest_pot_cornflour
+certtemplate=template_for_cert
+tradeable=no
+
+[chickenquest_cornflour_milky_mixture]
+name=Cornflour mixture
+desc=A mixture of milk, cream and cornflour.
+model=obj_chickenquest_cornflour_milky_mixture
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+members=yes
+iop4=Empty
+iop5=Destroy
+weight=3lb
+tradeable=no
+
+[chickenquest_milky_mixture]
+name=Milky mixture
+desc=It's a bucket of milk and cream.
+recol1s=173
+recol1d=29492
+model=obj_bucket_wax
+2dyof=-18
+2dzoom=1020
+2dyan=1660
+2dxan=204
+members=yes
+iop4=Empty
+iop5=Destroy
+weight=3lb
+tradeable=no
+
+[chickenquest_cinamon]
+name=Cinnamon
+desc=Some cinnamon sticks.
+model=obj_chickenquest_cinamon
+2dxof=4
+2dyof=-16
+2dzoom=720
+2dyan=770
+2dxan=168
+members=yes
+weight=3g
+tradeable=no
+
+[chickenquest_brulee_mixture_egg]
+name=Brulee
+desc=It's just missing a sprinkling of cinnamon.
+recol1s=29558
+recol1d=23177
+model=obj_chickenquest_cornflour_milky_mixture
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+members=yes
+iop4=Empty
+iop5=Destroy
+weight=300g
+tradeable=no
+
+[chickenquest_brulee_mixture]
+name=Brulee
+desc=A pot of brulee mixture - needs egg.
+recol1s=32767
+recol1d=23216
+recol2s=29558
+recol2d=25358
+model=obj_chickenquest_cornflour_milky_mixture
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+members=yes
+iop4=Empty
+iop5=Destroy
+weight=300g
+tradeable=no
+
+[chickenquest_brulee_mixture_cinamon]
+name=Brulee
+desc=Perfect, it just needs flambeing.
+recol1s=32767
+recol1d=9378
+recol2s=29558
+recol2d=25358
+model=obj_chickenquest_cornflour_milky_mixture
+manwear=obj_chickenquest_brulee_mixture_cinamon_manwear,0
+womanwear=obj_chickenquest_brulee_mixture_cinamon_manwear,6
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+members=yes
+iop4=Empty
+iop5=Destroy
+weight=300g
+tradeable=no
+
+[chickenquest_brulee_mixture_supreme]
+name=Brulee supreme
+desc=A pot of brulee supreme.
+recol1s=32767
+recol1d=14664
+recol2s=29558
+recol2d=20011
+model=obj_chickenquest_cornflour_milky_mixture
+2dxof=-1
+2dyof=2
+2dzoom=990
+2dyan=8
+2dxan=112
+members=yes
+iop4=Empty
+iop5=Destroy
+weight=300g
+tradeable=no
+
+[chickenquest_evil_chicken_egg]
+name=Evil chicken's egg
+desc=What came first, the chicken or...
+model=obj_chickenquest_evil_chicken_egg
+2dxof=1
+2dyof=-1
+2dzoom=528
+2dyan=414
+2dxan=290
+members=yes
+iop5=Destroy
+weight=80g
+tradeable=no
+
+[chickenquest_dragon_coin]
+name=Dragon token
+desc=It's got a dragon on it.
+iop1=Rub
+model=obj_chickenquest_dragon_coin
+2dzoom=530
+2dxan=415
+members=yes
+iop5=Destroy
+weight=10g
+tradeable=no

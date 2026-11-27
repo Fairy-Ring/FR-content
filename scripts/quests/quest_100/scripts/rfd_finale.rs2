@@ -1,0 +1,272 @@
+// VERIFIED route and specials: RuneHQ captured 15 April 2006.
+// UNKNOWN copy geometry, staging, rates and functional messages: rfd_finale.constant.
+[proc,rfd_finale_unlock]
+if (%hundred_main_quest_var ! ^rfd_frozen | %hundred_subquest_tally ! 8) return;
+%hundred_main_quest_var = ^rfd_finale_ready;
+%100culinaromancervisible = 0;
+mes("All eight guests are free. The Culinaromancer has escaped through the portal in Lumbridge Castle's banquet room.");
+
+[proc,rfd_finale_gate]()(boolean)
+if (%hundred_main_quest_var ! ^rfd_finale_ready | %hundred_subquest_tally ! 8) return(false);
+if (~count_questpoints < ^rfd_finale_required_qp) return(false);
+if (%deserttreasure < ^dt_stage_complete | %horrorquest < ^horror_complete) return(false);
+return(true);
+
+[oploc1,hundred_portal_active]
+if (~rfd_finale_gate = false) {
+    mes("You must free all eight guests, have 175 Quest Points, and complete Desert Treasure and Horror from the Deep.");
+    return;
+}
+~rfd_finale_enter;
+
+[proc,rfd_finale_enter]
+if (~rfd_finale_gate = false) return;
+~rfd_finale_cleanup;
+def_coord $base = region_create(^rfd_finale_copy_levels, ^rfd_finale_copy_zones, ^rfd_finale_copy_zones);
+def_int $level = 0;
+while ($level < ^rfd_finale_copy_levels) {
+    def_int $x = 0;
+    while ($x < ^rfd_finale_copy_zones) {
+        def_int $z = 0;
+        while ($z < ^rfd_finale_copy_zones) {
+            region_set($level, $x, $z, movecoord(^rfd_finale_source, multiply($x, 8), $level, multiply($z, 8)), 0);
+            $z = add($z, 1);
+        }
+        $x = add($x, 1);
+    }
+    $level = add($level, 1);
+}
+region_setexitcoord(^rfd_kitchen_landing);
+%rfd_finale_uid = add(region_uid, 1);
+~prayer_deactivate_all;
+~player_combat_stat;
+p_teleport(movecoord($base, ^rfd_finale_entry_x, ^rfd_finale_plane, ^rfd_finale_entry_z));
+mes("Your prayers will not work in this arena. You may leave through any portal and return to your next undefeated opponent.");
+~rfd_finale_spawn;
+
+[proc,rfd_finale_inside]()(boolean)
+if (%rfd_finale_uid = 0) return(false);
+if (region_findbycoord(coord) = false) return(false);
+if (add(region_uid, 1) = %rfd_finale_uid) return(true);
+return(false);
+
+[proc,rfd_finale_attackable]()(boolean)
+if (%npc_attacking_uid ! uid | %npc_int ! %rfd_finale_uid) return(false);
+if (%hundred_main_quest_var ! ^rfd_finale_ready | ~rfd_finale_inside = false) return(false);
+return(true);
+
+[proc,rfd_finale_spawn]
+if (~rfd_finale_inside = false | %hundred_main_quest_var ! ^rfd_finale_ready) return;
+def_npc $enemy;
+switch_int(%hundred_minionskilled_tally) {
+    case 0 : $enemy = hundred_minion1;
+    case 1 : $enemy = hundred_minion2;
+    case 2 : $enemy = hundred_minion3;
+    case 3 : $enemy = hundred_minion4;
+    case 4 : $enemy = hundred_minion5_air;
+    case 5 : $enemy = hundred_culinaromancer_final;
+    case default : return;
+}
+npc_add(region_getcoord(^rfd_finale_plane, ^rfd_finale_boss_x, ^rfd_finale_boss_z), $enemy, ^rfd_finale_lifetime);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_int = %rfd_finale_uid;
+%npc_action_delay = map_clock;
+npc_settimer(^rfd_finale_phase_ticks);
+if ($enemy = hundred_minion2) npc_setmode(opplayer2);
+else npc_setmode(applayer2);
+hint_npc;
+
+[oploc1,hundred_exit_portal]
+if (~rfd_finale_inside = false) return;
+~rfd_finale_cleanup;
+p_teleport(^rfd_kitchen_landing);
+
+[proc,rfd_finale_cleanup]
+clearqueue(rfd_finale_credit);
+hint_stop;
+%rfd_finale_uid = 0;
+
+[proc,rfd_finale_teleport_release](coord $destination)
+if (~rfd_finale_inside = false) return;
+if (region_findbycoord($destination) = true) {
+    if (add(region_uid, 1) = %rfd_finale_uid) return;
+}
+~rfd_finale_cleanup;
+
+[proc,rfd_finale_login]
+// The engine saves the region exit rather than a tile in an abandoned copy.
+%rfd_finale_uid = 0;
+
+[opnpc2,_rfd_finale_boss]
+if (~rfd_finale_attackable = false) return;
+if (npc_type = hundred_minion2) ~rfd_finale_disarm;
+@player_combat_start;
+
+[apnpc2,_rfd_finale_boss]
+if (~rfd_finale_attackable = false) return;
+if (npc_type = hundred_minion2) ~rfd_finale_disarm;
+@player_combat_start_ap;
+
+[ai_queue1,_rfd_finale_boss]
+// Never let mutable retaliation replace the immutable encounter owner.
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+if (finduid(%npc_attacking_uid) = false) return;
+if (~rfd_finale_attackable = false | ~npc_retal_ready = false) return;
+if (npc_type = hundred_minion2) npc_setmode(opplayer2);
+else npc_setmode(applayer2);
+
+[ai_timer,_rfd_finale_boss]
+if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
+if (~rfd_finale_attackable = false | stat(hitpoints) = 0) { npc_del; return; }
+%npc_aggressive_player = %npc_attacking_uid;
+if (npc_type = hundred_minion2) {
+    if (p_finduid(%npc_attacking_uid) = true) ~rfd_finale_disarm;
+    return;
+}
+def_npc $next;
+switch_npc(npc_type) {
+    case hundred_minion5_air : $next = hundred_minion5_water;
+    case hundred_minion5_water : $next = hundred_minion5_melee;
+    case hundred_minion5_melee : $next = hundred_minion5_earth;
+    case hundred_minion5_earth : $next = hundred_minion5_fire;
+    case hundred_minion5_fire : $next = hundred_minion5_ranged;
+    case hundred_minion5_ranged : $next = hundred_minion5_air;
+    case default : return;
+}
+def_npc_uid $old_uid = npc_uid;
+npc_changetype($next, ^rfd_finale_lifetime);
+// The native type-encoded UID changes; keep only this existing combat opponent.
+if (%aggressive_npc = $old_uid) %aggressive_npc = npc_uid;
+
+[proc,rfd_finale_disarm]
+if (inv_getobj(worn, ^wearpos_hands) = ice_gloves) return;
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+if ($weapon = null) return;
+if (inv_freespace(inv) > 0) {
+    ~unequip(^wearpos_rhand);
+    mes("Flambeed's heat makes you remove your weapon.");
+    return;
+}
+inv_dropslot(worn, coord, ^wearpos_rhand, ^dropslot_duration);
+~update_all($weapon);
+~on_unequip($weapon);
+mes("Flambeed's heat makes you drop your weapon.");
+
+[ai_opplayer2,_rfd_finale_boss] ~rfd_finale_attack;
+[ai_applayer2,_rfd_finale_boss] ~rfd_finale_attack;
+
+[proc,rfd_finale_attack]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~rfd_finale_attackable = false | %npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
+%npc_aggressive_player = %npc_attacking_uid;
+switch_npc(npc_type) {
+    case hundred_minion1 :
+        if (npc_range(coord) <= 1) ~npc_default_attack;
+        else ~npc_cast_spell_with_forced_max_hit(^fire_blast, npc_param(attackrate), ^rfd_finale_agrith_magic_max);
+    case hundred_minion2 :
+        npc_setmode(opplayer2);
+        if (npc_range(coord) <= 1) {
+            queue*(rfd_finale_disarm_queue, 0)(npc_uid);
+            ~npc_default_attack;
+        }
+    case hundred_minion3 :
+        // VERIFIED: she cannot hurt an adjacent player; distant magic freezes and drains.
+        if (npc_range(coord) <= 1) return;
+        npc_anim(human_castentangle, 0);
+        spotanim_pl(ice_barrage_impact, 0, 0);
+        %npc_action_delay = add(map_clock, npc_param(attackrate));
+        ~npc_set_attack_vars;
+        if_close;
+        if (~npc_player_hit_roll(^magic_style) = true) {
+            queue(combat_damage_player, 0, randominc(^rfd_finale_karamel_magic_max));
+            queue(npc_freeze_player, 0, ^rfd_finale_karamel_freeze_ticks);
+            queue*(rfd_finale_karamel_drain, 0)(%rfd_finale_uid);
+        }
+        queue*(playerhit_n_retaliate, 0)(npc_uid);
+    case hundred_minion4 :
+        if (npc_range(coord) <= 1 & random(^rfd_finale_dessourt_melee_chance) = 0) { ~npc_default_attack; return; }
+        npc_anim(dessourt_tot_attack, 0);
+        %npc_action_delay = add(map_clock, ^rfd_finale_fast_attack_ticks);
+        ~npc_set_attack_vars;
+        if_close;
+        if (~npc_player_hit_roll(^magic_style) = true) queue(combat_damage_player, 0, ^rfd_finale_dessourt_magic_damage);
+        queue*(playerhit_n_retaliate, 0)(npc_uid);
+    case hundred_culinaromancer_final :
+        ~npc_cast_spell_with_forced_max_hit(^fire_blast, npc_param(attackrate), ^rfd_finale_culinaromancer_magic_max);
+    case default :
+        if (npc_range(coord) <= 1) ~npc_default_attack;
+        else ~dagannoth_rangeattack(^rfd_finale_mother_ranged_max, ^false);
+}
+
+// Evaluate the player's attack style and spell BEFORE XP and hero-point settlement.
+[proc,rfd_finale_max_dealt](int $maximum, int $spell)(int)
+if (~rfd_finale_attackable = false) return(0);
+switch_npc(npc_type) {
+    case hundred_minion5_melee :
+        if ($spell = 0 & %damagetype ! ^ranged_style) return(min($maximum, npc_param(max_dealt)));
+    case hundred_minion5_ranged :
+        if ($spell = 0 & %damagetype = ^ranged_style) return(min($maximum, npc_param(max_dealt)));
+    case hundred_minion5_air :
+        switch_int($spell) { case ^wind_strike, ^wind_bolt, ^wind_blast, ^wind_wave : return(min($maximum, npc_param(max_dealt))); }
+    case hundred_minion5_water :
+        switch_int($spell) { case ^water_strike, ^water_bolt, ^water_blast, ^water_wave : return(min($maximum, npc_param(max_dealt))); }
+    case hundred_minion5_earth :
+        switch_int($spell) { case ^earth_strike, ^earth_bolt, ^earth_blast, ^earth_wave : return(min($maximum, npc_param(max_dealt))); }
+    case hundred_minion5_fire :
+        switch_int($spell) { case ^fire_strike, ^fire_bolt, ^fire_blast, ^fire_wave : return(min($maximum, npc_param(max_dealt))); }
+    case default : return(min($maximum, npc_param(max_dealt)));
+}
+return(0);
+
+[ai_queue3,_rfd_finale_boss]
+def_player_uid $owner = %npc_attacking_uid;
+def_int $instance = %npc_int;
+def_npc $enemy = npc_type;
+def_coord $drop = npc_coord;
+if (npc_findhero = ^true & uid = $owner & ~rfd_finale_attackable = true) {
+    queue*(rfd_finale_credit, 0)($instance, $enemy);
+    switch_npc($enemy) {
+        case hundred_minion1 : obj_add($drop, banana, 1, ^lootdrop_duration);
+        case hundred_minion2 : obj_add($drop, cake, 1, ^lootdrop_duration);
+        case hundred_minion3 : obj_add($drop, elid_choc_ice, 1, ^lootdrop_duration);
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,rfd_finale_credit](int $instance, npc $enemy)
+if ($instance ! %rfd_finale_uid | ~rfd_finale_inside = false | %hundred_main_quest_var ! ^rfd_finale_ready) return;
+def_int $wave = %hundred_minionskilled_tally;
+if (($wave = 0 & $enemy ! hundred_minion1) | ($wave = 1 & $enemy ! hundred_minion2) | ($wave = 2 & $enemy ! hundred_minion3) | ($wave = 3 & $enemy ! hundred_minion4) | ($wave = 5 & $enemy ! hundred_culinaromancer_final)) return;
+if ($wave = 4 & $enemy ! hundred_minion5_air & $enemy ! hundred_minion5_water & $enemy ! hundred_minion5_melee & $enemy ! hundred_minion5_earth & $enemy ! hundred_minion5_fire & $enemy ! hundred_minion5_ranged) return;
+if ($wave >= ^rfd_finale_fights) return;
+%hundred_minionskilled_tally = add($wave, 1);
+hint_stop;
+p_stopaction;
+if (%hundred_minionskilled_tally = ^rfd_finale_fights) {
+    %hundred_main_quest_var = ^rfd_complete;
+    ~update_questpoints;
+    ~send_quest_progress_colour(questlist:hundred_main, %hundred_main_quest_var, ^rfd_complete);
+    ~rfd_finale_cleanup;
+    p_teleport(^rfd_kitchen_landing);
+    ~rfd_lamp_give;
+    mes("You have defeated the Culinaromancer and completed Recipe for Disaster. You now have full access to his chest.");
+    return;
+}
+mes("You have defeated this opponent. You may leave to prepare, or face the next one.");
+~rfd_finale_spawn;
+
+[queue,rfd_finale_disarm_queue](npc_uid $enemy)
+if (npc_finduid($enemy) = false) return;
+if (npc_type ! hundred_minion2 | ~rfd_finale_attackable = false) return;
+~rfd_finale_disarm;
+
+[queue,rfd_finale_karamel_drain](int $instance)
+if ($instance ! %rfd_finale_uid | ~rfd_finale_inside = false) return;
+stat_sub(attack, ^rfd_finale_karamel_stat_drain, 0);
+stat_sub(strength, ^rfd_finale_karamel_stat_drain, 0);
+stat_sub(defence, ^rfd_finale_karamel_stat_drain, 0);
+stat_sub(ranged, ^rfd_finale_karamel_stat_drain, 0);
+stat_sub(magic, ^rfd_finale_karamel_stat_drain, 0);
+%sa_energy = max(0, sub(%sa_energy, ^rfd_finale_karamel_special_drain));

@@ -12,6 +12,13 @@ if(inv_total(worn, mm_amulet_of_monkey_speak) = 0) {
     return;
 }
 // Any greegree OK for throne (289: no Karamjan-only check here)
+if (%hundred_main_quest_var >= ^rfd_frozen & %100monkeyvisible > 0 &
+        %hundred_ilm_quest > 0 & %hundred_ilm_quest < ^rfd_guest_complete &
+        %mm_main >= ^mm_complete) {
+    @rfd_awowogei_king;
+    return;
+}
+
 switch_int(%mm_awowogei) {
     case ^awowogei_complete_mission :
         ~chatnpc_specific(nc_name(mm_awowogei_cutscene), mm_awowogei_cutscene, "<p,neutral>We are still pondering your proposition...We will let you know when we have an answer...");
