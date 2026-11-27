@@ -38,31 +38,24 @@ if (~macro_arena1_owned(^macro_arnav) = false | %macro_event_uid ! npc_uid | %np
 mes("There are three columns. What you need to do for me is to match up each picture with the word underneath the column, and then unlock the chest.");
 ~macro_arnav_screen;
 
-[proc,macro_arnav_symbol](int $index)(obj)
-switch_int ($index) {
-    case 0 : return(gold_ring);
-    case 1 : return(gold_necklace);
-    case 2 : return(gold_bar);
-}
-return(coins);
-
+// VERIFIED: inter_64 supplies native reel geometry, zoom and angles; inventory objects override that presentation.
 [proc,macro_arnav_screen]
 if (~macro_arena1_owned(^macro_arnav) = false) return;
 def_int $left = getbit_range(%macro_transmit, 0, 1);
 def_int $middle = getbit_range(%macro_transmit, 2, 3);
 def_int $right = getbit_range(%macro_transmit, 4, 5);
-if_setobject(inter_64:com_3, ~macro_arnav_symbol(modulo(add($left, 3), 4)), 400);
-if_setobject(inter_64:com_4, ~macro_arnav_symbol(modulo(add($middle, 3), 4)), 400);
-if_setobject(inter_64:com_5, ~macro_arnav_symbol(modulo(add($right, 3), 4)), 400);
-if_setobject(inter_64:com_6, ~macro_arnav_symbol($left), 400);
-if_setobject(inter_64:com_7, ~macro_arnav_symbol($middle), 400);
-if_setobject(inter_64:com_8, ~macro_arnav_symbol($right), 400);
-if_setobject(inter_64:com_9, ~macro_arnav_symbol(modulo(add($left, 1), 4)), 400);
-if_setobject(inter_64:com_10, ~macro_arnav_symbol(modulo(add($middle, 1), 4)), 400);
-if_setobject(inter_64:com_11, ~macro_arnav_symbol(modulo(add($right, 1), 4)), 400);
-if_settext(inter_64:com_16, oc_name(~macro_arnav_symbol(getbit_range(%macro_transmit, 6, 7))));
-if_settext(inter_64:com_17, oc_name(~macro_arnav_symbol(getbit_range(%macro_transmit, 8, 9))));
-if_settext(inter_64:com_18, oc_name(~macro_arnav_symbol(getbit_range(%macro_transmit, 10, 11))));
+if_setmodel(inter_64:com_3, enum(int, int, macro_arnav_symbol_models, modulo(add($left, 3), 4)));
+if_setmodel(inter_64:com_4, enum(int, int, macro_arnav_symbol_models, modulo(add($middle, 3), 4)));
+if_setmodel(inter_64:com_5, enum(int, int, macro_arnav_symbol_models, modulo(add($right, 3), 4)));
+if_setmodel(inter_64:com_6, enum(int, int, macro_arnav_symbol_models, $left));
+if_setmodel(inter_64:com_7, enum(int, int, macro_arnav_symbol_models, $middle));
+if_setmodel(inter_64:com_8, enum(int, int, macro_arnav_symbol_models, $right));
+if_setmodel(inter_64:com_9, enum(int, int, macro_arnav_symbol_models, modulo(add($left, 1), 4)));
+if_setmodel(inter_64:com_10, enum(int, int, macro_arnav_symbol_models, modulo(add($middle, 1), 4)));
+if_setmodel(inter_64:com_11, enum(int, int, macro_arnav_symbol_models, modulo(add($right, 1), 4)));
+if_settext(inter_64:com_16, enum(int, string, macro_arnav_symbol_labels, getbit_range(%macro_transmit, 6, 7)));
+if_settext(inter_64:com_17, enum(int, string, macro_arnav_symbol_labels, getbit_range(%macro_transmit, 8, 9)));
+if_settext(inter_64:com_18, enum(int, string, macro_arnav_symbol_labels, getbit_range(%macro_transmit, 10, 11)));
 if_openmain(inter_64);
 
 [if_button,inter_64:com_20] ~macro_arnav_rotate(0, 1);

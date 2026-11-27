@@ -1,0 +1,19 @@
+// VERIFIED native lock symbols: models/com/com_i48..com_i51.ob2,
+// pack/model.pack and scripts/interfaces/inter_64.if. Preserve the cache assets.
+// UNKNOWN engineering reel order, retained from the existing four-position puzzle.
+[macro_arnav_symbol_models]
+inputtype=int
+outputtype=int
+val=0,7753
+val=1,7750
+val=2,7751
+val=3,7752
+
+// Native symbols: ring (com_i48), necklace (com_i49), diamond (com_i50), coins (com_i51).
+[macro_arnav_symbol_labels]
+inputtype=int
+outputtype=string
+val=0,RING
+val=1,NECKLACE
+val=2,DIAMOND
+val=3,COINS

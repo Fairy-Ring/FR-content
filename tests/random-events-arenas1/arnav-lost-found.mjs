@@ -4,6 +4,31 @@ const { default: Environment } = await import(pathToFileURL(`${engine}/src/util/
 const { default: IfButtonHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/IfButtonHandler.ts`).href);
 const { default: IfButton } = await import(pathToFileURL(`${engine}/src/network/game/client/model/IfButton.ts`).href);
 const bank = id(types.InvType, 'bank');
+// VERIFIED: inter_64 native reel assets, resolved through pack/model.pack.
+const lockModels = [7753, 7750, 7751, 7752]; // com_i48 ring, com_i49 necklace, com_i50 diamond, com_i51 coins.
+const lockLabels = ['RING', 'NECKLACE', 'DIAMOND', 'COINS'];
+function assertReels(p, since) {
+  const updates = p.messages.slice(since);
+  const word = p.getVar(v('macro_transmit'));
+  const expected = [];
+  for (const offset of [3, 0, 1]) {
+    for (let column = 0; column < 3; column++) {
+      const selected = (word >> (2 * column)) & 3;
+      expected.push(lockModels[(selected + offset) % 4]);
+    }
+  }
+  const reels = Array.from({ length: 9 }, (_, i) => id(types.Component, `inter_64:com_${i + 3}`));
+  assert.deepEqual(updates.filter(packet => packet.constructor.name === 'IfSetModel' && reels.includes(packet.component))
+    .map(packet => [packet.component, packet.model]), reels.map((component, i) => [component, expected[i]]));
+  assert(!updates.some(packet => packet.constructor.name === 'IfSetObject' && reels.includes(packet.component)),
+    'native reel geometry must never be replaced by scaled inventory objects');
+  for (let column = 0; column < 3; column++) {
+    const component = id(types.Component, `inter_64:com_${16 + column}`);
+    const target = (word >> (6 + 2 * column)) & 3;
+    assert.equal(updates.find(packet => packet.constructor.name === 'IfSetText' && packet.component === component)?.text,
+      lockLabels[target], 'target text names the native symbol');
+  }
+}
 function button(p, suffix) {
   assert(new IfButtonHandler().handle(new IfButton(id(types.Component, `inter_64:${suffix}`)), p), `native lock button ${suffix}`);
 }
@@ -24,6 +49,37 @@ function solve(p) {
   button(p, 'com_19');
 }
 export default function register() {
+  check('Arnav renders native symbols and matching labels through every reel rotation', () => {
+    let p = player(); run(p, '[proc,macro_arnav_start]');
+    const beforeOpen = p.messages.length;
+    open(p);
+    assertReels(p, beforeOpen);
+    for (let target = 0; target < 4; target++) {
+      // Labelled puzzle fixture: cover every target label without relying on random draws.
+      p.setVar(v('macro_transmit'), (target << 6) | (target << 8) | (target << 10));
+      for (let column = 0; column < 3; column++) {
+        for (const [component, step] of [[20 + column, 1], [23 + column, 3]]) {
+          for (let turn = 0; turn < 4; turn++) {
+            const before = p.getVar(v('macro_transmit'));
+            const since = p.messages.length;
+            button(p, `com_${component}`);
+            const shift = column * 2;
+            const next = (((before >> shift) & 3) + step) % 4;
+            assert.equal(p.getVar(v('macro_transmit')), (before & ~(3 << shift)) | (next << shift),
+              'only the clicked reel changes, with wraparound in either direction');
+            assertReels(p, since);
+          }
+        }
+      }
+    }
+    p.closeModal();
+    p = reconnect(p);
+    const afterRelog = p.messages.length;
+    open(p);
+    assertReels(p, afterRelog);
+    solve(p);
+    assert.equal(count(p, 'coins'), 240);
+  });
   check('Arnav native reel completion stays at the current tile and grants once after real relog', () => {
     let p = player();
     run(p, '[debugproc,macro_arena1]', ['arnav'], { protect: false });
