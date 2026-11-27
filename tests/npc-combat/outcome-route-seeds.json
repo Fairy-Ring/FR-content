@@ -3097,6 +3097,58 @@
           "54_50"
         ]
       }
+    },
+    {
+      "script": "[ai_opplayer2,chickenquest_evil_chicken]",
+      "npc": "chickenquest_evil_chicken",
+      "style": "magic",
+      "distance": 4,
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,chickenquest_evil_chicken]",
+      "npc": "chickenquest_evil_chicken",
+      "style": "magic",
+      "distance": 4,
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_opplayer2,_rfd_finale_boss]",
+      "npc": "hundred_culinaromancer_final",
+      "style": "magic",
+      "distance": 4,
+      "prelude": "rfd-finale",
+      "playerVars": {
+        "hundred_main_quest_var": 4, "hundred_subquest_tally": 8,
+        "hundred_dwarf_quest": 10, "100goblin": 10, "100_pirate_quest_var": 10,
+        "100guide_prog": 10, "hundred_dave_main": 7, "100_ogre_prog": 10,
+        "chickenquest": 10, "hundred_ilm_quest": 10
+      },
+      "privateRegion": {
+        "enter": "[proc,rfd_finale_enter]",
+        "leave": "[oploc1,hundred_exit_portal]",
+        "maps": ["29_83", "50_50"]
+      },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
+    },
+    {
+      "script": "[ai_applayer2,_rfd_finale_boss]",
+      "npc": "hundred_culinaromancer_final",
+      "style": "magic",
+      "distance": 4,
+      "prelude": "rfd-finale",
+      "playerVars": {
+        "hundred_main_quest_var": 4, "hundred_subquest_tally": 8,
+        "hundred_dwarf_quest": 10, "100goblin": 10, "100_pirate_quest_var": 10,
+        "100guide_prog": 10, "hundred_dave_main": 7, "100_ogre_prog": 10,
+        "chickenquest": 10, "hundred_ilm_quest": 10
+      },
+      "privateRegion": {
+        "enter": "[proc,rfd_finale_enter]",
+        "leave": "[oploc1,hundred_exit_portal]",
+        "maps": ["29_83", "50_50"]
+      },
+      "seeds": { "hit": 2654435769, "miss": 2415085441, "zero": 1992887715 }
     }
   ]
 }
