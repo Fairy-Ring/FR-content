@@ -1,0 +1,101 @@
+// Public test world only (engine NODE_PUBLIC_TEST; command public_test).
+// UNKNOWN: engineering test-world feature, not authentic content. Copies of the Lumbridge
+// general store keeper (generalshopkeeper1, no new npc config) stand in seven banks and sell the
+// nine public_test_* shops for 0gp with infinite stock (scripts/shop/scripts/shop.rs2).
+// The Lumbridge keeper at 0_50_50_9_47 keeps its normal dialogue and shop.
+
+// Run once by the engine after the map loads, only when NODE_PUBLIC_TEST is true.
+[proc,world_startup_public_test]
+if (public_test = false) {
+    return;
+}
+~public_test_add_shopkeeper(0_49_53_46_48); // Varrock West Bank
+~public_test_add_shopkeeper(0_50_53_53_29); // Varrock East Bank
+~public_test_add_shopkeeper(0_48_54_21_39); // Edgeville Bank
+~public_test_add_shopkeeper(0_48_50_22_44); // Draynor Bank
+~public_test_add_shopkeeper(0_41_51_29_20); // Ardougne East South Bank
+~public_test_add_shopkeeper(0_40_52_57_5); // Ardougne East North Bank
+~public_test_add_shopkeeper(0_42_54_37_36); // Seers' Village Bank
+
+[proc,public_test_add_shopkeeper](coord $coord)
+if (npc_find($coord, generalshopkeeper1, 0, 0) = false) {
+    npc_add($coord, generalshopkeeper1, ^max_32bit_int);
+}
+
+// True for an active generalshopkeeper1 standing on a public test bank tile of a public test world.
+[proc,public_test_bank_shopkeeper]()(boolean)
+if (public_test = false) {
+    return (false);
+}
+def_coord $coord = npc_coord;
+if ($coord = 0_49_53_46_48 | $coord = 0_50_53_53_29 | $coord = 0_48_54_21_39 | $coord = 0_48_50_22_44
+    | $coord = 0_41_51_29_20 | $coord = 0_40_52_57_5 | $coord = 0_42_54_37_36) {
+    return (true);
+}
+return (false);
+
+// Trade: the bank copies open Tools & Basics; Lumbridge keeps its own shop.
+[opnpc3,generalshopkeeper1]
+if (~public_test_bank_shopkeeper = true) {
+    ~public_test_openshop(1);
+    return;
+}
+~openshop_activenpc;
+
+// Talk-to on a bank copy (from [opnpc1,generalshopkeeper1]): two pages of shop categories.
+[label,public_test_shop_menu]
+def_int $choice = ~p_choice5("Tools & Basics", 1, "Rares & Fun Items", 2, "Runes, Essence & Jewellery", 3, "Farming Seeds & Supplies", 4, "More shops...", 0);
+if ($choice = 0) {
+    $choice = ~p_choice5("Ores, Bars & Skilling Materials", 5, "Herbs & Herblore Secondaries", 6, "Slayer Gear & Supplies", 7, "Food & Potions", 8, "Combat Gear", 9);
+}
+~public_test_openshop($choice);
+
+[proc,public_test_openshop](int $choice)
+switch_int ($choice) {
+    case 1 : ~openshop(public_test_tools, 1000, 1000, 0, "Tools & Basics");
+    case 2 : ~openshop(public_test_rares, 1000, 1000, 0, "Rares & Fun Items");
+    case 3 : ~openshop(public_test_runes, 1000, 1000, 0, "Runes, Essence & Jewellery");
+    case 4 : ~openshop(public_test_farming, 1000, 1000, 0, "Farming Seeds & Supplies");
+    case 5 : ~openshop(public_test_skilling, 1000, 1000, 0, "Ores, Bars & Skilling Materials");
+    case 6 : ~openshop(public_test_herblore, 1000, 1000, 0, "Herbs & Herblore Secondaries");
+    case 7 : ~openshop(public_test_slayer, 1000, 1000, 0, "Slayer Gear & Supplies");
+    case 8 : ~openshop(public_test_food, 1000, 1000, 0, "Food & Potions");
+    case 9 : ~openshop(public_test_combat, 1000, 1000, 0, "Combat Gear");
+}
+
+// True while a public test world player has one of the nine 0gp shops open.
+[proc,public_test_shop]()(boolean)
+if (public_test = false) {
+    return (false);
+}
+if (%shop = public_test_tools | %shop = public_test_rares | %shop = public_test_runes
+    | %shop = public_test_farming | %shop = public_test_skilling | %shop = public_test_herblore
+    | %shop = public_test_slayer | %shop = public_test_food | %shop = public_test_combat) {
+    return (true);
+}
+return (false);
+
+// 0gp, infinite stock: give the shop's obj (noted for bulk supplies, see public_test_shop_obj)
+// without taking coins or shop stock, one at a time so Buy 5/10 stop cleanly when the
+// inventory fills.
+[label,public_test_buy_item](obj $obj, int $amount)
+if ($obj = null | inv_total(%shop, $obj) < 1) {
+    return;
+}
+def_namedobj $give = enum(obj, namedobj, public_test_shop_obj, $obj);
+if ($give = null) {
+    return;
+}
+def_int $i = 0;
+while ($i < $amount) {
+    if (inv_itemspace(inv, $give, 1, inv_size(inv)) = false) {
+        if ($i > 0) {
+            wealth_event(^wealth_shop_buy, oc_debugname($give), $i, 0);
+        }
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    inv_add(inv, $give, 1);
+    $i = calc($i + 1);
+}
+wealth_event(^wealth_shop_buy, oc_debugname($give), $i, 0);

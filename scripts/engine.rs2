@@ -1078,6 +1078,8 @@
 [command,map_live]()(boolean)
 // info: Return true when the tutorial skip is available
 [command,tutorial_skip]()(boolean)
+// info: Return true on a public test world (engine NODE_PUBLIC_TEST)
+[command,public_test]()(boolean)
 // info: Start tracking time
 [command,timespent]
 // info: Get the time spent since the timespent command was ran. This can be ^micros or ^millis

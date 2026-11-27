@@ -1,4 +1,9 @@
-[opnpc1,generalshopkeeper1] @generalshop_help; //Lumbridge
+[opnpc1,generalshopkeeper1] //Lumbridge; public test bank copies (scripts/public_test) open the 0gp shop menu
+if (~public_test_bank_shopkeeper = true) {
+    @public_test_shop_menu;
+}
+@generalshop_help;
+
 [opnpc1,generalassistant1] @generalshop_help; //Lumbridge
 [opnpc1,generalshopkeeper2] @generalshop_help; //Varrock
 [opnpc1,generalassistant2] @generalshop_help; //Varrock

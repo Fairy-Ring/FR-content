@@ -39,6 +39,11 @@ if (%shop = tai_bwo_wannai_cooperative | %shop = tai_bwo_wannai_drinksies) {
 return ("gp");
 
 [proc,can_sell_obj](obj $item)(boolean)
+// Public test 0gp shops never buy (NODE_PUBLIC_TEST only; scripts/public_test).
+if (~public_test_shop = true) {
+    mes("You can't sell items to this shop.");
+    return (false);
+}
 def_boolean $item_is_tradable = oc_tradeable(oc_uncert($item));
 if ($item = coins | $item = village_trade_sticks) {
     mes("You can't sell this item to a shop.");
@@ -77,6 +82,10 @@ mes("<$item_name>: currently costs <tostring($item_value)> <$payname>.");
 
 // Buy an item from the shop
 [label,buy_item](obj $obj, int $amount)
+// Public test 0gp infinite-stock shops (NODE_PUBLIC_TEST only; scripts/public_test).
+if (~public_test_shop = true) {
+    @public_test_buy_item($obj, $amount);
+}
 def_namedobj $pay = ~shop_pay_obj;
 def_string $payname = ~shop_pay_name;
 def_int $i = 0;
@@ -160,6 +169,10 @@ return (calc($diff - $base));
 
 // Purchase cost at a specifc stack count
 [proc,adjusted_item_cost_buying](obj $obj, int $diff)(int)
+// Public test 0gp shops (NODE_PUBLIC_TEST only; scripts/public_test).
+if (~public_test_shop = true) {
+    return (0);
+}
 def_int $cost = oc_cost($obj);
 def_int $value = ~calc_shop_value($cost, %shop_haggle, %shop_sell, ~price_mod(%shop, $diff, $obj));
 // Unlike sell values, shop purchase values can't be 0 (I believe...), not entirely sure if this is how
