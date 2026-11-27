@@ -14,6 +14,7 @@ switch_obj (last_useitem) {
 }
 
 [opheldu,bucket_milk]
+if (~rfd_amik_milk_cream() = true) return;
 switch_obj (last_useitem) {
     case cocktail_shaker : @add_cocktail_ingredient(last_item);
     case cake_tin : @make_uncooked_cake;

@@ -2,8 +2,9 @@
 // Hold greegree in greegree zones → equip → transmogrify; leave zone → force unequip.
 // Full MM quest not required for this slice.
 
-// Zones from 289 quest_mm.rs2 ~mm_greegree_zone (Ape Atoll + crash island + Ardougne zoo strip)
+// Original areas plus the RFD Ape caves; the Crash Island snake cave stays separate.
 [proc,mm_greegree_zone](coord $coord)(boolean)
+if (inzone(^rfd_awowogei_nut_cave_min, ^rfd_awowogei_nut_cave_max, $coord) = true | inzone(^rfd_awowogei_chamber_min, ^rfd_awowogei_chamber_max, $coord) = true) return(true);
 if (inzone(0_42_42_0_0, 2_43_43_63_63, $coord) = true | inzone(0_42_142_0_0, 0_43_142_63_63, $coord) = true | inzone(0_40_51_32_1, 0_41_51_15_23, $coord) = true | inzone(0_41_71_0_0, 0_41_71_63_63, $coord) = true | inzone(0_43_143_0_0, 0_43_143_63_63, $coord) = true) {
     return(true);
 }

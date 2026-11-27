@@ -17,6 +17,15 @@ if (%garden_quest = 1 & %fenk_charos_unlocked = 0 & (%swansong < 5 | %swansong >
     @garden_wom_quiz;
     return;
 }
+if (%chickenquest = ^rfd_amik_vanilla_added & ~rfd_amik_gate() = true) {
+    def_int $topic = ~p_choice2("Strange beasts.", 1, "Swan Song.", 2);
+    if ($topic = 1) {
+        if (~p_choice2("The Evil Chicken.", 1, "Never mind.", 2) = 1) {
+            @rfd_amik_wom_warning;
+        }
+        return;
+    }
+}
 if (%swansong < 5) {
     return;
 }

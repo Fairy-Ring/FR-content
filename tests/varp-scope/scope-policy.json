@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "hundred_ilm_var_1": "Original transmitted RFD Awowogei recipe and sample progress and the adjacent Amik story flag survive logout; session cooking state remains separate.",
     "magic_carpet_var": "UNKNOWN engineering recovery: original transmitted rug selector slot 499 saves the paid destination 1..8 until landing or login/logout recovery, then resets to zero.",
     "templetrek_main_var": "Original slot 700 retains an earned reward token's point value across logout; transient route, selection and visibility fields are reset or derived on login.",
     "twocats_planted_at": "UNKNOWN engineering timestamp in reserved original slot 326; persists so Unferth's planted potatoes mature across logout without losing four consumed seeds.",
@@ -409,6 +410,7 @@
     "desert": "Current desert-heat timer; the inherited name is temporary.",
     "feud_trial_villager": "Session-only active distracted, lured or unconscious trial villager UID; logout releases it while original saved quest checkpoints remain.",
     "soulbane_instance": "Owned emotion-room region UID plus one; leaving, logout and death discard the encounter, not completed-room progress.",
+    "rfd_finale_uid": "UNKNOWN engineering session token in reserved original slot 424; private finale instance UID plus one is discarded on departure and login while completed waves remain permanent.",
     "pest_instance": "Current Pest Control queue marker or owned match region UID plus one. Login, logout and departure discard participation.",
     "pest_activity": "Transient activity in assigned original server-only slot 239 is abandoned with the match; entry, leaving and login reset it before any reward.",
     "soulbane_unprotected": "Current emotion-room fear encounter, anger meter and illusion hit counters; unfinished rooms restart after leaving or logout.",
@@ -723,7 +725,7 @@
     "hopper_full": "perm",
     "hundred_dave": "perm",
     "hundred_dwarf": "perm",
-    "hundred_ilm_var_1": "temp",
+    "hundred_ilm_var_1": "perm",
     "hunt": "perm",
     "hunt_store_employed": "perm",
     "iban_staff_charges": "perm",
@@ -1076,7 +1078,7 @@
     "brewing_clock": "perm",
     "dt_stranger_uid": "temp",
     "teleblock_until": "temp",
-    "varp424_unused": "temp",
+    "rfd_finale_uid": "temp",
     "varp426_unused": "temp",
     "varp428_unused": "temp",
     "macro_arena_clock": "temp",
@@ -1236,6 +1238,8 @@
     "blast_furnace_access_until": "perm"
   },
   "declarationReasons": {
+    "hundred_ilm_var_1": "Original RFD recipe, sample and adjacent Amik story progress must survive logout.",
+    "rfd_finale_uid": "UNKNOWN engineering session token in reserved original server-only slot 424; never transmitted.",
     "templetrek_main_var": "Earned reward-token points persist until the original token is redeemed at Burgh de Rott's repaired bank booth.",
     "templetrek_temp_var": "Session-only owned Temple Trekking health, route, obstacle and combat state; every departure clears the run and repeat entry rebuilds it.",
     "ahoy_puzzle_state": "Reserved original slot stores permanent model flag dyes, pending ecto-tokens and the crone manual hand-in.",

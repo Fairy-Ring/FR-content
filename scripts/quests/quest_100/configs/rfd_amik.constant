@@ -1,0 +1,38 @@
+// UNKNOWN engineering stages reuse the existing chickenquest varp; no new varp/varbit.
+^rfd_amik_inspected = 1
+^rfd_amik_aris_spoken = 2
+^rfd_amik_cook_spoken = 3
+^rfd_amik_milky_mixture = 4
+^rfd_amik_cornflour_mixture = 5
+^rfd_amik_vanilla_added = 6
+^rfd_amik_wom_warned = 7
+^rfd_amik_egg_added = 8
+^rfd_amik_cinnamon_added = 9
+
+// UNKNOWN map-derived coordinates; packed-map playability does not establish historical landings.
+^rfd_amik_lair_min = 0_38_68_0_0
+^rfd_amik_lair_max = 0_38_68_63_63
+^rfd_amik_shrine_coord = 0_38_69_21_61
+^rfd_amik_lair_entry = 0_38_68_28_4
+^rfd_amik_chicken_spawn = 0_38_68_6_40
+^rfd_amik_lair_portal = 0_38_68_27_2
+^rfd_amik_shrine_return = 0_38_69_20_61
+
+// Map parameters from the existing Lumbridge mill script.
+^rfd_amik_hopper_coord = 2_49_51_30_43
+^rfd_amik_millbase_coord = 0_49_51_30_42
+
+// UNKNOWN engineering lifetime for action-summoned route NPCs; not applied to map spawns.
+^rfd_amik_spawn_duration = 2147483647
+// UNKNOWN engineering search radius for placing K'klik beside the summoner.
+^rfd_amik_fairy_spawn_min = 0
+^rfd_amik_fairy_spawn_max = 2
+
+// CANDIDATE later Old School combat fallback; original supplied melee/HP fields remain unchanged.
+^rfd_amik_chicken_magic = 200
+^rfd_amik_chicken_maxhit = 21
+^rfd_amik_chicken_attack_ticks = 4
+// UNKNOWN reach inherited from the existing Evil Chicken attack pattern.
+^rfd_amik_chicken_attack_range = 5
+// UNKNOWN bounded service lifetime; retaining the token permits another summon.
+^rfd_amik_fairy_duration = 100

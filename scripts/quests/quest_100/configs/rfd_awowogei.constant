@@ -1,0 +1,48 @@
+// VERIFIED route requirements: RuneHQ capture, 15 April 2006.
+// UNKNOWN stage allocation and map-derived travel endpoints.
+^rfd_awowogei_started = 1
+^rfd_awowogei_king_spoken = 2
+^rfd_awowogei_recipe_learned = 3
+^rfd_awowogei_wrong_food_rejected = 4
+^rfd_awowogei_first_batch_eaten = 5
+^rfd_awowogei_second_batch = 6
+^rfd_awowogei_prepared = 7
+^rfd_awowogei_stuffed = 8
+^rfd_awowogei_cooked = 9
+^rfd_awowogei_cooking_level = 70
+^rfd_awowogei_agility_level = 48
+// UNKNOWN engineering delays for the native visual transitions.
+^rfd_awowogei_cook_delay = 2
+^rfd_awowogei_pull_delay = 2
+// UNKNOWN bounded return-wrapper lifetime, refreshed after entering or relogging.
+^rfd_awowogei_return_duration = 1000
+// UNKNOWN map-derived landing tiles. The cache provides no route coordinates.
+^rfd_awowogei_red_tree = 0_42_43_8_33
+^rfd_awowogei_nut_bush = 0_47_85_12_17
+^rfd_awowogei_cave_entry = 0_47_85_17_17
+^rfd_awowogei_cave_exit = 0_43_42_6_41
+^rfd_awowogei_hot_rock = 0_47_85_48_44
+^rfd_awowogei_temple_trapdoor = 0_43_43_55_33
+// UNKNOWN safe upstairs landing beside Hafuba.
+^rfd_awowogei_teleport_destination = 1_43_43_44_46
+// UNKNOWN internal server row key matching the original component ordinal.
+^rfd_awowogei_spell = 569
+// CANDIDATE 74 Magic XP, represented in tenths.
+^rfd_awowogei_spell_xp = 740
+
+// UNKNOWN walkable landing choices around the retained native route anchors.
+^rfd_awowogei_snake_pit = 0_45_42_41_33
+^rfd_awowogei_snake_entry = 0_47_85_15_49
+^rfd_awowogei_snake_rope = 0_47_85_15_48
+^rfd_awowogei_nut_hole = 0_43_42_6_41
+// The original L1 rope is bridge-adjusted to runtime L0.
+^rfd_awowogei_temple_basement = 0_43_143_56_49
+^rfd_awowogei_temple_crack = 0_43_143_53_47
+^rfd_awowogei_chamber_min = 0_47_85_32_32
+^rfd_awowogei_chamber_max = 0_47_85_63_63
+^rfd_awowogei_chamber_entry = 0_47_85_53_43
+^rfd_awowogei_chamber_return = 0_47_85_54_43
+
+// UNKNOWN address mapping for the Ape Atoll nut cave; the snake pit is separate.
+^rfd_awowogei_nut_cave_min = 0_47_85_0_0
+^rfd_awowogei_nut_cave_max = 0_47_85_31_31

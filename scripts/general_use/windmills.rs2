@@ -20,10 +20,21 @@
 // The grain slides down the chute
 [oplocu,millbase]
 if (last_useitem = pot_empty) {
-    @millbase_take;
+    @millbase_use;
 } else {
     ~displaymessage(^dm_default);
 }
+
+[aplocu,millbase]
+if (last_useitem ! pot_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@millbase_use;
 
 [oploc1,millbase]
 if(%millcheck_multi = 1 & %flour > 0) @millbase_take;
@@ -35,10 +46,24 @@ if(%millcheck_multi = 1 & %flour > 0) @millbase_take;
 
 [oplocu,millbase_flour]
 if (last_useitem = pot_empty) {
-    @millbase_take;
+    @millbase_use;
 } else {
     ~displaymessage(^dm_default);
 }
+
+[aplocu,millbase_flour]
+if (last_useitem ! pot_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@millbase_use;
+[label,millbase_use]
+if (~rfd_amik_take_cornflour() = true) return;
+@millbase_take;
 
 [label,millbase_take]
 if (%flour > 0) {
@@ -68,7 +93,24 @@ if (inv_total(inv, pot_empty) < 1) {
     }
 }
 
-[oplocu,hopper_full] // OSRS never changes to this loc?
+[oplocu,hopper_full] @mill_hopper_fill;
+[aplocu,hopper_full]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@mill_hopper_fill;
+
+[oplocu,_hopper_nonfull] @mill_hopper_fill;
+[aplocu,_hopper_nonfull]
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@mill_hopper_fill;
+
+[label,mill_hopper_fill]
+if (~rfd_amik_sweetcorn_insert() = true) return;
 if (last_useitem = grain) {
     if(%hopper_full = ^false) {
         %hopper_full = ^true;
@@ -81,21 +123,6 @@ if (last_useitem = grain) {
 } else {
     ~displaymessage(^dm_default);
 }
-
-[oplocu,_hopper_nonfull]
-if (last_useitem = grain) {
-    if(%hopper_full = ^false) {
-        %hopper_full = ^true;
-        anim(human_pickuptable, 0);
-        mes("You put the grain in the hopper.");
-        inv_delslot(inv, last_useslot);
-        return;
-    }
-    mes("There is already grain in the hopper.");
-} else {
-    ~displaymessage(^dm_default);
-}
-
 [oploc1,_hoppercontrol]
 def_coord $hopper_coord = loc_param(hopper_coord);
 def_coord $millbase_coord = loc_param(millbase_coord);
@@ -116,6 +143,7 @@ if (%hopper_full = ^true) {
     %hopper_full = ^false;
     %millcheck_multi = 1;
     %flour = add(%flour, 1);
+    ~rfd_amik_mark_cornflour_ready($hopper_coord);
     if (%flour = 30) {
         mes("The flour bin downstairs is now full.");
     }

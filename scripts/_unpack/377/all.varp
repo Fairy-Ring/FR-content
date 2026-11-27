@@ -720,8 +720,6 @@ scope=perm
 [favour_key_ring]
 scope=perm
 
-[varp424_unused]
-
 [varp426_unused]
 
 [varp428_unused]
@@ -1106,9 +1104,6 @@ scope=perm
 [100_ogre]
 transmit=yes
 scope=perm
-
-[hundred_ilm_var_1]
-transmit=yes
 
 [varp686_unused]
 

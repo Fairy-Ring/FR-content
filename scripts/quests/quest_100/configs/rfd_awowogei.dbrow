@@ -1,0 +1,11 @@
+// CANDIDATE XP; UNKNOWN destination tile. The spell button is in the 377 standard book.
+[magic_spell_teleport_ape_atoll]
+table=magic_spell_table
+data=spell,^rfd_awowogei_spell
+data=spellcom,magic:com_569
+data=name,Teleport to Ape Atoll
+data=members,true
+data=levelrequired,64
+data=runesrequired,firerune,2,waterrune,2,lawrune,2,null,null
+data=experience,^rfd_awowogei_spell_xp
+data=tele_coord,^rfd_awowogei_teleport_destination
