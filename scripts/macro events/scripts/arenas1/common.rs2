@@ -89,10 +89,15 @@ if (inv_itemspace(inv, $item, $quantity, inv_size(inv)) = true) {
         mes("Reward stored in your bank.");
     } else {
         def_coord $drop = %macro_event_origin_coord;
+        if (%macro_event = ^macro_arnav) $drop = coord;
         if (%macro_event = ^macro_lost_and_found) $drop = %macro_event_target_coord;
         if ($drop = null | $drop = 0_0_0_0_0) $drop = coord;
         obj_add($drop, $item, $quantity, ^lootdrop_duration);
-        mes("Your reward is on the ground at your return location.");
+        if (%macro_event = ^macro_arnav) {
+            mes("Your reward is on the ground.");
+        } else {
+            mes("Your reward is on the ground at your return location.");
+        }
     }
 }
 

@@ -32,9 +32,10 @@ if (coord ! $target) {
 if (%macro_event ! ^macro_lost_and_found) {
     return;
 }
-mes("There has been a fault in the teleportation matrix.");//no idea where this line break should go... doesn't fit like the video shows
-mes("Please operate the odd appendage out to be forwarded to your destination.");
-~mesbox("There has been a fault in the teleportation matrix. Please operate the|odd appendage out to be forwarded to your destination.");
+// CANDIDATE wording: random-events.wording-lost-and-found-58.
+mes("There has been a fault in the teleportation matrix.");
+mes("Please operate the odd appendage to be forwarded to your destination.");
+~mesbox("There has been a fault in the teleportation matrix. Please operate the|odd appendage to be forwarded to your destination.");
 
 [proc,randomize_appendages]
 def_int $state1 = random(8);
@@ -89,7 +90,8 @@ switch_int ($check) {
         }
 }
 if ($correct = false) {
-    //mes here?
+    // CANDIDATE wording: random-events.wording-lost-and-found-59.
+    mes("You operate the appendage to no good effect.");
     stat_drain(magic, 10, 0);//drains magic by 10, no damage per RSW
     p_delay(0);
     ~randomize_appendages;

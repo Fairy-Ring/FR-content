@@ -1,5 +1,5 @@
-// VERIFIED source range: one or two correct feeds; sal-scaperune-pre.body#155-168.
-// UNKNOWN engineering choices: fixed two-feed threshold, four-way native-cluster draw, and UI text.
+// CANDIDATE feed range: one or two correct feeds; random-events.value-bob-count.
+// UNKNOWN engineering choices: fixed two-feed threshold, four-way native-cluster draw, and remaining UI text.
 // Native source: seven evil_bob_net OBJ placements and four fishing_spot_8986 cardinal clusters in maps/m39_74.jm2.
 [proc,macro_bob_start](stat $training)
 if ($training ! fishing & $training ! magic) return;
@@ -37,7 +37,7 @@ return(false);
 
 [opnpc1,macro_evil_bob_male_servant]
 if (~macro_arena1_owned(^macro_bob) = false) return;
-~mesbox("Speak with the female servant to learn which fishing spot to use.");
+~mesbox("I mean... L-l-l-leave me alone!");
 
 [opnpc1,macro_evil_bob_female_servant]
 if (~macro_arena1_owned(^macro_bob) = false) return;
@@ -53,12 +53,12 @@ if (~macro_arena1_owned(^macro_bob) = false) return;
 if (~macro_bob_sleeping = true) {
     ~mesbox("Evil Bob is asleep. Use the nearby portal to leave.");
 } else {
-    ~mesbox("Evil Bob is hungry. Bring him a raw fish.");
+    ~mesbox("I will never let you go, <displayname>! Bring me a raw fish.");
 }
-
-[oplocu,fishing_spot_8986]
+[proc,macro_bob_fish](obj $net)
 if (~macro_arena1_owned(^macro_bob) = false) return;
-if (last_useitem ! evil_bob_net | inv_total(inv, evil_bob_net) = 0) return;
+if ($net ! net & $net ! evil_bob_net) return;
+if (inv_total(inv, $net) = 0) return;
 def_namedobj $fish = evil_bob_cooked_fish_incorrect;
 if (~macro_bob_spot_direction = getbit_range(%macro_transmit, 0, 1)) $fish = evil_bob_cooked_fish_correct;
 if (inv_itemspace(inv, $fish, 1, inv_size(inv)) = false) {
@@ -66,6 +66,22 @@ if (inv_itemspace(inv, $fish, 1, inv_size(inv)) = false) {
     return;
 }
 inv_add(inv, $fish, 1);
+
+[oploc1,fishing_spot_8986]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+// `net` is the packed standard item with debugname Small fishing net; evil_bob_net is the event copy.
+if (inv_total(inv, net) > 0) {
+    ~macro_bob_fish(net);
+} else if (inv_total(inv, evil_bob_net) > 0) {
+    ~macro_bob_fish(evil_bob_net);
+} else {
+    mes("You need a small fishing net.");
+}
+
+[oplocu,fishing_spot_8986]
+if (~macro_arena1_owned(^macro_bob) = false) return;
+if (last_useitem ! net & last_useitem ! evil_bob_net) return;
+~macro_bob_fish(last_useitem);
 
 [oplocu,uncooking_pot]
 if (~macro_arena1_owned(^macro_bob) = false) return;
@@ -109,9 +125,9 @@ if ($fish = evil_bob_uncooked_fish_incorrect) {
     if ($required < ^macro_bob_count_max) {
         $required = add($required, 1);
         %macro_transmit = setbit_range_toint(%macro_transmit, $required, 16, 28);
-        ~mesbox("Evil Bob rejects the fish. His appetite has increased.");
+        ~mesbox("What was this? That was absolutely disgusting! His appetite has increased.");
     } else {
-        ~mesbox("Evil Bob rejects the fish.");
+        ~mesbox("What was this? That was absolutely disgusting!");
     }
     return;
 }
@@ -126,7 +142,7 @@ if (~macro_bob_sleeping = true) {
     }
     ~mesbox("Evil Bob falls asleep. Use the nearby portal to leave.");
 } else {
-    ~mesbox("Evil Bob accepts the fish. Bring him another.");
+    ~mesbox("Now get me another one, you no good human!");
 }
 
 [oploc1,portal_8987]

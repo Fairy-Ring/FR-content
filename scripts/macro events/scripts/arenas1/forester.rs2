@@ -1,6 +1,6 @@
 // VERIFIED task, carcass and rewards: random-events.freaky-forester-task / -rewards.
 // CANDIDATE success, wrong hand-in and saved-origin exit: value-forester-success-origin / -wrong.
-// UNKNOWN functional UI, equal tail weights, no deadline, and no wrong-kill cap; no recovered dialogue.
+// UNKNOWN equal tail weights, no deadline and no wrong-kill cap. CANDIDATE task wording: wording-freaky-forester-2/5.
 [proc,macro_forester_start]
 if (~macro_arena1_enter(^macro_forester, 0_40_74_40_38) = false) return;
 %macro_transmit = setbit_range_toint(%macro_transmit, random(^macro_forester_tail_weights), 0, 1);
@@ -9,14 +9,14 @@ if (~macro_arena1_enter(^macro_forester, 0_40_74_40_38) = false) return;
 [proc,macro_forester_status]
 if (~macro_arena1_owned(^macro_forester) = false) return;
 if (getbit_range(%macro_transmit, 2, 2) = 1) {
-    ~mesbox("The requested carcass is accepted. Use the portal to return.");
+    ~mesbox("Thanks, <displayname()>, you may use the portal to leave the area now.");
     return;
 }
 switch_int (getbit_range(%macro_transmit, 0, 1)) {
-    case 0 : ~mesbox("UNKNOWN task: find the one-tailed pheasant and bring its carcass to the Forester."); return;
-    case 1 : ~mesbox("UNKNOWN task: find the two-tailed pheasant and bring its carcass to the Forester."); return;
-    case 2 : ~mesbox("UNKNOWN task: find the three-tailed pheasant and bring its carcass to the Forester."); return;
-    case 3 : ~mesbox("UNKNOWN task: find the four-tailed pheasant and bring its carcass to the Forester."); return;
+    case 0 : ~mesbox("Hey there, <displayname()>. Can you kill the one tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+    case 1 : ~mesbox("Hey there, <displayname()>. Can you kill the two tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+    case 2 : ~mesbox("Hey there, <displayname()>. Can you kill the three tailed pheasant please. Bring me the raw pheasant when you're done."); return;
+    case 3 : ~mesbox("Hey there, <displayname()>. Can you kill the four tailed pheasant please. Bring me the raw pheasant when you're done."); return;
 }
 
 

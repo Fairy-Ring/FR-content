@@ -34,6 +34,8 @@ if (~macro_event_lost = true) ~macro_overworld_finish(^macro_arnav);
 
 [opnpc1,macro_combilock_pirate]
 if (~macro_arena1_owned(^macro_arnav) = false | %macro_event_uid ! npc_uid | %npc_macro_event_target ! uid) return;
+// CANDIDATE wording: random-events.wording-capt-arnav-29; applies to the original treasure symbols too.
+mes("There are three columns. What you need to do for me is to match up each picture with the word underneath the column, and then unlock the chest.");
 ~macro_arnav_screen;
 
 [proc,macro_arnav_symbol](int $index)(obj)
@@ -79,12 +81,15 @@ def_int $after = modulo(add($before, $direction), 4);
 [if_button,inter_64:com_19]
 if (~macro_arena1_owned(^macro_arnav) = false) return;
 if (getbit_range(%macro_transmit, 0, 5) = getbit_range(%macro_transmit, 6, 11)) {
+    // CANDIDATE wording: random-events.wording-capt-arnav-30.
+    mes("Ah, well done matey, that's the right combination. Here, have a little somethin' for helpin' me out.");
     ~macro_arena1_give(coins, ^macro_arnav_coins);
-    ~macro_arena1_return(^macro_arnav);
+    ~macro_event_cleanup(^macro_arnav, %macro_event_uid);
+    if_close;
 } else {
     %macro_transmit = add(%macro_transmit, 4096);
-    // UNKNOWN minimal functional feedback, not reconstructed pirate speech.
-    mes("The combination is incorrect.");
+    // CANDIDATE wording: random-events.wording-capt-arnav-31.
+    mes("Arrr! That be nowhere near close! Did ye not listen the first time around?");
     if (getbit_range(%macro_transmit, 12, 15) >= ^macro_arnav_attempts) {
         ~macro_arena1_fail(^macro_arnav);
     } else {

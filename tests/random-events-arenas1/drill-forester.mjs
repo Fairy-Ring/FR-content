@@ -20,7 +20,12 @@ const DRILL_EVENT = 16;
 const FORESTER_EVENT = 18;
 const DRILL_MATS = ['exercise_mat', 'exercise_mat_10077', 'exercise_mat_10078', 'exercise_mat_10079'];
 const EXERCISE_ANIMS = ['emote_run_on_spot', 'emote_situps_5', 'emote_pushups_5', 'emote_starjump_5'];
-const EXERCISE_LABELS = ['jogging in place', 'sit-ups', 'push-ups', 'star jumps'];
+const EXERCISE_ORDERS = [
+  'Get yourself over there and jog on that mat, private!',
+  'Get on that mat and give me sit ups, private!',
+  'Drop and give me push ups on that mat, private!',
+  'I want to see you on that mat doing star jumps, private!'
+];
 const PHEASANTS = ['macro_pheasant_onetail', 'macro_pheasant_twotail', 'macro_pheasant_threetail', 'macro_pheasant_fourtail'];
 const DRILL_OUTFIT = ['drill_top', 'drill_bottoms', 'drill_helm'];
 const FORESTER_OUTFIT = ['laderhosen_top', 'laderhosen_legs', 'laderhosen_hat'];
@@ -188,7 +193,7 @@ export default function register() {
       const messagesBefore = p.messages.length;
       run(p, '[proc,macro_drill_status]');
       assert(p.messages.some((packet, index) => index >= messagesBefore && typeof packet.text === 'string'
-        && packet.text.includes(EXERCISE_LABELS[state.target])), 'order text names the original native sign');
+        && packet.text === EXERCISE_ORDERS[state.target]), 'order uses the retained candidate instruction for the native sign');
       const name = DRILL_MATS[state.signs.indexOf(code)];
       const { loc } = nativeLoc(name, 49, 75);
       const seq = types.SeqType.get(id(types.SeqType, animation));

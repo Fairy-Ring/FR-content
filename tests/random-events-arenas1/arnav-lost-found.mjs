@@ -24,7 +24,7 @@ function solve(p) {
   button(p, 'com_19');
 }
 export default function register() {
-  check('Arnav real entry, reel buttons, unique completion and saved-origin return', () => {
+  check('Arnav native reel completion stays at the current tile and grants once after real relog', () => {
     let p = player();
     run(p, '[debugproc,macro_arena1]', ['arnav'], { protect: false });
     assert.equal(p.getVar(v('macro_event')), 15);
@@ -35,9 +35,13 @@ export default function register() {
     p.closeModal();
     p = reconnect(p);
     assert.equal(p.getVar(v('macro_transmit')), progress, 'native save/load retains reels');
+    const completionTile = [origin[0], origin[1] + 1, origin[2] + 1];
+    [p.level, p.x, p.z] = completionTile;
+    const actorUid = p.getVar(v('macro_event_uid'));
     solve(p);
     assert.equal(count(p, 'coins'), 240);
-    assert.deepEqual(tile(p), origin);
+    assert.deepEqual(tile(p), completionTile, 'in-place success does not teleport to the saved departure');
+    assert(!World.getNpcByUid(actorUid), 'successful completion removes the owned Arnav actor');
     assert.equal(p.getVar(v('macro_event')), 0);
     run(p, '[if_button,inter_64:com_19]');
     assert.equal(count(p, 'coins'), 240, 'stale unlock cannot repeat reward');
@@ -49,7 +53,7 @@ export default function register() {
     if ((word & 63) === ((word >> 6) & 63)) button(p, 'com_20');
     button(p, 'com_19');
     assert.equal(p.getVar(v('macro_event')), 15);
-    assert(p.messages.some(m => m.msg === 'The combination is incorrect.'));
+    assert(p.messages.some(m => m.msg === 'Arrr! That be nowhere near close! Did ye not listen the first time around?'));
     button(p, 'com_19'); button(p, 'com_19');
     assert.equal(count(p, 'coins'), 0);
     assert.notDeepEqual(tile(p), origin, 'period failure sends the player elsewhere');
@@ -64,6 +68,30 @@ export default function register() {
     solve(p);
     assert.equal(count(p, 'coins', bank), 240);
     assert.equal(count(p, 'bronze_dagger'), 28);
+  });
+  check('Arnav native Unlock leaves full-bank overflow at the current tile, not the saved origin', () => {
+    const p = player();
+    run(p, '[proc,macro_arnav_start]');
+    const completionTile = [origin[0], origin[1] + 1, origin[2] + 4];
+    [p.level, p.x, p.z] = completionTile;
+    for (let slot = 0; slot < 28; slot++) give(p, 'bronze_dagger');
+    const coinId = id(types.ObjType, 'coins');
+    const bankSize = types.InvType.get(bank).size;
+    const fillers = types.ObjType.configs.filter(item => item?.tradeable && item.dummyitem === 0
+      && item.certtemplate === -1 && item.id !== coinId).slice(0, bankSize);
+    assert.equal(fillers.length, bankSize, 'packed ordinary item types can fill the native bank');
+    for (const [slot, item] of fillers.entries()) p.invSet(bank, item.id, 1, slot);
+    solve(p);
+    assert.deepEqual(tile(p), completionTile);
+    assert.equal(p.getVar(v('macro_event')), 0);
+    assert.equal(count(p, 'coins'), 0);
+    assert.equal(count(p, 'coins', bank), 0);
+    const reward = World.getObj(completionTile[1], completionTile[2], completionTile[0], coinId, p.username37);
+    assert(reward, 'native reward object is owned and visible at the completion tile');
+    assert.equal(reward.count, 240);
+    assert.equal(World.getObj(origin[1], origin[2], origin[0], coinId, p.username37), null);
+    run(p, '[if_button,inter_64:com_19]');
+    assert.equal(reward.count, 240, 'stale success cannot duplicate the ground reward');
   });
   check('Lost and Found ordinary spell diversion charges once and pays earned compensation once', () => {
     let p = player();

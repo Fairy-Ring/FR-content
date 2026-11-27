@@ -1,6 +1,6 @@
-// VERIFIED source range: Sal describes one or two correct feeds; the fixed two-feed choice is UNKNOWN.
+// CANDIDATE range: one or two correct feeds (random-events.value-bob-count); fixed two is UNKNOWN.
 ^macro_bob_correct_feeds = 2
 // UNKNOWN engineering cap: the required-feed counter occupies thirteen bits.
 ^macro_bob_count_max = 8191
-// UNKNOWN engineering reward amount: 650 XP represented in tenths.
+// VERIFIED reward: 650 XP (random-events.evil-bob-rewards/value-bob-reward); 6500 tenths is an engineering representation.
 ^macro_bob_experience = 6500

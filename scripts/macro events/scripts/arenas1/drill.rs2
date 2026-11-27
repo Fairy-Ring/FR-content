@@ -26,15 +26,18 @@ while ($fourth = $first | $fourth = $second | $fourth = $third) {
 %macro_transmit = setbit_range_toint(%macro_transmit, ^macro_drill_required_correct, 10, 29);
 %macro_transmit = setbit_range_toint(%macro_transmit, 0, 30, 30);
 %macro_digger_var_4 = map_clock;
+// CANDIDATE wording: random-events.wording-drill-demon-21.
+mes("Move yourself, Private! Follow my orders and you may, just may, leave here in a fit state for my corps!");
 ~macro_drill_status;
 
 [proc,macro_drill_status]
 if (~macro_arena1_owned(^macro_drill) = false) return;
+// CANDIDATE orders: random-events.wording-drill-demon-22..25.
 switch_int (getbit_range(%macro_transmit, 8, 9)) {
-    case 0 : ~mesbox("UNKNOWN task: use the mat showing jogging in place."); return;
-    case 1 : ~mesbox("UNKNOWN task: use the mat showing sit-ups."); return;
-    case 2 : ~mesbox("UNKNOWN task: use the mat showing push-ups."); return;
-    case 3 : ~mesbox("UNKNOWN task: use the mat showing star jumps."); return;
+    case 0 : ~mesbox("Get yourself over there and jog on that mat, private!"); return;
+    case 1 : ~mesbox("Get on that mat and give me sit ups, private!"); return;
+    case 2 : ~mesbox("Drop and give me push ups on that mat, private!"); return;
+    case 3 : ~mesbox("I want to see you on that mat doing star jumps, private!"); return;
 }
 
 [opnpc1,macro_drilldemon]
@@ -75,6 +78,8 @@ if ($shown = $requested) {
 }
 %macro_transmit = setbit_range_toint(%macro_transmit, $remaining, 10, 29);
 if ($remaining = 0) {
+    // CANDIDATE wording: random-events.wording-drill-demon-27.
+    mes("Well I'll be, you actually did it, Private. Now take this and get out of my sight.");
     def_int $missing = 0;
     if (~obj_gettotal(drill_top) = 0) $missing = add($missing, 1);
     if (~obj_gettotal(drill_bottoms) = 0) $missing = add($missing, 1);
