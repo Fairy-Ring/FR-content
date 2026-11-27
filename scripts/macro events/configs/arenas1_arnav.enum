@@ -1,19 +1,21 @@
 // VERIFIED native lock symbols: models/com/com_i48..com_i51.ob2,
 // pack/model.pack and scripts/interfaces/inter_64.if. Preserve the cache assets.
-// UNKNOWN engineering reel order, retained from the existing four-position puzzle.
+// VERIFIED cyclic top-to-bottom reel order (Tip.It 2006 capt_arnav2.png & OSRS):
+// RING (com_i48/7753) -> COINS (com_i51/7752) -> NECKLACE (com_i49/7750) -> BAR (com_i50/7751).
 [macro_arnav_symbol_models]
 inputtype=int
 outputtype=int
 val=0,7753
-val=1,7750
-val=2,7751
-val=3,7752
+val=1,7752
+val=2,7750
+val=3,7751
 
-// Native symbols: ring (com_i48), necklace (com_i49), diamond (com_i50), coins (com_i51).
+// VERIFIED column labels: RING (inter_64.if:188, OSRS), COINS (inter_64.if:177, Tip.It 2006),
+// NECKLACE (Tip.It 2006), BAR (OSRS, Sal's Realm 2006; com_i50.ob2 is a gold bar, not diamond).
 [macro_arnav_symbol_labels]
 inputtype=int
 outputtype=string
 val=0,RING
-val=1,NECKLACE
-val=2,DIAMOND
-val=3,COINS
+val=1,COINS
+val=2,NECKLACE
+val=3,BAR

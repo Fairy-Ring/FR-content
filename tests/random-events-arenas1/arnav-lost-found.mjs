@@ -4,9 +4,9 @@ const { default: Environment } = await import(pathToFileURL(`${engine}/src/util/
 const { default: IfButtonHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/IfButtonHandler.ts`).href);
 const { default: IfButton } = await import(pathToFileURL(`${engine}/src/network/game/client/model/IfButton.ts`).href);
 const bank = id(types.InvType, 'bank');
-// VERIFIED: inter_64 native reel assets, resolved through pack/model.pack.
-const lockModels = [7753, 7750, 7751, 7752]; // com_i48 ring, com_i49 necklace, com_i50 diamond, com_i51 coins.
-const lockLabels = ['RING', 'NECKLACE', 'DIAMOND', 'COINS'];
+// VERIFIED: inter_64 native reel assets & 2006 cyclic order (Tip.It capt_arnav2.png, pack/model.pack).
+const lockModels = [7753, 7752, 7750, 7751]; // com_i48 ring, com_i51 coins, com_i49 necklace, com_i50 gold bar.
+const lockLabels = ['RING', 'COINS', 'NECKLACE', 'BAR'];
 function assertReels(p, since) {
   const updates = p.messages.slice(since);
   const word = p.getVar(v('macro_transmit'));
