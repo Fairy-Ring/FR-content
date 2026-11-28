@@ -1,5 +1,7 @@
 [proc,macro_quiz_start]
-if (~macro_arena_enter(^macro_quiz, 0_30_74_32_33, false) = false) return;
+// VERIFIED m30_74.jm2: L1 (32,28) is the h1 f8 contestant chair enclosed by 4 inviswalls, facing Quiz Master at (32,32).
+if (~macro_arena_enter(^macro_quiz, 1_30_74_32_28, false) = false) return;
+facesquare(1_30_74_32_32);
 anim(human_sitting_chair, 0);
 %macro_transmit = 0;
 %xplamp = 0;
@@ -8,6 +10,7 @@ softtimer(macro_quiz_keepalive, ^macro_quiz_keepalive_ticks);
 
 [proc,macro_quiz_login]
 if (~macro_arena_active(^macro_quiz) = false) return;
+facesquare(1_30_74_32_32);
 anim(human_sitting_chair, 0);
 softtimer(macro_quiz_keepalive, ^macro_quiz_keepalive_ticks);
 if (%macro_transmit >= ^macro_quiz_round_count) {
@@ -48,7 +51,8 @@ def_int $odd_category = random(^macro_quiz_category_count);
 def_int $common_offset = random(^macro_quiz_common_category_offset_count);
 def_int $odd_variant = random(^macro_quiz_variant_count);
 def_int $common_first_variant = random(^macro_quiz_variant_count);
-def_int $common_second_variant = random(^macro_quiz_variant_count);
+// Always pair the two distinct variants of the common category so no question shows duplicate items.
+def_int $common_second_variant = sub(1, $common_first_variant);
 def_int $question = multiply($odd_category, ^macro_quiz_odd_category_stride);
 $question = add($question, multiply($common_offset, ^macro_quiz_common_offset_stride));
 $question = add($question, multiply($odd_variant, ^macro_quiz_odd_variant_stride));

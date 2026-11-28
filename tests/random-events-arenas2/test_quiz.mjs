@@ -18,13 +18,13 @@ const nativeObjs = [
   'macro_quiz_tool1', 'macro_quiz_tool2',
   'macro_quiz_jewel1', 'macro_quiz_jewel2',
 ].map(name => obj(name));
-const question = ({ odd, offset, oddVariant, commonFirst, commonSecond, correct }) => [odd, offset, oddVariant, commonFirst, commonSecond, correct];
+const question = ({ odd, offset, oddVariant, commonFirst, correct }) => [odd, offset, oddVariant, commonFirst, correct];
 
 function enter(drawsForQuestion) {
   const p = player();
   draws({ [questionProc]: [...drawsForQuestion] }, () => run(p, '[proc,macro_event_general_spawn]', [event]));
   assert.equal(p.getVar(v('macro_event')), event);
-  assert.deepEqual(tile(p), [0, 1952, 4769], 'Quiz Master entry reaches the assigned native scene tile');
+  assert.deepEqual(tile(p), [1, 1952, 4764], 'Quiz Master entry reaches the native L1 contestant chair tile');
   assert.equal(p.modalChat, id('Component', 'pick_the_odd_one_out'));
   assert.equal(p.modalTutorial, -1, 'questions use chat modal so sarnie_rotate animates');
   return p;
@@ -36,8 +36,9 @@ function renderedObjs(p) {
   const byComponent = new Map(updates.map(packet => [packet.component, [packet.obj, packet.scale]]));
   return components.map(component => byComponent.get(component));
 }
-function expectedObjs({ odd, offset, oddVariant, commonFirst, commonSecond, correct }) {
+function expectedObjs({ odd, offset, oddVariant, commonFirst, correct }) {
   const common = offset >= odd ? offset + 1 : offset;
+  const commonSecond = 1 - commonFirst;
   let seen = 0;
   return [0, 1, 2].map(slot => {
     if (slot === correct) return [nativeObjs[odd * 2 + oddVariant], 180];
@@ -60,10 +61,12 @@ function openPrizeDialogue(p) {
 for (let odd = 0; odd < 5; odd++) {
   for (let oddVariant = 0; oddVariant < 2; oddVariant++) {
     for (let correct = 0; correct < 3; correct++) {
-      const spec = { odd, offset: (odd + 1) % 4, oddVariant, commonFirst: 0, commonSecond: 1, correct };
+      const spec = { odd, offset: (odd + 1) % 4, oddVariant, commonFirst: 0, correct };
       check(`Quiz native category ${odd} variant ${oddVariant} correct position ${correct}`, () => {
         const p = enter(question(spec));
-        assert.deepEqual(renderedObjs(p), expectedObjs(spec));
+        const shown = renderedObjs(p);
+        assert.deepEqual(shown, expectedObjs(spec));
+        assert.equal(new Set(shown.map(([o]) => o)).size, 3, 'all three displayed items are distinct');
         assert.equal(p.getVar(v('macro_transmit')), 0);
         assert.equal(p.getVar(v('xplamp')) % 3, correct);
         run(p, '[proc,macro_arena_return]', [event]);
