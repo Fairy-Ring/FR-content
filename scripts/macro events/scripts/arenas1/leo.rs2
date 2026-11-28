@@ -62,46 +62,57 @@ switch_int ($coffin) {
 }
 return(0);
 
-[proc,macro_leo_stone](int $group)(obj)
+// VERIFIED 377 model.pack ids for the five headstone symbol carvings (adjacent to com_i739=13399).
+[proc,macro_leo_stone_model](int $group)(int)
 switch_int ($group) {
-    case 1 : return(macro_digger_stonemine);
-    case 2 : return(macro_digger_stonecook);
-    case 3 : return(macro_digger_stoneaxe);
-    case 4 : return(macro_digger_stonespade);
-    case 5 : return(macro_digger_stonevase);
+    case 1 : return(13401); // obj_macro_digger_stonemine
+    case 2 : return(13400); // obj_macro_digger_stonecook
+    case 3 : return(13398); // obj_macro_digger_stoneaxe
+    case 4 : return(13402); // obj_macro_digger_stonespade
+    case 5 : return(13403); // obj_macro_digger_stonevase
 }
-return(macro_digger_stonemine);
+return(13401);
 
-[proc,macro_leo_show_item](obj $item)
-~objbox($item, "The coffin contains this item.", 250, 0, 0);
+[proc,macro_leo_clear_coffin_ui]
+if_setobject(inter_383:com_4, null, 100);
+if_setobject(inter_383:com_5, null, 100);
+if_setobject(inter_383:com_6, null, 100);
+if_setobject(inter_383:com_7, null, 100);
+if_setobject(inter_383:com_8, null, 100);
+if_setobject(inter_383:com_9, null, 100);
+if_setobject(inter_383:com_10, null, 100);
+if_setobject(inter_383:com_11, null, 100);
+if_setobject(inter_383:com_12, null, 100);
 
 [proc,macro_leo_inspect](int $coffin)
 if (~macro_arena1_owned(^macro_leo) = false) return;
 def_int $group = ~macro_leo_coffin_group($coffin);
 %macro_digger_interface_temp = $coffin;
+~macro_leo_clear_coffin_ui;
 if ($group = 1) {
-    ~macro_leo_show_item(macro_digger_skull);
-    ~macro_leo_show_item(macro_digger_bones);
-    ~macro_leo_show_item(macro_digger_apron);
-    ~macro_leo_show_item(macro_digger_nuggets);
-    ~macro_leo_show_item(macro_digger_pick_axe);
+    if_setobject(inter_383:com_4, macro_digger_skull, 180);
+    if_setobject(inter_383:com_5, macro_digger_bones, 180);
+    if_setobject(inter_383:com_6, macro_digger_apron, 180);
+    if_setobject(inter_383:com_7, macro_digger_nuggets, 180);
+    if_setobject(inter_383:com_8, macro_digger_pick_axe, 180);
 } else if ($group = 2) {
-    ~macro_leo_show_item(macro_digger_bowl_empty);
-    ~macro_leo_show_item(macro_digger_cake);
-    ~macro_leo_show_item(macro_digger_chefshat);
-    ~macro_leo_show_item(macro_digger_kebab);
-    ~macro_leo_show_item(macro_digger_knife);
+    if_setobject(inter_383:com_4, macro_digger_bowl_empty, 180);
+    if_setobject(inter_383:com_5, macro_digger_cake, 180);
+    if_setobject(inter_383:com_6, macro_digger_chefshat, 180);
+    if_setobject(inter_383:com_7, macro_digger_kebab, 180);
+    if_setobject(inter_383:com_8, macro_digger_knife, 180);
 } else if ($group = 3) {
-    ~macro_leo_show_item(macro_digger_hatchet);
-    ~macro_leo_show_item(macro_digger_woodlogs);
+    if_setobject(inter_383:com_4, macro_digger_hatchet, 180);
+    if_setobject(inter_383:com_5, macro_digger_woodlogs, 180);
 } else if ($group = 4) {
-    ~macro_leo_show_item(macro_digger_dibber);
-    ~macro_leo_show_item(macro_digger_potato_seeded);
-    ~macro_leo_show_item(macro_digger_secateurs);
+    if_setobject(inter_383:com_4, macro_digger_dibber, 180);
+    if_setobject(inter_383:com_5, macro_digger_potato_seeded, 180);
+    if_setobject(inter_383:com_6, macro_digger_secateurs, 180);
 } else if ($group = 5) {
-    ~macro_leo_show_item(macro_digger_pot_empty);
-    ~macro_leo_show_item(macro_digger_plant_pot_empty);
+    if_setobject(inter_383:com_4, macro_digger_pot_empty, 180);
+    if_setobject(inter_383:com_5, macro_digger_plant_pot_empty, 180);
 }
+if_openmain(inter_383);
 %macro_digger_interface_temp = 0;
 
 [proc,macro_leo_read_stone](int $index)
@@ -115,9 +126,11 @@ switch_int ($index) {
     case 5 : $group = %macro_digger_interface_slot_5;
 }
 %macro_digger_interface_temp = $index;
-~objbox(~macro_leo_stone($group), "This symbol marks the grave for matching coffin contents.", 250, 0, 0);
+// Native 377 headstone interface inter_384; xan=531 matches com_1 (com_i739) so the carved symbol faces the camera.
+if_setmodel(inter_384:com_2, ~macro_leo_stone_model($group));
+if_setangle(inter_384:com_2, 531, 0, 210);
+if_openmain(inter_384);
 %macro_digger_interface_temp = 0;
-
 [proc,macro_leo_take](int $grave_index)
 if (~macro_arena1_owned(^macro_leo) = false) return;
 if (%macro_digger_interface_checker = 1) return;

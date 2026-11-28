@@ -278,8 +278,15 @@ function solveLeo(p, { inspect = false, reconnectAfterTwo = false, verifyWrongLa
   }
 
   if (inspect) {
+    const stoneModels = [0, 13401, 13400, 13398, 13402, 13403];
     for (let index = 0; index < stones.length; index++) {
       run(p, `[oploc1,${leoStoneNames[index]}]`, [], { loc: stones[index].loc });
+      assert.equal(p.modalMain, id(types.Component, 'inter_384'), 'headstone opens native 377 gravestone interface inter_384');
+      const latestModel = p.messages.filter(pkt => pkt.constructor.name === 'IfSetModel' && pkt.component === id(types.Component, 'inter_384:com_2')).at(-1);
+      assert.equal(latestModel?.model, stoneModels[keys[index]], `headstone ${index + 1} renders native carving model for group ${keys[index]}`);
+      const latestAngle = p.messages.filter(pkt => pkt.constructor.name === 'IfSetAngle' && pkt.component === id(types.Component, 'inter_384:com_2')).at(-1);
+      assert.deepEqual([latestAngle?.xan, latestAngle?.yan, latestAngle?.zoom], [531, 0, 210], 'headstone carving faces the camera at inter_384 angle');
+      p.closeModal();
     }
     const mausoleum = locAt('mausoleum', 30, 78).loc;
     run(p, '[oploc1,mausoleum]', [], { loc: mausoleum });
@@ -307,6 +314,8 @@ function solveLeo(p, { inspect = false, reconnectAfterTwo = false, verifyWrongLa
     for (let coffin = 1; coffin <= 5; coffin++) {
       id(types.ObjType, `macro_digger_coffin_object_${coffin}`);
       checkCoffin(p, coffin);
+      assert.equal(p.modalMain, id(types.Component, 'inter_383'), 'coffin Check opens native 377 coffin interface inter_383');
+      p.closeModal();
     }
   }
 
