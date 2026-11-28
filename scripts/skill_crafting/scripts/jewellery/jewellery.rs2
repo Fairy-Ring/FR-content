@@ -354,14 +354,14 @@ if (inv_total(inv, agrith_sigil_mould) > 0 & map_members = ^true) {
     if_sethide(silver_casting:com_136, false);
 }
 
-if_setobject(silver_casting:com_94, nostringstar, 400);
-if_setobject(silver_casting:com_101, nostringsnake, 400);
-if_setobject(silver_casting:com_108, silver_sickle, 400);
-if_setobject(silver_casting:com_115, fenk_conductor, 400);
-if_setobject(silver_casting:com_122, tiara, 400);
+if_setobject(silver_casting:com_94, nostringstar, 100);
+if_setobject(silver_casting:com_101, nostringsnake, 100);
+if_setobject(silver_casting:com_108, silver_sickle, 100);
+if_setobject(silver_casting:com_115, fenk_conductor, 100);
+if_setobject(silver_casting:com_122, tiara, 100);
 // Candidate: item 7637 is the 377 model candidate for the Silvthrill rod.
-if_setobject(silver_casting:com_130, burgh_rod_command1, 400);
-if_setobject(silver_casting:com_137, agrith_sigil, 400);
+if_setobject(silver_casting:com_130, burgh_rod_command1, 100);
+if_setobject(silver_casting:com_137, agrith_sigil, 100);
 
 inv_setslot(silvercast377_commandrod, 0, burgh_rod_command1, 1);
 

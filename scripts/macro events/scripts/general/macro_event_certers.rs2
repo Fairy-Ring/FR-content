@@ -21,7 +21,7 @@ def_int $question = random(6);
 def_int $answer = random(3);
 %npc_int = add(add(100, multiply($question, 3)), $answer);
 if_openmain(inter_293);
-if_setobject(inter_293:com_7, enum(int, obj, macro_certer_objects, $question), 400);
+if_setobject(inter_293:com_7, enum(int, obj, macro_certer_objects, $question), 200);
 if_setrotation(inter_293:com_7, 0, 8);
 if_settext(inter_293:com_1, "A....<oc_name(enum(int, obj, macro_certer_objects, add($question, sub(3, $answer))))>");
 if_settext(inter_293:com_2, "B....<oc_name(enum(int, obj, macro_certer_objects, add($question, sub(4, $answer))))>");

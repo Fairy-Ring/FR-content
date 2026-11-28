@@ -532,7 +532,7 @@ function failureQueue(p) {
   escaped(p, 'punishment');
   assert.equal(p.getVar(v('macro_event')), 0);
 }
-const snacks = ['chocolate_bar', 'square_sandwich', 'roll', 'triangle_sandwich', 'baguette', 'meat_pie', 'kebab'];
+const snacks = ['baguette', 'triangle_sandwich', 'square_sandwich', 'roll', 'meat_pie', 'kebab', 'chocolate_bar'];
 for (let chosen = 0; chosen < snacks.length; chosen++) check(`Sandwich Lady native tray chooses ${snacks[chosen]}`, () => {
   const p = player(), other = player();
   const n = draws({ '[proc,macro_sandwich_lady_spawn]': [chosen] }, () => spawn(p, 14));
@@ -541,8 +541,8 @@ for (let chosen = 0; chosen < snacks.length; chosen++) check(`Sandwich Lady nati
   assert.deepEqual(snapshot(other), before, 'another player cannot open or answer the private tray');
   talk(p, n);
   assert.equal(p.modalMain, id('Component', 'sandwich_tray'));
-  const models = p.packets.filter(packet => packet.constructor.name === 'IfSetObject');
-  for (let i = 0; i < snacks.length; i++) assert(models.some(packet => packet.component === id('Component', `sandwich_tray:com_${i + 1}`) && packet.obj === obj(snacks[i])), `original model ${snacks[i]} is sent`);
+  const overwrites = p.packets.filter(packet => packet.constructor.name === 'IfSetObject');
+  assert.equal(overwrites.length, 0, 'native sandwich_tray models com_i683..com_i689 must not be overwritten by if_setobject');
   assert(button(p, `sandwich_tray:com_${chosen + 1}`), 'native button handler accepts the displayed food');
   assert.equal(count(p, snacks[chosen]), 1);
   assert.equal(p.getVar(v('macro_event')), 0);

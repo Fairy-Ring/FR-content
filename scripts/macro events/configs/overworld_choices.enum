@@ -22,14 +22,14 @@ val=10,gold_ring
 val=11,lobster
 
 // CANDIDATE seven original foods. Equal weights subtract the 2022 stale-baguette change.
-// Order follows the original tray model identities, not a replacement interface.
+// VERIFIED 377 sandwich_tray.if native model order (com_1..com_7 = com_i683..com_i689).
 [macro_sandwich_foods]
 inputtype=int
 outputtype=namedobj
-val=0,chocolate_bar
-val=1,square_sandwich
-val=2,roll
-val=3,triangle_sandwich
-val=4,baguette
-val=5,meat_pie
-val=6,kebab
+val=0,baguette
+val=1,triangle_sandwich
+val=2,square_sandwich
+val=3,roll
+val=4,meat_pie
+val=5,kebab
+val=6,chocolate_bar

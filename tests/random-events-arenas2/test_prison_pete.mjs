@@ -4,9 +4,10 @@ import { advance, check, CollisionType, coord, count, draws, Environment, enviro
 const event = 23;
 const targetProc = '[proc,macro_prison_pete_choose_target]';
 const rewardProc = '[proc,macro_prison_pete_reward]';
-const balloonModels = [10734, 10735, 10736, 10737];
+const balloonModels = [10749, 10750, 10751, 10752];
 const balloonName = index => `prisonpete_balloon${index + 1}`;
-const balloonComponents = ['balloon_animal:com_0', 'balloon_animal:com_4'].map(name => id('Component', name));
+const balloonComponent = id('Component', 'balloon_animal:com_4');
+const barsComponent = id('Component', 'balloon_animal:com_0');
 const sceneRegion = { x: 32, z: 69 };
 
 function enter() {
@@ -81,11 +82,12 @@ function pullLever(p) {
 }
 function assertTargetModel(p, index) {
   assert.equal(p.modalMain, id('Component', 'balloon_animal'));
-  const updates = p.packets
-    .filter(packet => packet.constructor.name === 'IfSetModel' && balloonComponents.includes(packet.component))
-    .slice(-2)
-    .map(packet => [packet.component, packet.model]);
-  assert.deepEqual(updates, balloonComponents.map(component => [component, balloonModels[index]]));
+  const barOverwrites = p.packets.filter(packet => packet.constructor.name === 'IfSetModel' && packet.component === barsComponent);
+  assert.equal(barOverwrites.length, 0, 'prison bars component com_0 must not be overwritten');
+  const latest = p.packets
+    .filter(packet => packet.constructor.name === 'IfSetModel' && packet.component === balloonComponent)
+    .at(-1);
+  assert.equal(latest?.model, balloonModels[index], `balloon_animal:com_4 displays static interface model ${balloonModels[index]}`);
 }
 function popBalloon(p, index) {
   const name = balloonName(index);

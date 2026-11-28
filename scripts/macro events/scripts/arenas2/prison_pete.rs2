@@ -76,7 +76,6 @@ if (~macro_arena_active(^macro_prison_pete) = false) return;
 ~macro_prison_pete_sync;
 if (~macro_prison_pete_target >= ^macro_prison_pete_balloon_count) return;
 def_int $model = enum(int, int, macro_prison_pete_balloon_models, ~macro_prison_pete_target);
-if_setmodel(balloon_animal:com_0, $model);
 if_setmodel(balloon_animal:com_4, $model);
 if_settext(balloon_animal:com_2, "Pop the matching balloon.");
 if_openmain(balloon_animal);

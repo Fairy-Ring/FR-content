@@ -23,3 +23,7 @@
 ^macro_quiz_box_gem_amount = 1
 // CANDIDATE Aug 2006 source; nature-rune outcome is not pre-target evidence.
 ^macro_quiz_box_naturerune_amount = 20
+// UNKNOWN engineering scale for 60x60 pick_the_odd_one_out slots via if_setobject.
+^macro_quiz_item_scale = 180
+// UNKNOWN engineering anti-stranding reopen cadence (ticks) when player dismisses chat modal.
+^macro_quiz_keepalive_ticks = 2

@@ -3,11 +3,13 @@ if (~macro_arena_enter(^macro_quiz, 0_30_74_32_33, false) = false) return;
 anim(human_sitting_chair, 0);
 %macro_transmit = 0;
 %xplamp = 0;
+softtimer(macro_quiz_keepalive, ^macro_quiz_keepalive_ticks);
 ~macro_quiz_choose_question;
 
 [proc,macro_quiz_login]
 if (~macro_arena_active(^macro_quiz) = false) return;
 anim(human_sitting_chair, 0);
+softtimer(macro_quiz_keepalive, ^macro_quiz_keepalive_ticks);
 if (%macro_transmit >= ^macro_quiz_round_count) {
     %xplamp = ^macro_quiz_prize_sentinel;
     ~macro_quiz_show_prize;
@@ -16,10 +18,30 @@ if (%macro_transmit >= ^macro_quiz_round_count) {
 ~macro_quiz_show_question;
 
 [proc,macro_quiz_cleanup]
+clearsofttimer(macro_quiz_keepalive);
+clearqueue(macro_quiz_reopen);
+clearqueue(macro_quiz_prize_prompt);
 anim(null, 0);
 tut_close;
 if_close;
 
+[softtimer,macro_quiz_keepalive]
+if (~macro_arena_active(^macro_quiz) = false) {
+    clearsofttimer(macro_quiz_keepalive);
+    return;
+}
+if (busy = false) {
+    if (%macro_transmit >= ^macro_quiz_round_count) {
+        if (getqueue(macro_quiz_prize_prompt) = 0) queue*(macro_quiz_prize_prompt, 0)();
+    } else if (getqueue(macro_quiz_reopen) = 0) {
+        queue*(macro_quiz_reopen, 0)();
+    }
+}
+
+[queue,macro_quiz_reopen]
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (busy = true) return;
+~macro_quiz_show_question;
 [proc,macro_quiz_choose_question]
 if (~macro_arena_active(^macro_quiz) = false) return;
 def_int $odd_category = random(^macro_quiz_category_count);
@@ -64,36 +86,36 @@ while ($slot < ^macro_quiz_answer_count) {
         else $variant = $common_second_variant;
         $common_seen = add($common_seen, 1);
     }
-    def_int $model = enum(int, int, macro_quiz_item_models, add(multiply($category, ^macro_quiz_variant_count), $variant));
+    def_namedobj $item = enum(int, namedobj, macro_quiz_item_models, add(multiply($category, ^macro_quiz_variant_count), $variant));
     switch_int($slot) {
-        case 0 : if_setmodel(pick_the_odd_one_out:com_5, $model);
-        case 1 : if_setmodel(pick_the_odd_one_out:com_6, $model);
-        case 2 : if_setmodel(pick_the_odd_one_out:com_7, $model);
+        case 0 : if_setobject(pick_the_odd_one_out:com_5, $item, ^macro_quiz_item_scale);
+        case 1 : if_setobject(pick_the_odd_one_out:com_6, $item, ^macro_quiz_item_scale);
+        case 2 : if_setobject(pick_the_odd_one_out:com_7, $item, ^macro_quiz_item_scale);
     }
     $slot = add($slot, 1);
 }
-// Restore the native question framing after a previous IF_SETOBJECT prize page.
-if_setangle(pick_the_odd_one_out:com_5, 0, 0, 400);
-if_setangle(pick_the_odd_one_out:com_6, 0, 0, 400);
-if_setangle(pick_the_odd_one_out:com_7, 0, 0, 446);
 if_sethide(pick_the_odd_one_out:com_5, ^false);
 if_sethide(pick_the_odd_one_out:com_6, ^false);
 if_sethide(pick_the_odd_one_out:com_7, ^false);
 // UNKNOWN functional prompt; the native interface supplies the screen layout.
 if_settext(pick_the_odd_one_out:com_8, "Pick the odd one out.");
-// Sticky chat prevents viewport-click stranding; Java 377 keeps these framed models static.
-tut_open(pick_the_odd_one_out);
+// Native chatbox modal runs Client.updateInterfaceAnimation so sarnie_rotate spins the items;
+// macro_quiz_keepalive reopens if the player dismisses the modal via the viewport.
+if_openchat(pick_the_odd_one_out);
 
 [proc,macro_quiz_show_prize]
 if (~macro_arena_active(^macro_quiz) = false) return;
-if_setobject(pick_the_odd_one_out:com_5, coins, 500);
-if_setobject(pick_the_odd_one_out:com_6, macro_quiz_mystery_box, 500);
-if_sethide(pick_the_odd_one_out:com_5, ^false);
-if_sethide(pick_the_odd_one_out:com_6, ^false);
-if_sethide(pick_the_odd_one_out:com_7, ^true);
-// UNKNOWN functional prompt; the prize choices are source-backed.
-if_settext(pick_the_odd_one_out:com_8, "Choose a prize.");
-tut_open(pick_the_odd_one_out);
+if_close;
+if (getqueue(macro_quiz_prize_prompt) = 0) queue*(macro_quiz_prize_prompt, 0)();
+
+[queue,macro_quiz_prize_prompt]
+if (~macro_arena_active(^macro_quiz) = false) return;
+if (%macro_transmit ! ^macro_quiz_round_count | %xplamp ! ^macro_quiz_prize_sentinel) return;
+// CANDIDATE retained transcript (wiki-osrs-13240710.txt:42-50): Quiz Master prize choice dialogue.
+~chatnpc_specific("Quiz Master", macro_magneson, "<p,happy>@blu@CONGRATULATIONS@bla@! You are a @dre@WINNER@bla@! Please choose your @blu@PRIZE@bla@!");
+def_int $choice = ~p_choice2("1000 Coins", 1, "Mystery Box", 2);
+if ($choice = 1) ~macro_quiz_choose_cash;
+else if ($choice = 2) ~macro_quiz_choose_box;
 
 [if_button,pick_the_odd_one_out:com_5] ~macro_quiz_button(0);
 [if_button,pick_the_odd_one_out:com_6] ~macro_quiz_button(1);
@@ -105,7 +127,7 @@ if (%macro_transmit >= ^macro_quiz_round_count) return;
 if ($choice ! calc(%xplamp % ^macro_quiz_question_stride)) {
     // UNKNOWN functional retry prompt; preserve the complete question identity.
     if_settext(pick_the_odd_one_out:com_8, "Wrong. Try again.");
-    tut_open(pick_the_odd_one_out);
+    if_openchat(pick_the_odd_one_out);
     return;
 }
 %macro_transmit = add(%macro_transmit, 1);
@@ -133,12 +155,7 @@ if_close;
 if (~macro_arena_active(^macro_quiz) = false) return;
 if (%macro_transmit < ^macro_quiz_round_count) {
     ~macro_quiz_answer($choice);
-    return;
 }
-if (%macro_transmit ! ^macro_quiz_round_count | %xplamp ! ^macro_quiz_prize_sentinel) return;
-if ($choice = 0) ~macro_quiz_choose_cash;
-else if ($choice = 1) ~macro_quiz_choose_box;
-
 
 [opheld1,macro_quiz_mystery_box]
 ~macro_quiz_open_box;

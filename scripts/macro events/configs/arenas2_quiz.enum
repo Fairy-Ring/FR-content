@@ -1,17 +1,18 @@
-// VERIFIED 377 model.pack ids for the two native variants in each category.
+// VERIFIED 377 antimacro.obj quiz items grouped by their five native categories
+// (food, weapon, armour, tool, jewel), two variants each, carrying native 2dzoom/2dxan/2dyan/recol.
 [macro_quiz_item_models]
 inputtype=int
-outputtype=int
-val=0,8830
-val=1,8831
-val=2,8837
-val=3,8828
-val=4,8834
-val=5,8833
-val=6,8836
-val=7,8838
-val=8,8835
-val=9,8832
+outputtype=namedobj
+val=0,macro_quiz_food1
+val=1,macro_quiz_food2
+val=2,macro_quiz_weapon1
+val=3,macro_quiz_weapon2
+val=4,macro_quiz_armour1
+val=5,macro_quiz_armour2
+val=6,macro_quiz_tool1
+val=7,macro_quiz_tool2
+val=8,macro_quiz_jewel1
+val=9,macro_quiz_jewel2
 
 // CANDIDATE pre-target Tip.It: a valuable uncut gem may appear in the box.
 // The four-species selection and equal draw are UNKNOWN engineering defaults.

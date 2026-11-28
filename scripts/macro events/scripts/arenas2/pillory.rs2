@@ -1,6 +1,7 @@
 // VERIFIED period task: Tip.It 28 April 2006, Pillory section.
 // VERIFIED: wrong key adds locks up to five and enforces 15 seconds (pre-target official KB).
-// UNKNOWN functional wording, uniform shape/cage/reward draws and native model pairing.
+// VERIFIED 377 .ob2 geometry + visual pairing: locks 9753/9754/9755 <-> keys 9749/9750/9751 (diamond/square/circle).
+// UNKNOWN functional wording and uniform shape/cage/reward draws.
 [proc,macro_pillory_start]
 if (map_members = ^false) return;
 def_coord $cage;

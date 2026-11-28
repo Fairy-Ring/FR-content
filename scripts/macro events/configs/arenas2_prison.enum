@@ -1,11 +1,12 @@
-// VERIFIED 377 model.pack ids for the four native balloon NPC models.
+// VERIFIED 377 static interface balloon models (com_i681, model_10750..10752) matching
+// npc_3119..3122 vertex/face counts (118/230, 110/210, 142/282, 170/320).
 [macro_prison_pete_balloon_models]
 inputtype=int
 outputtype=int
-val=0,10734
-val=1,10735
-val=2,10736
-val=3,10737
+val=0,10749
+val=1,10750
+val=2,10751
+val=3,10752
 
 // CANDIDATE source category: one noted uncut gem; exact species draw is UNKNOWN.
 [macro_prison_pete_reward_gems]
